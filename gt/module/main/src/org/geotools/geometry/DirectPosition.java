@@ -52,8 +52,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @see java.awt.geom.Point2D
  */
-public class DirectPosition implements org.opengis.spatialschema.geometry.DirectPosition,
-                                       Position, Serializable
+public final class DirectPosition implements org.opengis.spatialschema.geometry.DirectPosition,
+                                             Position, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -61,11 +61,9 @@ public class DirectPosition implements org.opengis.spatialschema.geometry.Direct
     private static final long serialVersionUID = 9071833698385715524L;
     
     /**
-     * The ordinates of the direct position. Consider as final.
-     * The only method to modify the reference is {@link #clone}.
-     * This array is read and written by {@link Envelope}.
+     * The ordinates of the direct position.
      */
-    double[] ordinates;
+    public final double[] ordinates;
 
     /**
      * The coordinate reference system for this position, or <code>null</code>.
@@ -347,13 +345,6 @@ public class DirectPosition implements org.opengis.spatialschema.geometry.Direct
      * Returns a deep copy of this position.
      */
     public Object clone() {
-        try {
-            DirectPosition p = (DirectPosition) super.clone();
-            p.ordinates = (double[]) p.ordinates.clone();
-            return p;
-        } catch (CloneNotSupportedException exception) {
-            // Should not happen, since we are cloneable.
-            throw new AssertionError(exception);
-        }
+        return new DirectPosition(ordinates);
     }
 }

@@ -128,7 +128,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
-public abstract class Coverage extends PropertySourceImpl /*implements org.opengis.coverage.Coverage*/ {
+public abstract class Coverage extends PropertySourceImpl implements org.opengis.coverage.Coverage {
     /**
      * The set of default axis name.
      */
@@ -720,8 +720,8 @@ public abstract class Coverage extends PropertySourceImpl /*implements org.openg
                                 point2D.y = y;
                                 csToGrid.inverseTransform(point2D, point2D);
                                 if (area==null || area.contains(point2D)) {
-                                    coordinate.setOrdinate(xAxis, point2D.x);
-                                    coordinate.setOrdinate(yAxis, point2D.y);
+                                    coordinate.ordinates[xAxis] = point2D.x;
+                                    coordinate.ordinates[yAxis] = point2D.y;
                                     iterator.setPixel(evaluate(coordinate, samples));
                                 } else {
                                     iterator.setPixel(padNaNs);
@@ -827,16 +827,16 @@ public abstract class Coverage extends PropertySourceImpl /*implements org.openg
             float[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
             final org.geotools.geometry.DirectPosition coordinate =
-              new org.geotools.geometry.DirectPosition(this.coordinate);
-            coordinate.setOrdinate(1, startY);
+                    new org.geotools.geometry.DirectPosition(this.coordinate);
+            coordinate.ordinates[1] = startY;
             for (int j=0; j<countY; j++) {
-                coordinate.setOrdinate(0, startX);
+                coordinate.ordinates[0] = startX;
                 for (int i=0; i<countX; i++) {
                     buffer = evaluate(coordinate, buffer);
                     real[index++] = buffer[element];
-                    coordinate.setOrdinate(0, coordinate.getOrdinate(0) + deltaX);
+                    coordinate.ordinates[0] += deltaX;
                 }
-                coordinate.setOrdinate(1, coordinate.getOrdinate(1) + deltaY);
+                coordinate.ordinates[1] += deltaY;
             }
         }
 
@@ -857,16 +857,16 @@ public abstract class Coverage extends PropertySourceImpl /*implements org.openg
             double[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
             final org.geotools.geometry.DirectPosition coordinate =
-              new org.geotools.geometry.DirectPosition(this.coordinate);
-            coordinate.setOrdinate(1, startY);
+                    new org.geotools.geometry.DirectPosition(this.coordinate);
+            coordinate.ordinates[1] = startY;
             for (int j=0; j<countY; j++) {
-                coordinate.setOrdinate(0, startX);
+                coordinate.ordinates[0] = startX;
                 for (int i=0; i<countX; i++) {
                     buffer = evaluate(coordinate, buffer);
                     real[index++] = buffer[element];
-                    coordinate.setOrdinate(0, coordinate.getOrdinate(0) + deltaX);
+                    coordinate.ordinates[0] += deltaX;
                 }
-                coordinate.setOrdinate(1, coordinate.getOrdinate(1) + deltaY);
+                coordinate.ordinates[1] += deltaY;
             }
         }
     }
