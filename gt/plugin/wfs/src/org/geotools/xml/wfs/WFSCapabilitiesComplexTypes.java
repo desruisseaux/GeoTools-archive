@@ -2,12 +2,23 @@
 package org.geotools.xml.wfs;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.data.wfs.Capability;
+import org.geotools.data.wfs.FeatureSetDescription;
+import org.geotools.data.wfs.WFSCapabilities;
+import org.geotools.data.wms.getCapabilities.Service;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultChoice;
 import org.geotools.xml.schema.DefaultFacet;
 import org.geotools.xml.schema.DefaultSequence;
@@ -114,8 +125,24 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException("Method not completed yet.");
+            if(element == null || value == null)
+                throw new SAXException("SchemaDescriptionLanguage had an erro while parsing -- missing input");
+            if(value.length < 1)
+                throw new SAXException("too few child elements for SchemaDescriptionLanguage");
+            boolean found = false;
+            List results = new LinkedList();
+            for(int i=0;i<value.length;i++){
+                if(value[i].getElement()!=null){
+                    if("XMLSCHEMA".equals(value[i].getElement().getName()))
+                        found = true;
+                    if((value[i].getElement().getName())!=null)
+                        results.add(value[i].getElement().getName());
+                }
+            }
+            if(!found)
+                throw new SAXException("XMLSCHEMA is a required child element, which was not found");
+            return results.size()==0?null:results;
+            
         }
 
         /**
@@ -612,8 +639,14 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            String s = attrs.getValue("","onlineResource");
+            if(s == null || "".equals(s))
+                s = attrs.getValue(WFSSchema.NAMESPACE,"onlineResource");
+            try {
+                return new URL(s);
+            } catch (MalformedURLException e) {
+                return null;
+            }
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -625,8 +658,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return URL.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
@@ -703,15 +735,30 @@ public class WFSCapabilitiesComplexTypes {
              * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
              */
             public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-                // TODO Auto-generated method stub
-                throw new SAXNotSupportedException();
+                if(element == null || value == null)
+                    throw new SAXException("Error occured in HTTPType: both an element and value param is required");
+                
+                if(value.length<1)
+                    throw new SAXException("Must have atleast one http type defined.");
+                
+                Capability c = new Capability();
+                for(int i=0;i<value.length;i++){
+                    if(value[i].getElement()!=null && value[i].getElement().getName().equals(elements[0].getName())){
+                        // get
+                        c.setGet((URL)value[i].getValue());
+                    }
+                    if(value[i].getElement()!=null && value[i].getElement().getName().equals(elements[1].getName())){
+                        // post
+                        c.setPost((URL)value[i].getValue());
+                    }
+                }
+                return c;
             }
             /**
              * @see org.geotools.xml.schema.Type#getInstanceType()
              */
             public Class getInstanceType() {
-                // TODO Auto-generated method stub
-                return null;
+                return Capability.class;
             }
             /**
              * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
@@ -770,8 +817,14 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            String s = attrs.getValue("","onlineResource");
+            if(s == null || "".equals(s))
+                s = attrs.getValue(WFSSchema.NAMESPACE,"onlineResource");
+            try {
+                return new URL(s);
+            } catch (MalformedURLException e) {
+                return null;
+            }
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -783,8 +836,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return URL.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
@@ -870,15 +922,26 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            if(element == null || value == null)
+                throw new SAXException("Invalid inputs for parsing a GetCapabilitiesType");
+            if(value.length<1)
+                throw new SAXException("Invalid number of inputs for parsing a GetCapabilitiesType");
+            int t = Capability.GET_FEATURE;
+            if(element.getName().equals("GetFeatureWithLock"))
+                t = Capability.GET_FEATURE_WITH_LOCK;
+            Capability[] c = new Capability[value.length];
+            for(int i=0;i<value.length;i++){
+                c[i] = (Capability)value[i];
+                c[i].setType(t);
+            }
+            
+            return c;
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
@@ -934,41 +997,15 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
             Element e = value[0].getElement();
     
-            if (e == null) {
+            if (e == null || value == null) {
                 throw new SAXException(
                     "Internal error, ElementValues require an associated Element.");
             }
     
-            WFSCapability capab = new WFSCapability();
-            capab.setRequest("DCPType");
-    
-            Object request;
-            String vendorSpecificCapabs;
-            request = vendorSpecificCapabs = null;
-    
-            for (int i = 0; i < value.length; i++) {
-                if (elements[0].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
-                    request = value[i].getValue();
-    
-                    capab.setRequest(request);
-                }
-    
-                if (elements[1].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
-                    vendorSpecificCapabs = (String) value[i].getValue();
-    
-                    capab.setVendorSpecificCapabilities(vendorSpecificCapabs);
-                }
-            }
-    
-            // check the required elements 
-            if ((request == null) || (vendorSpecificCapabs == null)) {
-                throw new SAXException(
-                    "Required Service Elements are missing, check"
-                    + " for the existence of Name, Title , or OnlineResource elements.");
-            }
-            return capab;
+            if(value.length!=1)
+                throw new SAXException("Wrong number of elements for DCPType");
+            return (Capability)value[0].getValue();
+            
         }
 
         /**
@@ -996,7 +1033,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return WFSCapability.class;
+            return Capability.class;
         }
 
         /**
@@ -1064,8 +1101,18 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            if(element == null || value == null)
+                throw new SAXException("Invalid inputs for parsing a GetCapabilitiesType");
+            if(value.length<1)
+                throw new SAXException("Invalid number of inputs for parsing a GetCapabilitiesType");
+            
+            Capability[] c = new Capability[value.length];
+            for(int i=0;i<value.length;i++){
+                c[i] = (Capability)value[i];
+                c[i].setType(Capability.LOCK_FEATURE);
+            }
+            
+            return c;
         }
 
         /**
@@ -1079,8 +1126,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
 
         /**
@@ -1171,8 +1217,18 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            
+            if(element == null)
+                throw new SAXException("Element cannot be null -- we should know what we are parsing");
+            if(value == null || value.length == 0)
+                throw new SAXException("We need atleast one value to parse a wfs:RequestType");
+            
+//            Capability[] result = new Capability[value.length];
+            List result = new LinkedList();
+            for(int i=0;i<value.length;i++){
+                result.add(Arrays.asList((Capability[])value[i].getValue()));
+            }
+            return result;
         }
 
         /**
@@ -1186,8 +1242,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
 
         /**
@@ -1227,9 +1282,9 @@ public class WFSCapabilitiesComplexTypes {
                     1, false, null),
                 new WFSElement("Title", XSISimpleTypes.String.getInstance(), 1,
                     1, false, null),
-                new WFSElement("Keywords", XSISimpleTypes.String.getInstance(),
+                 new WFSElement("Abstract", XSISimpleTypes.String.getInstance(),
                     0, 1, false, null),
-                new WFSElement("Abstract", XSISimpleTypes.String.getInstance(),
+                new WFSElement("Keywords", XSISimpleTypes.String.getInstance(),
                     0, 1, false, null),
                 new WFSElement("OnlineResource",
                     XSISimpleTypes.AnyURI.getInstance(), 1, 1, false, null),
@@ -1246,7 +1301,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return WFSService.class;
+            return Service.class;
         }
     
         /**
@@ -1271,62 +1326,46 @@ public class WFSCapabilitiesComplexTypes {
                     "Internal error, ElementValues require an associated Element.");
             }
     
-            String name;
-            String title;
-            String keywords;
-            String onlineResource;
-            String fees;
-            String accessConstraints;
-            name = title = keywords = onlineResource = fees = accessConstraints = null;
-    
-            WFSService service = new WFSService();
+            Service service = new Service("","",null);
     
             for (int i = 0; i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    name = (String) value[i].getValue();
-    
-                    service.setName(name);
+                    service.setName((String) value[i].getValue());
                 }
     
                 if (elements[1].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    title = (String) value[i].getValue();
-    
-                    service.setTitle(title);
+                    service.setTitle((String) value[i].getValue());
                 }
     
                 if (elements[2].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    keywords = (String) value[i].getValue();
-    
-                    service.setKeywords(keywords);
+                    service.setKeywordList(Arrays.asList(((String) value[i].getValue()).split(" ")));
                 }
     
                 if (elements[3].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    onlineResource = (String) value[i].getValue();
-    
-                    service.setOnlineResource(onlineResource);
+                    try {
+                        service.setOnlineResource(((URI) value[i].getValue()).toURL());
+                    } catch (MalformedURLException e1) {
+                        throw new SAXException(e1);
+                    }
                 }
     
                 if (elements[4].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    fees = (String) value[i].getValue();
-    
-                    service.setFees(fees);
+                    service.setFees((String) value[i].getValue());
                 }
     
                 if (elements[5].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    accessConstraints = (String) value[i].getValue();
-    
-                    service.setAccessConstraints(accessConstraints);
+                    service.setAccessConstraints((String) value[i].getValue());
                 }
             }
     
             // check the required elements 
-            if ((name == null) || (title == null) || ((onlineResource) == null)) {
+            if ((service.getName() == null) || (service.getTitle() == null) || ((service.getOnlineResource()) == null)) {
                 throw new SAXException(
                     "Required Service Elements are missing, check"
                     + " for the existence of Name, Title , or OnlineResource elements.");
@@ -1509,7 +1548,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return WFSCapability.class;
+            return Object[].class;
         }
     
         /**
@@ -1526,6 +1565,7 @@ public class WFSCapabilitiesComplexTypes {
          */
 
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+
             Element e = value[0].getElement();
     
             if (e == null) {
@@ -1533,35 +1573,26 @@ public class WFSCapabilitiesComplexTypes {
                     "Internal error, ElementValues require an associated Element.");
             }
     
-            Object request;
-            String vendorSpecificCapabs;
-            request = vendorSpecificCapabs = null;
-    
-            WFSCapability capab = new WFSCapability();
+            Object[] capab = new Object[2];
     
             for (int i = 0; i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    request = value[i].getValue();
-    
-                    capab.setRequest(request);
+                    capab[1] = (Capability[])value[i].getValue();
                 }
     
                 if (elements[1].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    vendorSpecificCapabs = (String) value[i].getValue();
-    
-                    capab.setVendorSpecificCapabilities(vendorSpecificCapabs);
+                    capab[0] = (String) value[i].getValue();
                 }
             }
     
             // check the required elements 
-            if ((request == null) || (vendorSpecificCapabs == null)) {
+            if ((capab[0] == null) || (capab[1] == null)) {
                 throw new SAXException(
                     "Required Service Elements are missing, check"
                     + " for the existence of Name, Title , or OnlineResource elements.");
             }
-    
             return capab;
         }
 
@@ -1669,8 +1700,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return WFSCapabilities.class;
         }
 
         /**
@@ -1693,8 +1723,51 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            
+            if(element!=null)
+            if(element.getType()!=this && !(element.getType() instanceof ComplexType)){
+                ComplexType t = (ComplexType)element.getType();
+                // TODO use equals here
+                while(t!=null && t!=this)
+                    t = t.getParent() instanceof ComplexType?(ComplexType)t.getParent():null;
+                if(t == null)
+                    throw new SAXNotSupportedException("The specified element was not a declared as a WFS_Capabilities element, or derived element");
+            }else{
+                // error -- cannot encode
+                throw new SAXNotSupportedException("The specified element was not a declared as a WFS_Capabilities element, or derived element");
+            }
+            
+            if(value == null || value.length != 4){
+                throw new SAXException("The WFS Capabilites document has the wrong number of children");
+            }
+            
+            WFSCapabilities result = new WFSCapabilities();
+            for(int i=0;i<4;i++){
+                if(elements[0].getName().equals(value[i].getElement().getName())){
+                    // service
+                    result.setService((Service)value[i].getValue());
+                }else{
+                if(elements[1].getName().equals(value[i].getElement().getName())){
+                    // capability
+                    Object[] temp = (Object[])value[i].getValue();
+                    if(temp.length!=2)
+                        throw new SAXException("The WFS Capabilites document has an invalid capability child");
+                    result.setVendorSpecificCapabilities((String)temp[0]);
+                    result.setCapabilities((Capability[])temp[1]);
+                }else{
+                if(elements[2].getName().equals(value[i].getElement().getName())){
+                    // FeatureTypeList
+                    result.setFeatureTypes((FeatureSetDescription[])value[i].getValue());
+                }else{
+                if(elements[3].getName().equals(value[i].getElement().getName())){
+                    // Filter_Capabilities
+                    result.setFilterCapabilities(value[i].getValue());
+                }else{
+                    // error
+                    throw new SAXException("The element "+(value[i].getElement()==null?"null":value[i].getElement().getName())+" was not found as a valid element ...");
+                }}}}
+            }
+            return result;
         }
     }
 
@@ -1755,8 +1828,18 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            if(element == null || value == null)
+                throw new SAXException("Invalid inputs for parsing a GetCapabilitiesType");
+            if(value.length<1)
+                throw new SAXException("Invalid number of inputs for parsing a GetCapabilitiesType");
+            
+            Capability[] c = new Capability[value.length];
+            for(int i=0;i<value.length;i++){
+                c[i] = (Capability)value[i];
+                c[i].setType(Capability.GET_CAPABILITIES);
+            }
+            
+            return c;
         }
 
         /**
@@ -1770,8 +1853,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
 
         /**
@@ -1843,8 +1925,23 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            if(element == null || value == null)
+                throw new SAXException("Invalid inputs for parsing a GetCapabilitiesType");
+            if(value.length<2)
+                throw new SAXException("Invalid number of inputs for parsing a GetCapabilitiesType");
+            
+            Capability[] c = new Capability[value.length-1];
+            List sdl = null;
+            for(int i=0;i<value.length;i++){
+                if(sdl==null && value[i].getElement()!=null && "SchemaDescriptionLanguage".equals(value[i].getElement().getName())){
+                    sdl = (List)value[i].getValue();
+                }else{
+                    c[i] = (Capability)value[i];
+                	c[i].setType(Capability.DESCRIBE_FEATURE_TYPE);
+                }
+            }
+            
+            return c;
         }
 
         /**
@@ -1858,8 +1955,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
 
         /**
@@ -1928,8 +2024,18 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            if(element == null || value == null)
+                throw new SAXException("Invalid inputs for parsing a GetCapabilitiesType");
+            if(value.length<1)
+                throw new SAXException("Invalid number of inputs for parsing a GetCapabilitiesType");
+            
+            Capability[] c = new Capability[value.length];
+            for(int i=0;i<value.length;i++){
+                c[i] = (Capability)value[i];
+                c[i].setType(Capability.TRANSACTION);
+            }
+            
+            return c;
         }
 
         /**
@@ -1943,8 +2049,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Capability[].class;
         }
 
         /**

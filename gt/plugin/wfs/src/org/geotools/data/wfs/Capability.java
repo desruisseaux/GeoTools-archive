@@ -20,12 +20,12 @@ import java.net.URL;
 
 public class Capability {
 
-    public static final int GETCAPABILITIES = 1;
-    public static final int DESCRIBEFEATURETYPE = 2;
+    public static final int GET_CAPABILITIES = 1;
+    public static final int DESCRIBE_FEATURE_TYPE = 2;
     public static final int TRANSACTION = 4;
-    public static final int GETFEATURE = 8;
-    public static final int GETFEATUREWITHLOCK = 16;
-    public static final int LOCKFEATURE = 32;
+    public static final int GET_FEATURE = 8;
+    public static final int GET_FEATURE_WITH_LOCK = 16;
+    public static final int LOCK_FEATURE = 32;
     
     private URL get;
     private URL post;
