@@ -145,7 +145,8 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
         Iterator dsIt = getDSFactories();
         DataStoreFactorySpi dsf = null;
 
-        for (; dsIt.hasNext(); dsf = (DataStoreFactorySpi) dsIt.next()) {
+        for (; dsIt.hasNext(); ) {
+			dsf = (DataStoreFactorySpi) dsIt.next();
             System.out.println("Found datastore " + dsf);
 
             if (dsf != null) {
@@ -387,22 +388,18 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
      * @version $Id
      */
     private static class DSParamsPanel extends JPanel {
-        /** DOCUMENT ME! */
-        private DataStoreFactorySpi.Param[] params;
-
-        /** DOCUMENT ME! */
-        private String[] values;
 
         /** DOCUMENT ME! */
         private JTable table;
+		private ParamsTableModel model;
 
         /**
          * Creates a new DSParamsPanel object.
          */
         public DSParamsPanel() {
             super(new BorderLayout());
-            table = new JTable();
-            table.setModel(new ParamsTableModel());
+			model = new ParamsTableModel();
+            table = new JTable(model);
 
             JScrollPane pane = new JScrollPane(table);
             pane.setPreferredSize(new Dimension(400, 140));
@@ -425,12 +422,12 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
          * @param dsf DOCUMENT ME!
          */
         public void setDataStore(DataStoreFactorySpi dsf) {
-            this.params = dsf.getParametersInfo();
-            values = new String[params.length];
+            model.params = dsf.getParametersInfo();
+            model.values = new String[model.params.length];
 
-            for (int i = 0; i < params.length; i++) {
-                if (params[i].sample != null) {
-                    values[i] = params[i].text(params[i].sample);
+            for (int i = 0; i < model.params.length; i++) {
+                if (model.params[i].sample != null) {
+                    model.values[i] = model.params[i].text(model.params[i].sample);
                 }
             }
 
@@ -447,13 +444,13 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
         public Map getDataStoreParameters() throws Exception {
             Map paramsMap = new HashMap();
 
-            for (int i = 0; i < params.length; i++) {
-                String key = params[i].key;
+            for (int i = 0; i < model.params.length; i++) {
+                String key = model.params[i].key;
                 Object value;
 
-                if (values[i] != null) {
+                if (model.values[i] != null) {
                     try {
-                        value = params[i].parse(values[i]);
+                        value = model.params[i].parse(model.values[i]);
                         paramsMap.put(key, value);
                     } catch (Throwable e) {
                         throw new Exception(e.getMessage(), e);
@@ -467,11 +464,19 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
         /**
          * Uses <code>params/values</code> as data model.
          */
-        private class ParamsTableModel extends DefaultTableModel {
-            /**
+        private static class ParamsTableModel extends DefaultTableModel {
+	        /** DOCUMENT ME! */
+	        DataStoreFactorySpi.Param []params;
+
+	        /** DOCUMENT ME! */
+	        private String[] values;
+
+			/**
              * Creates a new ParamsTableModel object.
              */
             public ParamsTableModel() {
+				super();
+				LOGGER.fine("new ParamsTableModel");
             }
 
             /**
@@ -504,6 +509,8 @@ public abstract class AbstractDSSelectionCard extends WizzardCard {
              * @return DOCUMENT ME!
              */
             public int getRowCount() {
+				System.out.println("params?");
+				System.out.println(params);
                 return (params == null) ? 0 : params.length;
             }
 
