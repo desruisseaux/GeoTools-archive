@@ -283,6 +283,18 @@ public abstract class AbstractConsole implements Runnable {
     }
 
     /**
+     * Executes all instructions (like {@link #run}), but stop at the first error.
+     *
+     * @throws Exception if an instruction failed.
+     */
+    public void executeAll() throws Exception {
+        while ((line=readLine(in)) != null) {
+            execute(line);
+            out.flush();
+        }
+    }
+
+    /**
      * Execute the specified instruction.
      *
      * @param  instruction The instruction to execute.

@@ -37,15 +37,15 @@ public class NumberParserTest extends TestCase {
     private NumberParser numberParser;
 
     /**
-    * Constructs a test case with the given name.
-    */
+     * Constructs a test case with the given name.
+     */
     public NumberParserTest(String name) {
         super(name);
     }
 
     /**
-    * Returns the test suite.
-    */
+     * Returns the test suite.
+     */
     public static Test suite() {
         return new TestSuite(NumberParserTest.class);
     }

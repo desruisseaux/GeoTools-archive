@@ -16,12 +16,13 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc.. 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.cs;
+package org.geotools.referencing;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.awt.geom.IllegalPathStateException;
+import javax.units.SI;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -29,9 +30,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.resources.XMath;
+import org.geotools.referencing.datum.Ellipsoid;
 
 
 /**
@@ -90,7 +89,7 @@ public class GeodeticCalculatorTest extends TestCase {
             180.00, 10000,  14142
         };
         final double             R          = 20000/Math.PI;
-        final Ellipsoid          ellipsoid  = Ellipsoid.createEllipsoid("Test",R,R,Unit.KILOMETRE);
+        final Ellipsoid          ellipsoid  = Ellipsoid.createEllipsoid("Test",R,R,SI.KILO(SI.METER));
         final GeodeticCalculator calculator = new GeodeticCalculator(ellipsoid);
         calculator.setAnchorPoint(0, 45);
         for (int i=0; i<DATA.length; i+=3) {

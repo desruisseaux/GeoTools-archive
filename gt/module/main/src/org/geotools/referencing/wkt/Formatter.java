@@ -48,6 +48,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
@@ -374,7 +375,8 @@ public class Formatter {
             final ParameterValue param = (ParameterValue) parameter;
             // Covariance: Remove cast if covariance is allowed.
             final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
-            Unit unit = descriptor.getUnit();
+            final Unit valueUnit = descriptor.getUnit();
+            Unit unit = valueUnit;
             if (unit!=null && !Unit.ONE.equals(unit)) {
                 if (linearUnit!=null && unit.isCompatible(linearUnit)) {
                     unit = linearUnit;
@@ -391,7 +393,11 @@ public class Formatter {
             buffer.append(symbols.separator);
             buffer.append(symbols.space);
             if (unit != null) {
-                format(param.doubleValue(unit));
+                double value = param.doubleValue(unit);
+                if (!unit.equals(valueUnit)) {
+                    value = XMath.fixRoundingError(value, 9);
+                }
+                format(value);
             } else {
                 appendObject(param.getValue());
             }

@@ -55,7 +55,7 @@ public final class XMath {
     private static final double[] POW10 = {
         1E+00, 1E+01, 1E+02, 1E+03, 1E+04, 1E+05, 1E+06, 1E+07, 1E+08, 1E+09,
         1E+10, 1E+11, 1E+12, 1E+13, 1E+14, 1E+15, 1E+16, 1E+17, 1E+18, 1E+19,
-        1E+20, 1E+21, 1E+22, 1E+23
+        1E+20, 1E+21, 1E+22
     };
 
     /**
@@ -111,15 +111,15 @@ public final class XMath {
      * for small power of 10 but has some rounding error issues (see
      * http://developer.java.sun.com/developer/bugParade/bugs/4358794.html).
      */
-    public static double pow10(final int x) {
-        if (x>=0) {
-            if (x<POW10.length) {
+    public static strictfp double pow10(final int x) {
+        if (x >= 0) {
+            if (x < POW10.length) {
                 return POW10[x];
             }
-        } else if (x!=Integer.MIN_VALUE) {
+        } else if (x != Integer.MIN_VALUE) {
             final int nx = -x;
-            if (nx<POW10.length) {
-                return 1/POW10[nx];
+            if (nx < POW10.length) {
+                return 1 / POW10[nx];
             }
         }
         try {
@@ -246,6 +246,55 @@ public final class XMath {
             }
         }
         return value;
+    }
+
+    /**
+     * Try to remove at least <code>n</code> fraction digits in the string representation of
+     * the specified value. This method try small changes to <code>value</code>, by adding or
+     * substracting a maximum of 4 ulps. If there is no small change that remove at least
+     * <code>n</code> fraction digits, then the value is returned unchanged. This method is
+     * used for hiding rounding errors, like in conversions from radians to degrees.
+     *
+     * <P>Example: <code>XMath.fixRoundingError(-61.500000000000014, 12)</code> returns
+     * <code>-61.5</code>.
+     *
+     * @param  value The value to fix.
+     * @param  n0 The minimum amount of fraction digits.
+     * @return The fixed value, or the unchanged <code>value</code> if there is no small change
+     *         that remove at least <code>n</code> fraction digits.
+     */
+    public static double fixRoundingError(final double value, int n) {
+        double lower = value;
+        double upper = value;
+        n = countFractionDigits(value) - n;
+        if (n > 0) {
+            for (int i=0; i<4; i++) {
+                if (countFractionDigits(lower = previous(lower)) <= n) return lower;
+                if (countFractionDigits(upper = next    (upper)) <= n) return upper;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Count the fraction digits in the string representation of
+     * the specified value. This method is equivalent to a call to
+     * <code>{@linkplain Double#toString(double) Double#toString}(value)</code>
+     * and counting the number of digits after the decimal separator.
+     */
+    public static int countFractionDigits(final double value) {
+        final String asText = Double.toString(value);
+        final int exp = asText.indexOf('E');
+        int upper, power;
+        if (exp >= 0) {
+            upper = exp;
+            power = Integer.parseInt(asText.substring(exp+1));
+        } else {
+            upper = asText.length();
+            power = 0;
+        }
+        while ((asText.charAt(--upper)) == '0');
+        return Math.max(upper - asText.indexOf('.') - power, 0);
     }
 
     /**
@@ -439,6 +488,8 @@ public final class XMath {
      *
      * @param  type The type (may be <code>null</code>).
      * @return The number of bits, or 0 if unknow.
+     *
+     * @todo Use the predefined constants when we will be allowed to use J2SE 1.5.
      */
     public static int getBitCount(final Class type) {
         if (Double   .class.isAssignableFrom(type)) return 64;

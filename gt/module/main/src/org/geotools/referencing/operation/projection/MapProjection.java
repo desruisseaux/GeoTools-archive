@@ -53,6 +53,7 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.resources.XMath;
 
 
 /**
@@ -365,7 +366,28 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     {
         if (descriptors.contains(descriptor)) {
             if (NonSI.DEGREE_ANGLE.equals(descriptor.getUnit())) {
+                /*
+                 * Converts radians to degrees and try to fix rounding error
+                 * (e.g. -61.500000000000014  -->  -61.5). This is necessary
+                 * in order to avoid a bias when formatting a transform and
+                 * parsing it again.
+                 */
                 value = Math.toDegrees(value);
+                double old = value;
+                value = XMath.fixRoundingError(value, 12);
+                if (value == old) {
+                    /*
+                     * The attempt to fix rounding error failed. Try again with the
+                     * assumption that the true value is a multiple of 1/3 of angle
+                     * (e.g. 51.166666666666664  -->  51.166666666666666), which is
+                     * common in the EPSG database.
+                     */
+                    old *= 3;
+                    final double test = XMath.fixRoundingError(old, 12);
+                    if (test != old) {
+                        value = test/3;
+                    }
+                }
             }
             values.parameter(descriptor.getName().getCode()).setValue(value);
         }
