@@ -21,8 +21,12 @@ import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterGroup;
+import org.geotools.parameter.ParameterGroupDescriptor;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -133,7 +137,7 @@ public class WMSFormat extends AbstractGridFormat {
      * </p>
      */
     public ParameterDescriptorGroup getReadParameters() {
-        Parameter params[] = new Parameter[16];
+        GeneralParameterDescriptor params[] = new GeneralParameterDescriptor[16];
 
         WMSParameterMaker maker = new WMSParameterMaker(capabilities);
         params[0] = maker.createVersionReadParam();
@@ -156,7 +160,7 @@ public class WMSFormat extends AbstractGridFormat {
         Map properties = new HashMap();
         properties.put( "name", capabilities.getService().getName() );
         properties.put( "remarks", capabilities.getService().get_abstract() );
-        readParameters = new ParameterGroup( properties, params );
+        readParameters = new ParameterGroupDescriptor( properties, params );
         return readParameters;
     }
 }

@@ -15,19 +15,22 @@
  *
  */
 package org.geotools.data.wms.gce;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Utils;
-import org.geotools.parameter.Parameter;
-
-import org.opengis.metadata.Identifier;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.referencing.IdentifiedObject;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 
 /**
@@ -43,76 +46,53 @@ public class WMSParameterMaker {
         this.capabilities = capabilities;
     }
 
-    public Parameter createVersionReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "VERSION";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the version of the WMS server to be used";
-        param.defaultValue = "1.1.1";
-        param.validValues = new TreeSet();
+	private Map fillProperties(String name, String remarks) {
+		Map properties = new HashMap();
+		
+		properties.put(IdentifiedObject.NAME_PROPERTY, name);
+    	properties.put(IdentifiedObject.REMARKS_PROPERTY, remarks);
 
-        //param.validValues.add("1.0.0");
-        //param.validValues.add("1.1.0");
-        param.validValues.add("1.1.1"); //TODO version support here
+		return properties;
+	}
+    
+    public GeneralParameterDescriptor createVersionReadParam() {
+    	String[] validValues = {"1.0.0", "1.1.0", "1.1.1", "1.3.0" };
 
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createFormatReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "FORMAT";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the desired format";
-        param.validValues = new TreeSet();
-
-        List formats = new ArrayList();
-        String[] formatStrings = capabilities.getRequest().getGetMap()
-                                             .getFormatStrings();
-
-        for (int i = 0; i < formatStrings.length; i++) {
-            formats.add(formatStrings[i]);
-        }
-
-        param.validValues.addAll(formats);
-
-        Identifier id = null;
+    	Map properties = fillProperties("VERSION", "Value contains the version of the WMS server to be used");
+    	
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, String.class, validValues, null, null, null, null);
 
         return param;
     }
 
-    public Parameter createRequestReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "REQUEST";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the the type of the request";
-        param.defaultValue = "GetMap";
-        param.validValues = new TreeSet();
-        param.validValues.add("GetMap");
+	public GeneralParameterDescriptor createFormatReadParam() {
+    	Map properties = fillProperties("FORMAT", "Value contains the desired format");
+    	
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, String.class, capabilities.getRequest().getGetMap().getFormatStrings(), null, null, null, null);
+        
+        return param;
+    }
 
-        Identifier id = null;
+    public GeneralParameterDescriptor createRequestReadParam() {
+    	Map properties = fillProperties("REQUEST","Value contains the the type of the request");
+    	String getMap = "GetMap";
+    	String[] validValues = {getMap};
+    	
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, String.class, validValues, getMap, null, null, null );
 
         return param;
     }
 
-    public Parameter createSRSReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "SRS";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the desired SRS for the entire map";
-
-        Set srs = new TreeSet();
+    public GeneralParameterDescriptor createSRSReadParam() {
+    	Map properties = fillProperties("SRS", "Value contains the desired SRS for the entire map");
+    	
+    	Set srs = new TreeSet();
         retrieveSRSs(capabilities.getLayers(), srs);
-        param.validValues = srs;
+        Object[] validValues = (Object[]) srs.toArray();
+    	
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, String.class, validValues, null, null, null, null);
 
-        Identifier id = null;
-
-        return param;
+    	return param;
     }
 
     private void retrieveSRSs(Layer[] layers, Set srsSet) {
@@ -123,156 +103,104 @@ public class WMSParameterMaker {
         }
     }
 
-    public Parameter createWidthReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "WIDTH";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the width, in pixels, of the requested map";
-
-        Identifier id = null;
+    public GeneralParameterDescriptor createWidthReadParam() {
+    	Map properties = fillProperties("WIDTH", "Value contains the width, in pixels, of the requested map");
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, Integer.class, null, null, new Integer(1), null, null);
 
         return param;
     }
 
-    public Parameter createHeightReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "HEIGHT";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the height, in pixels, of the requested map";
-
-        Identifier id = null;
+    public GeneralParameterDescriptor createHeightReadParam() {
+        Map properties = fillProperties("HEIGHT","Value contains the height, in pixels, of the requested map");
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, Integer.class, null, null, new Integer(1), null, null);
 
         return param;
     }
 
-    public Parameter createLayersReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "LAYERS";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains a list containing multiple SimpleLayer instances, " +
-            "representing a layer to be drawn and its style. The Style value " +
-            "can be empty.";
-        param.availableLayers = Arrays.asList(Utils.findDrawableLayers(
-                    capabilities.getLayers()));
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createBBoxMinXReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BBOX_MINX";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the minX value for the bounding box";
-
-        Identifier id = null;
+    public GeneralParameterDescriptor createLayersReadParam() {
+    	Map properties = fillProperties("LAYERS", 
+    			"Describes each layer in the WMS and the styles associated "+
+				"with. The parameter name is the name of the layer. The value"+
+				"is the style for that layer. The valid values are all the "+
+				"styles that layer can be drawn with.");
+        
+    	List layers = Arrays.asList(Utils.findDrawableLayers(
+                capabilities.getLayers()));
+    
+    	GeneralParameterDescriptor[] layerParams = new ParameterDescriptor[layers.size()];
+    	
+    	for (int i = 0; i < layers.size(); i++) {
+    		SimpleLayer layer = (SimpleLayer) layers.get(i);
+    		
+    		Map layerProperties = fillProperties(layer.getName(), "");
+    		
+    		layerParams[i] = new ParameterDescriptor(layerProperties, 0, 1, String.class, layer.getValidStyles().toArray(), null, null, null, null);
+    	}
+    	
+    	GeneralParameterDescriptor param = new ParameterGroupDescriptor(properties, 0, layers.size(), layerParams);
 
         return param;
     }
 
-    public Parameter createBBoxMinYReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BBOX_MINY";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the minY value for the bounding box";
+	private GeneralParameterDescriptor createBBoxParam(String coordDescriptor) {
+		Map properties = fillProperties("BBOX_"+coordDescriptor.toUpperCase(), "Value contains the "+coordDescriptor+" value for the bounding box");
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 1, 1, Double.class, null, null, null, null, null);
 
-        Identifier id = null;
+        return param;
+	}
 
+    public GeneralParameterDescriptor createBBoxMinXReadParam() {
+    	return createBBoxParam("minX");
+    }
+
+	public GeneralParameterDescriptor createBBoxMinYReadParam() {
+		return createBBoxParam("minY");
+    }
+
+    public GeneralParameterDescriptor createBBoxMaxXReadParam() {
+		return createBBoxParam("maxX");
+    }
+
+    public GeneralParameterDescriptor createBBoxMaxYReadParam() {
+		return createBBoxParam("maxY");    
+	}
+
+    public GeneralParameterDescriptor createTransparentReadParam() {
+    	Map properties = fillProperties("TRANSPARENT", "Value indicates map transparency");
+    	Boolean[] validValues = { new Boolean(true), new Boolean(false) };
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 0, 1, Boolean.class, validValues, new Boolean(false), null, null, null);
+        
+    	return param;
+    }
+
+    public GeneralParameterDescriptor createBGColorReadParam() {
+    	Map properties = fillProperties("BGCOLOR", "Value indicates map background colour in hex format (0xRRGGBB)");
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 0, 1, String.class, null, "0xFFFFFF", null, null, null);
         return param;
     }
 
-    public Parameter createBBoxMaxXReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BBOX_MAXX";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the maxX value for the bounding box";
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createBBoxMaxYReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BBOX_MAXY";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains the maxY value for the bounding box";
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createTransparentReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "TRANSPARENT";
-        param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates map transparency";
-        param.defaultValue = new Boolean(false);
-        param.valueClass = Boolean.class;
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createBGColorReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BGCOLOR";
-        param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates map background colour in hex format (0xRRGGBB)";
-        param.defaultValue = "0xFFFFFF";
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createExceptionsReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "EXCEPTIONS";
-        param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates the format in which exceptions are returned";
-        param.defaultValue = "application/vnd.ogc.se_xml";
+    public GeneralParameterDescriptor createExceptionsReadParam() {
+    	Map properties = fillProperties("EXCEPTIONS", "Value indicates the format in which exceptions are returned");
+    	String defaultValue = "application/vnd.ogc.se_xml";
+    	String[] validValues = { defaultValue };
+    	
+    	GeneralParameterDescriptor param = new ParameterDescriptor(properties, 0, 1, String.class, validValues, defaultValue, null, null, null);
 
         //TODO Fix exceptions later
         //param.validValues = new TreeSet(capabilities..getException().getFormats());
-        Identifier id = null;
 
+    	return param;
+    }
+
+    public GeneralParameterDescriptor createTimeReadParam() {
+    	Map properties = fillProperties("TIME", "Value indicates the time value desired");
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 0, 1, String.class, null, null, null, null, null);
         return param;
     }
 
-    public Parameter createTimeReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "TIME";
-        param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates the time value desired";
-
-        Identifier id = null;
-
-        return param;
-    }
-
-    public Parameter createElevationReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "ELEVATION";
-        param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates the elevation value desired";
-
-        Identifier id = null;
+    public GeneralParameterDescriptor createElevationReadParam() {
+    	Map properties = fillProperties("ELEVATION", "Value indicates the elevation value desired");
+        GeneralParameterDescriptor param = new ParameterDescriptor(properties, 0, 1, String.class, null, null, null, null, null);
 
         return param;
     }

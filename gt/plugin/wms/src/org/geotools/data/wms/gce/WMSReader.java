@@ -31,8 +31,11 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.gc.GridCoverage;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -132,23 +135,26 @@ public class WMSReader implements GridCoverageReader {
 
         List values = parameters.values();
         for (int i = 0; i < values.size(); i++) {
-            ParameterValue value = (ParameterValue) values.get(i);
+            GeneralParameterValue generalValue = (GeneralParameterValue) values.get(i);
+        	
+            String paramName = generalValue.getDescriptor().getName().toString();
 
-            if ((value == null) || (value.getValue() == null)) {
-//                System.out.println( "parameter "+i+" "+(value == null ? "null" : value.getDescriptor().getName(null) ));
+            if ((generalValue == null)) {
                 continue;
             }
-//            System.out.println( "parameter "+i+" "+value.getDescriptor().getName(null)+" : "+value.getValue() );
-            if (value.getDescriptor().getName().equals("LAYERS")) {
+
+            if (paramName.equals("LAYERS")) {
+            	ParameterGroup groupValue = (ParameterGroup) generalValue;
                 String layers = "";
                 String styles = "";
 
-                List layerList = (List) value.getValue();
+                List layerList = (List) groupValue.values();
 
                 for (int j = 0; j < layerList.size(); j++) {
-                    SimpleLayer simpleLayer = (SimpleLayer) layerList.get(j);
-                    layers = layers + simpleLayer.getName();
-                    styles = styles + simpleLayer.getStyle();
+                    Parameter parameter = (Parameter) layerList.get(j);
+                    
+                    layers = layers + parameter.getDescriptor().getName().toString();
+                    styles = styles + (String) parameter.getValue();
 
                     if (j < (layerList.size() - 1)) {
                         layers = layers + ",";
@@ -162,31 +168,43 @@ public class WMSReader implements GridCoverageReader {
                 continue;
             }
 
-            if (value.getDescriptor().getName().equals("BBOX_MINX")) {
-                minx = (String) value.getValue();
+            ParameterValue value = (ParameterValue) generalValue;
+            
+            if (paramName.equals("BBOX_MINX")) {
+                minx = ((Double) value.getValue()).toString();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName().equals("BBOX_MINY")) {
-                miny = (String) value.getValue();
+            if (paramName.equals("BBOX_MINY")) {
+                miny = ((Double) value.getValue()).toString();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName().equals("BBOX_MAXX")) {
-                maxx = (String) value.getValue();
+            if (paramName.equals("BBOX_MAXX")) {
+                maxx = ((Double) value.getValue()).toString();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName().equals("BBOX_MAXY")) {
-                maxy = (String) value.getValue();
+            if (paramName.equals("BBOX_MAXY")) {
+                maxy = ((Double) value.getValue()).toString();
 
                 continue;
             }
+            
+            if (paramName.equals("HEIGHT")) {
+            	request.setProperty("HEIGHT", ((Integer) value.getValue()).toString());
+            	continue;
+            }
+            
+            if (paramName.equals("WIDTH")) {
+            	request.setProperty("WIDTH", ((Integer) value.getValue()).toString());
+            	continue;
+            }
 
-            if (value.getDescriptor().getName().equals("TRANSPARENT")) {
+            if (paramName.equals("TRANSPARENT")) {
                 if (value.booleanValue()) {
                     request.setProperty("TRANSPARENT", "TRUE");
                 } else {
@@ -194,6 +212,10 @@ public class WMSReader implements GridCoverageReader {
                 }
 
                 continue;
+            }
+            
+            if (value.getValue() == null) {
+            	continue;
             }
 
             request.setProperty(value.getDescriptor().getName().toString(),
