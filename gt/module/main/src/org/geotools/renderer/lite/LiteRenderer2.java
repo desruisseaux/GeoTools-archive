@@ -104,6 +104,8 @@ import com.vividsolutions.jts.geom.Point;
  * @version $Id$
  */
 public class LiteRenderer2 implements Renderer, Renderer2D {
+    int error=0;
+    
     /** Tolerance used to compare doubles for equality */
     private static final double TOLERANCE = 1e-6;
 
@@ -286,6 +288,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     public void paint(Graphics2D graphics, Rectangle paintArea,
         AffineTransform transform) {
+	error=0;
         if ((graphics == null) || (paintArea == null)) {
             LOGGER.info("renderer passed null arguments");
 
@@ -375,6 +378,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
             + " , hits " + styleFactory.getHits() + ", requests "
             + styleFactory.getRequests());
+	
+	LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = "+error);
+
     }
 
     /**
@@ -770,7 +776,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     scaleDenominator);
             FeatureReader reader = features.reader();
 
-            while (reader.hasNext()) {
+            while (true) {
+		try{
+		    if( !reader.hasNext() )
+			break;
                 boolean doElse = true;
                 Feature feature = reader.next();
 
@@ -813,6 +822,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                         }
                     }
                 }
+	    }catch(Exception e){ 
+		error++; 
+	    }
             }
 
             reader.close();
