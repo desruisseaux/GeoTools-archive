@@ -19,12 +19,17 @@
 package org.geotools.cs;
 
 // JAI dependencies
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.media.jai.ParameterList;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
@@ -71,6 +76,40 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
 	 
     public CSAUTOFactory(){
         this( CoordinateSystemFactory.getDefault() );
+    }
+    
+    /**
+     * Provide a complete set of the known codes provided by this authority.
+     * <p>
+     * Note. this implementation should provide a leading "EPSG:" prefix, but
+     * the result provided does work with the EPSG assumption maintained by
+     * CRSService. The result may provide this prefix in the future. 
+     * </p>
+     * @see org.geotools.data.crs.CRSAuthoritySpi#getCodes()
+     * @return Set of know codes.
+     */
+    public Set getCodes() {
+        Set set = new TreeSet();
+        for( Iterator i=facts.keySet().iterator(); i.hasNext(); ) {
+            Integer code = (Integer) i.next();
+            set.add( "AUTO:"+code );
+        }
+        return set;
+    }
+    /**
+     * Provide access to WKT services.
+     * 
+     * @see org.geotools.data.crs.CRSAuthoritySpi#decode(java.lang.String)
+     * @param encoding
+     * @return
+     * @throws IOException
+     */
+    public CoordinateReferenceSystem decode( String encoding ) throws IOException {        
+        try {
+            return factory.createFromWKT( encoding );
+        } catch (FactoryException e) {
+            throw new IOException( e.getLocalizedMessage() );
+        }
     }
     /**
      * Construct a authority factory backed by the specified factory.

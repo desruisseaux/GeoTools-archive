@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.Set;
 
 // OpenGIS 
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //geotools
 import org.geotools.measure.AngleFormat;
@@ -124,6 +126,34 @@ public class CSEPSGFactory extends CoordinateSystemAuthorityFactory implements C
             throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
         }
         return factory.createFromWKT( wkt );
+    }
+    /**
+     * Provide a complete set of the known codes provided by this authority.
+     * <p>
+     * Note. this implementation should provide a leading "EPSG:" prefix, but
+     * the result provided does work with the EPSG assumption maintained by
+     * CRSService. The result may provide this prefix in the future. 
+     * </p>
+     * @see org.geotools.data.crs.CRSAuthoritySpi#getCodes()
+     * @return Set of know codes.
+     */
+    public Set getCodes() {
+        return epsg.keySet();
+    }
+    /**
+     * Provide access to WKT services.
+     * 
+     * @see org.geotools.data.crs.CRSAuthoritySpi#decode(java.lang.String)
+     * @param encoding
+     * @return
+     * @throws IOException
+     */
+    public CoordinateReferenceSystem decode( String encoding ) throws IOException {        
+        try {
+            return factory.createFromWKT( encoding );
+        } catch (FactoryException e) {
+            throw new IOException( e.getLocalizedMessage() );
+        }
     }
     
 }
