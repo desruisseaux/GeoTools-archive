@@ -20,69 +20,94 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.maintenance;
+package org.geotools.metadata.content;
+
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
- * Description of the class of information covered by the information.
+ * Location of the responsible individual or organization.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class ScopeDescription extends MetadataEntity
-       implements org.opengis.metadata.maintenance.ScopeDescription
+public class RangeDimension extends MetadataEntity
+       implements org.opengis.metadata.content.ContentInformation
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -5671299759930976286L;
+    private static final long serialVersionUID = 4365956866782010460L;
 
     /**
-     * Creates an initially empty scope description.
+     * Description of the range of a cell measurement value.
      */
-    public ScopeDescription() {
+    private InternationalString descriptor;
+
+    /**
+     * Construct an initially empty range dimension.
+     */
+    public RangeDimension() {
+    }
+
+    /**
+     * Return the description of the range of a cell measurement value.
+     */
+    public InternationalString getDescriptor() {
+        return descriptor;
     }
     
+    /**
+     * Set the description of the range of a cell measurement value.
+     */
+    public synchronized void setDescriptor(final InternationalString descriptor) {
+        checkWritePermission();
+        this.descriptor = descriptor;
+    }
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
+        descriptor = (InternationalString) unmodifiable(descriptor);
     }
 
     /**
-     * Compare this scope description with the specified object for equality.
+     * Compare this range dimension with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeDescription that = (ScopeDescription) object;
-            // TODO once method in ScopeDescription will be defined.
-            return true;
+            final RangeDimension that = (RangeDimension) object;
+            return Utilities.equals(this.descriptor, that.descriptor);
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this maintenance information.
+     * Returns a hash code value for this range dimension. For performance reason, this method do
+     * not uses all attributes for computing the hash code. Instead, it uses the attributes
+     * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        // TODO once method in ScopeDescription will be defined.
+        if (descriptor != null) code ^= descriptor.hashCode();
         return code;
     }
 
     /**
-     * Returns a string representation of this maintenance information.
+     * Returns a string representation of this range dimension
      */
-    public synchronized String toString() {
-        // TODO once method in ScopeDescription will be defined.
-        return "";
-    }
+    public String toString() {
+        return String.valueOf(descriptor);
+    }             
 }

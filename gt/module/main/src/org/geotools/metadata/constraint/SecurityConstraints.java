@@ -38,7 +38,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class SecurityConstraints extends Constraints implements org.opengis.metadata.constraint.SecurityConstraints {
+public class SecurityConstraints extends Constraints
+       implements org.opengis.metadata.constraint.SecurityConstraints
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -88,9 +90,9 @@ public class SecurityConstraints extends Constraints implements org.opengis.meta
     /**
      * Set the name of the handling restrictions on the resource.
      */
-    public synchronized void setClassification(final Classification classification) {
+    public synchronized void setClassification(final Classification newValue) {
         checkWritePermission();
-        this.classification = classification;
+        classification = newValue;
     }
 
     /**
@@ -105,9 +107,9 @@ public class SecurityConstraints extends Constraints implements org.opengis.meta
      * Set the explanation of the application of the legal constraints or other restrictions and legal
      * prerequisites for obtaining and using the resource.
      */
-    public synchronized void setUserNote(final InternationalString userNote) {
+    public synchronized void setUserNote(final InternationalString newValue) {
         checkWritePermission();
-        this.userNote = userNote;
+        userNote = newValue;
     }
 
     /**
@@ -120,9 +122,9 @@ public class SecurityConstraints extends Constraints implements org.opengis.meta
     /**
      * Set the name of the classification system.
      */
-     public synchronized void setClassificatonSystem(final InternationalString classificationSystem) {
+     public synchronized void setClassificatonSystem(final InternationalString newValue) {
          checkWritePermission();
-         this.classificationSystem = classificationSystem;
+         classificationSystem = newValue;
      }
 
     /**
@@ -135,9 +137,9 @@ public class SecurityConstraints extends Constraints implements org.opengis.meta
     /**
      * Set the additional information about the restrictions on handling the resource.
      */
-    public synchronized void setHandlingDescription(final InternationalString handlingDescription) {
+    public synchronized void setHandlingDescription(final InternationalString newValue) {
         checkWritePermission();
-        this.handlingDescription = handlingDescription;
+        handlingDescription = newValue;
     }
     
     /**

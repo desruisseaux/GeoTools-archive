@@ -43,7 +43,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class Constraints extends MetadataEntity implements org.opengis.metadata.constraint.Constraints {
+public class Constraints extends MetadataEntity
+       implements org.opengis.metadata.constraint.Constraints
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -74,14 +76,14 @@ public class Constraints extends MetadataEntity implements org.opengis.metadata.
      * Set the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    public synchronized void setUseLimitation(final List useLimitation) {
+    public synchronized void setUseLimitation(final List newValue) {
         checkWritePermission();
-        if (this.useLimitation == null) {
-            this.useLimitation = new CheckedArrayList(InternationalString.class);
+        if (useLimitation == null) {
+            useLimitation = new CheckedArrayList(InternationalString.class);
         } else {
-            this.useLimitation.clear();
+            useLimitation.clear();
         }
-        this.useLimitation.addAll(useLimitation);
+        useLimitation.addAll(newValue);
     }
 
     /**

@@ -40,7 +40,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class ResponsibleParty extends MetadataEntity implements org.opengis.metadata.citation.ResponsibleParty {
+public class ResponsibleParty extends MetadataEntity
+       implements org.opengis.metadata.citation.ResponsibleParty
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -98,9 +100,9 @@ public class ResponsibleParty extends MetadataEntity implements org.opengis.meta
      * Only one of <code>individualName</code>, {@link #getOrganisationName organisationName}
      * and {@link #getPositionName positionName} should be provided.
      */
-    public synchronized void setIndividualName(final String individualName) {
+    public synchronized void setIndividualName(final String newValue) {
         checkWritePermission();
-        this.individualName = individualName;
+        individualName = newValue;
     }
     
     /**
@@ -117,9 +119,9 @@ public class ResponsibleParty extends MetadataEntity implements org.opengis.meta
      * Only one of {@link #getIndividualName individualName}, </code>organisationName</code>
      * and {@link #getPositionName positionName} should be provided.
      */
-    public synchronized void setOrganisationName(final InternationalString organisationName) {
+    public synchronized void setOrganisationName(final InternationalString newValue) {
         checkWritePermission();
-        this.organisationName = organisationName;
+        organisationName = newValue;
     }
     
     /**
@@ -138,9 +140,9 @@ public class ResponsibleParty extends MetadataEntity implements org.opengis.meta
      * {@link #getOrganisationName organisationName} and <code>positionName</code>
      * should be provided.
      */
-    public synchronized void setPositionName(final InternationalString positionName) {
+    public synchronized void setPositionName(final InternationalString newValue) {
         checkWritePermission();
-        this.positionName = positionName;
+        positionName = newValue;
     }
     
     /**
@@ -153,9 +155,9 @@ public class ResponsibleParty extends MetadataEntity implements org.opengis.meta
     /**
      * Set the address of the responsible party.
      */
-    public synchronized void setContactInfo(final Contact contactInfo) {
+    public synchronized void setContactInfo(final Contact newValue) {
         checkWritePermission();
-        this.contactInfo = contactInfo;
+        contactInfo = newValue;
     }
     
     /**
@@ -168,9 +170,9 @@ public class ResponsibleParty extends MetadataEntity implements org.opengis.meta
     /**
      * Set the function performed by the responsible party.
      */
-    public synchronized void setRole(final Role role) {
+    public synchronized void setRole(final Role newValue) {
         checkWritePermission();
-        this.role = role;
+        role = newValue;
     }
     
     /**

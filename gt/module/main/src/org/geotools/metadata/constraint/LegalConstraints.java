@@ -42,7 +42,9 @@ import org.geotools.util.CheckedHashSet;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class LegalConstraints extends Constraints implements org.opengis.metadata.constraint.LegalConstraints {
+public class LegalConstraints extends Constraints
+       implements org.opengis.metadata.constraint.LegalConstraints
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -87,14 +89,14 @@ public class LegalConstraints extends Constraints implements org.opengis.metadat
      * Set the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    public synchronized void setAccessConstraints(final Set accessConstraints) {
+    public synchronized void setAccessConstraints(final Set newValues) {
         checkWritePermission();
-        if (this.accessConstraints == null) {
-            this.accessConstraints = new CheckedHashSet(Restriction.class);
+        if (accessConstraints == null) {
+            accessConstraints = new CheckedHashSet(Restriction.class);
         } else {
-            this.accessConstraints.clear();
+            accessConstraints.clear();
         }
-        this.accessConstraints.addAll(accessConstraints);
+        accessConstraints.addAll(newValues);
     }
 
     /**
@@ -110,14 +112,14 @@ public class LegalConstraints extends Constraints implements org.opengis.metadat
      * Set the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    public synchronized void setUseConstraints(Set useConstraints) {
+    public synchronized void setUseConstraints(final Set newValues) {
         checkWritePermission();
-        if (this.useConstraints == null) {
-            this.useConstraints = new CheckedHashSet(Restriction.class);
+        if (useConstraints == null) {
+            useConstraints = new CheckedHashSet(Restriction.class);
         } else {
-            this.useConstraints.clear();
+            useConstraints.clear();
         }
-        this.useConstraints.addAll(useConstraints);
+        useConstraints.addAll(newValues);
     }
 
     /**
@@ -136,9 +138,9 @@ public class LegalConstraints extends Constraints implements org.opengis.metadat
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    public synchronized void setOtherConstraints(InternationalString otherConstraints) {
+    public synchronized void setOtherConstraints(final InternationalString newValue) {
         checkWritePermission();
-        this.otherConstraints = otherConstraints;
+        otherConstraints = newValue;
     }   
 
     /**

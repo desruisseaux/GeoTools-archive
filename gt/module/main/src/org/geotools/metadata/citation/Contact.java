@@ -40,7 +40,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class Contact extends MetadataEntity implements org.opengis.metadata.citation.Contact {
+public class Contact extends MetadataEntity
+       implements org.opengis.metadata.citation.Contact
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -89,9 +91,9 @@ public class Contact extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set the physical and email address at which the organization or individual may be contacted.
      */
-    public synchronized void setAddress(final Address address) {
+    public synchronized void setAddress(final Address newValue) {
         checkWritePermission();
-        this.address = address;
+        address = newValue;
     }
     
     /**
@@ -105,9 +107,9 @@ public class Contact extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set supplemental instructions on how or when to contact the individual or organization.
      */
-    public synchronized void setContactInstructions(final InternationalString contactInstructions) {
+    public synchronized void setContactInstructions(final InternationalString newValue) {
         checkWritePermission();
-        this.contactInstructions = contactInstructions;
+        contactInstructions = newValue;
     }
 
     /**
@@ -121,9 +123,9 @@ public class Contact extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set on-line information that can be used to contact the individual or organization.
      */
-    public synchronized void setOnLineResource(final OnLineResource onLineResource) {
+    public synchronized void setOnLineResource(final OnLineResource newValue) {
         checkWritePermission();
-        this.onLineResource = onLineResource;
+        onLineResource = newValue;
     }
 
     /**
@@ -137,9 +139,9 @@ public class Contact extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set telephone numbers at which the organization or individual may be contacted.
      */
-    public synchronized void setPhone(final Telephone phone) {
+    public synchronized void setPhone(final Telephone newValue) {
         checkWritePermission();
-        this.phone = phone;
+        phone = newValue;
     }    
 
     /**
@@ -155,9 +157,9 @@ public class Contact extends MetadataEntity implements org.opengis.metadata.cita
      * Set time period (including time zone) when individuals can contact the organization or
      * individual. 
      */
-    public synchronized void setHoursOfService(final InternationalString hoursOfService) {
+    public synchronized void setHoursOfService(final InternationalString newValue) {
         checkWritePermission();
-        this.hoursOfService = hoursOfService;
+        hoursOfService = newValue;
     }
     
     /**

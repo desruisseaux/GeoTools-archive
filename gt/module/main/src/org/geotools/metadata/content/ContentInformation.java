@@ -20,69 +20,48 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.maintenance;
+package org.geotools.metadata.content;
 
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 
 
 /**
- * Description of the class of information covered by the information.
+ * Location of the responsible individual or organization.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class ScopeDescription extends MetadataEntity
-       implements org.opengis.metadata.maintenance.ScopeDescription
+public class ContentInformation extends MetadataEntity
+       implements org.opengis.metadata.content.ContentInformation
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -5671299759930976286L;
+    private static final long serialVersionUID = -1609535650982322560L;
 
     /**
-     * Creates an initially empty scope description.
+     * Construct an initially empty content information.
      */
-    public ScopeDescription() {
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
+    public ContentInformation() {
     }
 
     /**
-     * Compare this scope description with the specified object for equality.
+     * Compare this content information with the specified object for equality.
      */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
+    public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeDescription that = (ScopeDescription) object;
-            // TODO once method in ScopeDescription will be defined.
             return true;
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this maintenance information.
+     * Returns a hash code value for this content information.
      */
-    public synchronized int hashCode() {
+    public int hashCode() {
         int code = (int)serialVersionUID;
-        // TODO once method in ScopeDescription will be defined.
         return code;
-    }
-
-    /**
-     * Returns a string representation of this maintenance information.
-     */
-    public synchronized String toString() {
-        // TODO once method in ScopeDescription will be defined.
-        return "";
     }
 }

@@ -44,7 +44,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class OnLineResource extends MetadataEntity implements org.opengis.metadata.citation.OnLineResource {
+public class OnLineResource extends MetadataEntity
+       implements org.opengis.metadata.citation.OnLineResource
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -95,9 +97,9 @@ public class OnLineResource extends MetadataEntity implements org.opengis.metada
     /**
      * Set the name of an application profile that can be used with the online resource.
      */
-    public synchronized void setApplicationProfile(final String applicationProfile) {
+    public synchronized void setApplicationProfile(final String newValue) {
         checkWritePermission();
-        this.applicationProfile = applicationProfile;
+        applicationProfile = newValue;
     }
 
     /**
@@ -111,9 +113,9 @@ public class OnLineResource extends MetadataEntity implements org.opengis.metada
     /**
      * Set the detailed text description of what the online resource is/does.
      */
-    public synchronized void setDescription(final InternationalString description) {
+    public synchronized void setDescription(final InternationalString newValue) {
         checkWritePermission();
-        this.description = description;
+        description = newValue;
     }
     
     /**
@@ -127,9 +129,9 @@ public class OnLineResource extends MetadataEntity implements org.opengis.metada
     /**
      * Set the code for function performed by the online resource.
      */
-    public synchronized void setFunction(final OnLineFunction function) {
+    public synchronized void setFunction(final OnLineFunction newValue) {
         checkWritePermission();
-        this.function = function;
+        function = newValue;
     }
     
     /**
@@ -144,9 +146,9 @@ public class OnLineResource extends MetadataEntity implements org.opengis.metada
      * Set the location (address) for on-line access using a Uniform Resource Locator address or
      * similar addressing scheme such as http://www.statkart.no/isotc211.
      */
-    public synchronized void setLinkage(final URL linkage) {
+    public synchronized void setLinkage(final URL newValue) {
         checkWritePermission();
-        this.linkage = linkage;
+        linkage = newValue;
     }
     
     /**

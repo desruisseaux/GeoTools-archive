@@ -52,7 +52,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class Citation extends MetadataEntity implements org.opengis.metadata.citation.Citation {
+public class Citation extends MetadataEntity
+       implements org.opengis.metadata.citation.Citation
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -189,9 +191,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the name by which the cited resource is known.
      */
-    public synchronized void setTitle(final InternationalString title) {
+    public synchronized void setTitle(final InternationalString newValue) {
         checkWritePermission();
-        this.title = title;
+        title = newValue;
     }
 
     /**
@@ -206,14 +208,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the short name or other language name by which the cited information is known.
      */
-    public synchronized void setAlternateTitles(final List alternateTitles) {
+    public synchronized void setAlternateTitles(final List newValues) {
         checkWritePermission();
-        if (this.alternateTitles == null) {
-            this.alternateTitles = new CheckedArrayList(InternationalString.class);
+        if (alternateTitles == null) {
+            alternateTitles = new CheckedArrayList(InternationalString.class);
         } else {
-            this.alternateTitles.clear();
+            alternateTitles.clear();
         }
-        this.alternateTitles.addAll(alternateTitles);
+        alternateTitles.addAll(newValues);
     }
 
     /**
@@ -230,14 +232,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * @todo Defines a {@link HashMap} subclass which transform all {@link Date} object
      *       into unmidifiable dates.
      */
-    public synchronized void setDates(final Map dates) {
+    public synchronized void setDates(final Map newValues) {
         checkWritePermission();
-        if (this.dates == null) {
-            this.dates = new CheckedHashMap(DateType.class, Date.class);
+        if (dates == null) {
+            dates = new CheckedHashMap(DateType.class, Date.class);
         } else {
-            this.dates.clear();
+            dates.clear();
         }
-        this.dates.putAll(dates);
+        dates.putAll(newValues);
     }
 
     /**
@@ -250,9 +252,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the version of the cited resource.
      */
-    public synchronized void setEdition(final InternationalString edition) {
+    public synchronized void setEdition(final InternationalString newValue) {
         checkWritePermission();
-        this.edition = edition;
+        edition = newValue;
     }
 
     /**
@@ -267,12 +269,12 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      *
      * @todo Use an unmodifiable {@link Date} here.
      */
-    public synchronized void setEditionDate(Date editionDate) {
+    public synchronized void setEditionDate(Date newValue) {
         checkWritePermission();
-        if (editionDate != null) {
-            editionDate = new Date(editionDate.getTime());
+        if (newValue != null) {
+            newValue = new Date(newValue.getTime());
         }
-        this.editionDate = editionDate;
+        editionDate = newValue;
     }
 
     /**
@@ -288,14 +290,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Set the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public synchronized void setIdentifiers(final Set identifiers) {
+    public synchronized void setIdentifiers(final Set newValues) {
         checkWritePermission();
-        if (this.identifiers == null) {
-            this.identifiers = new CheckedHashSet(String.class);
+        if (identifiers == null) {
+            identifiers = new CheckedHashSet(String.class);
         } else {
-            this.identifiers.clear();
+            identifiers.clear();
         }
-        this.identifiers.addAll(identifiers);
+        identifiers.addAll(newValues);
     }
 
     /**
@@ -311,14 +313,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Set the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
      */
-    public synchronized void setIdentifierTypes(final Set identifierTypes) {
+    public synchronized void setIdentifierTypes(final Set newValues) {
         checkWritePermission();
-        if (this.identifierTypes == null) {
-            this.identifierTypes = new CheckedHashSet(String.class);
+        if (identifierTypes == null) {
+            identifierTypes = new CheckedHashSet(String.class);
         } else {
-            this.identifierTypes.clear();
+            identifierTypes.clear();
         }
-        this.identifierTypes.addAll(identifierTypes);
+        identifierTypes.addAll(newValues);
     }
 
     /**
@@ -334,14 +336,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Set the name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    public synchronized void setCitedResponsibleParties(final Set citedResponsibleParties) {
+    public synchronized void setCitedResponsibleParties(final Set newValues) {
         checkWritePermission();
-        if (this.citedResponsibleParties == null) {
-            this.citedResponsibleParties = new CheckedHashSet(ResponsibleParty.class);
+        if (citedResponsibleParties == null) {
+            citedResponsibleParties = new CheckedHashSet(ResponsibleParty.class);
         } else {
-            this.citedResponsibleParties.clear();
+            citedResponsibleParties.clear();
         }
-        this.citedResponsibleParties = citedResponsibleParties;
+        citedResponsibleParties.addAll(newValues);
     }
 
     /**
@@ -355,14 +357,14 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the mode in which the resource is represented, or an empty string if none.
      */
-    public synchronized void setPresentationForm(final Set presentationForm) {
+    public synchronized void setPresentationForm(final Set newValues) {
         checkWritePermission();
-        if (this.presentationForm == null) {
-            this.presentationForm = new CheckedHashSet(PresentationForm.class);
+        if (presentationForm == null) {
+            presentationForm = new CheckedHashSet(PresentationForm.class);
         } else {
-            this.presentationForm.clear();
+            presentationForm.clear();
         }
-        this.presentationForm.addAll( presentationForm );
+        presentationForm.addAll(newValues);
     }
 
     /**
@@ -377,9 +379,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Set the information about the series, or aggregate dataset, of which the dataset is
      * a part. Set to <code>null</code> if none.
      */
-    public synchronized void setSeries(final Series series) {
+    public synchronized void setSeries(final Series newValue) {
         checkWritePermission();
-        this.series = series;
+        series = newValue;
     }
 
     /**
@@ -394,9 +396,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Set other information required to complete the citation that is not recorded elsewhere.
      * Set to <code>null</code> if none.
      */
-    public synchronized void setOtherCitationDetails(final InternationalString otherCitationDetails) {
+    public synchronized void setOtherCitationDetails(final InternationalString newValue) {
         checkWritePermission();
-        this.otherCitationDetails = otherCitationDetails;
+        otherCitationDetails = newValue;
     }
 
     /**
@@ -413,9 +415,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * collectively, combined with information about what volumes are available at the
      * source cited. Set to <code>null</code> if there is no title.
      */
-    public synchronized void setCollectiveTitle(final InternationalString collectiveTitle) {
+    public synchronized void setCollectiveTitle(final InternationalString newValue) {
         checkWritePermission();
-        this.collectiveTitle = collectiveTitle;
+        collectiveTitle = newValue;
     }
 
     /**
@@ -428,9 +430,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the International Standard Book Number, or <code>null</code> if none.
      */
-    public synchronized void setISBN(final String ISBN) {
+    public synchronized void setISBN(final String newValue) {
         checkWritePermission();
-        this.ISBN = ISBN;
+        ISBN = newValue;
     }
 
     /**
@@ -443,9 +445,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     /**
      * Set the International Standard Serial Number, or <code>null</code> if none.
      */
-    public synchronized void setISSN(final String ISSN) {
+    public synchronized void setISSN(final String newValue) {
         checkWritePermission();
-        this.ISSN = ISSN;
+        ISSN = newValue;
     }
 
     /**

@@ -43,7 +43,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class Address extends MetadataEntity implements org.opengis.metadata.citation.Address {
+public class Address extends MetadataEntity
+       implements org.opengis.metadata.citation.Address
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -96,9 +98,9 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set the state, province of the location.
      */
-    public synchronized void setAdministrativeArea(final InternationalString administrativeArea) {
+    public synchronized void setAdministrativeArea(final InternationalString newValue) {
         checkWritePermission();
-        this.administrativeArea = administrativeArea;
+        administrativeArea = newValue;
     }
 
     /**
@@ -112,9 +114,9 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
    /**
      * Set the city of the location
      */
-    public synchronized void setCity(final InternationalString city) {
+    public synchronized void setCity(final InternationalString newValue) {
         checkWritePermission();
-        this.city = city;
+        city = newValue;
     }
 
     /**
@@ -128,9 +130,9 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * set the country of the physical address.
      */
-    public synchronized void setCountry(final InternationalString country) {
+    public synchronized void setCountry(final InternationalString newValue) {
         checkWritePermission();
-        this.country = country;
+        country = newValue;
     }
     
     /**
@@ -144,14 +146,14 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set the address line for the location (as described in ISO 11180, Annex A).
      */
-    public synchronized void setDeliveryPoints(final Set deliveryPoints) {
+    public synchronized void setDeliveryPoints(final Set newValues) {
         checkWritePermission();
-        if (this.deliveryPoints == null) {
-            this.deliveryPoints = new CheckedHashSet(String.class);
+        if (deliveryPoints == null) {
+            deliveryPoints = new CheckedHashSet(String.class);
         } else {
-            this.deliveryPoints.clear();
+            deliveryPoints.clear();
         }
-        this.deliveryPoints.addAll(deliveryPoints);
+        deliveryPoints.addAll(newValues);
     }
     /**
      * Returns the address of the electronic mailbox of the responsible organization or individual.
@@ -163,14 +165,14 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set the address of the electronic mailbox of the responsible organization or individual.
      */
-    public synchronized void setElectronicMailAddresses(final Set electronicMailAddresses) {
+    public synchronized void setElectronicMailAddresses(final Set newValues) {
         checkWritePermission();
-        if (this.electronicMailAddresses == null) {
-            this.electronicMailAddresses = new CheckedHashSet(String.class);
+        if (electronicMailAddresses == null) {
+            electronicMailAddresses = new CheckedHashSet(String.class);
         } else {
-            this.electronicMailAddresses.clear();
+            electronicMailAddresses.clear();
         }
-        this.electronicMailAddresses.addAll(electronicMailAddresses);
+        electronicMailAddresses.addAll(newValues);
     }
     
     /**
@@ -184,9 +186,9 @@ public class Address extends MetadataEntity implements org.opengis.metadata.cita
     /**
      * Set ZIP or other postal code.
      */
-    public synchronized void setPostalCode(final String postalCode) {
+    public synchronized void setPostalCode(final String newValue) {
         checkWritePermission();
-        this.postalCode = postalCode;
+        postalCode = newValue;
     }
 
     /**

@@ -35,7 +35,9 @@ import org.geotools.resources.Utilities;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class Series extends MetadataEntity implements org.opengis.metadata.citation.Series {
+public class Series extends MetadataEntity
+       implements org.opengis.metadata.citation.Series
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -83,9 +85,9 @@ public class Series extends MetadataEntity implements org.opengis.metadata.citat
     /**
      * Set the name of the series, or aggregate dataset, of which the dataset is a part.
      */
-    public synchronized void setName(final InternationalString name) {
+    public synchronized void setName(final InternationalString newValue) {
         checkWritePermission();
-        this.name = name;
+        name = newValue;
     }
 
     /**
@@ -98,9 +100,9 @@ public class Series extends MetadataEntity implements org.opengis.metadata.citat
     /**
      * Set information identifying the issue of the series.
      */
-    public synchronized void setIssueIdentification(final String issueIdentification) {
+    public synchronized void setIssueIdentification(final String newValue) {
         checkWritePermission();
-        this.issueIdentification = issueIdentification;
+        issueIdentification = newValue;
     }
 
     /**
@@ -113,9 +115,9 @@ public class Series extends MetadataEntity implements org.opengis.metadata.citat
     /**
      * Set details on which pages of the publication the article was published.
      */
-    public synchronized void setPage(final String page) {
+    public synchronized void setPage(final String newValue) {
         checkWritePermission();
-        this.page = page;
+        page = newValue;
     }
 
     /**

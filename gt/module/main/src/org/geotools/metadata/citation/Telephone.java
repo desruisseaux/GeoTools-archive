@@ -32,7 +32,9 @@ import org.geotools.resources.Utilities;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class Telephone extends MetadataEntity implements org.opengis.metadata.citation.Telephone {
+public class Telephone extends MetadataEntity
+       implements org.opengis.metadata.citation.Telephone
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -66,9 +68,9 @@ public class Telephone extends MetadataEntity implements org.opengis.metadata.ci
      * Set the telephone number by which individuals can speak to the responsible
      * organization or individual.
      */
-    public synchronized void setVoice(final String voice) {
+    public synchronized void setVoice(final String newValue) {
         checkWritePermission();
-        this.voice = voice;
+        voice = newValue;
     }
 
     /**
@@ -83,9 +85,9 @@ public class Telephone extends MetadataEntity implements org.opengis.metadata.ci
      * Set the telephone number of a facsimile machine for the responsible organization
      * or individual.
      */
-    public synchronized void setFacsimile(final String facsimile) {
+    public synchronized void setFacsimile(final String newValue) {
         checkWritePermission();
-        this.facsimile = facsimile;
+        facsimile = newValue;
     }
 
     /**

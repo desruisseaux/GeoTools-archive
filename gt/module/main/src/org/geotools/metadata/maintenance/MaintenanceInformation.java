@@ -43,7 +43,9 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class MaintenanceInformation extends MetadataEntity implements org.opengis.metadata.maintenance.MaintenanceInformation {
+public class MaintenanceInformation extends MetadataEntity
+       implements org.opengis.metadata.maintenance.MaintenanceInformation
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -107,9 +109,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
      * Set the frequency with which changes and additions are made to the resource
      * after the initial resource is completed.
      */
-    public synchronized void setMaintenanceAndUpdateFrequency(final MaintenanceFrequency aintenanceAndUpdateFrequency) {
+    public synchronized void setMaintenanceAndUpdateFrequency(final MaintenanceFrequency newValue) {
         checkWritePermission();
-        this.maintenanceAndUpdateFrequency = maintenanceAndUpdateFrequency;
+        maintenanceAndUpdateFrequency = newValue;
     }
 
     /**
@@ -122,9 +124,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
     /**
      * Set the scheduled revision date for resource.
      */
-    public synchronized void setDateOfNextUpdate(final Date dateOfNextUpdate) {
+    public synchronized void setDateOfNextUpdate(final Date newValue) {
         checkWritePermission();
-        this.dateOfNextUpdate = (dateOfNextUpdate!=null) ? dateOfNextUpdate.getTime() : Long.MIN_VALUE;
+        dateOfNextUpdate = (newValue!=null) ? newValue.getTime() : Long.MIN_VALUE;
     }
 
     /**
@@ -141,9 +143,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
      *
      * @return The period, in milliseconds.
      */
-    public synchronized void setUserDefinedMaintenanceFrequency(final long userDefinedMaintenanceFrequency) {
+    public synchronized void setUserDefinedMaintenanceFrequency(final long newValue) {
         checkWritePermission();
-        this.userDefinedMaintenanceFrequency = userDefinedMaintenanceFrequency;
+        userDefinedMaintenanceFrequency = newValue;
     }
 
     /**
@@ -156,9 +158,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
     /**
      * Scope of data to which maintenance is applied.
      */
-    public synchronized void setUpdateScope(final ScopeCode updateScope) {
+    public synchronized void setUpdateScope(final ScopeCode newValue) {
         checkWritePermission();
-        this.updateScope = updateScope;
+        updateScope = newValue;
     }
 
     /**
@@ -171,9 +173,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
     /**
      * Additional information about the range or extent of the resource.
      */
-    public synchronized void setUpdateScopeDescription(final ScopeDescription updateScopeDescription) {
+    public synchronized void setUpdateScopeDescription(final ScopeDescription newValue) {
         checkWritePermission();
-        this.updateScopeDescription = updateScopeDescription;
+        updateScopeDescription = newValue;
     }
 
     /**
@@ -186,9 +188,9 @@ public class MaintenanceInformation extends MetadataEntity implements org.opengi
     /**
      * Information regarding specific requirements for maintaining the resource.
      */
-    public synchronized void setMaintenanceNote(final InternationalString maintenanceNote) {
+    public synchronized void setMaintenanceNote(final InternationalString newValue) {
         checkWritePermission();
-        this.maintenanceNote = maintenanceNote;
+        maintenanceNote = newValue;
     }
     
     /**
