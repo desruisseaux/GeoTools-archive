@@ -32,6 +32,9 @@ import java.util.Set;
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
  * @version $Id: DataSource.java,v 1.16 2003/09/04 22:45:58 cholmesny Exp $
+ * 
+ * @deprecated Replaced by {@link org.geotools.data.DataStore}
+ *             or {@link org.geotools.gc.GridCoverageExchange} as required.
  */
 public interface DataSource {
     /**
