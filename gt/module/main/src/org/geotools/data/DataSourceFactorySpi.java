@@ -33,6 +33,7 @@ package org.geotools.data;
  * DataSource ds = DataSourceFinder.getDataSource(params);
  *
  * @author jmacgill
+ * @deprecated Please use DataStoreFactorySpi
  */
 public interface DataSourceFactorySpi extends org.geotools.factory.Factory {
     /**

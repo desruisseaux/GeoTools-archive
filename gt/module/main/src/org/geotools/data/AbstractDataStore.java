@@ -16,12 +16,20 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.catalog.DefaultQueryResult;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.opengis.catalog.Catalog;
@@ -31,15 +39,6 @@ import org.opengis.catalog.QueryDefinition;
 import org.opengis.catalog.QueryResult;
 
 import com.vividsolutions.jts.geom.Envelope;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**

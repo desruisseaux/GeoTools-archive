@@ -21,7 +21,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.factory.Factory;
 
 /**
@@ -250,7 +249,12 @@ public interface DataStoreFactorySpi extends Factory {
      * <p>
      * Subclasses may provide specific setAsText()/getAsText() requirements
      * </p>
-     * @deprecated Start to move towards org.geotools.parameter classes
+     *
+     * <p>
+     * Warning: We would like to start moving towards a common paraemters framework
+     * with GridCoverageExchnage. Param will be maintained as a wrapper for one point
+     * release (at which time it will be deprecated).
+     * </p> 
      */
     class Param {
         /** True if Param is required */

@@ -26,6 +26,7 @@ import java.io.IOException;
  * @author Jody Garnett, Refractions Research
  */
 public class FeatureLockException extends IOException {
+    private static final long serialVersionUID = 1L;
     String featureID;
 
     public FeatureLockException() {

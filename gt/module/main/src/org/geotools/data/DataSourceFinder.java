@@ -29,6 +29,7 @@ import java.util.Map;
  * file: META-INF/services/org.geotools.data.DataSourceFactorySpi The file
  * should contain a single line which gives the full name of the implementing
  * class. e.g. org.geotools.data.mytype.MyTypeDataSourceFacotry
+ * @deprecated Please use DataStoreFinder
  */
 public final class DataSourceFinder {
     private DataSourceFinder() {

@@ -25,6 +25,8 @@ import java.io.IOException;
  * @author Jody Garnett, Refractions Research
  */
 public class SchemaNotFoundException extends IOException {
+    private static final long serialVersionUID = 1L;
+    
     static final String NOT_FOUND = "Feature type could not be found for ";
     private String typeName;
 

@@ -16,11 +16,8 @@
  */
 package org.geotools.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
-import org.geotools.data.DataStoreFactorySpi.Param;
 
 
 /**

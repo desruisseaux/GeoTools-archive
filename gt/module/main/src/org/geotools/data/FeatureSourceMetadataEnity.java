@@ -17,13 +17,7 @@
 package org.geotools.data;
 
 import java.awt.geom.Point2D;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.cs.AxisInfo;
@@ -37,9 +31,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.units.Unit;
 import org.geotools.util.InternationalString;
-
-import org.opengis.catalog.MetadataEntity;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystem;
 

@@ -24,6 +24,8 @@ package org.geotools.data;
  */
 public class DataSourceException extends java.io.IOException {
     
+    private static final long serialVersionUID = 1L;
+    
     private Throwable cause;
     /**
      * Constructs a new instance of DataSourceException

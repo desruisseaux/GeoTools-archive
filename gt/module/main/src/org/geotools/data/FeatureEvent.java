@@ -45,6 +45,8 @@ import java.util.EventObject;
  * @version $Id: FeatureEvent.java,v 1.1 2003/12/01 22:00:38 cholmesny Exp $
  */
 public class FeatureEvent extends EventObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Event type constant denoting the adding of a feature.
      * 

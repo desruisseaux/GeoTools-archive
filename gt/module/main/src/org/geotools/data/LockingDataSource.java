@@ -129,6 +129,7 @@ import org.geotools.filter.Filter;
  * @see <a href="http://vwfs.refractions.net/docs/Design_Implications.pdf">Design Implications</a>
  * @author jgarnett, Refractions Research, Inc.
  * @version CVS Version  
+ * @deprecated Please make use of DataStoreAPI (check for getFeatureSource( typeName ) instance of FeatureLocking) 
  */
 public interface LockingDataSource extends DataSource {
             

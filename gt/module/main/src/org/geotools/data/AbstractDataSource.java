@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author Chris Holmes, TOPP
  * @version $Id: AbstractDataSource.java,v 1.6 2003/11/20 18:24:42 jive Exp $
+ * @deprecated Please use AbstractDataStore
  */
 public abstract class AbstractDataSource implements DataSource {
     /** A support string for unsupported operations messages */

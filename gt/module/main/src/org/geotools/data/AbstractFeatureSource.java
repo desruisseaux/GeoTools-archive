@@ -16,12 +16,12 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
