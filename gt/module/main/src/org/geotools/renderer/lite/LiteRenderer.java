@@ -278,7 +278,8 @@ public class LiteRenderer implements Renderer, Renderer2D {
 
     /** Maximun displacement for generalization during rendering */
     private double generalizationDistance = 1.0;
-
+    /** if the reprojection transform fails then canTransform is set to false */
+    private boolean canTransform=true;
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to
      * gain access to utility methods of this class TODO: it's probably better

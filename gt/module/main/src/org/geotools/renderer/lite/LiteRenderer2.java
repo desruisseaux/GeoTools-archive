@@ -186,6 +186,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     /** The math transform cache */
     private HashMap transformMap = new HashMap();
 
+    /** Set to false if the reprojection fails */
+    private boolean canTransform=true;
+    
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to
      * gain access to utility methods of this class or if you want to render
@@ -504,7 +507,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 LOGGER.severe(
                     "Got a tranform exception while trying to de-project the current "
                     + "envelope, falling back on full data loading (no bbox query)");
-
+		canTransform=false;
                 DefaultQuery q = new DefaultQuery(schema.getTypeName());
                 q.setPropertyNames(attributes);
                 query = q;
@@ -928,7 +931,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 Geometry g = findGeometry(feature, symbolizers[m]);
                 CoordinateReferenceSystem crs = findGeometryCS(feature,
                         symbolizers[m]);
-                MathTransform2D transform = getMathTransform(crs,
+                MathTransform2D transform = null;
+		
+		if (canTransform)
+		    transform=getMathTransform(crs,
                         destinationCrs, shape.getTransform());
 
                 if (transform != null) {
