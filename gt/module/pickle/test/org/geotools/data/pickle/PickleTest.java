@@ -16,6 +16,13 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -168,19 +175,27 @@ public class PickleTest extends TestCase {
    */
   public void testUnicodeSupport() throws Exception {
     File file = tmpFile();
-    PickleDataSource pds = new PickleDataSource(file.getParentFile(), file.getName());
+    PickleDataStore data = new PickleDataStore(file.getParentFile(), file.getName());
     AttributeType[] atts = new AttributeType[1];
     atts[0] = AttributeTypeFactory.newAttributeType("\uAAAA\uBBBB\uCCCC\uDDDD\uEEEE", String.class);
     FeatureType test = FeatureTypeFactory.newFeatureType(atts,"unicode");
-    FeatureCollection collection = FeatureCollections.newCollection();
-    Object[] attVals = new Object[atts.length];
+    FeatureCollection collection = FeatureCollections.newCollection();        
+    System.out.println( test );
     for (int i = 0; i < 100; i++) {
+      Object[] attVals = new Object[atts.length];        
       attVals[0] = "\uEEEE\uEEEE\uEEEE\uEEEE\uEEEE";
-      collection.add( test.create(attVals) );
-    }
-    pds.setFeatures(collection);
-    FeatureCollection fc = pds.getFeatures();
-    Feature[] f = (Feature[]) fc.toArray(new Feature[fc.size()]);
+      Feature newFeature = test.create(attVals);
+      collection.add( newFeature );               
+     }
+    data.createSchema( test );
+    FeatureStore store = (FeatureStore) data.getFeatureSource( "unicode" );
+    FeatureReader reader = DataUtilities.reader( collection );
+    store.setFeatures( reader );
+    assertEquals( -1, store.getCount( Query.ALL ) );
+    FeatureResults results =store.getFeatures(); 
+    assertEquals( 100,  results.getCount() );
+    FeatureCollection fc = store.getFeatures().collection();
+    Feature[] f = (Feature[]) fc.toArray(new Feature[fc.size()]);    
     assertEquals("\uAAAA\uBBBB\uCCCC\uDDDD\uEEEE",f[0].getFeatureType().getAttributeType(0).getName());
     for (int i = 0; i < f.length; i++) {
       assertEquals("\uEEEE\uEEEE\uEEEE\uEEEE\uEEEE",f[i].getAttribute(0));

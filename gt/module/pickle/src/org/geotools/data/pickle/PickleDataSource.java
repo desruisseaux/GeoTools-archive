@@ -15,7 +15,7 @@ import org.geotools.feature.*;
  *
  * @author  Ian Schneider
  */
-public class PickleDataSource extends AbstractDataSource {
+class PickleDataSource  {
   
   final String objectFile;
   final String classFile;
@@ -24,13 +24,7 @@ public class PickleDataSource extends AbstractDataSource {
   public PickleDataSource(File parent,String name) {
     this.objectFile = new File(parent, name + ".obj").getAbsolutePath();
     this.classFile  = new File(parent, name + ".clz").getAbsolutePath();
-  }
-  
-  protected DataSourceMetaData createMetaData() {
-    MetaDataSupport mds = new MetaDataSupport();
-    mds.setSupportsSetFeatures(true);
-    return mds;
-  }
+  } 
   
   public void setFeatures(FeatureCollection collection) throws DataSourceException {
     FileOutputStream obj = null;
@@ -100,8 +94,6 @@ public class PickleDataSource extends AbstractDataSource {
   
   public FeatureType getSchema() throws DataSourceException {
     return null;
-  }
-  
-  
+  }    
   
 }
