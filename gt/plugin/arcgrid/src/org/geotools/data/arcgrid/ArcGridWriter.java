@@ -20,11 +20,11 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
+import org.geotools.parameter.ParameterValue;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
 import java.io.IOException;
@@ -42,11 +42,8 @@ public class ArcGridWriter implements GridCoverageWriter {
     /** the destination object where we will do the writing */
     private Object destination;
 
-    /** Set up with data passed to write and add in the Parameter Objects */
-    transient private boolean compress = false;
+    ArcGridReader.InternalParam params=new ArcGridReader.InternalParam();
 
-    /** Set up with data passed to write and add in the Parameter Objects */
-    transient private boolean GRASSFormatEnabled = false;
     transient ArcGridRaster arcGridRaster;
     transient PrintWriter mWriter;
 
@@ -124,7 +121,7 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @throws IOException 
      *          Thrown for any other unexpected exception
      */
-    private void setEnvironment(ArcGridParameterValue[] parameters)
+    private void setEnvironment(ParameterValue[] parameters)
         throws InvalidParameterNameException, InvalidParameterValueException, 
             IOException {
         mWriter = ioexchange.getPrintWriter(destination);
@@ -134,26 +131,10 @@ public class ArcGridWriter implements GridCoverageWriter {
         }
 
         for (int i = 0; i < parameters.length; i++) {
-            parseParameter(parameters[i]);
+            ArcGridReader.parseParameter(parameters[i],params);
         }
     }
 
-    private void parseParameter(ArcGridParameterValue parameter)
-        throws InvalidParameterNameException, InvalidParameterValueException {
-        if (parameter.getDescriptor().getName(null).equals("GRASSFormatEnabled")) {
-            try {
-                GRASSFormatEnabled = parameter.booleanValue();
-            } catch (InvalidParameterTypeException e) {
-                throw new InvalidParameterValueException("A Boolean value was expected",
-                    parameter.getDescriptor().getName(null), 0);
-            }
-
-            return;
-        }
-
-        throw new InvalidParameterNameException(" is not a valid parameter for ArcGrid",
-            parameter.getDescriptor().getName(null));
-    }
 
     /**
      * This method was copied from ArcGridData source
@@ -173,13 +154,13 @@ public class ArcGridWriter implements GridCoverageWriter {
                 (bounds.getMaximum(1) - yl) / data.getHeight());
 
         try {
-            if (GRASSFormatEnabled) {
+            if (params.GRASSFormatEnabled) {
                 arcGridRaster = new GRASSArcGridRaster(mWriter);
             } else {
                 arcGridRaster = new ArcGridRaster(mWriter);
             }
 
-            arcGridRaster.writeRaster(data, xl, yl, cellsize, compress);
+            arcGridRaster.writeRaster(data, xl, yl, cellsize, params.compress);
         } catch (java.io.IOException ioe) {
             throw new DataSourceException("IOError writing", ioe);
         }
@@ -214,7 +195,7 @@ public class ArcGridWriter implements GridCoverageWriter {
         GeneralParameterValue[] parameters)
         throws InvalidParameterNameException, InvalidParameterValueException, 
             ParameterNotFoundException, IOException {
-        setEnvironment((ArcGridParameterValue[]) parameters);
+        setEnvironment((ParameterValue[]) parameters);
         writeGridCoverage(coverage);
         mWriter.close();
     }

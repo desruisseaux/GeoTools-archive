@@ -87,6 +87,8 @@ public class ArcGridRaster {
 	private Reader reader=null;
 	
 	private PrintWriter writer=null;
+
+    private boolean compress;
     
     /**
      * Creates a new instance of ArcGridRaster
@@ -95,7 +97,9 @@ public class ArcGridRaster {
      *
      */
 	public ArcGridRaster(URL srcURL) throws IOException {
-        this.srcURL = srcURL;
+        this.srcURL = srcURL;        
+        if (srcURL.getFile().endsWith(".gz")) 
+            compress=true;
     }
     
     /**
@@ -106,8 +110,9 @@ public class ArcGridRaster {
      * @param Reader reader to be used for reading the Raster
      *
      */
-	public ArcGridRaster(Reader reader) throws IOException {
+	public ArcGridRaster(Reader reader, boolean compress) throws IOException {
         this.reader=reader;
+        this.compress=compress;
     }
 	
     /**
@@ -276,7 +281,7 @@ public class ArcGridRaster {
     	if( reader != null )
     		return reader;
         // gzipped source, may be remote URL
-        if (srcURL.getFile().endsWith(".gz")) {
+        if (compress) {
             InputStream in = new java.util.zip.GZIPInputStream(
                 srcURL.openStream()
             );

@@ -24,6 +24,8 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
+import org.geotools.parameter.OperationParameter;
+import org.geotools.parameter.ParameterValue;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
@@ -35,22 +37,28 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.Reader;
 
-
 /**
  * This class can read a arc grid data source and create a grid coverage from
  * the data.
- *
+ * 
  * @author jeichar
  */
 public class ArcGridReader implements GridCoverageReader {
     private Object mSource;
+
     private Reader mReader;
-    private boolean compress = false;
-    private boolean GRASSFormatEnabled = false;
+
+    static class InternalParam{
+        boolean compress = false;
+        boolean GRASSFormatEnabled = false;
+    }
+    
+    private InternalParam params=new InternalParam();
     private IOExchange mExchange = IOExchange.getIOExchange();
 
     /** Default color ramp */
-    private Color[] demColors = new Color[] { Color.BLUE, Color.WHITE, Color.RED };
+    private Color[] demColors = new Color[] { Color.BLUE, Color.WHITE,
+            Color.RED };
 
     /** The coordinate system associated to the returned GridCoverage */
     private CoordinateSystem coordinateSystem = GeographicCoordinateSystem.WGS84;
@@ -60,12 +68,14 @@ public class ArcGridReader implements GridCoverageReader {
 
     /** The raster read from the data file */
     private ArcGridRaster arcGridRaster = null;
+
     private String name;
 
     /**
      * Creates a new instance of an ArcGridReader
-     *
-     * @param aSource URL referencing the location of the Arc Grid Data
+     * 
+     * @param aSource
+     *            URL referencing the location of the Arc Grid Data
      */
     public ArcGridReader(Object aSource) {
         mSource = aSource;
@@ -75,17 +85,18 @@ public class ArcGridReader implements GridCoverageReader {
      * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
      */
     public String[] getMetadataNames() throws IOException {
-        // Metadata has not been handled at this point  ie there is not spec on where it should be obtained 
+        // Metadata has not been handled at this point ie there is not spec on
+        // where it should be obtained
         return null;
     }
 
     /**
      * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
      */
-    public String getMetadataValue(String name)
-        throws IOException, MetadataNameNotFoundException {
+    public String getMetadataValue(String name) throws IOException,
+            MetadataNameNotFoundException {
         throw new MetadataNameNotFoundException(name
-            + " is not a valid metadata name for ArcGridReader");
+                + " is not a valid metadata name for ArcGridReader");
     }
 
     /**
@@ -118,16 +129,16 @@ public class ArcGridReader implements GridCoverageReader {
 
     /**
      * Note: The geotools GridCoverage does not implement the geoapi
-     * GridCoverage Interface so this method shows an error.  All other
-     * methods are using the geotools GridCoverage class
-     *
+     * GridCoverage Interface so this method shows an error. All other methods
+     * are using the geotools GridCoverage class
+     * 
      * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
      */
-    public GridCoverage read(
-        GeneralParameterValue[] parameters)
-        throws InvalidParameterNameException, InvalidParameterValueException, 
-            ParameterNotFoundException, IOException {
-        setEnvironment("ArcGrid", (ArcGridParameterValue[]) parameters);
+    public GridCoverage read(GeneralParameterValue[] parameters)
+            throws InvalidParameterNameException,
+            InvalidParameterValueException, ParameterNotFoundException,
+            IOException {
+        setEnvironment("ArcGrid", (ParameterValue[]) parameters);
 
         return getGridCoverage();
     }
@@ -151,19 +162,24 @@ public class ArcGridReader implements GridCoverageReader {
     /**
      * Sets up the object's environment based on the Parameters passed to it by
      * the client
-     *
-     * @param name A name for the gridCoverage
-     * @param parameters The parameters from a read() method
-     *
-     * @throws InvalidParameterNameException Thrown if a parameter was passed
-     *         to the reader that is not expected
-     * @throws InvalidParameterValueException Thrown if a boolean value is not
-     *         valid for the parameter passed
-     * @throws IOException Thrown for any other unexpected exception
+     * 
+     * @param name
+     *            A name for the gridCoverage
+     * @param parameters
+     *            The parameters from a read() method
+     * 
+     * @throws InvalidParameterNameException
+     *             Thrown if a parameter was passed to the reader that is not
+     *             expected
+     * @throws InvalidParameterValueException
+     *             Thrown if a boolean value is not valid for the parameter
+     *             passed
+     * @throws IOException
+     *             Thrown for any other unexpected exception
      */
-    private void setEnvironment(String name, ArcGridParameterValue[] parameters)
-        throws InvalidParameterNameException, InvalidParameterValueException, 
-            IOException {
+    private void setEnvironment(String name, ParameterValue[] parameters)
+            throws InvalidParameterNameException,
+            InvalidParameterValueException, IOException {
         mReader = mExchange.getReader(mSource);
         this.name = name;
 
@@ -172,44 +188,53 @@ public class ArcGridReader implements GridCoverageReader {
         }
 
         for (int i = 0; i < parameters.length; i++) {
-            parseParameter(parameters[i]);
+            parseParameter(parameters[i], params);
         }
     }
 
-    private void parseParameter(ArcGridParameterValue parameter)
-        throws InvalidParameterNameException, InvalidParameterValueException {
-        if (parameter.getDescriptor().getName(null).equals("GRASSFormatEnabled")) {
-            try {
-                GRASSFormatEnabled = parameter.booleanValue();
+    static void parseParameter(ParameterValue parameter, 
+            InternalParam params)
+            throws InvalidParameterNameException,
+            InvalidParameterValueException {
+        try {
+            if (parameter.getDescriptor().getName(null).equals(
+                    "GRASSFormatEnabled")) {
+
+                params.GRASSFormatEnabled = parameter.booleanValue();
 
                 return;
-            } catch (InvalidParameterTypeException e) {
-                throw new InvalidParameterValueException("A Boolean value was expected",
-                    parameter.getDescriptor().getName(null), 0);
+            } else if (parameter.getDescriptor().getName(null).equals(
+                    "Compressed")) {
+                params.compress = parameter.booleanValue();
+                return;
             }
+        } catch (InvalidParameterTypeException e) {
+            throw new InvalidParameterValueException(
+                    "A Boolean value was expected", parameter.getDescriptor()
+                            .getName(null), 0);
         }
 
         throw new InvalidParameterNameException(parameter.getDescriptor()
-                                                         .getName(null)
-            + " is not a valid parameter for ArcGrid", null);
+                .getName(null)
+                + " is not a valid parameter for ArcGrid", null);
     }
 
     /**
      * Returns the ArcGridRaster read by the datasource. Use it only for
      * specific needs, it's not a datasource independent method.
-     *
-     * @return the ArcGridRaster  read by the datasource
-     *
-     * @throws java.io.IOException Thrown in the case of an unexpected
-     *         exception
+     * 
+     * @return the ArcGridRaster read by the datasource
+     * 
+     * @throws java.io.IOException
+     *             Thrown in the case of an unexpected exception
      */
     public ArcGridRaster openArcGridRaster() throws java.io.IOException {
         if (arcGridRaster == null) {
             try {
-                if (GRASSFormatEnabled) {
-                    arcGridRaster = new GRASSArcGridRaster(mReader);
+                if (params.GRASSFormatEnabled) {
+                    arcGridRaster = new GRASSArcGridRaster(mReader, params.compress);
                 } else {
-                    arcGridRaster = new ArcGridRaster(mReader);
+                    arcGridRaster = new ArcGridRaster(mReader, params.compress);
                 }
             } catch (Exception e) {
                 throw new DataSourceException("Unexpected exception", e);
@@ -221,13 +246,13 @@ public class ArcGridReader implements GridCoverageReader {
 
     /**
      * Returns the GridCoverage read by the datasource. Use it if you want to
-     * avoid unpacking the getFeatures returned feature collection. Use only
-     * for specific needs, it's not a datasource independent method.
-     *
+     * avoid unpacking the getFeatures returned feature collection. Use only for
+     * specific needs, it's not a datasource independent method.
+     * 
      * @return the GridCoverage read by the datasource
-     *
-     * @throws java.io.IOException Thrown in the case of an unexpected
-     *         exception
+     * 
+     * @throws java.io.IOException
+     *             Thrown in the case of an unexpected exception
      */
     private GridCoverage getGridCoverage() throws java.io.IOException {
         if ((gridCoverage == null) || (gridCoverage.get() == null)) {
@@ -250,14 +275,14 @@ public class ArcGridReader implements GridCoverageReader {
         }
 
         return new GridCoverage(name, raster, coordinateSystem,
-            convertEnvelope(getBounds()), min, max, null,
-            new Color[][] { getColors() }, null);
+                convertEnvelope(getBounds()), min, max, null,
+                new Color[][] { getColors() }, null);
     }
 
     /**
      * Gets the coordinate system that will be associated to the GridCoverage.
      * The WGS84 coordinate system is used by default
-     *
+     * 
      * @return the coordinate system for GridCoverage creation
      */
     private CoordinateSystem getCoordinateSystem() {
@@ -267,7 +292,7 @@ public class ArcGridReader implements GridCoverageReader {
     /**
      * Gets the bounding box of this datasource using the default speed of this
      * datasource as set by the implementer.
-     *
+     * 
      * @return The bounding box of the datasource or null if unknown and too
      *         expensive for the method to calculate.
      */
@@ -276,9 +301,9 @@ public class ArcGridReader implements GridCoverageReader {
         double xmin = arcGridRaster.getXlCorner();
         double ymin = arcGridRaster.getYlCorner();
         double xmax = xmin
-            + (arcGridRaster.getNCols() * arcGridRaster.getCellSize());
+                + (arcGridRaster.getNCols() * arcGridRaster.getCellSize());
         double ymax = ymin
-            + (arcGridRaster.getNRows() * arcGridRaster.getCellSize());
+                + (arcGridRaster.getNRows() * arcGridRaster.getCellSize());
         env = new com.vividsolutions.jts.geom.Envelope(xmin, xmax, ymin, ymax);
 
         return env;
@@ -286,7 +311,7 @@ public class ArcGridReader implements GridCoverageReader {
 
     /**
      * Gets the default color ramp used to depict the GridCoverage
-     *
+     * 
      * @return the color ramp
      */
     private Color[] getColors() {
@@ -295,33 +320,37 @@ public class ArcGridReader implements GridCoverageReader {
 
     /**
      * Converts a JTS Envelope into an org.geotools.pt.Envelope
-     *
-     * @param source the jts envelope
-     *
+     * 
+     * @param source
+     *            the jts envelope
+     * 
      * @return the equivalent geotools envelope
      */
     private org.geotools.pt.Envelope convertEnvelope(
-        com.vividsolutions.jts.geom.Envelope source) {
+            com.vividsolutions.jts.geom.Envelope source) {
         double[] min = new double[] { source.getMinX(), source.getMinY() };
         double[] max = new double[] { source.getMaxX(), source.getMaxY() };
 
         return new org.geotools.pt.Envelope(min, max);
     }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-	 */
-	public boolean hasMoreGridCoverages() throws IOException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
+     */
+    public boolean hasMoreGridCoverages() throws IOException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.opengis.coverage.grid.GridCoverageReader#skip()
+     */
+    public void skip() throws IOException {
+        // TODO Auto-generated method stub
 
-	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
-	 */
-	public void skip() throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 }

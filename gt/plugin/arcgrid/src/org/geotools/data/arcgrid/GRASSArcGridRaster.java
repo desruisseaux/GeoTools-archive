@@ -47,8 +47,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         super(srcURL);
     }
 
-    public GRASSArcGridRaster(Reader reader) throws IOException {
-        super(reader);
+    public GRASSArcGridRaster(Reader reader, boolean compress) throws IOException {
+        super(reader, compress);
     }
 
     public GRASSArcGridRaster(PrintWriter writer) throws IOException {

@@ -19,6 +19,7 @@ package org.geotools.data.arcgrid;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.parameter.OperationParameter;
 import org.opengis.parameter.GeneralOperationParameter;
 
 import java.io.File;
@@ -52,12 +53,37 @@ public class ArcGridFormat extends AbstractGridFormat {
         mInfo = info;
 
         readParameters = new GeneralOperationParameter[2];
-        readParameters[0] = ArcGridOperationParameter.getGRASSReadParam();
-        readParameters[1] = ArcGridOperationParameter.getCompressReadParam();
+        readParameters[0] = getGRASSParam();
+        readParameters[1] = getCompressParam();
 
         writeParameters = new GeneralOperationParameter[2];
-        writeParameters[0] = ArcGridOperationParameter.getGRASSWriteParam();
-        writeParameters[1] = ArcGridOperationParameter.getCompressWriteParam();
+        writeParameters[0] = getGRASSParam();
+        writeParameters[1] = getCompressParam();
+    }
+    /**
+     * Creates a "Compress" Parameter.  Indicates whether the arcgrid data is
+     * compressed with GZIP
+     *
+     * @return a "Compress" Parameter.
+     */
+    public static GeneralOperationParameter getCompressParam() {
+
+        Boolean[] values=new Boolean[]{
+                new Boolean(true), new Boolean(false)};
+        
+        return new OperationParameter("Compressed", Boolean.class, values, new Boolean(false));
+    }
+    /**
+     * Creates a "GRASS" Parameter.  Indicates whether the arcgrid is in GRASS
+     * format
+     *
+     * @return a "GRASS" Parameter.
+     */
+    public static GeneralOperationParameter getGRASSParam() {
+        Boolean[] values=new Boolean[]{
+                new Boolean(true), new Boolean(false)};
+        
+        return new OperationParameter("GRASS", Boolean.class, values, new Boolean(false));
     }
 
     /**
