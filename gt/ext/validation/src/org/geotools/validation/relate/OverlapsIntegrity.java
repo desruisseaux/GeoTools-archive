@@ -214,7 +214,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 									if (showPrintLines)
 									{
 										//System.out.println(f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" overlapped "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
-										System.out.println(f1.getID().substring(8)+ " " + f2.getID().substring(8));
+										//System.out.println(f1.getID().substring(8)+ " " + f2.getID().substring(8));
 									}
 									success = false;
 									errors++;
@@ -343,7 +343,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 									if (showPrintLines)
 									{
 										//System.out.println(f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" overlapped "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
-										System.out.println(f1.getID().substring(11)+ " " + f2.getID().substring(11));
+										//System.out.println(f1.getID().substring(11)+ " " + f2.getID().substring(11));
 									}
 									success = false;
 									errors++;
