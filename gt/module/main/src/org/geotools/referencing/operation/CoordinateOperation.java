@@ -350,16 +350,16 @@ public class CoordinateOperation extends IdentifiedObject
                  * 'conversionFromBase' field that is set to this CoordinateOperation.
                  */
                 synchronized (GeneralDerivedCRS.class) {
-                    if (GeneralDerivedCRS.\u00A4COMPARING != null) {
+                    if (GeneralDerivedCRS.COMPARING != null) {
                         // NOTE: the following assertion fails for deserialized objects.
                         // assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
                         return true;
                     }
                     try {
-                        GeneralDerivedCRS.\u00A4COMPARING = this;
+                        GeneralDerivedCRS.COMPARING = this;
                         return equals(this.targetCRS, that.targetCRS, compareMetadata);
                     } finally {
-                        GeneralDerivedCRS.\u00A4COMPARING = null;
+                        GeneralDerivedCRS.COMPARING = null;
                     }
                 }
             }

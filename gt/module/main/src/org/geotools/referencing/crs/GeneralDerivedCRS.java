@@ -85,7 +85,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
      *       a different package.
      */
-    public static IdentifiedObject \u00A4COMPARING;
+    public static IdentifiedObject COMPARING;
 
     /**
      * The base coordinate reference system.
