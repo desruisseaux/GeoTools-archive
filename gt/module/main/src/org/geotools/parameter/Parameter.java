@@ -519,7 +519,9 @@ public class Parameter extends AbstractParameter
         Exception cause = null;
         try {
             if (value instanceof URL) {
-                return ((URL) value).toURI();
+                // TODO: use the next line when we will be allowed to compile for J2SE 1.5.
+                return new URI(value.toString());
+//                return ((URL) value).toURI();
             }
             if (value instanceof String) {
                 return new URI((String) value);
