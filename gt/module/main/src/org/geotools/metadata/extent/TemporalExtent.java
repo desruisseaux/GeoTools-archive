@@ -117,8 +117,8 @@ public class TemporalExtent extends MetadataEntity
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final TemporalExtent that = (TemporalExtent) object;
-            return Utilities.equals(this.startTime, that.startTime)  &&
-                   Utilities.equals(this.endTime,   that.endTime)  ;
+            return this.startTime == that.startTime &&
+                   this.endTime   == that.endTime;
         }
         return false;
     }
