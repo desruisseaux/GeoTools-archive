@@ -2,8 +2,12 @@ package org.geotools.data;
 
 import java.net.URI;
 
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.IllegalFilterException;
 
 /**
  * @author dzwiers
@@ -51,7 +55,7 @@ public abstract class NewQuery {
     		return null;
     	String[] r = new String[qa.length];
     	for(int i=0;i<r.length;i++)
-    		r[i] = qa[i]==null?null:qa[i].getTypeName();
+    		r[i] = qa[i]==null?null:qa[i].getAttributeName();
     	return r;
     }
     
@@ -142,6 +146,7 @@ public abstract class NewQuery {
      * aaime -- this is you hint spot :)
      * <p>
      * interface magic extends wish {
+     *    GeometryFactory geomFactory();
      *    CoordinateReferenceSystem force();
      *    CoordinateReferenceSystem reproject();
      * }
@@ -150,8 +155,10 @@ public abstract class NewQuery {
     public abstract Object getCoordinateSystemReprojectHint();
     
     /**
-     * (This idea is the best!)
-     * 
+     * Provides a mapping from from an expression to attribute.
+     * <p>
+     * (JG: This idea is the best! I really would like late binding though)
+     * </p>
      * @author davidz
      */
     public static class QueryAs{
@@ -160,13 +167,24 @@ public abstract class NewQuery {
     	// the output attributeName
     	private String attributeName;
     	
-    	// used to derive a property value ... this allows simple attribute mangling or selection ...
+    	// used to derive a property value ... this allows simple attribute mangling or selection ...    	
     	private Expression formula;
     	
     	private QueryAs(){}
-    	public QueryAs(String typeName, Expression formula){
-    		this.typeName = typeName;
+    	
+    	public QueryAs(String attributeName, Expression formula){
+    		this.attributeName = attributeName;
     		this.formula = formula;
+    	}
+    	
+    	/**
+    	 * Direct mapping of attribute with no changes 
+    	 * @throws IllegalFilterException
+    	 */
+    	public QueryAs(FeatureType schema, String attribute ) throws IllegalFilterException{
+    		this.attributeName = attribute;
+    		FilterFactory factory = FilterFactory.createFilterFactory();
+    		formula = factory.createAttributeExpression( schema, attribute );    		
     	}
     	
 		/**
