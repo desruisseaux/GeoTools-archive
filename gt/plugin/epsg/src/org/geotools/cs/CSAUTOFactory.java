@@ -425,7 +425,7 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final String   classification   = "Orthographic";		
             final ParameterList parameters  = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
-            parameters.setParameter("latitude_of_orgion", latitudeOfOrigin );
+            parameters.setParameter("latitude_of_origin", latitudeOfOrigin );
             final Projection projection = factory.createProjection("Auto Orthographic", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto Orthographic",
                                                            GeographicCoordinateSystem.WGS84,
@@ -482,8 +482,8 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final String   classification    = "Equirectangular";
             final ParameterList parameters   = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
-            parameters.setParameter("latitude_of_orgion", 0.0 );
-            parameters.setParameter("standard_parallel", standardParallel1);
+            parameters.setParameter("latitude_of_origin", 0.0 );
+            // parameters.setParameter("standard_parallel1", standardParallel1);
             final Projection projection = factory.createProjection("Auto Equirectangular", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto Equirectangular",
                                                            GeographicCoordinateSystem.WGS84,
