@@ -182,9 +182,7 @@ public class TransverseMercator extends MapProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    public static final class Provider 
-            extends org.geotools.referencing.operation.projection.MapProjection.Provider {
-
+    public static final class Provider extends AbstractProvider {
         /**
          * The parameters group.
          * @task REVISIT: should we set some default UTM parameter values

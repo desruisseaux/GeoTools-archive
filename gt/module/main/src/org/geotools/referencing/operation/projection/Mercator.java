@@ -96,7 +96,7 @@ public class Mercator extends MapProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    public static final class Provider1SP extends Provider {
+    public static final class Provider1SP extends AbstractProvider {
         /**
          * The parameters group.
          */
@@ -156,7 +156,7 @@ public class Mercator extends MapProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    public static final class Provider2SP extends Provider {
+    public static final class Provider2SP extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #standardParallel standard parallel}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.

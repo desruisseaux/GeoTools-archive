@@ -130,9 +130,7 @@ public class AlbersEqualArea extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider 
-            extends org.geotools.referencing.operation.projection.MapProjection.Provider {
-
+    public static final class Provider extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
@@ -220,7 +218,7 @@ public class AlbersEqualArea extends MapProjection {
         super(parameters, expected);
 
         phi1 = doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters);
-        ensureLatitudeInRange(Provider.STANDARD_PARALLEL_1, phi1, true);
+        ensureLatitudeInRange(       Provider.STANDARD_PARALLEL_1, phi1, true);
         phi2 = doubleValue(expected, Provider.STANDARD_PARALLEL_2, parameters);
         if (Double.isNaN(phi2)) {
             phi2 = phi1;

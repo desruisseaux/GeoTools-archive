@@ -76,9 +76,7 @@ public abstract class Orthographic extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider 
-            extends org.geotools.referencing.operation.projection.MapProjection.Provider {
-
+    public static final class Provider extends AbstractProvider {
         /**
          * The parameters group.
          */

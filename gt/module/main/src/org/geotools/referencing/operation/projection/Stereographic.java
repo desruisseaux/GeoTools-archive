@@ -169,7 +169,7 @@ public abstract class Stereographic extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider_Oblique extends Provider {
+    public static final class Provider_Oblique extends AbstractProvider {
         /**
          * The parameters group.
          */
@@ -214,8 +214,7 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            final double latitudeOfOrigin = Math.abs(
-                doubleValue(Provider.LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
@@ -252,7 +251,7 @@ public abstract class Stereographic extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider_Polar_A extends Provider {
+    public static final class Provider_Polar_A extends AbstractProvider {
         /**
          * The parameters group.
          */
@@ -315,7 +314,7 @@ public abstract class Stereographic extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static class Provider_Polar_B extends Provider {
+    public static class Provider_Polar_B extends AbstractProvider {
         /**
          * The operation parameter descriptor for the latitudeTrueScale
          * parameter value. Valid values range is from -90 to 90°. 
@@ -520,7 +519,7 @@ public abstract class Stereographic extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider_USGS extends Provider{
+    public static final class Provider_USGS extends AbstractProvider{
         /**
          * The parameters group.
          */
@@ -561,8 +560,7 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            final double latitudeOfOrigin = Math.abs(
-                doubleValue(Provider.LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {

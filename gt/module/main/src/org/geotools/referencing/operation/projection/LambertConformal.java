@@ -136,7 +136,7 @@ public class LambertConformal extends MapProjection{
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    public static final class Provider1SP extends Provider {       
+    public static final class Provider1SP extends AbstractProvider {       
         /**
          * The parameters group.
          */
@@ -194,7 +194,7 @@ public class LambertConformal extends MapProjection{
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    public static class Provider2SP extends Provider {
+    public static class Provider2SP extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.

@@ -244,19 +244,19 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         if (expected == null) {
             expected = getParameterDescriptors().descriptors();
         }
-        semiMajor           = doubleValue(expected, Provider.SEMI_MAJOR,         values);
-        semiMinor           = doubleValue(expected, Provider.SEMI_MINOR,         values);
-        centralMeridian     = doubleValue(expected, Provider.CENTRAL_MERIDIAN,   values);
-        latitudeOfOrigin    = doubleValue(expected, Provider.LATITUDE_OF_ORIGIN, values);
-        scaleFactor         = doubleValue(expected, Provider.SCALE_FACTOR,       values);
-        falseEasting        = doubleValue(expected, Provider.FALSE_EASTING,      values);
-        falseNorthing       = doubleValue(expected, Provider.FALSE_NORTHING,     values);
+        semiMajor           = doubleValue(expected, AbstractProvider.SEMI_MAJOR,         values);
+        semiMinor           = doubleValue(expected, AbstractProvider.SEMI_MINOR,         values);
+        centralMeridian     = doubleValue(expected, AbstractProvider.CENTRAL_MERIDIAN,   values);
+        latitudeOfOrigin    = doubleValue(expected, AbstractProvider.LATITUDE_OF_ORIGIN, values);
+        scaleFactor         = doubleValue(expected, AbstractProvider.SCALE_FACTOR,       values);
+        falseEasting        = doubleValue(expected, AbstractProvider.FALSE_EASTING,      values);
+        falseNorthing       = doubleValue(expected, AbstractProvider.FALSE_NORTHING,     values);
         isSpherical         = (semiMajor == semiMinor);
         excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
         excentricity        = Math.sqrt(excentricitySquared);
         globalScale         = scaleFactor*semiMajor;
-        ensureLongitudeInRange(Provider.CENTRAL_MERIDIAN,   centralMeridian,  true);
-        ensureLatitudeInRange (Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
+        ensureLongitudeInRange(AbstractProvider.CENTRAL_MERIDIAN,   centralMeridian,  true);
+        ensureLatitudeInRange (AbstractProvider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
     }
 
     /**
@@ -358,7 +358,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *
      * @param descriptors The value returned by
      *        <code>getParameterDescriptors().descriptors()</code>.
-     * @param descriptor  One of the {@link Provider} constants.
+     * @param descriptor  One of the {@link AbstractProvider} constants.
      * @param values      The group in which to set the value.
      * @param value       The value to set.
      */
@@ -413,13 +413,13 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         final Collection expected = descriptor.descriptors();
         // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
         final ParameterValueGroup values = (ParameterValueGroup) descriptor.createValue();
-        set(expected, Provider.SEMI_MAJOR,         values, semiMajor       );
-        set(expected, Provider.SEMI_MINOR,         values, semiMinor       );
-        set(expected, Provider.CENTRAL_MERIDIAN,   values, centralMeridian );
-        set(expected, Provider.LATITUDE_OF_ORIGIN, values, latitudeOfOrigin);
-        set(expected, Provider.SCALE_FACTOR,       values, scaleFactor     );
-        set(expected, Provider.FALSE_EASTING,      values, falseEasting    );
-        set(expected, Provider.FALSE_NORTHING,     values, falseNorthing   );
+        set(expected, AbstractProvider.SEMI_MAJOR,         values, semiMajor       );
+        set(expected, AbstractProvider.SEMI_MINOR,         values, semiMinor       );
+        set(expected, AbstractProvider.CENTRAL_MERIDIAN,   values, centralMeridian );
+        set(expected, AbstractProvider.LATITUDE_OF_ORIGIN, values, latitudeOfOrigin);
+        set(expected, AbstractProvider.SCALE_FACTOR,       values, scaleFactor     );
+        set(expected, AbstractProvider.FALSE_EASTING,      values, falseEasting    );
+        set(expected, AbstractProvider.FALSE_NORTHING,     values, falseNorthing   );
         return values;
     }
     
@@ -1025,7 +1025,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static abstract class Provider extends MathTransformProvider {
+    public static abstract class AbstractProvider extends MathTransformProvider {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -1134,7 +1134,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @param parameters The set of parameters (never <code>null</code>).
          */
-        public Provider(final ParameterDescriptorGroup parameters) {
+        public AbstractProvider(final ParameterDescriptorGroup parameters) {
             super(2, 2, parameters);
         }
 

@@ -277,9 +277,7 @@ public class ObliqueMercator extends MapProjection {
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static class Provider 
-            extends org.geotools.referencing.operation.projection.MapProjection.Provider {
-
+    public static class Provider extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #latitudeOfCentre}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
