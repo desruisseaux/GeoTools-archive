@@ -161,6 +161,8 @@ public class GMLSchema implements Schema {
         return complexTypes;
     }
 
+    /** GMLSchema.getInstance().getElements()[GMLSchema.BOX] */
+    public static final int BOX = 41;
     /*
      * Used to load the set of elements stored in the static class variable
      * representing the element set in the GML Schema
@@ -289,7 +291,7 @@ public class GMLSchema implements Schema {
         elements1[40] = new GMLElement("Polygon",
                 GMLComplexTypes.PolygonType.getInstance(), 1, 1, false,
                 elements1[29]); // gml:PolygonType
-        elements1[41] = new GMLElement("Box",
+        elements1[BOX] = new GMLElement("Box",
                 GMLComplexTypes.BoxType.getInstance(), 1, 1, false, null); // gml:BoxType
         elements1[42] = new GMLElement("MultiGeometry",
                 GMLComplexTypes.GeometryCollectionType.getInstance(), 1, 1,
