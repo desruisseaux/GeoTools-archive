@@ -150,7 +150,6 @@ public class DataUtilities {
         for (Iterator i = set.iterator(); i.hasNext(); index++) {
             names[index] = (String) i.next();
         }
-
         return names;
     }
 
@@ -158,12 +157,51 @@ public class DataUtilities {
      * DOCUMENT ME!
      *
      * @param filter DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static String[] attributeNames(Expression expression) {
+        if (expression == null) {
+            return new String[0];
+        }
+
+        final Set set = new HashSet();
+        traverse(expression,
+            new DataUtilities.AbstractFilterVisitor() {
+                public void visit(AttributeExpression attributeExpression) {
+                    set.add(attributeExpression.getAttributePath());
+                }
+            });
+
+        if (set.size() == 0) {
+            return new String[0];
+        }
+
+        String[] names = new String[set.size()];
+        int index = 0;
+
+        for (Iterator i = set.iterator(); i.hasNext(); index++) {
+            names[index] = (String) i.next();
+        }
+        return names;
+        
+    }
+    /**
+     *
+     * @param filter DOCUMENT ME!
      * @param visitor DOCUMENT ME!
      */
     public static void traverse(Filter filter, FilterVisitor visitor) {
         traverse(traverseDepth(filter), visitor);
     }
-
+    /**
+     *
+     * @param filter DOCUMENT ME!
+     * @param visitor DOCUMENT ME!
+     */
+    public static void traverse(Expression expression, FilterVisitor visitor) {
+        traverse(traverseDepth(expression), visitor);
+    }
     /**
      * Performs a depth first traversal on Filter.
      * 
@@ -229,6 +267,29 @@ public class DataUtilities {
             };
 
         filter.accept(traverse);
+
+        return set;
+    }
+    /**
+     * Performs a depth first traversal of Filter.
+     *
+     * @param filter
+     *
+     * @return Set of Filters in traversing filter
+     */
+    public static Set traverseDepth(Expression expression) {
+        final Set set = new HashSet();
+        FilterVisitor traverse = new Traversal() {
+                void traverse(Filter f) {
+                    set.add(f);
+                }
+
+                void traverse(Expression expr) {
+                    set.add(expr);
+                }
+            };
+
+        expression.accept(traverse);
 
         return set;
     }
