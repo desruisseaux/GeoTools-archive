@@ -75,9 +75,7 @@ public interface Metadata {
      */
     public interface Entity {
         Element getElement( String xpath );
-        Element getElement( int index );
-        Element[] getElements( );
-        int getNumElements( );
+        List getElements( );
     }
 
     /**
