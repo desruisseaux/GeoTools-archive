@@ -16,6 +16,7 @@
  */
 package org.geotools.xml;
 
+import org.xml.sax.DTDHandler;
 import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,6 +137,7 @@ public class DocumentFactory {
         try {
             parser.parse(is, xmlContentHandler);
         } catch (IOException e) {
+e.printStackTrace();
             throw new SAXException(e);
         }
 
@@ -151,10 +153,12 @@ public class DocumentFactory {
         spf.setValidating(false);
 
         try {
-            return spf.newSAXParser();
+            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            
+            SAXParser sp = spf.newSAXParser();
+            return sp;
         } catch (ParserConfigurationException e) {
-            throw new SAXException(e);
-        } catch (SAXException e) {
             throw new SAXException(e);
         }
     }

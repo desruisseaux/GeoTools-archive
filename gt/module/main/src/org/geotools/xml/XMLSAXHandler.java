@@ -20,10 +20,15 @@ import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.handlers.IgnoreHandler;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringBufferInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -66,6 +71,14 @@ public class XMLSAXHandler extends DefaultHandler {
     // the stack of handlers
     private Stack handlers = new Stack();
 
+    public InputSource resolveEntity( String pubId, String sysId ) throws IOException, SAXException {
+//System.out.println("***"+pubId+"*"+sysId+"*");
+        // avoid dtd files
+		if(sysId != null && sysId.endsWith("dtd")){
+		    return new InputSource(new StringBufferInputStream(""));
+		}
+		return super.resolveEntity(pubId,sysId);
+    }
     // hints
     private Map hints;
     private ElementHandlerFactory ehf = new ElementHandlerFactory(logger);
