@@ -2,7 +2,6 @@
 package org.geotools.xml;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -31,12 +30,12 @@ import org.xml.sax.SAXException;
  * @author dzwiers www.refractions.net
  */
 public class GMLParserTest extends TestCase {
-    public void testSchema() throws SAXException, IOException {
+    public void testSchema(){
         Schema s = SchemaFactory.getInstance(GMLSchema.NAMESPACE);
         assertNotNull(s);
     }
     
-    public void testOneFeature() throws SAXException, IOException {
+    public void testOneFeature(){
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -67,7 +66,7 @@ public class GMLParserTest extends TestCase {
             fail(e.toString());
         }
     }
-    public void testMoreFeatures() throws SAXException, IOException {
+    public void testMoreFeatures(){
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -99,7 +98,7 @@ public class GMLParserTest extends TestCase {
         }
     }
     
-    public void testFMERoadsFeatures() throws SAXException, IOException {
+    public void testFMERoadsFeatures() {
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -131,7 +130,7 @@ public class GMLParserTest extends TestCase {
         }
     }
     
-    public void testFMELakesFeatures() throws SAXException, IOException {
+    public void testFMELakesFeatures() {
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -170,7 +169,7 @@ public class GMLParserTest extends TestCase {
         FeatureIterator i = doc.features();
         int j = 1;
         while(i.hasNext()){
-            Feature ft = (Feature)i.next();;
+            Feature ft = i.next();
             assertNotNull("Feature #"+j+" is null",ft);
 //            assertNotNull("Feature #"+j+" missing crs ",ft.getFeatureType().getDefaultGeometry().getCoordinateSystem());
 //            System.out.println("Feature "+j+" : "+ft);
@@ -249,7 +248,7 @@ public class GMLParserTest extends TestCase {
         }
     }
     
-    public void testProblemFeatures() throws SAXException, IOException {
+    public void testProblemFeatures(){
        try {
            SAXParserFactory spf = SAXParserFactory.newInstance();
            spf.setNamespaceAware(true);
