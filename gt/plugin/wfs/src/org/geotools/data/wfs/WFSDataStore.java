@@ -41,9 +41,11 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -942,12 +944,22 @@ public class WFSDataStore extends AbstractDataStore{
 					}
 				}
 			}else{
-				// more than one child
-				Iterator it = filter.getFilterIterator();
 				int i = stack.size();
-				while(it.hasNext()){
-					((Filter)it.next()).accept(this);
-				}
+				if(filter.getFilterType() == Filter.LOGIC_OR){
+					Filter orReplacement;
+					try {
+						orReplacement = translateOr(filter);
+						orReplacement.accept(this);
+					} catch (IllegalFilterException e) {
+						stack.push(filter);
+						return;
+					}
+				}else{
+					// more than one child
+					Iterator it = filter.getFilterIterator();
+					while(it.hasNext()){
+						((Filter)it.next()).accept(this);
+					}
 				
 				//combine the unsupported and add to the top
 				if(i<stack.size()){
@@ -957,19 +969,20 @@ public class WFSDataStore extends AbstractDataStore{
 							f.and((Filter)stack.pop());
 						stack.push(f);
 					}else{
-					if(filter.getFilterType() == Filter.LOGIC_OR){
-//						Filter f = (Filter)stack.pop();
-						while(stack.size()>i)
-//							f.or((Filter)stack.pop());
-							stack.pop(); // or... we can't do the same as and
-						stack.push(filter);
-					}else{
+//					if(filter.getFilterType() == Filter.LOGIC_OR){
+////						Filter f = (Filter)stack.pop();
+//						while(stack.size()>i)
+////							f.or((Filter)stack.pop());
+//							stack.pop(); // or... we can't do the same as and
+//						stack.push(filter);
+//					}else{
 						// error?
 						logger.warning("LogicFilter found which is not 'and, or, not");
 						while(stack.size()>i)
 							stack.pop();
 						stack.push(filter);
-					}}
+					}//}
+				}
 				}
 			}
 		}
@@ -1063,6 +1076,30 @@ public class WFSDataStore extends AbstractDataStore{
 					return;
 				}
 			}
+		}
+		
+		public Filter translateOr(LogicFilter filter) throws IllegalFilterException{
+			if(filter.getFilterType() != LogicFilter.LOGIC_OR)
+				return filter;
+			
+			// a|b == ~~(a|b) negative introduction
+			// ~(a|b) == (~a + ~b) modus ponens
+			// ~~(a|b) == ~(~a + ~b) substitution
+			// a|b == ~(~a + ~b) negative simpilification
+			
+			FilterFactory ff = FilterFactory.createFilterFactory();
+			LogicFilter and = ff.createLogicFilter(Filter.LOGIC_AND);
+			Iterator i = filter.getFilterIterator();
+			while(i.hasNext()){
+				Filter f = (Filter)i.next();
+				if(f.getFilterType() == Filter.LOGIC_NOT){
+					// simplify it 
+					and.addFilter((Filter)((LogicFilter)f).getFilterIterator().next());
+				}else{
+					and.addFilter(f.not());
+				}
+			}
+			return and.not();
 		}
     }
     
