@@ -1,0 +1,3 @@
+org.geotools.filter.AreaFunction
+org.geotools.filter.MinFunction
+org.geotools.filter.MaxFunction
