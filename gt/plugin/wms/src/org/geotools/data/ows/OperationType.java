@@ -18,45 +18,51 @@ package org.geotools.data.ows;
 
 import java.net.URL;
 
+
 public class OperationType {
-	protected Object formats;
-	private URL get;
-	private URL post;
-	
-	/**
-	 * @return Returns the formats.
-	 */
-	public Object getFormats() {
-		return formats;
-	}
-	/**
-	 * @param formats The formats to set.
-	 */
-	public void setFormats(Object formats) {
-		this.formats = formats;
-	}
-	/**
-	 * @return Returns the get.
-	 */
-	public URL getGet() {
-		return get;
-	}
-	/**
-	 * @param get The get to set.
-	 */
-	public void setGet(URL get) {
-		this.get = get;
-	}
-	/**
-	 * @return Returns the post.
-	 */
-	public URL getPost() {
-		return post;
-	}
-	/**
-	 * @param post The post to set.
-	 */
-	public void setPost(URL post) {
-		this.post = post;
-	}
+    protected Object formats;
+    private URL get;
+    private URL post;
+
+    /**
+     * @return Returns the formats.
+     */
+    public Object getFormats() {
+        return formats;
+    }
+
+    /**
+     * @param formats The formats to set.
+     */
+    public void setFormats(Object formats) {
+        this.formats = formats;
+    }
+
+    /**
+     * @return Returns the get.
+     */
+    public URL getGet() {
+        return get;
+    }
+
+    /**
+     * @param get The get to set.
+     */
+    public void setGet(URL get) {
+        this.get = get;
+    }
+
+    /**
+     * @return Returns the post.
+     */
+    public URL getPost() {
+        return post;
+    }
+
+    /**
+     * @param post The post to set.
+     */
+    public void setPost(URL post) {
+        this.post = post;
+    }
 }

@@ -16,9 +16,18 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
+
+import org.jdom.Document;
+import org.jdom.Element;
+
 import java.io.IOException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,11 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
-import org.geotools.data.wms.request.GetMapRequest;
-import org.jdom.Document;
-import org.jdom.Element;
 
 /**
  * Provides support for the Web Map Server 1.0 Specificaiton.
@@ -52,55 +56,56 @@ import org.jdom.Element;
  * <li>Web Map Server - uses WMS1_0_0 as a WMSFormat factory to generate the correct
  *     WMS_1_0_0.Format.
  * </ul>
- * </p> 
+ * </p>
  * <p>
  * WMS1_0_0 provides both name and version information that may be checked against
  * a GetCapabilities document during version negotiation.
- * </p> 
+ * </p>
  * @author Jody Garnett, Refractions Research
  */
 public class WMS1_0_0 extends Specification {
-    
-	private WMSParser[] parsers;
-	
-	public WMS1_0_0() {
-		parsers = new WMSParser[1];
-		parsers[0] = new Parser();
-	}
-	
-    /** Expected name attribute for root element */
-    public String getName(){
-        return "WMT_MS_Capabilities";
-    }
-    /**
-     * Expected version attribute for root element.
-     */
-    public String getVersion(){
-        return "1.0.0";
-    }
-    
     static final Map mime = new HashMap();
+
     //TODO Fill out the rest of these mime types!
     static {
         mime.put("GIF", "image/gif");
         mime.put("PNG", "image/png");
         mime.put("JPEG", "image/jpeg");
         mime.put("BMP", "image/bmp");
-        mime.put("WebCGM", "image/cgm;Version=4;ProfileId=WebCGM" );
-        mime.put("SVG", "image/svg+xml" );
-        mime.put("GML.1", "text/xml" );
-        mime.put("GML.2", "text/xml" );
-        mime.put("GML.3", "text/xml" );
-        mime.put("WBMP", "image/vnd.wap.wbmp" );
-        mime.put("WMS_XML", "application/vnd.ogc.wms_xml" );
-        mime.put("MIME", "mime" );
-        mime.put("INIMAGE", "application/vnd.ogc.se_inimage" );
-        mime.put("TIFF", "image/tiff" );
-        mime.put("GeoTIFF", "image/tiff" );
-        mime.put("PPM", "image/x-portable-pixmap" );
-        mime.put("BLANK", "application/vnd.ogc.se_blank" );
-             
-    }    
+        mime.put("WebCGM", "image/cgm;Version=4;ProfileId=WebCGM");
+        mime.put("SVG", "image/svg+xml");
+        mime.put("GML.1", "text/xml");
+        mime.put("GML.2", "text/xml");
+        mime.put("GML.3", "text/xml");
+        mime.put("WBMP", "image/vnd.wap.wbmp");
+        mime.put("WMS_XML", "application/vnd.ogc.wms_xml");
+        mime.put("MIME", "mime");
+        mime.put("INIMAGE", "application/vnd.ogc.se_inimage");
+        mime.put("TIFF", "image/tiff");
+        mime.put("GeoTIFF", "image/tiff");
+        mime.put("PPM", "image/x-portable-pixmap");
+        mime.put("BLANK", "application/vnd.ogc.se_blank");
+    }
+
+    private WMSParser[] parsers;
+
+    public WMS1_0_0() {
+        parsers = new WMSParser[1];
+        parsers[0] = new Parser();
+    }
+
+    /** Expected name attribute for root element */
+    public String getName() {
+        return "WMT_MS_Capabilities";
+    }
+
+    /**
+     * Expected version attribute for root element.
+     */
+    public String getVersion() {
+        return "1.0.0";
+    }
+
     /**
      * Provides mapping from well known format to MIME type.
      * <p>
@@ -112,12 +117,14 @@ public class WMS1_0_0 extends Specification {
      * @param format
      * @return MIME type for format
      */
-    public static final String toMIME(String format ){
-        if( mime.containsKey( format )){
-            return (String) mime.get( format );
+    public static final String toMIME(String format) {
+        if (mime.containsKey(format)) {
+            return (String) mime.get(format);
         }
+
         return null;
     }
+
     /**
      * Provides mapping from MIME type to WMS 1.0.0 Format.
      * <p>
@@ -129,48 +136,57 @@ public class WMS1_0_0 extends Specification {
      * @param mimeType MIME type such as "image/gif"
      * @return Format well known WMS 1.0.0 format such as "GIF"
      */
-    public static final String toFormat(String mimeType ){
-        for( Iterator i=mime.entrySet().iterator(); i.hasNext(); ){
+    public static final String toFormat(String mimeType) {
+        for (Iterator i = mime.entrySet().iterator(); i.hasNext();) {
             Map.Entry entry = (Map.Entry) i.next();
-            if( mimeType.equals( entry.getValue())){
+
+            if (mimeType.equals(entry.getValue())) {
                 return (String) entry.getKey();
-            }            
+            }
         }
+
         return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.geotools.data.wms.Specification#createParser(org.jdom.Document)
      */
     public WMSParser createParser(Document document) throws IOException {
-    	WMSParser generic = null;
-		WMSParser custom = null;					
-		for (int i = 0; i < parsers.length; i++) {
-			int canProcess = parsers[i].canProcess( document );						
-			if (canProcess == WMSParser.GENERIC) {
-				generic = parsers[i];
-			} else if (canProcess == WMSParser.CUSTOM) {
-				custom = parsers[i];
-			}
-		}
-		WMSParser parser = generic;
-		
-		if (custom != null) {
-			parser = custom;
-		}
-		if (parser == null) {
-		    // Um can we have the name & version number please?
-		    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
-		}
-		
+        WMSParser generic = null;
+        WMSParser custom = null;
+
+        for (int i = 0; i < parsers.length; i++) {
+            int canProcess = parsers[i].canProcess(document);
+
+            if (canProcess == WMSParser.GENERIC) {
+                generic = parsers[i];
+            } else if (canProcess == WMSParser.CUSTOM) {
+                custom = parsers[i];
+            }
+        }
+
+        WMSParser parser = generic;
+
+        if (custom != null) {
+            parser = custom;
+        }
+
+        if (parser == null) {
+            // Um can we have the name & version number please?
+            throw new RuntimeException(
+                "No parsers available to parse that GetCapabilities document");
+        }
+
         return new Parser();
     }
+
     /* (non-Javadoc)
      * @see org.geotools.data.wms.Specification#createRequest(java.net.URL)
      */
     public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
-        return new GetCapsRequest( server );
+        return new GetCapsRequest(server);
     }
+
     /**
      * We need a custom request object.
      * <p>
@@ -179,48 +195,62 @@ public class WMS1_0_0 extends Specification {
      * <li>WMTVER=1.0.0
      * <li>
      * </p>
-     */ 
+     */
     static public class GetCapsRequest extends GetCapabilitiesRequest {
         /**
          * Construct a Request compatable with a 1.0.0 Web Feature Server.
-         * 
+         *
          * @param urlGetCapabilities URL of GetCapabilities document.
          */
-        public GetCapsRequest(URL urlGetCapabilities ) {
+        public GetCapsRequest(URL urlGetCapabilities) {
             super(urlGetCapabilities);
         }
-        protected void initVersion(){
-    	    setProperty("WMTVER", "1.0.0");
-    	}
-        protected void initRequest(){
+
+        protected void initVersion() {
+            setProperty("WMTVER", "1.0.0");
+        }
+
+        protected void initRequest() {
             setProperty("REQUEST", "capabilities");
         }
-        protected void initService(){
+
+        protected void initService() {
             ;
         }
     }
-    static public class GetMapRequest extends org.geotools.data.wms.request.GetMapRequest {
-        public GetMapRequest(URL onlineResource, String version, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions) {
-            super(onlineResource, version, availableLayers, availableSRSs, availableFormats, availableExceptions);
+
+    static public class GetMapRequest
+        extends org.geotools.data.wms.request.GetMapRequest {
+        public GetMapRequest(URL onlineResource, String version,
+            SimpleLayer[] availableLayers, Set availableSRSs,
+            String[] availableFormats, List availableExceptions) {
+            super(onlineResource, version, availableLayers, availableSRSs,
+                availableFormats, availableExceptions);
         }
-        
+
         protected void initRequest() {
             setProperty("REQUEST", "map");
         }
     }
-    static public class GetFeatureInfoRequest extends org.geotools.data.wms.request.GetFeatureInfoRequest {
-        public GetFeatureInfoRequest(URL onlineResource, GetMapRequest getMapRequest,
-                Set queryableLayers, String[] infoFormats) {
+
+    static public class GetFeatureInfoRequest
+        extends org.geotools.data.wms.request.GetFeatureInfoRequest {
+        public GetFeatureInfoRequest(URL onlineResource,
+            GetMapRequest getMapRequest, Set queryableLayers,
+            String[] infoFormats) {
             super(onlineResource, getMapRequest, queryableLayers, infoFormats);
         }
+
         protected void initRequest() {
             setProperty("REQUEST", "feature_info");
         }
     }
+
     static public class Parser extends AbstractWMSParser {
         public String getVersion() {
             return "1.0.0";
-        } 
+        }
+
         /**
          * WMS 1.0 makes use of a different definition of format that what we would like.
          * <p>
@@ -248,60 +278,75 @@ public class WMS1_0_0 extends Specification {
          */
         protected List queryFormats(Element op) {
             // Example: <Format><PNG /><JPEG /><GML.1 /></Format>
-            
             Element formatElement = op.getChild("Format");
-            
+
             Iterator iter;
-            
+
             List formats = new ArrayList();
             List formatElements = formatElement.getChildren();
             iter = formatElements.iterator();
+
             while (iter.hasNext()) {
                 Element format = (Element) iter.next();
-                String mime = toMIME( format.getName() );
-                if( mime != null ){
-                    formats.add( mime );
+                String mime = toMIME(format.getName());
+
+                if (mime != null) {
+                    formats.add(mime);
                 }
-            }        
+            }
+
             return formats;
         }
 
         protected URL queryDCPType(Element element, String httpType)
-                throws MalformedURLException {
+            throws MalformedURLException {
             List dcpTypeElements = element.getChildren("DCPType");
-            for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
+
+            for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
                 Element dcpTypeElement = (Element) i.next();
                 Element httpElement = dcpTypeElement.getChild("HTTP");
-                
+
                 Element httpTypeElement = httpElement.getChild(httpType);
+
                 if (httpTypeElement != null) {
-                	return new URL((httpTypeElement.getAttributeValue("onlineResource")));
+                    return new URL((httpTypeElement.getAttributeValue(
+                            "onlineResource")));
                 }
             }
-            return null;      
+
+            return null;
         }
+
         protected URL queryServiceOnlineResource(Element serviceElement)
-                throws MalformedURLException {
+            throws MalformedURLException {
             return new URL(serviceElement.getChildText("OnlineResource"));
         }
+
         protected String[] queryKeywords(Element serviceElement) {
             String keywords = serviceElement.getChildTextTrim("Keywords");
+
             return keywords.split(" ");
         }
+
         protected String getRequestGetCapName() {
             return "Capabilities";
         }
+
         protected String getRequestGetFeatureInfoName() {
             return "FeatureInfo";
         }
+
         protected String getRequestGetMapName() {
             return "Map";
         }
+
         protected List querySRS(Element layerElement) {
             Element srsElement = layerElement.getChild("SRS");
+
             if (srsElement != null) {
                 return Arrays.asList(srsElement.getTextTrim().split(" "));
             }
+
             return null;
         }
     }

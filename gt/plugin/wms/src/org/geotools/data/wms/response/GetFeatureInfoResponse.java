@@ -18,6 +18,7 @@ package org.geotools.data.wms.response;
 
 import java.io.InputStream;
 
+
 /**
  * Process GetFeatureInfoResponse.
  * <p>
@@ -34,12 +35,11 @@ import java.io.InputStream;
  * @author Richard Gould
  */
 public class GetFeatureInfoResponse extends AbstractResponse {
-
-	/**
-	 * @param contentType
-	 * @param inputStream
-	 */
-	public GetFeatureInfoResponse(String contentType, InputStream inputStream) {
-		super(contentType, inputStream);
-	}
+    /**
+     * @param contentType
+     * @param inputStream
+     */
+    public GetFeatureInfoResponse(String contentType, InputStream inputStream) {
+        super(contentType, inputStream);
+    }
 }

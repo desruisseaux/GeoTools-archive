@@ -18,23 +18,23 @@ package org.geotools.data.wms;
 
 import org.geotools.data.ows.OperationType;
 
+
 /**
  * A subclass of OperationType that allows format getters and setters
  * without having to cast them.
- * 
+ *
  * @author Richard Gould
  */
 public class WMSOperationType extends OperationType {
-	
-	public WMSOperationType() {
-		super();
-	}
-	
-	public String[] getFormatStrings() {
-		return (String[]) formats;
-	}
-	
-	public void setFormatStrings(String[] formats) {
-		this.formats = formats;
-	}
+    public WMSOperationType() {
+        super();
+    }
+
+    public String[] getFormatStrings() {
+        return (String[]) formats;
+    }
+
+    public void setFormatStrings(String[] formats) {
+        this.formats = formats;
+    }
 }

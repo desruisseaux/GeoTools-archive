@@ -16,16 +16,19 @@
  */
 package org.geotools.data.wms.response;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
+
 import org.jdom.Document;
 import org.jdom.JDOMException;
+
 import org.jdom.input.SAXBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 
 /**
  * Represents the response of a getCapabilities request.
@@ -43,26 +46,27 @@ import org.jdom.input.SAXBuilder;
  * @author Richard Gould, Refractions Research
  */
 public class GetCapabilitiesResponse extends AbstractResponse {
+    private WMSCapabilities capabilities;
 
-	private WMSCapabilities capabilities;
-
-	public GetCapabilitiesResponse(WMSParser parser, String contentType, InputStream inputStream) throws JDOMException, ParseCapabilitiesException, IOException {
-		this(parser, buildDocument(new SAXBuilder(), inputStream));
-	}
-
-    public GetCapabilitiesResponse(WMSParser parser, Document document) throws ParseCapabilitiesException{
-	    super(null, null);
-		capabilities = parser.constructCapabilities( document, new WMSBuilder() );    
-	}
-
-    private static Document buildDocument(SAXBuilder builder, InputStream inputStream) throws IOException, JDOMException{
-		return builder.build(inputStream);
+    public GetCapabilitiesResponse(WMSParser parser, String contentType,
+        InputStream inputStream)
+        throws JDOMException, ParseCapabilitiesException, IOException {
+        this(parser, buildDocument(new SAXBuilder(), inputStream));
     }
 
-    
-	/** Retrived parsed Capabilities */
-	public WMSCapabilities getCapabilities() {
-		return capabilities;
-	}
+    public GetCapabilitiesResponse(WMSParser parser, Document document)
+        throws ParseCapabilitiesException {
+        super(null, null);
+        capabilities = parser.constructCapabilities(document, new WMSBuilder());
+    }
 
+    private static Document buildDocument(SAXBuilder builder,
+        InputStream inputStream) throws IOException, JDOMException {
+        return builder.build(inputStream);
+    }
+
+    /** Retrived parsed Capabilities */
+    public WMSCapabilities getCapabilities() {
+        return capabilities;
+    }
 }

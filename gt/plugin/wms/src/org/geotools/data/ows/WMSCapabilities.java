@@ -16,64 +16,71 @@
  */
 package org.geotools.data.ows;
 
+
 /**
  * Represents a base object for a WMS getCapabilities response.
- * 
+ *
  * @author Richard Gould, Refractions Research
  */
 public class WMSCapabilities {
     private Service service;
     private WMSRequest request;
     private Layer[] layers;
-    
-	/**
-	 * @return Returns the layers.
-	 */
-	public Layer[] getLayers() {
-		return layers;
-	}
-	/**
-	 * @param layers The layers to set.
-	 */
-	public void setLayers(Layer[] layers) {
-		this.layers = layers;
-	}
-	/**
-	 * @return Returns the request.
-	 */
-	public WMSRequest getRequest() {
-		return request;
-	}
-	/**
-	 * @param request The request to set.
-	 */
-	public void setRequest(WMSRequest request) {
-		this.request = request;
-	}
-	/**
-	 * @return Returns the service.
-	 */
-	public Service getService() {
-		return service;
-	}
-	/**
-	 * @param service The service to set.
-	 */
-	public void setService(Service service) {
-		this.service = service;
-	}
-	/**
-	 * @return Returns the version.
-	 */
-	public String getVersion() {
-		return version;
-	}
-	/**
-	 * @param version The version to set.
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-	private String version;
-	
+    private String version;
+
+    /**
+     * @return Returns the layers.
+     */
+    public Layer[] getLayers() {
+        return layers;
+    }
+
+    /**
+     * @param layers The layers to set.
+     */
+    public void setLayers(Layer[] layers) {
+        this.layers = layers;
+    }
+
+    /**
+     * @return Returns the request.
+     */
+    public WMSRequest getRequest() {
+        return request;
+    }
+
+    /**
+     * @param request The request to set.
+     */
+    public void setRequest(WMSRequest request) {
+        this.request = request;
+    }
+
+    /**
+     * @return Returns the service.
+     */
+    public Service getService() {
+        return service;
+    }
+
+    /**
+     * @param service The service to set.
+     */
+    public void setService(Service service) {
+        this.service = service;
+    }
+
+    /**
+     * @return Returns the version.
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * @param version The version to set.
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    }
 }

@@ -16,10 +16,12 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.data.ows.WMSCapabilities;
+
+import org.jdom.Document;
+
 import java.io.IOException;
 
-import org.geotools.data.ows.WMSCapabilities;
-import org.jdom.Document;
 
 /**
  * Provides support for parsing of a WMS GetCapabilties Document.
@@ -40,44 +42,44 @@ import org.jdom.Document;
  */
 public interface WMSParser {
     /** Indicates Parser cannot process provided document */
-	public static final int NO = 0;
-	
-	/** Indicates Parser provides generic or limited support for provided document */
-	public static final int GENERIC = 1;
-	
-	/** Indicates Parser provides custom or specific support for provided document */
-	public static final int CUSTOM = 2;
-	
-	/**
-	 * Test if this WMSParser can handle the provided document.
+    public static final int NO = 0;
+
+    /** Indicates Parser provides generic or limited support for provided document */
+    public static final int GENERIC = 1;
+
+    /** Indicates Parser provides custom or specific support for provided document */
+    public static final int CUSTOM = 2;
+
+    /**
+     * Test if this WMSParser can handle the provided document.
+    * <p>
+    * Sample use:
+    * <pre><code>
+    *  SAXBuilder builder = new SAXBuilder();
+     *        Document document;
+     *        try {
+     *                document = builder.build(stream);
+     *                return parser.canProcess( document );
+     *        } catch (JDOMException e) {
+     *                throw new ParseCapabilitiesException( badXML );
+     *        }
+    * </code></pre>
+    * </p>
+    * @param document Document to test
+    * @returns GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
+    */
+    public int canProcess(Document document) throws IOException;
+
+    /**
+     * Use WMSBuilder to construct a Capabilities object for the provided docuemnt.
      * <p>
-     * Sample use:
-     * <pre><code>
-     *  SAXBuilder builder = new SAXBuilder();
-	 *	Document document;
-	 *	try {
-	 *		document = builder.build(stream);
-	 *		return parser.canProcess( document );
-	 *	} catch (JDOMException e) {
-	 *		throw new ParseCapabilitiesException( badXML );
-	 *	}
-     * </code></pre>
+     * Use of Builder pattern allows us to vary the Parser and isolate the complexities of
+     * Capabilities construction (especially layer objects) from Parsing code. Note the use of
+     * Builder (rather than a Factory) allows us to make the construction of layer objects order
+     * dependent.
      * </p>
-     * @param document Document to test
-     * @returns GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
+     * @param document Document to parse
      */
-	public int canProcess(Document document) throws IOException;
-	
-	/**
-	 * Use WMSBuilder to construct a Capabilities object for the provided docuemnt.
-	 * <p>
-	 * Use of Builder pattern allows us to vary the Parser and isolate the complexities of
-	 * Capabilities construction (especially layer objects) from Parsing code. Note the use of
-	 * Builder (rather than a Factory) allows us to make the construction of layer objects order
-	 * dependent.
-	 * </p>
-	 * @param document Document to parse
-	 */
-	public WMSCapabilities constructCapabilities(Document docuemnt, WMSBuilder builder )
-	    throws ParseCapabilitiesException;
+    public WMSCapabilities constructCapabilities(Document docuemnt,
+        WMSBuilder builder) throws ParseCapabilitiesException;
 }

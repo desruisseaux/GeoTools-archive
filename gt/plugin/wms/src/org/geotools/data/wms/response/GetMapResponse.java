@@ -30,7 +30,7 @@ import java.io.InputStream;
  * @author Richard Gould, Refractions Research
  */
 public class GetMapResponse extends AbstractResponse {
-	public GetMapResponse(String contentType, InputStream response) {
-		super(contentType, response);
-	}
+    public GetMapResponse(String contentType, InputStream response) {
+        super(contentType, response);
+    }
 }

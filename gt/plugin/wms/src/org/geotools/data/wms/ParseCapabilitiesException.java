@@ -19,6 +19,7 @@ package org.geotools.data.wms;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
 
+
 /**
  * Exception thrown trying to parse GetCapabilities document.
  * <p>
@@ -38,18 +39,17 @@ import org.xml.sax.SAXParseException;
  * @see org.xml.sax.Locator
  */
 public class ParseCapabilitiesException extends SAXParseException {
-
     private static final long serialVersionUID = 1L;
 
     /**
      * ParseCapabilitiesException exception at unknown location.
-     * 
+     *
      * @param message
      */
     public ParseCapabilitiesException(String message) {
-        super( message, null );        
+        super(message, null);
     }
-    
+
     /**
      * ParseCapabilitiesException exception at unknown location.
      * <p>
@@ -59,7 +59,7 @@ public class ParseCapabilitiesException extends SAXParseException {
      *   ...
      * }
      * catch( NumberFormatException badNumber ){
-     *    throw new ParseCapabilitiesException( badNumber ); 
+     *    throw new ParseCapabilitiesException( badNumber );
      * }
      * </code></pre>
      * </p>
@@ -69,9 +69,9 @@ public class ParseCapabilitiesException extends SAXParseException {
      * @param cause Another exception to embed in this one
      */
     public ParseCapabilitiesException(Exception cause) {
-        super( null, null, cause );
+        super(null, null, cause);
     }
-    
+
     /**
      * ParseCapabilitiesException exception at unknown location.
      * <p>
@@ -81,7 +81,7 @@ public class ParseCapabilitiesException extends SAXParseException {
      *   ...
      * }
      * catch( NumberFormatException nan ){
-     *    throw new ParseCapabilitiesException("BBox minx invalid", nan ); 
+     *    throw new ParseCapabilitiesException("BBox minx invalid", nan );
      * }
      * </code></pre>
      * </p>
@@ -91,8 +91,8 @@ public class ParseCapabilitiesException extends SAXParseException {
      *                null).
      * @param cause   Another exception to embed in this one
      */
-    public ParseCapabilitiesException(String message, Locator locator, Exception cause) {
-        super( message, locator, cause );
+    public ParseCapabilitiesException(String message, Locator locator,
+        Exception cause) {
+        super(message, locator, cause);
     }
-    
 }

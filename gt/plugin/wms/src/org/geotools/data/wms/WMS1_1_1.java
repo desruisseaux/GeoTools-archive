@@ -16,11 +16,14 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
+
+import org.jdom.Document;
+
 import java.io.IOException;
+
 import java.net.URL;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.jdom.Document;
 
 /**
  * Provides support for the Web Map Server 1.1.1 Specificaiton.
@@ -41,37 +44,38 @@ import org.jdom.Document;
  * <li>Web Map Server - uses WMS1_1_1 as a WMSFormat factory to generate the correct
  *     WMS_1_1_1.Format.
  * </ul>
- * </p> 
+ * </p>
  * <p>
  * WMS1_1_1 provides both name and version information that may be checked against
  * a GetCapabilities document during version negotiation.
- * </p> 
+ * </p>
  * @author Jody Garnett, Refractions Research
  */
 public class WMS1_1_1 extends Specification {
-	
-	private WMSParser[] parsers;
-	
-	public WMS1_1_1() {
-		parsers = new WMSParser[1];
-		parsers[0] = new Spec111WMSParser();
-	}
-	
+    private WMSParser[] parsers;
+
+    public WMS1_1_1() {
+        parsers = new WMSParser[1];
+        parsers[0] = new Spec111WMSParser();
+    }
+
     /** Expected name attribute for root element */
-    public String getName(){
+    public String getName() {
         return "WMT_MS_Capabilities";
     }
+
     /**
      * Expected version attribute for root element.
      */
-    public String getVersion(){
+    public String getVersion() {
         return "1.1.1";
     }
-    
+
     /** Factory method to create WMS 1.1.1 GetCapabilities Request */
-    public GetCapabilitiesRequest createGetCapabilitiesRequest( URL server ){
-        return new GetCapsRequest( server );
+    public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
+        return new GetCapsRequest(server);
     }
+
     /**
      * Create parser given document generated from createRequest.
      * <p>
@@ -88,44 +92,53 @@ public class WMS1_1_1 extends Specification {
      * @param document
      * @return Parser capable of handling provided document
      */
-    public WMSParser createParser( Document document ) throws IOException {
-    	WMSParser generic = null;
-		WMSParser custom = null;					
-		for (int i = 0; i < parsers.length; i++) {
-			int canProcess = parsers[i].canProcess( document );						
-			if (canProcess == WMSParser.GENERIC) {
-				generic = parsers[i];
-			} else if (canProcess == WMSParser.CUSTOM) {
-				custom = parsers[i];
-			}
-		}
-		WMSParser parser = generic;
-		
-		if (custom != null) {
-			parser = custom;
-		}
-		if (parser == null) {
-		    // Um can we have the name & version number please?
-		    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
-		}
+    public WMSParser createParser(Document document) throws IOException {
+        WMSParser generic = null;
+        WMSParser custom = null;
+
+        for (int i = 0; i < parsers.length; i++) {
+            int canProcess = parsers[i].canProcess(document);
+
+            if (canProcess == WMSParser.GENERIC) {
+                generic = parsers[i];
+            } else if (canProcess == WMSParser.CUSTOM) {
+                custom = parsers[i];
+            }
+        }
+
+        WMSParser parser = generic;
+
+        if (custom != null) {
+            parser = custom;
+        }
+
+        if (parser == null) {
+            // Um can we have the name & version number please?
+            throw new RuntimeException(
+                "No parsers available to parse that GetCapabilities document");
+        }
+
         return new Parser();
     }
+
     static public class GetCapsRequest extends GetCapabilitiesRequest {
         /**
          * Construct a Request compatable with a 1.0.0 Web Feature Server.
-         * 
+         *
          * @param urlGetCapabilities URL of GetCapabilities document.
          */
-        public GetCapsRequest(URL urlGetCapabilities ) {
+        public GetCapsRequest(URL urlGetCapabilities) {
             super(urlGetCapabilities);
         }
-        protected void initVersion(){
-    	    setProperty("VERSION", "1.1.1");
-    	}
+
+        protected void initVersion() {
+            setProperty("VERSION", "1.1.1");
+        }
     }
+
     static public class Parser extends AbstractWMSParser {
         public String getVersion() {
             return "1.1.1";
-        } 
+        }
     }
 }

@@ -18,52 +18,56 @@ package org.geotools.data.ows;
 
 import org.geotools.data.wms.WMSOperationType;
 
+
 /**
  * @author rgould
  *
  * Available WMS Operations are listed in a Request element.
  */
 public class WMSRequest {
-    
     private WMSOperationType getCapabilities;
     private WMSOperationType getMap;
     private WMSOperationType getFeatureInfo;
 
-    
-	/**
-	 * @return Returns the getCapabilities.
-	 */
-	public WMSOperationType getGetCapabilities() {
-		return getCapabilities;
-	}
-	/**
-	 * @param getCapabilities The getCapabilities to set.
-	 */
-	public void setGetCapabilities(WMSOperationType getCapabilities) {
-		this.getCapabilities = getCapabilities;
-	}
-	/**
-	 * @return Returns the getFeatureInfo.
-	 */
-	public WMSOperationType getGetFeatureInfo() {
-		return getFeatureInfo;
-	}
-	/**
-	 * @param getFeatureInfo The getFeatureInfo to set.
-	 */
-	public void setGetFeatureInfo(WMSOperationType getFeatureInfo) {
-		this.getFeatureInfo = getFeatureInfo;
-	}
-	/**
-	 * @return Returns the getMap.
-	 */
-	public WMSOperationType getGetMap() {
-		return getMap;
-	}
-	/**
-	 * @param getMap The getMap to set.
-	 */
-	public void setGetMap(WMSOperationType getMap) {
-		this.getMap = getMap;
-	}
+    /**
+     * @return Returns the getCapabilities.
+     */
+    public WMSOperationType getGetCapabilities() {
+        return getCapabilities;
+    }
+
+    /**
+     * @param getCapabilities The getCapabilities to set.
+     */
+    public void setGetCapabilities(WMSOperationType getCapabilities) {
+        this.getCapabilities = getCapabilities;
+    }
+
+    /**
+     * @return Returns the getFeatureInfo.
+     */
+    public WMSOperationType getGetFeatureInfo() {
+        return getFeatureInfo;
+    }
+
+    /**
+     * @param getFeatureInfo The getFeatureInfo to set.
+     */
+    public void setGetFeatureInfo(WMSOperationType getFeatureInfo) {
+        this.getFeatureInfo = getFeatureInfo;
+    }
+
+    /**
+     * @return Returns the getMap.
+     */
+    public WMSOperationType getGetMap() {
+        return getMap;
+    }
+
+    /**
+     * @param getMap The getMap to set.
+     */
+    public void setGetMap(WMSOperationType getMap) {
+        this.getMap = getMap;
+    }
 }

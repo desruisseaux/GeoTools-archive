@@ -157,14 +157,13 @@ public class WMSBuilder {
 
     private void finishLayer() {
         layer.setBoundingBoxes(bboxes);
-        
+
         layers.add(layer);
-        
+
         bboxes = null;
     }
 
     public WMSCapabilities finish() {
-        
         capabilities.setService(service);
 
         request.setGetCapabilities(getCapabilities);
@@ -174,7 +173,7 @@ public class WMSBuilder {
         capabilities.setRequest(request);
 
         finishLayer();
-        
+
         Layer[] layerArray = new Layer[layers.size()];
 
         for (int i = 0; i < layers.size(); i++) {

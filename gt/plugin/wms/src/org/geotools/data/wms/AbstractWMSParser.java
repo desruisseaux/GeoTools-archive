@@ -157,13 +157,13 @@ public abstract class AbstractWMSParser implements WMSParser {
         String name = layerElement.getChildText("Name");
         List srsElements = querySRS(layerElement);
         List styleElements = queryStyles(layerElement);
-        
+
         boolean queryable = Integer.parseInt(layerElement.getAttributeValue(
                     "queryable")) == 1;
-        
+
         builder.buildLayer(title, name, queryable, parentTitle, srsElements,
             styleElements);
-        
+
         parseBoundingBoxes(layerElement, builder);
 
         List children = layerElement.getChildren("Layer");
@@ -172,23 +172,28 @@ public abstract class AbstractWMSParser implements WMSParser {
             parseLayer((Element) i.next(), builder, title);
         }
     }
-    
+
     protected void parseBoundingBoxes(Element layerElement, WMSBuilder builder) {
         List bboxElements = layerElement.getChildren("BoundingBox");
         Iterator iter = bboxElements.iterator();
+
         while (iter.hasNext()) {
             Element bboxElement = (Element) iter.next();
-            
+
             String crs = bboxElement.getAttributeValue(getBBoxCRSName());
-            double minX = Double.parseDouble(bboxElement.getAttributeValue("minx"));
-            double minY = Double.parseDouble(bboxElement.getAttributeValue("miny"));
-            double maxX = Double.parseDouble(bboxElement.getAttributeValue("maxx"));
-            double maxY = Double.parseDouble(bboxElement.getAttributeValue("maxy"));
-            
+            double minX = Double.parseDouble(bboxElement.getAttributeValue(
+                        "minx"));
+            double minY = Double.parseDouble(bboxElement.getAttributeValue(
+                        "miny"));
+            double maxX = Double.parseDouble(bboxElement.getAttributeValue(
+                        "maxx"));
+            double maxY = Double.parseDouble(bboxElement.getAttributeValue(
+                        "maxy"));
+
             builder.buildBoundingBox(crs, minX, minY, maxX, maxY);
         }
     }
-    
+
     protected String getBBoxCRSName() {
         return "SRS";
     }

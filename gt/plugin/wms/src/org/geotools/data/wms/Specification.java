@@ -16,11 +16,14 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
+
+import org.jdom.Document;
+
 import java.io.IOException;
+
 import java.net.URL;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.jdom.Document;
 
 /**
  * Provides support for the Web Map Server Specificaitons.
@@ -42,7 +45,7 @@ import org.jdom.Document;
  * <li>WebMapServer - uses a GetCapabilitiesRequest during version negotiation.
  * <li>WMSGridCoverageExchange - uses a WMSFormatFactory to generate the correct WMSFormat
  * </ul>
- * </p> 
+ * </p>
  * <p>
  * Both name and version information that may be checked against
  * a GetCapabilities document during version negotiation.
@@ -56,17 +59,19 @@ import org.jdom.Document;
  */
 public abstract class Specification {
     /** Expected name attribute for root element */
-    public String getName(){
+    public String getName() {
         return "WMT_MS_Capabilities";
     }
+
     /**
      * Expected version attribute for root element.
      */
     public abstract String getVersion();
-        
-    
+
     /** Factory method to create WMSGetCapabilities Request */
-    public abstract GetCapabilitiesRequest createGetCapabilitiesRequest( URL server );
+    public abstract GetCapabilitiesRequest createGetCapabilitiesRequest(
+        URL server);
+
     /**
      * Create parser given document generated from createRequest.
      * <p>
@@ -84,5 +89,6 @@ public abstract class Specification {
      * @return Parser capable of handling provided document
      * @throws IOException if there is an error reading document
      */
-    public abstract WMSParser createParser( Document document ) throws IOException ;
+    public abstract WMSParser createParser(Document document)
+        throws IOException;
 }

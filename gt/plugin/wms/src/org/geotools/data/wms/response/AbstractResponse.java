@@ -18,25 +18,24 @@ package org.geotools.data.wms.response;
 
 import java.io.InputStream;
 
+
 /**
  * @author Richard Gould, Refractions Research
  */
 public class AbstractResponse {
+    protected InputStream inputStream;
+    protected String contentType;
 
-	protected InputStream inputStream;
-	protected String contentType;
+    public AbstractResponse(String contentType, InputStream inputStream) {
+        this.inputStream = inputStream;
+        this.contentType = contentType;
+    }
 
-	public AbstractResponse(String contentType, InputStream inputStream) {
-		this.inputStream = inputStream;
-		this.contentType = contentType;
-	}
-	
-	public String getContentType() {
-		return contentType;
-	}
+    public String getContentType() {
+        return contentType;
+    }
 
-	public InputStream getInputStream() {
-		return inputStream;
-	}
-
+    public InputStream getInputStream() {
+        return inputStream;
+    }
 }
