@@ -238,7 +238,7 @@
   <build>
     <resources> 
       <excludes>
-        <exclude>**/org/geotools/referencing/operation/transform/MathTransformTest.java</exclude>
+        <exclude>**/META-INF/services/org.geotools.referencing.crs.CRSAuthorityFactory</exclude>
       </excludes>
     </resources>
     <unitTest>
