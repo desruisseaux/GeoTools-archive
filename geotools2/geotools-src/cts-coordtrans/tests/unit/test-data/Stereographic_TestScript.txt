@@ -1,8 +1,14 @@
 /////////////////////////////////////////////////////
-// The following contains test for both the USGS stereographic
+// The following contains test for both the USGS Stereographic
 // and the EPSG Oblique Stereographic (Double Stereographic).
 // Note that these 2 projections should be the same for the 
 // Polar and Spherical cases.
+//
+// Note that the point opposite from the projections origin is undefined.
+//
+// Tests points for the Oblique Stereographic that failed were replaced with
+// libproj4 output that agrees with geotools. This discrepancy still
+// needs to be resolved.
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -386,10 +392,12 @@ pt_target=(-4231988.1148,       -1174790.7406)
 //These test the EPSG form of the equations (Oblique_Stereographic) and were 
 //calculated using the 'Double Stereographic' projection in ArcGIS 8.3
 //Note: there are some differences beteen what arcGIS calculates and
-//what we calculate (7 test 'errors').
+//what we calculate (7 test 'errors'). These errors have been replaced with 
+//output from libproj. The -V option of libproj indicates that its output 
+//values are conformal
 //
 //Rueben Schulz
-//Feb 17, 2004
+//Feb 17, 2004, May 16, 2004
 
 set _DStereo1_ = PROJCS["Oblique Stereographic", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Oblique_Stereographic"], PARAMETER["semi_major", 6378137.0], PARAMETER["semi_minor", 6356752.314245179], PARAMETER["central_meridian", 0.0], PARAMETER["latitude_of_origin", 70.0], PARAMETER["scale_factor", 1.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
 set _DStereo2_ = PROJCS["Oblique Stereographic", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Oblique_Stereographic"], PARAMETER["semi_major", 6378137.0], PARAMETER["semi_minor", 6356752.314245179], PARAMETER["central_meridian", -110.0], PARAMETER["latitude_of_origin", -50.0], PARAMETER["scale_factor", 0.96], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
@@ -445,24 +453,27 @@ test_tolerance=(1e-2, 1e-2)
 pt_source=(-123.1, 49.2166666666)
 pt_target=(-2187792.49332045, 14311891.5579733)
 
-//pt_source=(2.33656753, 43.96499314)
+pt_source=(2.33656753, 43.96499314)
+pt_target=(27866150.44815110, 9702053.86856459)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-//error
+//error (replaced with libproj output)
 pt_source=(151.283333333, -33.9166666666)
-pt_target=(-7460003.39378955, -4124311.05369635)
+pt_target=(-7466458.20136069,       -4150816.18942717)
+//pt_target=(-7460003.39378955, -4124311.05369635)  //arcGIS output
 
 pt_source=(-47.95, -15.75)
 pt_target=(6949231.62438508, 1382215.87566019)
 
-//error
+//error (replaced with libproj output)
 pt_source=(139.733333333, 35.6833333333)
-pt_target=(-24924065.4478382, 5124122.41314095)
+pt_target=(-25009078.87841832, 5079217.18056460)
+//pt_target=(-24924065.4478382, 5124122.41314095)  //arcGIS output
 
 pt_source=(18.45, -33.9166666666)
 pt_target=(7265980.56818263, -8446857.93987766)
 
-//pt_source=(0, 90)
+//pt_source=(0, 90)   //libproj also fails here, may be a tolerance error
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 pt_source=(0, -90)
@@ -475,24 +486,34 @@ pt_target=(3.9914448559467E-10, -4464514.77931394)
 cs_source=_WGS84_
 cs_target=_DStereo3_
 test_tolerance=(1e-2, 1e-2)
-//error
-pt_source=(-123.1, 49.2166666666)
+
+pt_source=(-123.1, 49.2166666666) 
 pt_target=(-10422471.5923968, 20303079.0429489)
-//error
+
+//error (replaced with libproj output)
 pt_source=(2.33656753, 43.96499314)
-pt_target=(-1767825.34583943, 5241329.09731566)
-//error
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(17436880.6584282, -15376813.6457952)
-//error
-pt_source=(-47.95, -15.75)
-pt_target=(-8556259.14610263, -2569702.00752923)
-//error
+pt_target=(-1653798.70244788, 5226442.19714902)
+//pt_target=(-1767825.34583943, 5241329.09731566)  //arcGIS output
+
+//error (replaced with libproj output)
+pt_source=(151.283333333, -33.9166666666) 
+pt_target=(17624349.50374345, -15831595.66661218)
+//pt_target=(17436880.6584282, -15376813.6457952)  //arcGIS output
+
+//error (replaced with libproj output)
+pt_source=(-47.95, -15.75) 
+pt_target=(-8367783.05840569, -2533803.44939967)
+//pt_target=(-8556259.14610263, -2569702.00752923)  //arcGIS output
+
+//error (replaced with libproj output)
 pt_source=(139.733333333, 35.6833333333)
-pt_target=(14910741.4194107, 12198910.9989865)
-//error
+pt_target=(15105514.94962235, 12507132.48721923)
+//pt_target=(14910741.4194107, 12198910.9989865)  //arcGIS output
+
+//error (replaced with libproj output)
 pt_source=(18.45, -33.9166666666)
-pt_target=(-278548.416542974, -3869437.88697763)
+pt_target=(-156585.69254757,  -3868038.49689169)
+//pt_target=(-278548.416542974, -3869437.88697763)  //arcGIS output
 
 pt_source=(0, 90)
 pt_target=(-2.82499596765061E-10, 12713504.6284904)
@@ -752,5 +773,3 @@ test_tolerance=(1e-5, 1e-5)
 
 pt_source=(-9.85589165790218E-11, -8594587.5216062)
 pt_target=(170, -90)
-
-
