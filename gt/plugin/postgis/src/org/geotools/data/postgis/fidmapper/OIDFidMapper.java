@@ -2,11 +2,15 @@ package org.geotools.data.postgis.fidmapper;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;
 import org.geotools.feature.Feature;
+import org.postgresql.PGStatement;
+
 
 /**
  * @author wolf
@@ -41,10 +45,17 @@ public class OIDFidMapper extends AbstractFIDMapper {
     }
 
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection, org.geotools.feature.Feature)
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection, org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature) throws IOException {
-        return feature.getID();
+    public String createID(Connection conn, Feature feature, Statement statement) throws IOException {
+        try {
+            PGStatement pgStatement = (PGStatement) statement;
+            return String.valueOf(pgStatement.getLastOID());
+        } catch (SQLException e) {
+            throw new DataSourceException("Problems occurred while getting last generate oid from Postgresql statement", e);
+        } catch (ClassCastException e) {
+            throw new DataSourceException("Statement is not a PGStatement. OIDFidMapper can be used only with Postgres!", e);
+        }
     }
 
     /**
