@@ -1531,7 +1531,7 @@ public class CoordinateTransformationFactory {
     private static String getTemporaryName(final CoordinateSystem source) {
         final StringBuffer buffer = new StringBuffer("Temporary-");
         buffer.append(++temporaryID);
-        String name = source.getName().toString();
+        String name = source.getName().getCode();
         if (name != null) {
             final String suffix = " derived from ";
             name = name.trim();
