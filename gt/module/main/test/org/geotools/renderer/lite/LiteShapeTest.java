@@ -6,6 +6,7 @@
 
 package org.geotools.renderer.lite;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import junit.framework.Test;
@@ -44,7 +45,7 @@ public class LiteShapeTest extends TestCase {
     public void testLineShape() {
         GeometryFactory geomFac = new GeometryFactory();
         LineString lineString = makeSampleLineString(geomFac, 0, 0);
-        LiteShape lineShape = new LiteShape(lineString);
+        LiteShape lineShape = new LiteShape(lineString, new AffineTransform(), false);
         
         assertFalse(lineShape.contains(0, 0));
         assertTrue(lineShape.contains(60, 60));
@@ -62,7 +63,7 @@ public class LiteShapeTest extends TestCase {
     public void testPolygonShape() {
         GeometryFactory geomFac = new GeometryFactory();
         Polygon polygon = makeSamplePolygon(geomFac, 0, 0);
-        LiteShape lineShape = new LiteShape(polygon);
+        LiteShape lineShape = new LiteShape(polygon, new AffineTransform(), false);
         
         assertFalse(lineShape.contains(0, 0));
         assertTrue(lineShape.contains(100, 100));
