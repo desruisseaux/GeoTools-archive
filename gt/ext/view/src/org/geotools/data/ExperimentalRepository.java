@@ -29,7 +29,7 @@ import java.io.IOException;
  * 
  * @author Jody Garnett
  */
-public class DataRepository2 extends DataRepository {	    
+public class ExperimentalRepository extends DefaultRepository {	    
 	
     /** FeatureView wrapper on FeatureSource. 
      * @throws IOException*/
