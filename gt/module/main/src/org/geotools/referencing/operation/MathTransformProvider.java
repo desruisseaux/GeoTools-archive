@@ -71,7 +71,7 @@ public abstract class MathTransformProvider extends OperationMethod {
 
     /**
      * The {@linkplain #getParameters parameters} represented as a group of descriptors. This
-     * convenience field make it easier to {@linkplain OperationParameterGroup#getParameter(String)
+     * convenience field make it easier to {@linkplain ParameterGroupDescriptor#getParameter(String)
      * search for named parameters}.
      */
     protected final OperationParameterGroup parameters;
@@ -95,7 +95,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a math transform provider from a set of properties.
      * The properties map is given unchanged to the
-     * {@linkplain OperationMethod#OperationMethod(Map,int,int,GeneralOperationParameter[])
+     * {@linkplain OperationMethod#OperationMethod(Map,int,int,GeneralParameterDescriptor[])
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -144,7 +144,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected static OperationParameterGroup group(final Identifier[] identifiers,
                                                    final GeneralOperationParameter[] parameters)
     {
-        return new org.geotools.parameter.OperationParameterGroup(toMap(null, identifiers), parameters);
+        return new org.geotools.parameter.ParameterGroupDescriptor(toMap(null, identifiers), parameters);
     }
 
     /**
@@ -167,10 +167,10 @@ public abstract class MathTransformProvider extends OperationMethod {
      * compares all parameter names against the name declared in {@link #parameters} and
      * thrown an exception if an unknow parameter is found. It also ensure that all values
      * are assignable to the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass expected class}, are between the
-     * {@linkplain org.geotools.parameter.OperationParameter#getMinimumValue minimum} and
-     * {@linkplain org.geotools.parameter.OperationParameter#getMaximumValue maximum} values and are one of the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValidValues set of valid values}.
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass expected class}, are between the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumValue minimum} and
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum} values and are one of the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValidValues set of valid values}.
      * If the value fails any of those tests, then an exception is thrown.
      *
      * @param  values The parameters values to check.
@@ -215,10 +215,10 @@ public abstract class MathTransformProvider extends OperationMethod {
      * Creates a math transform from the specified set of parameter values. The default
      * implementation ensures that the specified set of values do not contains any parameter
      * unknow to {@link #parameters}. It also ensures that all values are assignable to the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass expected class}, are between the
-     * {@linkplain org.geotools.parameter.OperationParameter#getMinimumValue minimum} and
-     * {@linkplain org.geotools.parameter.OperationParameter#getMaximumValue maximum} values and are one of the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValidValues set of valid values}.
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass expected class}, are between the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumValue minimum} and
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum} values and are one of the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValidValues set of valid values}.
      * Then it wraps wraps the values in a group and invokes
      * {@link #createMathTransform(ParameterValueGroup)}.
      *

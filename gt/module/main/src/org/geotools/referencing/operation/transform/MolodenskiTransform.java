@@ -327,56 +327,56 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
          */
-        public static final OperationParameter DIM = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter DIM = new org.geotools.parameter.ParameterDescriptor(
                 "dim", 2, 2, 3);
 
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final OperationParameter DX = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter DX = new org.geotools.parameter.ParameterDescriptor(
                 "dx", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dy" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final OperationParameter DY = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter DY = new org.geotools.parameter.ParameterDescriptor(
                 "dy", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity, default is 0.0.
          */
-        public static final OperationParameter DZ = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter DZ = new org.geotools.parameter.ParameterDescriptor(
                 "dz", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SRC_SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SRC_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "src_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "src_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SRC_SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SRC_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "src_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter TGT_SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter TGT_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "tgt_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter TGT_SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter TGT_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "tgt_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**

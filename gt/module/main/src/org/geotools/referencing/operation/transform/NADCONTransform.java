@@ -123,7 +123,7 @@ import java.util.prefs.Preferences;
  * @see <a href="http://www.ngs.noaa.gov/TOOLS/Nadcon/Nadcon.html"> NADCON -
  *      North American Datum Conversion Utility</a>
  *
- * @version $Id:$
+ * @version $Id$
  * @author Rueben Schulz 
  *
  * @TODO the transform code does not deal with the case where grids 
@@ -867,7 +867,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     /**
      * Inverse of a {@link NADCONTransform}.
      *
-     * @version $Id:$
+     * @version $Id$
      * @author Rueben Schulz
      */
     private final class Inverse extends AbstractMathTransform.Inverse implements Serializable {
@@ -929,7 +929,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * geographic} to {@linkPlain org.geotools.referencing.crs.GeographicCRS
      * geographic} coordinate reference systems.
      *
-     * @version $Id:$
+     * @version $Id$
      * @author Rueben Schulz
      */
     public static class Provider extends MathTransformProvider {
@@ -941,7 +941,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * parameter value. The default value is "conus.las".
          */
         public static final OperationParameter LAT_DIFF_FILE 
-            = new org.geotools.parameter.OperationParameter(
+            = new org.geotools.parameter.ParameterDescriptor(
                 "Latitude_difference_file", "".getClass(), null, "conus.las");
         
         /**
@@ -949,7 +949,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * parameter value. The default value is "conus.los".
          */
         public static final OperationParameter LONG_DIFF_FILE 
-            = new org.geotools.parameter.OperationParameter(
+            = new org.geotools.parameter.ParameterDescriptor(
                 "Longitude_difference_file", new String().getClass(), null, "conus.los");
 
         /** The parameters group. */

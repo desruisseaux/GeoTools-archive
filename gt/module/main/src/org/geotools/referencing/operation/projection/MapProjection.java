@@ -913,7 +913,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -922,21 +922,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
-        public static final OperationParameter CENTRAL_MERIDIAN = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter CENTRAL_MERIDIAN = new org.geotools.parameter.ParameterDescriptor(
                 "central_meridian", 0, -180, 180, NonSI.DEGREE_ANGLE);
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
-        public static final OperationParameter LATITUDE_OF_ORIGIN = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter LATITUDE_OF_ORIGIN = new org.geotools.parameter.ParameterDescriptor(
                 "latitude_of_origin", 0, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
@@ -945,21 +945,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SCALE_FACTOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SCALE_FACTOR = new org.geotools.parameter.ParameterDescriptor(
                 "scale_factor", 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #falseEasting falseEasting}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final OperationParameter FALSE_EASTING = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter FALSE_EASTING = new org.geotools.parameter.ParameterDescriptor(
                 "false_easting", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #falseNorthing falseNorthing}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final OperationParameter FALSE_NORTHING = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter FALSE_NORTHING = new org.geotools.parameter.ParameterDescriptor(
                 "false_northing", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**

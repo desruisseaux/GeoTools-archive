@@ -292,14 +292,14 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
-        public static final OperationParameter BASE = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter BASE = new org.geotools.parameter.ParameterDescriptor(
                 "base", 10, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #offset offset} parameter value.
          * Valid values range is unrestricted. The default value is 0.
          */
-        public static final OperationParameter OFFSET = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter OFFSET = new org.geotools.parameter.ParameterDescriptor(
                 "offset", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**

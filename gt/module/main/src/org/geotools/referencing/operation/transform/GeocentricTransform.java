@@ -574,21 +574,21 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The operation parameter descriptor for the "semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
          * The default value is 3.
          */
-        private static final OperationParameter DIM = new org.geotools.parameter.OperationParameter(
+        private static final OperationParameter DIM = new org.geotools.parameter.ParameterDescriptor(
                 "dim", 3, 2, 3);
 
         /**

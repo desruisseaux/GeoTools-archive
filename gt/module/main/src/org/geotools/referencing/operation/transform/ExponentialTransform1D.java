@@ -333,7 +333,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #scale scale} parameter value.
          * Valid values range is unrestricted. The default value is 1.
          */
-        public static final OperationParameter SCALE = new org.geotools.parameter.OperationParameter(
+        public static final OperationParameter SCALE = new org.geotools.parameter.ParameterDescriptor(
                 "scale", 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
