@@ -317,7 +317,8 @@ public class DefaultAttributeType implements AttributeType {
     public String toString() {
         String details = "name=" + name;
         details += (" , type=" + type);
-        details += (" , nillable=" + nillable);
+        details += (" , nillable=" + nillable) + ", min=" + min 
+	    + ", max=" + min;
 
         return "DefaultAttributeType [" + details + "]";
     }
