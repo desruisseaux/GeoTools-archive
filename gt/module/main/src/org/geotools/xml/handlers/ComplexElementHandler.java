@@ -313,7 +313,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         int t = index;
         int count = 0;
         int t2[] = null;
-        while(i<eg.length && t<elements.size()){
+        while(i<eg.length && end<elements.size()){
         	t2 = valid(eg[i], t);
         	if(t2[1] == 0 && t2[0] == t){// nothing, next
     			// move along
@@ -332,11 +332,15 @@ public class ComplexElementHandler extends XMLElementHandler {
         			t = index;
         		}else{
         			t = t2[0];
+        			if(t == elements.size()){
+        				end = t;
+        			}
+        			count++;
         		}
     		}
         }
 
-        return new int[]{t,1};
+        return new int[]{end,end==index?0:1};
     }
 
     /*
