@@ -23,16 +23,12 @@
 package org.geotools.validation;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.geotools.data.DataRepository;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.geotools.validation.FeatureValidation;
-import org.geotools.validation.IntegrityValidation;
-import org.geotools.validation.PlugIn;
-import org.geotools.validation.Validation;
-import org.geotools.validation.ValidationProcessor;
-import org.geotools.validation.ValidationResults;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
 import org.geotools.validation.dto.TestDTO;
@@ -61,21 +57,30 @@ import java.util.Set;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @author bowens
  * @version $Id: Validator.java,v 1.2 2004/02/18 18:27:18 dmzwiers Exp $
  */
 public class BatchValidator {
     private static Properties dataStoreProp;
     private static Properties transProp;
+    
+    private static Validator validator;
+    private static DataRepository dataRepository;
+
 
     public static void main(String[] args) {
         loadProperties(args);
 
         Map ds = loadDataStores();
         ValidationProcessor v = loadTests();
+		dataRepository = new DataRepository();
+        
         runTransactions(ds, v);
     }
 
-    private static void runTransactions(Map dsm, ValidationProcessor v) {
+
+    private static void runTransactions(Map dsm, ValidationProcessor v) 
+    {
         if ((dsm == null) || (dsm.size() == 0)) {
             System.out.println("No Datastores were defined.");
 
@@ -88,12 +93,83 @@ public class BatchValidator {
 
             return;
         }
-
-        Iterator i = dsm.keySet().iterator();
-
-        while (i.hasNext()) {
+		
+		
+        Iterator it = dsm.keySet().iterator();
+		
+		/** set up the data repositroy */
+		while (it.hasNext()) 
+	   	{
+			String typeRef = it.next().toString();
+			DataStore ds = (DataStore) dsm.get(typeRef);
+			try
+			{
+				dataRepository.register(typeRef, ds);
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+	   	}
+		validator = new Validator(dataRepository, v);
+		/** validator is now ready to go */
+		
+		it = dataRepository.getDataStores().iterator();
+		/** do the feature type validation dance */
+		while (it.hasNext())
+		{
+			DataStore store = (DataStore)it.next();
+			String typeNames[] = null;
+			try
+			{
+				typeNames = store.getTypeNames();
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			//HACK: get ALL feature types and smash through their features
+			// this is really really slow and will be fixed
+			for (int p = 0; p < typeNames.length; p++)
+			{
+				try
+				{
+					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures().reader());
+				} catch (IOException e1)
+				{
+					e1.printStackTrace();
+				} catch (Exception e1)
+				{
+					e1.printStackTrace();
+				}
+			}
+			
+		}
+		
+		Envelope envelope = makeEnvelope();
+					
+		
+		/** do the integrity validation dance */
+		try
+		{
+			validator.integrityValidation(dsm, envelope);
+		} catch (IOException e1)
+		{
+			e1.printStackTrace();
+		} catch (Exception e1)
+		{
+			e1.printStackTrace();
+		}
+		
+		if (true)	//HACK premature evacuation
+			return;
+		
+	   	//v.integrityValidation()
+		//v.featureValidation( , fs.getSchema(),fs.getFeatures().reader(), vr);
+	   	
+		it = dsm.keySet().iterator();
+        while (it.hasNext()) 
+        {
             Map sources = new HashMap();
-            String key = i.next().toString();
+            String key = it.next().toString();
             DataStore ds = (DataStore) dsm.get(key);
             String t = transProp.getProperty(key + ".Sources");
             String[] ss = t.split(",");
@@ -105,12 +181,13 @@ public class BatchValidator {
                     FeatureSource fs = ds.getFeatureSource(ss[j]);
                     sources.put(ss, fs);
 
-                    BatchValidationResults vr = new BatchValidationResults();
-                    v.runFeatureTests( null /** fix me */, fs.getSchema(),
-                        fs.getFeatures().collection(), vr);
-                    System.out.println("Feature Test Results for " + key + ":"
-                        + ss[j]);
-                    System.out.println(vr.toString());
+                    //BatchValidationResults vr = new BatchValidationResults();
+                    
+//                    v.runFeatureTests( "" /** fix me */, fs.getSchema(),
+//                        fs.getFeatures().reader(), vr);
+                    //System.out.println("Feature Test Results for " + key + ":"
+                    //    + ss[j]);
+                    //System.out.println(vr.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -140,7 +217,8 @@ public class BatchValidator {
 
             try {
                 BatchValidationResults vr = new BatchValidationResults();
-                v.runIntegrityTests( null /* fix me */, sources, env, vr);
+                
+                //v.runIntegrityTests( null /* fix me */, sources, env, vr);
                 System.out.println("Feature Integrety Test Results");
                 System.out.println(vr.toString());
             } catch (Exception e) {
@@ -148,6 +226,33 @@ public class BatchValidator {
             }
         }
     }
+
+
+	private static Envelope makeEnvelope()
+	{
+		Envelope env;
+		try {
+			double minx = Double.parseDouble(transProp.getProperty(
+						"Bounds.minX"));
+			double miny = Double.parseDouble(transProp.getProperty(
+						"Bounds.maxX"));
+			double maxx = Double.parseDouble(transProp.getProperty(
+						"Bounds.maxX"));
+			double maxy = Double.parseDouble(transProp.getProperty(
+						"Bounds.maxY"));
+			env = new Envelope(minx, miny, maxx, maxy);
+		} catch (Exception e) {
+			System.err.println("Envelope not specified in Transaction.properties.");
+			env = new Envelope();
+		}
+		
+		if (env == null) {
+			env = new Envelope(Integer.MIN_VALUE, Integer.MIN_VALUE,
+					Integer.MAX_VALUE, Integer.MAX_VALUE);
+		}
+		
+		return env;
+	}
 
     private static void loadProperties(String[] args) {
         File dsProp = null;
@@ -177,8 +282,11 @@ public class BatchValidator {
                         System.err.println("Data file:" + value);
                         System.exit(1);
                     }
-                } else {
-                    if ("-trans".equals(param)) {
+                } 
+                else 
+                {
+                    if ("-trans".equals(param)) 
+                    {
                         File tmp = null;
                         tmp = new File(ClassLoader.getSystemResource(value)
                                                   .getFile());
@@ -191,8 +299,11 @@ public class BatchValidator {
                             System.err.println("Data file:" + value);
                             System.exit(1);
                         }
-                    } else {
-                        if ("-help".equals(param)) {
+                    } 
+                    else 
+                    {
+                        if ("-help".equals(param)) 
+                        {
                             System.out.println("Batch Validator");
                             System.out.println("Version 0.1");
                             System.out.println("");
@@ -212,7 +323,9 @@ public class BatchValidator {
                             System.out.println("-help");
                             System.out.println("This screen.");
                             System.exit(0);
-                        } else {
+                        } 
+                        else 
+                        {
                             System.err.println(
                                 "Usage Error: use -help for usage");
                             System.err.println("Invalid option:" + param);
@@ -326,14 +439,16 @@ public class BatchValidator {
         int rcount = 0;
 
         // remove whitespace
-        for (int i = 0; i < ids.length; i++) {
+        for (int i = 0; i < ids.length; i++) 
+        {
             ids[i] = ids[i].trim();
 
             Map m = new HashMap();
             String tmp = dataStoreProp.getProperty(ids[i] + ".Params");
             String[] params = tmp.split(",");
 
-            for (int j = 0; j < params.length; j++) {
+            for (int j = 0; j < params.length; j++) 
+            {
                 String[] vals = params[j].split("=");
 
                 if (vals.length == 2) {
@@ -365,7 +480,7 @@ public class BatchValidator {
                 System.err.println("DataStore " + ids[i]
                     + " incured an error and will not be used.");
             }
-        }
+        }// end for ids
 
         return result;
     }
@@ -602,7 +717,8 @@ class BatchValidatorProcessor extends ValidationProcessor {
         Map defaultPlugIns = new HashMap(plugInNames.size());
         i = plugInNames.iterator();
 
-        while (i.hasNext()) {
+        while (i.hasNext()) 
+        {
             String plugInName = (String) i.next();
             PlugInDTO dto = (PlugInDTO) plugIns.get(plugInName);
             Class plugInClass = null;
@@ -643,11 +759,15 @@ class BatchValidatorProcessor extends ValidationProcessor {
         // step 3 configure plug-ins with tests + add to processor
         i = testSuites.keySet().iterator();
 
-        while (i.hasNext()) {
+		// for each TEST SUITE
+        while (i.hasNext()) 
+        {
             TestSuiteDTO tdto = (TestSuiteDTO) testSuites.get(i.next());
             Iterator j = tdto.getTests().keySet().iterator();
 
-            while (j.hasNext()) {
+			// for each TEST in the test suite
+            while (j.hasNext()) 
+            {
                 TestDTO dto = (TestDTO) tdto.getTests().get(j.next());
 
                 // deal with test
