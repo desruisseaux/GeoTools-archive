@@ -4,3 +4,4 @@ org.geotools.referencing.operation.transform.ExponentialTransform1D$Provider
 org.geotools.referencing.operation.transform.GeocentricTransform$Provider
 org.geotools.referencing.operation.transform.GeocentricTransform$ProviderInverse
 org.geotools.referencing.operation.transform.AbridgedMolodenskiTransform$Provider
+org.geotools.referencing.operation.transform.MolodenskiTransform$Provider
