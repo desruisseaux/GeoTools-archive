@@ -168,6 +168,24 @@ public abstract class MathTransformProvider extends OperationMethod {
     }
 
     /**
+     * Constructs an optional parameter descriptor from a set of alias.
+     * The parameter is identified as with {@link #createDescriptor}.
+     *
+     * @param identifiers The parameter identifiers. Most contains at least one entry.
+     * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
+     * @param unit    The unit for default, minimum and maximum values.
+     */
+    protected static ParameterDescriptor createOptionalDescriptor(final Identifier[] identifiers,
+                                                                  final double       minimum,
+                                                                  final double       maximum,
+                                                                  final Unit         unit)
+    {
+        return new org.geotools.parameter.ParameterDescriptor(
+                toMap(identifiers), Double.NaN, minimum, maximum, unit, false);
+    }
+
+    /**
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
@@ -355,7 +373,28 @@ public abstract class MathTransformProvider extends OperationMethod {
                 }
             }
         }
-        return group.parameter(name);
+        if (param.getMinimumOccurs() != 0) {
+            return group.parameter(name);
+        }
+        /*
+         * The parameter is optional. We don't want to invokes 'parameter(name)', because we don't
+         * want to create a new parameter is the user didn't supplied one. Search the parameter
+         * ourself (so we don't create any), and returns null if we don't find any.
+         *
+         * TODO: A simplier solution would be to add a 'isDefined' method in GeoAPI,
+         *       or something similar.
+         */
+        final GeneralParameterDescriptor search;
+        search = ((ParameterDescriptorGroup) group.getDescriptor()).descriptor(name);
+        if (search instanceof ParameterDescriptor) {
+            for (final Iterator it=group.values().iterator(); it.hasNext();) {
+                final GeneralParameterValue candidate = (GeneralParameterValue) it.next();
+                if (search.equals(candidate.getDescriptor())) {
+                    return (ParameterValue) candidate;
+                }
+            }        
+        }
+        return null;
     }
     
     /**
@@ -365,14 +404,17 @@ public abstract class MathTransformProvider extends OperationMethod {
      *
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
-     * @return The requested parameter value.
+     * @return The requested parameter value, or {@code null} if {@code param} is
+     *         {@linkplain #createOptionalDescriptor optional} and the user didn't
+     *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static String stringValue(final ParameterDescriptor param,
                                         final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        return getValue(param, group).stringValue();
+        final ParameterValue value = getValue(param, group);
+        return (value!=null) ? value.stringValue() : null;
     }
 
     /**
@@ -382,26 +424,31 @@ public abstract class MathTransformProvider extends OperationMethod {
      *
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
-     * @return The requested parameter value.
+     * @return The requested parameter value, or {@code 0} if {@code param} is
+     *         {@linkplain #createOptionalDescriptor optional} and the user didn't
+     *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static int intValue(final ParameterDescriptor param,
                                   final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        return getValue(param, group).intValue();
+        final ParameterValue value = getValue(param, group);
+        return (value!=null) ? value.intValue() : 0;
     }
 
     /**
      * Returns the parameter value for the specified operation parameter.
      * Values are automatically converted into the standard units specified
-     * by the supplied <code>param</code> argument.
+     * by the supplied {@code param} argument.
      * This convenience method is used by subclasses for initializing
      * {@linkplain MathTransform math transform} from a set of parameters.
      *
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
-     * @return The requested parameter value.
+     * @return The requested parameter value, or {@code NaN} if {@code param} is
+     *         {@linkplain #createOptionalDescriptor optional} and the user didn't
+     *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static double doubleValue(final ParameterDescriptor param,
@@ -410,7 +457,8 @@ public abstract class MathTransformProvider extends OperationMethod {
     {
         final Unit unit = param.getUnit();
         final ParameterValue value = getValue(param, group);
-        return (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
+        return (value==null) ? Double.NaN :
+                (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
     }
 
     /**

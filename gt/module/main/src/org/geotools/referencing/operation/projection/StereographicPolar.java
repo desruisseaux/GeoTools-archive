@@ -87,7 +87,7 @@ public class StereographicPolar extends Stereographic {
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
-     * @param  latitudeOfOrigin The latitude of origin in radians. If not Double.NaN
+     * @param  latitudeOfOrigin The latitude of origin in radians. If not {@link Double#NaN}
      *         it overrides the latitude of origin parameter.
      * @param stereoType The type of stereographic projection (used for 
      *        creating wkt).
@@ -257,7 +257,7 @@ public class StereographicPolar extends Stereographic {
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.
-         * @param  latitudeOfOrigin The latitude of origin in radians. If not Double.NaN
+         * @param  latitudeOfOrigin The latitude of origin in radians. If not {@link Double#NaN}
          *         it overrides the latitude of origin parameter.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).
@@ -401,7 +401,7 @@ public class StereographicPolar extends Stereographic {
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.
-         * @param  latitudeOfOrigin The latitude of origin in radians. If not Double.NaN
+         * @param  latitudeOfOrigin The latitude of origin in radians. If not {@link Double#NaN}
          *         it overrides the latitude of origin parameter.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).

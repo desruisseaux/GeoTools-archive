@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 
 // JAI dependencies
 import javax.media.jai.PlanarImage;
@@ -62,6 +63,11 @@ import org.geotools.resources.gcs.ResourceKeys;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractGridCoverage extends AbstractCoverage implements GridCoverage {
+    /**
+     * The logger for grid coverage operations.
+     */
+    public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.grid");
+
     /**
      * Sources grid coverage, or {@code null} if none. This information is lost during
      * serialization, in order to avoid sending a too large amount of data over the network.

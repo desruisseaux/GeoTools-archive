@@ -287,6 +287,17 @@ public class GridGeometry2D extends GridGeometryGT {
             throw e;
         }
     }
+
+    /**
+     * Returns the two-dimensional part of the {@linkplain #getGridRange grid range}
+     * as a rectangle.
+     */
+    public Rectangle getGridRange2D() {
+        return new Rectangle(gridRange.getLower (gridDimensionX),
+                             gridRange.getLower (gridDimensionY),
+                             gridRange.getLength(gridDimensionX),
+                             gridRange.getLength(gridDimensionY));
+    }
     
     /**
      * Returns a math transform for the two dimensional part. This is a convenience method for

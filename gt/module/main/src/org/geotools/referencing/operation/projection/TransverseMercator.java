@@ -599,8 +599,8 @@ public class TransverseMercator extends MapProjection {
      * is correctly set.
      *
      * @return The central meridian, using the scalefactor and false easting 
-     *         to decide if this is a UTM or MTM case. Returns Double.NaN if the 
-     *         case of the projection cannot be determined.
+     *         to decide if this is a UTM or MTM case. Returns {@link Double#NaN}
+     *         if the case of the projection cannot be determined.
      */
     public double getCentralMeridian() {
         //UTM

@@ -33,7 +33,6 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderedImageFactory;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 // JAI dependencies
 import javax.media.jai.CRIFImpl;
@@ -48,6 +47,7 @@ import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
+import org.geotools.coverage.grid.AbstractGridCoverage;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.DualRectIter;
@@ -271,7 +271,7 @@ final class SampleTranscoder extends PointOpImage {
             record.setSourceClassName("SampleDimensionGT");
             record.setSourceMethodName("<classinit>");
             record.setThrown(exception);
-            Logger.getLogger("org.geotools.coverage").log(record);
+            AbstractGridCoverage.LOGGER.log(record);
         }
     }
 }

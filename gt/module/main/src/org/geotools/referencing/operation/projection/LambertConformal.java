@@ -207,13 +207,13 @@ public class LambertConformal extends MapProjection{
          * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
-        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createDescriptor(
+        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "standard_parallel_2"),
                     new Identifier(Citation.EPSG,     "Latitude of 2nd standard parallel"),
                     new Identifier(Citation.GEOTIFF,  "StdParallel2")
                 },
-                Double.NaN, -90, 90, NonSI.DEGREE_ANGLE);
+                -90, 90, NonSI.DEGREE_ANGLE);
         
         /**
          * The parameters group.
@@ -267,7 +267,7 @@ public class LambertConformal extends MapProjection{
             final Collection descriptors = PARAMETERS.descriptors();
             return new LambertConformal(parameters, descriptors, true, false, false);
         }
-     }
+    }
 
 
     /**

@@ -50,6 +50,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.operation.Resampler2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
@@ -215,7 +216,12 @@ public class GridCoverageTest extends TestCase {
          *
          * Grid coverage construction finished. Now, test it.
          */
-        assertSame(image.getTile(0,0), coverage.getRenderedImage().getTile(0,0));
+        final boolean sameCRS = coverage.getCoordinateReferenceSystem().equals(crs);
+        if (sameCRS) {
+            assertSame(image.getTile(0,0), coverage.getRenderedImage().getTile(0,0));
+        } else {
+            assertTrue(coverage instanceof Resampler2D);
+        }
 
         // Test the creation of a "geophysics" view.
         GridCoverage2D geophysics= coverage.geophysics(true);
@@ -229,26 +235,28 @@ public class GridCoverageTest extends TestCase {
         assertTrue(geophysics.getSampleDimension(0).getSampleToGeophysics().isIdentity());
 
         // Compare data.
-        final int bandN = 0; // Band to test.
-        double[] bufferCov = null;
-        double[] bufferGeo = null;
-        final double left  = bounds.getMinX() + (0.5*PIXEL_SIZE); // Includes translation to center
-        final double upper = bounds.getMaxY() - (0.5*PIXEL_SIZE); // Includes translation to center
-        final Point2D.Double point = new Point2D.Double(); // Will maps to pixel center.
-        for (int j=raster.getHeight(); --j>=0;) {
-            for (int i=raster.getWidth(); --i>=0;) {
-                point.x = left  + PIXEL_SIZE*i;
-                point.y = upper - PIXEL_SIZE*j;
-                double r = raster.getSampleDouble(i,j,bandN);
-                bufferCov =   coverage.evaluate(point, bufferCov);
-                bufferGeo = geophysics.evaluate(point, bufferGeo);
-                assertEquals(r, bufferCov[bandN], EPS);
+        if (sameCRS) {
+            final int bandN = 0; // Band to test.
+            double[] bufferCov = null;
+            double[] bufferGeo = null;
+            final double left  = bounds.getMinX() + (0.5*PIXEL_SIZE); // Includes translation to center
+            final double upper = bounds.getMaxY() - (0.5*PIXEL_SIZE); // Includes translation to center
+            final Point2D.Double point = new Point2D.Double(); // Will maps to pixel center.
+            for (int j=raster.getHeight(); --j>=0;) {
+                for (int i=raster.getWidth(); --i>=0;) {
+                    point.x = left  + PIXEL_SIZE*i;
+                    point.y = upper - PIXEL_SIZE*j;
+                    double r = raster.getSampleDouble(i,j,bandN);
+                    bufferCov =   coverage.evaluate(point, bufferCov);
+                    bufferGeo = geophysics.evaluate(point, bufferGeo);
+                    assertEquals(r, bufferCov[bandN], EPS);
 
-                // Compare transcoded samples.
-                if (r < BEGIN_VALID) {
-                    assertTrue(Double.isNaN(bufferGeo[bandN]));
-                } else {
-                    assertEquals(OFFSET + SCALE*r, bufferGeo[bandN], EPS);
+                    // Compare transcoded samples.
+                    if (r < BEGIN_VALID) {
+                        assertTrue(Double.isNaN(bufferGeo[bandN]));
+                    } else {
+                        assertEquals(OFFSET + SCALE*r, bufferGeo[bandN], EPS);
+                    }
                 }
             }
         }

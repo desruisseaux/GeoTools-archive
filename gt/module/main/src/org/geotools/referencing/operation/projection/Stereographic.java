@@ -188,7 +188,7 @@ public abstract class Stereographic extends MapProjection {
                 SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
-     
+
         /**
          * Construct a new provider. 
          */
@@ -215,10 +215,11 @@ public abstract class Stereographic extends MapProjection {
         {
             final Collection descriptors = PARAMETERS.descriptors();
             //values here are in degrees (the standard units for this parameter)
-            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = Math.abs(MapProjection.doubleValue(
+                                            descriptors, LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Equatorial case.
@@ -231,7 +232,7 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Generic (oblique) case.
@@ -317,16 +318,15 @@ public abstract class Stereographic extends MapProjection {
      */
     public static class Provider_Polar_B extends AbstractProvider {
         /**
-         * The operation parameter descriptor for the latitudeTrueScale
+         * The operation parameter descriptor for the {@code latitudeTrueScale}
          * parameter value. Valid values range is from -90 to 90°. 
-         * Default value is Double.NaN.
          */
-        public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createDescriptor(
+        public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createOptionalDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.ESRI, "Standard_Parallel_1"),
-                    new Identifier(Citation.EPSG, "Latitude of standard parallel")  
+                    new Identifier(Citation.EPSG, "Latitude of standard parallel")
                 },
-                Double.NaN, -90, 90, NonSI.DEGREE_ANGLE);
+                -90, 90, NonSI.DEGREE_ANGLE);
                 
         /**
          * The parameters group.
@@ -374,7 +374,8 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            final double latitudeTrueScale = doubleValue(LATITUDE_TRUE_SCALE, parameters);
+            final double latitudeTrueScale = MapProjection.doubleValue(
+                                             descriptors, LATITUDE_TRUE_SCALE, parameters);
             final double latitudeOfOrigin = (latitudeTrueScale < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
 
             if (isSpherical(parameters)) {
@@ -562,10 +563,11 @@ public abstract class Stereographic extends MapProjection {
         {
             final Collection descriptors = PARAMETERS.descriptors();
             //values here are in degrees (the standard units for this parameter)
-            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));         
+            final double latitudeOfOrigin = Math.abs(MapProjection.doubleValue(
+                                            descriptors, LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.
@@ -578,7 +580,7 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.

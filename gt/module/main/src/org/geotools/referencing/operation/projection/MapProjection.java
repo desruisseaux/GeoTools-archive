@@ -261,7 +261,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *         <code>getParameterDescriptors().descriptors()</code>.
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
-     * @return The requested parameter value.
+     * @return The requested parameter value, or {@code NaN} if {@code param} is
+     *         {@linkplain MathTransformProvider#createOptionalDescriptor optional}
+     *         and the user didn't provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
      *
      * @see MathTransformProvider#doubleValue

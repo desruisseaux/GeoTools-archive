@@ -323,14 +323,14 @@ public class ObliqueMercator extends MapProjection {
          * parameter value. It is an optional parameter with valid values ranging
          * from -360 to 360°. Default value is {@link #alpha_c}.
          */
-        public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createDescriptor(
+        public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createOptionalDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "rectified_grid_angle"),
                     new Identifier(Citation.EPSG,     "Angle from Rectified to Skew Grid"),
 		    new Identifier(Citation.ESRI,     "XY_Plane_Rotation"),
                     new Identifier(Citation.GEOTIFF,  "RectifiedGridAngle")
                 },
-                Double.NaN, -360, 360, NonSI.DEGREE_ANGLE);
+                -360, 360, NonSI.DEGREE_ANGLE);
                 
         /**
          * The parameters group.
@@ -646,9 +646,8 @@ public class ObliqueMercator extends MapProjection {
         //not checking if latitudeOfCentere is 0, since equations behave correctly
         ensureLatitudeInRange(Provider.LAT_OF_CENTRE, latitudeOfCentre, false);
         
-        if(twoPoint) {
-            longitudeOfCentre = Double.NaN;
-            
+        if (twoPoint) {
+            longitudeOfCentre  = Double.NaN;
             latitudeOf1stPoint = doubleValue(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, parameters);
             //checks that latOf1stPoint is not +-90 degrees
             ensureLatitudeInRange(Provider_TwoPoint.LAT_OF_1ST_POINT, latitudeOf1stPoint, false);
@@ -670,9 +669,9 @@ public class ObliqueMercator extends MapProjection {
                 throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT2_EQ_NEG_90));
             }
         } else {
-	    latitudeOf1stPoint = Double.NaN;
+	    latitudeOf1stPoint  = Double.NaN;
             longitudeOf1stPoint = Double.NaN;
-            latitudeOf2ndPoint = Double.NaN;
+            latitudeOf2ndPoint  = Double.NaN;
             longitudeOf2ndPoint = Double.NaN;
                        
             longitudeOfCentre = doubleValue(expected, Provider.LONG_OF_CENTRE, parameters);

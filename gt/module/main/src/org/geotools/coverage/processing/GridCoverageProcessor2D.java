@@ -167,7 +167,6 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
             //
             // OpenGIS operations
             //
-//            DEFAULT.addOperation(new Resampler.Operation());
 //            DEFAULT.addOperation(new SelectSampleDimension.Operation());
 //            DEFAULT.addOperation(new MaskFilterOperation("MinFilter"));
 //            DEFAULT.addOperation(new MaskFilterOperation("MaxFilter"));

@@ -54,9 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import javax.units.Unit;
 
 // JAI dependencies
@@ -100,6 +98,7 @@ import org.opengis.util.Cloneable;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
@@ -731,6 +730,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Returns information for the grid coverage geometry. Grid geometry
      * includes the valid range of grid coordinates and the georeferencing.
+     *
+     * @todo Use covariant return type once we are allowed to compile for J2SE 1.5.
      */
     public GridGeometry getGridGeometry() {
         final String error = checkConsistency(image, gridGeometry);
@@ -1383,19 +1384,19 @@ testLinear: for (int i=0; i<numBands; i++) {
             param = param.add(sampleDimensions);
             operation = "org.geotools.SampleTranscode";
         }
-        final Logger logger = Logger.getLogger("org.geotools.gc");
-        if (logger.isLoggable(Level.FINE)) {
-            // Log a message using the same level (FINE) than GridCoverageProcessor.
+        if (LOGGER.isLoggable(AbstractGridCoverageProcessor.OPERATION)) {
+            // Log a message using the same level than GridCoverageProcessor.
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINE,
+            final LogRecord record = Resources.getResources(locale).getLogRecord(
+                                     AbstractGridCoverageProcessor.OPERATION,
                                      ResourceKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
                                      new Integer(geo ? 1 : 0), shortName});
             record.setSourceClassName("GridCoverage");
             record.setSourceMethodName("geophysics");
-            logger.log(record);
+            LOGGER.log(record);
         }
         return new GridCoverage2D(getName(), JAI.create(operation, param, hints),
                                   crs, gridGeometry, null, targetBands,

@@ -71,10 +71,12 @@ import org.geotools.coverage.processing.CannotReprojectException;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.factory.Hints;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.AbstractCoordinateOperationFactory;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.GCSUtilities;
@@ -116,11 +118,12 @@ public final class Resampler2D extends GridCoverage2D {
      * in the native code of medialib, which halt the Java Virtual Machine. Using the pure Java
      * implementation instead resolve the problem.
      *
-     * @task TODO: Remove this hack when Sun will fix the medialib bug.
+     * @todo Remove this hack when Sun will fix the medialib bug. See
+     *       http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854
      */
-//    static {
-//        ImageUtilities.allowNativeAcceleration("Affine", false);
-//    }
+    static {
+        ImageUtilities.allowNativeAcceleration("Affine", false);
+    }
 
     /**
      * Constructs a new grid coverage for the specified grid geometry.
@@ -163,7 +166,7 @@ public final class Resampler2D extends GridCoverage2D {
      * @param  targetCRS Coordinate reference system for the new grid coverage, or {@code null}.
      * @param  targetGG The target grid geometry, or {@code null} for default.
      * @param  interpolation The interpolation to use.
-     * @param  The rendering hints. This is usually provided by a {@link GridCoverageProcessor2D}.
+     * @param  hints The rendering hints. This is usually provided by {@link GridCoverageProcessor2D}.
      *         This method will looks for {@link Hints#COORDINATE_OPERATION_FACTORY}
      *         and {@link Hints#JAI_INSTANCE} keys.
      * @return The new grid coverage, or <code>sourceCoverage</code> if no resampling was needed.
@@ -253,9 +256,9 @@ public final class Resampler2D extends GridCoverage2D {
             }
         }
         /*
-         * Gets the target image as a {@link RenderedOp}.  The source image is
-         * initially wrapped into in a "Null" operation. Later, we will change
-         * this "Null" operation into a "Warp" operation.  We can't use "Warp"
+         * Gets the target image as a {@link RenderedOp}. The source image is
+         * initially wrapped into a "Null" operation. Later, we will change
+         * this "Null" operation into a "Warp" operation. We can't use "Warp"
          * now because we will know the envelope only after creating the GridCoverage.
          * Note: RenderingHints contain mostly indications about tiles layout.
          */
@@ -298,7 +301,8 @@ public final class Resampler2D extends GridCoverage2D {
             }
             final MathTransform step2r;
             step2x = factory.createOperation(sourceCRS, targetCRS).getMathTransform();
-            step2r = getMathTransform2D(step2x, mtFactory);
+            step2r = getMathTransform2D(step2x, mtFactory, sourceGG.axisDimensionX,
+                                                           sourceGG.axisDimensionY);
             /*
              * Gets the source and target envelope. It is difficult to check if the first
              * two dimensions are really independent from other dimensions.   However, if
@@ -310,10 +314,12 @@ public final class Resampler2D extends GridCoverage2D {
             final Envelope sourceEnvelope2D = sourceCoverage.getEnvelope2D();
             final Envelope targetEnvelope   = CRSUtilities.transform(step2x, sourceEnvelope  );
             final Envelope targetEnvelope2D = CRSUtilities.transform(step2r, sourceEnvelope2D);
-//TODO        if (!targetEnvelope.getSubEnvelope(0,2).equals(targetEnvelope2D)) {
-//                throw new TransformException(Resources.format(
-//                        ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
-//            }
+            if (!new Envelope2D(targetEnvelope2D).boundsEquals(targetEnvelope,
+                    sourceGG.axisDimensionX, sourceGG.axisDimensionY, 1E-8))
+            {
+                throw new TransformException(Resources.format(
+                        ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+            }
             /*
              * If the target GridGeometry is incomplete, provides default
              * values for the missing fields. Three cases may occurs:
@@ -377,14 +383,15 @@ public final class Resampler2D extends GridCoverage2D {
             final MathTransform step3x = sourceGG.getGridToCoordinateSystem().inverse();
             if (step1x.equals(step3x.inverse())) {
                 xtr = step2x;
-            } else if (step2x==null) {
+            } else if (step2x == null) {
                 xtr = mtFactory.createConcatenatedTransform(step1x, step3x);
             } else {
                 xtr = mtFactory.createConcatenatedTransform(
                       mtFactory.createConcatenatedTransform(step1x, step2x), step3x);
             }
             if (xtr != null) {
-                assert getMathTransform2D(xtr, mtFactory).equals(transform) : xtr;
+                assert getMathTransform2D(xtr, mtFactory, sourceGG.gridDimensionX,
+                                          sourceGG.gridDimensionY).equals(transform) : xtr;
                 Envelope envelope = GCSUtilities.toEnvelope(sourceGG.getGridRange());
                 envelope = CRSUtilities.transform(xtr.inverse(), envelope);
                 targetGG = new GridGeometry2D(GCSUtilities.toGridRange(envelope), step1x);
@@ -400,8 +407,8 @@ public final class Resampler2D extends GridCoverage2D {
          * change the "Null" operation into a "Warp" one later.
          */
         if (true) {
-            final GridRange gridRange =
-                (targetCoverage!=null ? targetCoverage.getGridGeometry() : targetGG).getGridRange();
+            final GridRange gridRange = (targetCoverage != null ? targetCoverage.getGridGeometry()
+                                                                : targetGG).getGridRange();
             int layoutMask = 0;
             ImageLayout layout;
             if (hints != null) {
@@ -513,7 +520,7 @@ public final class Resampler2D extends GridCoverage2D {
                 paramBlk.add(affine).add(interpolation).add(background);
                 targetImage.setParameterBlock(paramBlk);
                 targetImage.setOperationName("Affine");
-                Rectangle targetBounds = null;//TODO targetGG.getGridRange().getSubGridRange(0,2).toRectangle();
+                final Rectangle targetBounds = targetGG.getGridRange2D();
                 if (!targetBounds.equals(targetImage.getBounds())) {
                     if (targetCoverage == null) {
                         // "Affine" computed its own image bounds, which doesn't
@@ -574,7 +581,7 @@ public final class Resampler2D extends GridCoverage2D {
             }
         }
         /*
-         * Construct the final grid coverage, then log a message as in the following example:
+         * Constructs the final grid coverage, then log a message as in the following example:
          *
          *     Resampled coverage "Foo" from coordinate system "myCS" (for an image of size
          *     1000x1500) to coordinate system "WGS84" (image size 1000x1500). JAI operation
@@ -588,10 +595,11 @@ public final class Resampler2D extends GridCoverage2D {
         if (targetGeophysics != null) {
             targetCoverage = targetCoverage.geophysics(targetGeophysics.booleanValue());
         }
-//TODO    assert targetCoverage.getCoordinateReferenceSystem().equals(targetCRS!=null ? targetCS : sourceCS, false);
-//        assert targetGG!=null || targetImage.getBounds().equals(sourceImage.getBounds());
-//        assert targetCoverage.getGridGeometry().getGridRange().getSubGridRange(0,2).toRectangle()
-//                             .equals(targetImage.getBounds()) : targetGG;
+        assert CRSUtilities.equalsIgnoreMetadata(targetCoverage.getCoordinateReferenceSystem(),
+                            targetCRS!=null ? targetCRS : sourceCRS) : targetCoverage;
+        assert targetGG!=null || targetImage.getBounds().equals(sourceImage.getBounds());
+        assert ((GridGeometry2D) targetCoverage.getGridGeometry()).getGridRange2D()
+                             .equals(targetImage.getBounds()) : targetGG;
 
         if (AbstractGridCoverageProcessor.LOGGER.isLoggable(Level.FINE)) {
             final Locale locale = sourceCoverage.getLocale();
@@ -615,32 +623,36 @@ public final class Resampler2D extends GridCoverage2D {
     }
 
     /**
-     * Returns the math transform for the two first dimensions of the specified transform.
-     * This method is usefull for extracting the transformation caused by the head CS in
-     * a {@link org.geotools.cs.CompoundCoordinateSystem}, assuming that this head CS is
-     * a {@link org.geotools.cs.HorizontalCoordinateSystem}.
+     * Returns the math transform for the two specified dimensions of the specified transform.
      *
      * @param  transform The transform.
      * @param  mtFactory The factory to use for extracting the sub-transform.
      * @return The {@link MathTransform2D} part of <code>transform</code>.
      * @throws FactoryException if <code>transform</code> is not separable.
      */
-    private static MathTransform2D getMathTransform2D(MathTransform transform,
-                                                final MathTransformFactory mtFactory)
+    private static MathTransform2D getMathTransform2D(final MathTransform        transform,
+                                                      final MathTransformFactory mtFactory,
+                                                      final int xAxis, final int yAxis)
             throws FactoryException
     {
-//TODO    final IntegerSequence  inputDimensions = JAIUtilities.createSequence(0, 1);
-//        final IntegerSequence outputDimensions = new IntegerSequence();
-//        transform = mtFactory.createSubTransform(transform, inputDimensions, outputDimensions);
-//        if (JAIUtilities.containsAll(outputDimensions, 0, 2)) {
-//            transform = mtFactory.createFilterTransform(transform, inputDimensions);
-//            return (MathTransform2D) transform;
-//        }
+        final DimensionFilter filter = new DimensionFilter(mtFactory);
+        filter.addSourceDimension(xAxis);
+        filter.addSourceDimension(yAxis);
+        MathTransform candidate = filter.separate(transform);
+        if (candidate instanceof MathTransform2D) {
+            return (MathTransform2D) candidate;
+        }
+        filter.addTargetDimension(xAxis);
+        filter.addTargetDimension(yAxis);
+        candidate = filter.separate(transform);
+        if (candidate instanceof MathTransform2D) {
+            return (MathTransform2D) candidate;
+        }
         throw new FactoryException(Resources.format(ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
     }
 
     /**
-     * Check if two geometries are equal, ignoring unspecified fields. If one or both geometries
+     * Checks if two geometries are equal, ignoring unspecified fields. If one or both geometries
      * has no "gridToCoordinateSystem" transform, then this properties is not taken in account.
      * Same apply for the grid range.
      * 
@@ -716,7 +728,7 @@ public final class Resampler2D extends GridCoverage2D {
          * Construct a "Resample" operation.
          */
         public Operation() {
-            super(new org.geotools.parameter.ParameterDescriptorGroup("Interpolate",
+            super(new org.geotools.parameter.ParameterDescriptorGroup("Resample",
                   new ParameterDescriptor[] {SOURCE_0, INTERPOLATION_TYPE,
                           COORDINATE_REFERENCE_SYSTEM, GRID_GEOMETRY}));
         }

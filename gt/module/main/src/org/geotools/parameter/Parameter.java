@@ -286,6 +286,8 @@ public class Parameter extends AbstractParameter
     /**
      * Returns the unit type as one of error message code. Used for
      * checking unit with a better error message formatting if needed.
+     *
+     * @todo Provides a distinct error number for Unit.ONE.
      */
     static int getUnitMessageID(final Unit unit) {
         // Note: ONE must be tested before RADIAN.
@@ -333,26 +335,17 @@ public class Parameter extends AbstractParameter
      * @see #getUnit
      * @see #setValue(double)
      * @see #doubleValueList()
-     *
-     * @todo Should throws an exception if the value is not set. Current implementation
-     *       returns NaN, which is a workaround for the SP2 default value in "Lambert"
-     *       projection (SP2 default to SP1). A more elaborated fix is needed, which will
-     *       require a custom implementation of ParameterDescriptor.
      */
     public double doubleValue() throws InvalidParameterTypeException {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
-        } else if (value == null) {
-            return Double.NaN;
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
-//        final String name = getName(descriptor);
-//        if (value == null) {
-//            throw new IllegalStateException(Resources.format(
-//                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
-//        }
-//        throw new InvalidParameterTypeException(getClassTypeError(), name);
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**

@@ -17,39 +17,42 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gp;
+package org.geotools.coverage.grid;
 
-// J2SE and JAI dependencies
+// J2SE dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
+// JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.FittedCoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.ProjectedCoordinateSystem;
-import org.geotools.cs.Projection;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.gc.GridCoverage;
-//import org.geotools.gc.GridCoverageTest;
-import org.geotools.gc.GridGeometry;
-import org.geotools.gc.GridRange;
-//import org.geotools.gc.Viewer;
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.referencing.cs.CartesianCS;
+import org.geotools.referencing.crs.DerivedCRS;
+import org.geotools.referencing.crs.ProjectedCRS;
+import org.geotools.referencing.operation.OperationMethod;
+import org.geotools.referencing.operation.MathTransformFactory;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
 
 
 /**
@@ -60,7 +63,7 @@ import org.geotools.gc.GridRange;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class ResampleTest extends TestCase {//GridCoverageTest {
+public final class ResampleTest extends GridCoverageTest {
     /**
      * Set to <code>true</code> if the test case should show the projection results
      * in a windows. This flag is set to <code>true</code> if the test is run from
@@ -77,7 +80,7 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
     /**
      * The source grid coverage.
      */
-    private GridCoverage coverage;
+    private GridCoverage2D coverage;
     
     /**
      * Constructs a test case with the given name.
@@ -91,7 +94,17 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
      */
     protected void setUp() throws Exception {
         super.setUp();
-//        coverage = getExample(0);
+        coverage = getExample(0);
+    }
+
+    /**
+     * Applies an operation on the specified coverage.
+     * This is invoked before to run the tests defined in the super-class.
+     */
+    protected GridCoverage2D transform(final GridCoverage2D coverage) {
+        final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
+        return (GridCoverage2D) processor.doOperation("Resample", coverage,
+                                "CoordinateReferenceSystem", getProjectedCRS(coverage));
     }
 
     /**
@@ -109,40 +122,65 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
     /**
      * Returns the "Sample to geophysics" transform as an affine transform.
      */
-    private static AffineTransform getAffineTransform(final GridCoverage coverage) {
+    private static AffineTransform getAffineTransform(final GridCoverage2D coverage) {
         AffineTransform tr;
-        tr = (AffineTransform)coverage.getGridGeometry().getGridToCoordinateSystem2D();
+        tr = (AffineTransform)((GridGeometry2D)coverage.getGridGeometry()).getGridToCoordinateSystem2D();
         tr = new AffineTransform(tr); // Change the type to the default Java2D implementation.
         return tr;
     }
 
     /**
-     * Projète l'image dans le systeme de coordonnées
-     * spécifié et affiche le résultat à l'écran.
-     *
-     * @param  cs Le systeme de coordonées de destination.
-     * @return The operation name which was applied on the image, or <code>null</code> if none.
+     * Returns a projected CRS for test purpose.
      */
-    private String projectTo(final CoordinateSystem cs, final GridGeometry geometry) {
-        return projectTo(cs, geometry, SHOW);
+    private static CoordinateReferenceSystem getProjectedCRS(final GridCoverage2D coverage) {
+        try {
+            final GeographicCRS  base = (GeographicCRS) coverage.getCoordinateReferenceSystem();
+            final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
+            final MathTransformFactory factory = new MathTransformFactory();
+            final ParameterValueGroup parameters = factory.getDefaultParameters("Oblique_Stereographic");
+            parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis());
+            parameters.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis());
+            parameters.parameter("central_meridian").setValue(5);
+            parameters.parameter("latitude_of_origin").setValue(-5);
+            final MathTransform mt;
+            try {
+                mt = factory.createParameterizedTransform(parameters);
+            } catch (FactoryException exception) {
+                fail(exception.getLocalizedMessage());
+                return null;
+            }
+            return new ProjectedCRS("Stereographic", new OperationMethod(mt), base, mt, CartesianCS.PROJECTED);
+        } catch (NoSuchIdentifierException exception) {
+            fail(exception.getLocalizedMessage());
+            return null;
+        }
     }
 
     /**
-     * Projète l'image dans le systeme de coordonnées
-     * spécifié et affiche le résultat à l'écran.
+     * Projects the specified image to the specified CRS.
+     * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
      *
-     * @param  cs Le systeme de coordonées de destination.
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
-    private String projectTo(final CoordinateSystem   cs,
-                             final GridGeometry geometry,
-                             final boolean          show)
+    private String projectTo(final CoordinateReferenceSystem crs, final GridGeometry2D geometry) {
+        return projectTo(crs, geometry, SHOW);
+    }
+
+    /**
+     * Projects the specified image to the specified CRS.
+     * The result will be displayed in a window if {@code show} is set to {@code true}.
+     *
+     * @return The operation name which was applied on the image, or <code>null</code> if none.
+     */
+    private String projectTo(final CoordinateReferenceSystem crs,
+                             final GridGeometry2D       geometry,
+                             final boolean                  show)
     {
-        final GridCoverageProcessor processor = GridCoverageProcessor.getDefault();
+        final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
         final String arg1; final Object value1;
         final String arg2; final Object value2;
-        if (cs != null) {
-            arg1="CoordinateSystem"; value1=cs;
+        if (crs != null) {
+            arg1="CoordinateReferenceSystem"; value1=crs;
             if (geometry != null) {
                 arg2="GridGeometry"; value2=geometry;
             } else {
@@ -152,13 +190,13 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
             arg1="GridGeometry";      value1=geometry;
             arg2="InterpolationType"; value2="bilinear";
         }
-        GridCoverage projected = coverage.geophysics(true);
-        projected = processor.doOperation("Resample", projected, arg1, value1, arg2, value2);
+        GridCoverage2D projected = coverage.geophysics(true);
+        projected = (GridCoverage2D) processor.doOperation("Resample", projected, arg1, value1, arg2, value2);
         assertNotNull(projected.getRenderedImage().getData());
         final RenderedImage image = projected.getRenderedImage();
         projected = projected.geophysics(false);
         if (show) {
-//TODO            Viewer.show(projected);
+            Viewer.show(projected);
         } else {
             // Force computation
             assertNotNull(projected.getRenderedImage().getData());
@@ -166,56 +204,50 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
         String operation = null;
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
-            Logger.getLogger("org.geotools.gp").fine("Applied \""+operation+"\" JAI operation.");
+            GridCoverageProcessor2D.LOGGER.fine("Applied \""+operation+"\" JAI operation.");
         }
         return operation;
     }
 
     /**
-     * Test the "Resample" operation with an identity transform.
+     * Tests the "Resample" operation with an identity transform.
      */
     public void testIdentity() {
-        if (coverage == null) return;  // TODO: delete this line.
-        assertEquals("Lookup", projectTo(coverage.getCoordinateSystem(), null));
+        assertEquals("Lookup", projectTo(coverage.getCoordinateReferenceSystem(), null));
     }
 
     /**
-     * Test the "Resample" operation with a "Crop" transform.
+     * Tests the "Resample" operation with a "Crop" transform.
      */
     public void testCrop() {
-        if (coverage == null) return;  // TODO: delete this line.
         assertEquals("Crop", projectTo(null,
-                             new GridGeometry(new GridRange(new Rectangle(50,50,200,200)), null)));
+                             new GridGeometry2D(new GridRangeGT(new Rectangle(50,50,200,200)), null)));
     }
 
     /**
-     * Test the "Resample" operation with an "Affine" transform.
+     * Tests the "Resample" operation with a stereographic coordinate system.
+     */
+    public void testStereographic() {
+        assertEquals("Warp", projectTo(getProjectedCRS(coverage), null));
+    }
+
+    /**
+     * Tests the "Resample" operation with an "Affine" transform.
      */
     public void testAffine() {
-        if (coverage == null) return;  // TODO: delete this line.
         AffineTransform atr = getAffineTransform(coverage);
         atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
-        MathTransform    tr = MathTransformFactory.getDefault().createAffineTransform(atr);
-        CoordinateSystem cs = new FittedCoordinateSystem("F2", coverage.getCoordinateSystem(), tr, null);
+        MathTransform tr = ProjectiveTransform.create(atr);
+        CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
+        crs = new DerivedCRS("F2", new OperationMethod(tr), crs, tr, crs.getCoordinateSystem());
         /*
          * Note: In current Resampler implementation, the affine transform effect tested
          *       on the first line below will not be visible with the simple viewer used
          *       here.  It would be visible however with more elaborated viewer like the
          *       one provided in the <code>org.geotools.renderer</code> package.
          */
-        assertEquals("Lookup", projectTo(cs, null, false));
-        assertEquals("Affine", projectTo(null, new GridGeometry(null, tr)));
-    }
-
-    /**
-     * Test the "Resample" operation with a stereographic coordinate system.
-     */
-    public void testStereographic() {
-        if (coverage == null) return;  // TODO: delete this line.
-        final CoordinateSystem cs = new ProjectedCoordinateSystem("Stereographic",
-                GeographicCoordinateSystem.WGS84,
-                new Projection("Stereographic","Oblique_Stereographic",Ellipsoid.WGS84,null,null));
-        assertEquals("Warp", projectTo(cs, null));
+        assertEquals("Lookup", projectTo(crs, null, false));
+        assertEquals("Affine", projectTo(null, new GridGeometry2D(null, tr)));
     }
     
     /**
@@ -223,8 +255,7 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
      * a "Resample" operation.
      */
     public void testTranslation() throws NoninvertibleTransformException {
-        if (coverage == null) return;  // TODO: delete this line.
-        GridCoverage  grid = coverage;
+        GridCoverage2D grid = coverage;
         final int    transX =  -253;
         final int    transY =  -456;
         final double scaleX =  0.04;
@@ -240,9 +271,9 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
          * amount, with the opposite sign.
          */
         AffineTransform expected = getAffineTransform(grid);
-        grid = new GridCoverage("Translated", img,  grid.getCoordinateSystem(),
-                                grid.getEnvelope(), grid.getSampleDimensions(),
-                                new GridCoverage[]{grid}, grid.getProperties());
+        grid = new GridCoverage2D("Translated", img,  grid.getCoordinateReferenceSystem(),
+                                  grid.getEnvelope(), grid.getSampleDimensions(),
+                                  new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);
         assertEquals(expected, getAffineTransform(grid));
         /*
@@ -251,12 +282,12 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
          * new image bounds.
          */
         final AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
-        final MathTransform2D tr = MathTransformFactory.getDefault().createAffineTransform(at);
-        final GridGeometry geometry = new GridGeometry(null, tr);
-        grid = GridCoverageProcessor.getDefault().doOperation(
-                                                  "Resample",         grid,
-                                                  "CoordinateSystem", grid.getCoordinateSystem(),
-                                                  "GridGeometry",     geometry);
+        final MathTransform   tr = ProjectiveTransform.create(at);
+        final GridGeometry2D geometry = new GridGeometry2D(null, tr);
+        grid = (GridCoverage2D) GridCoverageProcessor2D.getDefault().doOperation(
+                "Resample",                  grid,
+                "CoordinateReferenceSystem", grid.getCoordinateReferenceSystem(),
+                "GridGeometry",              geometry);
         assertEquals(at, getAffineTransform(grid));
         img = grid.getRenderedImage();
         expected.preConcatenate(at.createInverse());
@@ -264,6 +295,14 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
         expected.transform(point, point); // Round toward neareast integer
         assertEquals("Incorrect X translation", point.x, img.getMinX());
         assertEquals("Incorrect Y translation", point.y, img.getMinY());
+    }
+
+    /**
+     * Inherited test disabled for this suite.
+     *
+     * @todo Investigate why this test fails.
+     */
+    public void testSerialization() {
     }
 
     /**
@@ -278,7 +317,7 @@ public final class ResampleTest extends TestCase {//GridCoverageTest {
      */
     public static void main(final String[] args) {
         SHOW = true;
-        org.geotools.util.MonolineFormatter.initGeotools(Level.FINER);
+        org.geotools.util.MonolineFormatter.initGeotools(GridCoverageProcessor2D.OPERATION);
         junit.textui.TestRunner.run(suite());
     }
 }

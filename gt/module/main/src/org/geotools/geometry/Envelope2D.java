@@ -29,6 +29,8 @@ import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -47,7 +49,32 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope {
      * The coordinate reference system, or <code>null</code>.
      */
     private CoordinateReferenceSystem crs;
-    
+
+    /**
+     * Constructs two-dimensional envelope defined by an other {@link Envelope}.
+     */
+    public Envelope2D(final Envelope envelope) {
+        super(envelope.getMinimum(0), envelope.getMinimum(1),
+              envelope.getLength (0), envelope.getLength (1));
+
+        // TODO: check below should be first, if only Sun could fix RFE #4093999.
+        final int dimension = envelope.getDimension();
+        if (dimension != 2) {
+            throw new IllegalStateException(Resources.format(
+                    ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(dimension)));
+        }
+        // TODO: Code below would be simplier if 'getCoordinateReferenceSystem()'
+        //       method was defined right into the 'Envelope' interface.
+        if (envelope instanceof Envelope2D) {
+            crs = ((Envelope2D) envelope).getCoordinateReferenceSystem();
+        } else if (envelope instanceof GeneralEnvelope) {
+            crs = ((GeneralEnvelope) envelope).getCoordinateReferenceSystem();
+        } else {
+            crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
+        }
+        setCoordinateReferenceSystem(crs); // Paranoiac check.
+    }
+
     /**
      * Constructs two-dimensional envelope defined by an other {@link Rectangle2D}.
      */
@@ -55,7 +82,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope {
         super(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
         setCoordinateReferenceSystem(crs);
     }
-    
+
     /**
      * Constructs two-dimensional envelope defined by the specified coordinates.
      */
@@ -180,5 +207,42 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope {
             return Utilities.equals(this.crs, that.crs);
         }
         return false;
+    }
+
+    /**
+     * Returns {@code true} if {@code this} envelope bounds is equals to {@code that} envelope
+     * bounds in two specified dimensions. The coordinate reference system is not compared, since
+     * it doesn't need to have the same number of dimensions.
+     *
+     * @param that The envelope to compare to.
+     * @param xDim The dimension of {@code that} envelope to compare to the <var>x</var> dimension
+     *             of {@code this} envelope.
+     * @param yDim The dimension of {@code that} envelope to compare to the <var>y</var> dimension
+     *             of {@code this} envelope.
+     * @param eps  A small tolerance number for floating point number comparaisons. This value will
+     *             be scaled according this envelope {@linkplain #width width} and
+     *             {@linkplain #height height}.
+     * @return {@code true} if the envelope bounds are the same (up to the specified tolerance
+     *         level) in the specified dimensions, or {@code false} otherwise.
+     */
+    public boolean boundsEquals(final Envelope that, final int xDim, final int yDim, double eps) {
+        eps *= 0.5*(width + height);
+        for (int i=0; i<4; i++) {
+            final int dim2D = (i & 1);
+            final int dimND = (dim2D == 0) ? xDim : yDim;
+            final double value2D, valueND;
+            if ((i & 2) == 0) {
+                value2D = this.getMinimum(dim2D);
+                valueND = that.getMinimum(dimND);
+            } else {
+                value2D = this.getMaximum(dim2D);
+                valueND = that.getMaximum(dimND);
+            }
+            // Use '!' for catching NaN values.
+            if (!(Math.abs(value2D - valueND) <= eps)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

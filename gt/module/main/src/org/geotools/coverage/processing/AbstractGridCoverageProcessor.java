@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 // JAI dependencies
 import javax.media.jai.PropertySource;
 import javax.media.jai.PropertySourceImpl;
-import javax.media.jai.util.CaselessStringKey; // For javadoc
+import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -46,6 +46,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterNameException;
 
 // Geotools dependencies
 import org.geotools.resources.gcs.ResourceKeys;
@@ -214,18 +215,22 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentValue1 The value for the first parameter.
      * @return The result as a grid coverage.
      * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
-     * @throws ParameterNotFound if there is no parameter with the specified name.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
      */
     public GridCoverage doOperation(final String operationName, final GridCoverage source,
                                     final String argumentName1, final Object argumentValue1)
-            throws OperationNotFoundException, ParameterNotFoundException
+            throws OperationNotFoundException, InvalidParameterNameException
     {
         final Operation operation = getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
-        parameters.parameter("Source")     .setValue(source);
-        parameters.parameter(argumentName1).setValue(argumentValue1);
+        parameters.parameter("Source").setValue(source);
+        try {
+            parameters.parameter(argumentName1).setValue(argumentValue1);
+        } catch (ParameterNotFoundException cause) {
+            throw invalidParameterName(cause);
+        }
         return doOperation(operation, parameters);
     }
     
@@ -240,20 +245,24 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentValue2 The value for the second parameter.
      * @return The result as a grid coverage.
      * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
-     * @throws ParameterNotFoundException if there is no parameter with the specified name.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
      */
     public GridCoverage doOperation(final String operationName, final GridCoverage source,
                                     final String argumentName1, final Object argumentValue1,
                                     final String argumentName2, final Object argumentValue2)
-            throws OperationNotFoundException, ParameterNotFoundException
+            throws OperationNotFoundException, InvalidParameterNameException
     {
         final Operation operation = getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
-        parameters.parameter("Source")     .setValue(source);
-        parameters.parameter(argumentName1).setValue(argumentValue1);
-        parameters.parameter(argumentName2).setValue(argumentValue2);
+        parameters.parameter("Source").setValue(source);
+        try {
+            parameters.parameter(argumentName1).setValue(argumentValue1);
+            parameters.parameter(argumentName2).setValue(argumentValue2);
+        } catch (ParameterNotFoundException cause) {
+            throw invalidParameterName(cause);
+        }
         return doOperation(operation, parameters);
     }
 
@@ -270,7 +279,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentValue3 The value for the third parameter.
      * @return The result as a grid coverage.
      * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
-     * @throws ParameterNotFoundException if there is no parameter with the specified name.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
      */
@@ -278,19 +287,23 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
                                     final String argumentName1, final Object argumentValue1,
                                     final String argumentName2, final Object argumentValue2,
                                     final String argumentName3, final Object argumentValue3)
-            throws OperationNotFoundException, ParameterNotFoundException
+            throws OperationNotFoundException, InvalidParameterNameException
     {
         final Operation operation = getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
-        parameters.parameter("Source")     .setValue(source);
-        parameters.parameter(argumentName1).setValue(argumentValue1);
-        parameters.parameter(argumentName2).setValue(argumentValue2);
-        parameters.parameter(argumentName3).setValue(argumentValue3);
+        parameters.parameter("Source").setValue(source);
+        try {
+            parameters.parameter(argumentName1).setValue(argumentValue1);
+            parameters.parameter(argumentName2).setValue(argumentValue2);
+            parameters.parameter(argumentName3).setValue(argumentValue3);
+        } catch (ParameterNotFoundException cause) {
+            throw invalidParameterName(cause);
+        }
         return doOperation(operation, parameters);
     }
 
     /**
-     * Apply a process operation to a grid coverage.
+     * Applies a process operation to a grid coverage.
      *
      * @deprecated Use {@link #doOperation(Operation, ParameterValueGroup)} instead.
      */
@@ -317,6 +330,17 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      */
     public abstract GridCoverage doOperation(final Operation operation,
                                              final ParameterValueGroup parameters);
+
+    /**
+     * Converts a "parameter not found" exception into an "invalid parameter name".
+     */
+    private static InvalidParameterNameException invalidParameterName(final ParameterNotFoundException cause) {
+        final String name = cause.getParameterName();
+        final InvalidParameterNameException exception = new InvalidParameterNameException(
+                Resources.format(ResourceKeys.ERROR_UNKNOW_PARAMETER_NAME_$1, name), name);
+        exception.initCause(cause);
+        return exception;
+    }
 
     /**
      * @deprecated This method is not yet implemented, and may not be there in a future
