@@ -9,13 +9,17 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -227,7 +231,7 @@ public class Rendering2DTest extends TestCase {
     }
 
     public void testSimpleRender() throws Exception {
-        try {
+
             // same as the datasource test, load in some features into a table
             System.err.println("starting rendering2DTest");
 
@@ -239,18 +243,15 @@ public class Rendering2DTest extends TestCase {
             LiteRenderer renderer = new LiteRenderer(map);
             Envelope env= map.getLayerBounds();
             env=new Envelope( env.getMinX()-20, env.getMaxX()+20, env.getMinY()-20, env.getMaxY()+20 );
-            showRender(renderer, 1000, env);
-        } catch (HeadlessException e) {
-            // do nothing
-        }
+            showRender("testSimpleRender", renderer, 1000, env);
+
     }
 
         public void testReprojection() throws Exception {
-            try {
+
                 // same as the datasource test, load in some features into a table
                 System.err.println("starting testLiteRender2");
     
-                java.net.URL base = TestData.getResource(this, ".");
     
                 FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84);
                 Style style = createTestStyle();
@@ -265,13 +266,8 @@ public class Rendering2DTest extends TestCase {
                 .createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
                 
-    //            crs=GeographicCRS.WGS84;
-                MathTransform t=FactoryFinder
-                .getCoordinateOperationFactory()
-                .createOperation(
-                        GeographicCRS.WGS84,
-                        crs)
-                .getMathTransform();
+                MathTransform t=FactoryFinder.getCoordinateOperationFactory()
+                .createOperation( GeographicCRS.WGS84, crs).getMathTransform();
                 
                 Envelope env=map.getLayerBounds();
 
@@ -282,22 +278,10 @@ public class Rendering2DTest extends TestCase {
                 
                 Rectangle rect = new Rectangle(400, 400);
                 renderer.setOptimizedDataLoadingEnabled(true);
-                
-                showRender(renderer, 1000, env);
-                
 
-//                java.io.File file = new java.io.File(base.getPath(), "Rendering2DTest"
-//                        + renderer.getClass().getName().replace('.', '_') + ".png");
-//                java.io.FileOutputStream out = new java.io.FileOutputStream(file);
-//                boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
-//                out.close();
-//                if (!fred) {
-//                    System.out.println("Failed to write image to " + file.toString());
-//                }
-    
-            } catch (HeadlessException e) {
-                // do nothing
-            }
+                env=new Envelope( bounds.getMinX()-2000000, bounds.getMaxX()+2000000, bounds.getMinY()-2000000, bounds.getMaxY()+2000000);
+                showRender("testReprojection", renderer, 1000, env);
+
         }
 
     /**
@@ -309,7 +293,7 @@ public class Rendering2DTest extends TestCase {
      * @throws Exception
      */
     public void testDefinitionQuery() throws Exception {
-        try {
+
             System.err.println("starting definition query test");
             final FeatureCollection ft = createTestDefQueryFeatureCollection();
             final Style style = createDefQueryTestStyle();
@@ -340,7 +324,7 @@ public class Rendering2DTest extends TestCase {
             // just the 3 geometric atts should get be loaded
             assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender(renderer, 1000, null);
+            showRender("testDefinitionQuery1", renderer, 1000, null);
 
             // test attribute based filter
             FeatureType schema = ft.features().next().getFeatureType();
@@ -365,7 +349,7 @@ public class Rendering2DTest extends TestCase {
             String val = (String) results.reader().next().getAttribute("id");
             assertEquals("ft1", val);
 
-            showRender(renderer, 1000, null);
+            showRender("testDefinitionQuery2", renderer, 1000, null);
 
             // try a bbox filter as definition query for the layer
             filter = null;
@@ -397,22 +381,15 @@ public class Rendering2DTest extends TestCase {
             // the 4 atts should be loaded since the definition query includes "id"
             assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender(renderer, 1000, null);
-        } catch (HeadlessException e) {
-            // do nothing
-        }
+            showRender("testDefinitionQuery3", renderer, 1000, null);
+
     }
 
     /**
      * bounds may be null
      */
-    private void showRender( Object renderer, long timeOut, Envelope bounds ) throws InterruptedException {
-        Frame frame = new Frame();
-        frame.addWindowListener(new WindowAdapter(){
-            public void windowClosing( WindowEvent e ) {
-                e.getWindow().dispose();
-            }
-        });
+    private void showRender( String testName, Object renderer, long timeOut, Envelope bounds ) throws Exception {
+        
         int w = 300, h = 300;
         final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
@@ -421,7 +398,17 @@ public class Rendering2DTest extends TestCase {
         render(renderer, g, new Rectangle(w, h), bounds);
         if( System.getProperty("java.awt.headless")==null || 
                 !System.getProperty("java.awt.headless").equals("true") ){
+            Frame frame = new Frame();
+            frame.addWindowListener(new WindowAdapter(){
+                public void windowClosing( WindowEvent e ) {
+                    e.getWindow().dispose();
+                }
+            });
+            
             Panel p = new Panel(){
+                /** <code>serialVersionUID</code> field */
+                private static final long serialVersionUID = 1L;
+
                 public void paint(Graphics g){
                     g.drawImage(image, 0,0,this);
                 }
@@ -429,11 +416,36 @@ public class Rendering2DTest extends TestCase {
             frame.add(p);
             frame.setSize(w, h);
             frame.setVisible(true);
+
+            Thread.sleep(timeOut);
+            frame.dispose();
+        }
+
+        java.net.URL base = TestData.getResource(this, ".");
+        java.io.File file = new java.io.File(base.getPath(), testName+"_"
+                + renderer.getClass().getName().replace('.', '_') + ".png");
+        java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+        boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
+        out.close();
+        if (!fred) {
+            System.out.println("Failed to write image to " + file.toString());
+        }
+
+        java.io.File fileExemplar = new java.io.File(base.getPath()+"/exemplars", testName+"_"
+                + renderer.getClass().getName().replace('.', '_') + ".png");
+        
+        FileInputStream inExemplar=new FileInputStream(fileExemplar);
+        FileInputStream inTest=new FileInputStream(file);
+        
+        BufferedImage imageTest=ImageIO.read(inTest);
+        BufferedImage imageExemplar=ImageIO.read(inExemplar);
+        
+        for( int y=0; y< imageExemplar.getHeight(); y++){
+            for( int x=0; x< imageExemplar.getWidth(); x++){
+                assertEquals(imageExemplar.getRGB(x,y), imageTest.getRGB(x,y));
+            }
         }
         
-        
-        Thread.sleep(timeOut);
-        frame.dispose();
     }
 
     /**
