@@ -448,7 +448,7 @@ public class Formatter {
      */
     public String getName(final IdentifiedObject info) {
         final Identifier identifier = getIdentifier(info);
-        return (identifier!=null) ? identifier.getCode() : info.getName().toString(locale);
+        return (identifier!=null) ? identifier.getCode() : info.getName().toString( null );
     }
 
     /**
