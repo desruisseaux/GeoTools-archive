@@ -166,7 +166,8 @@ public class FeatureFlatTest extends TestCase {
         testFeature.setAttribute("testString", newData);
         assertEquals("match modified (string) attribute", testFeature.getAttribute("testString"), newData);
 
-        Point newGeom = new Point(new Coordinate(3, 4), new PrecisionModel(), 1);
+        GeometryFactory gf = new GeometryFactory();
+        Point newGeom = gf.createPoint(new Coordinate(3, 4));
         testFeature.setAttribute("testGeometry", newGeom);
         assertEquals("match modified (geometry) attribute", testFeature.getAttribute("testGeometry"), newGeom);
 

@@ -22,6 +22,7 @@ import org.geotools.data.DataTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -151,11 +152,11 @@ public class FeatureTypeTest extends DataTestCase {
         // complex type
         Feature feature = lakeFeatures[0];
         
-        PrecisionModel precisionModel = new PrecisionModel();
         Coordinate coords = new Coordinate(1, 3); 
         Coordinate coords2 = new Coordinate(1, 3);
-        Geometry point = new Point( coords, precisionModel, 1);
-        Geometry point2 = new Point( coords2, precisionModel, 1);
+        GeometryFactory gf = new GeometryFactory();
+        Geometry point = gf.createPoint(coords);
+        Geometry point2 = gf.createPoint( coords2);
         
         // JTS does not implement Object equals contract
         assertTrue( "jts identity", point != point2 );

@@ -17,6 +17,7 @@
 package org.geotools.feature;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -59,7 +60,8 @@ public class SampleFeatureFixtures {
      */
     public static Object[] createAttributes() {
         Object[] attributes = new Object[10];
-        attributes[0] = new Point(new Coordinate(1, 2), new PrecisionModel(), 1);
+        GeometryFactory gf = new GeometryFactory();
+        attributes[0] = gf.createPoint(new Coordinate(1, 2));
         attributes[1] = new Boolean(true);
         attributes[2] = new Character('t');
         attributes[3] = new Byte("10");
