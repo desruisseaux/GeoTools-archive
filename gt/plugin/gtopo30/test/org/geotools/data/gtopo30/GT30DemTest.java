@@ -28,8 +28,10 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
 import org.geotools.filter.Filter;
 import org.geotools.gc.GridCoverage;
 
@@ -55,7 +57,8 @@ public class GT30DemTest extends TestCaseSupport {
         // read dem      
         URL demURL = getTestResource("test.dem");
         GTopo30DataSource ds = new GTopo30DataSource(demURL);
-        FeatureCollection fc = ds.getFeatures((Filter) null);
+        FeatureCollection fc = FeatureCollections.newCollection();
+        ds.getFeatures(fc, Query.ALL);
         Envelope ex = ds.getBounds();
 
         // get the image out of the grid coverage
@@ -73,7 +76,8 @@ public class GT30DemTest extends TestCaseSupport {
         URL demURL = getTestResource("test.dem");
         GTopo30DataSource ds = new GTopo30DataSource(demURL);
         ds.setCropEnvelope(new Envelope(0, 40, 70, 90));
-        FeatureCollection fc = ds.getFeatures((Filter) null);
+        FeatureCollection fc = FeatureCollections.newCollection();
+        ds.getFeatures(fc, Query.ALL);
         System.out.println(ds.getBounds());
 
         // get the image out of the grid coverage

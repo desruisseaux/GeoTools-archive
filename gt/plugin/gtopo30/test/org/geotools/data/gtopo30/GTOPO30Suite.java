@@ -23,7 +23,6 @@ public class GTOPO30Suite extends TestCase {
     suite.addTestSuite(GT30HeaderTest.class);
     suite.addTestSuite(GT30StatTest.class);
     suite.addTestSuite(GT30DemTest.class);
-    suite.addTestSuite(ServiceTest.class);
     
     return suite;
   }

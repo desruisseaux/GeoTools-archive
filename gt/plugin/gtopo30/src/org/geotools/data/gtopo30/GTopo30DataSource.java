@@ -51,7 +51,6 @@ import org.geotools.cs.PrimeMeridian;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 import org.geotools.cv.ScaledColorSpace;
-import org.geotools.data.AbstractDataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.feature.AttributeType;
@@ -84,7 +83,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author aaime
  */
-public class GTopo30DataSource extends AbstractDataSource {
+public class GTopo30DataSource {
     /** Let's say that, for the moment, I want to read approximately 512k at a time */
     private static final int TILE_SIZE = 1024 * 512;
 
@@ -233,13 +232,14 @@ public class GTopo30DataSource extends AbstractDataSource {
      *
      * @throws DataSourceException For all data source errors.
      */
-    public FeatureCollection getFeatures(Filter filter)
+    /*
+     public FeatureCollection getFeatures(Filter filter)
         throws DataSourceException {
         FeatureCollection fc = FeatureCollections.newCollection();
         getFeatures(fc, filter);
 
         return fc;
-    }
+    }*/
 
     /**
      * Loads the DEM from the file, wraps it in a feature that will be included into the returned
