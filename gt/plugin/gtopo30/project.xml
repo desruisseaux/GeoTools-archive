@@ -54,6 +54,11 @@
       <version>1.0.0</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
+    <dependency>
+      <id>units</id>
+      <version>0.01</version>
+      <url>http://jsr-108.sourceforge.net</url>
+    </dependency>
   </dependencies>
   <build>
     <unitTest>
@@ -62,7 +67,7 @@
       </includes>
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>**/*.STX</include>
             <include>**/*.HDR</include>
