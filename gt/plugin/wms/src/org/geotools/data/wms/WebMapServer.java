@@ -25,6 +25,8 @@ import java.util.zip.GZIPInputStream;
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryRequest;
+import org.geotools.data.ows.BoundingBox;
+import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
@@ -42,8 +44,14 @@ import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
 
 /**
@@ -642,5 +650,69 @@ public class WebMapServer implements Discovery {
             }
         }
         return Collections.unmodifiableList(layers);
+    }
+    
+    /**
+     * Given a layer and a coordinate reference system, will locate an envelope
+     * for that layer in that CRS.
+     * 
+     * If null is returned, no valid bounding box could be found.
+     * 
+     * @param layer
+     * @param crs
+     * @return an Envelope containing a valid bounding box, or null if none are found
+     */
+    public Envelope getEnvelope(Layer layer, CoordinateReferenceSystem crs) {
+        
+        for (int i = 0; i < crs.getIdentifiers().length; i++) {
+            String epsgCode = crs.getIdentifiers()[i].toString();
+
+            BoundingBox tempBBox = null;
+            Layer parentLayer = layer;
+
+            //Locate a BBOx if we can
+            while( tempBBox == null && parentLayer != null ) {
+                tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get(epsgCode);
+                
+                //TODO HACK 3005 and 42102 are close enough
+                if (epsgCode.equals("EPSG:3005") && tempBBox == null) {
+                    tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get("EPSG:42102");
+                }
+                parentLayer = parentLayer.getParent();
+            }
+    
+            //Otherwise, locate a LatLon BBOX
+    
+            //TODO HACK 4326 is close enough to 4269
+            if (tempBBox == null && ("EPSG:4326".equals(epsgCode.toUpperCase()) ||
+                    "EPSG:4269".equals(epsgCode.toUpperCase()) )) { //$NON-NLS-1$
+                LatLonBoundingBox latLonBBox = null;
+    
+                parentLayer = layer;
+                while (latLonBBox == null && parentLayer != null) {
+                    latLonBBox = parentLayer.getLatLonBoundingBox();
+                    if (latLonBBox != null) {
+                        break;
+                    }
+                    parentLayer = layer.getParent();
+                }
+                
+                if (latLonBBox == null) {
+                    return new GeneralEnvelope(new double[] { -180, -90 }, new double[] {180, 90});
+                }
+                
+                return new GeneralEnvelope(new double[] {latLonBBox.getMinX(), latLonBBox.getMinY()}, 
+                        new double[] { latLonBBox.getMaxX(), latLonBBox.getMaxY() });
+            }
+            
+            //TODO Attempt to figure out the valid area of teh CRS and use that.
+            
+            if (tempBBox != null) {
+                return new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                        new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+            }
+    
+        }
+        return null;
     }
 }

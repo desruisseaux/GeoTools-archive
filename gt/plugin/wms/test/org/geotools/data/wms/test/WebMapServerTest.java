@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSLayerCatalogEntry;
@@ -41,6 +42,9 @@ import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
 
 
@@ -218,6 +222,41 @@ public class WebMapServerTest extends TestCase {
         }
     }
     
+    public void testGetEnvelope() throws Exception {
+        WebMapServer wms = new WebMapServer(featureURL);
+        
+        WMSCapabilities caps = wms.getCapabilities();
+        
+        Layer layer = caps.getLayers()[1];
+        CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
+        
+        Envelope envelope = wms.getEnvelope(layer, crs);
+        
+//        minx="-172.367" miny="35.6673" maxx="-11.5624" maxy="83.8293" />
+        assertEquals(envelope.getMinimum(0), -172.367, 0.0);
+        assertEquals(envelope.getMinimum(1), 35.6673, 0.0);
+        assertEquals(envelope.getMaximum(0), -11.5624, 0.0);
+        assertEquals(envelope.getMaximum(1), 83.8293, 0.0);
 
+        crs = CRS.decode("EPSG:42304");
+        envelope = wms.getEnvelope(layer, crs);
+        
+//        minx="-2.2e+06" miny="-712631" maxx="3.0728e+06" maxy="3.84e+06" />
+        assertEquals(envelope.getMinimum(0), -2.2e+06, 0.0);
+        assertEquals(envelope.getMinimum(1), -712631, 0.0);
+        assertEquals(envelope.getMaximum(0), 3.0728e+06, 0.0);
+        assertEquals(envelope.getMaximum(1), 3.84e+06, 0.0);
+        
+        layer = caps.getLayers()[2];
+        crs = CRS.decode("EPSG:4326");
+        
+        envelope = wms.getEnvelope(layer, crs);
+        
+//        minx="-178.838" miny="31.8844" maxx="179.94" maxy="89.8254" />
+        assertEquals(envelope.getMinimum(0), -178.838, 0.0);
+        assertEquals(envelope.getMinimum(1), 31.8844, 0.0);
+        assertEquals(envelope.getMaximum(0), 179.94, 0.0);
+        assertEquals(envelope.getMaximum(1), 89.8254, 0.0);
+    }
     
 }
