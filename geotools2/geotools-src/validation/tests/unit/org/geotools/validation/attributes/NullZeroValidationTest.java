@@ -78,8 +78,7 @@ public class NullZeroValidationTest extends TestCase {
 	}
 
 	public void testRangeFeatureValidation() throws Exception {
-		test.setPath("id");
-		
+	    //test.setPath("id");
 		
 		assertTrue(test.validate(feature, type, results));
 		assertEquals(0,results.failedFeatures.size());
@@ -126,11 +125,6 @@ public class NullZeroValidationTest extends TestCase {
 		assertEquals(10, test.getMin());
 	}
 
-	public void testGetPath() {
-		test.setPath("path");
-		assertEquals("path", test.getPath());
-	}
-
 	public void testSetMax() {
 		test.setMax(500);
 		assertEquals(500, test.getMax());
@@ -140,11 +134,6 @@ public class NullZeroValidationTest extends TestCase {
 	public void testSetMin() {
 		test.setMin(5);
 		assertEquals(5, test.getMin());
-	}
-
-	public void testSetPath() {
-		test.setPath("path2");
-		assertEquals("path2", test.getPath());
 	}
 
 }
