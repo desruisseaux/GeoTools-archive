@@ -20,7 +20,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.geotools.demos;
+package org.geotools.validation;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.DataStore;
@@ -63,7 +63,7 @@ import java.util.Set;
  * @author $Author: dmzwiers $ (last modification)
  * @version $Id: Validator.java,v 1.2 2004/02/18 18:27:18 dmzwiers Exp $
  */
-public class Validator {
+public class BatchValidator {
     private static Properties dataStoreProp;
     private static Properties transProp;
 
@@ -106,7 +106,7 @@ public class Validator {
                     sources.put(ss, fs);
 
                     BatchValidationResults vr = new BatchValidationResults();
-                    v.runFeatureTests(fs.getSchema(),
+                    v.runFeatureTests( null /** fix me */, fs.getSchema(),
                         fs.getFeatures().collection(), vr);
                     System.out.println("Feature Test Results for " + key + ":"
                         + ss[j]);
@@ -140,7 +140,7 @@ public class Validator {
 
             try {
                 BatchValidationResults vr = new BatchValidationResults();
-                v.runIntegrityTests(sources, env, vr);
+                v.runIntegrityTests( null /* fix me */, sources, env, vr);
                 System.out.println("Feature Integrety Test Results");
                 System.out.println(vr.toString());
             } catch (Exception e) {
@@ -437,7 +437,7 @@ public class Validator {
         // processing
         // (for starters it should use a custom FeatureResults
         //  that logs fail/warning information)
-        BatchValidator gv = new BatchValidator(ts, m);
+        BatchValidatorProcessor gv = new BatchValidatorProcessor(ts, m);
 
         return gv;
     }
@@ -478,7 +478,7 @@ public class Validator {
     	TestSuiteDTO dto = null;
 
     	try {
-    		dto = XMLReader.readTestSuite(new FileReader(testSuite), plugIns);
+    		dto = XMLReader.readTestSuite( testSuite.getName(), new FileReader(testSuite), plugIns);
     	} catch (FileNotFoundException e) {
     		System.err.println("TestSuite file was not found.");
     		System.err.println(testSuite.toString());
@@ -539,7 +539,7 @@ public class Validator {
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-class BatchValidator extends ValidationProcessor {
+class BatchValidatorProcessor extends ValidationProcessor {
     /**
      * BatchValidator constructor.
      * 
@@ -547,7 +547,7 @@ class BatchValidator extends ValidationProcessor {
      * super();
      * </p>
      */
-    public BatchValidator() {
+    public BatchValidatorProcessor() {
         super();
     }
 
@@ -563,7 +563,7 @@ class BatchValidator extends ValidationProcessor {
      *
      * @see load(Map,Map)
      */
-    public BatchValidator(Map testSuites, Map plugIns) {
+    public BatchValidatorProcessor(Map testSuites, Map plugIns) {
         super();
         load(testSuites, plugIns);
     }
@@ -594,7 +594,7 @@ class BatchValidator extends ValidationProcessor {
         }
 
         i = plugIns.values().iterator();
-
+        Map errors = new HashMap();
         while (i.hasNext())
             errors.put(i.next(), Boolean.FALSE);
 
