@@ -199,11 +199,16 @@ public class MapInfoDataSource {
     
     private String filename;
     
-    /** Construct MapInfoDataSource and attach it to the specified file
+    /**
+     * Construct MapInfoDataSource and attach it to the specified file
+     * <p>
+     * Package visisbility - we should only really play with this
+     * via the DataStore api.
+     * </p>
      * @param url location of the mif file to read
      * @throws MalformedURLException invalid URL was used
      */
-    public MapInfoDataSource(URL url) throws java.net.MalformedURLException {
+    MapInfoDataSource(URL url) throws java.net.MalformedURLException {
         filename = java.net.URLDecoder.decode( url.getFile() );
         geomFactory = new GeometryFactory();
     }

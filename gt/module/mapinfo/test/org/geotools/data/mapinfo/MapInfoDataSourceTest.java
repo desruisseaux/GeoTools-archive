@@ -24,7 +24,7 @@ import org.geotools.resources.TestData;
  * @author iant
  */
 public class MapInfoDataSourceTest extends TestCase {
-    MapInfoDataSource dsMapInfo;
+    MapInfoDataStore dsMapInfo;
     boolean setup = false;
     public MapInfoDataSourceTest(java.lang.String testName) {
         super(testName);
@@ -53,9 +53,9 @@ public class MapInfoDataSourceTest extends TestCase {
         }
         try{
         	System.out.println("Testing ability to load "+url);
-            MapInfoDataSource datasource = new MapInfoDataSource(url);
+            MapInfoDataStore data = new MapInfoDataStore(url);
 	
-            FeatureCollection collection = datasource.getFeatures(Filter.NONE);
+            FeatureCollection collection = data.getFeatureSource( data.getTypeNames()[0]).getFeatures().collection();
             assertEquals("Wrong number of features loaded", 49,collection.size());
         }
         catch(DataSourceException e){
