@@ -46,7 +46,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     /** Web Map Server proxy */
     private WebMapServer wms;
 
-    public WMSGridCoverageExchange(Object source) throws MalformedURLException, SAXException, URISyntaxException
+    public WMSGridCoverageExchange(Object source) throws SAXException, URISyntaxException, IOException
 {
         if (source instanceof String || source instanceof URL) {
             URL url = null;

@@ -81,7 +81,6 @@ import java.util.Set;
  * @author Jody Garnett, Refractions Reasearch
  */
 public abstract class Specification {
-    protected WMSParser[] parsers;
 
     /**
      * Expected version attribute for root element.
@@ -99,46 +98,6 @@ public abstract class Specification {
      */
     public abstract GetCapabilitiesRequest createGetCapabilitiesRequest(
         URL server);
-
-    /**
-     * Create a WMSParser capable of parsing a 1.0.0 Capabilities document
-     *
-     * @param document a JDOM Document containing the Capabilities to be parsed
-     *
-     * @return a WMSParser that is capable of parsing the provided document
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws RuntimeException DOCUMENT ME!
-     *
-     * @see org.geotools.data.wms.Specification#createParser(org.jdom.Document)
-     */
-    public WMSParser createParser(Document document) throws IOException {
-        WMSParser generic = null;
-        WMSParser custom = null;
-
-        for (int i = 0; i < parsers.length; i++) {
-            int canProcess = parsers[i].canProcess(document);
-
-            if (canProcess == WMSParser.GENERIC) {
-                generic = parsers[i];
-            } else if (canProcess == WMSParser.CUSTOM) {
-                custom = parsers[i];
-            }
-        }
-
-        WMSParser parser = generic;
-
-        if (custom != null) {
-            parser = custom;
-        }
-
-        if (parser == null) {
-            // Um can we have the name & version number please?
-            throw new RuntimeException("No parsers available to parse that GetCapabilities document");
-        }
-
-        return parser;
-    }
 
     public abstract GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings, List exceptions );
 }

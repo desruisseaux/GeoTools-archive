@@ -18,13 +18,16 @@ package org.geotools.data.wms;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -41,9 +44,12 @@ import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.handlers.DocumentHandler;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 /**
@@ -142,10 +148,16 @@ public class WebMapServer implements Discovery {
 
     protected Specification[] specs;
     private Specification specification;
+    
+    //Flag used to determine if we have checked the capabilities already, 
+    //So we don't check multiple times
+    private boolean alreadyChecked;
 
-    public WebMapServer(final URL serverURL) throws SAXException, URISyntaxException {
+    public WebMapServer(final URL serverURL) throws SAXException, URISyntaxException, IOException {
         this.serverURL = serverURL;
 
+        this.alreadyChecked = false;
+        
         setupSpecifications();
         
         getCapabilities();
@@ -233,16 +245,17 @@ public class WebMapServer implements Discovery {
      * @param server DOCUMENT ME!
      *
      * @return GetCapabilitiesRequest suitable for use with a parser
-     * @throws URISyntaxException
      * @throws SAXException
+     * @throws URISyntaxException
+     * @throws IOException
      * @throws IOException
      * @throws JDOMException
      */
-    private WMSCapabilities negotiateVersion(URL server) throws SAXException, URISyntaxException {
+    private WMSCapabilities negotiateVersion(URL server) throws SAXException, URISyntaxException, IOException {
         List versions = new ArrayList(specs.length);
 
         for (int i = 0; i < specs.length; i++) {
-            versions.add(specs[i].getVersion());
+            versions.add(i, specs[i].getVersion());
         }
 
         int minClient = 0;
@@ -259,11 +272,24 @@ public class WebMapServer implements Discovery {
 
             //Grab document
             URL url = request.getFinalURL();
-            WMSCapabilities capabilities = parseCapabilities(url);
+//            System.out.println("URL: "+url.toExternalForm());
+            WMSCapabilities capabilities;
+            try {
+                capabilities = parseCapabilities(url);
+            } catch (SAXException e) {
+                capabilities = null;
+                e.printStackTrace();
+            }
+            
+            int compare = -1;
+            String serverVersion = clientVersion; //Ignored if caps is null
 
-            String serverVersion = capabilities.getVersion();
+            if (capabilities != null) {
+            
+                serverVersion = capabilities.getVersion();
 
-            int compare = serverVersion.compareTo(clientVersion);
+                compare = serverVersion.compareTo(clientVersion);
+            }
 
             if (compare == 0) {
                 //we have an exact match and have capabilities as well!
@@ -272,11 +298,21 @@ public class WebMapServer implements Discovery {
                 return capabilities;
             }
 
-            if (versions.contains(serverVersion)) {
+            if (capabilities != null && versions.contains(serverVersion)) {
                 // we can communicate with this server
                 // 
-                test = versions.indexOf(serverVersion);
+//                System.out.println("Server responded with "+serverVersion+". We know it and will use it now.");
+                
+                int index = versions.indexOf(serverVersion);
+                this.specification = specs[index];
+                
+                return capabilities;
+                
             } else if (compare < 0) {
+                if (capabilities == null) {
+//                    System.out.println("Unable to read from server at version:"+serverVersion+".");
+                }
+//                System.out.println("Downgrading version.");
                 // server responded lower then we asked - and we don't understand.	           
                 maxClient = test - 1; // set current version as limit
 
@@ -290,6 +326,8 @@ public class WebMapServer implements Discovery {
 
                 test = versions.indexOf(clientVersion);
             } else {
+//                System.out.println("Server responded with "+serverVersion+" after a request for "+clientVersion);
+//                System.out.println("Upgrading");
                 // server responsed higher than we asked - and we don't understand
                 minClient = test + 1; // set current version as lower limit
 
@@ -367,8 +405,20 @@ public class WebMapServer implements Discovery {
         return after;
     }
 
-    private WMSCapabilities parseCapabilities(URL url) throws SAXException, URISyntaxException {
-		return (WMSCapabilities) DocumentFactory.getInstance(url.toURI(), null, Level.FINE);
+    private WMSCapabilities parseCapabilities(URL url) throws SAXException, URISyntaxException, IOException {
+        Map hints = new HashMap();
+        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+        
+        URLConnection urlConnection = url.openConnection();
+//        urlConnection.setRequestProperty("accept", "application/vnd.ogc.wms+xml, text/xml, *; q=.2, */*; q=.2");
+//        urlConnection.setRequestProperty("accept-encoding", "compress; q=1.0, gzip; q=0, *");
+        
+        InputStream io = urlConnection.getInputStream();
+        
+    	Object object = DocumentFactory.getInstance(io, hints, Level.WARNING);
+    
+    	WMSCapabilities capabilities = (WMSCapabilities) object;
+    	return capabilities;
     }
 
     /**
@@ -377,15 +427,17 @@ public class WebMapServer implements Discovery {
      * be checked with getProblem()
      *
      * @return a WMT_MS_Capabilities, or null if there was an error
-     * @throws URISyntaxException
      * @throws SAXException
+     * @throws URISyntaxException
+     * @throws IOException
      * @throws JDOMException
      * @throws IOException
      * @throws ParseCapabilitiesException
      */
-    public WMSCapabilities getCapabilities() throws SAXException, URISyntaxException {
-        if (capabilities == null) {
+    public WMSCapabilities getCapabilities() throws SAXException, URISyntaxException, IOException {
+        if (capabilities == null && !alreadyChecked) {
              capabilities = negotiateVersion(serverURL);
+             alreadyChecked = true;
         }
 
         return capabilities;
@@ -440,7 +492,7 @@ public class WebMapServer implements Discovery {
         return namedLayers;
     }
 
-    public GetMapRequest createGetMapRequest() throws SAXException, URISyntaxException {
+    public GetMapRequest createGetMapRequest() throws SAXException, URISyntaxException, IOException {
         if (capabilities == null) {
             getCapabilities();
             
@@ -506,7 +558,7 @@ public class WebMapServer implements Discovery {
         //return getCapabilities().getCapability().getException().getFormats();
     }
 
-    private Set getSRSs() throws SAXException, URISyntaxException {
+    private Set getSRSs() throws SAXException, URISyntaxException, IOException {
         Set srss = new TreeSet();
 
         Layer[] layers = getCapabilities().getLayers();

@@ -6,22 +6,14 @@
  */
 package org.geotools.data.wms.test;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMS1_3_0;
-import org.geotools.data.wms.WMSParser;
-import org.geotools.data.wms.xml.WMSSchema;
-import org.geotools.resources.TestData;
-import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.SchemaFactory;
-import org.geotools.xml.schema.Schema;
 
 /**
  * @author Kefka
@@ -44,10 +36,6 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         assertEquals(properties.get("VERSION"), "1.3.0");
         assertEquals(properties.get("REQUEST"), "GetCapabilities");
         assertEquals(properties.get("SERVICE"), "WMS");
-	}
-	
-	protected void parserCheck(WMSParser parser) {
-		assertEquals(parser.getClass(), WMS1_3_0.Parser.class);
 	}
 	
 	public void testCreateParser() throws Exception {

@@ -68,8 +68,6 @@ import java.util.Set;
  */
 public class WMS1_1_1 extends WMS1_1_0 {
     public WMS1_1_1() {
-        parsers = new WMSParser[1];
-        parsers[0] = new Parser();
     }
 
     /**
@@ -102,11 +100,6 @@ public class WMS1_1_1 extends WMS1_1_0 {
         }
     }
 
-    static public class Parser extends WMS1_1_0.Parser {
-        public String getVersion() {
-            return "1.1.1";
-        }
-    }
     static public class GetMapRequest extends WMS1_1_0.GetMapRequest {
 
         public GetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions ) {

@@ -51,8 +51,9 @@ public class WMSSchema implements Schema {
         new WMSElement("Abstract", XSISimpleTypes.String.getInstance()),
         new WMSElement("KeywordList", _KeywordListType.getInstance()), 
         new WMSElement("Keyword", _KeywordType.getInstance()),
+        new WMSElement("Keywords", _KeywordsType.getInstance()),
         new WMSElement("OnlineResource", _OnlineResourceType.getInstance()),
-        new WMSElement("Format", XSISimpleTypes.String.getInstance()),
+        new WMSElement("Format", _FormatType.getInstance()),
         
         new WMSElement("Service", _ServiceType.getInstance()),
         new WMSElement("ContactInformation", _ContactInformationType.getInstance()),
@@ -81,9 +82,16 @@ public class WMSSchema implements Schema {
         new WMSElement("VendorSpecificCapabilities", _VendorSpecificCapabilitiesType.getInstance()),
         new WMSElement("UserDefinedSymbolization", _UserDefinedSymbolizationType.getInstance()),
         new WMSElement("Request", _RequestType.getInstance()),
+        
+        new WMSElement("Capabilities", OperationType.getInstance()),
         new WMSElement("GetCapabilities", OperationType.getInstance()),
+        
+        new WMSElement("Map", OperationType.getInstance()),
         new WMSElement("GetMap", OperationType.getInstance()),
+        
+        new WMSElement("FeatureInfo", OperationType.getInstance()),
         new WMSElement("GetFeatureInfo", OperationType.getInstance()),
+        
         new WMSElement("DescribeLayer", OperationType.getInstance()),
         new WMSElement("GetLegendGraphic", OperationType.getInstance()),
         new WMSElement("GetStyles", OperationType.getInstance()),
@@ -104,6 +112,7 @@ public class WMSSchema implements Schema {
         new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance()),
         new WMSElement("BoundingBox", _BoundingBoxType.getInstance()),
         new WMSElement("Dimension", _DimensionType.getInstance()),
+        new WMSElement("Extent", _ExtentType.getInstance()),
         new WMSElement("Attribution", _AttributionType.getInstance()),
         new WMSElement("LogoURL", _LogoURLType.getInstance()),
         new WMSElement("MetadataURL", _MetadataURLType.getInstance()),
@@ -116,7 +125,27 @@ public class WMSSchema implements Schema {
         new WMSElement("StyleSheetURL", _StyleSheetURLType.getInstance()),
         new WMSElement("StyleURL", _StyleURLType.getInstance()),
         new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance()),
-        new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance())
+        new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance()),
+        new WMSElement("ScaleHint", _ScaleHintType.getInstance()),
+        
+        //1.0.0 format elements
+        new WMSElement("GIF", _GIFType.getInstance()),
+        new WMSElement("JPEG", _JPEGType.getInstance()),
+        new WMSElement("PNG", _PNGType.getInstance()),
+        new WMSElement("PPM", _PPMType.getInstance()),
+        new WMSElement("TIFF", _TIFFType.getInstance()),
+        new WMSElement("GeoTIFF", _GeoTIFFType.getInstance()),
+        new WMSElement("WebCGM", _WebCGMType.getInstance()),
+        new WMSElement("SVG", _SVGType.getInstance()),
+        new WMSElement("WMS_XML", _WMS_XMLType.getInstance()),
+        new WMSElement("GML.1", _GML_1Type.getInstance()),
+        new WMSElement("GML.2", _GML_2Type.getInstance()),
+        new WMSElement("GML.3", _GML_3Type.getInstance()),
+        new WMSElement("BMP", _BMPType.getInstance()),
+        new WMSElement("WBMP", _WBMPType.getInstance()),
+        new WMSElement("MIME", _MIMEType.getInstance()),
+        new WMSElement("INIMAGE", _INIMAGEType.getInstance()),
+        new WMSElement("BLANK", _BLANKType.getInstance()),
     };
     
     static final ComplexType[] complexTypes = new ComplexType[] {

@@ -187,7 +187,7 @@ public class WebMapServerTest extends TestCase {
 
     }*/
     
-    public void testIterator() throws SAXException, URISyntaxException {
+    public void testIterator() throws SAXException, URISyntaxException, IOException {
         WebMapServer wms = new WebMapServer(serverURL);
         wms.getCapabilities();
         

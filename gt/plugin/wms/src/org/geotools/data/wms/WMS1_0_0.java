@@ -80,8 +80,7 @@ public class WMS1_0_0 extends Specification {
      * Public constructor creates the WMS1_0_0 object.
      */
     public WMS1_0_0() {
-        parsers = new WMSParser[1];
-        parsers[0] = new Parser();
+        
     }
 
     /**
@@ -164,6 +163,7 @@ public class WMS1_0_0 extends Specification {
 
         protected void initVersion() {
             setProperty("WMTVER", "1.0.0"); //$NON-NLS-1$ //$NON-NLS-2$
+            properties.remove("VERSION");
         }
 
         protected void initRequest() {
@@ -249,18 +249,6 @@ public class WMS1_0_0 extends Specification {
            
         }
     }*/
-
-    /**
-     * A WMSParser capable of parsing 1.0.0 GetCapabilities document
-     */
-    static public class Parser extends AbstractWMSParser {
-        /**
-         * @return the version that this parser supports.
-         */
-        public String getVersion() {
-            return "1.0.0"; //$NON-NLS-1$
-        }
-    }
 
     /* (non-Javadoc)
      * @see org.geotools.data.wms.Specification#createGetMapRequest(java.net.URL, java.lang.String, org.geotools.data.wms.SimpleLayer[], java.util.Set, java.lang.String[], java.util.List)
