@@ -22,6 +22,7 @@ package org.geotools.data.shapefile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
@@ -40,6 +41,9 @@ public class ShapefileDataStoreFactory
     implements FileDataStoreFactorySpi {
     public static final Param URLP = new Param("url", URL.class,
         "url to a .shp file");
+    
+    public static final Param NAMESPACEP = new Param("namespace", URI.class,
+    "uri to a the namespace",false); //not required
 
     /**
      * Takes a list of params which describes how to access a restore and
@@ -84,7 +88,8 @@ public class ShapefileDataStoreFactory
         URL url = null;
         try {
             url = (URL) URLP.lookUp(params);
-            ds = new ShapefileDataStore(url);
+            URI namespace = (URI) NAMESPACEP.lookUp(params);  //will be null if it doesnt exist
+            ds = new ShapefileDataStore(url,namespace);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);

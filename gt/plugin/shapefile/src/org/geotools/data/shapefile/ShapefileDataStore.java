@@ -84,6 +84,7 @@ import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -109,6 +110,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected final URL shxURL;
     protected final URL prjURL;
     protected final URL xmlURL;
+    
+    protected URI namespace =null; //namespace provided by the constructor's map
     protected FeatureType schema; // read only
     
     /**
@@ -159,6 +162,20 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         prjURL = new URL(filename + prjext);
         xmlURL = new URL(filename + xmlext);
         
+    }
+    
+    /**
+     *   this sets the datastore's namespace during construction
+     *   (so the schema - FeatureType - will have the correct value)
+     *   You can call this with namespace = null, but I suggest you give it an actual namespace.
+     * @param url
+     * @param namespace
+     * @throws java.net.MalformedURLException
+     */
+    public ShapefileDataStore(URL url,URI namespace) throws java.net.MalformedURLException
+    {
+       	this(url);
+    	this.namespace = namespace;
     }
     
     /**
@@ -570,11 +587,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 }
                 if(parent != null){
                     schema = FeatureTypeFactory.newFeatureType(readAttributes(),
-                    createFeatureTypeName(), null, false, new FeatureType[] {parent});
+                    createFeatureTypeName(), namespace, false, new FeatureType[] {parent});
                 }
                 else {
-                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
-                    createFeatureTypeName());
+                	if (namespace != null)
+                	{
+                		schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                				createFeatureTypeName(),namespace,false);
+                	}
+                	else
+                	{
+                		schema = FeatureTypeFactory.newFeatureType(readAttributes(), createFeatureTypeName(), GMLSchema.NAMESPACE, false);
+                	}
                 }
             } catch (SchemaException se) {
                 throw new DataSourceException("Error creating FeatureType", se);
