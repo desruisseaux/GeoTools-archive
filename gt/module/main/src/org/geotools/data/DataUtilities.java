@@ -808,6 +808,13 @@ public class DataUtilities {
         if ((properties == null) && (override == null)) {
             return featureType;
         }
+        
+        if(properties == null) {
+          properties = new String[featureType.getAttributeCount()];
+          for (int i = 0; i < properties.length; i++) {
+            properties[i] = featureType.getAttributeType(i).getName();
+          }
+        }
 
         boolean same = featureType.getAttributeCount() == properties.length &&
             featureType.getTypeName().equals( typeName ) &&
