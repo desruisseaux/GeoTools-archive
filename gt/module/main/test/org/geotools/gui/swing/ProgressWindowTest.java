@@ -82,7 +82,7 @@ public class ProgressWindowTest extends TestCase {
     }
 
     /**
-     * Test the progress listener with a progress ranging from 0 to 100% in 10 seconds.
+     * Test the progress listener with a progress ranging from 0 to 100%
      */
     public void testProgress() throws InterruptedException {
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY-2);
@@ -91,7 +91,7 @@ public class ProgressWindowTest extends TestCase {
         progress.started();
         for (int i=0; i<=100; i++) {
             progress.progress(i);
-            Thread.currentThread().sleep(100);
+            Thread.currentThread().sleep(20);
             if ((i==40 || i==80) && warning!=null) {
                 progress.warningOccurred(source, margin, warning);
             }
