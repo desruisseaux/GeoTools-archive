@@ -284,16 +284,23 @@ public class CRSService {
 	
 	/**
 	 * Applies transform to all geometry attribute.
-	 *   
+	 * 
+	 * @param feature Feature to be transformed
+	 * @param schema Schema for target transformation - transform( schema, crs )
+	 * @param transform MathTransform used to transform coordinates - reproject( crs, crs )
+	 * @return transformed Feature of type schema
 	 * @throws TransformException
 	 * @throws MismatchedDimensionException
+	 * @throws IllegalAttributeException
 	 */
-	static Feature transform( Feature feature, FeatureType schema, MathTransform transform ) throws MismatchedDimensionException, TransformException{
-	    FeatureType type = feature.getFeatureType();
+	static Feature transform( Feature feature, FeatureType schema, MathTransform transform ) throws MismatchedDimensionException, TransformException, IllegalAttributeException{
+	    feature = schema.create( feature.getAttributes( null ), feature.getID() );
+	    
 	    GeometryAttributeType geomType = schema.getDefaultGeometry();
 	    Geometry geom = (Geometry) feature.getAttribute( geomType.getName() );
-	    	    
-	    geom = transform( geom, transform );	    
+	    
+	    geom = transform( geom, transform );
+	    
 	    try {	        
             feature.setAttribute( geomType.getName(), geom );
         } catch (IllegalAttributeException shouldNotHappen) {
