@@ -20,6 +20,7 @@
  */
 package org.geotools.data.jdbc;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
@@ -36,19 +37,48 @@ public class JDBCDataStoreConfig {
     public static final String FID_GEN_MANUAL_INC = "MANUAL_INC";
     public static final String DEFAULT_FID_GEN_KEY = "DEFAULT_GEN";
     public static final String DEFAULT_FID_GEN = FID_GEN_INSERT_NULL;
+    
+    /**
+     * Namespace of schema describing this JDBCDatastore.
+     * <p>
+     * Assume this is in the GML sense?
+     * </p> 
+     */
     private final String namespace;
+    
+    /** Name of database schema */ 
     private final String databaseSchemaName;
+    
     protected final long typeHandlerCacheTimout;
-
+    
+    /**
+     * Construct <code>JDBCDataStoreConfig</code>.
+     *
+     */
     public JDBCDataStoreConfig() {
         this(null, null, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
     }
 
+    /**
+     * Construct <code>JDBCDataStoreConfig</code>.
+     *
+     * @param namespace
+     * @param databaseSchemaName
+     * @param fidColumnOverrideMap
+     * @param fidGenerationMap
+     */
     public JDBCDataStoreConfig(String namespace, String databaseSchemaName,
         Map fidColumnOverrideMap, Map fidGenerationMap) {
         this(namespace, databaseSchemaName, Long.MAX_VALUE);
     }
 
+    /**
+     * Construct <code>JDBCDataStoreConfig</code>.
+     *
+     * @param namespace
+     * @param databaseSchemaName
+     * @param typeHandlerCacheTimeout
+     */
     public JDBCDataStoreConfig(String namespace, String databaseSchemaName,
          long typeHandlerCacheTimeout) {
         this.namespace = namespace;
@@ -60,6 +90,13 @@ public class JDBCDataStoreConfig {
 	this.typeHandlerCacheTimout = typeHandlerCacheTimeout;
     }
 
+    /**
+     * TODO summary sentence for createWithNameSpaceAndSchemaName ...
+     * 
+     * @param namespace
+     * @param schemaName
+     * @return
+     */
     public static JDBCDataStoreConfig createWithNameSpaceAndSchemaName(
         String namespace, String schemaName) {
         return new JDBCDataStoreConfig(namespace, schemaName,
@@ -89,7 +126,6 @@ public class JDBCDataStoreConfig {
     public String getNamespace() {
         return namespace;
     }
-
     /**
      * @return
      */

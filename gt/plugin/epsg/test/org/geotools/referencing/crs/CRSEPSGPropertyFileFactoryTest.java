@@ -69,7 +69,7 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
     }
     
     public void test26910() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("26910");
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:26910");
         assertNotNull( crs );                
     }
     public void testSuccess() throws Exception {
@@ -86,6 +86,6 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
                 System.err.println("WARNING:"+e );
             }            
         }
-        System.out.println( "sucess:" + count + "/" + total );                
+        System.out.println( "success:" + count + "/" + total );                
     }
 }

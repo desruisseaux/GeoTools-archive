@@ -41,6 +41,7 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -86,12 +87,36 @@ import com.vividsolutions.jts.geom.Envelope;
  * @todo Allows the user to set ordering (i.e. preferred implementation).
  */
 public final class FactoryFinder {
+    
+    
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
      */
     private static ServiceRegistry registry;
 
+    /**
+     * Programtic managment of AuthorityFactory.
+     * <p>
+     * Needed for user managed, not plug-in manged, AuthorityFactory. Also
+     * useful for testcases.
+     * <p>
+     * @param authority 
+     */
+    public static void addAuthority( AuthorityFactory authority ){
+        getServiceRegistry().registerServiceProvider( authority );
+    }
+    /**
+     * Programtic managment of AuthorityFactory.
+     * <p>
+     * Needed for user managed, not plug-in manged, AuthorityFactory. Also
+     * useful for testcases.
+     * <p>
+     * @param authority 
+     */
+    public static void removeAuthority( AuthorityFactory authority ){
+        getServiceRegistry().deregisterServiceProvider( authority );
+    }
     /**
      * Do not allows any instantiation of this class.
      */
@@ -107,6 +132,25 @@ public final class FactoryFinder {
      */
     private static Iterator getProviders(final Class category) {
         assert Thread.holdsLock(FactoryFinder.class);
+        ServiceRegistry services = getServiceRegistry();
+        Iterator iterator = services.getServiceProviders(category, false);
+        if (!iterator.hasNext()) {
+            /*
+             * No plugin. This method is probably invoked the first time for the specified
+             * category, otherwise we should have found at least the Geotools implementation.
+             * Scans the plugin now, but for this category only.
+             */
+            scanForPlugins(category);
+            iterator = services.getServiceProviders(category, false);
+        }
+        return iterator;
+    }
+    /**
+     * This method will initialize the {@link ServiceRegistry} and scan for
+     * plugin the first time it will be invoked.
+     * @return 
+     */
+    private static ServiceRegistry getServiceRegistry() {
         if (registry == null) {
             // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
             registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
@@ -117,17 +161,7 @@ public final class FactoryFinder {
                                            AuthorityFactory.class,
                                            CoordinateOperationFactory.class}).iterator());
         }
-        Iterator iterator = registry.getServiceProviders(category, false);
-        if (!iterator.hasNext()) {
-            /*
-             * No plugin. This method is probably invoked the first time for the specified
-             * category, otherwise we should have found at least the Geotools implementation.
-             * Scans the plugin now, but for this category only.
-             */
-            scanForPlugins(category);
-            iterator = registry.getServiceProviders(category, false);
-        }
-        return iterator;
+        return registry;
     }
 
     /**
@@ -208,20 +242,31 @@ public final class FactoryFinder {
      * @throws NoSuchAuthorityCodeException If the code could not be understood 
      */ 
     public static CoordinateReferenceSystem decode( String code ) throws NoSuchAuthorityCodeException {
-        //Set factories = getAuthorityFactories();
-        if( "EPSG:4269".equals( code )){ //$NON-NLS-1$
-            try {
-                // Temp hack for testing
-                return getCRSFactory().createFromWKT(
-                        "4269=GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]]" //$NON-NLS-1$
-                        );
-            } catch (NoSuchElementException e) {
-                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage(), "EPSG", code ); //$NON-NLS-1$
-            } catch (FactoryException e) {
-                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage(), "EPSG", code ); //$NON-NLS-1$
-            }
+        int split = code.indexOf(':');
+        if( split == -1 ){
+            throw new NoSuchAuthorityCodeException("No authority was defined - did you forget 'EPSG:number'?", "unknown", code );
         }
-        throw new NoSuchAuthorityCodeException( "Unabled to locate code", "not found", code); //$NON-NLS-1$ //$NON-NLS-2$
+        final String AUTHORITY = code.substring( 0, split );
+        Throwable trouble = null;
+        for( Iterator i = getAuthorityFactories().iterator(); i.hasNext(); ){
+            AuthorityFactory factory = (AuthorityFactory) i.next();
+            factory.getAuthority().getIdentifierTypes().contains( AUTHORITY );
+            try {
+                CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
+                if( crs != null ) return crs;
+            } catch (FactoryException e) {
+                trouble = e;
+            }
+            catch (Throwable e) {
+                trouble = e;
+            }
+        }        
+        if( trouble instanceof NoSuchAuthorityCodeException){
+            throw (NoSuchAuthorityCodeException) trouble;
+        }
+        NoSuchAuthorityCodeException notFound = new NoSuchAuthorityCodeException( "Unabled to locate code", "not found", code); //$NON-NLS-1$ //$NON-NLS-2$
+        if( trouble != null ) notFound.initCause( trouble );        
+        throw notFound; 
     }
     
     /**

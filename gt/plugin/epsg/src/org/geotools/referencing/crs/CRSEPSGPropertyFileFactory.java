@@ -21,11 +21,13 @@ package org.geotools.referencing.crs;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
 
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -45,7 +47,8 @@ import org.opengis.util.InternationalString;
  */
 //not quite sure how I am going to create a new factory (what should the geoapi method be)
 public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
-   
+    public static final String AUTHORITY = "EPSG";
+    public static final String AUTHORITY_PREFIX = "EPSG:";
     //would be nice to cache crs objects for codes that have already been requested    
     
     /**
@@ -63,6 +66,9 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
     
     //object factory
     protected CRSFactory crsFactory;
+
+    /** Cache of parsed CoordinateReferenceSystem WKT by EPSG_NUMBER */
+    private Hashtable cache = new Hashtable();
         
     protected CRSEPSGPropertyFileFactory() throws FactoryException {
         this(FactoryFinder.getCRSFactory());
@@ -107,15 +113,25 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
         if (code == null) {
             return null;
         }
-        if (code.startsWith("EPSG:")) { // EPSG:26907
-            code = code.substring(5);
+        if( !code.startsWith( AUTHORITY_PREFIX )){
+            throw new NoSuchAuthorityCodeException( "This factory only understand EPSG codes", AUTHORITY, code );
         }
-        code = code.trim();
-        String wkt = epsg.getProperty( code );
-        if( wkt == null ) {
-            throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
+        final String EPSG_NUMBER = code.substring( code.indexOf(':')+1 ).trim();
+        
+        if( cache.contains( EPSG_NUMBER ) ){
+            Object value = cache.get( EPSG_NUMBER );
+            if( value instanceof Throwable ){
+                throw new FactoryException( "WKT for "+code+" could not be parsed", (Throwable) value );
+            }
+            if( value instanceof CoordinateReferenceSystem){
+                return (CoordinateReferenceSystem) value;
+            }            
         }
-        return crsFactory.createFromWKT(wkt);
+        final String WKT = epsg.getProperty( EPSG_NUMBER );
+        if( WKT == null ) {
+            throw new NoSuchAuthorityCodeException( "Unknown EPSG_NUMBER", AUTHORITY, code );
+        }
+        return crsFactory.createFromWKT(WKT);
     }
     
     public Object createObject(String code) throws FactoryException {
@@ -156,9 +172,14 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      */
     public Set getAuthorityCodes(Class clazz) throws FactoryException {
         //could cashe this info if it is time consuming to filter
+        Set set;
         if (clazz.getName().equalsIgnoreCase(CoordinateReferenceSystem.class.getName())) {
-            return epsg.keySet();  
-            
+            Set all= new java.util.TreeSet();
+            for(java.util.Iterator i = epsg.keySet().iterator(); i.hasNext();) {
+                String code = (String) i.next();                
+                all.add( AUTHORITY_PREFIX+code);                
+            }  
+            return all;
         } else if (clazz.getName().equalsIgnoreCase(GeographicCRS.class.getName())) {
             Set all = epsg.keySet();
             Set geoCRS = new java.util.TreeSet();
@@ -166,7 +187,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
                 String code = (String) i.next();
                 String wkt = epsg.getProperty( code );
                 if (wkt.startsWith("GEOGCS")) {
-                    geoCRS.add(code);
+                    geoCRS.add( AUTHORITY_PREFIX+code);
                 }
             }  
             return geoCRS;
@@ -178,7 +199,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
                 String code = (String) i.next();
                 String wkt = epsg.getProperty( code );
                 if (wkt.startsWith("PROJCS")) {
-                    projCRS.add(code);
+                    projCRS.add( AUTHORITY_PREFIX+code);
                 }
             }  
             return projCRS;
