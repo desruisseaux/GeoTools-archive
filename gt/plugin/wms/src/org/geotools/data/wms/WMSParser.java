@@ -6,6 +6,8 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 
 import org.geotools.data.wms.capabilities.Capabilities;
@@ -27,6 +29,6 @@ public interface WMSParser {
 	 * @param element
 	 * @return an int, the value of which is NO, GENERIC, or CUSTOM
 	 */
-	public int canProcess(Element element);
+	public int canProcess(InputStream stream) throws IOException;
 	public Capabilities constructCapabilities(Element capabilitiesElement) throws ParseCapabilitiesException;
 }

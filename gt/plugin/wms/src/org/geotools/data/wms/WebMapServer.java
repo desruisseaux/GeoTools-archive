@@ -71,6 +71,8 @@ public class WebMapServer {
 	private Capabilities capabilities;
 	private Exception problem;
 	
+	private WMSParser[] parsers;
+	
 	public static final int IN_PROGRESS = 1;
 	public static final int NOTCONNECTED = 0;
 	public static final int ERROR = -1;
@@ -96,6 +98,7 @@ public class WebMapServer {
 	 */
 	public WebMapServer (URL serverURL) {
 		this(serverURL, false);
+		
 	}
 	
 	/**
@@ -114,6 +117,9 @@ public class WebMapServer {
 	 */
 	public WebMapServer (final URL serverURL, boolean wait) {
 		this.serverURL = serverURL;
+		
+		parsers = new WMSParser[1];
+		parsers[0] = new Parser1_1_1();
 		
 		if (wait) 
 			return;
@@ -206,8 +212,27 @@ public class WebMapServer {
 				currentResponse = new GetMapResponse(contentType, inputStream);
 			} else if (currentRequest instanceof GetCapabilitiesRequest) {
 				try {
-					//TODO VERSION SUPPORT, FIX THIS HACK
-					currentResponse = new GetCapabilitiesResponse(new Parser1_1_1(), contentType, inputStream);
+
+					WMSParser generic = null;
+					WMSParser custom = null;
+					for (int i = 0; i < parsers.length; i++) {
+						int canProcess = parsers[i].canProcess(finalURL.openStream());
+						
+						if (canProcess == WMSParser.GENERIC) {
+							generic = parsers[i];
+						} else if (canProcess == WMSParser.CUSTOM) {
+							custom = parsers[i];
+						}
+					}
+					WMSParser parser = generic;
+					if (custom != null) {
+						parser = custom;
+					}
+					if (parser == null) {
+						throw new RuntimeException("No parsers available to parse that GetCapabilities document");
+					}
+					
+					currentResponse = new GetCapabilitiesResponse(parser, contentType, inputStream);
 					capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
 				} catch (JDOMException e) {
 					problem = e;

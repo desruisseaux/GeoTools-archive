@@ -6,6 +6,8 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,8 +20,11 @@ import org.geotools.data.wms.capabilities.Layer;
 import org.geotools.data.wms.capabilities.OperationType;
 import org.geotools.data.wms.capabilities.Request;
 import org.geotools.data.wms.capabilities.Service;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 
 /**
  * @author Kefka
@@ -29,7 +34,18 @@ import org.jdom.Namespace;
  */
 public class Parser1_1_1 implements WMSParser {
 
-	public int canProcess(Element element) {
+	public int canProcess(InputStream stream) throws IOException {
+		
+		SAXBuilder builder = new SAXBuilder();
+		Document document;
+		try {
+			document = builder.build(stream);
+		} catch (JDOMException e) {
+			return NO;
+		}
+
+		Element element = document.getRootElement(); //Root = "WMT_MS_Capabilities"
+			
 		if (!element.getName().equals("WMT_MS_Capabilities")) {
 			return WMSParser.NO;
 		}

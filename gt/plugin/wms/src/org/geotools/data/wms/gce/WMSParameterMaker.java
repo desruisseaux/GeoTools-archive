@@ -17,17 +17,14 @@
 package org.geotools.data.wms.gce;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Utils;
-import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.Style;
 import org.geotools.data.wms.capabilities.Capabilities;
+import org.geotools.data.wms.capabilities.Layer;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
 
@@ -113,15 +110,9 @@ public class WMSParameterMaker {
         return param;
 	}	
 	
-	private void retrieveSRSs(Layer layer, Set srsSet) {
-		List layerSRS = layer.getSrs();
-		srsSet.addAll(layerSRS);
-		
-		List subLayers = layer.getSubLayers();
-		Iterator iter = subLayers.iterator();
-		while (iter.hasNext()) {
-			Layer subLayer = (Layer) iter.next();
-			retrieveSRSs(subLayer, srsSet);
+	private void retrieveSRSs(Layer[] layers, Set srsSet) {
+		for (int i = 0; i < layers.length; i++) {
+			srsSet.addAll(layers[i].getSrs());
 		}
 	}
 	
@@ -157,7 +148,7 @@ public class WMSParameterMaker {
         param.remarks = "Value contains a list containing multiple SimpleLayer instances, " 
         	           +"representing a layer to be drawn and its style. The Style value "
 					   +"can be empty.";
-        param.availableLayers = Utils.findDrawableLayers(capabilities.getCapability().getLayer());
+        param.availableLayers = Arrays.asList(Utils.findDrawableLayers(capabilities.getLayers()));
 
         Identifier id = null;
 
@@ -248,7 +239,8 @@ public class WMSParameterMaker {
         param.minOccurs = 0;
         param.remarks = "Value indicates the format in which exceptions are returned";
         param.defaultValue = "application/vnd.ogc.se_xml";
-        param.validValues = new TreeSet(capabilities.getCapability().getException().getFormats());
+        //TODO Fix exceptions later
+        //param.validValues = new TreeSet(capabilities..getException().getFormats());
         
         Identifier id = null;
 
