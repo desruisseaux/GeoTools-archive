@@ -31,6 +31,7 @@ import org.geotools.data.gml.GMLDataSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.resources.TestData;
 import org.geotools.styling.SLDStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
@@ -45,26 +46,10 @@ import java.net.URL;
  *
  * @author James
  */
-public class SVGTest extends TestCase {
-    String dataFolder;
-
+public class SVGTest extends TestCase {    
     public SVGTest(java.lang.String testName) throws Exception{
         super(testName);
-
-        dataFolder = new File( java.net.URLDecoder.decode(getResourcePath("/testData/bluelake.svg"),"UTF-8")).getParent();
-
     }
-
-    private String getResourcePath(String resourceName) {
-        URL r = getClass().getResource(resourceName);
-
-        if (r == null) {
-            throw new RuntimeException("Could not locate resource : " + resourceName);
-        }
-
-        return r.getFile();
-    }
-
     public static void main(java.lang.String[] args) {
         junit.textui.TestRunner.run(suite());
     }
@@ -101,11 +86,12 @@ public class SVGTest extends TestCase {
     private void createSVG(final String stylefile, final String gmlfile, final String outfile) {
         try {
             GenerateSVG gen = new GenerateSVG();
-            URL url = new URL("file:///" + dataFolder + "/" + gmlfile);
+            URL url = TestData.getResource( this, gmlfile );
+            
             DataSource ds = new GMLDataSource(url);
             FeatureCollection fc = ds.getFeatures(Query.ALL);
 
-            File f = new File(dataFolder, stylefile);
+            File f = TestData.file( this, stylefile );
 
             MapContext mapContext = new DefaultMapContext();
             StyleFactory sFac = StyleFactory.createStyleFactory();
@@ -113,10 +99,8 @@ public class SVGTest extends TestCase {
             Style[] style = reader.readXML();
             mapContext.addLayer(fc, style[0]);
 
-            url = new URL("file:///" + dataFolder + "/" + outfile);
-
-            FileOutputStream out = new FileOutputStream(java.net.URLDecoder.decode(url.getPath(),"UTF-8")); 
-
+            File file = TestData.temp( this, outfile );
+            FileOutputStream out = new FileOutputStream( file ); 
 
             gen.setCanvasSize(new Dimension(500, 500));
             gen.go(mapContext, fc.getBounds(), out);
