@@ -8,9 +8,10 @@ package org.geotools.data.oracle;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import oracle.jdbc.OracleConnection;
 //import oracle.sdoapi.OraSpatialManager;
@@ -19,6 +20,7 @@ import oracle.jdbc.OracleConnection;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
@@ -28,6 +30,7 @@ import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.feature.AttributeType;
@@ -41,8 +44,6 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  */
 public class OracleDataStore extends JDBCDataStore {
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
-    
     /**
      * @param connectionPool
      * @param config
@@ -80,6 +81,7 @@ public class OracleDataStore extends JDBCDataStore {
      * @see org.geotools.data.jdbc.JDBCDataStore#allowTable(java.lang.String)
      */
     protected boolean allowTable(String tablename) {
+	LOGGER.finer("checking table name: " + tablename);
         if (tablename.endsWith("$"))  {
             return false;
         } else if (tablename.startsWith("XDB$"))  {
@@ -96,8 +98,22 @@ public class OracleDataStore extends JDBCDataStore {
             return false;
         } else if (tablename.startsWith("AW$"))  {
             return false;
+        } else if (tablename.startsWith("AQ$"))  {
+            return false;
+	} else if (tablename.startsWith("APPLY$"))  {
+            return false;
+	} else if (tablename.startsWith("REPCAT$"))  {
+            return false;
+        } else if (tablename.startsWith("CWM$"))  {
+            return false;
+        } else if (tablename.startsWith("CWM2$"))  {
+            return false;
+        } else if (tablename.startsWith("EXF$"))  {
+            return false;
+        } else if (tablename.startsWith("DM$"))  {
+            return false;
         } 
-        
+        LOGGER.finer("returning true for tablename: " + tablename);
         return true;
     }
 
@@ -128,14 +144,38 @@ public class OracleDataStore extends JDBCDataStore {
      * @see org.geotools.data.jdbc.JDBCDataStore#determineSRID(java.lang.String, java.lang.String)
      */
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
-        OracleConnection conn = null;        
-        try {        
-            conn = (OracleConnection) getConnection(Transaction.AUTO_COMMIT);
-            //GeometryMetaData gMetaData = OraSpatialManager.getGeometryMetaData(conn, tableName, geometryColumnName);
-            //return gMetaData.getSpatialReferenceID();
-            return -1;            
-        }
-        finally {
+        Connection conn = null;        
+        //try {        
+	    //  conn = (OracleConnection) getConnection(Transaction.AUTO_COMMIT);
+           //GeometryMetaData gMetaData = OraSpatialManager.getGeometryMetaData(conn, tableName, geometryColumnName);
+         //return gMetaData.getSpatialReferenceID();
+	//   return -1;            
+       //}
+	 try {
+            String sqlStatement = "SELECT SRID FROM ALL_SDO_GEOM_METADATA "
+                + "WHERE TABLE_NAME='" + tableName + "' AND COLUMN_NAME='"
+                + geometryColumnName + "'";
+            conn = getConnection(Transaction.AUTO_COMMIT);
+            LOGGER.finer("the sql statement for srid is " + sqlStatement);
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(sqlStatement);
+
+            if (result.next()) {
+                int retSrid = result.getInt("srid");
+                JDBCUtils.close(statement);
+
+                return retSrid;
+            } else {
+                String mesg = "No geometry column row for srid in table: "
+                    + tableName + ", geometry column " + geometryColumnName +
+                    ", be sure column is defined in USER_SDO_GEOM_METADATA";
+                throw new DataSourceException(mesg);
+            }
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+
+            throw new DataSourceException(message, sqle);
+        } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);            
         }        
     }
@@ -146,14 +186,30 @@ public class OracleDataStore extends JDBCDataStore {
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
     	FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
         SQLEncoder encoder = new SQLEncoderOracle(info.getSRIDs());
+        encoder.setFIDMapper(getFIDMapper(typeName));
         return new DefaultSQLBuilder(encoder);
     }
-
-	/**
-	 * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType, org.geotools.data.jdbc.QueryData)
-	 */
-	protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException {
-		return new SDOAttributeIO(type, queryData);
-	}
+    
+    /**
+     * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType, org.geotools.data.jdbc.QueryData)
+     */
+    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException {
+	return new SDOAttributeIO(type, queryData);
+    }
+    
+    /**
+     * Returns a Oracle text based feature writer that just issues the sql
+     * statements directly, as text.  Jody and Sean say things will go faster 
+     * if we use updatable resultsets and all that jazz, but I can't get
+     * those to work, and this does, so I'm going forth with it.
+     *
+     * @task TODO: Comment out this method and try out the default JDBC
+     *             FeatureWriter - Jody thinks it will go faster.  It will
+     *             need to be debugged, however, as it would not work.
+     */ 
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
+        QueryData queryData) throws IOException {
+        return new OracleFeatureWriter(fReader, queryData);
+    }
 
 }
