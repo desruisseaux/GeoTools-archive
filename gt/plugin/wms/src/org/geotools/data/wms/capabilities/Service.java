@@ -38,33 +38,24 @@ public class Service {
 	/** The URL pointing to where this Service can be accessed - Required */
 	private URL onlineResource;
 	
-	/** Contains Strings specifying keywords that apply to the Service. Can be used for searching, etc */
-	private List keywordList;
+	/** Keywords that apply to the Service. Can be used for searching, etc */
+	private String[] keywordList;
 	
 	/** Abstract allows a description providing more information about the Service */
 	private String _abstract;
+
 	
-    /**
-     * @param name
-     * @param title
-     * @param onlineResource
-     */
-    public Service(String name, String title, URL onlineResource) {
-        super();
-        this.name = name;
-        this.title = title;
-        this.onlineResource = onlineResource;
-    }
+	
     public String get_abstract() {
         return _abstract;
     }
     public void set_abstract(String _abstract) {
         this._abstract = _abstract;
     }
-    public List getKeywordList() {
+    public String[] getKeywordList() {
         return keywordList;
     }
-    public void setKeywordList(List keywordList) {
+    public void setKeywordList(String[] keywordList) {
         this.keywordList = keywordList;
     }
     public String getName() {
