@@ -7,11 +7,21 @@
 package org.geotools.data.shape;
 
 
+<<<<<<< .mine
+import org.geotools.data.*;
+import org.geotools.feature.*;
+
+import com.vividsolutions.jts.geom.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+=======
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Date;
+>>>>>>> .r7857
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureResults;
@@ -86,12 +96,17 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      */
     public void testEnvelope() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
+<<<<<<< .mine
+        //ShapefileDataSource s = new ShapefileDataSource(getTestResource(STATE_POP));
+        assertEquals(features.getBounds(), s.getBounds());
+=======
         ShapefileDataStore s = new ShapefileDataStore(getTestResource(STATE_POP));
         String typeName = s.getTypeNames()[0];
         FeatureResults all = s.getFeatureSource( typeName ).getFeatures();
         
         assertEquals(features.getBounds(), all.getBounds() );
 
+>>>>>>> .r7857
     }
     
     public void testLoadAndVerify() throws Exception {
