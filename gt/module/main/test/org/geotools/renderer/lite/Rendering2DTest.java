@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -57,10 +58,13 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDParser;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.UserLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -107,7 +111,20 @@ public class Rendering2DTest extends TestCase {
         TestSuite suite = new TestSuite(Rendering2DTest.class);
         return suite;
     }
+     
+    Style loadTestStyle() throws IOException {
+        StyleFactory factory = StyleFactory.createStyleFactory();
 
+        java.net.URL surl = TestData.getResource(this, "test-sld.xml");
+        SLDParser stylereader = new SLDParser(factory, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+
+        UserLayer layer = (UserLayer)sld.getStyledLayers()[0];
+
+        Style style = layer.getUserStyles()[0];
+        return style;
+    }
+    
     Style createTestStyle() throws IllegalFilterException {
         StyleFactory sFac = StyleFactory.createStyleFactory();
         // The following is complex, and should be built from
@@ -251,6 +268,24 @@ public class Rendering2DTest extends TestCase {
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
         showRender("testSimpleRender", renderer, 1000, env);
+
+    }
+    
+    public void testRenderLoadedStyle() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting RenderLoadedStyle");
+
+        FeatureCollection ft = createTestFeatureCollection(null, POLYGON);
+        Style style = loadTestStyle();
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        showRender("RenderLoadedStyle", renderer, 5000, env);
 
     }
 
@@ -599,7 +634,7 @@ public class Rendering2DTest extends TestCase {
         if ( (System.getProperty("java.awt.headless") == null
                 || !System.getProperty("java.awt.headless").equals("true"))
                 && INTERACTIVE) {
-            Frame frame = new Frame();
+            Frame frame = new Frame(testName);
             frame.addWindowListener(new WindowAdapter(){
                 public void windowClosing( WindowEvent e ) {
                     e.getWindow().dispose();
