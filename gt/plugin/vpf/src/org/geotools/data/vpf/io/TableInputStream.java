@@ -36,6 +36,7 @@ import org.geotools.data.vpf.util.DataUtils;
  *
  * @author <a href="mailto:kobit@users.sf.net">Artur Hefczyc</a>
  * @version $Id: TableInputStream.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @deprecated
  */
 public class TableInputStream extends VPFInputStream implements FileConstants, DataTypesDefinition {
     private static final String EMPTY_STRING = "";
