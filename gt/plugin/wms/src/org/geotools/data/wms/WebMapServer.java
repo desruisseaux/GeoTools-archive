@@ -9,7 +9,6 @@ package org.geotools.data.wms;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -161,7 +160,7 @@ public class WebMapServer implements Discovery {
 
             //Grab document
             URL url = request.getFinalURL();
-            //            System.out.println("URL: "+url.toExternalForm());
+//                        System.out.println("URL: "+url.toExternalForm());
             WMSCapabilities tempCapabilities;
             try {
                 tempCapabilities = parseCapabilities(url);
@@ -191,7 +190,7 @@ public class WebMapServer implements Discovery {
             if (tempCapabilities != null && versions.contains(serverVersion)) {
                 // we can communicate with this server
                 // 
-                //                System.out.println("Server responded with "+serverVersion+". We know it and will use it now.");
+//                                System.out.println("Server responded with "+serverVersion+". We know it and will use it now.");
 
                 int index = versions.indexOf(serverVersion);
                 this.specification = specs[index];
@@ -200,9 +199,9 @@ public class WebMapServer implements Discovery {
 
             } else if (compare < 0) {
                 if (tempCapabilities == null) {
-                    //                    System.out.println("Unable to read from server at version:"+serverVersion+".");
+//                                        System.out.println("Unable to read from server at version:"+serverVersion+".");
                 }
-                //                System.out.println("Downgrading version.");
+//                                System.out.println("Downgrading version.");
                 // server responded lower then we asked - and we don't understand.
                 maxClient = test - 1; // set current version as limit
 
@@ -220,8 +219,8 @@ public class WebMapServer implements Discovery {
 
                 test = versions.indexOf(clientVersion);
             } else {
-                //                System.out.println("Server responded with "+serverVersion+" after a request for "+clientVersion);
-                //                System.out.println("Upgrading");
+//                                System.out.println("Server responded with "+serverVersion+" after a request for "+clientVersion);
+//                                System.out.println("Upgrading");
                 // server responsed higher than we asked - and we don't understand
                 minClient = test + 1; // set current version as lower limit
 

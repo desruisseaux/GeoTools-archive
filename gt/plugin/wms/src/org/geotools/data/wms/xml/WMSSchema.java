@@ -109,6 +109,10 @@ public class WMSSchema implements Schema {
         new WMSElement("Layer", _LayerType.getInstance()),
         new WMSElement("CRS", XSISimpleTypes.String.getInstance()),
         new WMSElement("EX_GeographicBoundingBox", _EX_GeographicBoundingBoxType.getInstance()),
+        new WMSElement("westBoundLongitude", LongitudeType.getInstance()),
+        new WMSElement("eastBoundLongitude", LongitudeType.getInstance()),
+        new WMSElement("southBoundLatitude", LatitudeType.getInstance()),
+        new WMSElement("northBoundLatitude", LatitudeType.getInstance()),
         new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance()),
         new WMSElement("BoundingBox", _BoundingBoxType.getInstance()),
         new WMSElement("Dimension", _DimensionType.getInstance()),
@@ -127,7 +131,7 @@ public class WMSSchema implements Schema {
         new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance()),
         new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance()),
         new WMSElement("ScaleHint", _ScaleHintType.getInstance()),
-//        new WMSElement("SRS", XSISimpleTypes.String.getInstance()),
+        new WMSElement("SRS", XSISimpleTypes.String.getInstance()),
         
         //1.0.0 format elements
         new WMSElement("GIF", _GIFType.getInstance()),
