@@ -236,8 +236,8 @@ public class FilterOpsComplexTypes {
         	try {
         		short type = findFilterType( element.getName() );
 				CompareFilter filter = factory.createCompareFilter( type );
-				filter.addLeftValue( (Expression) value[0] );
-				filter.addRightValue( (Expression) value[1] );				
+				filter.addLeftValue( (Expression) value[0].getValue() );
+				filter.addRightValue( (Expression) value[1].getValue() );				
 				return filter;
 			}
         	catch( ClassCastException filterRequired ){
@@ -1714,8 +1714,8 @@ public class FilterOpsComplexTypes {
         	try {
         		short type = (short) SpatialOpsType.findFilterType( element.getName() );
         		GeometryFilter filter = factory.createGeometryFilter( type );
-				filter.addLeftGeometry( (Expression) value[0] );
-				filter.addRightGeometry( (Expression) value[1] );				
+				filter.addLeftGeometry( (Expression) value[0].getValue() );
+				filter.addRightGeometry( (Expression) value[1].getValue() );				
 				return filter;
 			}
         	catch( ClassCastException filterRequired ){
