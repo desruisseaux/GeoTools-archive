@@ -109,7 +109,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     private final Unit unit;
 
     /**
-     * Constructs a parameter for a range of integer values.
+     * Constructs a mandatory parameter for a range of integer values.
      *
      * @param name The parameter name.
      * @param defaultValue The default value for the parameter.
@@ -121,17 +121,35 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final int minimum,
                                final int maximum)
     {
-        this(name, Integer.class, Parameter.wrap(defaultValue),
-             minimum == Integer.MIN_VALUE ? null : Parameter.wrap(minimum),
-             maximum == Integer.MAX_VALUE ? null : Parameter.wrap(maximum), null);
+        this(Collections.singletonMap(NAME_PROPERTY, name),
+             defaultValue, minimum, maximum, true);
     }
 
     /**
-     * Constructs a parameter for a range of floating point values. The parameter is mandatory
-     * if no default value is specified (i.e. <code>defaultValue</code> is <code>NaN</code>).
-     * Otherwise, the parameter will be optional.
+     * Constructs a parameter for a range of integer values.
      *
-     * @param name The parameter name.
+     * @param properties The parameter properties (name, identifiers, alias...).
+     * @param defaultValue The default value for the parameter.
+     * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
+     * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
+     * @param required <code>true</code> if this parameter is required,
+     *                 <code>false</code> otherwise.
+     */
+    public ParameterDescriptor(final Map properties,
+                               final int defaultValue,
+                               final int minimum,
+                               final int maximum,
+                               final boolean required)
+    {
+        this(properties, required, Integer.class, null, Parameter.wrap(defaultValue),
+             minimum == Integer.MIN_VALUE ? null :  Parameter.wrap(minimum),
+             maximum == Integer.MAX_VALUE ? null :  Parameter.wrap(maximum), null);
+    }
+
+    /**
+     * Constructs a mandatory parameter for a range of floating point values.
+     *
+     * @param name    The parameter name.
      * @param defaultValue The default value for the parameter, or {@link Double#NaN} if none.
      * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
@@ -143,16 +161,36 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final double maximum,
                                final Unit   unit)
     {
-        this(name, Double.class,
+        this(Collections.singletonMap(NAME_PROPERTY, name),
+             defaultValue, minimum, maximum, unit, true);
+    }
+
+    /**
+     * Constructs a parameter for a range of floating point values.
+     *
+     * @param properties The parameter properties (name, identifiers, alias...).
+     * @param defaultValue The default value for the parameter, or {@link Double#NaN} if none.
+     * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
+     * @param unit    The unit for default, minimum and maximum values.
+     * @param required <code>true</code> if this parameter is required,
+     *                 <code>false</code> otherwise.
+     */
+    public ParameterDescriptor(final Map     properties,
+                               final double  defaultValue,
+                               final double  minimum,
+                               final double  maximum,
+                               final Unit    unit,
+                               final boolean required)
+    {
+        this(properties, required, Double.class, null,
              Double.isNaN(defaultValue)          ? null : Parameter.wrap(defaultValue),
              minimum == Double.NEGATIVE_INFINITY ? null : Parameter.wrap(minimum),
              maximum == Double.POSITIVE_INFINITY ? null : Parameter.wrap(maximum), unit);
     }
 
     /**
-     * Constructs a parameter from a range of comparable objects. The parameter is mandatory
-     * if no default value is specified (i.e. <code>defaultValue</code> is <code>null</code>).
-     * Otherwise, the parameter will be optional.
+     * Constructs a mandatory parameter from a range of comparable objects.
      *
      * @param name The parameter name.
      * @param valueClass The class that describe the type of the parameter.
@@ -160,6 +198,10 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or <code>null</code>.
      * @param maximum The maximum parameter value, or <code>null</code>.
      * @param unit    The unit for default, minimum and maximum values, or <code>null</code>.
+     *
+     * @deprecated This constructor add little benefit compared to the full constructor.
+     *             In other words, this "convenience" constructor doesn't save much typing.
+     *             It will be removed in a future version, in order to simplify the API.
      */
     public ParameterDescriptor(final String     name,
                                final Class      valueClass,
@@ -168,8 +210,48 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final Comparable maximum,
                                final Unit       unit)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), true,
-             valueClass, null, defaultValue, minimum, maximum, unit);
+        this(Collections.singletonMap(NAME_PROPERTY, name),
+             valueClass, null, defaultValue, minimum, maximum, unit, true);
+    }
+
+    /**
+     * Construct a parameter for a name and a default value. The parameter type will
+     * be assumed the same than the default value class.
+     * 
+     * @param name         The parameter name.
+     * @param remarks      An optional description as a {@link String} or an
+     *                     {@link InternationalString}, or <code>null</code> if none.
+     * @param defaultValue The default value.
+     * @param required     <code>true</code> if this parameter is required,
+     *                     <code>false</code> otherwise.
+     */
+    public ParameterDescriptor(final String       name,
+                               final CharSequence remarks,
+                               final Object       defaultValue,
+                               final boolean      required)
+    {
+        this(toMap(name, remarks),
+             defaultValue.getClass(),
+             (defaultValue instanceof CodeList) ? getCodeLists(defaultValue.getClass()) : null,
+             defaultValue,
+             null,
+             null,
+             null,
+             required);
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static final Map toMap(final String name, final CharSequence remarks) {
+        if (remarks == null ){
+            return Collections.singletonMap(NAME_PROPERTY, name);
+        }
+        final Map properties = new HashMap(4);
+        properties.put(NAME_PROPERTY,    name);
+        properties.put(REMARKS_PROPERTY, remarks);
+        return properties;        
     }
 
     /**
@@ -186,6 +268,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Construct a parameter for a {@linkplain CodeList code list} (or enumeration).
+     * This constructor is used by the {@link Parameter(String,CodeList)} constructor.
      *
      * @param name         The parameter name.
      * @param valueClass   The class that describe the type of the parameter.
@@ -209,72 +292,13 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                     .invoke(null, (Object[]) null);
         } catch (Exception exception) {
             // No code list defined. Not a problem; we will just
-            // not provided any set of code to check against.
+            // not provide any set of code to check against.
             return null;
         }
     }
 
     /**
-     * Construct a parameter for a name and a default value. The parameter type will
-     * be assumed the same than the default value class.
-     * 
-     * @param name The parameter name.
-     * @param description An optional description.
-     * @param defaultValue The default value.
-     * @param required <code>true</code> if this parameter is required,
-     *        <code>false</code> otherwise.
-     *
-     * @deprecated Use the constructor with an {@link InternationalString} argument instead.
-     */
-    public ParameterDescriptor(final String   name,
-                               final String   description,
-                               final Object   defaultValue,
-                               final boolean  required )
-    {
-        this(name, new SimpleInternationalString(description), defaultValue, required);
-    }
-
-    /**
-     * Construct a parameter for a name and a default value. The parameter type will
-     * be assumed the same than the default value class.
-     * 
-     * @param name The parameter name.
-     * @param description An optional description.
-     * @param defaultValue The default value.
-     * @param required <code>true</code> if this parameter is required,
-     *        <code>false</code> otherwise.
-     */
-    public ParameterDescriptor(final String              name,
-                               final InternationalString description,
-                               final Object              defaultValue,
-                               final boolean             required)
-    {
-        this(toMap(name, description),
-             required,
-             defaultValue.getClass(),
-             (defaultValue instanceof CodeList) ? getCodeLists(defaultValue.getClass()) : null,
-             defaultValue,
-             null,
-             null,
-             null);
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static final Map toMap(final String name, final InternationalString remarks) {
-        if (remarks == null ){
-            return Collections.singletonMap(NAME_PROPERTY, name);
-        }
-        final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY,   name);
-        properties.put(REMARKS_PROPERTY, remarks);
-        return properties;        
-    }
-
-    /**
-     * Construct a parameter for a set of predefined values.
+     * Construct a mandatory parameter for a set of predefined values.
      *
      * @param name The parameter name.
      * @param valueClass The class that describe the type of the parameter.
@@ -288,8 +312,42 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final Object[] validValues,
                                final Object   defaultValue)
     {
-        this(Collections.singletonMap("name", name), true,
-             valueClass, validValues, defaultValue, null, null, null);
+        this(Collections.singletonMap(NAME_PROPERTY, name),
+             valueClass, validValues, defaultValue, null, null, null, true);
+    }
+
+    /**
+     * Construct a parameter from a set of properties. The properties map is
+     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
+     *
+     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param valueClass The class that describe the type of the parameter.
+     * @param validValues A finite set of valid values (usually from a
+     *        {linkplain org.opengis.util.CodeList code list}) or <code>null</code>
+     *        if it doesn't apply.
+     * @param defaultValue The default value for the parameter, or <code>null</code>.
+     * @param minimum The minimum parameter value, or <code>null</code>.
+     * @param maximum The maximum parameter value, or <code>null</code>.
+     * @param unit    The unit for default, minimum and maximum values.
+     * @param required <code>true</code> if this parameter is required, or <code>false</code>
+     *        if it is optional.
+     */
+    public ParameterDescriptor(final Map        properties,
+                               final Class      valueClass,
+                               final Object[]   validValues,
+                               final Object     defaultValue,
+                               final Comparable minimum,
+                               final Comparable maximum,
+                               final Unit       unit,
+                               final boolean    required)
+    {
+        this(properties, required, valueClass,
+             validValues,
+             defaultValue,
+             Parameter.replace(minimum),
+             Parameter.replace(maximum),
+             unit);
     }
 
     /**
@@ -308,6 +366,16 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or <code>null</code>.
      * @param maximum The maximum parameter value, or <code>null</code>.
      * @param unit    The unit for default, minimum and maximum values.
+     *
+     * @deprecated Use the constructor with <code>required</code> as the last argument
+     *             instead. This is just a change in the order of arguments, which was
+     *             performed for consistency with other constructors.
+     *
+     * @todo Do not delete this constructor. Turn it into a private one instead, because
+     *       it is invoked by other constructors in this class.
+     *
+     *       This constructor assumes that minimum, maximum and default values are
+     *       already replaced by their cached values, if available.
      */
     public ParameterDescriptor(final Map        properties,
                                final boolean    required,

@@ -432,7 +432,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *
      * <P>where options are:</P>
      *
-     * <TABLE>
+     * <TABLE CELLPADDING='0' CELLSPACING='0'>
      *   <TR><TD NOWRAP><CODE>-all</CODE></TD>
      *       <TD NOWRAP>&nbsp;List the parameters for all transforms</TD></TR>
      *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
@@ -453,7 +453,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * </code></blockquote>
      *
      * <P>The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line using the "<code>chcp</code>" command with no arguments.</P>
+     * commande line using the "<code>chcp</code>" command with no arguments.
+     * This <code>-encoding</code> argument need to be supplied only once.</P>
      *
      * @param args Command line arguments.
      */

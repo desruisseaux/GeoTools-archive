@@ -23,6 +23,7 @@ package org.geotools.parameter;
 import java.util.Map;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Collections;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -293,9 +294,10 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
          * is no need to synchronize since it is not a big deal if the same parameter is
          * constructed twice.
          */
-        param = new org.geotools.parameter.ParameterDescriptor(prefix + row + separator + column,
-                Double.TYPE, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
-                null, null, Unit.ONE);
+        param = new org.geotools.parameter.ParameterDescriptor(
+                Collections.singletonMap(NAME_PROPERTY, prefix + row + separator + column),
+                Double.TYPE, null, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
+                null, null, Unit.ONE, true);
         if (index >= 0) {
             parameters[index] = param;
         }

@@ -139,7 +139,7 @@ public class IdentifiedObject extends Formattable
                              ((org.opengis.referencing.IdentifiedObject) o2).getRemarks());
         }
         protected Object readResolve() throws ObjectStreamException {
-            return NAME_COMPARATOR;
+            return REMARKS_COMPARATOR;
         }
     }
     

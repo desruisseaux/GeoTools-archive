@@ -325,63 +325,64 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
+         * This parameter is specific to Geotools.
          */
-        public static final ParameterDescriptor DIM = new org.geotools.parameter.ParameterDescriptor(
-                "dim", 2, 2, 3);
+        public static final ParameterDescriptor DIM =
+                AbridgedMolodenskiTransform.Provider.DIM;
 
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final ParameterDescriptor DX = new org.geotools.parameter.ParameterDescriptor(
-                "dx", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DX =
+                AbridgedMolodenskiTransform.Provider.DX;
         
         /**
          * The operation parameter descriptor for the "dy" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final ParameterDescriptor DY = new org.geotools.parameter.ParameterDescriptor(
-                "dy", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DY =
+                AbridgedMolodenskiTransform.Provider.DY;
         
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity, default is 0.0.
          */
-        public static final ParameterDescriptor DZ = new org.geotools.parameter.ParameterDescriptor(
-                "dz", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DZ =
+                AbridgedMolodenskiTransform.Provider.DZ;
         
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SRC_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "src_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SRC_SEMI_MAJOR =
+                AbridgedMolodenskiTransform.Provider.SRC_SEMI_MAJOR;
 
         /**
          * The operation parameter descriptor for the "src_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SRC_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "src_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SRC_SEMI_MINOR =
+                AbridgedMolodenskiTransform.Provider.SRC_SEMI_MINOR;
         
         /**
          * The operation parameter descriptor for the "tgt_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "tgt_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor TGT_SEMI_MAJOR =
+                AbridgedMolodenskiTransform.Provider.TGT_SEMI_MAJOR;
         
         /**
          * The operation parameter descriptor for the "tgt_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "tgt_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor TGT_SEMI_MINOR =
+                AbridgedMolodenskiTransform.Provider.TGT_SEMI_MINOR;
 
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Molodenski"),
                 new Identifier(Citation.EPSG,     "9604"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(

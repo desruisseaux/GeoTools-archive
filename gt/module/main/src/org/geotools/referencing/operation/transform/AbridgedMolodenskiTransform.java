@@ -25,6 +25,7 @@ package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.Serializable;
+import java.util.Collections;
 import javax.units.SI;
 
 // OpenGIS dependencies
@@ -365,63 +366,95 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
 
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
+         * This parameter is specific to Geotools.
          */
-        public static final ParameterDescriptor DIM = new org.geotools.parameter.ParameterDescriptor(
-                "dim", 2, 2, 3);
+        public static final ParameterDescriptor DIM =
+                new org.geotools.parameter.ParameterDescriptor(
+                    Collections.singletonMap(NAME_PROPERTY,
+                                             new Identifier(Citation.GEOTOOLS, "dim")),
+                    2, 2, 3, false);
 
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final ParameterDescriptor DX = new org.geotools.parameter.ParameterDescriptor(
-                "dx", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DX = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "dx"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dy" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final ParameterDescriptor DY = new org.geotools.parameter.ParameterDescriptor(
-                "dy", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DY = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "dy"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity, default is 0.0.
          */
-        public static final ParameterDescriptor DZ = new org.geotools.parameter.ParameterDescriptor(
-                "dz", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor DZ = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "dz"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SRC_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "src_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SRC_SEMI_MAJOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "src_semi_major"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "src_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SRC_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "src_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SRC_SEMI_MINOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "src_semi_minor"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "tgt_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor TGT_SEMI_MAJOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "tgt_semi_major"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "tgt_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor TGT_SEMI_MINOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "tgt_semi_minor"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
                 new Identifier(Citation.EPSG,     "9605"),
                 new Identifier(Citation.GEOTOOLS, Resources.format(

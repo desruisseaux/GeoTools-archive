@@ -25,6 +25,8 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 import java.awt.geom.Point2D;
 import javax.units.NonSI;
@@ -100,7 +102,7 @@ public class Mercator extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Mercator_1SP"),
                 new Identifier(Citation.EPSG,     "9804"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
@@ -150,18 +152,21 @@ public class Mercator extends MapProjection {
         /**
          * The operation parameter descriptor for the {@link #standardParallel standard parallel}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         *
-         * @todo Specify alias. The API is already available, just a little bit more complicated.
          */
-        public static final ParameterDescriptor STANDARD_PARALLEL = new org.geotools.parameter.ParameterDescriptor(
-                "standard_parallel_1", 0, -90, 90, NonSI.DEGREE_ANGLE);
+        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "standard_parallel_1"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Mercator_2SP"),
                 new Identifier(Citation.EPSG,     "9805"),
+                new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
@@ -245,7 +250,22 @@ public class Mercator extends MapProjection {
      * {@inheritDoc}
      */
     public ParameterValueGroup getParameterValues() {
-        return null; // TODO
+        final boolean sp1 = Double.isNaN(standardParallel);
+        final ParameterDescriptorGroup descriptor = (sp1) ? Provider1SP.PARAMETERS
+                                                          : Provider2SP.PARAMETERS;
+        // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
+        final ParameterValueGroup values = (ParameterValueGroup) descriptor.createValue();
+        set(Provider.SEMI_MAJOR,       values, semiMajor      );
+        set(Provider.SEMI_MINOR,       values, semiMinor      );
+        set(Provider.CENTRAL_MERIDIAN, values, centralMeridian);
+        if (sp1) {
+            set(Provider1SP.SCALE_FACTOR, values, scaleFactor);
+        } else {
+            set(Provider2SP.STANDARD_PARALLEL, values, standardParallel);
+        }
+        set(Provider.FALSE_EASTING,  values, falseEasting );
+        set(Provider.FALSE_NORTHING, values, falseNorthing);
+        return values;
     }
     
     /**

@@ -89,6 +89,19 @@ public class Citation extends MetadataEntity
     }
 
     /**
+     * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#GEOTIFF
+     */
+    public static final Citation GEOTIFF = new Citation("GeoTIFF");
+    static {
+        GEOTIFF.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
+        GEOTIFF.setCitedResponsibleParties(Collections.singleton(
+             org.geotools.metadata.citation.ResponsibleParty.GEOTIFF));
+        GEOTIFF.freeze();
+    }
+
+    /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      *
      * @see org.geotools.metadata.citation.ResponsibleParty#GEOTOOLS

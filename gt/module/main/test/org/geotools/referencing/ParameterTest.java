@@ -337,10 +337,10 @@ public class ParameterTest extends TestCase {
     public void testGroup() {
         final Integer ONE = new Integer(1);
         final ParameterDescriptor p1, p2, p3, p4;
-        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"), true,  Integer.class, null, ONE, null, null, null);
-        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"), true,  Integer.class, null, ONE, null, null, null);
-        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), false, Integer.class, null, ONE, null, null, null);
-        p4 = new ParameterDescriptor(Collections.singletonMap("name", "4"), false, Integer.class, null, ONE, null, null, null) {
+        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"),  Integer.class, null, ONE, null, null, null, true);
+        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"),  Integer.class, null, ONE, null, null, null, true);
+        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), Integer.class, null, ONE, null, null, null, false);
+        p4 = new ParameterDescriptor(Collections.singletonMap("name", "4"), Integer.class, null, ONE, null, null, null, false) {
             /**
              * We are cheating here: <code>maximumOccurs</code> should always be 1 for
              * <code>ParameterValue</code>. However, the Geotools implementation should

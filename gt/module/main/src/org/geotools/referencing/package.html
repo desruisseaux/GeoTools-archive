@@ -11,13 +11,8 @@
 
   <P ALIGN="justify">This package provides implementations for general positioning, coordinate
   reference systems (CRS), and coordinate transformations. Coordinates can have any number of
-  dimensions. So this implementation can handle 2D and 3D coordinates, as well as 4D, 5D etc.</P>
-
-  <P ALIGN="justify">Most interfaced objects are immutable. This means that implementations promise
-  not to change an object's internal state once they have handed out an interface pointer. Since
-  most interfaced objects are specified to be immutable, there do not need to be any constraints
-  on operation sequencing. This means that these interfaces can be used in parallel computing
-  environments (e.g. internet servers).</P>
+  dimensions. So this implementation can handle 2D and 3D coordinates, as well as 4D, 5D,
+  <CITE>etc.</CITE></P>
   
   <P ALIGN="justify">This package provides a special implementation of
   {@linkplain org.geotools.referencing.Identifier identifier}, which is also a
@@ -26,5 +21,26 @@
   {@linkplain org.geotools.referencing.IdentifiedObject#getName main identifier} and the
   {@linkplain org.geotools.referencing.IdentifiedObject#getAlias aliases} of an
   {@linkplain org.geotools.referencing.IdentifiedObject identified object}.</P>
+  
+  <P ALIGN="justify">All factory methods are capable to find an object using an
+  unscoped (or local) name. However, in order to avoid potential conflict, it is
+  recommanded to use scoped name when possible. For example even if both can work,
+  prefer "EPSG:9624" instead of "9624" for the affine transform in order to avoid
+  potential conflict with an other authority using the same code number.</P>
+  
+  <H3>Command-line tools</H3>
+  <P ALIGN="justify">A set of command lines tools is provided for performing queries.
+  The tools are implemented in the <CODE>main</CODE> method of some key classes. The
+  tools are:</P>
+
+  <TABLE>
+    <TR>
+      <TD>{@link org.geotools.referencing.FactoryFinder#main FactoryFinder}&nbsp;</TD>
+      <TD>List registered factories found in the class path (not only Geotools implementations).</TD>
+    </TR><TR>
+      <TD>{@link org.geotools.referencing.operation.MathTransformFactory#main MathTransformFactory}&nbsp;</TD>
+      <TD>List registered math transforms found in the class path.</TD>
+    </TR>
+  </TABLE>
   </BODY>
 </HTML>

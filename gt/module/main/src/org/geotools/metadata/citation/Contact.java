@@ -72,6 +72,18 @@ public class Contact extends MetadataEntity
     }
     
     /**
+     * Contact informations for the
+     * <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> group.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#GEOTIFF
+     */
+    public static final Contact GEOTIFF = new Contact();
+    static {
+        GEOTIFF.setOnLineResource(org.geotools.metadata.citation.OnLineResource.GEOTIFF);
+        GEOTIFF.freeze();
+    }
+    
+    /**
      * Contact informations for the <A HREF="http://www.geotools.org">Geotools</A> project.
      *
      * @see org.geotools.metadata.citation.OnLineResource#GEOTOOLS

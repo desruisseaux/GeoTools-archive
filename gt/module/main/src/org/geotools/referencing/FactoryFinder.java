@@ -291,19 +291,16 @@ public final class FactoryFinder {
     {
         getProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final TableWriter table  = new TableWriter(out, 1);
+        final TableWriter table  = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
+        table.writeHorizontalSeparator();
         table.write("Factory");
         table.nextColumn();
         table.write("Implementation(s)");
-        table.nextLine();
-        table.nextColumn('\u2500');
-        table.nextColumn('\u2500');
-        table.nextLine();
+        table.writeHorizontalSeparator();
         for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
             final Class category = (Class)categories.next();
             table.write(Utilities.getShortName(category));
-            table.write(':');
             table.nextColumn();
             boolean first = true;
             for (final Iterator providers=getProviders(category); providers.hasNext();) {
@@ -317,6 +314,7 @@ public final class FactoryFinder {
             }
             table.nextLine();
         }
+        table.writeHorizontalSeparator();
         table.flush();
     }
 
@@ -331,7 +329,7 @@ public final class FactoryFinder {
      *
      * <P>where options are:</P>
      *
-     * <TABLE>
+     * <TABLE CELLPADDING='0' CELLSPACING='0'>
      *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
      *       <TD NOWRAP>&nbsp;Set the character encoding</TD></TR>
      *   <TR><TD NOWRAP><CODE>-locale</CODE> <VAR>&lt;language&gt;</VAR></TD>
@@ -346,7 +344,8 @@ public final class FactoryFinder {
      * </code></blockquote>
      *
      * <P>The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line using the "<code>chcp</code>" command with no arguments.</P>
+     * commande line using the "<code>chcp</code>" command with no arguments.
+     * This <code>-encoding</code> argument need to be supplied only once.</P>
      *
      * @param args Command line arguments.
      */

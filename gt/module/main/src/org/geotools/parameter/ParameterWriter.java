@@ -217,13 +217,13 @@ public class ParameterWriter extends FilterWriter {
             final Identifier identifier = group.getName();
             for (int i=0; i<alias.length; i++) {
                 if (!identifier.equals(alias[i])) {
-                    out.write(hasWrote ? ", " : " (");
+                    out.write(hasWrote ? "\", \"" : " (alias \"");
                     out.write(alias[i].toInternationalString().toString(locale));
                     hasWrote = true;
                 }
             }
             if (hasWrote) {
-                out.write(')');
+                out.write("\")");
             }
         }
         final String lineSeparator = System.getProperty("line.separator", "\n");
@@ -239,10 +239,16 @@ public class ParameterWriter extends FilterWriter {
         table.nextColumn();
         table.write(resources.getString(ResourceKeys.CLASS));
         table.nextColumn();
+        table.write("Minimum");  // TODO localize
+        table.nextColumn();
+        table.write("Maximum");  // TODO localize
+        table.nextColumn();
         table.write(resources.getString((values==null) ? ResourceKeys.DEFAULT_VALUE
                                                        : ResourceKeys.VALUE));
+        table.nextColumn();
+        table.write("Units");  // TODO localize
         table.nextLine();
-        table.writeHorizontalSeparator();
+        table.nextLine('\u2550');
         /*
          * Format each element in the parameter group. If values were supplied, we will
          * iterate through the values instead of the descriptor. We do it that way because
@@ -283,9 +289,10 @@ public class ParameterWriter extends FilterWriter {
             alias = generalDescriptor.getAlias();
             if (alias != null) {
                 for (int i=0; i<alias.length; i++) {
-                    if (!identifier.equals(alias[i])) {
-                        out.write(lineSeparator);
-                        out.write(alias[i].toInternationalString().toString(locale));
+                    final GenericName a = alias[i];
+                    if (!identifier.equals(a)) {
+                        table.write(lineSeparator);
+                        table.write(a.asLocalName().toInternationalString().toString(locale));
                     }
                 }
             }
@@ -299,7 +306,17 @@ public class ParameterWriter extends FilterWriter {
                 final ParameterDescriptor descriptor = (ParameterDescriptor) generalDescriptor;
                 table.write(Utilities.getShortName(descriptor.getValueClass()));
                 table.nextColumn();
-                Object value;
+                table.setAlignment(TableWriter.ALIGN_RIGHT);
+                Object value = descriptor.getMinimumValue();
+                if (value != null) {
+                    table.write(formatValue(value));
+                }
+                table.nextColumn();
+                value = descriptor.getMaximumValue();
+                if (value != null) {
+                    table.write(formatValue(value));
+                }
+                table.nextColumn();
                 if (generalValue != null) {
                     value = ((ParameterValue) generalValue).getValue();
                 } else {
@@ -327,10 +344,15 @@ public class ParameterWriter extends FilterWriter {
                         table.write(formatValue(value));
                     }
                 }
+                table.nextColumn();
+                table.setAlignment(TableWriter.ALIGN_LEFT);
+                value = descriptor.getUnit();
+                if (value != null) {
+                    table.write(value.toString());
+                }
             }
-            table.nextLine();
+            table.writeHorizontalSeparator();
         }
-        table.writeHorizontalSeparator();
         table.flush();
         /*
          * Now format all groups deferred to the end of this table.

@@ -78,6 +78,21 @@ public class ResponsibleParty extends MetadataEntity
     }
     
     /**
+     * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> responsible
+     * party.
+     *
+     * @see org.geotools.metadata.citation.Contact#GEOTIFF
+     *
+     * @todo Localize.
+     */
+    public static ResponsibleParty GEOTIFF = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        GEOTIFF.setOrganisationName(new SimpleInternationalString("GeoTIFF"));
+        GEOTIFF.setContactInfo(org.geotools.metadata.citation.Contact.GEOTIFF);
+        GEOTIFF.freeze();
+    }
+    
+    /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      *
      * @see org.geotools.metadata.citation.Contact#GEOTOOLS

@@ -957,7 +957,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "NADCON"),
                 new Identifier(Citation.EPSG,     "9613"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(

@@ -122,6 +122,33 @@ public abstract class MathTransformProvider extends OperationMethod {
     }
 
     /**
+     * Constructs a parameter descriptor from a set of alias. The parameter is
+     * identified by codes provided by one or more authorities. Common authorities are
+     * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
+     * {@link org.geotools.metadata.citation.Citation#EPSG} for example.
+     *
+     * <P>The first entry in the <code>identifiers</code> array is both the
+     * {@linkplain ParameterDescriptor#getName main name} and the
+     * {@linkplain ParameterDescriptor#getIdentifiers identifiers}.
+     * All others are {@linkplain ParameterDescriptor#getAlias aliases}.</P>
+     *
+     * @param identifiers  The parameter identifiers. Most contains at least one entry.
+     * @param defaultValue The default value for the parameter, or {@link Double#NaN} if none.
+     * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
+     * @param unit    The unit for default, minimum and maximum values.
+     */
+    protected static ParameterDescriptor createDescriptor(final Identifier[] identifiers,
+                                                          final double       defaultValue,
+                                                          final double       minimum,
+                                                          final double       maximum,
+                                                          final Unit         unit)
+    {
+        return new org.geotools.parameter.ParameterDescriptor(
+                toMap(identifiers), defaultValue, minimum, maximum, unit, true);
+    }
+
+    /**
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
@@ -132,12 +159,20 @@ public abstract class MathTransformProvider extends OperationMethod {
      * {@linkplain ParameterDescriptorGroup#getIdentifiers identifiers}.
      * All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</P>
      *
-     * @param identifiers  The operation identifier. Most contains at least one entry.
+     * @param identifiers  The operation identifiers. Most contains at least one entry.
      * @param parameters   The set of parameters, or <code>null</code> or an empty array if none.
      */
-    protected static ParameterDescriptorGroup group(final Identifier[] identifiers,
-                                                    final GeneralParameterDescriptor[] parameters)
+    protected static ParameterDescriptorGroup createDescriptorGroup(
+                final Identifier[] identifiers, final GeneralParameterDescriptor[] parameters)
     {
+        return new org.geotools.parameter.ParameterDescriptorGroup(toMap(identifiers), parameters);
+    }
+
+    /**
+     * Put the identifiers into a properties map suitable for {@link IdentifiedObject}
+     * constructor.
+     */
+    private static Map toMap(final Identifier[] identifiers) {
         ensureNonNull("identifiers", identifiers);
         if (identifiers.length == 0) {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ARRAY));
@@ -154,7 +189,7 @@ public abstract class MathTransformProvider extends OperationMethod {
         properties.put(NAME_PROPERTY,        identifiers[0]);
         properties.put(IDENTIFIERS_PROPERTY, identifiers[0]);
         properties.put(ALIAS_PROPERTY,       alias);
-        return new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
+        return properties;
     }
 
     /**

@@ -65,24 +65,33 @@ public class OnLineResource extends MetadataEntity
     public static final OnLineResource EPSG = new OnLineResource();
     
     /**
+     * The online resources for the
+     * <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> group.
+     */
+    public static final OnLineResource GEOTIFF = new OnLineResource();
+    
+    /**
      * The online resources for the <A HREF="http://www.geotools.org">Geotools</A> project.
      */
     public static final OnLineResource GEOTOOLS = new OnLineResource();
     static {
         try {
-            OPEN_GIS.setLinkage(new URL("http://www.opengis.org" ));
-            EPSG    .setLinkage(new URL("http://www.epsg.org"    ));
-            GEOTOOLS.setLinkage(new URL("http://www.geotools.org"));
+            OPEN_GIS.setLinkage(new URL("http://www.opengis.org"              ));
+            EPSG    .setLinkage(new URL("http://www.epsg.org"                 ));
+            GEOTIFF .setLinkage(new URL("http://www.remotesensing.org/geotiff"));
+            GEOTOOLS.setLinkage(new URL("http://www.geotools.org"             ));
         } catch (MalformedURLException exception) {
             // Should never happen.
             throw new ExceptionInInitializerError(exception);
         }
         OPEN_GIS.setFunction(OnLineFunction.DOWNLOAD);
         EPSG    .setFunction(OnLineFunction.DOWNLOAD);
+        GEOTIFF .setFunction(OnLineFunction.DOWNLOAD);
         GEOTOOLS.setFunction(OnLineFunction.DOWNLOAD);
         
         OPEN_GIS.freeze();
         EPSG    .freeze();
+        GEOTIFF .freeze();
         GEOTOOLS.freeze();
     }
     

@@ -46,10 +46,12 @@ import org.opengis.parameter.ParameterValue;
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
+import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.resources.cts.Resources;
+import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -303,6 +305,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         throw new InvalidParameterValueException(Resources.format(
                 ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)),
                 name.getName().getCode(), x);
+    }
+
+    /**
+     * Set the value in a parameter group. This convenience method is used
+     * by subclasses for {@link #getParameterValues} implementation. Values
+     * are automatically converted from radians to degrees if needed.
+     */
+    static void set(final ParameterDescriptor descriptor,
+                    final ParameterValueGroup values,
+                          double              value)
+    {
+        if (NonSI.DEGREE_ANGLE.equals(descriptor.getUnit())) {
+            value = Math.toDegrees(value);
+        }
+        values.parameter(descriptor.getName().getCode()).setValue(value);
     }
 
     /**
@@ -925,8 +942,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final ParameterDescriptor SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "semi_major"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #semiMinor semiMinor} parameter value.
@@ -934,22 +955,36 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final ParameterDescriptor SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "semi_minor"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
-        public static final ParameterDescriptor CENTRAL_MERIDIAN = new org.geotools.parameter.ParameterDescriptor(
-                "central_meridian", 0, -180, 180, NonSI.DEGREE_ANGLE);
+        public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "central_meridian"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.GEOTIFF,  "NatOriginLong")
+                },
+                0, -180, 180, NonSI.DEGREE_ANGLE);
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
-        public static final ParameterDescriptor LATITUDE_OF_ORIGIN = new org.geotools.parameter.ParameterDescriptor(
-                "latitude_of_origin", 0, -90, 90, NonSI.DEGREE_ANGLE);
+        public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "latitude_of_origin"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.GEOTIFF,  "NatOriginLat")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
          * The operation parameter descriptor for the {@link #scaleFactor scaleFactor}
@@ -957,22 +992,37 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final ParameterDescriptor SCALE_FACTOR = new org.geotools.parameter.ParameterDescriptor(
-                "scale_factor", 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
+        public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "scale_factor"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.GEOTIFF,  "ScaleAtNatOrigin")
+                },
+                1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #falseEasting falseEasting}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final ParameterDescriptor FALSE_EASTING = new org.geotools.parameter.ParameterDescriptor(
-                "false_easting", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor FALSE_EASTING = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "false_easting"),
+// TODO                    new Identifier(Citation.EPSG,     ""),
+                    new Identifier(Citation.GEOTIFF,  "FalseEasting")
+                },
+                0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #falseNorthing falseNorthing}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final ParameterDescriptor FALSE_NORTHING = new org.geotools.parameter.ParameterDescriptor(
-                "false_northing", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor FALSE_NORTHING = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "false_northing"),
+// TODO                    new Identifier(Citation.EPSG,     ""),
+                    new Identifier(Citation.GEOTIFF,  "FalseNorthing")
+                },
+                0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * Constructs a math transform provider from a set of parameters. The provider

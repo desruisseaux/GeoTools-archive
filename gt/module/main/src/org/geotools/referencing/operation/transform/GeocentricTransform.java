@@ -27,6 +27,7 @@ package org.geotools.referencing.operation.transform;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import javax.units.Converter;
 import javax.units.Unit;
 import javax.units.SI;
@@ -573,37 +574,48 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The operation parameter descriptor for the "semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
-                "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "semi_major"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
-                "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+        public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
+                new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, "semi_minor"),
+// TODO                    new Identifier(Citation.EPSG,     "")
+                },
+                Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
          * The default value is 3.
          */
-        private static final ParameterDescriptor DIM = new org.geotools.parameter.ParameterDescriptor(
-                "dim", 3, 2, 3);
+        private static final ParameterDescriptor DIM =
+                new org.geotools.parameter.ParameterDescriptor(
+                    Collections.singletonMap(NAME_PROPERTY,
+                                             new Identifier(Citation.GEOTOOLS, "dim")),
+                    3, 2, 3, false);
 
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS =
-                group("Ellipsoid_To_Geocentric", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
+                "Ellipsoid_To_Geocentric", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Construct the parameters group.
          */
-        static ParameterDescriptorGroup group(final String ogc,
-                                              final String epsg,
-                                              final int geotools)
+        static ParameterDescriptorGroup createDescriptorGroup(final String ogc,
+                                                              final String epsg,
+                                                              final int geotools)
         {
-            return group(new Identifier[] {
+            return createDescriptorGroup(new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, ogc),
                     new Identifier(Citation.EPSG,     epsg),
                     new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
@@ -663,8 +675,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          *
          * @todo The EPSG code seems to be the same than for the direct transform.
          */
-        static final ParameterDescriptorGroup PARAMETERS =
-                group("Geocentric_To_Ellipsoid", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
+                "Geocentric_To_Ellipsoid", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Create a provider.

@@ -193,6 +193,23 @@ public class Parameter extends AbstractParameter
     }
 
     /**
+     * Replace the specified value by the cached value, if it exists.
+     * This is used for reducing memory usage for frequently used values.
+     */
+    static Comparable replace(final Comparable value) {
+        final Comparable[] CACHED;
+        if (value instanceof Double) {
+            CACHED = CACHED_DOUBLES;
+        } else if (value instanceof Integer) {
+            CACHED = CACHED_INTEGERS;
+        } else {
+            return value;
+        }
+        final int i = Arrays.binarySearch(CACHED, value);
+        return (i>=0) ? CACHED[i] : value;
+    }
+
+    /**
      * Normalize the specified unit into one of "standard" units used in projections.
      */
     private static Unit normalize(final Unit unit) {
