@@ -95,8 +95,15 @@ import com.vividsolutions.jts.geom.Polygon;
  * that it's available only from version 0.7.2 onwards.
  * </p>
  *
- * @author Chris Holmes, Andrea Aime
+ * @author Chris Holmes, TOPP
+ * @author Andrea Aime
+ * @author Paulo Rizzi
  * @version $Id: PostgisDataStore.java,v 1.18.2.3 2004/05/02 15:31:43 aaime Exp $
+ * @task REVISIT: So Paulo Rizzi has a number of improvements in 
+ * http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them, but 
+ * some beg more fundamental questions - like the use of primary keys - in the
+ * geotools model.  See the issue for a bit more discussion, and I will attempt
+ * to write my thoughts up on wiki soon.  -ch
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** The logger for the postgis module. */
@@ -717,16 +724,26 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         Statement st = null;
 
-        if (!tablePresent(tableName, con)) {
+        //fix from Paulo Rizzi, to print sql used to create table if it was
+        //already present.
+        boolean shouldExecute = !tablePresent(tableName, con);
+
             try {
                 con.setAutoCommit(false);
                 st = con.createStatement();
 
-                StringBuffer statementSQL = new StringBuffer("CREATE TABLE "
-                        + tableName + " (");
+                StringBuffer statementSQL = new StringBuffer("CREATE TABLE \""
+                        + tableName + "\" (");
 
                 if (!fidMapper.returnFIDColumnsAsAttributes()) {
                     for (int i = 0; i < fidMapper.getColumnCount(); i++) {
+             
+                        //fix from PR, to ignore the auto oid columns
+                      if ("oid".equalsIgnoreCase(fidMapper.getColumnName(i))) {
+                            continue;
+                      }
+
+
                         int val = fidMapper.getColumnType(i);
                         String typeName = getSQLTypeName(fidMapper
                                 .getColumnType(i));
@@ -736,96 +753,150 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                                 + fidMapper.getColumnSize(i) + ")";
                         }
 
-                        statementSQL.append(fidMapper.getColumnName(i) + " "
-                            + typeName + ",");
+                        statementSQL.append("\"" + fidMapper.getColumnName(i) 
+                            + "\" " + typeName + ",");
                     }
                 }
 
                 statementSQL.append(makeSqlCreate(attributeType));
-                statementSQL.append(" CONSTRAINT PK PRIMARY KEY (");
+                //fix from PR, constraint name must be unique, so add tablename
+                statementSQL.append(" CONSTRAINT PK_" + tableName + 
+                                    " PRIMARY KEY (");
 
                 for (int i = 0; i < fidMapper.getColumnCount(); i++) {
-                    statementSQL.append(fidMapper.getColumnName(i) + ",");
+                    statementSQL.append("\"" + fidMapper.getColumnName(i) 
+                                        + "\",");
                 }
 
                 statementSQL.setCharAt(statementSQL.length() - 1, ')');
                 statementSQL.append(")");
 
-                // System.out.println(statementSQL);
-                st.execute(statementSQL.toString());
-
-                for (int i = 0; i < attributeType.length; i++) {
-                    if (attributeType[i].isGeometry()) {
-                        GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
-                        CoordinateReferenceSystem refSys = geomAttribute
-                            .getCoordinateSystem();
-                        int SRID = -1;
-
-                        if (refSys != null) {
-                            SRID = -1;
-                        } else {
-                            SRID = -1;
-                        }
-
-                        DatabaseMetaData metaData = con.getMetaData();
-                        ResultSet rs = metaData.getCatalogs();
-                        rs.next();
-
-                        String dbName = rs.getString(1);
-                        rs.close();
-
-                        statementSQL = new StringBuffer(
-                                "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
-                                + "'" + dbName + "'," + "'" + tableName + "',"
-                                + "'" + attributeType[i].getName() + "',"
-                                + "2," + SRID + "," + "'"
-                                + CLASS_MAPPINGS.get(geomAttribute.getType())
-                                                .toString() + "')");
-                        System.out.println(statementSQL);
-                        st.execute(statementSQL.toString());
-                    }
+                System.out.println(statementSQL.toString());
+                
+                if (shouldExecute) {  
+                    st.execute(statementSQL.toString());
                 }
 
+            //fix from pr: it may be that table existed and then was dropped
+            //without removing its geometry info from GEOMETRY_COLUMNS.
+            //To support this, try to delete before inserting.
+            ////Preserving case for table names gives problems, 
+            //so convert to lower case
+            statementSQL = new StringBuffer(
+                    "DELETE FROM GEOMETRY_COLUMNS WHERE f_table_catalog=''"
+                    + " AND f_table_schema = 'public'"
+                    + 
+                ////" AND f_table_name = '" + tableName.toLowerCase() + "'");
+                " AND f_table_name = '" + tableName + "';");
+
+            //SISfixed - prints statement for later reuse
+            String s = statementSQL.toString();
+            System.out.println(s);
+
+            if (shouldExecute) {
+                st.execute(s);
+            }
+
+	    //Ok, so Paulo Rizzi suggested that we get rid of our hand-adding
+            //of geometry column information and use AddGeometryColumn instead
+	    //as it is better (this is in GEOT-379, he attached an extended
+            //datastore that does postgis fixes).  But I am pretty positive 
+            //the reason we are doing things this way is to preserve the order
+            //of FeatureTypes.  I know this is fairly silly, from most 
+            //information perspectives, but from another perspective it seems
+            //to make sense - if you were transfering a featureType from one
+            //data store to another then it should have the same order, right?
+            //And order is important in WFS.  There are a few caveats though
+            //for one I don't even know if things work right.  I imagine the
+            //proper constraints that a AddGeometryColumn operation does are 
+            //not set in our hand version, for one.  I would feel better about
+            //ignoring the order and just doing things as we like if we had 
+            //views in place, if users could add the schema, and then be able
+            //to get it back in exactly the order they wanted.  So for now 
+            //let's leave things as is, and maybe talk about it in an irc. -ch 
+
+                for (int i = 0; i < attributeType.length; i++) {
+                    if (!attributeType[i].isGeometry()) {
+			continue;
+		    }
+		    GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
+                    //This needs to be improved - I believe we now have
+                    //code for a PostGIS authority factory, so we need to
+                    //look up from the CRS (maybe its WKT?) to the postgis
+                    //spatial_ref_sys table, which will tell us the SRID
+                    //for it.  I'm not sure about the exact mechanism for
+                    //this, as I don't know how the authorities and crs's
+                    //work, but it should be possible -ch
+                    CoordinateReferenceSystem refSys = geomAttribute
+                        .getCoordinateSystem();
+                    int SRID = -1;
+                     //so for now we just use -1
+                     if (refSys != null) {
+                         SRID = -1;
+                     } else {
+                        SRID = -1;
+                     }
+
+                     DatabaseMetaData metaData = con.getMetaData();
+                     ResultSet rs = metaData.getCatalogs();
+                     rs.next();
+
+                     String dbName = rs.getString(1);
+                     rs.close();
+                     String typeName = geomAttribute.isGeometry() ? 
+                         "GEOMETRY" :
+                         (String) CLASS_MAPPINGS.get(geomAttribute.getType());
+            
+                     if( typeName != null ) {
+                         //SISfixed- dbName was used for schema name, force 
+                         //it to 'public' Preserving case for table names 
+                         //gives problems, so convert to lower case
+                            //statementSQL = new StringBuffer(
+                            //"INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
+                            //+ "'" + dbName + "'," + "'" + tableName + "',"
+                            //+ "'" + attributeType[i].getName() + "',"
+                            //+ "2," + SRID + "," + "'"
+                            //+ typeName + "')");
+                            statementSQL = new StringBuffer(
+                            "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
+                             ////+ "'" + "public" + "'," + "'" + tableName.toLowerCase() + "',"
+                             + "'" + "public" + "'," + "'" + tableName + "',"
+                             + "'" + attributeType[i].getName() + "',"
+                             + "2," + SRID + "," + "'"
+                             + typeName + "')");
+                        System.out.println(statementSQL);
+                             if (shouldExecute) {
+                                 st.execute(statementSQL.toString());
+                             }
+			} else {
+			    System.out.println("Error: " + geomAttribute
+					       .getName()+ " unknown type!!!");
+			}
+
+ 
+                //also build a spatial index on each geometry column.
+                //TODO review!!! Should this be parameterized???
+                //SISfixed - put tablename and fieldname between quotes to preserve case					
+                statementSQL.append("\nCREATE INDEX spatial_"
+                    + tableName.toLowerCase() + "_"
+                    + attributeType[i].getName().toLowerCase() + " ON \""
+                    + tableName + "\" USING GIST (\""
+                    + attributeType[i].getName() + "\");");
+
+                //SISfixed - prints statement for later reuse
+                s = statementSQL.toString();
+                System.out.println(s);
+
+                if (shouldExecute) {
+                    st.execute(s);
+                }
+		}   
                 con.commit();
 
-                //"CREATE TABLE "+tableName+" ( )";
+		//Paulo Rizzi had a VACUUM ANALYZE here, but I'm not sure that
+                //it's needed, since the table is empty.  Waiting for feedback
+                //from dblasby -ch
 
-                /*
-                 * Statement st=con.createStatement(); String
-                 * statementSQL="CREATE TABLE "+tableName+" ( )";
-                 * System.out.println(statementSQL); st.execute(statementSQL);
-                 *
-                 * for (int i = 0; i < attributeType.length; i++) { String
-                 * typeName = null; if ((typeName =(String)
-                 * TYPE_MAP.get(attributeType[i].getType()))!= null) { if
-                 * (attributeType[i].isGeometry()) { GeometryAttributeType
-                 * geomAttribute=(GeometryAttributeType)attributeType[i];
-                 * CoordinateReferenceSystem
-                 * ref=geomAttribute.getCoordinateSystem(); int SRID; if
-                 * (ref==null) SRID=-1; else SRID=-1; statementSQL="SELECT
-                 * AddGeometryColumn(" +"'"+this.config.getNamespace()+"',"
-                 * +"'"+tableName+"'," +"'"+geomAttribute.getName()+"',"
-                 * +SRID+"," +"'"+typeName+"'," +"2)";
-                 * System.out.println(statementSQL);
-                 * st.executeQuery(statementSQL); } else { if
-                 * (typeName.equals("VARCHAR")) typeName = typeName + "(" +
-                 * attributeType[i].getFieldLength() + ")";
-                 *
-                 *
-                 * System.out.println(typeName);
-                 *
-                 *
-                 * statementSQL = "ALTER TABLE " + tableName + " ADD COLUMN " +
-                 * attributeType[i].getName()+" " + typeName;
-                 * System.out.println(statementSQL); st.execute(statementSQL);
-                 *
-                 * if (!attributeType[i].isNillable()) { statementSQL="ALTER
-                 * TABLE "+tableName +" ALTER COLUMN
-                 * "+attributeType[i].getName() +" SET NOT NULL" ;
-                 * System.out.println(statementSQL); st.execute(statementSQL); }
-                 *  } } else throw (new IOException("Type not supported!")); }
-                 * con.commit(); st.close(); con.close();
-                 */
             } catch (SQLException e) {
                 try {
                     if (con != null) {
@@ -854,9 +925,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     }
                 }
             }
-        } else {
-            throw new IOException("The table " + tableName + " already exist.");
-        }
+	    if (!shouldExecute) {
+		throw new IOException("The table " + tableName + " already exist.");
+	    }
     }
 
     /**
@@ -906,8 +977,23 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     typeName = typeName + " NOT NULL";
                 }
 
+                                //SISfixed - added support for default values
+                //TODO review!!! Is toString() always OK???
+                //TODO review!!! Brute-force quoting should work for numbers also,
+                //but not sure!!!
+                Object defaultValue = attributeType[i].createDefaultValue();
+
+                if (defaultValue != null) {
+                    typeName = typeName + " DEFAULT '"
+                        + defaultValue.toString() + "'";
+                }
+
+                //SISfixed - put fieldname between quotes to preserve case
+                buf.append("\"" + attributeType[i].getName() + "\" " + typeName
+                    + ",\n");
+
                 buf.append(attributeType[i].getName() + " " + typeName + ",");
-                System.out.println(buf);
+                //System.out.println(buf);
             } else {
                 throw (new IOException("Type not supported!"));
             }
