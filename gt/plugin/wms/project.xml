@@ -2,8 +2,8 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-graph</name>
-  <id>graph</id>
+  <name>geotools-wms</name>
+  <id>wms</id>
   <currentVersion>2.1.x</currentVersion>
   <versions>
     <version>
@@ -13,35 +13,20 @@
     </version>
   </versions>
   <package>org.geotools</package>
-  <shortDescription>Interfaces and Helper implementations for
-  Feature Based Graphs and Networks.</shortDescription>
+  <shortDescription>WebMapServer client, a GetCapabilities data model, 
+  and a WMS GridCoverage Exchange</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
-  Graph classes that builds and walk networks based on Feature relationships.
-
-  The orgional graph package has been developed using the JUMP Feature API.
-  Its intension is to be able to aid automated skeletonization of water bodies
-  by computing directionality of generated skeletons. The work for the orgiional
-  JUMP based library has been funded by the BC Proventional Government department
-  of BMGS.
-
-  This library has been ported to geotools2 as part of the VWFS project sponcered
-  by Geo Innovations.</description>
+  An OGC WebMapServer client implementation wrapped up in a GridCoverageExchange.
+  
+  There is a data model representing the GetCapabilities response mapped from the DTD
+  to Java classes. This is in the wms.getCapabilities package.  
+  </description>
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Module Maintainer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Justin Deoliveira</name>
-      <id>jdeolive</id>
-      <email>jdeolive@users.sourceforge.net</email>
+      <name>Richard Gould</name>
+      <id>rgould</id>
+      <email>rgould@refractions.net</email>
       <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
@@ -60,11 +45,6 @@
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
-   <dependency>
-      <id>opengis+legacy</id>
-      <version>0.1</version>
-      <url>http://www.opengis.org</url>
-    </dependency>
     <dependency>
       <id>geoapi</id>
       <version>SNAPSHOT</version>
@@ -80,12 +60,6 @@
       <version>3.8.1</version>
       <type>test</type>
       <url>http://junit.org/</url>
-    </dependency>
-    <dependency>
-      <id>mockrunner</id>
-      <version>0.2</version>
-      <type>test</type>
-      <url>http://mockrunner.sourceforge.net/</url>
     </dependency>
   </dependencies>
   <build>
