@@ -4,7 +4,6 @@
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-
 /**
  * @author jgarnett
  *
@@ -13,6 +12,8 @@
  */
 public class SVNSmuch {
 
-	public static void main(String[] args) {
-	}
+public static void main(String[] args) {
+	Process 
+	
+	
 }
