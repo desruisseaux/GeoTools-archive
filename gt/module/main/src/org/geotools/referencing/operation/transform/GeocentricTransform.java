@@ -23,22 +23,16 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
-
 import javax.units.Converter;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.parameter.ParameterReal;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -46,6 +40,14 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.parameter.ParameterReal;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -243,20 +245,21 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Implementation of geodetic to geocentric conversion. This
-     * implementation allows the caller to use height in computation.
+     * Implementation of geodetic to geocentric conversion. This implementation allows the caller
+     * to use height in computation. This is used for assertion with {@link #checkTransform}.
      */
-    private void transform(final double[] srcPts, int srcOff,
-                           final double[] dstPts, int dstOff,
-                           int numPts, boolean hasHeight)
+    private void transform(double[] srcPts, int srcOff,
+                     final double[] dstPts, int dstOff,
+                     int numPts, boolean hasHeight)
     {
-        int step = 0;
         final int dimSource = getSourceDimensions();
         hasHeight |= (dimSource>=3);
-        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
-            step = -dimSource;
-            srcOff -= (numPts-1)*step;
-            dstOff -= (numPts-1)*step;
+        if (srcPts==dstPts && needCopy(srcOff, dimSource, dstOff, 3, numPts)) {
+            // Source and destination arrays overlaps: copy in a temporary buffer.
+            final double[] old = srcPts;
+            srcPts = new double[numPts * (hasHeight ? 3 : 2)];
+            System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
+            srcOff = 0;
         }
         while (--numPts >= 0) {
             final double L = Math.toRadians(srcPts[srcOff++]); // Longitude
@@ -270,8 +273,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             dstPts[dstOff++] = (rn + h) * cosLat * Math.cos(L); // X: Toward prime meridian
             dstPts[dstOff++] = (rn + h) * cosLat * Math.sin(L); // Y: Toward East
             dstPts[dstOff++] = (rn * (1-e2) + h) * sinLat;      // Z: Toward North
-            srcOff += step;
-            dstOff += step;
         }
     }
     
@@ -279,16 +280,17 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Converts geodetic coordinates (longitude, latitude, height) to geocentric
      * coordinates (x, y, z) according to the current ellipsoid parameters.
      */
-    public void transform(final float[] srcPts, int srcOff,
-                          final float[] dstPts, int dstOff, int numPts)
+    public void transform(float[] srcPts, int srcOff,
+                    final float[] dstPts, int dstOff, int numPts)
     {
-        int step = 0;
         final int dimSource = getSourceDimensions();
         final boolean hasHeight = (dimSource>=3);
-        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
-            step = -dimSource;
-            srcOff -= (numPts-1)*step;
-            dstOff -= (numPts-1)*step;
+        if (srcPts==dstPts && needCopy(srcOff, dimSource, dstOff, 3, numPts)) {
+            // Source and destination arrays overlaps: copy in a temporary buffer.
+            final float[] old = srcPts;
+            srcPts = new float[numPts*dimSource];
+            System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
+            srcOff = 0;
         }
         while (--numPts >= 0) {
             final double L = Math.toRadians(srcPts[srcOff++]); // Longitude
@@ -302,8 +304,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             dstPts[dstOff++] = (float) ((rn + h) * cosLat * Math.cos(L)); // X: Toward prime meridian
             dstPts[dstOff++] = (float) ((rn + h) * cosLat * Math.sin(L)); // Y: Toward East
             dstPts[dstOff++] = (float) ((rn * (1-e2) + h) * sinLat);      // Z: Toward North
-            srcOff += step;
-            dstOff += step;
         }
     }
     
@@ -314,18 +314,19 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Algorithm for Geocentric to Geodetic Coordinate Conversion", by
      * Ralph Toms, Feb 1996.
      */
-    public void inverseTransform(final double[] srcPts, int srcOff,
-                                 final double[] dstPts, int dstOff, int numPts)
+    public void inverseTransform(double[] srcPts, int srcOff,
+                           final double[] dstPts, int dstOff, int numPts)
     {
-        int step = 0;
-        final int dimSource = getSourceDimensions();
-        final boolean hasHeight = (dimSource>=3);
+        final int dimTarget = getSourceDimensions();
+        final boolean hasHeight = (dimTarget>=3);
         boolean   computeHeight = hasHeight;
         assert (computeHeight=true)==true; // Intentional side effect FIXME: are you insane?
-        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
-            step    = -dimSource;
-            srcOff -= (numPts-1)*step;
-            dstOff -= (numPts-1)*step;
+        if (srcPts==dstPts && needCopy(srcOff, 3, dstOff, dimTarget, numPts)) {
+            // Source and destination arrays overlaps: copy in a temporary buffer.
+            final double[] old = srcPts;
+            srcPts = new double[numPts*3];
+            System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
+            srcOff = 0;
         }
         while (--numPts >= 0) {
             final double x = srcPts[srcOff++]; // Toward prime meridian
@@ -372,8 +373,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                 assert MAX_ERROR > (distance=checkTransform(new double[]
                         {x,y,z, longitude, latitude, height})) : distance;
             }
-            srcOff += step;
-            dstOff += step;
         }
     }
     
@@ -384,18 +383,19 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Algorithm for Geocentric to Geodetic Coordinate Conversion", by
      * Ralph Toms, Feb 1996.
      */
-    public void inverseTransform(final float[] srcPts, int srcOff,
-                                 final float[] dstPts, int dstOff, int numPts)
+    public void inverseTransform(float[] srcPts, int srcOff,
+                           final float[] dstPts, int dstOff, int numPts)
     {
-        int step = 0;
-        final int dimSource = getSourceDimensions();
-        final boolean hasHeight = (dimSource>=3);
+        final int dimTarget = getSourceDimensions();
+        final boolean hasHeight = (dimTarget>=3);
         boolean   computeHeight = hasHeight;
         assert (computeHeight=true) == true; // Intentional side effect FIXME: are you insane?
-        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
-            step    = -dimSource;
-            srcOff -= (numPts-1)*step;
-            dstOff -= (numPts-1)*step;
+        if (srcPts==dstPts && needCopy(srcOff, 3, dstOff, dimTarget, numPts)) {
+            // Source and destination arrays overlaps: copy in a temporary buffer.
+            final float[] old = srcPts;
+            srcPts = new float[numPts*3];
+            System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
+            srcOff = 0;
         }
         while (--numPts >= 0) {
             final double x = srcPts[srcOff++]; // Toward prime meridian
@@ -442,8 +442,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                 assert MAX_ERROR > (distance=checkTransform(new double[]
                         {x,y,z, longitude, latitude, height})) : distance;
             }
-            srcOff += step;
-            dstOff += step;
         }
     }
     

@@ -245,7 +245,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
              * and copy the transformation result in the destination position.
              */
             final double[] array;
-            if (dimSource <= dimTarget) {
+            if (dimSource >= dimTarget) {
                 array = ptSrc.getCoordinates();
             } else {
                 array = new double[dimTarget];
@@ -641,6 +641,50 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         return "PARAM_MT";
     }
+
+    /**
+     * Checks if source coordinates need to be copied before to apply the transformation.
+     * This convenience method is provided for <code>transform(...)</code> method implementation.
+     * This method make the following assumptions:
+     * <BR><BR>
+     * <UL>
+     *   <LI>Coordinates will be iterated from lower index to upper index.</LI>
+     *   <LI>Coordinates are read and writen in shrunk. For example (longitude,latitude,height)
+     *       values for one coordinate are read together, and the transformed (x,y,z) values are
+     *       written together only after.</LI>
+     * </UL>
+     * <BR><BR>
+     * However, this method does not assumes that source and target dimension are the same (in the
+     * special case where source and target dimension are always the same, a simplier and more
+     * efficient check is possible). The following example prepares a transformation from 2
+     * dimensional points to three dimensional points:
+     * <BR><BR>
+     * <blockquote><pre>
+     * public void transform(double[] srcPts, int srcOff,
+     *                       double[] dstPts, int dstOff, int numPts)
+     * {
+     *     if (srcPts==dstPts && <strong>needCopy</strong>(srcOff, 2, dstOff, 3, numPts) {
+     *         final double[] old = srcPts;
+     *         srcPts = new double[numPts*2];
+     *         System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
+     *         srcOff = 0;
+     *     }
+     * }</pre><blockquote>
+     */
+    protected static boolean needCopy(final int srcOff, final int dimSource,
+                                      final int dstOff, final int dimTarget, final int numPts)
+    {
+        if (numPts <= 1  ||  (srcOff >= dstOff  &&  dimSource >= dimTarget)) {
+            /*
+             * Source coordinates are stored after target coordinates. If implementation
+             * read coordinates from lower index to upper index, then the destination will
+             * not overwrite the source coordinates, even if there is an overlaps.
+             */
+            return false;
+        }
+        return srcOff  <  dstOff + numPts*dimTarget &&
+               dstOff  <  srcOff + numPts*dimSource;
+    }
     
     /**
      * Ensures that the specified longitude stay within &plusmn;&pi; radians. This method
@@ -652,6 +696,20 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     protected static double rollLongitude(final double x) {
         return x - (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
+    }
+
+    /**
+     * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
+     * If <code>matrix</code> is already an instance of <code>GeneralMatrix</code>,
+     * then it is returned unchanged. Otherwise, all elements are copied in a new
+     * <code>GeneralMatrix</code> object.
+     */
+    static GeneralMatrix wrap(final Matrix matrix) {
+        if (matrix instanceof GeneralMatrix) {
+            return (GeneralMatrix) matrix;
+        } else {
+            return new GeneralMatrix(matrix);
+        }
     }
     
     /**

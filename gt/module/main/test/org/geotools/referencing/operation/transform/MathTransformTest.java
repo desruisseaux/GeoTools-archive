@@ -121,12 +121,11 @@ public class MathTransformTest extends TestCase {
         
         MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
                                         GeographicCRS.WGS84, crs).getMathTransform();
-        
-        DirectPosition position=new GeneralDirectPosition(-123, 55);
-        
-        t.transform(position, position);
-        
-        
+        DirectPosition position = new GeneralDirectPosition(-123, 55);
+        position = t.          transform(position, position);
+        position = t.inverse().transform(position, position);
+        assertEquals(-123, position.getOrdinate(0), 1E-6);
+        assertEquals(  55, position.getOrdinate(1), 1E-6);
     }
 
     /**

@@ -134,7 +134,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             if (matrix.isIdentity()) {
                 return IdentityTransform.create(dimension);
             }
-            final GeneralMatrix m = GeneralMatrix.wrap(matrix);
+            final GeneralMatrix m = wrap(matrix);
             if (m.isAffine()) {
                 switch (dimension) {
                     case 1: return LinearTransform1D.create(m.getElement(0,0), m.getElement(0,1));

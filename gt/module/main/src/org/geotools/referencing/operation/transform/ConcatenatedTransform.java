@@ -380,12 +380,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         final int numCol = matrix1.getNumCol();
         final GeneralMatrix matrix;
         if (numCol == matrix2.getNumCol()) {
-            matrix  =  GeneralMatrix.wrap(matrix2);
-            matrix.mul(GeneralMatrix.wrap(matrix1));
+            matrix  =  wrap(matrix2);
+            matrix.mul(wrap(matrix1));
         } else {
             matrix = new GeneralMatrix(numRow, numCol);
-            matrix.mul(GeneralMatrix.wrap(matrix2),
-                       GeneralMatrix.wrap(matrix1));
+            matrix.mul(wrap(matrix2), wrap(matrix1));
         }
         return matrix;
     }

@@ -320,20 +320,6 @@ public class GeneralMatrix extends GMatrix implements Matrix {
                         new Integer(dim), new Integer(dimension)));
         }
     }
-
-    /**
-     * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
-     * If <code>matrix</code> is already an instance of <code>GeneralMatrix</code>,
-     * then it is returned unchanged. Otherwise, all elements are copied in a new
-     * <code>GeneralMatrix</code> object.
-     */
-    public static GeneralMatrix wrap(final Matrix matrix) {
-        if (matrix instanceof GeneralMatrix) {
-            return (GeneralMatrix) matrix;
-        } else {
-            return new GeneralMatrix(matrix);
-        }
-    }
     
     /**
      * Retrieves the specifiable values in the transformation matrix into a
