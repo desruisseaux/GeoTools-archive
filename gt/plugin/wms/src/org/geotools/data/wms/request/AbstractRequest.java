@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 
 /**
@@ -40,12 +41,41 @@ public class AbstractRequest {
      * @param onlineResource
      */
     public AbstractRequest(URL onlineResource) {
-        this.onlineResource = onlineResource;
+    	
+    	properties = new Properties();
+    	
+        // Need to strip off the query, as getFinalURL will add it back
+        // on, with all the other properties. If we don't, elements will
+        // be duplicated.
+        int index = onlineResource.toExternalForm().lastIndexOf("?");
+        String urlWithoutQuery = null;
 
-        properties = new Properties();
+        if (index <= 0) {
+            urlWithoutQuery = onlineResource.toExternalForm();
+        } else {
+            urlWithoutQuery = onlineResource.toExternalForm().substring(0, index);
+        }
 
-        //      TODO remove this when more version support comes along
-        // setProperty("VERSION", "1.1.1");
+        try {
+            this.onlineResource = new URL(urlWithoutQuery);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error parsing URL");
+        }
+
+        // Doing this preserves all of the query parameters while
+        // enforcing the mandatory ones
+        if (onlineResource.getQuery() != null) {
+            StringTokenizer tokenizer = new StringTokenizer(onlineResource.getQuery(),
+                    "&");
+
+            while (tokenizer.hasMoreTokens()) {
+                String token = tokenizer.nextToken();
+                String[] param = token.split("=");
+                setProperty(param[0].toUpperCase(), param[1]);
+            }
+        }
+
+        
     }
 
     public URL getFinalURL() {
