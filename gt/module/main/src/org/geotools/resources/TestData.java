@@ -137,6 +137,9 @@ public class TestData {
      */
     public static final File file( final Object caller, final String path ) throws IOException {
     	URL url = getResource( caller, path );
+    	if( url == null ) {
+    		throw new FileNotFoundException("Could not locate test-data: "+path );    		
+    	}    	
     	// Based SVGTest
     	File file = new File(java.net.URLDecoder.decode( url.getFile(),"UTF-8"));
     	if( !file.exists() ) {
