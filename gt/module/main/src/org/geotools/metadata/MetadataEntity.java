@@ -112,11 +112,12 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     }
 
     /**
-     * Access to the values associated with metadata {@linkplain Element elements}.
-     * The list is returned in the same order as described by the {@link EntityType}
-     * schema information.
+     * Access to the values associated with metadata
+     * {@linkplain org.opengis.catalog.MetadataEntity.Element elements}.
+     * The list is returned in the same order as described by the
+     * {@link org.opengis.catalog.MetadataEntity.EntityType} schema information.
      *
-     * @return List of {@linkplain Element elements}.
+     * @return List of {@linkplain org.opengis.catalog.MetadataEntity.Element elements}.
      */
     public final List elements() {
         final BeanEntity entity = (BeanEntity) getEntityType();
@@ -156,8 +157,8 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * @param xPath XPath representation of element location.
      * @return element value, List of element value, or null if xPath did not match anything.
      */
-    public final Object getElement(final String xpath) {
-        final List elements = XPathFactory.value(xpath, this);
+    public final Object getElement(final String xPath) {
+        final List elements = XPathFactory.value(xPath, this);
         switch (elements.size()) {
             case 0:  return null;
             case 1:  return elements.get(0);
@@ -166,11 +167,11 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     }
 
     /**
-     * Gets the value of the provided Element.
+     * Gets the value of the provided element.
      * 
      * @param  element Element that indicates the value the caller wishes to obtain.
      * @return The value of the element the parameter represents
-     *         null if the current Metadata does not contain the Element.
+     *         null if the current Metadata does not contain the element.
      */
     public final Object getElement(final Element element) {
         final BeanElement elemImpl;
@@ -221,9 +222,9 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     }
 
     /**
-     * A basic implementation of the {@link EntityType} interface which uses
-     * uses reflection to examine the structure of a metadata. Instances of
-     * this class can be created by the {@link #getEntity} method only.
+     * A basic implementation of the {@link org.opengis.catalog.MetadataEntity.EntityType}
+     * interface which uses uses reflection to examine the structure of a metadata. Instances
+     * of this class can be created by the {@link #getEntity} method only.
      * 
      * @author Jody Garnett
      * @author Martin Desruisseaux
@@ -247,7 +248,8 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
         final Map propertyMap;
 
         /**
-         * An unmodifiable list of {@link Element} to be returned by {@link #elements}.
+         * An unmodifiable list of {@link org.opengis.catalog.MetadataEntity.Element}
+         * to be returned by {@link #elements}.
          */
         private final List elements;
 
@@ -317,12 +319,14 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
         }
 
         /**
-         * Gets or creates the {@link EntityType} instance that describes all attributes found in
-         * a metadata interface. The <code>type</code> argument should be one of GeoAPI metadata
-         * interfaces or an implementation of those interfaces.
+         * Gets or creates the {@link org.opengis.catalog.MetadataEntity.EntityType} instance
+         * that describes all attributes found in a metadata interface. The <code>type</code>
+         * argument should be one of GeoAPI metadata interfaces or an implementation of those
+         * interfaces.
          *
          * @param type The class of a metadata to be inspected
-         * @return An {@link EntityType} that descibes the class passed in.
+         * @return An {@link org.opengis.catalog.MetadataEntity.EntityType} that descibes the
+         *         class passed in.
          * @throws IntrospectionException if the introspection failed.
          */
         public static synchronized BeanEntity getEntity(final Class type)
@@ -344,8 +348,9 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
         }   
 
         /**
-         * The xPath is used to identify {@linkplain Element elements} in the Metadata data
-         * hierarchy. If the xPath has wild cards a list of Metadata Elements will be returned.
+         * The xPath is used to identify {@linkplain org.opengis.catalog.MetadataEntity.Element
+         * elements} in the Metadata data hierarchy. If the xPath has wild cards a list of
+         * Metadata Elements will be returned.
          * 
          * @param xpath an XPath statement that indicates 0 or more Elements.
          * @return Null if no elements are found to match the xpath 
@@ -362,11 +367,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
         }
 
         /**
-         * Get a List of all the {@linkplain Element elements} this <code>EntityType</code> contains.
-         * Only the elements contained by the current <code>EntityType</code> are returned,
-         * in other words this method is not recursive, elements in sub-enties are not returned.
+         * Get a List of all the {@linkplain org.opengis.catalog.MetadataEntity.Element elements}
+         * this <code>EntityType</code> contains. Only the elements contained by the current
+         * <code>EntityType</code> are returned, in other words this method is not recursive,
+         * elements in sub-enties are not returned.
          *
-         * @return a List of all the {@linkplain Element elements} this <code>EntityType</code> contains.
+         * @return a List of all the {@linkplain org.opengis.catalog.MetadataEntity.Element
+         *         elements} this <code>EntityType</code> contains.
          */
         public List getElements() {
             return elements;
@@ -374,8 +381,8 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     }
 
     /**
-     * A basic implementation of the {@link Element} interface which uses
-     * uses reflection to examine the structure of a metadata.
+     * A basic implementation of the {@link org.opengis.catalog.MetadataEntity.Element}
+     * interface which uses uses reflection to examine the structure of a metadata.
      * 
      * @author Jody Garnett
      * @author Martin Desruisseaux

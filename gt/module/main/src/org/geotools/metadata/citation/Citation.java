@@ -42,6 +42,7 @@ import org.geotools.metadata.MetadataEntity;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedArrayList;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 
 
@@ -177,7 +178,7 @@ public class Citation extends MetadataEntity
         if (title instanceof InternationalString) {
             this.title = (InternationalString) title;
         } else {
-            this.title = new org.geotools.util.InternationalString(title.toString());
+            this.title = new SimpleInternationalString(title.toString());
         }
     }
 
@@ -229,7 +230,7 @@ public class Citation extends MetadataEntity
     /**
      * Set the reference date for the cited resource.
      *
-     * @todo Defines a {@link HashMap} subclass which transform all {@link Date} object
+     * @todo Defines a {@link java.util.HashMap} subclass which transform all {@link Date} object
      *       into unmidifiable dates.
      */
     public synchronized void setDates(final Map newValues) {

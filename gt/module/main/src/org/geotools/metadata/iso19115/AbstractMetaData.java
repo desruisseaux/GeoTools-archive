@@ -71,7 +71,7 @@ public abstract class AbstractMetaData implements MetadataEntity, MetaData {
         	Method read = descriptor.getReadMethod();        	
         	Method method = (Method) descriptor.getReadMethod();
             try {
-            	Object value = read.invoke( this, null );
+            	Object value = read.invoke(this, (Object[])null);
             	elements.add( value );                
             } catch (Exception e) {
                 throw new RuntimeException("There must be a bug in the EntityImpl class during the introspection.",
@@ -112,7 +112,7 @@ public abstract class AbstractMetaData implements MetadataEntity, MetaData {
         PropertyDescriptor descriptor = elemImpl.getProperty();
         Method read = descriptor.getReadMethod();
         try {
-        	return read.invoke( this, null );        	               
+        	return read.invoke(this, (Object[]) null);        	               
         } catch (Exception e) {
             throw new RuntimeException("There must be a bug in the EntityImpl class during the introspection.",
                 e);

@@ -140,8 +140,6 @@ public class MaintenanceInformation extends MetadataEntity
 
     /**
      * Maintenance period other than those defined.
-     *
-     * @return The period, in milliseconds.
      */
     public synchronized void setUserDefinedMaintenanceFrequency(final long newValue) {
         checkWritePermission();

@@ -48,9 +48,7 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class Lineage extends MetadataEntity
-       implements org.opengis.metadata.lineage.Lineage
-{
+public class Lineage extends MetadataEntity implements org.opengis.metadata.lineage.Lineage {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -184,7 +182,7 @@ public class Lineage extends MetadataEntity
     }
 
     /**
-     * Returns a string representation of this series.
+     * Returns a string representation of this lineage.
      */
     public String toString() {
         return String.valueOf(statement);
