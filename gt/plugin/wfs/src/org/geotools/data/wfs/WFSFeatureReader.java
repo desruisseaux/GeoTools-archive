@@ -50,7 +50,7 @@ public class WFSFeatureReader extends FCBuffer {
         }
     }
     
-    public static FeatureReader getFeatureReader(InputStream is, int capacity) throws SAXException {
+    public static WFSFeatureReader getFeatureReader(InputStream is, int capacity) throws SAXException {
         WFSFeatureReader fc = new WFSFeatureReader(is, capacity);
         fc.start(); // calls run
         if(fc.exception != null)

@@ -148,6 +148,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     }
 
     /**
+     * @throws SAXException
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {

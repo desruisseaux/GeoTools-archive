@@ -291,7 +291,7 @@ System.out.println("GetCaps -- post "+postUrl);
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
      */
     protected FeatureReader getFeatureReader(String typeName) throws IOException {
-        FeatureReader t = null;
+        WFSFeatureReader t = null;
         if((protos & POST_FIRST) == POST_FIRST && t == null){
             try {
                 t = getFeatureReaderPost(typeName);
@@ -324,11 +324,16 @@ System.out.println("GetCaps -- post "+postUrl);
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
             }
-
-        return t;
+            
+        if(t.getFeatureType()!=null)
+            return t;
+        
+        if(t.hasNext()) // opportunity to throw exception
+            throw new IOException("There are features but no feature type ... odd");
+        return null;
     }
     
-    private FeatureReader getFeatureReaderGet(String typeName) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderGet(String typeName) throws SAXException, IOException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
 		if(getUrl == null)
@@ -359,11 +364,11 @@ System.out.println("GetCaps -- post "+postUrl);
 
  	    InputStream is = getInputStream(hc,auth);
         
-        FeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
         return ft;
     }
     
-    private FeatureReader getFeatureReaderPost(String typeName) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderPost(String typeName) throws SAXException, IOException{
         URL postUrl = capabilities.getGetFeature().getPost();
 
 		if(postUrl == null)
@@ -386,7 +391,7 @@ System.out.println("GetCaps -- post "+postUrl);
 
  	    InputStream is = getInputStream(hc,auth);
 
-        FeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
         return ft;
     }
     
