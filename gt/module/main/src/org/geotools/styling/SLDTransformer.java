@@ -130,10 +130,10 @@ public class SLDTransformer extends TransformerBase {
                 end("Font");
             }
             
-            if( text.getLabel() != null ){
-                start("Label");
+            if( text.getLabelPlacement() != null ){
+                start("LabelPlacement");
                 text.getLabelPlacement().accept(this);
-                end("Label");
+                end("LabelPlacement");
             }
             if( text.getHalo() != null ) text.getHalo().accept(this);
             if( text.getFill() != null ) text.getFill().accept(this);            
