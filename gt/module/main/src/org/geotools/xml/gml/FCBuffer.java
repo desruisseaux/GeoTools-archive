@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
 public class FCBuffer extends Thread implements FeatureReader {
     /** Last feature is in the buffer */
     public static final int FINISH = -1;
-
+    
     /** DOCUMENT ME! */
     public static final int STOP = -2;
 
@@ -65,6 +65,7 @@ public class FCBuffer extends Thread implements FeatureReader {
 
     private FCBuffer() {
         // should not be called
+    	super("Feature Collection Buffer");
     }
 
     /**
@@ -75,6 +76,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @param ft Nullable
      */
     protected FCBuffer(URI document, int capacity, int timeout, FeatureType ft) {
+    	super("Feature Collection Buffer");
         features = new Feature[capacity];
         this.timeout = timeout;
         this.document = document;
@@ -319,8 +321,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      */
     public void close(){
         state = STOP; // note for the sax parser
-
-        // TODO better here !!!
+        interrupt();
     }
 
     /**

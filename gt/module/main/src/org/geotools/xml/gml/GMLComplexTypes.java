@@ -4205,6 +4205,8 @@ public class GMLComplexTypes {
                             .getCapacity() - 1)) {
                         logger.finest("waiting for reader");
                         Thread.yield();
+                        if(featureCollectionBuffer.state == FCBuffer.STOP)
+                        	throw new StopException(); // alternative to stop()
                     }
                 }
             } else {

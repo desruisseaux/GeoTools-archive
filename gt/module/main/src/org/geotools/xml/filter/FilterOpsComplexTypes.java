@@ -756,7 +756,7 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-        	System.out.println("end of filter"+value.length+":"+value[0]);
+//        	System.out.println("end of filter"+value.length+":"+value[0]);
             return value[0].getValue();
         }
 
@@ -1837,7 +1837,7 @@ public class FilterOpsComplexTypes {
      * The <BBOX> element is defined as a convenient and more compact way
      * of encoding the very common bounding box constraint based on the
      * gml:Box geometry. It is equivalent to the spatial operation
-     * <Not><Disjoint> … </Disjoint></Not> meaning that the <BBOX> operator
+     * <Not><Disjoint> ï¿½ </Disjoint></Not> meaning that the <BBOX> operator
      * should identify all geometries that spatially interact with the box
      * in some manner.
      * 

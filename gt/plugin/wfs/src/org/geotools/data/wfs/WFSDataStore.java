@@ -306,24 +306,26 @@ public class WFSDataStore extends AbstractDataStore {
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,typeName);
         String crsName = null;
         String ftName = null;
-        crsName = fsd.getSRS();
-        ftName = fsd.getName();
+        if(fsd != null){
+            crsName = fsd.getSRS();
+            ftName = fsd.getName();
         
-        CoordinateReferenceSystem crs;
-        try {
-            if(crsName!=null){
-                crs = CRS.decode(crsName);
-            	t = FeatureTypes.transform(t,crs);
+            CoordinateReferenceSystem crs;
+            try {
+                if(crsName!=null){
+                    crs = CRS.decode(crsName);
+            	    t = FeatureTypes.transform(t,crs);
+                }
+            } catch (FactoryException e) {
+                WFSDataStoreFactory.logger.warning(e.getMessage());
+            } catch (SchemaException e) {
+                WFSDataStoreFactory.logger.warning(e.getMessage());
             }
-        } catch (FactoryException e) {
-            WFSDataStoreFactory.logger.warning(e.getMessage());
-        } catch (SchemaException e) {
-            WFSDataStoreFactory.logger.warning(e.getMessage());
         }
         
         if(ftName!=null){
             try {
-                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName,t.getNamespaceURI(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespaceURI(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
             } catch (FactoryConfigurationError e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             } catch (SchemaException e1) {
@@ -690,7 +692,10 @@ public class WFSDataStore extends AbstractDataStore {
         FeatureReader t = null;
         SAXException sax = null;
         IOException io = null;
-        Filter[] filters = splitFilters(query,transaction); // [server][post] 
+System.out.println("Doing the Request");
+        Filter[] filters = splitFilters(query,transaction); // [server][post]
+System.out.println("\nServer side Filter = "+filters[0]);
+System.out.println("Client side Filter = "+filters[1]+"\n\n");
         
         query = new DefaultQuery(query);
         // TODO modify bbox requests here

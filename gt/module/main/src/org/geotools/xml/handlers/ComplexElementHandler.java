@@ -464,7 +464,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         	            // error, so redo
         	            if(eg[t].getMinOccurs()>count){
         	                // not good
-System.out.println("Seq Failed");
+//System.out.println("Seq Failed");
         	                return new int[]{index,0}; // not whole sequence
         	            }
         	            t++;
@@ -477,14 +477,14 @@ System.out.println("Seq Failed");
     			// move along and retest that spot
     			if(eg[t].getMinOccurs()>count){
     				// not good
-System.out.println("Seq Failed");
+//System.out.println("Seq Failed");
 					return new int[]{index,0}; // not whole sequence
     			}
     			t++;
     			count=0; // next defined type
         	}
         }
-System.out.println("Seq index = "+tIndex+" Matched");
+//System.out.println("Seq index = "+tIndex+" Matched");
         return new int[]{tIndex,1};
     }
 
