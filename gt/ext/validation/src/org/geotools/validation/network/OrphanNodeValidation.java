@@ -29,13 +29,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.graph.Graph;
-import org.geotools.graph.GraphComponent;
-import org.geotools.graph.build.LineGraphBuilder;
-import org.geotools.graph.traverse.BasicGraphTraversal;
-import org.geotools.graph.traverse.GraphTraversal;
-import org.geotools.graph.traverse.GraphVisitor;
-import org.geotools.graph.traverse.SimpleGraphWalker;
+import org.geotools.graph.build.line.LineStringGraphGenerator;
+import org.geotools.graph.structure.Graph;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
 
@@ -96,52 +91,77 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
      */
     public boolean validate(Map layers, Envelope envelope,
         final ValidationResults results) throws Exception {
-        LineGraphBuilder lgb = new LineGraphBuilder();
-        FeatureSource fs = (FeatureSource) layers.get(typeName);
-        FeatureResults fr = fs.getFeatures();
-        FeatureCollection fc = fr.collection();
-        FeatureIterator f = fc.features();
+    	
+      LineStringGraphGenerator lgb = new LineStringGraphGenerator();
+    	FeatureSource fs = (FeatureSource) layers.get(typeName);
+      FeatureResults fr = fs.getFeatures();
+      FeatureCollection fc = fr.collection();
+      FeatureIterator f = fc.features();
 
-        while (f.hasNext()) {
-            Feature ft = f.next();
+      while (f.hasNext()) {
+          Feature ft = f.next();
 
-            if (envelope.contains(ft.getBounds())) {
-                lgb.add(ft);
-            }
-        }
+          if (envelope.contains(ft.getBounds())) {
+              //lgb.add(ft);
+          	lgb.add(ft.getDefaultGeometry());
+          }
+      }
 
-        // lgb is loaded
-        Graph g = lgb.build();
-
-        class OrphanVisitor implements GraphVisitor {
-            private int count = 0;
-
-            public int getCount() {
-                return count;
-            }
-
-            public int visit(GraphComponent element) {
-                if (element.getAdjacentElements().size() == 0) {
-                    count++;
-                }
-
-                results.error(element.getFeature(), "Orphaned");
-
-                return GraphTraversal.CONTINUE;
-            }
-        }
-
-        OrphanVisitor ov = new OrphanVisitor();
-        SimpleGraphWalker sgv = new SimpleGraphWalker(ov);
-        BasicGraphTraversal bgt = new BasicGraphTraversal(g, sgv);
-        bgt.walkNodes();
-
-        if (ov.getCount() == 0) {
-            return true;
-        } else {
-            return false;
-        }
+      // lgb is loaded
+      Graph g = lgb.getGraph();
+			
+      return(g.getNodesOfDegree(0).size() == 0);
+      
     }
+    
+//    public boolean validate_old(Map layers, Envelope envelope,
+//        final ValidationResults results) throws Exception {
+//        LineGraphBuilder lgb = new LineGraphBuilder();
+//        FeatureSource fs = (FeatureSource) layers.get(typeName);
+//        FeatureResults fr = fs.getFeatures();
+//        FeatureCollection fc = fr.collection();
+//        FeatureIterator f = fc.features();
+//
+//        while (f.hasNext()) {
+//            Feature ft = f.next();
+//
+//            if (envelope.contains(ft.getBounds())) {
+//                lgb.add(ft);
+//            }
+//        }
+//
+//        // lgb is loaded
+//        org.geotools.graph.structure.Graph g = lgb.build();
+//
+//        class OrphanVisitor implements GraphVisitor {
+//            private int count = 0;
+//
+//            public int getCount() {
+//                return count;
+//            }
+//
+//            public int visit(GraphComponent element) {
+//                if (element.getAdjacentElements().size() == 0) {
+//                    count++;
+//                }
+//
+//                results.error(element.getFeature(), "Orphaned");
+//
+//                return GraphTraversal.CONTINUE;
+//            }
+//        }
+//
+//        OrphanVisitor ov = new OrphanVisitor();
+//        SimpleGraphWalker sgv = new SimpleGraphWalker(ov);
+//        BasicGraphTraversal bgt = new BasicGraphTraversal(g, sgv);
+//        bgt.walkNodes();
+//
+//        if (ov.getCount() == 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     /**
      * Access typeName property.
