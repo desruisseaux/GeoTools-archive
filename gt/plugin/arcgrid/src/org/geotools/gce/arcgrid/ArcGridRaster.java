@@ -78,7 +78,7 @@ public class ArcGridRaster {
     protected double xllCorner = Double.NaN;
     protected double yllCorner = Double.NaN;
     protected double cellSize = Double.NaN;
-    protected double noData = Double.NaN;
+    protected double noData = -9999;
     protected int nCols = -1;
     protected int nRows = -1;
     private Reader reader = null;
@@ -490,7 +490,7 @@ public class ArcGridRaster {
         out.println(cellSize = cellsize);
         out.print(NODATA_VALUE);
         spaces(out, 2);
-        out.println(noData = -9999);
+        out.println(noData);
 
         // reset min and max
         minValue = Double.MIN_VALUE;
@@ -513,7 +513,7 @@ public class ArcGridRaster {
 
                 // no data masking
                 if (Double.isNaN(v)) {
-                    v = -9999;
+                    v =noData;
                 }
 
                 // append value and possible spacer

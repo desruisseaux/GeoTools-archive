@@ -41,6 +41,12 @@ import java.io.*;
 import java.net.*;
 
 import java.util.*;
+import javax.units.UnitFormat;
+import java.text.ParseException;
+import org.geotools.util.NumberRange;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.SampleDimensionGT;
+import javax.units.Unit;
 
 /**
  * This class can read an arc grid data source and create a grid coverage from
@@ -291,7 +297,7 @@ public class ArcGridReader implements GridCoverageReader {
      *             Thrown for any other unexpected exception
      */
     private void setEnvironment(GeneralParameterValue[] params)
-        throws InvalidParameterNameException, InvalidParameterValueException, 
+        throws InvalidParameterNameException, InvalidParameterValueException,
             IOException {
         for (int i = 0; i < params.length; i++) {
             Parameter param = (Parameter) params[i];
@@ -386,7 +392,7 @@ public class ArcGridReader implements GridCoverageReader {
                     this.arcGridRaster.getXlCorner()
                     + (this.arcGridRaster.getNCols() * this.arcGridRaster
                     .getCellSize()),
-                    
+
                 this.arcGridRaster.getYlCorner()
                     + (this.arcGridRaster.getNRows() * this.arcGridRaster
                     .getCellSize())
@@ -400,15 +406,44 @@ public class ArcGridReader implements GridCoverageReader {
             //TODO this is not finished it is just a temporary hack
             //
             //////////////////////////////////////////////////////////////////////////////////////////////////
-            ColorModel cm = RasterFactory.createComponentColorModel(DataBuffer.TYPE_FLOAT,
-                    ColorSpace.getInstance(ColorSpace.CS_GRAY), //
-                    false, false, //ignored since
-                    Transparency.OPAQUE);
+            /**
+              *
+              */
+             //String UoM =;
+             //UnitFormat unitFormat = UnitFormat.getStandardInstance();
+             Unit uom = null;
+             //try {
+             //    uom = unitFormat.parseUnit(UoM);
+             //} catch (ParseException ex1) {
+             //    uom = null;
+             //}
 
-            return new GridCoverage2D(name,
-                new BufferedImage(cm, raster, false, null), coordinateSystem,
-                envelope);
+             //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+             Category values = new Category("values",
+                                            new Color[] {Color.BLUE,
+                                            Color.GREEN, Color.RED},
+                                            new NumberRange(this.arcGridRaster.getMinValue(),
+                     this.arcGridRaster.getMaxValue()),
+                                            1.0,
+                                            0.0)
+                               ,
+                               nan = new Category("nodata", Color.black,
+                     Double.NaN);
 
+             SampleDimensionGT band =
+                     new SampleDimensionGT(new Category[] {nan,
+                                           values}, uom);
+             BufferedImage image = new BufferedImage(band.getColorModel(),
+                     raster,
+                     false,
+                     null); //properties????
+             return new GridCoverage2D("ArcGrid",//TODO SET THE NAME!!!
+                                       image,
+                                       coordinateSystem,
+                                       envelope,
+                                       new SampleDimensionGT[] {band},
+                                       null,
+                                          null);//TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
             //////////////////////////////////////////////////////////////////////////////////////////////////
             //
             //TODO this is not finishedit is just a temporary hack
