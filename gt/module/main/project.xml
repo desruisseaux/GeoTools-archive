@@ -240,7 +240,6 @@
       <excludes>
         <exclude>**/*CodeList*</exclude>
         <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
-        <exclude>**/org/geotools/gml/GmlTest.java</exclude>
       </excludes>     
       <resources>
         <resource>
