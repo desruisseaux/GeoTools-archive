@@ -807,10 +807,11 @@ public class WFSDataStore extends AbstractDataStore{
 						stack.push(f);
 					}else{
 					if(filter.getFilterType() == Filter.LOGIC_OR){
-						Filter f = (Filter)stack.pop();
+//						Filter f = (Filter)stack.pop();
 						while(stack.size()>i)
-							f.or((Filter)stack.pop());
-						stack.push(f);
+//							f.or((Filter)stack.pop());
+							stack.pop(); // or... we can't do the same as and
+						stack.push(filter);
 					}else{
 						// error?
 						logger.warning("LogicFilter found which is not 'and, or, not");
