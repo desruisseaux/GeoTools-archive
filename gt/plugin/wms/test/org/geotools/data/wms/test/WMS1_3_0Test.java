@@ -6,9 +6,7 @@
  */
 package org.geotools.data.wms.test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
@@ -26,7 +24,6 @@ import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -177,7 +174,7 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
         request.setQueryLayers(request.getQueryableLayers());
         request.setQueryPoint(200, 200);
-        request.setInfoFormat("text/plain");
+        request.setInfoFormat("text/swf");
         
         System.out.println(request.getFinalURL());
 
