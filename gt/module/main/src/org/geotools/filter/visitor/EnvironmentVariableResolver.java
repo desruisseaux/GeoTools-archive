@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.MapScaleDenominator;
 
 import org.geotools.filter.parser.ParseException;
@@ -30,13 +31,11 @@ import org.geotools.filter.parser.ParseException;
  *
  * @author James Macgill, Penn State
  */
-public class EnvironmentVariableResolver extends AbstractFilterVisitor implements org.geotools.filter.FilterVisitor {
-    
-    
-    
+public class EnvironmentVariableResolver {
+ 
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
-    
+    private boolean found = false;
     
     /**
      * Empty constructor
@@ -45,7 +44,7 @@ public class EnvironmentVariableResolver extends AbstractFilterVisitor implement
     }
     
     /**
-     * Find all instances of MapScaleDenominator and replace them with 
+     * Find all instances of MapScaleDenominator and replace them with
      * the a literal expression for the provided map scale.
      * The passed in filter is NOT modifed by calls to this method.
      * @param filter The Filter to check for MapScaleDenominator Environment Variables
@@ -57,10 +56,9 @@ public class EnvironmentVariableResolver extends AbstractFilterVisitor implement
         Filter output = (Filter)ExpressionBuilder.parse(input);
         return output;
     }
-    
-    
+      
     /**
-     * Find all instances of MapScaleDenominator and replace them with 
+     * Find all instances of MapScaleDenominator and replace them with
      * the a literal expression for the provided map scale.
      * The passed in filter is NOT modifed by calls to this method.
      * @param exp The Expression to check for MapScaleDenominator Environment Variables
@@ -78,17 +76,15 @@ public class EnvironmentVariableResolver extends AbstractFilterVisitor implement
      * @todo: supply implementation, currently always returns true!
      */
     public boolean needsResolving(Filter f){
-        return true;
-    }
-    
-    
-    /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
-     */
-    public void visit(Expression expression) {
-        if(expression instanceof MapScaleDenominator){
-            System.err.println("FOUND ONE");
-        }
+        final java.util.List parts = new java.util.ArrayList();
+        new AbstractFilterVisitor(){
+            public void visit(Expression expression) {
+                if(expression instanceof MapScaleDenominator){
+                    parts.add(expression);
+                }
+            }
+        }.visit(f);
+        return parts.size() > 0;
     }
     
 }
