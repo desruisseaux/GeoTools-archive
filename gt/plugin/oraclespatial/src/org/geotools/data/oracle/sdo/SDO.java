@@ -2513,17 +2513,17 @@ public final class SDO {
 
         ensure( "ELEM_INFO STARTING_OFFSET {1} must be in the range {0}..{1} of COORDINATES",
                 1,STARTING_OFFSET, ordinateSize( coords, GTYPE ) );        
-//        if( !(1 <= STARTING_OFFSET && STARTING_OFFSET <= ordinateSize( coords, GTYPE ))){
-//            throw new IllegalArgumentException(
-//                    "ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+
-//                    "inconsistent with COORDINATES length "+ordinateSize( coords, GTYPE ) );
-//        } 
+        if( !(1 <= STARTING_OFFSET && STARTING_OFFSET <= ordinateSize( coords, GTYPE ))){
+            throw new IllegalArgumentException(
+                    "ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+
+                    "inconsistent with COORDINATES length "+ordinateSize( coords, GTYPE ) );
+        } 
         ensure( "ETYPE {0} must be expected POLYGON or POLYGON_EXTERIOR (one of {1})",
                 eTYPE, new int[]{ ETYPE.POLYGON, ETYPE.POLYGON_EXTERIOR } );
-//		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR)){
-//			throw new IllegalArgumentException(
-//			        "ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
-//		}        
+		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR)){
+			throw new IllegalArgumentException(
+			        "ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
+		}        
 		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
 		    LOGGER.warning( "Could not create JTS Polygon with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges, and 2 for rectangle");
 			return null;
@@ -2605,8 +2605,9 @@ HOLES:
         final int STARTING_OFFSET = STARTING_OFFSET(elemInfo, triplet);
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
+        final int LENGTH = coords.size()*D(GTYPE);
         
-		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
+		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= LENGTH))
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) &&
 		   !(eTYPE == ETYPE.POLYGON_EXTERIOR) && !(eTYPE == ETYPE.POLYGON_INTERIOR)){
@@ -2742,8 +2743,9 @@ HOLES:
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		// assert replacement code
-		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
+        final int LENGTH = coords.size()*D(GTYPE);
+        
+		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= LENGTH))
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.LINE))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected LINE");
@@ -2813,9 +2815,9 @@ LINES: 		// bad bad gotos jody
         final int STARTING_OFFSET = STARTING_OFFSET(elemInfo, triplet);
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
-
-		// assert replacement code
-		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
+        final int LENGTH = coords.size()*D(GTYPE);
+        
+		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= LENGTH))
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
@@ -2894,7 +2896,9 @@ POLYGONS:
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
+        final int LENGTH = coords.size()*D(GTYPE);
+        
+		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= LENGTH))
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
