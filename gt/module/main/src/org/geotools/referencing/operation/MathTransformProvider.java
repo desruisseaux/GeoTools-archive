@@ -38,6 +38,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -226,9 +227,12 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @throws InvalidParameterNameException if a parameter name is unknow.
      * @throws InvalidParameterValueException if a parameter has an invalid value.
      * @throws ParameterNotFoundException if a required parameter was not found.
+     * @throws FactoryException if the math transform can't be created for some other reason
+     *         (for example a required file was not found).
      */
     public MathTransform createMathTransform(final GeneralParameterValue[] values)
-            throws InvalidParameterNameException, InvalidParameterValueException, ParameterNotFoundException
+            throws InvalidParameterNameException, InvalidParameterValueException,
+                   ParameterNotFoundException, FactoryException
     {
         ensureValidValues(values);
         if (values.length == 1) {
@@ -248,9 +252,12 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @param  values The group of parameter values.
      * @return The created math transform.
      * @throws ParameterNotFoundException if a required parameter was not found.
+     * @throws FactoryException if the math transform can't be created for some other reason
+     *         (for example a required file was not found). Checked exceptions like
+     *         {@link java.io.IOException} should be wrapped in this exception.
      */
     protected abstract MathTransform createMathTransform(ParameterValueGroup values)
-            throws ParameterNotFoundException;
+            throws ParameterNotFoundException, FactoryException;
 
     /**
      * Returns the parameter value for the specified operation parameter.
