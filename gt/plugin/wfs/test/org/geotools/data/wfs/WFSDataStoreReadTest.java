@@ -210,6 +210,7 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+        fr.close();
     }if(post){
         // 	post
         System.out.println("Post FeatureReaderWithFilterTest");
@@ -231,5 +232,6 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+        fr.close();
     }}
 }

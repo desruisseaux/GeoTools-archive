@@ -546,9 +546,11 @@ public class WFSDataStore extends AbstractDataStore{
 		
 		List fts = capabilities.getFeatureTypes(); // FeatureSetDescription
 		Iterator i = fts.iterator();
+		String queryName = query.getTypeName().substring(query.getTypeName().indexOf(":")+1);
 		while(i.hasNext()){
 			FeatureSetDescription fsd = (FeatureSetDescription)i.next();
-			if(query.getTypeName().equals(fsd.getName())){
+			String fsdName = fsd.getName()==null?null:fsd.getName().substring(fsd.getName().indexOf(":")+1);
+			if(queryName.equals(fsdName)){
 				return fsd.getLatLongBoundingBox();
 			}
 		}
@@ -561,6 +563,8 @@ public class WFSDataStore extends AbstractDataStore{
     protected Filter getUnsupportedFilter(String typeName, Filter filter) {
     	if(typeName == null)
     		return filter;
+    	if(Filter.NONE == filter)
+    		return Filter.NONE;
 		FeatureType ft;
 		try {
 			ft = getSchema(typeName);
@@ -573,8 +577,16 @@ public class WFSDataStore extends AbstractDataStore{
         List fts = capabilities.getFeatureTypes(); //FeatureSetDescription
         boolean found = false;
         for(int i=0;i<fts.size();i++)
-        	if(fts.get(i)!=null && typeName.equals(((FeatureSetDescription)fts.get(i)).getName()))
-        		found = true;
+        	if(fts.get(i)!=null ){
+        		FeatureSetDescription fsd = (FeatureSetDescription)fts.get(i);
+        		if(typeName.equals(fsd.getName())){
+        			found=true;
+        		}else{
+        		String fsdName = fsd.getName()==null?null:fsd.getName().substring(fsd.getName().indexOf(":")+1);
+        		if(typeName.equals(fsdName))
+        			found = true;
+        		}
+        	}
         if(!found){
         	logger.warning("Could not find typeName: "+typeName);
         	return filter;
@@ -582,7 +594,8 @@ public class WFSDataStore extends AbstractDataStore{
         WFSFilterVisitor wfsfv = new WFSFilterVisitor(capabilities.getFilterCapabilities(),ft);
         filter.accept(wfsfv);
         
-        return wfsfv.getFilter();
+        Filter f = wfsfv.getFilter();
+        return f==null?Filter.NONE:f;
     }
     
     private static class WFSFilterVisitor implements FilterVisitor{
@@ -594,7 +607,7 @@ public class WFSDataStore extends AbstractDataStore{
     		if(stack.size()>1){
     			logger.warning("Too many stack items after run: "+stack.size());
     		}
-    		return (Filter)stack.pop();
+    		return stack.isEmpty()?null:(Filter)stack.pop();
     	}
     	
     	private FilterCapabilities fcs = null;
@@ -606,8 +619,57 @@ public class WFSDataStore extends AbstractDataStore{
 		 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
 		 */
 		public void visit(Filter filter) {
-			stack.push(filter);
-			logger.warning("@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
+			if(Filter.NONE == filter)
+				return;
+			if(!stack.isEmpty()){
+				stack.push(filter);
+				logger.warning("@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
+			}else{
+				switch(filter.getFilterType()){
+				case Filter.BETWEEN:
+					visit((BetweenFilter) filter);
+					break;
+				case Filter.COMPARE_EQUALS:
+				case Filter.COMPARE_GREATER_THAN:
+				case Filter.COMPARE_GREATER_THAN_EQUAL:
+				case Filter.COMPARE_LESS_THAN:
+				case Filter.COMPARE_LESS_THAN_EQUAL:
+				case Filter.COMPARE_NOT_EQUALS:
+					visit((BetweenFilter) filter);
+				break;
+				case Filter.FID:
+					visit((BetweenFilter) filter);
+				break;
+				case Filter.GEOMETRY_BBOX:
+				case Filter.GEOMETRY_BEYOND:
+				case Filter.GEOMETRY_CONTAINS:
+				case Filter.GEOMETRY_CROSSES:
+				case Filter.GEOMETRY_DISJOINT:
+				case Filter.GEOMETRY_DWITHIN:
+				case Filter.GEOMETRY_EQUALS:
+				case Filter.GEOMETRY_INTERSECTS:
+				case Filter.GEOMETRY_OVERLAPS:
+				case Filter.GEOMETRY_TOUCHES:
+				case Filter.GEOMETRY_WITHIN:
+					visit((GeometryFilter) filter);
+				break;
+				case Filter.LIKE:
+					visit((LikeFilter) filter);
+				break;
+				case Filter.LOGIC_AND:
+				case Filter.LOGIC_NOT:
+				case Filter.LOGIC_OR:
+					visit((LogicFilter) filter);
+				break;
+				case Filter.NULL:
+					visit((NullFilter) filter);
+				break;
+				default:
+					stack.push(filter);
+					logger.warning("@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
+					break;
+				}
+			}
 			
 		}
 		/* (non-Javadoc)
@@ -859,7 +921,7 @@ public class WFSDataStore extends AbstractDataStore{
 		 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
 		 */
 		public void visit(Expression expression) {
-				stack.push(expression);
+			stack.push(expression);
 			logger.warning("@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)");
 			
 		}

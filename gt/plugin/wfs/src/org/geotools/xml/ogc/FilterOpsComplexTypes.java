@@ -379,7 +379,7 @@ public class FilterOpsComplexTypes {
         		if(fc.getScalarOps()==0 && fc.getSpatialOps()==0)
         			return false;
         	}
-        	return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Filter;
+        	return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Filter && ((Filter)value).getFilterType()!=0;
         }
         /**
          * Note the assumption is that the comparison of this filter with the WFS capabilities document has already been processed
@@ -387,14 +387,16 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-        	if(!(value instanceof Filter))
+        	if(!canEncode(element,value,hints))
         		return;
             // we may only encode one type of filter ...
         	Filter filter = (Filter)value;
         	if(filter == null)return;
         	if(filter == Filter.NONE)return;
+        	
         	if(element != null)
         	output.startElement(element.getNamespace(),element.getName(),null);
+        	
         	if(filter instanceof LogicFilter){
         		elems[2].getType().encode(elems[2],filter,output,hints);
     		}else{
@@ -413,9 +415,10 @@ public class FilterOpsComplexTypes {
         	}else{
         	if(filter instanceof NullFilter){
     			elems[1].getType().encode(elems[1],filter,output,hints);
-        	}else{
-        		throw new OperationNotSupportedException("The Filter type is not known: please try again. "+filter == null?"null":filter.getClass().getName());
+//        	}else{
+//        		throw new OperationNotSupportedException("The Filter type is not known: please try again. "+filter == null?"null":filter.getClass().getName());
         	}}}}}}
+        	
         	if(element != null)
         	output.endElement(element.getNamespace(),element.getName());
         }

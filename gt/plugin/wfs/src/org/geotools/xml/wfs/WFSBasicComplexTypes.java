@@ -172,7 +172,8 @@ public class WFSBasicComplexTypes {
                     attributes.addAttribute(WFSSchema.NAMESPACE.toString(),elems[3].getName(),null,"integer",""+query.getMaxFeatures());
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);
-                elems[0].getType().encode(elems[0],value,output,hints);
+                if(elems[0].getType().canEncode(elems[0],value,hints))
+                	elems[0].getType().encode(elems[0],value,output,hints);
                 output.endElement(element.getNamespace(),element.getName());
             }else{
                 throw new OperationNotSupportedException("not a valid value/element for a DescribeFeatureTypeType.");
@@ -525,7 +526,7 @@ public class WFSBasicComplexTypes {
                     for(int i=0;i<propNames.length;i++)
                         elems[0].getType().encode(elems[0],propNames[i],output,hints);
                 if(Filter.NONE!=query.getFilter())
-                if(query.getFilter()!=null)
+                if(query.getFilter()!=null && elems[1].getType().canEncode(elems[1],query.getFilter(),hints))
                     elems[1].getType().encode(elems[1],query.getFilter(),output,hints);
                 
                 output.endElement(element.getNamespace(),element.getName());
