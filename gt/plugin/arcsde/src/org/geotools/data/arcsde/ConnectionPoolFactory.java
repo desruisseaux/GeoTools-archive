@@ -30,7 +30,7 @@ import org.geotools.data.DataSourceException;
  * @author Gabriel Rold?n
  * @version $Id: ConnectionPoolFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
-public class ConnectionPoolFactory {
+class ConnectionPoolFactory {
     /** DOCUMENT ME! */
     private static Logger LOGGER = Logger.getLogger(ConnectionPoolFactory.class.getPackage()
                                                                                .getName());

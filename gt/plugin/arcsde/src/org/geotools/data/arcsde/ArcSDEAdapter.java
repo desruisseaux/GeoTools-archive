@@ -57,10 +57,10 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * from geotool's Query's, mapping SDE types to Java ones and JTS Geometries,
  * etc.
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: ArcSDEAdapter.java,v 1.4 2004/06/22 20:13:15 jfear Exp $
  */
-public class ArcSDEAdapter {
+class ArcSDEAdapter {
     /** Logger for ths class' package */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEAdapter.class.getPackage()
                                                                              .getName());
@@ -504,160 +504,167 @@ public class ArcSDEAdapter {
 
         return queryColumns;
     }
-}
-
-
-/**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.4 $
- */
-class SdeTypeDef {
-    /** DOCUMENT ME! */
-    final int colDefType;
-
-    /** DOCUMENT ME! */
-    final int size;
-
-    /** DOCUMENT ME! */
-    final int scale;
 
     /**
-     * Creates a new SdeTypeDef object.
+     * DOCUMENT ME!
      *
-     * @param colDefType DOCUMENT ME!
-     * @param size DOCUMENT ME!
-     * @param scale DOCUMENT ME!
+     * @author $author$
+     * @version $Revision: 1.4 $
      */
-    public SdeTypeDef(int colDefType, int size, int scale) {
-        this.colDefType = colDefType;
-        this.size = size;
-        this.scale = scale;
-    }
-}
+    public static class SdeTypeDef {
+        /** DOCUMENT ME! */
+        final int colDefType;
 
+        /** DOCUMENT ME! */
+        final int size;
 
-/**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.9 $
- */
-class FilterSet {
-    private Filter sourceFilter;
-    private Filter sqlFilter;
-    private Filter geometryFilter;
-    private Filter unsupportedFilter;
+        /** DOCUMENT ME! */
+        final int scale;
 
-    /** DOCUMENT ME!  */
-    SQLEncoderSDE sqlEncoder;
-
-    /** DOCUMENT ME!  */
-    GeometryEncoderSDE geometryEncoder;
-
-    /**
-     * Creates a new FilterSet object.
-     *
-     * @param sdeLayer DOCUMENT ME!
-     * @param sourceFilter DOCUMENT ME!
-     */
-    public FilterSet(SeLayer sdeLayer, Filter sourceFilter) {
-        sqlEncoder = new SQLEncoderSDE(sdeLayer);
-        geometryEncoder = new GeometryEncoderSDE(sdeLayer);
-        setFilter(sourceFilter);
+        /**
+         * Creates a new SdeTypeDef object.
+         *
+         * @param colDefType DOCUMENT ME!
+         * @param size DOCUMENT ME!
+         * @param scale DOCUMENT ME!
+         */
+        public SdeTypeDef(int colDefType, int size, int scale) {
+            this.colDefType = colDefType;
+            this.size = size;
+            this.scale = scale;
+        }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param sourceFilter DOCUMENT ME!
+     * @author $author$
+     * @version $Revision: 1.9 $
      */
-    public void setFilter(Filter sourceFilter) {
-        this.sourceFilter = sourceFilter;
-        createFilters();
-    }
+    public static class FilterSet {
+        /** DOCUMENT ME!  */
+        private Filter sourceFilter;
 
-    /**
-     * DOCUMENT ME!
-     */
-    private void createFilters() {
-        SQLUnpacker unpacker = new SQLUnpacker(sqlEncoder.getCapabilities());
-        unpacker.unPackAND(sourceFilter);
+        /** DOCUMENT ME!  */
+        private Filter sqlFilter;
 
-        this.sqlFilter = unpacker.getSupported();
+        /** DOCUMENT ME!  */
+        private Filter geometryFilter;
 
-        Filter remainingFilter = unpacker.getUnSupported();
+        /** DOCUMENT ME!  */
+        private Filter unsupportedFilter;
 
-        unpacker = new SQLUnpacker(GeometryEncoderSDE.getCapabilities());
-        unpacker.unPackAND(remainingFilter);
+        /** DOCUMENT ME! */
+        SQLEncoderSDE sqlEncoder;
 
-        this.geometryFilter = unpacker.getSupported();
-        this.unsupportedFilter = unpacker.getUnSupported();
-    }
+        /** DOCUMENT ME! */
+        GeometryEncoderSDE geometryEncoder;
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DataSourceException DOCUMENT ME!
-     */
-    public String createSqlWhereClause() throws DataSourceException {
-        String where = null;
-        Filter sqlFilter = getSqlFilter();
-
-        if (sqlFilter != Filter.NONE) {
-            try {
-                where = sqlEncoder.encode(sqlFilter);
-            } catch (SQLEncoderException sqle) {
-                String message = "Geometry encoder error: " + sqle.getMessage();
-                throw new DataSourceException(message, sqle);
-            }
+        /**
+         * Creates a new FilterSet object.
+         *
+         * @param sdeLayer DOCUMENT ME!
+         * @param sourceFilter DOCUMENT ME!
+         */
+        public FilterSet(SeLayer sdeLayer, Filter sourceFilter) {
+            sqlEncoder = new SQLEncoderSDE(sdeLayer);
+            geometryEncoder = new GeometryEncoderSDE(sdeLayer);
+            setFilter(sourceFilter);
         }
 
-        return where;
-    }
+        /**
+         * DOCUMENT ME!
+         *
+         * @param sourceFilter DOCUMENT ME!
+         */
+        public void setFilter(Filter sourceFilter) {
+            this.sourceFilter = sourceFilter;
+            createFilters();
+        }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws GeometryEncoderException DOCUMENT ME!
-     */
-    public SeFilter[] createSpatialFilters() throws GeometryEncoderException {
-        geometryEncoder.encode(geometryFilter);
+        /**
+         * DOCUMENT ME!
+         */
+        private void createFilters() {
+            SQLUnpacker unpacker = new SQLUnpacker(sqlEncoder.getCapabilities());
+            unpacker.unPackAND(sourceFilter);
 
-        SeFilter[] sdeSpatialFilters = geometryEncoder.getSpatialFilters();
+            this.sqlFilter = unpacker.getSupported();
 
-        return sdeSpatialFilters;
-    }
+            Filter remainingFilter = unpacker.getUnSupported();
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Filter getSqlFilter() {
-        return (sqlFilter == null) ? Filter.NONE : sqlFilter;
-    }
+            unpacker = new SQLUnpacker(GeometryEncoderSDE.getCapabilities());
+            unpacker.unPackAND(remainingFilter);
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Filter getGeometryFilter() {
-        return (geometryFilter == null) ? Filter.NONE : geometryFilter;
-    }
+            this.geometryFilter = unpacker.getSupported();
+            this.unsupportedFilter = unpacker.getUnSupported();
+        }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Filter getUnsupportedFilter() {
-        return (unsupportedFilter == null) ? Filter.NONE : unsupportedFilter;
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         *
+         * @throws DataSourceException DOCUMENT ME!
+         */
+        public String createSqlWhereClause() throws DataSourceException {
+            String where = null;
+            Filter sqlFilter = getSqlFilter();
+
+            if (sqlFilter != Filter.NONE) {
+                try {
+                    where = sqlEncoder.encode(sqlFilter);
+                } catch (SQLEncoderException sqle) {
+                    String message = "Geometry encoder error: "
+                        + sqle.getMessage();
+                    throw new DataSourceException(message, sqle);
+                }
+            }
+
+            return where;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         *
+         * @throws GeometryEncoderException DOCUMENT ME!
+         */
+        public SeFilter[] createSpatialFilters()
+            throws GeometryEncoderException {
+            geometryEncoder.encode(geometryFilter);
+
+            SeFilter[] sdeSpatialFilters = geometryEncoder.getSpatialFilters();
+
+            return sdeSpatialFilters;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public Filter getSqlFilter() {
+            return (sqlFilter == null) ? Filter.NONE : sqlFilter;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public Filter getGeometryFilter() {
+            return (geometryFilter == null) ? Filter.NONE : geometryFilter;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public Filter getUnsupportedFilter() {
+            return (unsupportedFilter == null) ? Filter.NONE : unsupportedFilter;
+        }
     }
 }

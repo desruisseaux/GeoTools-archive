@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jake Fear, jfear@polexis.com
  * @version
  */
-public class ArcSDEFeatureWriter implements FeatureWriter {
+class ArcSDEFeatureWriter implements FeatureWriter {
     private static final Logger LOGGER = Logger.getLogger(ArcSDEFeatureWriter.class.getPackage()
                                                                                    .getName());
     private ArcSDEDataStore dataStore;

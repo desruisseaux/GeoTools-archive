@@ -17,10 +17,7 @@
 package org.geotools.data.arcsde;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.NoSuchElementException;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
@@ -47,6 +44,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFilter;
+import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.xml.sax.helpers.ParserAdapter;
@@ -58,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * SdeDatasource's test cases
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: ArcSDEDataStoreTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDEDataStoreTest extends TestCase {
@@ -66,20 +64,8 @@ public class ArcSDEDataStoreTest extends TestCase {
     private static Logger LOGGER = Logger.getLogger(ArcSDEDataStoreTest.class.getPackage()
                                                                              .getName());
 
-    /** folder used to load test filters */
-    private String dataFolder = "/testData/";
-
-    /** the set of test parameters loaded from /testData/testparams.properties */
-    private Properties conProps = null;
-
-    /** the name of the table holding the point test features */
-    private String point_table;
-
-    /** the name of the table holding the linestring test features */
-    private String line_table;
-
-    /** the name of the table holding the polygon test features */
-    private String polygon_table;
+    /** DOCUMENT ME! */
+    private TestData testData;
 
     /** an ArcSDEDataStore created on setUp() to run tests against */
     private DataStore store;
@@ -101,9 +87,6 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     public ArcSDEDataStoreTest(String name) {
         super(name);
-
-        URL folderUrl = getClass().getResource("/testData");
-        dataFolder = folderUrl.toExternalForm() + "/";
     }
 
     /**
@@ -115,23 +98,8 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        conProps = new Properties();
-
-        String propsFile = "/testData/testparams.properties";
-        InputStream in = getClass().getResourceAsStream(propsFile);
-
-        if (in == null) {
-            fail("cannot find test params: " + propsFile);
-        }
-
-        conProps.load(in);
-        point_table = conProps.getProperty("point_table");
-        line_table = conProps.getProperty("line_table");
-        polygon_table = conProps.getProperty("polygon_table");
-        assertNotNull("point_table not defined in " + propsFile, point_table);
-        assertNotNull("line_table not defined in " + propsFile, line_table);
-        assertNotNull("polygon_table not defined in " + propsFile, polygon_table);
-        store = getDataStore();
+        this.testData = new TestData();
+        this.store = testData.getDataStore();
     }
 
     /**
@@ -140,52 +108,46 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
-        conProps = null;
+        testData = null;
         super.tearDown();
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testFinder() {
+    public void testFinder() throws IOException {
         DataStore sdeDs = null;
 
-        try {
-            sdeDs = DataStoreFinder.getDataStore(conProps);
+        sdeDs = DataStoreFinder.getDataStore(testData.getConProps());
 
-            String failMsg = sdeDs + " is not an ArcSDEDataStore";
-            assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
-            LOGGER.info("testFinder OK :" + sdeDs.getClass().getName());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail("can't find the SdeDataSource:" + ex.getMessage());
-        }
+        String failMsg = sdeDs + " is not an ArcSDEDataStore";
+        assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
+        LOGGER.info("testFinder OK :" + sdeDs.getClass().getName());
     }
 
     /**
      * tests that a connection to a live ArcSDE database can be established
      * with the parameters defined int testparams.properties, and a
      * ArcSDEConnectionPool can be properly setted up
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testConnect() {
+    public void testConnect() throws IOException {
         LOGGER.info("testing connection to the sde database");
 
         ConnectionPoolFactory pf = ConnectionPoolFactory.getInstance();
         ConnectionConfig congfig = null;
 
-        try {
-            congfig = new ConnectionConfig(conProps);
-        } catch (Exception ex) {
-            pf.clear(); //close and remove all pools
-            fail(ex.getMessage());
-        }
+        congfig = new ConnectionConfig(testData.getConProps());
 
         try {
             ArcSDEConnectionPool pool = pf.getPoolFor(congfig);
             LOGGER.info("connection succeed " + pool.getPoolSize()
                 + " connections ready");
         } catch (DataSourceException ex) {
-            fail(ex.getMessage());
+            throw ex;
         } finally {
             pf.clear(); //close and remove all pools
         }
@@ -203,32 +165,29 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void testGetTypeNames() throws IOException {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
-        testTypeExists(featureTypes, point_table);
-        testTypeExists(featureTypes, line_table);
-        testTypeExists(featureTypes, polygon_table);
+        testTypeExists(featureTypes, testData.getPoint_table());
+        testTypeExists(featureTypes, testData.getLine_table());
+        testTypeExists(featureTypes, testData.getPolygon_table());
     }
 
     /**
      * tests that the schema for the defined tests tables are returned.
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testGetSchema() {
+    public void testGetSchema() throws IOException {
         FeatureType schema;
 
-        try {
-            schema = store.getSchema(point_table);
-            assertNotNull(schema);
-            assertTrue(schema.getAttributeCount() > 0);
-            schema = store.getSchema(line_table);
-            assertNotNull(schema);
-            assertTrue(schema.getAttributeCount() > 0);
-            schema = store.getSchema(polygon_table);
-            assertNotNull(schema);
-            assertTrue(schema.getAttributeCount() > 0);
-            LOGGER.info("testGetSchema OK: " + schema);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+        schema = store.getSchema(testData.getPoint_table());
+        assertNotNull(schema);
+        assertTrue(schema.getAttributeCount() > 0);
+        schema = store.getSchema(testData.getLine_table());
+        assertNotNull(schema);
+        assertTrue(schema.getAttributeCount() > 0);
+        schema = store.getSchema(testData.getPolygon_table());
+        assertNotNull(schema);
+        assertTrue(schema.getAttributeCount() > 0);
+        LOGGER.info("testGetSchema OK: " + schema);
     }
 
     /**
@@ -244,67 +203,70 @@ public class ArcSDEDataStoreTest extends TestCase {
      * SeConnection, an exception is thrown by de Java ArcSDE API saying that
      * a "NETWORK I/O OPERATION FAILED"
      * </p>
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws IllegalAttributeException DOCUMENT ME!
      */
-    public void testGetFeatureReader() {
-        try {
-            final int num_readers = 24;
-            String[] typeNames = { point_table, line_table, polygon_table };
-            FeatureReader[] readers = new FeatureReader[num_readers];
-            int[] counts = new int[num_readers];
+    public void testGetFeatureReader()
+        throws IOException, IllegalAttributeException {
+        final int NUM_READERS = Integer.parseInt(testData.getConProps().getProperty("pool.maxConnections"));
+        String[] typeNames = {
+                testData.getPoint_table(), testData.getLine_table(),
+                testData.getPolygon_table()
+            };
+        FeatureReader[] readers = new FeatureReader[NUM_READERS];
+        int[] counts = new int[NUM_READERS];
 
-            for (int i = 0; i < num_readers;) {
-                for (int j = 0; j < typeNames.length; j++, i++) {
-                    readers[i] = getReader(typeNames[j]);
-                }
+        for (int i = 0; i < NUM_READERS;) {
+            for (int j = 0; (j < typeNames.length) && (i < NUM_READERS);
+                    j++, i++) {
+                readers[i] = getReader(typeNames[j]);
             }
+        }
 
-            Feature f;
-            Geometry geom;
-            int count1 = 0;
-            int count2 = 0;
-            int count3 = 0;
-            long t = System.currentTimeMillis();
-            boolean hasNext = false;
+        Feature f;
+        Geometry geom;
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        long t = System.currentTimeMillis();
+        boolean hasNext = false;
 
-            while (true) {
-                for (int i = 0; i < num_readers; i++) {
-                    if (readers[i].hasNext()) {
-                        hasNext = true;
-
-                        break;
-                    }
-
-                    hasNext = false;
-                }
-
-                if (!hasNext) {
-                    for (int i = 0; i < num_readers; i++)
-                        readers[i].close();
+        while (true) {
+            for (int i = 0; i < NUM_READERS; i++) {
+                if (readers[i].hasNext()) {
+                    hasNext = true;
 
                     break;
                 }
 
-                for (int i = 0; i < num_readers; i++) {
-                    if (testNext(readers[i])) {
-                        ++counts[i];
-                    }
-                }
+                hasNext = false;
             }
 
-            t = System.currentTimeMillis() - t;
+            if (!hasNext) {
+                for (int i = 0; i < NUM_READERS; i++)
+                    readers[i].close();
 
-            String scounts = "";
+                break;
+            }
 
-            for (int i = 0; i < num_readers; i++)
-                scounts += (counts[i] + ", ");
-
-            LOGGER.info("testGetFeatureReader: traversed " + scounts
-                + " features simultaneously from " + num_readers
-                + " different FeatureReaders in " + t + "ms");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
+            for (int i = 0; i < NUM_READERS; i++) {
+                if (testNext(readers[i])) {
+                    ++counts[i];
+                }
+            }
         }
+
+        t = System.currentTimeMillis() - t;
+
+        String scounts = "";
+
+        for (int i = 0; i < NUM_READERS; i++)
+            scounts += (counts[i] + ", ");
+
+        LOGGER.info("testGetFeatureReader: traversed " + scounts
+            + " features simultaneously from " + NUM_READERS
+            + " different FeatureReaders in " + t + "ms");
     }
 
     /**
@@ -314,9 +276,11 @@ public class ArcSDEDataStoreTest extends TestCase {
      *
      * @return DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws IllegalAttributeException DOCUMENT ME!
      */
-    private boolean testNext(FeatureReader r) throws Exception {
+    private boolean testNext(FeatureReader r)
+        throws IOException, IllegalAttributeException {
         if (r.hasNext()) {
             Feature f = r.next();
             assertNotNull(f);
@@ -353,39 +317,116 @@ public class ArcSDEDataStoreTest extends TestCase {
     }
 
     /**
+     * tests the datastore behavior when fetching data based on mixed queries.
+     * 
+     * <p>
+     * "Mixed queries" refers to mixing alphanumeric and geometry based
+     * filters, since that is the natural separation of things in the Esri
+     * Java API for ArcSDE. This is necessary since mixed queries sometimes
+     * are problematic. So this test ensures that:
+     * 
+     * <ul>
+     * <li>
+     * A mixed query respects all filters
+     * </li>
+     * <li>
+     * A mixed query does not fails when getBounds() is performed
+     * </li>
+     * <li>
+     * A mixed query does not fails when getCount() is performed
+     * </li>
+     * </ul>
+     * </p>
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public void testMixedQueries() throws Exception {
+        final int EXPECTED_RESULT_COUNT = 3;
+        FeatureSource fs = store.getFeatureSource(testData.getPolygon_table());
+        Filter bboxFilter = getBBoxfilter(fs);
+        String sqlFilterUri = getFilterUri("filters.sql.polygons.filter");
+        Filter sqlFilter = parseDocument(sqlFilterUri);
+        LOGGER.info("Geometry filter: " + bboxFilter);
+        LOGGER.info("SQL filter: " + sqlFilter);
+
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter,
+                AbstractFilter.LOGIC_AND);
+        mixedFilter.addFilter(bboxFilter);
+        LOGGER.info("Mixed filter: " + mixedFilter);
+
+        //verify both filter constraints are met
+        testFilter(mixedFilter, fs, EXPECTED_RESULT_COUNT);
+
+        //check that getBounds and getCount do function
+        FeatureResults results = fs.getFeatures(mixedFilter);
+        Envelope bounds = results.getBounds();
+        assertNotNull(bounds);
+        LOGGER.info("results bounds: " + bounds);
+
+        FeatureReader reader = results.reader();
+
+        /*verify that then features are already being fetched, getBounds and
+         * getCount still work
+         */
+        reader.next();
+        bounds = results.getBounds();
+        assertNotNull(bounds);
+        LOGGER.info("results bounds when reading: " + bounds);
+
+        int count = results.getCount();
+        assertEquals(EXPECTED_RESULT_COUNT, count);
+        LOGGER.info("wooohoooo...");
+        reader.close();
+    }
+
+    /**
+     * Test that FID filters are correctly handled
+     *
+     * @throws UnsupportedOperationException DOCUMENT ME!
+     */
+    /*
+    public void testFidFilters() {
+        throw new UnsupportedOperationException("Don't forget to implement");
+    }
+    */
+
+    /**
+     * Test that all supported geometry filters are working properly
+     *
+     * @throws UnsupportedOperationException DOCUMENT ME!
+     */
+    /*
+    public void testGeometryFilters() {
+        throw new UnsupportedOperationException("Don't forget to implement");
+    }
+    */
+
+    /**
      * test that getFeatureSource over the point_table table works
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testGetFeatureSourcePoint() {
-        try {
-            testGetFeatureSource(store.getFeatureSource(point_table));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+    public void testGetFeatureSourcePoint() throws IOException {
+        testGetFeatureSource(store.getFeatureSource(testData.getPoint_table()));
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testGetFeatureSourceLine() {
-        try {
-            testGetFeatureSource(store.getFeatureSource(line_table));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+    public void testGetFeatureSourceLine() throws IOException {
+        testGetFeatureSource(store.getFeatureSource(testData.getLine_table()));
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void testGetFeatureSourcePoly() {
-        try {
-            testGetFeatureSource(store.getFeatureSource(polygon_table));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+    public void testGetFeatureSourcePoly() throws IOException {
+        testGetFeatureSource(store.getFeatureSource(testData.getPolygon_table()));
     }
 
     /**
@@ -394,7 +435,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     public void testGetFeaturesPoint() throws IOException {
-        testGetFeatures("points", point_table);
+        testGetFeatures("points", testData.getPoint_table());
     }
 
     /**
@@ -403,7 +444,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     public void testGetFeaturesLine() throws IOException {
-        testGetFeatures("lines", line_table);
+        testGetFeatures("lines", testData.getLine_table());
     }
 
     /**
@@ -412,34 +453,40 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     public void testGetFeaturesPolygon() throws IOException {
-        testGetFeatures("polygons", polygon_table);
+        testGetFeatures("polygons", testData.getPolygon_table());
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testSQLFilterPoints() {
+    public void testSQLFilterPoints() throws Exception {
         String uri = getFilterUri("filters.sql.points.filter");
         int expected = getExpectedCount("filters.sql.points.expectedCount");
-        testFilter(uri, point_table, expected);
+        testFilter(uri, testData.getPoint_table(), expected);
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testSQLFilterLines() {
+    public void testSQLFilterLines() throws Exception {
         String uri = getFilterUri("filters.sql.lines.filter");
         int expected = getExpectedCount("filters.sql.lines.expectedCount");
-        testFilter(uri, line_table, expected);
+        testFilter(uri, testData.getLine_table(), expected);
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testSQLFilterPolygons() {
+    public void testSQLFilterPolygons() throws Exception {
         String uri = getFilterUri("filters.sql.polygons.filter");
         int expected = getExpectedCount("filters.sql.polygons.expectedCount");
-        testFilter(uri, polygon_table, expected);
+        testFilter(uri, testData.getPolygon_table(), expected);
     }
 
     /**
@@ -449,7 +496,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         //String uri = getFilterUri("filters.bbox.points.filter");
         //int expected = getExpectedCount("filters.bbox.points.expectedCount");
         int expected = 6;
-        testBBox(point_table, expected);
+        testBBox(testData.getPoint_table(), expected);
     }
 
     /**
@@ -459,7 +506,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         //String uri = getFilterUri("filters.bbox.lines.filter");
         //int expected = getExpectedCount("filters.bbox.lines.expectedCount");
         int expected = 22;
-        testBBox(line_table, expected);
+        testBBox(testData.getLine_table(), expected);
     }
 
     /**
@@ -469,7 +516,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         //String uri = getFilterUri("filters.bbox.polygons.filter");
         //int expected = getExpectedCount("filters.bbox.polygons.expectedCount");
         int expected = 8;
-        testBBox(polygon_table, expected);
+        testBBox(testData.getPolygon_table(), expected);
     }
 
     /**
@@ -566,38 +613,16 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @return DOCUMENT ME!
      */
     private String getFilterUri(String filterKey) {
-        String filterFileName = conProps.getProperty(filterKey);
+        String filterFileName = testData.getConProps().getProperty(filterKey);
 
         if (filterFileName == null) {
             super.fail(filterKey
                 + " param not found in tests configurarion properties file");
         }
 
-        String uri = dataFolder + filterFileName;
+        String uri = testData.getDataFolder() + filterFileName;
 
         return uri;
-    }
-
-    /**
-     * creates an ArcSDEDataStore using /testData/testparams.properties as
-     * holder of datastore parameters
-     *
-     * @return DOCUMENT ME!
-     */
-    private ArcSDEDataStore getDataStore() {
-        try {
-            ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
-            ConnectionConfig config = new ConnectionConfig(conProps);
-            ArcSDEConnectionPool pool = pfac.getPoolFor(config);
-            ArcSDEDataStore ds = new ArcSDEDataStore(pool);
-
-            return ds;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail("cannot obtain datastore: " + ex.getMessage());
-        }
-
-        return null;
     }
 
     /**
@@ -609,7 +634,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private int getExpectedCount(String key) {
         try {
-            return Integer.parseInt(conProps.getProperty(key));
+            return Integer.parseInt(testData.getConProps().getProperty(key));
         } catch (NumberFormatException ex) {
             super.fail(key
                 + " parameter not found or not an integer in testParams.properties");
@@ -624,16 +649,14 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @param filterUri DOCUMENT ME!
      * @param table DOCUMENT ME!
      * @param expected DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    private void testFilter(String filterUri, String table, int expected) {
-        try {
-            Filter filter = parseDocument(filterUri);
-            FeatureSource fsource = store.getFeatureSource(table);
-            testFilter(filter, fsource, expected);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+    private void testFilter(String filterUri, String table, int expected)
+        throws Exception {
+        Filter filter = parseDocument(filterUri);
+        FeatureSource fsource = store.getFeatureSource(table);
+        testFilter(filter, fsource, expected);
     }
 
     /**

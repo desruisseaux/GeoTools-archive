@@ -59,23 +59,23 @@ import com.vividsolutions.jts.geom.Envelope;
  * Transaction and Locking Support. These implementations will not be optimal
  * but they will work.
  * </p>
- * 
- * <p>
- * Pleae note that there may be a better place for you to start out from, (like
- * JDBCDataStore).
- * </p>
  *
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEDataStore.java,v 1.8 2004/06/28 10:24:32 jfear Exp $
  */
-public class ArcSDEDataStore extends AbstractDataStore {
+class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getPackage()
                                                                                .getName());
+
+    /** DOCUMENT ME! */
     private ArcSDEConnectionPool connectionPool;
 
     /** <code>Map&lt;typeName/FeatureType&gt;</code> of feature type schemas */
     private Map schemasCache = new HashMap();
+
+    /** A mutex for synchronizing */
+    private Object mutex = new Object();
 
     /**
      * Creates a new ArcSDEDataStore object.
@@ -247,8 +247,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 sdeQuery.close();
             }
 
-            throw new DataSourceException("Problem with feature reader: " +
-                                          t.getMessage(), t);
+            throw new DataSourceException("Problem with feature reader: "
+                + t.getMessage(), t);
         }
 
         return reader;
@@ -282,8 +282,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
      */
     protected Filter getUnsupportedFilter(String typeName, Filter filter) {
         try {
-            FilterSet filters = ArcSDEAdapter.computeFilters(this, typeName,
-                    filter);
+            ArcSDEAdapter.FilterSet filters = ArcSDEAdapter.computeFilters(this,
+                    typeName, filter);
 
             Filter result = filters.getUnsupportedFilter();
 
@@ -463,14 +463,21 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @throws IOException if there are errors getting the count
      */
     protected int getCount(Query query) throws IOException {
+        LOGGER.info("getCount");
+
         ArcSDEQuery sdeQuery = null;
 
         try {
             sdeQuery = ArcSDEAdapter.createSeQuery(this, query);
+            sdeQuery.prepareQuery();
 
-            return sdeQuery.calculateResultCount();
-        } catch (DataSourceException ex) {
-            throw ex;
+            int count = sdeQuery.calculateResultCount();
+            LOGGER.info("count: " + count);
+
+            return count;
+        } catch (Exception ex) {
+            LOGGER.info("Error calculating count");
+            throw new IOException();
         } finally {
             if (sdeQuery != null) {
                 sdeQuery.close();
@@ -493,17 +500,31 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @return the bounds, or null if too expensive
      *
      * @throws IOException
+     * @throws DataSourceException DOCUMENT ME!
      */
     protected Envelope getBounds(Query query) throws IOException {
+        LOGGER.info("getBounds");
+
         ArcSDEQuery sdeQuery = null;
 
         try {
             sdeQuery = ArcSDEAdapter.createSeQuery(this, query);
+            sdeQuery.prepareQuery();
 
-            return sdeQuery.calculateQueryExtent();
-        } catch (DataSourceException ex) {
-            throw ex;
+            Envelope ev = sdeQuery.calculateQueryExtent();
+            LOGGER.info("bounds: " + ev);
+
+            return ev;
+        } catch (Exception ex) {
+            if (ex instanceof IOException) {
+                throw (IOException) ex;
+            } else {
+                throw new DataSourceException("unable to get bounds: "
+                    + ex.getMessage(), ex);
+            }
         } finally {
+            LOGGER.info("closing query for bounds");
+
             if (sdeQuery != null) {
                 sdeQuery.close();
             }

@@ -16,20 +16,19 @@
  */
 package org.geotools.data.arcsde;
 
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeTable;
+import org.geotools.data.DataSourceException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
-
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeTable;
 
 
 /**
@@ -79,7 +78,7 @@ import com.esri.sde.sdk.client.SeTable;
  * </ul>
  * </p>
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: ArcSDEConnectionPool.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEConnectionPool {
@@ -132,6 +131,13 @@ public class ArcSDEConnectionPool {
      */
     private boolean closed = false;
 
+    //    START ADDED BY BROCK
+
+    /** DOCUMENT ME!  */
+    private HashMap cachedLayers;
+
+    //    END ADDED BY BROCK
+
     /**
      * Creates a new SdeConnectionPool object with the connection parameters
      * holded by <code>config</code>
@@ -149,6 +155,10 @@ public class ArcSDEConnectionPool {
             throw new NullPointerException("parameter config can't be null");
         }
 
+        //      START ADDED BY BROCK
+        cachedLayers = new HashMap();
+
+        //      END ADDED BY BROCK        
         this.config = config;
         LOGGER.fine("populating ArcSDE connection pool");
 
@@ -200,47 +210,58 @@ public class ArcSDEConnectionPool {
     }
 
     /**
-     * This method does not just release a connection, it 'recycles' it, 
-     * to make a completely new connection.  This is due to a nasty problem
-     * with <i>some</i> arcsde instances on <i>some</i> datastores, only when
-     * spatial constraints are used.  They seem to poison the connection.
-     * So this is a half decent work around, which probably slows things a bit,
+     * This method does not just release a connection, it 'recycles' it,  to
+     * make a completely new connection.  This is due to a nasty problem with
+     * <i>some</i> arcsde instances on <i>some</i> datastores, only when
+     * spatial constraints are used.  They seem to poison the connection. So
+     * this is a half decent work around, which probably slows things a bit,
      * but also makes it work.
+     *
+     * @param seConnection DOCUMENT ME!
+     *
+     * @throws DataSourceException DOCUMENT ME!
      */
     public void recycle(SeConnection seConnection) throws DataSourceException {
-	if (seConnection == null) {
-	    LOGGER.fine("trying to recycle a null connection");
-	    return;
+        if (seConnection == null) {
+            LOGGER.fine("trying to recycle a null connection");
+
+            return;
         }
 
         synchronized (mutex) {
-	    LOGGER.finer("trying to recycle seconnection: " + seConnection);
-	    LOGGER.finer("used is: " + usedConnections + "\navailable is " + availableConnections);
-	    //added to force close
-	    try {
-	    seConnection.close();
-	    } catch (SeException sex) {
-		LOGGER.fine("trouble closing seconnection: " + sex.getMessage());
-		sex.printStackTrace();
-	    }
-	    if (usedConnections.contains(seConnection)) {
-		usedConnections.remove(seConnection);
-	    }
-	    if (availableConnections.contains(seConnection)) {
-		LOGGER.fine("trying to recycle an already freed connection, " +
-			    "getting rid of the free one...");
-		availableConnections.remove(seConnection);
-	    } 
+            LOGGER.finer("trying to recycle seconnection: " + seConnection);
+            LOGGER.finer("used is: " + usedConnections + "\navailable is "
+                + availableConnections);
 
-	    SeConnection newConnection = null;
-                try {
-                    newConnection = newConnection();
-                    availableConnections.add(newConnection);
-                    LOGGER.fine("recycled new connection to pool: " + newConnection);
-                } catch (SeException ex) {
-                    throw new DataSourceException("Can't create connection to "
-                        + config.getServerName() + ": " + ex.getMessage(), ex);
-                }
+            //added to force close
+            try {
+                seConnection.close();
+            } catch (SeException sex) {
+                LOGGER.fine("trouble closing seconnection: " + sex.getMessage());
+                sex.printStackTrace();
+            }
+
+            if (usedConnections.contains(seConnection)) {
+                usedConnections.remove(seConnection);
+            }
+
+            if (availableConnections.contains(seConnection)) {
+                LOGGER.fine("trying to recycle an already freed connection, "
+                    + "getting rid of the free one...");
+                availableConnections.remove(seConnection);
+            }
+
+            SeConnection newConnection = null;
+
+            try {
+                newConnection = newConnection();
+                availableConnections.add(newConnection);
+                LOGGER.fine("recycled new connection to pool: " + newConnection);
+            } catch (SeException ex) {
+                throw new DataSourceException("Can't create connection to "
+                    + config.getServerName() + ": " + ex.getMessage(), ex);
+            }
+
             LOGGER.fine(seConnection + " freed" + ", added " + newConnection);
         }
     }
@@ -252,23 +273,25 @@ public class ArcSDEConnectionPool {
      */
     public void release(SeConnection seConnection) {
         if (seConnection == null) {
-	    LOGGER.fine("trying to release a null connection");
-	    return;
+            LOGGER.fine("trying to release a null connection");
+
+            return;
         }
 
         synchronized (mutex) {
-	    LOGGER.fine("trying to release a seconnection: " + seConnection);
-	    LOGGER.finer("used is: " + usedConnections + "\navailable is " + availableConnections);
-	    usedConnections.remove(seConnection);
+            LOGGER.fine("trying to release a seconnection: " + seConnection);
+            LOGGER.finer("used is: " + usedConnections + "\navailable is "
+                + availableConnections);
+            usedConnections.remove(seConnection);
+
             if (availableConnections.contains(seConnection)) {
                 LOGGER.fine("trying to free an already freed connection...");
             } else {
                 availableConnections.add(seConnection);
             }
-	    
-	    LOGGER.fine(seConnection + "freed, after release used is: " + 
-			usedConnections + 
-			"\navailable is " + availableConnections);
+
+            LOGGER.fine(seConnection + "freed, after release used is: "
+                + usedConnections + "\navailable is " + availableConnections);
         }
     }
 
@@ -511,42 +534,42 @@ public class ArcSDEConnectionPool {
      *
      * @throws NoSuchElementException DOCUMENT ME!
      * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
      */
     public SeLayer getSdeLayer(String typeName)
         throws NoSuchElementException, IOException {
-        SeConnection conn = null;
-        Vector layers = null;
+        //attempt to get the SeLayer object from cache before creating a new
+        //one, because creation is costly for SeLayer objects.
+        SeLayer layer = (SeLayer) cachedLayers.get(typeName);
 
-        try {
-            conn = getConnection();
-            layers = conn.getLayers();
-        } catch (SeException ex) {
-            throw new DataSourceException("Error querying the layers list"
-					  + ex.getSeError().getSdeError() +
-					  " (" + ex.getSeError().getErrDesc()
-					  + ") ", ex);
-        } catch (UnavailableConnectionException ex) {
-            throw new DataSourceException("No free connection found to query the layers list",
-                ex);
-        } finally {
-            release(conn);
-        }
-
-        SeLayer layer = null;
-
-        try {
-            for (Iterator it = layers.iterator(); it.hasNext();) {
-                layer = (SeLayer) it.next();
-
-                if (layer.getQualifiedName().equalsIgnoreCase(typeName)) {
-                    break;
+        //if the layer was not cached, create it
+        if (layer == null) {
+            synchronized (mutex) {
+                //check for race condition
+                if ((layer = (SeLayer) cachedLayers.get(typeName)) != null) {
+                    return layer;
                 }
 
-                layer = null;
+                List layers = getAvailableSdeLayers();
+
+                try {
+                    for (Iterator it = layers.iterator(); it.hasNext();) {
+                        layer = (SeLayer) it.next();
+
+                        if (layer.getQualifiedName().equalsIgnoreCase(typeName)) {
+                            break;
+                        }
+
+                        layer = null;
+                    }
+                } catch (SeException ex) {
+                    throw new NoSuchElementException(ex.getMessage());
+                }
+
+                //cache the layer.
+                if (layer != null) {
+                    cachedLayers.put(typeName, layer);
+                }
             }
-        } catch (SeException ex) {
-            throw new NoSuchElementException(ex.getMessage());
         }
 
         return layer;
@@ -568,8 +591,9 @@ public class ArcSDEConnectionPool {
 
             return conn.getLayers();
         } catch (SeException ex) {
-            throw new DataSourceException("Error consulting the list of available layers",
-                ex);
+            throw new DataSourceException("Error querying the layers list"
+                + ex.getSeError().getSdeError() + " ("
+                + ex.getSeError().getErrDesc() + ") ", ex);
         } catch (UnavailableConnectionException ex) {
             throw new DataSourceException("No free connection found to query the layers list",
                 ex);

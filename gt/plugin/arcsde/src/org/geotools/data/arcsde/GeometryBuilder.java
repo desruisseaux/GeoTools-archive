@@ -92,7 +92,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * propper geometry type
  * </p>
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 public abstract class GeometryBuilder {
@@ -428,7 +428,7 @@ public abstract class GeometryBuilder {
  * <code>GeometryBuilder</code> specialized in creating  JTS
  * <code>Point</code>s from <code>SeShape</code> points and viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class PointBuilder extends GeometryBuilder {
@@ -492,7 +492,7 @@ class PointBuilder extends GeometryBuilder {
  * <code>MultiPoint</code>s from <code>SeShape</code> multipoints and
  * viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class MultiPointBuilder extends GeometryBuilder {
@@ -571,7 +571,7 @@ class MultiPointBuilder extends GeometryBuilder {
  * <code>GeometryBuilder</code> specialized in creating  JTS
  * <code>LineString</code>s from <code>SeShape</code> linestring and viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class LineStringBuilder extends GeometryBuilder {
@@ -650,7 +650,7 @@ class LineStringBuilder extends GeometryBuilder {
  * <code>MultiLineString</code>s from <code>SeShape</code> multilinestrings
  * and viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class MultiLineStringBuilder extends LineStringBuilder {
@@ -741,7 +741,7 @@ class MultiLineStringBuilder extends LineStringBuilder {
  * <code>GeometryBuilder</code> specialized in creating  JTS
  * <code>Polygon</code>s from <code>SeShape</code> polygon and viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class PolygonBuilder extends GeometryBuilder {
@@ -868,7 +868,7 @@ class PolygonBuilder extends GeometryBuilder {
  * <code>MultiPolygon</code>s from <code>SeShape</code> multipolygons and
  * viceversa
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
  */
 class MultiPolygonBuilder extends PolygonBuilder {

@@ -54,11 +54,30 @@
       <version>SNAPSHOT</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
+    <!--
     <dependency>
       <artifactId>jsde_sdk</artifactId>
       <groupId>arcsde</groupId>
       <version>8.3</version>
     </dependency>
+    -->
+
+    <dependency>
+      <artifactId>jsde_sdk</artifactId>
+      <groupId>arcsde</groupId>
+      <version>9.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>jsde_concurrent</artifactId>
+      <groupId>arcsde</groupId>
+      <version>9.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>jsde_jpe_sdk</artifactId>
+      <groupId>arcsde</groupId>
+      <version>9.0</version>
+    </dependency>
+
     <dependency>
       <id>JTS</id>
       <version>1.6-SNAPSHOT</version>
@@ -73,8 +92,12 @@
       <!-- This section excludes the tests, comment out if your
                  testData/testparams.properties are set correctly -->
       <excludes>
+      <!--
         <exclude>**/ArcSDEDataStoreTest.java</exclude>
         <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
+	-->
+        <exclude>**/ArcSDEQueryTest.java</exclude>
+        <exclude>**/ArcSDEFeatureStoreTest.java</exclude>
         <exclude>**/FilterTest.java</exclude>
       </excludes>
       <!-- End exclude tests -->

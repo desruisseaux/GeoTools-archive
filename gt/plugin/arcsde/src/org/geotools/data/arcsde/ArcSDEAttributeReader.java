@@ -16,34 +16,45 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeRow;
+import com.esri.sde.sdk.client.SeShape;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeRow;
-import com.esri.sde.sdk.client.SeShape;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  * Implements an attribute reader that is aware of the particulars of ArcSDE.
  * This class sends its logging to the log named "org.geotools.data".
  *
- * @author Gabriel Roldán
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
  */
-public class ArcSDEAttributeReader implements AttributeReader {
+class ArcSDEAttributeReader implements AttributeReader {
+    /** DOCUMENT ME!  */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+
+    /** DOCUMENT ME!  */
     private ArcSDEQuery query;
+
+    /** DOCUMENT ME!  */
     private FeatureType schema;
+
+    /** DOCUMENT ME!  */
     private SeRow currentRow;
+
+    /** DOCUMENT ME!  */
     private SeShape currentShape;
+
+    /** DOCUMENT ME!  */
     private GeometryBuilder geometryBuilder;
+
+    /** DOCUMENT ME!  */
     private int geometryTypeIndex = -1;
 
     /** DOCUMENT ME! */
@@ -51,6 +62,8 @@ public class ArcSDEAttributeReader implements AttributeReader {
 
     /** DOCUMENT ME! */
     int fidPrefixLen;
+
+    /** DOCUMENT ME!  */
     private boolean hasNextAlreadyCalled = false;
 
     /**
