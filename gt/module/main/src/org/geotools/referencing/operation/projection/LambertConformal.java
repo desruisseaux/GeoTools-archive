@@ -49,7 +49,6 @@ import org.geotools.resources.cts.Resources;
  * Lambert Conical Conformal Projection.  Areas and shapes are deformed
  * as one moves away from standard parallels.  The angles are true in
  * a limited area.  This projection is used for the charts of North America.
- * It uses a default central latitude of 40°N.
  * <br><br>
  *
  * This implementation provides transforms for three cases of the lambert conic 
@@ -58,18 +57,15 @@ import org.geotools.resources.cts.Resources;
  *   <li><code>Lambert_Conformal_Conic_1SP</code> (EPSG code 9801)</li>
  *   <li><code>Lambert_Conformal_Conic_2SP</code> (EPSG code 9802)</li>
  *   <li><code>Lambert_Conic_Conformal_2SP_Belgium</code> (EPSG code 9803)</li>
- *   <li><code>Lambert_Conformal_Conic</code></li>
+ *   <li><code>Lambert_Conformal_Conic</code> - An alias for the ESRI 2SP case
+ *       that includes a scale_factor parameter</li>
  * </ul>
  *
  * For the 1SP case the latitude of origin is used as the standard parallel (SP). 
- * To use a 1SP with a latitude of origin different from the SP, use the 2SP
- * and set both the SP1 and SP2 to the single SP. Alternatively, the "standard_parallel_2" 
+ * To use 1SP with a latitude of origin different from the SP, use the 2SP
+ * and set the SP1 to the single SP. The "standard_parallel_2" 
  * parameter is optional and will be given the same value as "standard_parallel_1" 
  * if not set (creating a 1 standard parallel projection). 
- * <br><br>
- *
- * The <code>Lambert_Conformal_Conic</code> is a 2SP case that includes a 
- * scale_factor code that ESRI specifies.
  * <br><br>
  *
  * <strong>References:</strong><ul>
