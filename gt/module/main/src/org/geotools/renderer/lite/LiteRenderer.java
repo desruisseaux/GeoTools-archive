@@ -80,6 +80,7 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
+import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -1693,11 +1694,12 @@ public class LiteRenderer implements Renderer, Renderer2D {
             int size = ((Number) graphic.getSize().getValue(feature)).intValue();
             double rotation = ((Number) graphic.getRotation().getValue(feature))
                 .doubleValue();
-
+            double opacity = ((Number) graphic.getOpacity().getValue(feature))
+                .doubleValue();
             if (geom instanceof Point) {
-                renderImage((Point) geom, img, size, rotation);
+                renderImage((Point) geom, img, size, rotation, opacity);
             } else {
-                renderImage(geom.getCentroid(), img, size, rotation);
+                renderImage(geom.getCentroid(), img, size, rotation, opacity);
             }
 
             return true;
@@ -1797,11 +1799,19 @@ public class LiteRenderer implements Renderer, Renderer2D {
         }
 
         int size = 6; // size in pixels
+        int x = 0;
+        int y = 0;
         double rotation = 0.0; // rotation in degrees
         size = ((Number) graphic.getSize().getValue(feature)).intValue();
+        Displacement offset = graphic.getDisplacement();
+        if(offset != null){
+            x = ((Number)offset.getDisplacementX().getValue(feature)).intValue();
+            y = ((Number)offset.getDisplacementY().getValue(feature)).intValue();
+            y = -y;
+        }
         rotation = (((Number) graphic.getRotation().getValue(feature))
             .doubleValue() * Math.PI) / 180d;
-        fillDrawMark(graphics, (Point) geom, mark, size, rotation, feature);
+        fillDrawMark(graphics, (Point) geom, mark, size, rotation, x, y, feature);
 
         return true;
     }
@@ -1841,8 +1851,8 @@ public class LiteRenderer implements Renderer, Renderer2D {
      * @param rotation the image rotatation
      */
     private void renderImage(Point point, BufferedImage img, int size,
-        double rotation) {
-        renderImage(point.getX(), point.getY(), img, size, rotation);
+        double rotation, double opacity) {
+        renderImage(point.getX(), point.getY(), img, size, rotation, opacity);
     }
 
     /**
@@ -1855,7 +1865,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
      * @param rotation the image rotatation
      */
     private void renderImage(double tx, double ty, BufferedImage img, int size,
-        double rotation) {
+        double rotation, double opacity) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("drawing Image @" + tx + "," + ty);
         }
@@ -1863,6 +1873,8 @@ public class LiteRenderer implements Renderer, Renderer2D {
         final AffineTransform old = applyTransform(tx, ty, img, size, rotation);
 
         // we moved the origin to the centre of the image.
+        graphics.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER,  (float)opacity));
         graphics.drawImage(img, -img.getWidth() / 2, -img.getHeight() / 2, obs);
 
         graphics.setTransform(old);
@@ -1927,8 +1939,8 @@ public class LiteRenderer implements Renderer, Renderer2D {
      * @param feature the feature associated to the mark
      */
     private void fillDrawMark(Graphics2D graphic, Point point, Mark mark,
-        int size, double rotation, Feature feature) {
-        fillDrawMark(graphic, point.getX(), point.getY(), mark, size, rotation,
+        int size, double rotation, int xOffset, int yOffset, Feature feature) {
+        fillDrawMark(graphic, point.getX(), point.getY(), mark, size, rotation, xOffset, yOffset,
             feature);
     }
 
@@ -1944,7 +1956,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
      * @param feature the feature associated to the mark
      */
     private void fillDrawMark(Graphics2D graphic, double tx, double ty,
-        Mark mark, int size, double rotation, Feature feature) {
+        Mark mark, int size,  double rotation, int xOffset, int yOffset, Feature feature) {
         AffineTransform temp = graphic.getTransform();
         AffineTransform markAT = new AffineTransform();
         Shape shape = Java2DMark.getWellKnownMark(mark.getWellKnownName()
@@ -1955,7 +1967,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
         Point2D graphicCentre = new java.awt.geom.Point2D.Double();
         temp.transform(mapCentre, graphicCentre);
         markAT.translate(graphicCentre.getX(), graphicCentre.getY());
-
+        markAT.translate(xOffset / temp.getScaleX(), xOffset / temp.getScaleX());//displacment
         double shearY = temp.getShearY();
         double scaleY = temp.getScaleY();
 
@@ -2169,7 +2181,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                 .doubleValue();
 
             fillDrawMark(g1, markCentrePoint, mark, (int) (size * .9),
-                rotation, feature);
+                rotation, 0, 0,  feature);
 
             MediaTracker track = new MediaTracker(obs);
             track.addImage(image, 1);
@@ -2417,7 +2429,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             rotation = ((Number) gFill.getRotation().getValue(feature))
                 .doubleValue();
             fillDrawMark(g1, markCentrePoint, mark, (int) (size * .9),
-                rotation, feature);
+                rotation, 0,0, feature);
 
             MediaTracker track = new MediaTracker(obs);
             track.addImage(image, 1);
@@ -2514,7 +2526,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 
                 for (dist = 0; dist < (len - imageWidth); dist += imageWidth) {
                     /*graphic.drawImage(image2,(int)x-midx,(int)y-midy,null); */
-                    renderImage(x, y, image, size, rotation);
+                    renderImage(x, y, image, size, rotation,1);
 
                     x += dx;
                     y += dy;
@@ -2544,7 +2556,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                     ig.drawImage(image, 0, 0, trueImageWidth, trueImageHeight,
                         obs);
 
-                    renderImage(x, y, img, size, rotation);
+                    renderImage(x, y, img, size, rotation,1);
                 }
 
                 break;
