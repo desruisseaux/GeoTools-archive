@@ -366,27 +366,27 @@ public class WebMapServer implements Discovery {
     	return (GetCapabilitiesResponse) internalIssueRequest(request);
     }
     
-    public GetMapResponse issueRequest(GetMapRequest request) throws IOException, SAXException {
+    public GetMapResponse issueRequest(GetMapRequest request) throws IOException, ServiceException, SAXException {
         return (GetMapResponse) internalIssueRequest(request);
     }
     
-    public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest request) throws IOException, SAXException {
+    public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest request) throws IOException, ServiceException, SAXException {
         return (GetFeatureInfoResponse) internalIssueRequest(request);
     }
     
-    public DescribeLayerResponse issueRequest(DescribeLayerRequest request) throws IOException, SAXException {
+    public DescribeLayerResponse issueRequest(DescribeLayerRequest request) throws IOException, ServiceException, SAXException {
         return (DescribeLayerResponse) internalIssueRequest(request);
     }
     
-    public GetLegendGraphicResponse issueRequest(GetLegendGraphicRequest request) throws IOException, SAXException {
+    public GetLegendGraphicResponse issueRequest(GetLegendGraphicRequest request) throws IOException, ServiceException, SAXException {
         return (GetLegendGraphicResponse) internalIssueRequest(request);
     }
     
-    public GetStylesResponse issueRequest(GetStylesRequest request) throws IOException, SAXException {
+    public GetStylesResponse issueRequest(GetStylesRequest request) throws IOException, ServiceException, SAXException {
         return (GetStylesResponse) internalIssueRequest(request);
     }
     
-    public PutStylesResponse issueRequest(PutStylesRequest request) throws IOException, SAXException {
+    public PutStylesResponse issueRequest(PutStylesRequest request) throws IOException, ServiceException, SAXException {
         return (PutStylesResponse) internalIssueRequest(request);
     }
 

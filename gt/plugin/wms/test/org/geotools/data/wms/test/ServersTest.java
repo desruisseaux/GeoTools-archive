@@ -6,12 +6,36 @@
  */
 package org.geotools.data.wms.test;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.SimpleLayer;
+import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
+import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.ows.ServiceException;
+import org.xml.sax.SAXException;
 
 /**
  * @author Richard Gould
@@ -29,7 +53,8 @@ public class ServersTest extends TestCase {
 //    	servers[3] = new URL("http://wms.cits.rncan.gc.ca/cgi-bin/cubeserv.cgi?VERSION=1.1.0&REQUEST=GetCapabilities");
 //    	servers[4] = new URL("http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
 //    	servers[5] = new URL("http://www2.demis.nl/mapserver/Request.asp?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetCapabilities");
-//THIS ONE OFFLINE    	servers[6] = new URL("http://datamil.udel.edu/servlet/com.esri.wms.Esrimap?servicename=DE_census2k_sf1&VERSION=1.0.0&request=capabilities");
+//THIS ONE OFFLINE    	
+//        servers[6] = new URL("http://datamil.udel.edu/servlet/com.esri.wms.Esrimap?servicename=DE_census2k_sf1&VERSION=1.0.0&request=capabilities");
 //    	servers[7] = new URL("http://www.lifemapper.org/Services/WMS/?Service=WMS&VERSION=1.1.1&request=getcapabilities");
 //    	this server returns OGC for 1.3.0
 //    	servers[8] = new URL("http://globe.digitalearth.gov/viz-bin/wmt.cgi?VERSION=1.1.0&Request=GetCapabilities");
@@ -53,13 +78,254 @@ public class ServersTest extends TestCase {
 //    	servers[25] = new URL("http://test.landmap.ac.uk/ecwp/ecw_wms.dll?request=GetCapabilities&service=wms");
 //    	servers[26] = new URL("http://emandev.cciw.ca/cgi-bin/mapserver/mapserv.exe?REQUEST=GetCapabilities&MAP=C:/Inetpub/wwwroot/emanco/cgi-bin/mapserver/naturewatch.map&VERSION=1.1.1&SERVICE=WMS");
    	
+        int total = 0;
+        int passedCount = 0;
+        
     	for (int i = 0; i < servers.length; i++) {
     		if (servers[i] != null) {
-    		    WebMapServer wms = new WebMapServer(servers[i]);
-    			assertNotNull("Missing Capabilities",wms.getCapabilities());
-    		    WMSCapabilities capabilities = wms.getCapabilities();
-    		    assertNotNull(capabilities.getRequest());
+                total++;
+                Random random = new Random();
+                String dir = "tests";
+                String filename = URLEncoder.encode(servers[i].getHost()+random.nextInt(10000));
+                File file = new File("C:\\"+dir+"\\"+filename+".txt");
+                file.createNewFile();
+                PrintStream out = new PrintStream(file);
+                boolean passed = serverTest(out, servers[i]);
+                out.flush();
+                out.close();
+                
+                if (passed) {
+                    System.out.println(servers[i].toExternalForm() + " passed.");
+                    passedCount++;
+                    file.delete();
+                }
+//    		    WebMapServer wms = new WebMapServer(servers[i]);
+//    			assertNotNull("Missing Capabilities",wms.getCapabilities());
+//    		    WMSCapabilities capabilities = wms.getCapabilities();
+//    		    assertNotNull(capabilities.getRequest());
     		}
     	}
+        
+        System.out.println("Total tested: "+total);
+        System.out.println("Total passed: "+passedCount);
+    }
+    
+    public boolean serverTest(PrintStream out, URL url) {
+        WebMapServer wms = null;
+        
+        boolean passed = true;
+        
+        out.print("Parsing Capabilities...");
+        try {
+            wms = new WebMapServer(url);
+            out.println("passed.");
+        } catch (ServiceException e) {
+            out.println("failed.");
+            passed = false;
+            while (e != null) {
+                if (e.getLocator() != null && e.getLocator().length() != 0) {
+                    out.println("ServiceException at "+e.getLocator()+": "+e.getMessage()+"("+e.getCode()+")");
+                }
+                out.println("ServiceException: "+e.getMessage()+"("+e.getCode()+")");
+                e = e.getNext();
+            }
+            return passed;
+        } catch (IOException e) {
+            out.println("failed.");
+            passed = false;
+            out.println("IOException: "+e.getMessage());
+            e.printStackTrace(out);
+            return passed;
+        } catch (SAXException e) {
+            out.println("failed.");
+            passed = false;
+            out.println("SAXException: "+e.getMessage());
+            e.printStackTrace(out);
+            return passed;
+        }
+        
+        WMSCapabilities caps = wms.getCapabilities();
+        assertNotNull(caps);
+        
+        out.println("Validating layer LatLonBoundingBoxes...");
+        Iterator iter = caps.getLayerList().iterator();
+        while (iter.hasNext()) {
+            Layer layer = (Layer) iter.next();
+            if (layer.getLatLonBoundingBox() == null) {
+                if (layer.getName() != null) {
+                    out.println("WARNING: Layer '"+layer.getName()+"' contains no LatLonBoundingBox.");
+                    passed = false;
+                }
+            }
+        }
+        
+        Layer layer = null;
+        out.print("Looking for a named layer...");
+        iter = caps.getLayerList().iterator();
+        while (iter.hasNext()) {
+            Layer tempLayer = (Layer) iter.next();
+            if (tempLayer.getName() != null) {
+                layer = tempLayer;
+                out.println("found one. Using layer '"+layer.getName()+"'");
+                break;
+            }
+        }
+        String format = null;
+        if (layer == null) {
+            out.println("server contains no named layers. Cannot perform GetMap requests on it");
+            passed = false;
+        } else {
+            out.print("Checking for GetMap operation...");
+            if (caps.getRequest().getGetMap() == null) {
+                out.println("NOT FOUND. Will attempt a request using 'image/gif' anyway.");
+                passed = false;
+                format = "image/gif";
+            } else {
+                out.println("found.");
+                out.print("Searching for a suitable format...");
+                List formats = Arrays.asList(caps.getRequest().getGetMap().getFormatStrings());
+                if (formats.contains("image/png")) {
+                    format = "image/png";
+                    out.println("using 'image/png'.");
+                }
+                
+                if (format == null && formats.contains("image/gif")) {
+                    format = "image/gif";
+                    out.println("using 'image/gif'.");
+                }
+                
+                if (format == null && formats.contains("image/jpeg")) {
+                    format = "image/jpeg";
+                    out.println("using 'image/jpeg'.");
+                }
+                
+                if (format == null) {
+                    format = (String) formats.get(0);
+                    out.println("server does not support GIF, PNG or JPEG. Using '"+format+"'");
+                    passed = false;
+                }
+            }
+        }
+
+        
+        out.print("Performing GetMap operation...");
+        GetMapRequest request = wms.createGetMapRequest();
+        //TODO make this easier
+        request.setLayers(Collections.singletonList(new SimpleLayer(layer.getName(), "")));
+        //TODO make this easier
+        LatLonBoundingBox bbox = layer.getLatLonBoundingBox();
+        request.setBBox(bbox.getMinX()+","+bbox.getMinY()+","+bbox.getMaxX()+","+bbox.getMaxY());
+        request.setFormat(format);
+        request.setSRS("EPSG:4326");
+        request.setDimensions("100","100");
+        
+        try {
+            GetMapResponse response = wms.issueRequest(request);
+            out.println("received a response.");
+            
+            out.print("Checking returned format...");
+            if (response.getContentType().indexOf(format) == -1) {
+                out.println("server returned bad format. Expected "+format+", got "+response.getContentType()+".");
+                passed = false;
+            } else {
+                out.println("passed.");
+            }
+            
+            out.print("Checking dimensions...");
+            BufferedImage image = ImageIO.read(response.getInputStream());
+            if (image.getWidth() != 100 || image.getHeight() != 100) {
+                out.println("server returned bad dimensions. Expect 100, 100. Returned "+image.getWidth()+","+image.getHeight());
+                passed = false;
+            } else {
+                out.println("passed.");
+            }
+        } catch (ServiceException e) {
+            out.println("failed.");
+            passed = false;
+            while (e != null) {
+                if (e.getLocator() != null && e.getLocator().length() != 0) {
+                    out.println("ServiceException at "+e.getLocator()+": "+e.getMessage()+"("+e.getCode()+")");
+                }
+                out.println("ServiceException: "+e.getMessage()+"("+e.getCode()+")");
+                e = e.getNext();
+            }
+        } catch (IOException e) {
+            out.println("failed.");
+            passed = false;
+            out.println("IOException: "+e.getMessage());
+            e.printStackTrace(out);
+        } catch (SAXException e) {
+            out.println("failed.");
+            passed = false;
+            out.println("SAXException: "+e.getMessage());
+            e.printStackTrace(out);
+        } finally {
+            out.println(request.getFinalURL());
+        }
+        
+        if (caps.getRequest().getGetFeatureInfo() != null) {
+            out.println("");
+            out.println("Server supports GetFeatureInfo requests. Beginning tests.");
+            
+            Layer qLayer = null;
+            out.print("Locating a queryable layer...");
+            Set qLayers = WMSUtils.getQueryableLayers(caps);
+            if (qLayers != null && qLayers.size() != 0) {
+                qLayer = (Layer) qLayers.iterator().next();
+                out.println("found layer '"+qLayer.getName()+"'.");
+            } else {
+                out.println("NOT FOUND");
+                passed = false;
+            }
+            
+            if (qLayer != null) {
+                GetFeatureInfoRequest gfiRequest = wms.createGetFeatureInfoRequest(request);
+                gfiRequest.addQueryLayer(qLayer);
+                gfiRequest.setFeatureCount(5);
+                gfiRequest.setQueryPoint(50,50);
+                
+                String gfiFormat = caps.getRequest().getGetFeatureInfo().getFormatStrings()[0];
+                out.println("Using "+gfiFormat+" as format during GetFeatureInfo request.");
+                
+                gfiRequest.setInfoFormat(gfiFormat);
+                
+                try {
+                    out.print("Performing GetFeatureInfo request...");
+                    GetFeatureInfoResponse response = wms.issueRequest(gfiRequest);
+                    out.println("response received.");
+                    
+                    out.print("Checking returned format...");
+                    if (response.getContentType().indexOf(gfiFormat) == -1) {
+                        out.println("server returned bad format. Expected "+gfiFormat+", got "+response.getContentType()+".");
+                        passed = false;
+                    } else {
+                        out.println("passed.");
+                    }
+                } catch (ServiceException e) {
+                    out.println("failed.");
+                    passed = false;
+                    while (e != null) {
+                        if (e.getLocator() != null && e.getLocator().length() != 0) {
+                            out.println("ServiceException at "+e.getLocator()+": "+e.getMessage()+"("+e.getCode()+")");
+                        }
+                        out.println("ServiceException: "+e.getMessage()+"("+e.getCode()+")");
+                        e = e.getNext();
+                    }
+                } catch (IOException e) {
+                    out.println("failed.");
+                    passed = false;
+                    out.println("IOException: "+e.getMessage());
+                    e.printStackTrace(out);
+                } catch (SAXException e) {
+                    out.println("failed.");
+                    passed = false;
+                    out.println("SAXException: "+e.getMessage());
+                    e.printStackTrace(out);
+                } finally {
+                    out.println(request.getFinalURL());
+                }
+            }
+        }
+        return passed;
     }
 }
