@@ -81,6 +81,15 @@ import org.geotools.resources.cts.ResourceKeys;
  * than east-west.
  * <br><br>
  *
+ * The elliptical equations used here are series approximations, and their accuracy
+ * decreases as points move farther from the central meridian of the projection.
+ * The forward equations here are accurate to a less than a mm +- 10 degrees from 
+ * the central meridian, a few mm +- 15 degrees from the 
+ * central meridian and a few cm +- 20 degrees from the central meridian.
+ * The spherical equations are not approximations and should always give the 
+ * correct values.
+ * <br><br>
+ *
  * There are a number of versions of the transverse mercator projection 
  * including the Universal (UTM) and Modified (MTM) Transverses Mercator 
  * projections. In these cases the earth is divided into zones. For the UTM
@@ -109,7 +118,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Transverse Mercator projection on MathWorld</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on Remote Sensing</A>
  *
- * @version $Id: TransverseMercator.java,v 1.6 2004/02/23 12:28:23 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -165,14 +174,15 @@ public class TransverseMercator extends CylindricalProjection {
                                 FC8= 0.01785714285714285714285;  // 1/56
 
     /**
-     * Relative precision used in the <code>mlfn<code> method.
+     * Relative iteration precision used in the <code>mlfn<code> method. This 
+     * overrides the value in the MapProjection class.
      */
-    private static final double EPS11 = 1E-11;
+    private static final double TOL = 1E-11;
     
     /**
      * Informations about a {@link TransverseMercator}.
      *
-     * @version $Id: TransverseMercator.java,v 1.6 2004/02/23 12:28:23 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -270,7 +280,7 @@ public class TransverseMercator extends CylindricalProjection {
         double sinphi = Math.sin(y);
         double cosphi = Math.cos(y);
         
-        double t = Math.abs(cosphi)>TOL ? sinphi/cosphi : 0;
+        double t = (Math.abs(cosphi)>EPS) ? sinphi/cosphi : 0;
         t *= t;
         double al = cosphi*x;
         double als = al*al;
@@ -312,7 +322,7 @@ public class TransverseMercator extends CylindricalProjection {
         } else {
             double sinphi = Math.sin(phi);
             double cosphi = Math.cos(phi);
-            double t = (Math.abs(cosphi) > TOL) ? sinphi/cosphi : 0.0;
+            double t = (Math.abs(cosphi) > EPS) ? sinphi/cosphi : 0.0;
             double n = esp * cosphi*cosphi;
             double con = 1.0 - es * sinphi*sinphi;
             double d = x*Math.sqrt(con);
@@ -371,7 +381,7 @@ public class TransverseMercator extends CylindricalProjection {
                        
             double cosphi = Math.cos(y);
             double b = cosphi * Math.sin(x);
-            if (Math.abs(Math.abs(b) - 1.0) <= TOL) {
+            if (Math.abs(Math.abs(b) - 1.0) <= EPS) {
                 throw new ProjectionException(Resources.format(
                 ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
             }
@@ -380,7 +390,7 @@ public class TransverseMercator extends CylindricalProjection {
             x = 0.5 * Math.log((1.0+b)/(1.0-b));    /* Snyder 8-1 */
             
             if ((b=Math.abs(yy)) >= 1.0) {
-                if ((b-1.0) > TOL) {
+                if ((b-1.0) > EPS) {
                     throw new ProjectionException(Resources.format(
                         ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
                 } else {
@@ -418,9 +428,8 @@ public class TransverseMercator extends CylindricalProjection {
             t = Math.cos(latitudeOfOrigin + y);
             double phi = Math.asin(Math.sqrt((1.0-t*t)/(1.0+d*d)));
             y = y<0.0 ? -phi : phi;
-            x = (Math.abs(d)<=TOL && Math.abs(t)<=TOL) ? 
-                    0.0 :
-                    Math.atan2(d,t);
+            x = (Math.abs(d)<=EPS && Math.abs(t)<=EPS) ? 
+                    0.0 : Math.atan2(d,t);
 
             assert Math.abs(ptDst.getX()-x) <= EPS : x;
             assert Math.abs(ptDst.getY()-y) <= EPS : y;
@@ -455,7 +464,7 @@ public class TransverseMercator extends CylindricalProjection {
     
     /**
      * Calculates the latitude (<code>phi</code>) from a meridian distance.
-     * Determines phi to EPS11 (1e-11) radians, about 1e-6 seconds.
+     * Determines phi to TOL (1e-11) radians, about 1e-6 seconds.
      * 
      * @param arg meridian distance to calulate latitude for.
      * @return the latitude of the meridian distance.
@@ -465,7 +474,7 @@ public class TransverseMercator extends CylindricalProjection {
         double s, t, phi, k = 1.0/(1.0 - es);
 	int i;
 	phi = arg;
-        for (i=10; true;) { // rarely goes over 5 iterations
+        for (i=MAX_ITER; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
                 throw new ProjectionException(Resources.format(
                             ResourceKeys.ERROR_NO_CONVERGENCE));
@@ -474,7 +483,7 @@ public class TransverseMercator extends CylindricalProjection {
             t = 1.0 - es * s * s;
             t = (mlfn(phi, s, Math.cos(phi)) - arg) * (t * Math.sqrt(t)) * k;
             phi -= t;
-            if (Math.abs(t) < EPS11) {
+            if (Math.abs(t) < TOL) {
                 return phi;
             }
 	}

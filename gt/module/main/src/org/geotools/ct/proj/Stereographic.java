@@ -68,16 +68,23 @@ import org.geotools.resources.cts.ResourceKeys;
  *        This is a little bit faster, but may be a little bit less accurate)</li>
  * </ul>   
  *
- * The <code>"Stereographic"</code> case uses the USGS equations of Snyder.
- * This computes the conformal latitude of each point on the sphere.
+ * Both the <code>"Oblique_Stereographic"</code> and <code>"Stereographic"</code> 
+ * projections are "double" projections involving two parts: 1) a conformal
+ * transformation of the geographic coordinates to a sphere and 2) a spherical
+ * Stereographic projection. The EPSG considers both methods to be valid, but 
+ * considers them to be a different coordinate operation method.
+ * <br><br>
  *
- * The <code>"Oblique_Stereographic"</code> case uses equations from the EPSG and only uses
- * a single conformal sphere at the origin point. Here the transform involves two parts: 
- * 1) a conformal transformation of the geographic coordinates to a sphere and 2) a spherical
- * Stereographic projection. Because of this, this projection is sometimes called the 
- * "Double Stereographic". The EPSG considers both methods to be valid, but considers
- * the USGS method to be a different coordinate operation method. The equations
- * given by the EPSG are used in New Brunswick (Canada) and the Netherlands.
+ * The <code>"Stereographic"</code> case uses the USGS equations of Snyder.
+ * This uses a simplified conversion to the conformal sphere that computes 
+ * the conformal latitude of each point on the sphere.
+ * <br><br>
+ *
+ * The <code>"Oblique_Stereographic"</code> case uses equations from the EPSG.
+ * This uses a more generalized form of the conversion to the conformal sphere; using only 
+ * a single conformal sphere at the origin point. Since this is a "double" projection,
+ * it is sometimes called the "Double Stereographic". The <code>"Oblique_Stereographic"</code>
+ * is used in New Brunswick (Canada) and the Netherlands.
  * <br><br>
  *
  * The <code>"Stereographic"</code> and <code>"Double Stereographic"</code> names are used in
@@ -85,7 +92,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * for the later only.
  * <br><br>
  *
- * WARNING: Tests points calculated with ArcGIS's "Double Stereographic" are
+ * <strong>WARNING:<strong> Tests points calculated with ArcGIS's "Double Stereographic" are
  * not always equal to points calculated with the <code>"Oblique_Stereographic"</code>.
  * However, where there are differences, two different implementations of these equations
  * (EPSG guidence note 7 and libproj) calculate the same values. Until these 
@@ -125,7 +132,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/stereographic.html">Stereographic</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
- * @version $Id: Stereographic.java,v 1.9 2004/05/03 07:36:47 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -135,10 +142,6 @@ import org.geotools.resources.cts.ResourceKeys;
  *             for <code>"Oblique_Stereographic"</code>.
  */
 public abstract class Stereographic extends PlanarProjection {
-    /**
-     * Maximum number of itterations for the inverse calculation.
-     */
-    static final int MAX_ITER = 10;
 
     /**
      * Informations about a {@link Stereographic} projection. The {@link #create} method infer
@@ -147,7 +150,7 @@ public abstract class Stereographic extends PlanarProjection {
      * default value is 90°N for <code>"Polar_Stereographic"</code> and 0° for
      * <code>"Oblique_Stereographic"</code>.
      *
-     * @version $Id: Stereographic.java,v 1.9 2004/05/03 07:36:47 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
