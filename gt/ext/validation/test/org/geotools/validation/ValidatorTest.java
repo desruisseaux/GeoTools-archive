@@ -33,6 +33,7 @@ import org.geotools.filter.Filter;
 import com.vividsolutions.jts.geom.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -84,10 +85,8 @@ public class ValidatorTest extends TestCase {
     	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), reader, results );
     	reader.close();    	
     	assertEquals( "lakes test", 0, results.error.size() );
-    	
-
     }
-    public Feature invalidLake() throws Exception {
+    public Feature createInvalidLake() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	
     	FeatureReader reader = lakes.getFeatures( new DefaultQuery("lakes", Filter.NONE, 1, null, null) ).reader();
@@ -118,7 +117,7 @@ public class ValidatorTest extends TestCase {
     }
     public void testFeatureValidation2() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	Feature newFeature = invalidLake();
+    	Feature newFeature = createInvalidLake();
     	    	
     	FeatureReader add = DataUtilities.reader( new Feature[]{ newFeature, } );
     	
@@ -128,6 +127,16 @@ public class ValidatorTest extends TestCase {
     	assertEquals( "lakes test", 2, results.error.size() );
     }
 
-    public void testIntegrityValidation() {
+    public void testIntegrityValidation() throws Exception {
+    	DefaultFeatureResults results = new DefaultFeatureResults();
+    	Set set = fixture.repository.types().keySet();
+    	Map map = new HashMap();
+    	for( Iterator i=set.iterator(); i.hasNext(); ){
+    		String typeRef = (String) i.next();
+    		String split[] = typeRef.split(":");
+    		map.put( typeRef, fixture.repository.source( split[0], split[1] ) );
+    	}    	
+    	fixture.processor.runIntegrityTests( set, map, null, results );    	    	
+    	assertEquals( "integrity test", 0, results.error.size() );
     }
 }

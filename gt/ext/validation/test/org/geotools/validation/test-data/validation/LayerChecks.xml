@@ -6,16 +6,20 @@
 	xs:schemaLocation="testSuiteSchema /data/capabilities/validate/testSuiteSchema.xsd">
 	<name>Layer Checks</name>
 	<description>Various multi layer sanity checks for spatial data</description>
-	<test>
-		<name>River - Stream</name>
-		<description>Checks that Rivers intersect Streams at a node.</description>
-		<plugin>Lines Node Intersect</plugin>
+		<test>
+		<name>overlaps</name>
+		<description>River - Stream</description>
+		<plugin>Geometry Overlaps Geometry</plugin>
 		<argument >
-			<name>lineTypeRef</name>
+			<name>geomTypeRefB</name>
 			<string>RIVERS:rivers</string>
 		</argument>
 		<argument >
-			<name>restrictedLineTypeRef</name>
+			<name>expected</name>
+			<boolean>false</boolean>
+		</argument>
+		<argument>
+			<name>geomTypeRefA</name>
 			<string>STREAMS:streams</string>
 		</argument>
 	</test>
