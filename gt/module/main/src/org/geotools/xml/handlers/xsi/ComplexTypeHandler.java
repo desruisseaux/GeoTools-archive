@@ -16,9 +16,11 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
@@ -32,6 +34,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -41,6 +45,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -1029,18 +1035,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
         /**
          * 
-         * <p>
-         * TODO DOCUMENT ME!
-         * </p>
-         *
-         * @return
-         */
-        public boolean isAbstracT() {
-            return abstracT;
-        }
-
-        /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getAnyAttributeNameSpace()
          */
         public String getAnyAttributeNameSpace() {
@@ -1109,6 +1103,25 @@ public class ComplexTypeHandler extends XSIElementHandler {
         public Element findChildElement(String name) {
             return (child == null) ? null : child.findChildElement(name);
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(parent.canEncode(element,value,hints)){
+                parent.encode(element,value,output,hints);
+            }else{
+                throw new OperationNotSupportedException("This is a generic schema element -- cannot print yet");
+            	// TODO fix this
+            }
+        }
     }
 
     /**
@@ -1136,8 +1149,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         public RestrictedSimpleType(SimpleType prt, RestrictionHandler rest) {
             parent = prt;
             namespace = prt.getNamespace();
-            constraints = (FacetHandler[]) rest.getConstraints().toArray(new FacetHandler[rest.getConstraints()
-                                                                                              .size()]);
+            constraints = (FacetHandler[]) rest.getConstraints().toArray(new FacetHandler[rest.getConstraints().size()]);
         }
 
         /**
@@ -1404,6 +1416,34 @@ public class ComplexTypeHandler extends XSIElementHandler {
                     }
                 }
             }
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            return parent.toAttribute(attribute,value,hints);
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            return ((parent!=null && parent.canCreateAttributes(attribute,value,hints) && attribute.getSimpleType()!=null && (attribute.getSimpleType() instanceof RestrictedSimpleType)) && value!=null);
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return ((parent!=null && parent.canEncode(element,value,hints) && element.getType()!=null && (element.getType() instanceof RestrictedSimpleType)) && value!=null);
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            parent.encode(element,value,output,hints);
         }
     }
 }

@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.util.Map;
+
 /**
  * <p>
  * This interface is intended to represent an XML Schema simple type. This
@@ -75,4 +77,19 @@ public interface SimpleType extends Type {
      * @return
      */
     public String getId();
+    
+    /**
+     * 
+     * <p>
+     * returns the value as a string
+     * </p>
+     *
+     * @param attribute
+     * @param value
+     * @param hints
+     * @return
+     */
+    public AttributeValue toAttribute(Attribute attribute, Object value, Map hints);
+
+    public boolean canCreateAttributes(Attribute attribute, Object value, Map hints);
 }

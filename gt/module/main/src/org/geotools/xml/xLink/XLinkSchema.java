@@ -10,15 +10,21 @@
  */
 package org.geotools.xml.xLink;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAttributeValue;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Group;
@@ -58,6 +64,20 @@ public class XLinkSchema implements Schema{
      */
 	private static class ActuateSimpleType implements SimpleType{
 
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+//            return (lookUpTable.contains(value));
+            return false; // it's an attribute
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // it's an attribute ... do nothing
+        }
 		public Class getInstanceType(){
 		    return String.class;
 		}
@@ -119,6 +139,23 @@ public class XLinkSchema implements Schema{
 			}
 			return null;
 		}
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            if(canCreateAttributes(attribute,value,hints)){
+                return new DefaultAttributeValue(attribute,(String)value);
+            }
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            return attribute.getName()!=null && attribute.getName().equals(Actuate.getInstance().getName()) && lookUpTable.contains(value);
+        }
 			
 	}
 
@@ -135,6 +172,23 @@ public class XLinkSchema implements Schema{
      */
 	private static class ShowSimpleType implements SimpleType{
 
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            if(canCreateAttributes(attribute,value,hints)){
+                return new DefaultAttributeValue(attribute,(String)value);
+            }
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            return attribute.getName()!=null && attribute.getName().equals(Actuate.getInstance().getName()) && lookUpTable.contains(value);
+        }
+        
 		public Class getInstanceType(){
 		    return String.class;
 		}
@@ -196,6 +250,21 @@ public class XLinkSchema implements Schema{
 			}
 			return null;
 		}
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+//            return (lookUpTable.contains(value));
+            return false; // it's an attribute
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // it's an attribute ... do nothing
+        }
 	}
 
 	// local list of attribute declarations
@@ -1222,9 +1291,9 @@ public class XLinkSchema implements Schema{
 	}
 
 	// list or URIs supported bu this namespace
-	private URI[] uris = {
-		makeURI("xlinks.xsd"),
-	};
+	private URI uris = 
+		makeURI("xlinks.xsd")
+	;
 
 	// convinience method to deal with the URISyntaxException
 	private URI makeURI(String s){
@@ -1236,10 +1305,14 @@ public class XLinkSchema implements Schema{
 		}
 	}
 	
+	public String getPrefix(){
+	    return "xLink";
+	}
+	
 	/**
-     * @see org.geotools.xml.xsi.Schema#getURIs()
+     * @see org.geotools.xml.xsi.Schema#getURI()
      */
-	public URI[] getURIs(){
+	public URI getURI(){
 		return uris;
 	}
 

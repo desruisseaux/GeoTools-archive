@@ -30,7 +30,7 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -56,6 +56,7 @@ public class SchemaHandler extends XSIElementHandler {
     public final static String LOCALNAME = "schema";
     
     private String id;
+    private String prefix;
     private String targetNamespace;
     private String version;
     private boolean elementFormDefault;
@@ -71,8 +72,10 @@ public class SchemaHandler extends XSIElementHandler {
     private HashSet elements;
     private HashSet groups;
     private HashSet simpleTypes;
-    private HashSet uriList;
+    private URI uri;
     private Schema schema = null;
+    
+    private HashMap prefixCache;
 
     /**
      * 
@@ -86,11 +89,46 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     */
+    public void startPrefixMapping(String pref, String uri)
+            throws SAXException {
+        if(targetNamespace == null){
+            if(prefixCache ==null)
+                prefixCache = new HashMap();
+            prefixCache.put(uri,pref);
+        }else{
+            // we have already started
+            if(targetNamespace.equals(uri))
+                prefix = pref;
+        }
+    }
+    
+    /**
      * 
      * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
+
+        // targetNamespace
+        targetNamespace = atts.getValue("", "targetNamespace");
+
+        if (targetNamespace == null) {
+            targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
+        }
+        
+        if(prefixCache!=null && targetNamespace!=null && (!targetNamespace.equals(""))){
+            Iterator i = prefixCache.keySet().iterator();
+            while(i!=null && i.hasNext()){
+                String uriT = (String)i.next();
+                if(targetNamespace.equals(uriT)){
+                    prefix = (String)prefixCache.get(uriT);
+                    i = null;
+                }
+            }
+        }
+        prefixCache = null;
         
         // attributeFormDefault
         String attributeFormDefault = atts.getValue("", "attributeFormDefault");
@@ -137,37 +175,12 @@ public class SchemaHandler extends XSIElementHandler {
             id = atts.getValue(namespaceURI, "id");
         }
 
-        // targetNamespace
-        targetNamespace = atts.getValue("", "targetNamespace");
-
-        if (targetNamespace == null) {
-            targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
-        }
-
         // version
         version = atts.getValue("", "version");
 
         if (version == null) {
             version = atts.getValue(namespaceURI, "version");
         }
-    }
-
-    /**
-     * 
-     * <p>
-     * Returns true if the uri is included in the list which map to 
-     * this schema definition.
-     * </p>
-     *
-     * @param uri
-     * @return
-     */
-    public boolean includesURI(URI uri) {
-        if (uriList == null) {
-            uriList = new HashSet();
-        }
-
-        return uriList.contains(uri);
     }
 
     /**
@@ -318,8 +331,11 @@ public class SchemaHandler extends XSIElementHandler {
             return schema; // already compressed.
         }
 
-        if (!includesURI(thisURI)) {
-            uriList.add(thisURI);
+        if (uri==null) {
+            uri = thisURI;
+        }else{
+            if(thisURI!=null)
+                uri = thisURI.resolve(uri);
         }
 
         Iterator it = null;
@@ -337,9 +353,10 @@ public class SchemaHandler extends XSIElementHandler {
                 cs = SchemaFactory.getInstance(targetNamespace, incURI,
                         logger.getLevel());
 
-                if (!uriList.contains(incURI)) {
-                    uriList.add(incURI);
-                }
+                if(uri!=null)
+                    uri = incURI.resolve(uri);
+                else
+                    uri = incURI;
 
                 // already compressed
                 addSchema(cs);
@@ -364,10 +381,6 @@ public class SchemaHandler extends XSIElementHandler {
                     Schema cs = SchemaFactory.getInstance(imp.getNamespace(),
                             incURI, logger.getLevel());
 
-                    if (!uriList.contains(incURI)) {
-                        uriList.add(incURI);
-                    }
-
                     imports.add(cs);
                 } else {
                     imports.add((Schema) obj);
@@ -386,12 +399,10 @@ public class SchemaHandler extends XSIElementHandler {
         schema.finalDefault = finalDefault;
         schema.blockDefault = blockDefault;
         schema.id = id;
+        schema.prefix = prefix;
         schema.targetNamespace = targetNamespace;
         schema.version = version;
-
-        if (uriList != null) {
-            schema.URIs = (URI[]) uriList.toArray(new URI[uriList.size()]);
-        }
+        schema.uri = uri;
 
         if (imports != null) {
             schema.imports = (Schema[]) imports.toArray(new Schema[imports.size()]);
@@ -1249,16 +1260,15 @@ public class SchemaHandler extends XSIElementHandler {
                 simpleTypes.add(objs[i]);
         }
 
-        objs = s.getURIs();
-
-        if (objs != null) {
-            if ((uriList == null) && (objs.length > 0)) {
-                uriList = new HashSet();
-            }
-
-            for (int i = 0; i < objs.length; i++)
-                uriList.add(objs[i]);
+        URI tempuri = s.getURI();
+        if(uri == null){
+            uri = tempuri;
+        }else{
+            if(tempuri != null)
+                uri = tempuri.resolve(uri);
         }
+
+        
     }
 
     /**
@@ -1302,7 +1312,7 @@ public class SchemaHandler extends XSIElementHandler {
         String version;
         int finalDefault;
         int blockDefault;
-        URI[] URIs;
+        URI uri;
         Schema[] imports;
         SimpleType[] simpleTypes;
         ComplexType[] complexTypes;
@@ -1310,6 +1320,7 @@ public class SchemaHandler extends XSIElementHandler {
         Attribute[] attributes;
         Element[] elements;
         Group[] groups;
+        String prefix;
 
         /**
          * 
@@ -1409,10 +1420,10 @@ public class SchemaHandler extends XSIElementHandler {
 
         /**
          * 
-         * @see org.geotools.xml.xsi.Schema#getURIs()
+         * @see org.geotools.xml.xsi.Schema#getURI()
          */
-        public URI[] getURIs() {
-            return URIs;
+        public URI getURI() {
+            return uri;
         }
 
         /**
@@ -1436,7 +1447,14 @@ public class SchemaHandler extends XSIElementHandler {
          * @see org.geotools.xml.xsi.Schema#includesURI(java.net.URI)
          */
         public boolean includesURI(URI uri) {
-            return Arrays.binarySearch(URIs, uri) >= 0;
+            return this.uri.equals(uri);
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Schema#getPrefix()
+         */
+        public String getPrefix() {
+            return prefix;
         }
     }
 }

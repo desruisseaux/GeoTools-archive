@@ -16,6 +16,7 @@
  */
 package org.geotools.xml.xsi;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Calendar;
@@ -24,6 +25,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeValue;
+import org.geotools.xml.schema.DefaultAttributeValue;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Schema;
@@ -57,6 +64,17 @@ public class XSISimpleTypes {
      * @return
      */
     public static SimpleType find(java.lang.String type) {
+        if (m == null) {
+            load();
+        }
+
+        SimpleType r = (SimpleType) m.get(type);
+
+        return r;
+    }
+    
+    public static SimpleType find(Class type) {
+        // assuming strings and class values will not conflict
         if (m == null) {
             load();
         }
@@ -115,14 +133,68 @@ public class XSISimpleTypes {
         m.put(NormalizedString.getInstance().getName(),
             NormalizedString.getInstance());
         m.put(Token.getInstance().getName(), Token.getInstance());
-        m.put(QName.getInstance().getName(), NCName.getInstance());
-        m.put(Name.getInstance().getName(), NCName.getInstance());
+        m.put(QName.getInstance().getName(), QName.getInstance());
+        m.put(Name.getInstance().getName(), Name.getInstance());
         m.put(NCName.getInstance().getName(), NCName.getInstance());
         m.put(Boolean.getInstance().getName(), Boolean.getInstance());
         m.put(AnyURI.getInstance().getName(), AnyURI.getInstance());
         m.put(Base64Binary.getInstance().getName(), Base64Binary.getInstance());
         m.put(HexBinary.getInstance().getName(), HexBinary.getInstance());
         m.put(Language.getInstance().getName(), Language.getInstance());
+        
+
+        m.put(Integer.getInstance().getInstanceType(), Integer.getInstance());
+        m.put(Decimal.getInstance().getInstanceType(), Decimal.getInstance());
+        m.put(NegativeInteger.getInstance().getInstanceType(),
+            NegativeInteger.getInstance());
+        m.put(PositiveInteger.getInstance().getInstanceType(),
+            PositiveInteger.getInstance());
+        m.put(NonNegativeInteger.getInstance().getInstanceType(),
+            NonNegativeInteger.getInstance());
+        m.put(NonPositiveInteger.getInstance().getInstanceType(),
+            NonPositiveInteger.getInstance());
+        m.put(Long.getInstance().getInstanceType(), Long.getInstance());
+        m.put(Int.getInstance().getInstanceType(), Int.getInstance());
+        m.put(Short.getInstance().getInstanceType(), Short.getInstance());
+        m.put(Byte.getInstance().getInstanceType(), Byte.getInstance());
+        m.put(UnsignedLong.getInstance().getInstanceType(), UnsignedLong.getInstance());
+        m.put(UnsignedShort.getInstance().getInstanceType(), UnsignedShort.getInstance());
+        m.put(UnsignedInt.getInstance().getInstanceType(), UnsignedInt.getInstance());
+        m.put(UnsignedByte.getInstance().getInstanceType(), UnsignedByte.getInstance());
+        m.put(Float.getInstance().getInstanceType(), Float.getInstance());
+        m.put(Double.getInstance().getInstanceType(), Double.getInstance());
+
+        m.put(Date.getInstance().getInstanceType(), Date.getInstance());
+        m.put(DateTime.getInstance().getInstanceType(), DateTime.getInstance());
+        m.put(Duration.getInstance().getInstanceType(), Duration.getInstance());
+        m.put(gDay.getInstance().getInstanceType(), gDay.getInstance());
+        m.put(gMonth.getInstance().getInstanceType(), gMonth.getInstance());
+        m.put(gMonthDay.getInstance().getInstanceType(), gMonthDay.getInstance());
+        m.put(gYear.getInstance().getInstanceType(), gYear.getInstance());
+        m.put(gYearMonth.getInstance().getInstanceType(), gYearMonth.getInstance());
+        m.put(Time.getInstance().getInstanceType(), Time.getInstance());
+
+        m.put(ID.getInstance().getInstanceType(), ID.getInstance());
+        m.put(IDREF.getInstance().getInstanceType(), IDREF.getInstance());
+        m.put(IDREFS.getInstance().getInstanceType(), IDREFS.getInstance());
+        m.put(ENTITY.getInstance().getInstanceType(), ENTITY.getInstance());
+        m.put(ENTITIES.getInstance().getInstanceType(), ENTITIES.getInstance());
+        m.put(NMTOKEN.getInstance().getInstanceType(), NMTOKEN.getInstance());
+        m.put(NMTOKENS.getInstance().getInstanceType(), NMTOKENS.getInstance());
+        m.put(NOTATION.getInstance().getInstanceType(), NOTATION.getInstance());
+
+        m.put(String.getInstance().getInstanceType(), String.getInstance());
+        m.put(NormalizedString.getInstance().getInstanceType(),
+            NormalizedString.getInstance());
+        m.put(Token.getInstance().getInstanceType(), Token.getInstance());
+        m.put(QName.getInstance().getInstanceType(), QName.getInstance());
+        m.put(Name.getInstance().getInstanceType(), Name.getInstance());
+        m.put(NCName.getInstance().getInstanceType(), NCName.getInstance());
+        m.put(Boolean.getInstance().getInstanceType(), Boolean.getInstance());
+        m.put(AnyURI.getInstance().getInstanceType(), AnyURI.getInstance());
+        m.put(Base64Binary.getInstance().getInstanceType(), Base64Binary.getInstance());
+        m.put(HexBinary.getInstance().getInstanceType(), HexBinary.getInstance());
+        m.put(Language.getInstance().getInstanceType(), Language.getInstance());
     }
 
     /**
@@ -133,6 +205,45 @@ public class XSISimpleTypes {
      *
      */
     protected static abstract class XSISimpleType implements SimpleType {
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            // TODO ensure equals works here
+            return value!=null && value.getClass().equals(getInstanceType()) && attribute.getSimpleType()!=null && this.getClass().equals(attribute.getSimpleType().getClass());
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO ensure equals works here
+            return value!=null && value.getClass().equals(getInstanceType()) && element.getType()!=null && this.getClass().equals(element.getType().getClass());
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            return new DefaultAttributeValue(attribute,value.toString());
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(element == null){
+                output.startElement(getNamespace(),getName(),null);
+            	output.characters(value.toString());
+            	output.endElement(getNamespace(),getName());
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+            	output.characters(value.toString());
+            	output.endElement(element.getNamespace(),element.getName());
+            }
+        }
+        
         /**
          * <p>
          * This method is intended to return an instance of the implemented type.

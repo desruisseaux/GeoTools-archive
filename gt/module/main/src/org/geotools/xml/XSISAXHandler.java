@@ -69,6 +69,13 @@ public class XSISAXHandler extends DefaultHandler {
     }
 
     /**
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     */
+    public void startPrefixMapping(String arg0, String arg1)
+            throws SAXException {
+        rootHandler.startPrefixMapping(arg0, arg1);
+    }
+    /**
      * Stores the uri being parsed to help resolve relative uris within the
      * document.
      * 
@@ -76,6 +83,7 @@ public class XSISAXHandler extends DefaultHandler {
      */
     public XSISAXHandler(URI uri) {
         this.uri = uri;
+        rootHandler = new RootHandler(uri);
     }
 
     /**
@@ -85,7 +93,7 @@ public class XSISAXHandler extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#endDocument()
      */
     public void endDocument() throws SAXException {
-        rootHandler = ((RootHandler) handlers.pop());
+        handlers.pop();
     }
 
     /**
@@ -96,7 +104,7 @@ public class XSISAXHandler extends DefaultHandler {
      */
     public void startDocument() throws SAXException {
         try {
-            handlers.push(new RootHandler(uri));
+            handlers.push(rootHandler);
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw e;

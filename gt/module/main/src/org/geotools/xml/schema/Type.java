@@ -10,8 +10,12 @@
  */
 package org.geotools.xml.schema;
 
+import java.io.IOException;
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.PrintHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -97,4 +101,27 @@ public interface Type {
      * @return
      */
     public Class getInstanceType();
+
+
+    /**
+     * 
+     * @param element The element which may be used to represent the Object. This is included to allow for child definitions to include addition information where appropriate. 
+     * @param value An Object which may or may not be encodeable by this type. The value may also be null.
+     * 
+     * @return True when the encode method can interpret the given element/value pair into valid xml.
+     * 
+     * @see Type#encode(Element, Object, Writer, Map)
+     */
+    public boolean canEncode(Element element, Object value, Map hints);
+    
+    /**
+     * @param element The original element declaration to which we should encode. 
+     * @param value The Object to encode.
+     * @param output This is where the output should be written to.
+     * @param hints For providing additional context information to specific schemas.
+     * @throws IOException When there is an error with the Writer.
+     * @throws OperationNotSupportedException When this type cannot be encoded ... and wasn't checked first.
+     */
+    public void encode(Element element, Object value, PrintHandler output, Map hints) 
+    	throws IOException, OperationNotSupportedException;
 }

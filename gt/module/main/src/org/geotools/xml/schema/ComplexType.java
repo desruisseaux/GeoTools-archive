@@ -29,6 +29,7 @@ import java.util.Map;
  * @author dzwiers www.refractions.net
  */
 public interface ComplexType extends Type {
+    
     /**
      * Returns true when the complexType should be considered abstract, as 
      * defined by the XML schema of which this complex type definition is a 

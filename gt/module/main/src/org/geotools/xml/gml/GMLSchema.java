@@ -16,10 +16,13 @@
  */
 package org.geotools.xml.gml;
 
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAttributeValue;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Group;
@@ -30,10 +33,14 @@ import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -71,7 +78,7 @@ public class GMLSchema implements Schema {
     private static SimpleType[] simpleTypes = { new GMLNullType(), };
 
     // this schema's set of supported uri's
-    private URI[] uris = { makeURI("geometry.xsd"), makeURI("feature.xsd"), };
+    private URI uri = makeURI(NAMESPACE);
 
     /**
      * Creates a new GMLSchema object.
@@ -411,8 +418,8 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getURIs()
      */
-    public URI[] getURIs() {
-        return uris;
+    public URI getURI() {
+        return uri;
     }
 
     static class AttributeList {
@@ -943,5 +950,56 @@ public class GMLSchema implements Schema {
         public Class getInstanceType() {
             return String.class;
         }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            final String[] enumeration = {
+                    "inapplicable", "unknown", "unavailable", "missing"
+                };
+
+            if (Arrays.binarySearch(enumeration, value) < 0) {
+                // not found
+                return new DefaultAttributeValue(attribute,null);
+            }
+            return new DefaultAttributeValue(attribute,value.toString());
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            final String[] enumeration = {
+                    "inapplicable", "unknown", "unavailable", "missing"
+                };
+                return Arrays.binarySearch(enumeration, value) < 0;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            final String[] enumeration = {
+                    "inapplicable", "unknown", "unavailable", "missing"
+                };
+                return Arrays.binarySearch(enumeration, value) < 0;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            output.startElement(element.getNamespace(),element.getName(),null);
+            output.characters(value.toString());
+            output.endElement(element.getNamespace(),element.getName());
+        }
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Schema#getPrefix()
+     */
+    public String getPrefix() {
+        return "gml";
     }
 }

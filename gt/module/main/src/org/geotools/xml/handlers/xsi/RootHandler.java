@@ -55,6 +55,7 @@ public class RootHandler extends XSIElementHandler {
      */
     public RootHandler(URI uri) {
         this.uri = uri;
+        schema = new SchemaHandler();
     }
 
     /**
@@ -73,7 +74,8 @@ public class RootHandler extends XSIElementHandler {
         throws SAXException {
         if (SchemaHandler.LOCALNAME.equalsIgnoreCase(localName)
                 && SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
-            schema = new SchemaHandler();
+            if(schema == null)
+                schema = new SchemaHandler();
 
             return schema;
         }
@@ -113,6 +115,15 @@ public class RootHandler extends XSIElementHandler {
         Schema s = schema.compress(uri);
 
         return s;
+    }
+    
+
+    /**
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     */
+    public void startPrefixMapping(String arg0, String arg1)
+            throws SAXException {
+        schema.startPrefixMapping(arg0, arg1);
     }
 
     /**

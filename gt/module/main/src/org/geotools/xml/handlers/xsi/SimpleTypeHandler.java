@@ -16,7 +16,12 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XSIElementHandler;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeValue;
+import org.geotools.xml.schema.DefaultAttribute;
+import org.geotools.xml.schema.DefaultAttributeValue;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.SimpleType;
@@ -24,6 +29,8 @@ import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -31,6 +38,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -762,6 +771,116 @@ public class SimpleTypeHandler extends XSIElementHandler {
              */
             public Object getValue() {
                 return val;
+            }
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+            if(value == null)return null;
+            if(isUnion){
+                for(int i=0;i<children.length;i++){
+                    // finds first that works
+                    // TODO check that 'equals' works here
+                    if(children[i].equals(attribute.getSimpleType()) && children[i].canCreateAttributes(attribute,value,hints))
+                        return children[i].toAttribute(attribute,value,hints);
+                }
+                return children[0].toAttribute(attribute,value,hints);
+            }else{
+                if(isList){
+                    List l = (List)value;
+                    Iterator i = l.iterator();
+                    String s = "";
+                    if(i.hasNext()){
+                        Object t = children[0].toAttribute(attribute,i.next(),hints).getValue();
+                        s = t.toString();
+                        while(i.hasNext()){
+                            t = children[0].toAttribute(attribute,i.next(),hints).getValue();
+                            s = s+" "+t.toString();
+                    	}
+                    }
+                    return new DefaultAttributeValue(attribute,s);
+                }else
+                    return children[0].toAttribute(attribute,value,hints);
+            }
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         */
+        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+            if(value == null)return false;
+            if(isUnion){
+                for(int i=0;i<children.length;i++){
+                    // finds first that works
+                    // TODO check that 'equals' works here
+                    if(children[i].equals(attribute.getSimpleType()) && children[i].canCreateAttributes(attribute,value,hints))
+                        return true;
+                }
+                return false;
+            }else{
+                if(isList){
+                    return children[0].canCreateAttributes(attribute,value,hints);
+                }else
+                    return children[0].canCreateAttributes(attribute,value,hints);
+            }
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null)return false;
+            if(isUnion){
+                for(int i=0;i<children.length;i++){
+                    // finds first that works
+                    // TODO check that 'equals' works here
+                    if(children[i].equals(element.getType()) && children[i].canEncode(element,value,hints))
+                        return true;
+                }
+                return false;
+            }else{
+                if(isList){
+                    return children[0].canEncode(element,value,hints);
+                }else
+                    return children[0].canEncode(element,value,hints);
+            }
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null)return;
+            if(isUnion){
+                for(int i=0;i<children.length;i++){
+                    // finds first that works
+                    // TODO check that 'equals' works here
+                    if(children[i].equals(element.getType()) && children[i].canEncode(element,value,hints))
+                        children[i].encode(element,value,output,hints);
+                    	return;
+                }
+                children[0].encode(element,value,output,hints);
+                return;
+            }else{
+                if(isList){
+                    List l = (List)value;
+                    Iterator i = l.iterator();
+                    String s = "";
+                    if(i.hasNext()){
+                        Object t = children[0].toAttribute(new DefaultAttribute(null,null,children[0],0,null,null,false),value,hints).getValue();
+                        s = t.toString();
+                        while(i.hasNext()){
+                            t = children[0].toAttribute(new DefaultAttribute(null,null,children[0],0,null,null,false),value,hints).getValue();
+                            s = s+" "+t.toString();
+                    	}
+                    }
+                    children[0].encode(element,s,output,hints);
+                    return;
+                }else
+                    children[0].encode(element,value,output,hints);
+                	return;
             }
         }
     }

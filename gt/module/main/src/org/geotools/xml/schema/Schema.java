@@ -188,14 +188,22 @@ public interface Schema {
 
     /**
      * <p>
-     * Gets the list of URIs which are represented by this Schema. This allows
-     * one Schema to represent one targetNamespace, but be potentially
-     * represented in more than one file.
+     * Gets the URI which is represented by this Schema. 
      * </p>
      *
      * @return
      */
-    public URI[] getURIs();
+    public URI getURI();
+    
+
+    /**
+     * <p>
+     * Gets the recommended prefix for this schema.
+     * </p>
+     *
+     * @return
+     */
+    public String getPrefix();
 
     /**
      * <p>
@@ -236,6 +244,8 @@ public interface Schema {
      * <p>
      * This looks to see if the URI passed in is represented by this Schema.
      * Often this method uses some heuritics on the list of included URIs.
+     * This allows one Schema to represent one targetNamespace, but be 
+     * potentially represented in more than one file.
      * </p>
      *
      * @param uri

@@ -328,6 +328,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         DefaultElement elem = new DefaultElement();
         elem.id = id;
         elem.name = name;
+        elem.namespace = parent.getTargetNamespace();
         elem.defaulT = defaulT;
         elem.fixed = fixed;
         elem.block = block;
@@ -427,6 +428,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         String id;
         String defaulT;
         String fixed;
+        String namespace;
         Element substitutionGroup;
         Type type;
 
@@ -550,6 +552,13 @@ public class ElementTypeHandler extends ElementGroupingHandler {
          */
         public String getId() {
             return id;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Element#getNamespace()
+         */
+        public String getNamespace() {
+            return namespace;
         }
     }
 }

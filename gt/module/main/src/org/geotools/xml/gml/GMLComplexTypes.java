@@ -34,11 +34,14 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.xml.PrintHandler;
+import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema.AttributeList;
 import org.geotools.xml.gml.GMLSchema.GMLAttribute;
 import org.geotools.xml.gml.GMLSchema.GMLComplexType;
@@ -50,6 +53,7 @@ import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xLink.XLinkSchema;
@@ -57,9 +61,14 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -398,6 +407,20 @@ public class GMLComplexTypes {
         public Element findChildElement(String name) {
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -515,6 +538,20 @@ public class GMLComplexTypes {
          */
         public Element findChildElement(String name) {
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
         }
     }
 
@@ -648,6 +685,30 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Geometry));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Geometry g = (Geometry)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            GMLComplexTypes.encode(element,g,output);
+            output.endElement(element.getNamespace(),element.getName());
+            
         }
     }
 
@@ -789,6 +850,30 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Geometry));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Point g = (Point)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            GMLComplexTypes.encode(null,g,output);
+            output.endElement(element.getNamespace(),element.getName());
+            
+        }
     }
 
     /**
@@ -925,6 +1010,30 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof LineString));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            LineString g = (LineString)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            GMLComplexTypes.encode(null,g,output);
+            output.endElement(element.getNamespace(),element.getName());
+            
         }
     }
 
@@ -1066,6 +1175,30 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Polygon));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Polygon g = (Polygon)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            GMLComplexTypes.encode(null,g,output);
+            output.endElement(element.getNamespace(),element.getName());
+            
+        }
     }
 
     /**
@@ -1206,6 +1339,30 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof LinearRing));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            LinearRing g = (LinearRing)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            GMLComplexTypes.encode(null,g,output);
+            output.endElement(element.getNamespace(),element.getName());
+            
+        }
     }
 
     /**
@@ -1342,6 +1499,28 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Point));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Point g = (Point)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+            
         }
     }
 
@@ -1493,6 +1672,28 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof LineString));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            LineString g = (LineString)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+            
+        }
     }
 
     /**
@@ -1641,6 +1842,28 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof LinearRing));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            LinearRing g = (LinearRing)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+            
         }
     }
 
@@ -1796,6 +2019,47 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Geometry));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Geometry g = (Geometry)value;
+
+            AttributesImpl ai = new AttributesImpl();
+            // no GID
+            if(g.getUserData()!=null){
+                // TODO Fix this when parsing is better ... should be a coord reference system
+                ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+            }else{
+                if(g.getSRID()!=0){
+                    // deprecated version
+                    ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+                }else
+                    ai = null;
+            }
+
+            if(g == null || g.getCoordinates() == null || g.getCoordinates().length == 0)
+                return;
+            
+            output.startElement(GMLSchema.NAMESPACE,element.getName(),ai);
+            Coordinate[] coords = g.getCoordinates();
+            encodeCoords(element,coords,output);
+            output.endElement(GMLSchema.NAMESPACE,element.getName());
+            
+        }
     }
 
     /**
@@ -1931,6 +2195,28 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Polygon));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Polygon g = (Polygon)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+            
+        }
     }
 
     /**
@@ -2048,6 +2334,27 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof GeometryCollection));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            GeometryCollection g = (GeometryCollection)value;
+            
+            GMLComplexTypes.encode(element,g,output);
         }
     }
 
@@ -2170,6 +2477,27 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof MultiPoint));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            MultiPoint g = (MultiPoint)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+        }
     }
 
     /**
@@ -2291,6 +2619,27 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof MultiLineString));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            MultiLineString g = (MultiLineString)value;
+            
+            GMLComplexTypes.encode(element,g,output);
+        }
     }
 
     /**
@@ -2411,6 +2760,27 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof MultiPolygon));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            MultiPolygon g = (MultiPolygon)value;
+            
+            GMLComplexTypes.encode(element,g,output);
         }
     }
 
@@ -2557,6 +2927,27 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Coordinate));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            Coordinate g = (Coordinate)value;
+            
+            GMLComplexTypes.encodeCoord(element,g,output);
         }
     }
 
@@ -2732,6 +3123,27 @@ public class GMLComplexTypes {
          */
         public boolean isMixed() {
             return true;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof CoordinateSequence));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            CoordinateSequence g = (CoordinateSequence)value;
+            
+            GMLComplexTypes.encodeCoords(element,g,output);
         }
     }
 
@@ -2974,6 +3386,72 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || element == null || !(value instanceof Feature))
+                return false;
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(canEncode(element,value,hints)){
+                Feature f = (Feature)value;
+                if(element == null){
+                    print(f,output,hints);
+                }else{
+                    print(element,f,output,hints);
+                }
+            }
+        }
+        
+        private void print(Element e,Feature f, PrintHandler ph, Map hints) throws OperationNotSupportedException, IOException{
+            AttributesImpl ai = new AttributesImpl();
+            if(f.getID()!=null && !f.getID().equals(""))
+                ai.addAttribute("","fid","","ID",f.getID());
+            else
+                ai = null;
+            ph.startElement(e.getNamespace(),e.getName(),ai);
+            
+            FeatureType ft = f.getFeatureType();
+            AttributeType[] ats = ft.getAttributeTypes();
+            if(ats!=null){
+                for(int i=0;i<ats.length;i++){
+                    Element e2 = e.findChildElement(ats[i].getName());
+                    e2.getType().encode(e2,f.getAttribute(i),ph,hints);
+                }
+            }
+            
+            ph.endElement(e.getNamespace(),e.getName());
+        }
+        
+        private void print(Feature f, PrintHandler ph, Map hints) throws OperationNotSupportedException, IOException{
+            AttributesImpl ai = new AttributesImpl();
+            if(f.getID()!=null && !f.getID().equals(""))
+                ai.addAttribute("","fid","","ID",f.getID());
+            else
+                ai = null;
+            ph.startElement(GMLSchema.NAMESPACE,"_Feature",ai);
+            
+            FeatureType ft = f.getFeatureType();
+            AttributeType[] ats = ft.getAttributeTypes();
+            if(ats!=null){
+                for(int i=0;i<ats.length;i++){
+                    Type t = XSISimpleTypes.find(ats[i].getType());
+                    t.encode(null,f.getAttribute(i),ph,hints);
+                }
+            }
+            
+            ph.endElement(GMLSchema.NAMESPACE,"_Feature");
+        }
     }
 
     /**
@@ -3201,6 +3679,66 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof FeatureCollection));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || (!(value instanceof FeatureCollection)))
+                return;
+            
+            if(element == null)
+                output.startElement(GMLSchema.NAMESPACE,"_featureCollection",null);
+            else
+                output.startElement(element.getNamespace(),element.getName(),null);
+            
+            FeatureCollection fc = (FeatureCollection)value;
+            
+            if(fc.getBounds()!=null){
+                BoundingShapeType.getInstance().encode(null,fc.getBounds(),output,hints);
+            }
+            
+            FeatureIterator i = fc.features();
+            Element e = null;
+            while(i.hasNext()){
+                Feature f = i.next();
+                output.startElement(GMLSchema.NAMESPACE,"featureMember",null);
+                if(e == null){
+                    Schema s = SchemaFactory.getInstance(element.getNamespace());
+                    FeatureType ft = f.getFeatureType();
+                    Element[] elems = s.getElements();
+                    if(elems!=null && ft.getTypeName()!=null)
+                        for(int j=0;j<elems.length;j++)
+                            if(ft.getTypeName().equalsIgnoreCase(elems[j].getName())){
+                                // possible match, check inheritance
+                                
+                                if(elems[j].getType()!=null && AbstractFeatureType.getInstance().canEncode(elems[j],f,hints)){
+                                    e = elems[j];
+                                    j = elems.length;
+                                }
+                            }
+                }
+                if(e == null)
+                    throw new NullPointerException("Feature Definition not found in Schema "+element.getNamespace());
+                AbstractFeatureType.getInstance().encode(e,f,output,hints);
+                output.endElement(GMLSchema.NAMESPACE,"featureMember");
+            }
+
+            if(element == null)
+                output.startElement(GMLSchema.NAMESPACE,"_featureCollection",null);
+            else
+                output.startElement(element.getNamespace(),element.getName(),null);
+        }
     }
 
     /**
@@ -3324,6 +3862,36 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return (t!=null && (value instanceof Geometry));
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!(value instanceof Geometry))
+                return;
+            Geometry g = (Geometry)value;
+            if(element == null)
+                output.startElement(GMLSchema.NAMESPACE,"geometryProperty",null);
+            else
+                output.startElement(element.getNamespace(),element.getName(),null);
+            
+            GMLComplexTypes.encode(null,g,output);
+
+            if(element == null)
+                output.endElement(GMLSchema.NAMESPACE,"geometryProperty");
+            else
+                output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -3454,6 +4022,35 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(!(value instanceof Feature))
+                return false;
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return t == this;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!(value instanceof Feature))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"featureMember",null);
+                AbstractFeatureType.getInstance().encode(null,value,output,hints);
+                output.endElement(GMLSchema.NAMESPACE,"featureMember");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                AbstractFeatureType.getInstance().encode(element.findChildElement(((Feature)value).getFeatureType().getTypeName()),value,output,hints);
+                output.endElement(element.getNamespace(),element.getName());
+            }
+        }
     }
 
     /**
@@ -3559,6 +4156,54 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || element == null || !(value instanceof Geometry))
+                return false;
+            Type t = element.getType();
+            while(t!=null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!(value instanceof Geometry))
+                return;
+            
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"boundedBy",null);
+                BoxType.getInstance().encode(null,value,output,hints);
+                output.endElement(GMLSchema.NAMESPACE,"boundedBy");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                if(element.findChildElement("Box")!=null){
+                    if(element.findChildElement("Box").getType().canEncode(element.findChildElement("Box"),value,hints)){
+                        element.findChildElement("Box").getType().encode(element.findChildElement("Box"),value,output,hints);
+                    }
+                }
+                Schema s = SchemaFactory.getInstance(element.getNamespace());
+            	Element[] elems = s.getElements();
+            	if(elems!=null){
+            	    for(int i=0;i<elems.length;i++){
+            	        // TODO check for .equals working
+            	        if(elems[i].getSubstitutionGroup()!=null && elems[i].getSubstitutionGroup().equals((new GMLSchema()).getElements()[41]) &&
+            	            elems[i].getType().canEncode(elems[i],value,hints)){
+            	            elems[i].getType().encode(elems[i],value,output,hints);
+                            output.endElement(element.getNamespace(),element.getName());
+            	            return;
+            	        }
+            	    }
+            	}
+            	BoxType.getInstance().encode(null,value,output,hints);
+                output.endElement(element.getNamespace(),element.getName());
+            }
         }
     }
 
@@ -3668,6 +4313,35 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof Point))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof Point))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"pointProperty",null);
+                GMLComplexTypes.encode(null,(Point)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"pointProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(Point)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
+        }
     }
 
     /**
@@ -3775,6 +4449,35 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof Polygon))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof Polygon))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"polygonProperty",null);
+                GMLComplexTypes.encode(null,(Polygon)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"polygonProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(Polygon)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
         }
     }
 
@@ -3884,6 +4587,35 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof LineString))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof Point))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"lineStringProperty",null);
+                GMLComplexTypes.encode(null,(LineString)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"lineStringProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(LineString)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
+        }
     }
 
     /**
@@ -3991,6 +4723,35 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof MultiPoint))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof MultiPoint))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"multiPointProperty",null);
+                GMLComplexTypes.encode(null,(MultiPoint)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"multiPointProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(MultiPoint)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
         }
     }
 
@@ -4101,6 +4862,35 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof MultiLineString))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof MultiLineString))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"multiLineStringProperty",null);
+                GMLComplexTypes.encode(null,(MultiLineString)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"multiLineStringProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(MultiLineString)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
+        }
     }
 
     /**
@@ -4209,6 +4999,35 @@ public class GMLComplexTypes {
                 }
 
             return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof MultiPolygon))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof MultiPolygon))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"multiPolygonProperty",null);
+                GMLComplexTypes.encode(null,(MultiPolygon)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"multiPolygonProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(MultiPolygon)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
         }
     }
 
@@ -4319,5 +5138,352 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            if(value == null || !(value instanceof GeometryCollection))
+                return false;
+            Type t = element.getType();
+            while(t != null && t!=this)
+                t = t.getParent();
+            return t!=null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(value == null || !(value instanceof GeometryCollection))
+                return;
+            if(element == null){
+                output.startElement(GMLSchema.NAMESPACE,"multiGeometryProperty",null);
+                GMLComplexTypes.encode(null,(GeometryCollection)value,output);
+                output.endElement(GMLSchema.NAMESPACE,"multiGeometryProperty");
+            }else{
+                output.startElement(element.getNamespace(),element.getName(),null);
+                GMLComplexTypes.encode(null,(GeometryCollection)value,output);
+                output.endElement(element.getNamespace(),element.getName());
+            }
+        }
+    }
+    
+    static void encode(Element e, Geometry g, PrintHandler output) throws IOException{
+        if(g instanceof Point){
+            encode(e,(Point)g,output);
+            return;
+        }
+        if(g instanceof Polygon){
+            encode(e,(Polygon)g,output);
+            return;
+        }
+        if(g instanceof LinearRing){
+            encode(e,(LinearRing)g,output);
+        return;
+    }
+        if(g instanceof LineString){
+            encode(e,(LineString)g,output);
+        return;
+}
+        if(g instanceof MultiLineString){
+            encode(e,(MultiLineString)g,output);
+        return;
+    }
+        if(g instanceof MultiPolygon){
+            encode(e,(MultiPolygon)g,output);
+        return;
+    }
+        if(g instanceof MultiPoint){
+            encode(e,(MultiPoint)g,output);
+            return;
+        }
+        if(g instanceof GeometryCollection){
+            encode(e,(GeometryCollection)g,output);
+            return;
+        }
+    }
+    
+    static void encode(Element e, Point g, PrintHandler output) throws IOException{
+        if(g == null || g.getCoordinate()==null)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"point",ai);
+        else
+            output.startElement(e.getNamespace(),e.getName(),ai);
+        encodeCoords(null,g.getCoordinates(),output);
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"point");
+        else
+            output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, LineString g, PrintHandler output) throws IOException{
+        if(g == null || g.getCoordinates()==null)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"lineString",ai);
+        else
+            output.startElement(e.getNamespace(),e.getName(),ai);
+        encodeCoords(null,g.getCoordinates(),output);
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"lineString");
+        else
+            output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, LinearRing g, PrintHandler output) throws IOException{
+        if(g == null || g.getCoordinates()==null)
+            return;
+        if(e == null)
+            encode((new GMLSchema()).getElements()[39],(LineString)g,output);
+        else
+            encode(e,(LineString)g,output);
+        
+    }
+    
+    static void encode(Element e, Polygon g, PrintHandler output) throws IOException{
+        if(g == null || g.getCoordinates()==null)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+        
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"polygon",ai);
+        else
+            output.startElement(e.getNamespace(),e.getName(),ai);
+        encode((new GMLSchema()).getElements()[35],(LinearRing)g.getExteriorRing(),output);
+        if(g.getNumInteriorRing()>0)
+        for(int i=0;i<g.getNumInteriorRing();i++)
+            encode((new GMLSchema()).getElements()[36],(LinearRing)g.getInteriorRingN(i),output);
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"polygon");
+        else
+            output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, MultiPoint g, PrintHandler output) throws IOException{
+        
+        if(g == null || g.getNumPoints()>0)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // 	no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+    
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"multiPoint",ai);
+        else
+        	output.startElement(e.getNamespace(),e.getName(),ai);
+        
+        for(int i=0;i<g.getNumGeometries();i++){
+            output.startElement(GMLSchema.NAMESPACE,"pointMember",null);
+            encode(null,(Point)g.getGeometryN(i),output);
+            output.endElement(GMLSchema.NAMESPACE,"pointMember");
+        }
+
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"multiPoint");
+        else
+        	output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, MultiLineString g, PrintHandler output) throws IOException{
+        if(g == null || g.getNumPoints()>0)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // 	no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+    
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"multiLineString",ai);
+        else
+        	output.startElement(e.getNamespace(),e.getName(),ai);
+        
+        for(int i=0;i<g.getNumGeometries();i++){
+            output.startElement(GMLSchema.NAMESPACE,"lineStringMember",null);
+            encode(null,(LineString)g.getGeometryN(i),output);
+            output.endElement(GMLSchema.NAMESPACE,"lineStringMember");
+        }
+
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"multiLineString");
+        else
+        	output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, MultiPolygon g, PrintHandler output) throws IOException{
+        if(g == null || g.getNumPoints()>0)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // 	no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+    
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"multiPolygon",ai);
+        else
+        	output.startElement(e.getNamespace(),e.getName(),ai);
+        
+        for(int i=0;i<g.getNumGeometries();i++){
+            output.startElement(GMLSchema.NAMESPACE,"polygonMember",null);
+            encode(null,(Polygon)g.getGeometryN(i),output);
+            output.endElement(GMLSchema.NAMESPACE,"polygonMember");
+        }
+
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"multiPolygon");
+        else
+        	output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encode(Element e, GeometryCollection g, PrintHandler output) throws IOException{
+        if(g == null || g.getNumPoints()>0)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        // 	no GID
+        if(g.getUserData()!=null){
+            // TODO Fix this when parsing is better ... should be a coord reference system
+            ai.addAttribute("","srsName","","anyURI",g.getUserData().toString());
+        }else{
+            if(g.getSRID()!=0){
+                // deprecated version
+                ai.addAttribute("","srsName","","anyURI",""+g.getSRID());
+            }else
+                ai = null;
+        }
+    
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"multiGeometry",ai);
+        else
+        	output.startElement(e.getNamespace(),e.getName(),ai);
+        
+        for(int i=0;i<g.getNumGeometries();i++){
+            output.startElement(GMLSchema.NAMESPACE,"geometryMember",null);
+            encode(null,(Polygon)g.getGeometryN(i),output);
+            output.endElement(GMLSchema.NAMESPACE,"geometryMember");
+        }
+
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"multiGeometry");
+        else
+        	output.endElement(e.getNamespace(),e.getName());
+    }
+    
+    static void encodeCoord(Element e, Coordinate coord, PrintHandler output) throws IOException{
+        if(coord == null)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        ai.addAttribute("","X","","decimal",""+coord.x);
+        ai.addAttribute("","Y","","decimal",""+coord.y);
+        if(coord.z != Double.NaN)
+            ai.addAttribute("","Z","","decimal",""+coord.z);
+        if(e == null)
+            output.element(GMLSchema.NAMESPACE,"coord",ai);
+        else
+            output.element(e.getNamespace(),e.getName(),ai);
+    }
+    
+    static void encodeCoords(Element e, CoordinateSequence coords, PrintHandler output) throws IOException{
+        if(coords == null || coords.size()==0)
+            return;
+        encodeCoords(e,coords.toCoordinateArray(),output);
+    }
+    
+    static void encodeCoords(Element e, Coordinate[] coords, PrintHandler output) throws IOException{
+        if(coords == null || coords.length==0)
+            return;
+        AttributesImpl ai = new AttributesImpl();
+        String dec,cs,ts;
+        dec = ".";
+        cs = ",";
+        ts = " ";
+        ai.addAttribute("","decimal","","string",dec);
+        ai.addAttribute("","cs","","string",cs);
+        ai.addAttribute("","ts","","string",ts);
+        
+        if(e == null)
+            output.startElement(GMLSchema.NAMESPACE,"coordinates",ai);
+        else
+            output.startElement(e.getNamespace(),e.getName(),ai);
+        
+        Coordinate c = coords[0];
+        if(c.z == Double.NaN)
+            output.characters(c.x+cs+c.y);
+        else
+            output.characters(c.x+cs+c.y+cs+c.z);
+        for(int i=1;i<coords.length;i++){
+            c = coords[i];
+            if(c.z == Double.NaN)
+                output.characters(ts+c.x+cs+c.y);
+            else
+                output.characters(ts+c.x+cs+c.y+cs+c.z);
+        }
+        
+        if(e == null)
+            output.endElement(GMLSchema.NAMESPACE,"coordinates");
+        else
+            output.endElement(e.getNamespace(),e.getName());
     }
 }

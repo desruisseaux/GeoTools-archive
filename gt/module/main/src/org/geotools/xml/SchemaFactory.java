@@ -294,6 +294,7 @@ public class SchemaFactory {
         private String id;
 
         private String version;
+        private String prefix;
 
         private String targetNamespace;
 
@@ -305,7 +306,7 @@ public class SchemaFactory {
 
         private boolean eForm;
 
-        private URI[] uris;
+        private URI uri;
 
         /**
          * This completes the merge of two schemas, s1 and s2. When there is a
@@ -554,28 +555,24 @@ public class SchemaFactory {
 
             HashSet hs = new HashSet();
 
-            URI[] u1 = s1.getURIs();
+            URI u1 = s1.getURI();
 
-            if (u1 == null) {
-                u1 = new URI[0];
+
+            URI u2 = s2.getURI();
+
+            if(u1 == null){
+                uri = u2;
+            }else{
+                if(u2 ==null)
+                    uri = u1;
+                else
+                    uri = u2.relativize(u1);
             }
-
-            URI[] u2 = s2.getURIs();
-
-            if (u2 == null) {
-                u2 = new URI[0];
+            if(s1.getPrefix()==null || s1.getPrefix().equals("")){
+                prefix = s2.getPrefix();
+            }else{
+                prefix = s1.getPrefix();
             }
-
-            for (int i = 0; i < u1.length; i++)
-                hs.add(u1[i]);
-
-            for (int i = 0; i < u2.length; i++)
-                if (!hs.contains(u2[i])) {
-                    hs.add(u2[i]);
-                }
-
-            uris = new URI[hs.size()];
-            uris = (URI[]) hs.toArray(uris);
         }
 
         /**
@@ -666,16 +663,11 @@ public class SchemaFactory {
          * @see schema.Schema#includesURI(java.net.URI)
          */
         public boolean includesURI(URI uri) {
-            if (uris == null) {
+            if (uri == null) {
                 return false;
             }
 
-            for (int i = 0; i < uris.length; i++)
-                if (uris[i].equals(uri)) {
-                    return true;
-                }
-
-            return false;
+            return this.uri.equals(uri);
         }
 
         /**
@@ -695,8 +687,12 @@ public class SchemaFactory {
         /**
          * @see schema.Schema#getURIs()
          */
-        public URI[] getURIs() {
-            return uris;
+        public URI getURI() {
+            return uri;
+        }
+        
+        public String getPrefix(){
+            return prefix;
         }
     }
 }
