@@ -33,55 +33,22 @@ import junit.framework.TestCase;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMS1_1_1Test extends TestCase {
+public class WMS1_1_1Test extends WMS1_1_0Test {
 
-	URL server;
-	
 	public WMS1_1_1Test() throws Exception {
+		this.spec = new WMS1_1_1();
 		this.server = new URL(
 		"http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");
 	}
 
 	public void testGetName() {
-		WMS1_1_1 spec = new WMS1_1_1();
 		assertEquals(spec.getName(), "WMT_MS_Capabilities");
 	}
 
 	public void testGetVersion() {
-		WMS1_1_1 spec = new WMS1_1_1();
 		assertEquals(spec.getVersion(), "1.1.1");
 	}
-
-	public void testCreateGetCapabilitiesRequest() {
-		WMS1_1_1 spec = new WMS1_1_1();
-		GetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
-		
-		Properties properties = new Properties();
-
-        StringTokenizer tokenizer = new StringTokenizer(request.getFinalURL()
-                                                               .getQuery(), "&");
-
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
-            String[] param = token.split("=");
-            properties.setProperty(param[0].toUpperCase(), param[1]);
-        }
-        
-        assertEquals(properties.get("VERSION"), "1.1.1");
-        assertEquals(properties.get("REQUEST"), "GetCapabilities");
-        assertEquals(properties.get("SERVICE"), "WMS");
-        
-        WebMapServer wms = new WebMapServer(server, true);
-        WMSCapabilities capabilities = wms.getCapabilities();
-
-        if (!(wms.getProblem() instanceof IOException)) {
-            assertNotNull(capabilities);
-        }        
-	}
-
 	public void testCreateParser() throws Exception {
-        WMS1_1_1 spec = new WMS1_1_1();
-
         File getCaps = TestData.file(this, "1.1.1Capabilities.xml");
         URL getCapsURL = getCaps.toURL();
 
@@ -172,5 +139,19 @@ public class WMS1_1_1Test extends TestCase {
         assertEquals(layer.getTitle(), "USGS Urban Areas Ortho-Imagery");
         
 
+	}
+	/* (non-Javadoc)
+	 * @see org.geotools.data.wms.test.WMS1_0_0Test#checkProperties(java.util.Properties)
+	 */
+	protected void checkProperties(Properties properties) {
+        assertEquals(properties.get("VERSION"), "1.1.1");
+        assertEquals(properties.get("REQUEST"), "GetCapabilities");
+        assertEquals(properties.get("SERVICE"), "WMS");
+	}
+	/* (non-Javadoc)
+	 * @see org.geotools.data.wms.test.WMS1_0_0Test#parserCheck(org.geotools.data.wms.WMSParser)
+	 */
+	protected void parserCheck(WMSParser parser) {
+		assertEquals(parser.getClass(), WMS1_1_1.Parser.class);
 	}
 }

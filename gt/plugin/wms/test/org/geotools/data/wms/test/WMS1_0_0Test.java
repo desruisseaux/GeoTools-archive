@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
@@ -39,27 +40,25 @@ import java.util.StringTokenizer;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WMS1_0_0Test extends TestCase {
-    private URL server;
+    protected URL server;
+    protected Specification spec;
 
     public WMS1_0_0Test() throws Exception {
+    	this.spec = new WMS1_0_0();
         this.server = new URL(
                 "http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");
     }
 
     public void testGetName() {
-        WMS1_0_0 spec = new WMS1_0_0();
         assertEquals(spec.getName(), "WMT_MS_Capabilities");
     }
 
     public void testGetVersion() {
-        WMS1_0_0 spec = new WMS1_0_0();
         assertEquals(spec.getVersion(), "1.0.0");
     }
 
     public void testCreateGetCapabilitiesRequest() throws Exception {
-        WMS1_0_0 spec = new WMS1_0_0();
         GetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
-        System.out.println(request.getFinalURL());
 
         Properties properties = new Properties();
 
@@ -71,9 +70,8 @@ public class WMS1_0_0Test extends TestCase {
             String[] param = token.split("=");
             properties.setProperty(param[0].toUpperCase(), param[1]);
         }
-
-        assertEquals(properties.getProperty("REQUEST"), "capabilities");
-        assertEquals(properties.getProperty("WMTVER"), "1.0.0");
+        
+        checkProperties(properties);
 
         WebMapServer wms = new WebMapServer(server, true);
         WMSCapabilities capabilities = wms.getCapabilities();
@@ -83,20 +81,14 @@ public class WMS1_0_0Test extends TestCase {
         }
     }
 
-    public void testCreateParser() throws Exception {
-        WMS1_0_0 spec = new WMS1_0_0();
+	protected void checkProperties(Properties properties) {
+        assertEquals(properties.getProperty("REQUEST"), "capabilities");
+        assertEquals(properties.getProperty("WMTVER"), "1.0.0");
+    }
 
-        File getCaps = TestData.file(this, "1.0.0Capabilities.xml");
-        URL getCapsURL = getCaps.toURL();
+	public void testCreateParser() throws Exception {
+		WMSCapabilities capabilities = createCapabilities("1.0.0Capabilities.xml");
 
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(getCapsURL);
-
-        WMSParser parser = spec.createParser(document);
-        assertEquals(parser.getClass(), WMS1_0_0.Parser.class);
-
-        WMSCapabilities capabilities = parser.constructCapabilities(document,
-                new WMSBuilder());
         assertEquals(capabilities.getVersion(), "1.0.0");
         assertEquals(capabilities.getService().getName(), "GetMap");
         assertEquals(capabilities.getService().getTitle(), "World Map");
@@ -133,4 +125,23 @@ public class WMS1_0_0Test extends TestCase {
         BoundingBox bbox = (BoundingBox) layers[1].getBoundingBoxes().get("EPSG:4326");
         assertNotNull(bbox);
     }
+
+	protected WMSCapabilities createCapabilities(String capFile) throws Exception {
+        File getCaps = TestData.file(this, capFile);
+        URL getCapsURL = getCaps.toURL();
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(getCapsURL);
+
+        WMSParser parser = spec.createParser(document);
+        
+        parserCheck(parser);
+        
+
+        return parser.constructCapabilities(document, new WMSBuilder());
+	}
+
+	protected void parserCheck(WMSParser parser) {
+		assertEquals(parser.getClass(), WMS1_0_0.Parser.class);
+	}
 }
