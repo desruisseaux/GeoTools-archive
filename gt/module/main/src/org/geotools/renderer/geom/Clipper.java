@@ -298,7 +298,7 @@ public final class Clipper {
             return polyline;
         }
         final Rectangle2D dataBounds = polyline.getDataBounds();
-        if (clip.contains(dataBounds)) {
+        if (XRectangle2D.containsInclusive(clip, dataBounds)) {
             return polyline;
         }
         if (!XRectangle2D.intersectInclusive(clip, dataBounds)) {

@@ -469,6 +469,37 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
+     * Tests if the interior of the <code>inner</code> rectangle is contained in the interior
+     * and/or the edge of the <code>outter</code> rectangle. This method is similar to
+     * {@link #contains(Rectangle2D)} except for the following points:
+     * <ul>
+     *   <li>This method doesn't test only the <em>interiors</em> of <code>outter</code>.
+     *       It tests for the edges as well.</li>
+     *   <li>This method tests also rectangle with zero {@linkplain Rectangle2D#getWidth width} or
+     *       {@linkplain Rectangle2D#getHeight height} (which are {@linkplain Rectangle2D#isEmpty
+     *       empty} according {@link Shape} contract).</li>
+     *   <li>This method work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
+     *       {@linkplain Double#NaN NaN} values.</li>
+     * </ul>
+     *
+     * This method is said <cite>inclusive</cite> because it tests bounds as closed interval
+     * rather then open interval (the default Java2D behavior). Usage of closed interval is
+     * required if at least one rectangle may be the bounding box of a perfectly horizontal
+     * or vertical line; such a bounding box has 0 width or height.
+     *
+     * @param  rect1 The first rectangle to test.
+     * @param  rect2 The second rectangle to test.
+     * @return <code>true</code> if the interior of <code>inner</code> is inside the interior
+     *         and/or the edge of <code>outter</code>.
+     *
+     * @todo Check for negative width or height (should returns <code>false</code>).
+     */
+    public static boolean containsInclusive(final Rectangle2D outter, final Rectangle2D inner) {
+        return outter.getMinX() <= inner.getMinX() && outter.getMaxX() >= inner.getMaxX() &&
+               outter.getMinY() <= inner.getMinY() && outter.getMaxY() >= inner.getMaxY();
+    }
+
+    /**
      * Determines where the specified coordinates lie with respect
      * to this <code>Rectangle2D</code>.
      * This method computes a binary OR of the appropriate mask values
