@@ -24,8 +24,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -127,7 +130,7 @@ public final class FactoryFinder {
         }
     }
     
-    private static ClassLoader[] findLoader() {
+    public static ClassLoader[] findLoader() {
         Logger logger = Logger.getLogger("org.geotools.factory");
         logger.finest("Finding ClassLoader");
         
