@@ -49,11 +49,7 @@
       <version>2.1.x</version>
     </dependency>
 
-    <dependency>
-      <id>geoapi</id>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
+    
 
     <dependency>
       <id>log4j</id>

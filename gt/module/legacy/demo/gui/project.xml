@@ -28,11 +28,7 @@
       <version>0.1</version>
       <url>http://www.opengis.org</url>
     </dependency>
-    <dependency>
-      <id>geoapi</id>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
+    
     <dependency>
       <artifactId>arcgrid</artifactId>
       <groupId>gt2</groupId>

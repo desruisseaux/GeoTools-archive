@@ -33,11 +33,7 @@
     </developer>
   </developers>
   <dependencies>
-    <dependency>
-      <id>geoapi</id>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
+    
     <dependency>
       <id>units</id>
       <version>0.01</version>

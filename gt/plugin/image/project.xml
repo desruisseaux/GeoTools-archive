@@ -31,11 +31,7 @@
       <version>1.6-SNAPSHOT</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
-    <dependency>
-      <id>geoapi</id>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
+    
     <dependency>
       <id>units</id>
       <version>0.01</version>

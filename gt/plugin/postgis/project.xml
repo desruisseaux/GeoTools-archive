@@ -80,11 +80,7 @@ freely available.</description>
         <relese.bundle>true</relese.bundle>
       </properties>
     </dependency>
-    <dependency>
-      <id>geoapi</id>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
+    
     <dependency>
       <id>opengis+legacy</id>
       <version>0.1</version>

@@ -13,7 +13,8 @@ For this release the following modules comprise the geotools library:
 @REQUIRED@
 
 The following modules comprise the plug-ins and extentions:
-@OPTIONALs@
+@PLUGIN@
+@EXTENTION@
 
 These optional jars typicaly provide support for specific data formats or
 sources, or provide specific additional functionality.

@@ -67,12 +67,6 @@
       <version>0.1</version>
       <url>http://www.opengis.org</url>
     </dependency>
-    <dependency>
-      <groupId>geoapi</groupId>
-      <artifactId>geoapi</artifactId>
-      <version>SNAPSHOT</version>
-      <url>http://geoapi.sourceforge.net</url>
-    </dependency>
   </dependencies>
   <contributors>
     <contributor>

@@ -67,8 +67,8 @@ public class TigerFeatureReader implements FeatureReader {
     public TigerFeatureReader(File dir, String typeName)
         throws IOException {
         // Typename contains both the file prefix and the subtype to be read
-        this.namespace = typeName.substring(0, typeName.lastIndexOf("_"));
-        this.typeName = typeName.substring(typeName.lastIndexOf("_") + 1);
+        this.namespace = typeName.substring(0, typeName.indexOf("_"));
+        this.typeName = typeName.substring(typeName.indexOf("_") + 1);
 
         // here we deal with case sensetivity. A little clumsy but what can you do... 
         // Try lower case extension first

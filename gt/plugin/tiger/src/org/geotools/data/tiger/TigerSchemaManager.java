@@ -166,9 +166,12 @@ public class TigerSchemaManager {
      * @return TigerSchemaElement[]
      */
     public TigerSchemaElement[] getSchema(String typeName) {
-        String typeNameString = getTypeSubNameString(typeName);
-
-        return (TigerSchemaElement[]) schemaMapping.get(typeNameString);
+        TigerSchemaElement[] schema = (TigerSchemaElement[])schemaMapping.get(typeName);
+        if(null == schema){
+            String typeNameString = getTypeSubNameString(typeName);
+            schema  =  (TigerSchemaElement[])schemaMapping.get(typeNameString);
+        }
+        return schema;
     }
 
     /**
