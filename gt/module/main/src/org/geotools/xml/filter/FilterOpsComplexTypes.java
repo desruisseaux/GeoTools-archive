@@ -2098,17 +2098,17 @@ public class FilterOpsComplexTypes {
 
             output.startElement(element.getNamespace(), element.getName(), null);
 
-            if (lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING) {
+            if (lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE) {
                 elems[0].getType().encode(elems[0], lf.getLeftGeometry(),
                     output, hints); // prop name
-                elems[1].getType().encode(elems[1], lf.getRightGeometry(),
+                elems[1].getType().encode(elems[1], lf.getRightGeometry().getValue(null),
                     output, hints); // geom
                 elems[2].getType().encode(elems[2], lf, output, hints); // distancetype
             } else {
-                if (lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING) {
+                if (lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE) {
                     elems[0].getType().encode(elems[0], lf.getRightGeometry(),
                         output, hints); // prop name
-                    elems[1].getType().encode(elems[1], lf.getLeftGeometry(),
+                    elems[1].getType().encode(elems[1], lf.getLeftGeometry().getValue(null),
                         output, hints); // geom
                     elems[2].getType().encode(elems[2], lf, output, hints); // distancetype
                 } else {
@@ -2231,11 +2231,11 @@ public class FilterOpsComplexTypes {
             if (lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY) {
                 ai.addAttribute(getNamespace().toString(), attrs[0].getName(),
                     null, "string",
-                    ((Geometry) lf.getLeftGeometry()).getUserData().toString());
+                    ((Geometry) lf.getLeftGeometry().getValue(null)).getUserData().toString());
             } else {
                 ai.addAttribute(getNamespace().toString(), attrs[0].getName(),
                     null, "string",
-                    ((Geometry) lf.getRightGeometry()).getUserData().toString());
+                    ((Geometry) lf.getRightGeometry().getValue(null)).getUserData().toString());
             }
 
             output.startElement(element.getNamespace(), element.getName(), null);
