@@ -207,7 +207,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @return
      */
-    protected abstract String getGeometryInsertText(Geometry geom, int srid);
+    protected abstract String getGeometryInsertText(Geometry geom, int srid) throws IOException;
 
     /**
      * Override that uses sql statements to perform the operation.
