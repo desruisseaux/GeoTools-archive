@@ -22,16 +22,14 @@ package org.geotools.data.shapefile.shp;
 
 import java.nio.ByteBuffer;
 
-<<<<<<< .mine
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-=======
 import org.geotools.geometry.coordinatesequence.CSBuilder;
 import org.geotools.geometry.coordinatesequence.CSBuilderFactory;
->>>>>>> .r10795
 
 
 /*
