@@ -1,1 +1,1 @@
-%JAVA_HOME%\bin\javaw.exe %SCRIPT_HOME%\taget\classes\SVNMunch %1 %2
+%JAVA_HOME%\bin\javaw.exe %SCRIPT_HOME%\taget\classes\SVNMunch %1 %2 %3 %4
