@@ -1,6 +1,6 @@
 package org.geotools.geometry.jts;
 
-import org.geotools.ct.MathTransform2D;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
