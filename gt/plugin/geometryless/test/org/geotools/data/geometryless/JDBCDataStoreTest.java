@@ -526,10 +526,10 @@ public class JDBCDataStoreTest extends TestCase {
                 new Coordinate(55, 55),
                 new Coordinate(55, 45),
                 new Coordinate(45, 45)};
-        PrecisionModel precModel = new PrecisionModel();
-        LinearRing shell = new LinearRing(points, precModel, srid);
-        Polygon[] testPolys = { new Polygon(shell, precModel, srid)};
-        MultiPolygon the_geom = new MultiPolygon(testPolys, precModel, srid);
+        GeometryFactory gf = new GeometryFactory();
+        LinearRing shell = gf.createLinearRing(points);
+        Polygon[] testPolys = { gf.createPolygon(shell,null)};
+        MultiPolygon the_geom = gf.createMultiPolygon(testPolys);
         Integer gID = new Integer(addId);
         Double area = new Double(100.0);
         Double perimeter = new Double(40.0);
