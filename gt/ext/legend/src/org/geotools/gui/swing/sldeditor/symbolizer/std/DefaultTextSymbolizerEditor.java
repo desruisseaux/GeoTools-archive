@@ -149,7 +149,7 @@ public class DefaultTextSymbolizerEditor extends SymbolizerEditor implements SLD
             };
 
         FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes,
-                "demo", "", false, null, (GeometryAttributeType) geom);
+                "demo", null, false, null, (GeometryAttributeType) geom);
         System.out.println("Get default geometry: " + ft.getDefaultGeometry());
 
         JPanel panel = new JPanel();

@@ -276,7 +276,7 @@ public class SingleRuleEditor extends JPanel implements SLDEditor, StyleEditor {
                 AttributeTypeFactory.newAttributeType("population", Long.class)
             };
 
-        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", "",
+        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", null,
                 false, null, (GeometryAttributeType) geom);
         FormUtils.show(new SingleRuleEditor(ft, false));
     }

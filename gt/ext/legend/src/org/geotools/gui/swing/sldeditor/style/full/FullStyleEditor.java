@@ -336,7 +336,7 @@ public class FullStyleEditor extends JComponent implements SLDEditor, StyleEdito
                 AttributeTypeFactory.newAttributeType("population", Long.class)
             };
 
-        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", "",
+        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", null,
                 false, null, (GeometryAttributeType) geom);
         FeatureTypeStyle featureStyle = styleBuilder.createFeatureTypeStyle(SymbolizerUtils
                 .getDefaultSymbolizer(ft));

@@ -445,7 +445,7 @@ public class TreeStyleEditor extends JComponent implements SLDEditor {
                 AttributeTypeFactory.newAttributeType("population", Long.class)
             };
 
-        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", "",
+        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", null,
                 false, null, (GeometryAttributeType) geom);
         FeatureTypeStyle featureStyle = styleBuilder.createFeatureTypeStyle(SymbolizerUtils
                 .getDefaultSymbolizer(ft));
