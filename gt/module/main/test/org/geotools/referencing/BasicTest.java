@@ -19,7 +19,7 @@
  */
 package org.geotools.referencing;
 
-// J2SE and JUnit dependencies
+// J2SE dependencies and extensions
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,13 +28,19 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
 import javax.units.SI;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.GeographicCRS;
@@ -50,9 +56,6 @@ import org.geotools.referencing.datum.GeodeticDatum;
 import org.geotools.referencing.datum.PrimeMeridian;
 import org.geotools.referencing.datum.VerticalDatum;
 import org.geotools.util.SimpleInternationalString;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.util.InternationalString;
 
 
 /**

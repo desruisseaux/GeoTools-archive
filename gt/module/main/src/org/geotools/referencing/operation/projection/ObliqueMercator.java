@@ -803,7 +803,10 @@ public class ObliqueMercator extends MapProjection {
         }
         return values;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst)
             throws ProjectionException 
     {
@@ -840,6 +843,9 @@ public class ObliqueMercator extends MapProjection {
         return new Point2D.Double(x,y);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
     {
@@ -866,6 +872,23 @@ public class ObliqueMercator extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }    
+
+    /**
+     * Maximal error (in metres) tolerated for assertion, if enabled.
+     *
+     * @param dx The longitude in degrees.
+     * @param dy The latitude in degrees.
+     * @return   The tolerance level for assertions, in meters.
+     */
+    protected double getToleranceForAssertions(final double longitude, final double latitude) {
+        if (Math.abs(longitude - centralMeridian)/2 +
+            Math.abs(latitude  - latitudeOfCentre) > 10)
+        {
+            // When far from the valid area, use a larger tolerance.
+            return 1;
+        }
+        return super.getToleranceForAssertions(longitude, latitude);
+    }
     
     /**
      * Returns a hash value for this projection.

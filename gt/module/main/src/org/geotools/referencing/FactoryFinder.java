@@ -111,8 +111,8 @@ public final class FactoryFinder {
     /**
      * Programmatic management of authority factories.
      * <br><br>
-     * Needed for user managed, not plug-in mangaed, authority factory.
-     * Also useful for testcases.
+     * Needed for user managed, not plug-in managed, authority factory.
+     * Also useful for test cases.
      *
      * @param authority The authority to add.
      */
@@ -123,8 +123,8 @@ public final class FactoryFinder {
     /**
      * Programmatic management of authority factories.
      * <br><br>
-     * Needed for user managed, not plug-in mangaed, authority factory.
-     * Also useful for testcases.
+     * Needed for user managed, not plug-in managed, authority factory.
+     * Also useful for test cases.
      *
      * @param authority The authority to remove.
      */
@@ -135,9 +135,10 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link DatumFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered, an arbitrary one is selected.
+     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
      *
-     * @return First datum factory found, not deterministic.
+     * @return First datum factory found.
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link DatumFactory} interface.
      */
@@ -157,9 +158,10 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered, an arbitrary one is selected.
+     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
      *
-     * @return The first coordinate system Factory found - not deterministic 
+     * @return The first coordinate system factory found.
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CSFactory} interface.
      */
@@ -179,9 +181,10 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CRSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered, an arbitrary one is selected.
+     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
      *
-     * @return The first coordinate reference system factory found - not deterministic
+     * @return The first coordinate reference system factory found.
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CRSFactory} interface.
      */
@@ -214,7 +217,8 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link MathTransformFactory}. If no implementation
      * is registered, then this method throws an exception. If more than one implementation is
-     * registered, an arbitrary one is selected.
+     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link MathTransformFactory} interface.
@@ -234,7 +238,8 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CoordinateOperationFactory}. If no
      * implementation is registered, then this method throws an exception. If more than
-     * one implementation is registered, an arbitrary one is selected.
+     * one implementation is registered and an {@linkplain #setOrdering ordering is set},
+     * then the preferred implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CoordinateOperationFactory} interface.
@@ -249,6 +254,93 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCoordinateOperationFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class));
+    }
+
+    /**
+     * Sets a pairwise ordering between two vendors. If one or both vendors are not
+     * currently registered, or if the desired ordering is already set, nothing happens
+     * and <code>false</code> is returned.
+     * <br><br>
+     * The example below said that an ESRI implementation (if available) is
+     * preferred over the Geotools one:
+     *
+     * <blockquote><code>FactoryFinder.setOrdering("ESRI", "Geotools");</code></blockquote>
+     *
+     * @param  vendor1 The preferred vendor.
+     * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
+     * @return <code>true</code> if the ordering was set for at least one category.
+     */
+    public static boolean setOrdering(final String vendor1, final String vendor2) {
+        return setOrdering(vendor1, vendor2, true);
+    }
+
+    /**
+     * Unsets a pairwise ordering between two vendors. If one or both vendors are not
+     * currently registered, or if the desired ordering is already unset, nothing happens
+     * and <code>false</code> is returned.
+     *
+     * @param  vendor1 The preferred vendor.
+     * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
+     * @return <code>true</code> if the ordering was unset for at least one category.
+     */
+    public static boolean unsetOrdering(final String vendor1, final String vendor2) {
+        return setOrdering(vendor1, vendor2, false);
+    }
+
+    /**
+     * Sets or unsets a pairwise ordering between two vendors. If one or both vendors are not
+     * currently registered, or if the desired ordering is already set/unset, nothing happens
+     * and false is returned.
+     *
+     * @param vendor1 The preferred vendor.
+     * @param vendor2 The vendor to which <code>vendor1</code> is preferred.
+     * @param set     <code>true</code> for setting the ordering, or <code>false</code> for
+     *                unsetting.
+     */
+    private synchronized static boolean setOrdering(final String vendor1, final String vendor2,
+                                                    final boolean set)
+    {
+        boolean done = false;
+        final FactoryRegistry registry = getServiceRegistry();
+        for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
+            final Class category = (Class) categories.next();
+            Factory impl1 = null;
+            Factory impl2 = null;
+            for (final Iterator it=registry.getServiceProviders(category); it.hasNext();) {
+                final Factory factory = (Factory) it.next();
+                final Citation vendor = factory.getVendor();
+                if (org.geotools.metadata.citation.Citation.titleMatches(vendor, vendor1)) {
+                    impl1 = factory;
+                }
+                if (org.geotools.metadata.citation.Citation.titleMatches(vendor, vendor2)) {
+                    impl2 = factory;
+                }
+                if (impl1!=null && impl2!=null && impl1!=impl2) {
+                    if (set) {
+                        done |= registry.setOrdering(category, impl1, impl2);
+                    } else {
+                        done |= registry.unsetOrdering(category, impl1, impl2);
+                    }
+                }
+            }
+        }
+        return done;
+    }
+
+    /**
+     * Scans for factory plug-ins on the application class path. This method is
+     * needed because the application class path can theoretically change, or
+     * additional plug-ins may become available. Rather than re-scanning the
+     * classpath on every invocation of the API, the class path is scanned
+     * automatically only on the first invocation. Clients can call this
+     * method to prompt a re-scan. Thus this method need only be invoked by
+     * sophisticated applications which dynamically make new plug-ins
+     * available at runtime.
+     */
+    public static void scanForPlugins() {
+        if (registry != null) {
+            registry.scanForPlugins();
+        }
     }
 
     /**

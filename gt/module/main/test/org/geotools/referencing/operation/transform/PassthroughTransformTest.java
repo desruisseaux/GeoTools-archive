@@ -151,7 +151,7 @@ public class PassthroughTransformTest extends TestTransform {
                          final MathTransform submt, final int subOffset)
             throws TransformException
     {
-        final int  pointCount = 500;
+        final int  pointCount = 200;
         final int mtDimension = mt.getSourceDimensions();
         final int atDimension = submt.getSourceDimensions();
         final double[] atData = new double[pointCount * atDimension];

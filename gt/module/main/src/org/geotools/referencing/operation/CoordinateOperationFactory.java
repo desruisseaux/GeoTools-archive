@@ -588,7 +588,7 @@ public class CoordinateOperationFactory extends Factory
                 org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D :
                 org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D;
         if (forceGreenwich && getGreenwichLongitude(datum.getPrimeMeridian()) != 0) {
-            datum = new StandardDatum(datum);
+            datum = new TemporaryDatum(datum);
         } else if (hasStandardAxis(cs, STANDARD)) {
             return crs;
         }
@@ -604,12 +604,12 @@ public class CoordinateOperationFactory extends Factory
      * A datum identical to the specified datum except for the prime meridian, which is replaced
      * by Greenwich. This datum is processed in a special way by {@link #equalsIgnorePrimeMeridian}.
      */
-    private static final class StandardDatum extends org.geotools.referencing.datum.GeodeticDatum {
+    private static final class TemporaryDatum extends org.geotools.referencing.datum.GeodeticDatum {
         /** The wrapped datum. */
         private final GeodeticDatum datum;
 
         /** Wrap the specified datum. */
-        public StandardDatum(final GeodeticDatum datum) {
+        public TemporaryDatum(final GeodeticDatum datum) {
             super(getTemporaryName(datum), datum.getEllipsoid(),
                   org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
             this.datum = datum;
@@ -617,8 +617,8 @@ public class CoordinateOperationFactory extends Factory
 
         /** Unwrap the datum. */
         public static GeodeticDatum unwrap(GeodeticDatum datum) {
-            while (datum instanceof StandardDatum) {
-                datum = ((StandardDatum) datum).datum;
+            while (datum instanceof TemporaryDatum) {
+                datum = ((TemporaryDatum) datum).datum;
             }
             return datum;
         }
@@ -1118,8 +1118,8 @@ public class CoordinateOperationFactory extends Factory
         final GeneralMatrix matrix;
         try {
             final Matrix datumShift = org.geotools.referencing.datum.GeodeticDatum.
-                                      getAffineTransform(StandardDatum.unwrap(sourceDatum),
-                                                         StandardDatum.unwrap(targetDatum));
+                                      getAffineTransform(TemporaryDatum.unwrap(sourceDatum),
+                                                         TemporaryDatum.unwrap(targetDatum));
             if (!(datumShift instanceof GMatrix)) {
                 throw new OperationNotFoundException(Resources.format(
                             ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
@@ -1441,8 +1441,13 @@ public class CoordinateOperationFactory extends Factory
     private static boolean equalsIgnorePrimeMeridian(GeodeticDatum object1,
                                                      GeodeticDatum object2)
     {
-        return equalsIgnoreMetadata(StandardDatum.unwrap(object1),
-                                    StandardDatum.unwrap(object2));
+        object1 = TemporaryDatum.unwrap(object1);
+        object2 = TemporaryDatum.unwrap(object2);
+        if (equalsIgnoreMetadata(object1.getEllipsoid(), object2.getEllipsoid())) {
+            return nameMatches(object1, object2.getName().getCode()) ||
+                   nameMatches(object2, object1.getName().getCode());
+        }
+        return false;
     }
 
     /**

@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing;
 
 // J2SE dependencies
 import java.io.FileReader;
@@ -34,14 +34,14 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 /**
  * A console for running test scripts. Most of the work is already done by the subclass.
- * <code>TestConsole</code> mostly add statistics about the test executed. This class is
+ * <code>TestScript</code> mostly add statistics about the test executed. This class is
  * used by {@link ScriptTest}. It can also be run from the command line for executing all
  * files specified in argument.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class TestConsole extends Console {
+public final class TestScript extends Console {
     /**
      * Number of tests run and passed. Used for displaying statistics.
      */
@@ -52,7 +52,7 @@ public final class TestConsole extends Console {
      *
      * @param in The input stream.
      */
-    public TestConsole(final LineNumberReader in) {
+    public TestScript(final LineNumberReader in) {
         super(in);
         setPrompt(null);
     }
@@ -107,7 +107,7 @@ public final class TestConsole extends Console {
             for (int i=0; i<args.length; i++) {
                 final String filename = args[i];
                 final LineNumberReader in = new LineNumberReader(new FileReader(filename));
-                final TestConsole test = new TestConsole(in);
+                final TestScript test = new TestScript(in);
                 test.out.write("Running \"");
                 test.out.write(filename);
                 test.out.write('"');

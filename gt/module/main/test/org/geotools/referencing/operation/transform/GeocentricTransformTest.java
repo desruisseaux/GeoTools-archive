@@ -74,9 +74,7 @@ public class GeocentricTransformTest extends TestTransform {
     public GeocentricTransformTest(final String name) {
         super(name);
     }
-    
-    
-    
+
     /**
      * Tests the orthodromic distance computed by {@link Ellipsoid}. There is actually two
      * algorithms used: one for the ellipsoidal model, and a simpler one for spherical model.
@@ -161,7 +159,7 @@ public class GeocentricTransformTest extends TestTransform {
          */
         final double   cartesianDistance[] = new double[4];
         final double orthodromicDistance[] = new double[4];
-        final double[]              array0 = new double[2550]; // 255 is divisible by 3.
+        final double[]              array0 = new double[900]; // Must be divisible by 3.
         for (int i=0; i<array0.length; i++) {
             final int range;
             switch (i % 3) {

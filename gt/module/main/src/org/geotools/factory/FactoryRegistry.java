@@ -87,7 +87,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return All factories for the specified category.
      */
     public Iterator getServiceProviders(final Class category) {
-        Iterator iterator = getServiceProviders(category, false);
+        Iterator iterator = getServiceProviders(category, true);
         if (!iterator.hasNext()) {
             /*
              * No plugin. This method is probably invoked the first time for the specified
@@ -97,7 +97,7 @@ public class FactoryRegistry extends ServiceRegistry {
             for (final Iterator it=getClassLoaders().iterator(); it.hasNext();) {
                 scanForPlugins((ClassLoader) it.next(), category);
             }
-            iterator = getServiceProviders(category, false);
+            iterator = getServiceProviders(category, true);
         }
         return iterator;
     }
@@ -139,6 +139,7 @@ public class FactoryRegistry extends ServiceRegistry {
         message.append(Utilities.getShortName(category));
         message.append("' implementations:");
         message.append(lineSeparator);
+        boolean newServices = false;
         while (factories.hasNext()) {
             Object factory = factories.next();
             final Class factoryClass = factory.getClass();
@@ -150,22 +151,25 @@ public class FactoryRegistry extends ServiceRegistry {
             if (replacement != null) {
                 factory = replacement;
             }
-            final boolean newService = registerServiceProvider(factory, category);
-            /*
-             * The factory is now registered. Add it to the message to be logged
-             * at the end of this method. We log all factories together in order
-             * to produces only one log entry, since some registration (e.g.
-             * MathTransformProviders) may be quite extensive.
-             */
-            message.append("  ");
-            message.append(newService ? "Register " : "Replace  ");
-            message.append(factoryClass.getName());
-            message.append(lineSeparator);
+            if (registerServiceProvider(factory, category)) {
+                /*
+                 * The factory is now registered. Add it to the message to be logged
+                 * at the end of this method. We log all factories together in order
+                 * to produces only one log entry, since some registration (e.g.
+                 * MathTransformProviders) may be quite extensive.
+                 */
+                message.append("  Register ");
+                message.append(factoryClass.getName());
+                message.append(lineSeparator);
+                newServices = true;
+            }
         }
-        final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
-        record.setSourceClassName(FactoryRegistry.class.getName());
-        record.setSourceMethodName("scanForPlugins");
-        Logger.getLogger("org.opengis.factory").log(record);
+        if (newServices) {
+            final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
+            record.setSourceClassName(FactoryRegistry.class.getName());
+            record.setSourceMethodName("scanForPlugins");
+            Logger.getLogger("org.opengis.factory").log(record);
+        }
     }
 
     /**
@@ -182,15 +186,16 @@ public class FactoryRegistry extends ServiceRegistry {
      * If some more classloaders should be scanned, they shall be added into the code
      * of this method.
      */
-    public static Set getClassLoaders() {
+    public final Set getClassLoaders() {
         final Set loaders = new HashSet();
-        for (int i=0; i<3; i++) {
+        for (int i=0; i<4; i++) {
             final ClassLoader loader;
             try {
                 switch (i) {
-                    case 0:  loader = FactoryRegistry.class.getClassLoader();         break;
-                    case 1:  loader = Thread.currentThread().getContextClassLoader(); break;
-                    case 2:  loader = ClassLoader.getSystemClassLoader();             break;
+                    case 0:  loader = getClass().getClassLoader();                    break;
+                    case 1:  loader = FactoryRegistry.class.getClassLoader();         break;
+                    case 2:  loader = Thread.currentThread().getContextClassLoader(); break;
+                    case 3:  loader = ClassLoader.getSystemClassLoader();             break;
                     // Add any supplementary class loaders here, if needed.
                     default: throw new AssertionError(i); // Should never happen.
                 }

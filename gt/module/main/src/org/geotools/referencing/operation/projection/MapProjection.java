@@ -81,14 +81,6 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                                                                              Serializable
 {
     /**
-     * Maximal error (in metres) tolerated for assertion, if enabled. When assertions are enabled,
-     * every direct projection is followed by an inverse projection, and the result is compared to
-     * the original coordinate. If a distance greater than <code>MAX_ERROR</code> is found, then an
-     * {@link AssertionError} will be thrown.
-     */
-    private static final double MAX_ERROR = 1;
-    
-    /**
      * Maximum difference allowed when comparing real numbers.
      */
     static final double EPS = 1.0E-6;
@@ -462,7 +454,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Check if the transform of <code>point</code> is close enough to <code>target</code>.
      * "Close enough" means that the two points are separated by a distance shorter than
-     * {@link #MAX_ERROR}. This method is used for assertions with JD2SE 1.4.
+     * {@link #getToleranceForAssertions}. This method is used for assertions with J2SE 1.4.
      *
      * @param point   Point to transform, in degrees if <code>inverse</code> is false.
      * @param target  Point to compare to, in metres if <code>inverse</code> is false.
@@ -494,10 +486,11 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 point     = transform(point, point);
                 distance  = point.distance(target);
             }
-            // Be less strict when the point is near an edge.
-            final boolean edge = (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89);
-            if (distance > (edge ? 5*MAX_ERROR : MAX_ERROR)) { // Do not fail for NaN values.
-                throw new AssertionError(distance);
+            if (distance > getToleranceForAssertions(longitude, latitude)) {
+                // Do not fail for NaN values.
+                throw new AssertionError("\u03B5=" + distance +
+                                         " (\u0394\u03BB=" + (longitude-centralMeridian) + "\u00B0" +
+                                         ", \u0394\u03C6=" + (latitude-latitudeOfOrigin) + "\u00B0)");
             }
         } catch (TransformException exception) {
             final AssertionError error = new AssertionError(exception.getLocalizedMessage());
@@ -912,6 +905,28 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             inverse = new Inverse();
         }
         return inverse;
+    }
+
+    /**
+     * Maximal error (in metres) tolerated for assertion, if enabled. When assertions are enabled,
+     * every direct projection is followed by an inverse projection, and the result is compared to
+     * the original coordinate. If a distance greater than the tolerance level is found, then an
+     * {@link AssertionError} will be thrown. Subclasses should override this method if they need
+     * to relax the tolerance level.
+     *
+     * @param dx The longitude in degrees.
+     * @param dy The latitude in degrees.
+     * @return   The tolerance level for assertions, in meters.
+     */
+    protected double getToleranceForAssertions(final double longitude, final double latitude) {
+        if (Math.abs(longitude - centralMeridian)/2 +
+            Math.abs(latitude  - latitudeOfOrigin) > 40)
+        {
+            // When far from the valid area, use a larger tolerance.
+            return 1;
+        }
+        // Be less strict when the point is near an edge.
+        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : 1E-6;
     }
     
     

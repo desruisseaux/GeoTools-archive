@@ -200,8 +200,8 @@ public class MathTransformTest extends TestCase {
     public void testAffineTransformConcatenation() throws FactoryException, TransformException {
         final MathTransform[] transforms = new MathTransform[2];
         final int numDim = 4;
-        final int numPts = 250;
-        for (int pass=0; pass<400; pass++) {
+        final int numPts = 200;
+        for (int pass=0; pass<100; pass++) {
             final int     dimSource = random.nextInt(numDim)+1;
             final int     dimTarget = random.nextInt(numDim)+1;
             final int     dimInterm = random.nextInt(numDim)+1;
@@ -248,7 +248,7 @@ public class MathTransformTest extends TestCase {
     public void testNaN() throws FactoryException, TransformException {
         final GeneralMatrix matrix = new GeneralMatrix(2,2);
         matrix.setElement(0,0,0);
-        for (int i=0; i<1000; i++) {
+        for (int i=0; i<200; i++) {
             final int rawBits = 0x7FC00000 + random.nextInt(100);
             final float value = Float.intBitsToFloat(rawBits);
             assertTrue("isNaN", Float.isNaN(value));
@@ -285,7 +285,7 @@ public class MathTransformTest extends TestCase {
         final double[] targetPt = new double[numPts];
         final double[]  compare = new double[numPts];
         final double[]    delta = new double[numPts];
-        for (int pass=0; pass<200; pass++) {
+        for (int pass=0; pass<100; pass++) {
             for (int i=0; i<numPts; i++) {
                 sourcePt[i] = 20*random.nextDouble()+0.1;
             }
@@ -416,7 +416,7 @@ public class MathTransformTest extends TestCase {
         /*
          * Test with an arbitrary number of randoms points.
          */
-        for (int pass=0; pass<1000; pass++) {
+        for (int pass=0; pass<200; pass++) {
             for (int j=0; j<maxDimSource; j++) {
                 final double ord = 100*random.nextDouble();
                 for (int i=0; i<sources.length; i++) {

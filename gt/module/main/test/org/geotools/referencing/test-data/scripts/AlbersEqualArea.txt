@@ -11,7 +11,7 @@
 // How to run this script:
 //
 //    chdir org/geotools/referencing/test-data/scripts
-//    java -ea org.geotools.referencing.operation.TestConsole AlbersEqualArea.txt
+//    java -ea org.geotools.referencing.TestScript AlbersEqualArea.txt
 //
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
@@ -24,7 +24,7 @@
 
 //geogCS's 
 set _WGS84_ = GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
-set _sphere_ = GEOGCS["sphere", DATUM["sphere", SPHEROID["sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
+set _sphere_ = GEOGCS["sphere", DATUM["sphere", SPHEROID["sphere", 6370997.0, 0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
 
 
 ////////////////////////////////////////
@@ -366,8 +366,8 @@ target pt = (0.00000000,      -4490245.37133415)
 ////////////////////////////////////////
 //Spherical 2SP (SP1 != sp2)
 //Albers_Conic_Equal_Area
-set _Albers6_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 156.0], PARAMETER["latitude_of_origin", 40.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 35.0], PARAMETER["standard_parallel_2", 78.0], AXIS["x",EAST], AXIS["y",NORTH]]
-set _Albers7_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 80.0], PARAMETER["latitude_of_origin", -33.0], PARAMETER["false_easting", 123.0], PARAMETER["false_northing", 100.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -41.0], PARAMETER["standard_parallel_2", -56.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers6_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 156.0], PARAMETER["latitude_of_origin", 40.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 35.0], PARAMETER["standard_parallel_2", 78.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers7_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 80.0], PARAMETER["latitude_of_origin", -33.0], PARAMETER["false_easting", 123.0], PARAMETER["false_northing", 100.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -41.0], PARAMETER["standard_parallel_2", -56.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _sphere_
 target crs = _Albers6_
@@ -499,8 +499,8 @@ target pt = (-1790752.16965052,       -6296962.48424930)
 ////////////////////////////////////////
 //Spherical 1SP (SP1 == sp2)
 //Albers_Conic_Equal_Area
-set _Albers8_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -110.5], PARAMETER["latitude_of_origin", 58.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 58.0], PARAMETER["standard_parallel_2", 58.0], AXIS["x",EAST], AXIS["y",NORTH]]
-set _Albers9_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -22.0], PARAMETER["latitude_of_origin", -52.0], PARAMETER["false_easting", 2000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -66.0], PARAMETER["standard_parallel_2", -66.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers8_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -110.5], PARAMETER["latitude_of_origin", 58.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 58.0], PARAMETER["standard_parallel_2", 58.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers9_=PROJCS["Albers", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -22.0], PARAMETER["latitude_of_origin", -52.0], PARAMETER["false_easting", 2000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -66.0], PARAMETER["standard_parallel_2", -66.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _sphere_
 target crs = _Albers8_

@@ -9,7 +9,7 @@
 // How to run this script:
 //
 //    chdir org/geotools/referencing/test-data/scripts
-//    java -ea org.geotools.referencing.operation.TestConsole Simple.txt
+//    java -ea org.geotools.referencing.TestScript Simple.txt
 //
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater

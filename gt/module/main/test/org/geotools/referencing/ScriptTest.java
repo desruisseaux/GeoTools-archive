@@ -36,7 +36,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.referencing.operation.TestConsole;
 import org.geotools.resources.TestData;
 
 
@@ -87,7 +86,7 @@ public class ScriptTest extends TestCase {
             throw new FileNotFoundException(filename);
         }
         final LineNumberReader in = new LineNumberReader(new InputStreamReader(url.openStream()));
-        final TestConsole test = new TestConsole(in);
+        final TestScript test = new TestScript(in);
         test.executeAll();
         in.close();
     }

@@ -119,6 +119,8 @@ public class Citation extends MetadataEntity
      * @see http://www.opengeospatial.org/
      * @see http://www.opengis.org/docs/01-068r3.pdf
      * @see org.geotools.metadata.citation.ResponsibleParty#OGC
+     *
+     * @todo May need to move to a class more closely related to CRS factories.
      */
     public static final Citation AUTO = new Citation("Automatic Projections");
     static { // Sanity check ensure that all @see tags are actually available in the metadata
@@ -155,6 +157,8 @@ public class Citation extends MetadataEntity
      * </p>
      * @see http://portal.opengis.org/files/?artifact_id=5316
      * @see org.geotools.metadata.citation.ResponsibleParty#OGC
+     *
+     * @todo May need to move to a class more closely related to CRS factories.
      */
     public static final Citation AUTO2 = new Citation("Automatic Projections");
     static {
@@ -238,7 +242,7 @@ public class Citation extends MetadataEntity
      * List of authorities declared in this class.
      */
     private static final Citation[] AUTHORITIES = {
-        OPEN_GIS, EPSG, GEOTIFF, ESRI
+        OPEN_GIS, EPSG, GEOTIFF, ESRI, GEOTOOLS
     };
 
     /**
@@ -352,29 +356,48 @@ public class Citation extends MetadataEntity
     public static Citation createCitation(final String name) {
         for (int i=0; i<AUTHORITIES.length; i++) {
             final Citation citation = AUTHORITIES[i];
-            InternationalString title = citation.getTitle();
-            Iterator iterator = null;
-            do {
-                if (title.toString(Locale.US).equalsIgnoreCase(name)) {
-                    return citation;
-                }
-                if (title.toString().equalsIgnoreCase(name)) {
-                    return citation;
-                }
-                if (iterator == null) {
-                    final List titles = citation.getAlternateTitles();
-                    if (titles == null) {
-                        break;
-                    }
-                    iterator = titles.iterator();
-                }
-                if (!iterator.hasNext()) {
-                    break;
-                }
-                title = (InternationalString) iterator.next();
-            } while (true);
+            if (titleMatches(citation, name)) {
+                return citation;
+            }
         }
         return new Citation(name);
+    }
+
+    /**
+     * Returns <code>true</code> if the {@linkplain #getTitle title} or any
+     * {@linkplain #getAlternateTitles alternate title} in the given citation
+     * matches the given string.
+     *
+     * @param  citation The citation to check for.
+     * @param  title The title or alternate title to compare.
+     * @return <code>true</code> in the title or alternate title matche the given string.
+     */
+    public static boolean titleMatches(final org.opengis.metadata.citation.Citation citation,
+                                       String title)
+    {
+        title = title.trim();
+        InternationalString candidate = citation.getTitle();
+        Iterator iterator = null;
+        do {
+            if (candidate.toString(Locale.US).trim().equalsIgnoreCase(title)) {
+                return true;
+            }
+            if (candidate.toString().trim().equalsIgnoreCase(title)) {
+                return true;
+            }
+            if (iterator == null) {
+                final List titles = citation.getAlternateTitles();
+                if (titles == null) {
+                    break;
+                }
+                iterator = titles.iterator();
+            }
+            if (!iterator.hasNext()) {
+                break;
+            }
+            candidate = (InternationalString) iterator.next();
+        } while (true);
+        return false;
     }
 
     /**

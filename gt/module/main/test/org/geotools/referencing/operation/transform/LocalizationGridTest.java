@@ -22,10 +22,12 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.util.Random;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 
 
