@@ -63,6 +63,7 @@ import org.geotools.cs.*;
 import org.geotools.ct.*;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -89,75 +90,75 @@ public class ScriptTest extends TestCase {
     /**
      * A simple test file to parse and execute.
      */
-    private static final String SIMPLE_SCRIPT = "test-data/Simple_TestScript.txt";
-
+    private static final String SIMPLE_SCRIPT = "Simple_TestScript.txt";
+    
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String STEREOGRAPHIC_SCRIPT = "test-data/Stereographic_TestScript.txt";
-
+    private static final String STEREOGRAPHIC_SCRIPT = "Stereographic_TestScript.txt";
+    
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String ORTHOGRAPHIC_SCRIPT = "test-data/Orthographic_TestScript.txt";
-
+    private static final String ORTHOGRAPHIC_SCRIPT = "Orthographic_TestScript.txt";
+    
     /**
      * A test file to parse and execute for Albers equals area projection.
      */
-    private static final String ALBERS_SCRIPT = "test-data/AlbersEqualArea_TestScript.txt";
+    private static final String ALBERS_SCRIPT = "AlbersEqualArea_TestScript.txt";
     
     /**
      * The OpenGIS test file to parse and execute.
      */
-    private static final String OPENGIS_SCRIPT = "test-data/OpenGIS_TestScript.txt";
-
+    private static final String OPENGIS_SCRIPT = "OpenGIS_TestScript.txt";
+    
     /**
      * The coordinate system factory to use for the test.
      * This is also the class used for parsing WKT texts.
      */
     private CoordinateSystemFactory csFactory;
-
+    
     /**
      * The coordinate transformation factory to use for the test.
      */
     private CoordinateTransformationFactory ctFactory;
-
+    
     /**
      * The math transformation factory to use for the test.
      */
     private MathTransformFactory mtFactory;
-
+    
     /**
      * The list of object defined in the {@link #OPENGIS_SCRIPT} file. Keys are
      * {@link String} objects, while values are {@link CoordinateSystem} or
      * {@link MathTransform} objects.
      */
     private Map definitions;
-
+    
     /**
      * Source and target coordinate systems for the test currently executed.
      * Those fields are updated many times by {@link #runInstruction}.
      */
     private CoordinateSystem sourceCS, targetCS;
-
+    
     /**
      * Source and target coordinate points for the test currently executed.
      * Those fields are updated many times by {@link #runInstruction}.
      */
     private CoordinatePoint sourcePT, targetPT;
-
+    
     /**
      * Tolerance numbers for the test currently executed.
      * Thise field is updated many times by {@link #runInstruction}.
      */
     private double[] tolerance;
-
+    
     /**
      * Number of test run and passed. Used for displaying
      * a report after once the test is finished.
      */
     private int testRun, testPassed;
-
+    
     /**
      * If non-null display error messages to this writer instead of throwing
      * {@link AssertionFailedError}. This is used for debugging only.
@@ -177,7 +178,7 @@ public class ScriptTest extends TestCase {
     public static Test suite() {
         return new TestSuite(ScriptTest.class);
     }
-
+    
     /**
      * Set up common objects used for all tests.
      */
@@ -187,8 +188,11 @@ public class ScriptTest extends TestCase {
         ctFactory    = CoordinateTransformationFactory.getDefault();
         mtFactory    = MathTransformFactory.getDefault();
         definitions  = new HashMap();
+        if(out == null){
+            out = new PrintWriter(System.out);
+        }
     }
-
+    
     /**
      * Check if two coordinate points are equals, in the limits of the specified
      * tolerance vector.
@@ -201,21 +205,20 @@ public class ScriptTest extends TestCase {
      * @throws AssertionFailedError If the actual point is not equals to the expected point.
      */
     private static void assertEquals(final CoordinatePoint expected,
-                                     final CoordinatePoint actual,
-                                     final double[]        tolerance)
-        throws AssertionFailedError
-    {
+    final CoordinatePoint actual,
+    final double[]        tolerance)
+    throws AssertionFailedError {
         final int dimension = actual.getDimension();
         final int lastToleranceIndex = tolerance.length-1;
         assertEquals("The coordinate point doesn't have the expected dimension",
-                     expected.getDimension(), dimension);
+        expected.getDimension(), dimension);
         for (int i=0; i<dimension; i++) {
             assertEquals("Mismatch for ordinate "+i+" (zero-based):",
-                         expected.getOrdinate(i), actual.getOrdinate(i),
-                         tolerance[Math.min(i, lastToleranceIndex)]);
+            expected.getOrdinate(i), actual.getOrdinate(i),
+            tolerance[Math.min(i, lastToleranceIndex)]);
         }
     }
-
+    
     /**
      * Returns a coordinate system for the specified name. The coordinate system
      * must has been previously defined with a call to {@link #addDefinition}.
@@ -227,7 +230,7 @@ public class ScriptTest extends TestCase {
         }
         throw new FactoryException("No coordinate system defined for \""+name+"\".");
     }
-
+    
     /**
      * Parse a vector of values. Vectors are used for coordinate points.
      * Example:
@@ -248,7 +251,7 @@ public class ScriptTest extends TestCase {
         }
         return values;
     }
-
+    
     /**
      * Check if the specified string start and end with the specified delimitors,
      * and returns the string without the delimitors.
@@ -267,7 +270,7 @@ public class ScriptTest extends TestCase {
         }
         return text;
     }
-
+    
     /**
      * If the specified string start with <code>"set"</code>, then add its
      * value to the {@link #definitions} map and returns <code>true</code>.
@@ -310,7 +313,7 @@ public class ScriptTest extends TestCase {
             st = new StringTokenizer(value, ",");
             if (st.countTokens() != 3) {
                 throw new FactoryException("COMPD_CS must be in the form "+
-                                           "COMPD_CS[\"name\", cs1name, cs2name]");
+                "COMPD_CS[\"name\", cs1name, cs2name]");
             }
             String csname = removeDelimitors(st.nextToken(), '"', '"');
             CoordinateSystem head = getCoordinateSystem(st.nextToken().trim());
@@ -342,7 +345,7 @@ public class ScriptTest extends TestCase {
         }
         return true;
     }
-
+    
     /**
      * Run an instruction. Instruction may be any of the following lines
      * (values listed here are just examples):
@@ -362,8 +365,7 @@ public class ScriptTest extends TestCase {
      * @throws TransformException if the transformation can't be run.
      */
     private void runInstruction(final String text, final int lineNumber)
-            throws FactoryException, TransformException
-    {
+    throws FactoryException, TransformException {
         final StringTokenizer st = new StringTokenizer(text, "=");
         if (st.countTokens() != 2) {
             throw new FactoryException("Illegal instruction: "+text);
@@ -425,7 +427,7 @@ public class ScriptTest extends TestCase {
             out.println();
         }
     }
-
+    
     /**
      * Run the specified script.
      *
@@ -446,12 +448,15 @@ public class ScriptTest extends TestCase {
                 dataFolder = new File(System.getProperty("basedir", "."));
                 dataFolder = new File(dataFolder, "/tests/unit/");
                 dataFolder = new File(dataFolder, script);
-                in = new FileInputStream(dataFolder);
+//                in = new FileInputStream(dataFolder);
+                reader = new LineNumberReader(TestData.getReader(this, script));
             }
-            reader = new LineNumberReader(new InputStreamReader(in));
+            else{
+                reader = new LineNumberReader(new InputStreamReader(in));
+            }
         }
         String line;
-        while ((line=reader.readLine()) != null) {             
+        while ((line=reader.readLine()) != null) {
             line = line.trim();
             if (line.length() == 0) {
                 // Ignore empty lines.
@@ -481,8 +486,8 @@ public class ScriptTest extends TestCase {
             out.println('%');
             out.flush();
         }
-    }   
-
+    }
+    
     /**
      * Run the {@link #SIMPLE_SCRIPT}.
      *
@@ -493,7 +498,7 @@ public class ScriptTest extends TestCase {
     public void testSimple() throws IOException, FactoryException {
         runScript(SIMPLE_SCRIPT);
     }
-
+    
     /**
      * Run the {@link #STEREOGRAPHIC_SCRIPT}.
      *
@@ -504,7 +509,7 @@ public class ScriptTest extends TestCase {
     public void testStereographic() throws IOException, FactoryException {
         runScript(STEREOGRAPHIC_SCRIPT);
     }
-
+    
     /**
      * Run the {@link #ORTHOGRAPHIC_SCRIPT}.
      *
@@ -515,7 +520,7 @@ public class ScriptTest extends TestCase {
     public void testOrthographic() throws IOException, FactoryException {
         runScript(ORTHOGRAPHIC_SCRIPT);
     }
-
+    
     /**
      * Run the {@link #ALBERS_SCRIPT}.
      *
@@ -526,7 +531,7 @@ public class ScriptTest extends TestCase {
     public void testAlbersEqualArea() throws IOException, FactoryException {
         runScript(ALBERS_SCRIPT);
     }
-
+    
     /**
      * Run the {@link #OPENGIS_SCRIPT}.
      *
@@ -537,7 +542,7 @@ public class ScriptTest extends TestCase {
     public void testOpenGIS() throws IOException, FactoryException {
         runScript(OPENGIS_SCRIPT);
     }
-
+    
     /**
      * Run the test from the command line. By default, this method run all tests. In order
      * to run only one test, use one of the following line:
@@ -581,7 +586,7 @@ public class ScriptTest extends TestCase {
             done = true;
         }
         if (script!=null && !done) {
-            test.runScript("test-data/"+script+"_TestScript.txt");
+            test.runScript(script+"_TestScript.txt");
         }
         test.tearDown();
     }
