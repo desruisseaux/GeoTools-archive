@@ -16,8 +16,6 @@
  */
 package org.geotools.feature;
 
-import java.net.URISyntaxException;
-
 import org.geotools.geometry.JTS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -44,11 +42,7 @@ public class FeatureTypes {
     public static FeatureType transform(FeatureType schema, CoordinateReferenceSystem crs) throws SchemaException{
     	FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
         
-        try {
-            factory.setNamespace( schema.getNamespace() );
-        } catch (URISyntaxException e) {
-            throw new SchemaException(e);
-        }
+        factory.setNamespaceURI( schema.getNamespaceURI() );
         factory.setName( schema.getTypeName() );
         
         GeometryAttributeType defaultGeometryType = null;
