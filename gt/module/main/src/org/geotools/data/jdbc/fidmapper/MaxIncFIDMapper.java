@@ -177,6 +177,6 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
      */
     public void initSupportStructures() {
-        // TODO Auto-generated method stub
+        // no support structure needed
     }
 }
