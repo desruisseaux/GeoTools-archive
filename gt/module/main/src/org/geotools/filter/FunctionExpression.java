@@ -16,12 +16,14 @@
  */
 package org.geotools.filter;
 
+import org.geotools.factory.Factory;
+
 /**
  * Interface for a function expression implementation
  *
  * @author James Macgill, PSU
  */
-public interface FunctionExpression extends Expression {
+public interface FunctionExpression extends Expression, Factory{
     /**
      * Gets the number of arguments that are set.
      *

@@ -309,11 +309,26 @@ public class FilterFactoryImpl extends FilterFactory {
         name = name.replaceFirst("" + c, "" + Character.toUpperCase(c));
 
         try {
-            return (FunctionExpression) Class.forName("org.geotools.filter."
-                + name + "Function").newInstance();
+            //TODO: Replace the following return statement with something that uses 
+            //FactoryFinder to find the function.
+            java.util.Iterator it = org.geotools.factory.FactoryFinder.factories(FunctionExpression.class);
+            String funName = "";
+            FunctionExpression exp = null;
+            while ((funName != "found") && (it.hasNext())){
+                FunctionExpression fe = (FunctionExpression) it.next();
+                funName = fe.getName();
+                if (funName == name){
+                    exp = fe;
+                    funName = "found";
+                }
+            }
+            return exp;
+            
+//            return (FunctionExpression) Class.forName("org.geotools.filter."
+//                + name + "Function").newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Unable to create class " + name
-                + "Filter", e);
+                + "Function", e);  //changed the word "Filter" to "Function".
         }
     }
 
