@@ -228,6 +228,23 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
     
     /**
+     * Makes sure that the specified longitude stay within ±180 degrees. This methpod should be
+     * invoked after coordinates are transformed. This
+     * method may add or substract an amount of 360° to <var>x</var>.
+     *
+     * @param  x The longitude.
+     * @return The longitude in the range +/- 180°.
+     */
+    protected double ensureInRange(double x) {
+        if (x > Math.PI) {
+            x -= 2*Math.PI;
+        } else if (x < -Math.PI) {
+            x += 2*Math.PI;
+        }
+        return x;
+    }
+    
+    /**
      * Transform the specified shape. The default implementation compute
      * quadratic curves using three points for each shape's segments.
      *
