@@ -130,7 +130,7 @@ public final class FactoryFinder {
         }
     }
     
-    public static ClassLoader[] findLoader() {
+    public static ClassLoader[] findClassLoaders() {
         Logger logger = Logger.getLogger("org.geotools.factory");
         logger.finest("Finding ClassLoader");
         
@@ -272,7 +272,7 @@ public final class FactoryFinder {
         ClassLoader[] loaders;
         
         if (classLoader == null) {
-            loaders = findLoader();
+            loaders = findClassLoaders();
         } else {
             loaders = new ClassLoader[1];
             loaders[0] = classLoader;
@@ -400,7 +400,7 @@ public final class FactoryFinder {
             Collection allresources;;
             
             if (loader == null) {
-                loaders = findLoader();
+                loaders = findClassLoaders();
             }
             
             if (loaders == null )
