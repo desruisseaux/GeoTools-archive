@@ -59,10 +59,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements D
      */
     public DataSourceMetadataEnity createMetadata(Map params) throws IOException {
         URL host = null;
-        if(params.containsKey(SERVER_URL)){
-            host = (URL)params.get(SERVER_URL);
+        if(params.containsKey(SERVER_URL.key)){
+            host = (URL)params.get(SERVER_URL.key);
         }else{
-            host = ((URL)params.get(GET_CAPABILITIES_URL));
+            host = ((URL)params.get(GET_CAPABILITIES_URL.key));
         }
         return new DataSourceMetadataEnity(host.toString(), getDisplayName(), getDescription() );
     }
