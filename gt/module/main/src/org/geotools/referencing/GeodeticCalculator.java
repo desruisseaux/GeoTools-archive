@@ -496,14 +496,27 @@ public class GeodeticCalculator {
     public double getOrthodromicDistance() throws IllegalStateException {
         if (!directionValid) {
             computeDirection();
-            final double check;
-            assert !(ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) ||
-                   (check = Math.abs(distance-((org.geotools.referencing.datum.Ellipsoid)ellipsoid)
-                   .orthodromicDistance(Math.toDegrees(long1), Math.toDegrees(lat1),
-                                        Math.toDegrees(long2), Math.toDegrees(lat2))))
-                   <= semiMajorAxis*TOLERANCE_2 : check;
+            assert checkOrthodromicDistance();
         }
         return distance;
+    }
+
+    /**
+     * Computes the orthodromic distance using the algorithm implemented in the Geotools's
+     * ellipsoid class (if available), and check if the error is smaller than some tolerance
+     * error.
+     */
+    private boolean checkOrthodromicDistance() {
+        if (ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) {
+            double check;
+            final org.geotools.referencing.datum.Ellipsoid ellipsoid =
+                 (org.geotools.referencing.datum.Ellipsoid) this.ellipsoid;
+            check = ellipsoid.orthodromicDistance(Math.toDegrees(long1), Math.toDegrees(lat1),
+                                                  Math.toDegrees(long2), Math.toDegrees(lat2));
+            check = Math.abs(distance - check);
+            return check <= semiMajorAxis*TOLERANCE_2;
+        }
+        return true;
     }
 
     /**
