@@ -7,6 +7,7 @@
 package org.geotools.data.jdbc;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
@@ -27,7 +28,7 @@ public class MockJDBCDataStore extends JDBCDataStore {
      * @throws DataSourceException
      */
     public MockJDBCDataStore(ConnectionPool connectionPool) throws IOException {
-        super(connectionPool);
+        super( connectionPool, new JDBCDataStoreConfig() );                
         typeHandler.setFIDMapper("FEATURE_TYPE1", new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE1"));
 		typeHandler.setFIDMapper("FEATURE_TYPE2", new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE2"));
     }
