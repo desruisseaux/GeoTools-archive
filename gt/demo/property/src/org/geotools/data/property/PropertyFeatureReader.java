@@ -78,7 +78,13 @@ public class PropertyFeatureReader implements FeatureReader {
         Object[] values = new Object[reader.getAttributeCount()];
 
         for (int i = 0; i < reader.getAttributeCount(); i++) {
-            values[i] = reader.read(i);
+            try {
+				values[i] = reader.read(i);
+			} catch (RuntimeException e) {
+				values[i] = null;
+			} catch (IOException e) {
+				throw e;
+			}
         }
 
         return type.create(values, fid);
