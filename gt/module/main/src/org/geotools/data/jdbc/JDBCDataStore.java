@@ -192,7 +192,7 @@ public abstract class JDBCDataStore implements DataStore {
     private LockingManager lockingManager = createLockingManager();
 
     /** The ConnectionPool */
-    private ConnectionPool connectionPool;
+    protected ConnectionPool connectionPool;
     protected final JDBCDataStoreConfig config;
 
     protected FeatureTypeHandler typeHandler = null;

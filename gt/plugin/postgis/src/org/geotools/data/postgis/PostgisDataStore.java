@@ -63,6 +63,7 @@ import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.postgis.attributeio.PgWKBAttributeIO;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
+import org.geotools.data.postgis.referencing.PostgisAuthorityFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -70,6 +71,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -646,7 +648,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             LOGGER.fine("geometry sql statement is " + sqlStatement);
 
             String geometryType = null;
-
+            
             // retrieve the result set from the JDBC driver
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);
@@ -655,6 +657,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 geometryType = result.getString("type");
                 LOGGER.fine("geometry type is: " + geometryType);
             }
+            
+            
 
             if (geometryType == null) {
                 String msg = " no geometry found in the GEOMETRY_COLUMNS table "
@@ -668,13 +672,27 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             Class type = (Class) GEOM_TYPE_MAP.get(geometryType);
 
-            return AttributeTypeFactory.newAttributeType(columnName, type);
+            CoordinateReferenceSystem crs = null;
+            try{
+                crs = getPostgisAuthorityFactory().createCRS(determineSRID(tableName,columnName));
+            }catch(FactoryException e){
+                crs = null;
+            }
+            return AttributeTypeFactory.newAttributeType(columnName, type,true,0,null,crs);
         } catch (SQLException sqe) {
             throw new IOException("An SQL exception occurred: "
                 + sqe.getMessage());
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
+    }
+    
+    private static PostgisAuthorityFactory paf = null;
+    private PostgisAuthorityFactory getPostgisAuthorityFactory(){
+        if(paf == null){
+            paf = new PostgisAuthorityFactory(connectionPool);
+        }
+        return paf;
     }
 
     /**
