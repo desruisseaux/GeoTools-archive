@@ -32,6 +32,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+
 // Geotools dependencies
 import org.geotools.referencing.crs.ProjectedCRS;
 import org.geotools.referencing.wkt.AbstractParser;
@@ -78,6 +81,7 @@ public class WKTParserTest extends TestCase {
         final Parser parser = new Parser();
         String       wkt1, wkt2;
         ProjectedCRS crs1, crs2;
+        ParameterValueGroup param;
         /*
          * First, rather simple Mercator projection.
          * Uses standard units and axis order.
@@ -98,12 +102,19 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
-        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
-        wkt2 = parser.format(crs1);
-        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2  = parser.format(crs1);
+        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("PARAM_MT[\"Mercator_1SP\""));
+        assertEquals("semi_major",   6378137.0, param.parameter("semi_major"      ).doubleValue(), 1E-4);
+        assertEquals("semi_minor",   6356752.3, param.parameter("semi_minor"      ).doubleValue(), 1E-1);
+        assertEquals("central_meridian", -20.0, param.parameter("central_meridian").doubleValue(), 1E-8);
+        assertEquals("scale_factor",       1.0, param.parameter("scale_factor"    ).doubleValue(), 1E-8);
+        assertEquals("false_easting", 500000.0, param.parameter("false_easting"   ).doubleValue(), 1E-4);
+        assertEquals("false_northing",     0.0, param.parameter("false_northing"  ).doubleValue(), 1E-4);
         /*
          * Same Mercator projection as above, but
          * switch longitude and latitude axis.
@@ -124,12 +135,19 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
-        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
-        wkt2 = parser.format(crs1);
-        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2  = parser.format(crs1);
+        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("CONCAT_MT[PARAM_MT["));
+        assertEquals("semi_major",   6378137.0, param.parameter("semi_major"      ).doubleValue(), 1E-4);
+        assertEquals("semi_minor",   6356752.3, param.parameter("semi_minor"      ).doubleValue(), 1E-1);
+        assertEquals("central_meridian", -20.0, param.parameter("central_meridian").doubleValue(), 1E-8);
+        assertEquals("scale_factor",       1.0, param.parameter("scale_factor"    ).doubleValue(), 1E-8);
+        assertEquals("false_easting", 500000.0, param.parameter("false_easting"   ).doubleValue(), 1E-4);
+        assertEquals("false_northing",     0.0, param.parameter("false_northing"  ).doubleValue(), 1E-4);
         /*
          * Try an other projection (Transverse Mercator).
          */
@@ -152,11 +170,54 @@ public class WKTParserTest extends TestCase {
                "  AXIS[\"E\",EAST],\n"                                                                    +
                "  AXIS[\"N\",NORTH],\n"                                                                   +
                "  AUTHORITY[\"EPSG\",\"27700\"]]\n";
-        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
-        wkt2 = parser.format(crs1);
-        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2  = parser.format(crs1);
+        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
+        assertEquals("semi_major",   6377563.396, param.parameter("semi_major"        ).doubleValue(), 1E-4);
+        assertEquals("semi_minor",   6356256.909, param.parameter("semi_minor"        ).doubleValue(), 1E-3);
+        assertEquals("latitude_of_origin",  49.0, param.parameter("latitude_of_origin").doubleValue(), 1E-8);
+        assertEquals("central_meridian",    -2.0, param.parameter("central_meridian"  ).doubleValue(), 1E-8);
+        assertEquals("scale_factor",      0.9996, param.parameter("scale_factor"      ).doubleValue(), 1E-5);
+        assertEquals("false_easting",   400000.0, param.parameter("false_easting"     ).doubleValue(), 1E-4);
+        assertEquals("false_northing", -100000.0, param.parameter("false_northing"    ).doubleValue(), 1E-4);
+        /*
+         * Try a projection with feet units.
+         */
+        wkt1 = "PROJCS[\"TransverseMercator\",\n"                     +
+               "  GEOGCS[\"Sphere\",\n"                               +
+               "    DATUM[\"Sphere\",\n"                              +
+               "      SPHEROID[\"Sphere\", 6370997.0, 0.0],\n"        +
+               "      TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]],\n" +
+               "    PRIMEM[\"Greenwich\", 0.0],\n"                    +
+               "    UNIT[\"degree\", 0.017453292519943295],\n"        +
+               "    AXIS[\"Longitude\", EAST],\n"                     +
+               "    AXIS[\"Latitude\", NORTH]],\n"                    +
+               "  PROJECTION[\"Transverse_Mercator\",\n"              +
+               "    AUTHORITY[\"OGC\",\"Transverse_Mercator\"]],\n"   +
+               "  PARAMETER[\"central_meridian\", 170.0],\n"          +
+               "  PARAMETER[\"latitude_of_origin\", 50.0],\n"         +
+               "  PARAMETER[\"scale_factor\", 0.95],\n"               +
+               "  PARAMETER[\"false_easting\", 0.0],\n"               +
+               "  PARAMETER[\"false_northing\", 0.0],\n"              +
+               "  UNIT[\"feet\", 0.304800609601219],\n"               +
+               "  AXIS[\"x\", EAST],\n"                               +
+               "  AXIS[\"y\", NORTH]]\n";
+        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2  = parser.format(crs1);
+        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        param = crs1.getConversionFromBase().getParameterValues();
+        assertEquals(crs1, crs2);
+        assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
+        assertEquals("semi_major",     6370997.0, param.parameter("semi_major"        ).doubleValue(), 1E-5);
+        assertEquals("semi_minor",     6370997.0, param.parameter("semi_minor"        ).doubleValue(), 1E-5);
+        assertEquals("latitude_of_origin",  50.0, param.parameter("latitude_of_origin").doubleValue(), 1E-8);
+        assertEquals("central_meridian",   170.0, param.parameter("central_meridian"  ).doubleValue(), 1E-8);
+        assertEquals("scale_factor",        0.95, param.parameter("scale_factor"      ).doubleValue(), 1E-8);
+        assertEquals("false_easting",        0.0, param.parameter("false_easting"     ).doubleValue(), 1E-8);
+        assertEquals("false_northing",       0.0, param.parameter("false_northing"    ).doubleValue(), 1E-8);
     }
 
     /**

@@ -367,7 +367,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             throw new FactoryException(exception);
         }
         if (methods != null) {
-            methods.add(provider);
+            methods.add(provider.getMethod(tr));
         }
         tr = (MathTransform) pool.canonicalize(tr);
         return tr;

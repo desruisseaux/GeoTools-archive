@@ -114,9 +114,9 @@ set _Molodenski_=PARAM_MT["Abridged_Molodenski",PARAMETER["dim",3],PARAMETER["dx
 
 // Fitted coordinate systems, and compounded fitted coordinate systems.
 set _FitOsgb36_=FITTED_CS["Fitted OSGB36",_AddYtoXAndShift23_,_Osgb36_]
-//set _ZkmFitOsgb36_=COMPD_CS["Z depth in Km with Osgb36",_VmsldKm_,_FitOsgb36_]
+set _ZkmFitOsgb36_=COMPD_CS["Z depth in Km with Osgb36",_VmsldKm_,_FitOsgb36_]
 set _VmslhMinus7_=FITTED_CS["Mean sea level minus 7",_Add7_,_Vmslh_]
-//set _ZMinus7FitOsgb36_=COMPD_CS["Z minus 7, with fitted Osgb36",_VmslhMinus7_,_FitOsgb36_]
+set _ZMinus7FitOsgb36_=COMPD_CS["Z minus 7, with fitted Osgb36",_VmslhMinus7_,_FitOsgb36_]
 
 
 // Start the tests...

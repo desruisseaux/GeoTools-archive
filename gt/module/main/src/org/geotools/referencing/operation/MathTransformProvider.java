@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.util.GenericName;
 
-//
+// Geotools dependencies
 import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -313,30 +313,6 @@ public abstract class MathTransformProvider extends OperationMethod {
     }
 
     /**
-     * Creates a math transform from the specified group of parameter values.
-     * Subclasses should implements this method as in the example below:
-     *
-     * <blockquote><pre>
-     * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
-     * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
-     * // etc...
-     * </pre></blockquote>
-     *
-     * @param  values The group of parameter values.
-     * @return The created math transform.
-     * @throws InvalidParameterNameException if the values contains an unknow parameter.
-     * @throws ParameterNotFoundException if a required parameter was not found.
-     * @throws InvalidParameterValueException if a parameter has an invalid value.
-     * @throws FactoryException if the math transform can't be created for some other reason
-     *         (for example a required file was not found).
-     */
-    protected abstract MathTransform createMathTransform(ParameterValueGroup values)
-            throws InvalidParameterNameException,
-                   ParameterNotFoundException,
-                   InvalidParameterValueException,
-                   FactoryException;
-
-    /**
      * Returns the parameter value for the specified operation parameter.
      * This convenience method is used by subclasses for initializing
      * {@linkplain MathTransform math transform} from a set of parameters.
@@ -406,5 +382,39 @@ public abstract class MathTransformProvider extends OperationMethod {
         final Unit unit = param.getUnit();
         final ParameterValue value = getValue(param, group);
         return (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
+    }
+
+    /**
+     * Creates a math transform from the specified group of parameter values.
+     * Subclasses should implements this method as in the example below:
+     *
+     * <blockquote><pre>
+     * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
+     * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
+     * // etc...
+     * </pre></blockquote>
+     *
+     * @param  values The group of parameter values.
+     * @return The created math transform.
+     * @throws InvalidParameterNameException if the values contains an unknow parameter.
+     * @throws ParameterNotFoundException if a required parameter was not found.
+     * @throws InvalidParameterValueException if a parameter has an invalid value.
+     * @throws FactoryException if the math transform can't be created for some other reason
+     *         (for example a required file was not found).
+     */
+    protected abstract MathTransform createMathTransform(ParameterValueGroup values)
+            throws InvalidParameterNameException,
+                   ParameterNotFoundException,
+                   InvalidParameterValueException,
+                   FactoryException;
+
+    /**
+     * Returns the operation method for the specified math transform. This method is invoked
+     * automatically after <code>createMathTransform</code>. The default implementation returns
+     * <code>this</code>, which is appropriate for the vast majority of cases. An exception is
+     * affine transform, which provides different methods for different matrix sizes.
+     */
+    protected org.opengis.referencing.operation.OperationMethod getMethod(final MathTransform mt) {
+        return this;
     }
 }

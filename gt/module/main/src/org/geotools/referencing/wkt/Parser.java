@@ -841,8 +841,8 @@ public class Parser extends MathTransformParser {
         Element element = parent.pullElement("FITTED_CS");
         String     name = element.pullString("name");
         Map  properties = parseAuthority(element, name);
-        final CoordinateReferenceSystem base = parseCoordinateReferenceSystem(element);
         final MathTransform toBase = parseMathTransform(element, true);
+        final CoordinateReferenceSystem base = parseCoordinateReferenceSystem(element);
         final OperationMethod method = getOperationMethod();
         element.close();
         /*

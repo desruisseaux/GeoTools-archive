@@ -24,10 +24,10 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
-import java.util.Collection;
 import java.util.Map;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -36,6 +36,7 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.util.UnsupportedImplementationException;
 
 
@@ -109,15 +110,41 @@ public class Operation extends SingleOperation
      * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
     public ParameterValueGroup getParameterValues() throws UnsupportedOperationException {
-        if (transform instanceof AbstractMathTransform) {
-            final ParameterValueGroup p = ((AbstractMathTransform) transform).getParameterValues();
-            if (p != null) {
-                return p;
-            }
-            // TODO: localize the message.
-            throw new UnsupportedOperationException("No parameter available from the math transform");
+        return getParameterValues(transform, method.getParameters(), true);
+    }
+
+    /**
+     * Returns the parameter values for the math transform that use the specified descriptor.
+     *
+     * @param  mt The math transform for which parameters are desired.
+     * @param  descriptor The descriptor to search for.
+     * @param  required <code>true</code> if an exception must be thrown if parameters are unknow.
+     * @return The parameter values, or null.
+     * @throws UnsupportedImplementationException if the math transform implementation do not
+     *         provide information about parameters.
+     */
+    private static ParameterValueGroup getParameterValues(final MathTransform mt,
+                                                          final ParameterDescriptorGroup descriptor,
+                                                          boolean required)
+    {
+        if (mt instanceof ConcatenatedTransform) {
+            final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
+            final ParameterValueGroup param1 = getParameterValues(ct.transform1, descriptor, false);
+            final ParameterValueGroup param2 = getParameterValues(ct.transform2, descriptor, false);
+            if (param1==null && param2!=null) return param2;
+            if (param2==null && param1!=null) return param1;
+            required = true;
         }
-        throw new UnsupportedImplementationException(transform.getClass());
+        if (mt instanceof AbstractMathTransform) {
+            final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
+            if (param != null) {
+                return param;
+            }
+        }
+        if (required) {
+            throw new UnsupportedImplementationException(mt.getClass());
+        }
+        return null;
     }
 
     /**

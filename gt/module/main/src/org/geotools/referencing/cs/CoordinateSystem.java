@@ -26,12 +26,18 @@ package org.geotools.referencing.cs;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-
 import javax.units.ConversionException;
 import javax.units.Converter;
 import javax.units.SI;
 import javax.units.Unit;
 
+// OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
@@ -39,10 +45,6 @@ import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -197,7 +199,8 @@ public class CoordinateSystem extends IdentifiedObject
      * @param  targetCS The target coordinate system.
      * @return The conversion from <code>sourceCS</code> to <code>targetCS</code> as
      *         an affine transform. Only axis orientation and units are taken in account.
-     * @throws IllegalArgumentException if axis doesn't matches.
+     * @throws IllegalArgumentException if axis doesn't matches, or the CS doesn't have the
+     *         same geometry.
      * @throws ConversionException if the unit conversion is non-linear.
      */
     public static Matrix swapAndScaleAxis(final org.opengis.referencing.cs.CoordinateSystem sourceCS,
@@ -207,7 +210,12 @@ public class CoordinateSystem extends IdentifiedObject
         // Note: while this method signature declares Matrix as the return type,
         //       CoordinateOperationFactory.createTransformationStep(GeocentricCRS,GeocentricCRS)
         //       really expects a GeneralMatrix. Other transformation steps are generic enough.
-
+        if (!Utilities.sameInterfaces(sourceCS.getClass(), targetCS.getClass(),
+                                      org.opengis.referencing.cs.CoordinateSystem.class))
+        {
+            // TODO: localize
+            throw new IllegalArgumentException("Incompatible type of coordinate systems.");
+        }
         final AxisDirection[] sourceAxis = getAxisDirections(sourceCS);
         final AxisDirection[] targetAxis = getAxisDirections(targetCS);
         final GeneralMatrix matrix = new GeneralMatrix(sourceAxis, targetAxis);

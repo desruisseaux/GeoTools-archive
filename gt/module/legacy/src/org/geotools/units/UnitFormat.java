@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.geotools.resources.CharUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 import org.geotools.resources.rsc.ResourceKeys;
@@ -137,8 +138,8 @@ final class UnitFormat {
                 final int   length = power.length();
                 final int  initPos = buffer.length();
                 for (int i=0; i<length; i++) {
-                    final char c=power.charAt(i);
-                    final char s=Utilities.toSuperScript(c);
+                    final char c = power.charAt(i);
+                    final char s = CharUtilities.toSuperScript(c);
                     if (s==c) {
                         buffer.setLength(initPos);
                         buffer.append(EXPONENT_SYMBOL);
@@ -469,7 +470,7 @@ final class UnitFormat {
                 expStart = symbolEnd+1;
             } else {
                 for (symbolEnd=length; --symbolEnd>=0;) {
-                    if (!Utilities.isSuperScript(symbol.charAt(symbolEnd))) {
+                    if (!CharUtilities.isSuperScript(symbol.charAt(symbolEnd))) {
                         symbolEnd++;
                         break;
                     }
@@ -484,9 +485,11 @@ final class UnitFormat {
              */
             if (symbolEnd>=1 && expStart<length) {
                 final String powerText; {
-                    final StringBuffer tmp=new StringBuffer(symbol.substring(expStart));
-                    for (int i=tmp.length(); --i>=0;) tmp.setCharAt(i, Utilities.toNormalScript(tmp.charAt(i)));
-                    powerText=tmp.toString();
+                    final StringBuffer tmp = new StringBuffer(symbol.substring(expStart));
+                    for (int i=tmp.length(); --i>=0;) {
+                        tmp.setCharAt(i, CharUtilities.toNormalScript(tmp.charAt(i)));
+                    }
+                    powerText = tmp.toString();
                 }
                 symbol=symbol.substring(0, symbolEnd);
                 try {

@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.crs.GeocentricCRS;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.datum.Ellipsoid;
-import org.geotools.referencing.operation.TransformationTest;
+import org.geotools.referencing.operation.TestTransform;
 import org.geotools.resources.XMath;
 
 
@@ -53,7 +53,7 @@ import org.geotools.resources.XMath;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricTransformTest extends TransformationTest {
+public class GeocentricTransformTest extends TestTransform {
     /**
      * Runs the tests with the textual test runner.
      */

@@ -33,7 +33,6 @@ import javax.units.Unit;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -45,15 +44,12 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.Projection;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.util.UnsupportedImplementationException;
+
 
 
 /**
@@ -348,56 +344,6 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
         }
         return matrix;
     }
-
-    /**
-     * Returns the projection parameter values, or an empty array if none.
-     * Invoking this method is similar to invoking <code>{@linkplain #conversionFromBase
-     * conversionFromBase}.{@linkplain Conversion#getParameterValues getParameterValues}()</code>,
-     * except that only parameters relative to the projection are returned. More specifically,
-     * if some affine transform steps were added (for axis swapping or unit conversions), they
-     * will be ignored.
-     *
-     * @see org.opengis.referencing.operation.MathTransformFactory#createParameterizedTransform
-     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
-     */
-    public ParameterValueGroup getParameterValues() {
-        return getParameterValues(conversionFromBase.getMathTransform(),
-                                  conversionFromBase.getMethod().getParameters(), true);
-    }
-
-    /**
-     * Returns the parameter values for the math transform that use the specified descriptor.
-     *
-     * @param  mt The math transform for which parameters are desired.
-     * @param  descriptor The descriptor to search for.
-     * @param  required <code>true</code> if an exception must be thrown if parameters are unknow.
-     * @return The parameter values, or null.
-     * @throws UnsupportedImplementationException if the math transform implementation do not
-     *         provide information about parameters.
-     */
-    private static ParameterValueGroup getParameterValues(final MathTransform mt,
-                                                          final ParameterDescriptorGroup descriptor,
-                                                          boolean required)
-    {
-        if (mt instanceof ConcatenatedTransform) {
-            final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
-            final ParameterValueGroup param1 = getParameterValues(ct.transform1, descriptor, false);
-            final ParameterValueGroup param2 = getParameterValues(ct.transform2, descriptor, false);
-            if (param1==null && param2!=null) return param2;
-            if (param2==null && param1!=null) return param1;
-            required = true;
-        }
-        if (mt instanceof AbstractMathTransform) {
-            final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
-            if (param != null) {
-                return param;
-            }
-        }
-        if (required) {
-            throw new UnsupportedImplementationException(mt.getClass());
-        }
-        return null;
-    }
     
     /**
      * Returns a hash value for this projected CRS.
@@ -426,7 +372,7 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
                                  getAngularUnit(baseCRS.getCoordinateSystem()));
         formatter.append(baseCRS);
         formatter.append(conversionFromBase.getMethod());
-        final Collection parameters = getParameterValues().values();
+        final Collection parameters = conversionFromBase.getParameterValues().values();
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
             final GeneralParameterValue param = (GeneralParameterValue) it.next();
             if (nameMatches(param.getDescriptor(), "semi_major") ||

@@ -326,14 +326,25 @@ public abstract class AbstractConsole implements Runnable {
         err.print(Utilities.getShortClassName(exception));
         err.print(" at line ");
         err.print(in.getLineNumber());
-        final String message = exception.getLocalizedMessage();
-        if (message != null) {
-            err.print(": ");
-            err.print(message);
+        Throwable cause = exception;
+        while (true) {
+            String message = cause.getLocalizedMessage();
+            if (message != null) {
+                err.print(": ");
+                err.print(message);
+            }
+            err.println();
+            cause = cause.getCause();
+            if (cause == null) {
+                break;
+            }
+            err.print("Caused by ");
+            err.print(Utilities.getShortClassName(cause));
         }
-        err.println();
+        err.println("Type 'stacktrace' for stack trace information.");
         if (line!=null && exception instanceof ParseException) {
             AbstractParser.reportError(err, line, ((ParseException)exception).getErrorOffset());
         }
+        err.println();
     }
 }

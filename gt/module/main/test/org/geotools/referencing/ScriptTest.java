@@ -26,14 +26,18 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URL;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.referencing.operation.TestConsole;
-import org.geotools.resources.TestData;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.TestConsole;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -113,9 +117,9 @@ public class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testSimple() throws Exception {
-//        runScript("scripts/Simple.txt");
-//    }
+    public void testSimple() throws Exception {
+        runScript("scripts/Simple.txt");
+    }
     
     /**
      * Run "Projections.txt".
@@ -176,9 +180,9 @@ public class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testStereographic() throws Exception {
-//        runScript("scripts/Stereographic.txt");
-//    }
+    public void testStereographic() throws Exception {
+        runScript("scripts/Stereographic.txt");
+    }
     
     /**
      * Run "Orthographic.txt".

@@ -148,6 +148,8 @@ public class OperationMethod extends IdentifiedObject
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
      * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     *
+     * @deprecated Use the method expecting a parameter group instead.
      */
     public OperationMethod(final Map properties,
                            final int sourceDimensions,

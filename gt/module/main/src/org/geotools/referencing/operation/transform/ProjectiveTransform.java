@@ -40,6 +40,7 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
@@ -465,6 +466,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         private static final long serialVersionUID = 649555815622129472L;
 
         /**
+         * The set of predefined providers.
+         */
+        private static OperationMethod[] methods = new OperationMethod[8];
+
+        /**
          * The parameters group.
          *
          * @todo We should register EPSG parameter identifiers (A0, A1, A2, B0, B1, B2) as well.
@@ -485,12 +491,19 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         }
 
         /**
-         * Create a provider for affine transform with a default matrix size.
+         * Creates a provider for affine transform with a default matrix size.
          */
         public Provider() {
-            super(MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
-                  MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
-                  PARAMETERS);
+            this(MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
+                 MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1);
+            methods[MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-2] = this;
+        }
+
+        /**
+         * Creates a provider for affine transform with the specified dimensions.
+         */
+        private Provider(final int sourceDimensions, final int targetDimensions) {
+            super(sourceDimensions, targetDimensions, PARAMETERS);
         }
 
         /**
@@ -511,6 +524,26 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 throws ParameterNotFoundException
         {
             return create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
+        }
+
+        /**
+         * Returns the operation method for the specified math transform.
+         * This method provides different methods for different matrix sizes.
+         */
+        protected OperationMethod getMethod(final MathTransform mt) {
+            final int sourceDimensions = mt.getSourceDimensions();
+            final int targetDimensions = mt.getTargetDimensions();
+            if (sourceDimensions == targetDimensions) {
+                final int i = sourceDimensions - 1;
+                if (i>=0 && i<methods.length) {
+                    OperationMethod method = methods[i];
+                    if (method == null) {
+                        methods[i] = method = new Provider(sourceDimensions, targetDimensions);
+                    }
+                    return method;
+                }
+            }
+            return new Provider(sourceDimensions, targetDimensions);
         }
     }
 }

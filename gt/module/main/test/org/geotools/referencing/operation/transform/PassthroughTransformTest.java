@@ -36,7 +36,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.TransformationTest;
+import org.geotools.referencing.operation.TestTransform;
 
 
 /**
@@ -51,7 +51,7 @@ import org.geotools.referencing.operation.TransformationTest;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PassthroughTransformTest extends TransformationTest {
+public class PassthroughTransformTest extends TestTransform {
     /**
      * Runs the tests with the textual test runner.
      */

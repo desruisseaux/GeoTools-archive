@@ -48,117 +48,65 @@ public final class Utilities {
     }
 
     /**
-     * Determines whether the character is a superscript. Most superscripts have
-     * unicode values from \\u2070 to \\u207F inclusive. Superscripts are the
-     * following symbols:
+     * Convenience method for testing two objects for
+     * equality. One or both objects may be null.
+     */
+    public static boolean equals(final Object object1, final Object object2) {
+        return (object1==object2) || (object1!=null && object1.equals(object2));
+    }
+
+    /**
+     * Returns <code>true</code> if the two specified objects implements exactly the same set of
+     * interfaces. Only interfaces assignable to <code>base</code> are compared. Declaration order
+     * doesn't matter. For example in ISO 19111, different interfaces exist for different coordinate
+     * system geometries (<code>CartesianCS</code>, <code>PolarCS</code>, etc.). We can check if two
+     * CS implementations has the same geometry with the following code:
      *
      * <blockquote><code>
-     *     \u2070 \u00B9 \u00B2 \u00B3 \u2074 \u2075 \u2076 \u2077
-     *     \u2078 \u2079 \u207A \u207B \u207C \u207D \u207E \u207F
+     * if (sameInterfaces(cs1, cs2, {@linkplain org.opengis.referencing.cs.CoordinateSystem}.class))
      * </code></blockquote>
      */
-    public static boolean isSuperScript(final char c) {
-        switch (c) {
-            /*1*/case '\u2071':
-            /*2*/case '\u2072':
-            /*3*/case '\u2073': return false;
-            /*1*/case '\u00B9':
-            /*2*/case '\u00B2':
-            /*3*/case '\u00B3': return true;
+    public static boolean sameInterfaces(final Class object1,
+                                         final Class object2,
+                                         final Class  base)
+    {
+        if (object1 == object2) {
+            return true;
         }
-        return (c>='\u2070' && c<='\u207F');
-    }
-
-    /**
-     * Determines whether the character is a subscript. Most subscripts have
-     * unicode values from \\u2080 to \\u208E inclusive. Subscripts are the
-     * following symbols:
-     *
-     * <blockquote><code>
-     *     \u2080 \u2081 \u2082 \u2083 \u2084 \u2085 \u2086 \u2087
-     *     \u2088 \u2089 \u208A \u208B \u208C \u208D \u208E
-     * </code></blockquote>
-     */
-    public static boolean isSubScript(final char c) {
-        return (c>='\u2080' && c<='\u208E');
-    }
-
-    /**
-     * Converts the character argument to superscript.
-     * Only the following characters can be converted
-     * (other characters are left unchanged):
-     *
-     * <blockquote><pre>
-     * 0 1 2 3 4 5 6 7 8 9 + - = ( ) n
-     * </pre></blockquote>
-     */
-    public static char toSuperScript(final char c) {
-        switch (c) {
-            case '1': return '\u00B9';
-            case '2': return '\u00B2';
-            case '3': return '\u00B3';
-            case '+': return '\u207A';
-            case '-': return '\u207B';
-            case '=': return '\u207C';
-            case '(': return '\u207D';
-            case ')': return '\u207E';
-            case 'n': return '\u207F';
+        if (object1==null || object2==null) {
+            return false;
         }
-        if (c>='0' && c<='9') {
-            return (char) (c+('\u2070'-'0'));
+        final Class[] c1 = object1.getInterfaces();
+        final Class[] c2 = object2.getInterfaces();
+        /*
+         * Trim all interfaces that are not assignable to 'base' in the 'c2' array.
+         * Doing this once will avoid to redo the same test many time in the inner
+         * loops j=[0..n].
+         */
+        int n = 0;
+        for (int i=0; i<c2.length; i++) {
+            final Class c = c2[i];
+            if (base.isAssignableFrom(c)) {
+                c2[n++] = c;
+            }
         }
-        return c;
-    }
-
-    /**
-     * Converts the character argument to subscript.
-     * Only the following characters can be converted
-     * (other characters are left unchanged):
-     *
-     * <blockquote><pre>
-     * 0 1 2 3 4 5 6 7 8 9 + - = ( ) n
-     * </pre></blockquote>
-     */
-    public static char toSubScript(final char c) {
-        switch (c) {
-            case '+': return '\u208A';
-            case '-': return '\u208B';
-            case '=': return '\u208C';
-            case '(': return '\u208D';
-            case ')': return '\u208E';
+        /*
+         * For each interface assignable to 'base' in the 'c1' array, check if
+         * this interface exists also in the 'c2' array. Order doesn't matter.
+         */
+compare:for (int i=0; i<c1.length; i++) {
+            final Class c = c1[i];
+            if (base.isAssignableFrom(c)) {
+                for (int j=0; j<n; j++) {
+                    if (c.equals(c2[j])) {
+                        System.arraycopy(c2, j+1, c2, j, --n-j);
+                        continue compare;
+                    }
+                }
+                return false; // Interface not found in 'c2'.
+            }
         }
-        if (c>='0' && c<='9') {
-            return (char) (c+('\u2080'-'0'));
-        }
-        return c;
-    }
-
-    /**
-     * Converts the character argument to normal script.
-     */
-    public static char toNormalScript(final char c) {
-        switch (c) {
-            case '\u00B9': return '1';
-            case '\u00B2': return '2';
-            case '\u00B3': return '3';
-            case '\u2071': return c;
-            case '\u2072': return c;
-            case '\u2073': return c;
-            case '\u207A': return '+';
-            case '\u207B': return '-';
-            case '\u207C': return '=';
-            case '\u207D': return '(';
-            case '\u207E': return ')';
-            case '\u207F': return 'n';
-            case '\u208A': return '+';
-            case '\u208B': return '-';
-            case '\u208C': return '=';
-            case '\u208D': return '(';
-            case '\u208E': return ')';
-        }
-        if (c>='\u2070' && c<='\u2079') return (char) (c-('\u2070'-'0'));
-        if (c>='\u2080' && c<='\u2089') return (char) (c-('\u2080'-'0'));
-        return c;
+        return n==0; // If n>0, at least one interface was not found in 'c1'.
     }
 
     /**
@@ -236,14 +184,6 @@ public final class Utilities {
      */
     public static String getShortClassName(final Object object) {
         return getShortName(object!=null ? object.getClass() : null);
-    }
-
-    /**
-     * Convenience method for testing two objects for
-     * equality. One or both objects may be null.
-     */
-    public static boolean equals(final Object object1, final Object object2) {
-        return (object1==object2) || (object1!=null && object1.equals(object2));
     }
 
     /**
