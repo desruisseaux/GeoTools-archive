@@ -139,6 +139,7 @@ public class XSISAXHandler extends DefaultHandler {
         throws SAXException {
         try {
             String text = String.copyValueOf(ch, start, length);
+//            System.out.println("CHARS: " + text);
 
             if ((text != null) && !"".equals(text.trim())) {
                 ((XSIElementHandler) handlers.peek()).characters(text);
@@ -164,6 +165,7 @@ public class XSISAXHandler extends DefaultHandler {
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
         logger.info("END: " + qName);
+//        System.out.println("END: " + qName);
 
         try {
             ((XSIElementHandler) handlers.pop()).endElement(namespaceURI,
@@ -190,6 +192,7 @@ public class XSISAXHandler extends DefaultHandler {
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
         logger.info("START: " + qName);
+//        System.out.println("START: " + qName);
 
         try {
             XSIElementHandler eh = ((XSIElementHandler) handlers.peek())

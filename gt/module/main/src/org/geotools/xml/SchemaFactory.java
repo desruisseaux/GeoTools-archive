@@ -273,8 +273,8 @@ public class SchemaFactory {
         }
     public synchronized static Schema getInstance(URI targetNamespace,
             InputStream is, Level level) throws SAXException {
-            if ((targetNamespace == null) || "".equals(targetNamespace)
-                    || (schemas.get(targetNamespace) == null)) {
+            if (targetNamespace == null
+                    || schemas.get(targetNamespace) == null) {
 
                     setParser();
 
@@ -287,7 +287,7 @@ public class SchemaFactory {
                         throw new SAXException(e);
                     }
 
-                    if ((targetNamespace == null) || "".equals(targetNamespace)) {
+                    if (targetNamespace == null) {
                         return contentHandler.getSchema();
                     }
 

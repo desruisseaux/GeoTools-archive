@@ -271,10 +271,12 @@ System.out.println("GetCaps -- post "+postUrl);
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-
+        os.close();
  	    InputStream is = getInputStream(hc,auth);
         Schema schema = SchemaFactory.getInstance(null,is);
         Element[] elements = schema.getElements();
+        if (elements == null)
+            return null; // not found
         Element element = null;
         
         for(int i = 0;i<elements.length && element == null;i++)

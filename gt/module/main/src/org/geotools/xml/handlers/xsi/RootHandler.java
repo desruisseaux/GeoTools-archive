@@ -78,7 +78,7 @@ public class RootHandler extends XSIElementHandler {
 
             return schema;
         }
-
+        logger.warning("Starting schema with "+localName+" element.");
         return null;
     }
 
