@@ -916,7 +916,9 @@ public class DataUtilities {
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(typeName);
         try {
-            typeFactory.setNamespace( new URI(namespace));
+            if( namespace != null ){
+                typeFactory.setNamespace( new URI(namespace));
+            }
         } catch (URISyntaxException badNamespace ) {
             throw new SchemaException( badNamespace );            
         }
