@@ -6,12 +6,12 @@
  */
 package org.geotools.gce.image;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import junit.framework.TestCase;
 
+import java.io.File;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * @author rgould
@@ -20,27 +20,23 @@ import junit.framework.TestCase;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WorldImageFormatTest extends TestCase {
+    private WorldImageFormat format;
 
-	private WorldImageFormat format;
+    public WorldImageFormatTest(String name) {
+        super(name);
+    }
 
+    protected void setUp() throws Exception {
+        super.setUp();
+        format = new WorldImageFormat();
+    }
 
-	public WorldImageFormatTest(String name) {
-		super(name);
-	}
-
-	protected void setUp() throws Exception {
-		super.setUp();
-		format = new WorldImageFormat();
-	}
-
-	public void testGetWorldExtension() {
-		assertEquals(WorldImageFormat.getWorldExtension("png"), ".pgw");
-		assertEquals(WorldImageFormat.getWorldExtension("gif"), ".gfw");
-		assertEquals(WorldImageFormat.getWorldExtension("jpg"), ".jgw");
-		assertEquals(WorldImageFormat.getWorldExtension("jpeg"), ".jgw");
-		assertEquals(WorldImageFormat.getWorldExtension("tif"), ".tfw");
-		assertEquals(WorldImageFormat.getWorldExtension("tiff"), ".tfw");
-		
-	}
-
+    public void testGetWorldExtension() {
+        assertEquals(WorldImageFormat.getWorldExtension("png"), ".pgw");
+        assertEquals(WorldImageFormat.getWorldExtension("gif"), ".gfw");
+        assertEquals(WorldImageFormat.getWorldExtension("jpg"), ".jgw");
+        assertEquals(WorldImageFormat.getWorldExtension("jpeg"), ".jgw");
+        assertEquals(WorldImageFormat.getWorldExtension("tif"), ".tfw");
+        assertEquals(WorldImageFormat.getWorldExtension("tiff"), ".tfw");
+    }
 }
