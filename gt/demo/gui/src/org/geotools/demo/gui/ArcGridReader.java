@@ -44,6 +44,7 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import java.util.Collections;
@@ -91,7 +92,7 @@ public class ArcGridReader {
         GridCoverageReader reader = f.getReader(url);
         
         //get the parameters and set them
-        ParameterGroupDescriptor paramDescriptor = f.getReadParameters();
+        OperationParameterGroup paramDescriptor = f.getReadParameters();
         ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
         
         params.getValue( "Compressed" ).setValue( true ); //zipped files do not work
