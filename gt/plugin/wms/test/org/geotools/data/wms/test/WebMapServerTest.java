@@ -208,15 +208,15 @@ public class WebMapServerTest extends TestCase {
         WebMapServer wms = new WebMapServer(serverURL);
         wms.getCapabilities();
         
-        Iterator iter = wms.iterator();
+        Iterator iter = wms.entries().iterator();
         assertNotNull(iter);
         
         while(iter.hasNext()) {
             WMSLayerCatalogEntry entry = (WMSLayerCatalogEntry) iter.next();
-            assertNotNull(entry);
-            assertEquals(entry.getMetadataNames()[0], WMSLayerMetadataEntity.TYPE_NAME);
-            assertNotNull(entry.getDataName());
-            WMSLayerMetadataEntity metadata = (WMSLayerMetadataEntity) entry.getMetadata(WMSLayerMetadataEntity.TYPE_NAME);
+            assertNotNull(entry);            
+            assertTrue( entry.metadata().keySet().contains( WMSLayerMetadataEntity.TYPE_NAME) );
+            assertNotNull(entry.getDataName());            
+            WMSLayerMetadataEntity metadata = (WMSLayerMetadataEntity) entry.metadata().get(WMSLayerMetadataEntity.TYPE_NAME);
             assertNotNull(metadata);
             assertNotNull(metadata.getName());
         }

@@ -16,6 +16,9 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.catalog.CatalogEntry;
+import org.geotools.catalog.Discovery;
+import org.geotools.catalog.QueryRequest;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.request.AbstractRequest;
@@ -30,16 +33,12 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.opengis.catalog.Catalog;
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.MetadataEntity;
-import org.opengis.catalog.QueryDefinition;
-import org.opengis.catalog.QueryResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -133,7 +132,7 @@ import java.util.TreeSet;
  *
  * @author Richard Gould, Refractions Research
  */
-public class WebMapServer implements Catalog {
+public class WebMapServer implements Discovery {
     /**
      * Returned by getStatus(). Indicates that the server is currently
      * performing a request.
@@ -711,35 +710,39 @@ public class WebMapServer implements Catalog {
      * Catalog Interface Methods
      **************************************************************************
      */
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.Catalog#query(org.opengis.catalog.QueryDefinition)
-     */
-    public QueryResult query(QueryDefinition arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.Catalog#add(org.opengis.catalog.CatalogEntry)
-     */
-    public void add(CatalogEntry arg0) throws IllegalStateException {
-        // TODO Auto-generated method stub
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.Catalog#remove(org.opengis.catalog.CatalogEntry)
-     */
-    public void remove(CatalogEntry arg0) throws IllegalStateException {
-        // TODO Auto-generated method stub
-    }
 
     /**
-     * Returns an Iterator that can iterate through all of the layers in the
-     * capabilities. It flattens the hierarchy. Each element is of type Layer.
-     *
+     * Metadata search through entries. 
+     * 
+     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
+     * @param queryRequest
+     * @return List of matching TypeEntry
+     */
+    public List search( QueryRequest queryRequest ) {
+        if( queryRequest == QueryRequest.ALL ) {
+            return entries();
+        }
+        List queryResults = new ArrayList();
+CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
+            CatalogEntry entry = (CatalogEntry) i.next();
+METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
+                if( queryRequest.match( m.next() ) ) {
+                    queryResults.add( entry );
+                    break METADATA;
+                }
+            }
+        }
+        return queryResults;
+    }
+    
+    /**
+     * Catalog of the Layers known to this Web Map Server.
+     * <p>
+     * It flattens the hierarchy. Each element is of type Layer.
+     * </p>
      * @return an iterator that will iterate through the layers
      */
-    public Iterator iterator() {
+    public List entries() {
         ArrayList layers = new ArrayList();
 
         for (int i = 0; i < capabilities.getLayers().length; i++) {
@@ -747,11 +750,9 @@ public class WebMapServer implements Catalog {
 
             if ((layer.getName() != null) && (layer.getName().length() != 0)) { //$NON-NLS-1$
 
-                CatalogEntry entry = new WMSLayerCatalogEntry(this, layer);
-                layers.add(entry);
+                layers.add( new WMSLayerCatalogEntry(this, layer) );                
             }
         }
-
-        return layers.iterator();
+        return Collections.unmodifiableList( layers );
     }
 }

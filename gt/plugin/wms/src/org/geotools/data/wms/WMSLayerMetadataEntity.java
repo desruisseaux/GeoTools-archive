@@ -34,7 +34,7 @@ public class WMSLayerMetadataEntity extends AbstractMetadataEntity {
     }
 
     public String getName() {
-        return layer.getName();
+        return TYPE_NAME;
     }
 
     public String getTitle() {

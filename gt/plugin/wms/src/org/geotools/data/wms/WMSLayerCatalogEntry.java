@@ -16,83 +16,70 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.catalog.CatalogEntry;
 import org.geotools.data.ows.Layer;
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.MetadataEntity;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 public class WMSLayerCatalogEntry implements CatalogEntry {
     WebMapServer wms;
     Layer layer;
-    List metadatas;    
+    Map metadatas;   
     
     public WMSLayerCatalogEntry(WebMapServer wms, Layer layer) {
         this.wms = wms;
         this.layer = layer;
-        metadatas = new ArrayList();
-        metadatas.add(new WMSLayerMetadataEntity(layer));
+        metadatas = new HashMap();
+        
+        WMSLayerMetadataEntity metadata = new WMSLayerMetadataEntity(layer);        
+        metadatas.put( metadata.getName(), metadata );
     }
 
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getResource()
+    /**
+     * Access Layer.
+     * 
+     * @see org.geotools.catalog.CatalogEntry#resource()
+     * @return an org.geotools.data.ows.Layer
      */
-    public Object getResource() {
+    public Object resource() {
         return layer;
     }
-
+    
+    /** Access to parent WebMapServer */
     public WebMapServer getWMS() {
         return wms;
     }
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getDataName()
+    
+    /**
+     * Layer name, for display in user interface.
+     * 
+     * @return Display name for this Layer
      */
     public String getDataName() {
         return layer.getName();
     }
 
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getNumMetadata()
+    /**
+     * Map of MetadataEntity by name
+     * 
+     * @return Map of Metadata by name
      */
-    public int getNumMetadata() {
-        return metadatas.size();
+    public Map metadata() {
+        return Collections.unmodifiableMap( metadatas );
     }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getMetadataNames()
+    
+    /**
+     * Names of available metadata.
+     * 
+     * @return names of available metadata
      */
     public String[] getMetadataNames() {
-        String[] names = new String[4];
-        names[0] = WMSLayerMetadataEntity.TYPE_NAME;
-
-        return names;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getMetadata(int)
-     */
-    public MetadataEntity getMetadata(int index) {
-        return (MetadataEntity) metadatas.get(index);
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#getMetadata(java.lang.String)
-     */
-    public MetadataEntity getMetadata(String name) {
-        if (WMSLayerMetadataEntity.TYPE_NAME == name) {
-            return (MetadataEntity) metadatas.get(0);
-        }
-
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.CatalogEntry#iterator()
-     */
-    public Iterator iterator() {
-        return metadatas.iterator();
+        return (String[]) metadatas.keySet().toArray( new String[ metadata().size() ] );
     }
     
     public boolean equals( Object obj ) {
@@ -118,4 +105,5 @@ public class WMSLayerCatalogEntry implements CatalogEntry {
                (layer == null?  0 : layer.hashCode() << 30 ) |
                (metadatas == null ? 0 : metadatas.hashCode() << 60 );
     }
+
 }
