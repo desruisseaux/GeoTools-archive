@@ -78,7 +78,7 @@ public class GT2Eclipse {
 		String src;
 		for (int i = 0; i < dir.length; i++) {
 		    src = dir[i];
-		    if (src.equals("CVS"))
+		    if (src.equals("CVS") || src.equals(".svn"))
 			continue;
 		    if (!set.contains(src)) {
 			System.out.println("target " + src + " was not built by maven");
@@ -98,7 +98,7 @@ public class GT2Eclipse {
 		String src;
 		for (int i = 0; i < dir.length; i++) {
 		    src = dir[i];
-		    if (src.equals("CVS"))
+		    if (src.equals("CVS")||src.equals(".svn"))
 			continue;
 		    if (!set.contains(src)) {
 			System.out.println("target " + src + " was not built by maven");
@@ -178,7 +178,7 @@ public class GT2Eclipse {
 		String src;
 		for (int i = 0; i < dir.length; i++) {
 		    src = dir[i];
-		    if (src.equals("CVS"))
+		    if (src.equals("CVS")||src.equals(".svn"))
 			continue;
 		    if (!set.contains(src)) {
 			System.out.println("target " + src
@@ -237,8 +237,6 @@ public class GT2Eclipse {
 				String jars[] = dir.list(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
 						if (name.indexOf("-2.0-B") != -1)
-							return false;
-						if (name.endsWith("-0.1.jar"))
 							return false;
 						if (name.endsWith(".md5"))
 							return false;
