@@ -349,6 +349,20 @@ public class TransverseMercator extends MapProjection {
         return new Point2D.Double(x,y);        
     }
     
+    
+    protected double getToleranceForAssertions(final double longitude, final double latitude) {
+        if (Math.abs(longitude - centralMeridian) > 0.26) {   //15 degrees
+            // When far from the valid area, use a larger tolerance.
+            return 2.5;
+        } else if (Math.abs(longitude - centralMeridian) > 0.22) {  //12.5 degrees
+            return 1.0;
+        } else if (Math.abs(longitude - centralMeridian) > 0.17) {  //10 degrees
+            return 0.5;
+        }
+        // a normal tolerance
+        return 1E-6;
+    }
+    
 
     /**
      * Provides the transform equations for the spherical case of the
@@ -381,8 +395,9 @@ public class TransverseMercator extends MapProjection {
                 throws ProjectionException 
         {
             // Compute using ellipsoidal formulas, for comparaison later.
+            double normalizedLongitude = x;
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-                       
+                    
             double cosphi = Math.cos(y);
             double b = cosphi * Math.sin(x);
             if (Math.abs(Math.abs(b) - 1.0) <= EPS) {
@@ -390,26 +405,13 @@ public class TransverseMercator extends MapProjection {
                 ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
             }
             
-            double yy = cosphi * Math.cos(x) / Math.sqrt(1.0-b*b);
+            //Using Snyder's equation for calculating y, instead of the one used in Proj4
+            //poential problems when y and x = 90 degrees, but behaves ok in tests   
+            y = Math.atan2(Math.tan(y),Math.cos(x)) - latitudeOfOrigin;   /* Snyder 8-3 */
             x = 0.5 * Math.log((1.0+b)/(1.0-b));    /* Snyder 8-1 */
-            
-            if ((b=Math.abs(yy)) >= 1.0) {
-                if ((b-1.0) > EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
-                } else {
-                    yy = 0.0;
-                }
-            } else {
-                yy = Math.acos(yy);
-            }
-            if (y < 0) {
-                yy = -yy;
-            }
-            y = (yy - latitudeOfOrigin);
-          
-            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+
+            assert Math.abs(ptDst.getX()-x) <= getToleranceForSphereAssertions(normalizedLongitude,0) : ptDst.getX()-x;
+            assert Math.abs(ptDst.getY()-y) <= getToleranceForSphereAssertions(normalizedLongitude,0) : ptDst.getY()-y;
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -427,20 +429,42 @@ public class TransverseMercator extends MapProjection {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
             
             double t = Math.exp(x);
-            double d = 0.5 * (t-1.0/t);
-            t = Math.cos(latitudeOfOrigin + y);
-            double phi = Math.asin(Math.sqrt((1.0-t*t)/(1.0+d*d)));
-            y = y<0.0 ? -phi : phi;
-            x = (Math.abs(d)<=EPS && Math.abs(t)<=EPS) ? 
-                    0.0 : Math.atan2(d,t);
-
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            double sinhX = 0.5 * (t-1.0/t);                //sinh(x)
+            double cosD = Math.cos(latitudeOfOrigin + y);
+            double phi = Math.asin(Math.sqrt((1.0-cosD*cosD)/(1.0+sinhX*sinhX)));
+            // correct for the fact that we made everything positive using sqrt(x*x)
+            y = ((y + latitudeOfOrigin)<0.0) ? -phi : phi;   
+            x = (Math.abs(sinhX)<=EPS && Math.abs(cosD)<=EPS) ? 
+                    0.0 : Math.atan2(sinhX,cosD);
+           
+            assert Math.abs(ptDst.getX()-x) <= getToleranceForSphereAssertions(x,0) : ptDst.getX()-x;
+            assert Math.abs(ptDst.getY()-y) <= getToleranceForSphereAssertions(x,0) : ptDst.getY()-y;
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
             }
             return new Point2D.Double(x,y);
+        }
+        
+        /*
+         *  Allow a larger tolerance when comparing spherical to elliptical calculations
+         *  when we are far from the central meridian (elliptical calculations are
+         *  not valid here).
+         *
+         *  longitude here is standardized (in radians) and centralMeridian has 
+         *  already been removed from it.
+         */
+        protected double getToleranceForSphereAssertions(final double longitude, final double latitude) {
+            if (Math.abs(Math.abs(longitude)- Math.PI/2.0) < TOL) {  //90 degrees
+                // elliptical equations are at their worst here
+                return 1E18;
+            }
+            if (Math.abs(longitude) > 0.26) {   //15 degrees
+                // When far from the valid area, use a very larger tolerance.          
+                return 1000000;
+            }
+            // a normal tolerance
+            return 1E-6;
         }
     }
     
