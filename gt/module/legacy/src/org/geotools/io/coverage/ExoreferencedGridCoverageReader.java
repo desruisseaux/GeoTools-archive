@@ -46,7 +46,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.gc.GridRange;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.gcs.ResourceKeys;
-import org.opengis.referencing.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystem;
 
 
 /**

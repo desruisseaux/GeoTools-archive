@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
  */
-public class XMLEncoderTest extends FilterTestSupport {
+public class XMLEncoderTest extends LegacyFilterTestSupport {
     /** Feature on which to preform tests */
     private Filter filter = null;
 
