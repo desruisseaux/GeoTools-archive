@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * Wrapper class extends SeQuery to hold a SeConnection until close() is
  * called.
  *
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEQuery.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 class ArcSDEQuery {
@@ -49,24 +49,22 @@ class ArcSDEQuery {
     private static final Logger LOGGER = Logger.getLogger(ArcSDEQuery.class.getPackage()
                                                                            .getName());
 
-    //private SeConnection connection;
-
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ArcSDEConnectionPool connectionPool;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private FeatureType schema;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeQuery query;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeSqlConstruct sqlConstruct;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ArcSDEAdapter.FilterSet filters;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeConnection connection = null;
 
     /**
@@ -343,7 +341,7 @@ class ArcSDEQuery {
                     /* this section causes calculateLayerExtent to throw an
                      * indexOutOfBoundsException
                     
-                         ---- start of section that causes errors
+                           ---- start of section that causes errors
                      * */
                     if (filters.getGeometryFilter() != Filter.NONE) {
                         SeFilter[] geometryFilters = filters
@@ -402,9 +400,9 @@ class ArcSDEQuery {
     ////////////////////////////////////////////////////////////////////////
 
     /**
-     * Closes the query and releases the underlying stream back to the stream
-     * pool. If reset is TRUE, the query status is set to INACTIVE; also
-     * releases the SeConnection back to the SeConnectionPool
+     * Closes the query and releases the holded connection back to the
+     * connection pool. If reset is TRUE, the query status is set to INACTIVE;
+     * also releases the SeConnection back to the SeConnectionPool
      */
     public void close() {
         try {

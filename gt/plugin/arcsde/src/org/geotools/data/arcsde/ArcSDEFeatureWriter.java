@@ -1,4 +1,4 @@
-/*
+	/*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002, Geotools Project Managment Committee (PMC)
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.AttributeType;

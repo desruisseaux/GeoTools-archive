@@ -16,13 +16,6 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeCoordinateReference;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import junit.framework.TestCase;
@@ -50,6 +43,8 @@ import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.xml.sax.helpers.ParserAdapter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,7 +110,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         testData = null;
         super.tearDown();
     }
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -369,34 +364,73 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         final int LOOP_COUNT = 6;
 
-        for (int i = 0; i < LOOP_COUNT;) {
-        	LOGGER.info("Running #" + i + " iteration for mixed query test");
+        for (int i = 0; i < LOOP_COUNT; i++) {
+            LOGGER.info("Running #" + i + " iteration for mixed query test");
+
             //check that getBounds and getCount do function
             try {
-				FeatureResults results = fs.getFeatures(mixedFilter);
-				Envelope bounds = results.getBounds();
-				assertNotNull(bounds);
-				LOGGER.info("results bounds: " + bounds);
+                FeatureResults results = fs.getFeatures(mixedFilter);
+                Envelope bounds = results.getBounds();
+                assertNotNull(bounds);
+                LOGGER.info("results bounds: " + bounds);
 
-				FeatureReader reader = results.reader();
+                FeatureReader reader = results.reader();
 
-				/*verify that then features are already being fetched, getBounds and
-				 * getCount still work
-				 */
-				reader.next();
-				bounds = results.getBounds();
-				assertNotNull(bounds);
-				LOGGER.info("results bounds when reading: " + bounds);
+                /*verify that then features are already being fetched, getBounds and
+                 * getCount still work
+                 */
+                reader.next();
+                bounds = results.getBounds();
+                assertNotNull(bounds);
+                LOGGER.info("results bounds when reading: " + bounds);
 
-				int count = results.getCount();
-				assertEquals(EXPECTED_RESULT_COUNT, count);
-				LOGGER.info("wooohoooo...");
-				reader.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.WARNING, "At iteration " + i, e);
-				throw e;
-			}
+                int count = results.getCount();
+                assertEquals(EXPECTED_RESULT_COUNT, count);
+                LOGGER.info("wooohoooo...");
+                reader.close();
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "At iteration " + i, e);
+                throw e;
+            }
         }
+    }
+
+    /**
+     * to expose GEOT-408, tests that queries in which only non spatial
+     * attributes are requested does not fails due to the datastore trying to
+     * parse the geometry attribute.
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public void testAttributeOnlyQuery() throws Exception {
+        DataStore ds = testData.getDataStore();
+        FeatureSource fSource = ds.getFeatureSource(testData.getLine_table());
+        FeatureType type = fSource.getSchema();
+        DefaultQuery attOnlyQuery = new DefaultQuery(type.getTypeName());
+        List propNames = new ArrayList(type.getAttributeCount() - 1);
+
+        for (int i = 0; i < type.getAttributeCount(); i++) {
+            if (type.getAttributeType(i).isGeometry()) {
+                continue;
+            }
+
+            propNames.add(type.getAttributeType(i).getName());
+        }
+
+        attOnlyQuery.setPropertyNames(propNames);
+
+        FeatureResults results = fSource.getFeatures(attOnlyQuery);
+        FeatureType resultSchema = results.getSchema();
+        assertEquals(propNames.size(), resultSchema.getAttributeCount());
+
+        for (int i = 0; i < propNames.size(); i++) {
+            assertEquals(propNames.get(i),
+                resultSchema.getAttributeType(i).getName());
+        }
+        
+        //the problem described in GEOT-408 arises in attribute reader, so
+        //we must to try fetching features
+        results.reader().next();
     }
 
     /**

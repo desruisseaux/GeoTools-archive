@@ -23,6 +23,7 @@ import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,25 +37,25 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 class ArcSDEAttributeReader implements AttributeReader {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ArcSDEQuery query;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private FeatureType schema;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeRow currentRow;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeShape currentShape;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private GeometryBuilder geometryBuilder;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private int geometryTypeIndex = -1;
 
     /** DOCUMENT ME! */
@@ -63,7 +64,7 @@ class ArcSDEAttributeReader implements AttributeReader {
     /** DOCUMENT ME! */
     int fidPrefixLen;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private boolean hasNextAlreadyCalled = false;
 
     /**
@@ -80,19 +81,25 @@ class ArcSDEAttributeReader implements AttributeReader {
         this.fidPrefix = new StringBuffer(schema.getTypeName()).append(".");
         this.fidPrefixLen = fidPrefix.length();
 
-        Class geometryClass = schema.getDefaultGeometry().getType();
-        this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
+        final GeometryAttributeType geomType = schema.getDefaultGeometry();
 
-        String geometryTypeName = schema.getDefaultGeometry().getName();
-        AttributeType[] types = schema.getAttributeTypes();
+        //@task REVISIT: put the if statement again when knowing how to
+        //obtain the feature ID if the geometry att was not requested. (needed in readFID())
+        ////if (geomType != null) {
+            Class geometryClass = geomType.getType();
+            this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
 
-        for (int i = 0; i < types.length; i++) {
-            if (types[i].getName().equals(geometryTypeName)) {
-                geometryTypeIndex = i;
+            String geometryTypeName = geomType.getName();
+            AttributeType[] types = schema.getAttributeTypes();
 
-                break;
+            for (int i = 0; i < types.length; i++) {
+                if (types[i].getName().equals(geometryTypeName)) {
+                    geometryTypeIndex = i;
+
+                    break;
+                }
             }
-        }
+        ////}
     }
 
     /**
@@ -132,7 +139,8 @@ class ArcSDEAttributeReader implements AttributeReader {
                 //user is not so smart to doing it itself
                 if (currentRow == null) {
                     query.close();
-                } else {
+                } else if (geometryTypeIndex > -1) {
+                    //just if the geometry was included in the query.
                     currentShape = currentRow.getShape(geometryTypeIndex);
                 }
             } catch (SeException ex) {
