@@ -110,7 +110,7 @@ public class StereographicPolar extends Stereographic {
         //get standard_parallel_1 parameter value
         latitudeTrueScale = doubleValue(expected, Provider_Polar_B.LATITUDE_TRUE_SCALE, parameters);
         if (Double.isNaN(latitudeTrueScale)) {
-            latitudeTrueScale = latitudeOfOrigin;
+            latitudeTrueScale = this.latitudeOfOrigin;
         }
         ensureLatitudeInRange(Provider_Polar_B.LATITUDE_TRUE_SCALE, latitudeTrueScale, true);
                   
