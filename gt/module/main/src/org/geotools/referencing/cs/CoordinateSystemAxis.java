@@ -34,7 +34,7 @@ import javax.units.Unit;
 import org.opengis.referencing.cs.AxisDirection;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -50,7 +50,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see CoordinateSystem
  * @see Unit
  */
-public class CoordinateSystemAxis extends Info implements org.opengis.referencing.cs.CoordinateSystemAxis {
+public class CoordinateSystemAxis extends IdentifiedObject
+                               implements org.opengis.referencing.cs.CoordinateSystemAxis
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -442,8 +444,8 @@ public class CoordinateSystemAxis extends Info implements org.opengis.referencin
     }
 
     /**
-     * Construct an axis from a set of properties. The properties map is given
-     * unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * Construct an axis from a set of properties. The properties map is given unchanged
+     * to the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
@@ -519,7 +521,7 @@ public class CoordinateSystemAxis extends Info implements org.opengis.referencin
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -610,7 +612,7 @@ public class CoordinateSystemAxis extends Info implements org.opengis.referencin
          *         <code>false</code> for comparing only properties relevant to transformations.
          * @return <code>true</code> if both objects are equal.
          */
-        public boolean equals(final Info object, final boolean compareMetadata) {
+        public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
             if (super.equals(object, compareMetadata)) {
                 // Always compare the key, since we use it for differentiating axis
                 // with the same abbreviation (e.g. LATITUDE and GEODETIC_LATITUDE).

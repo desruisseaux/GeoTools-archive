@@ -32,7 +32,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.cs.CompoundCS;
 import org.geotools.referencing.wkt.Formatter;
@@ -157,7 +157,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

@@ -30,7 +30,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 
 
 /**
@@ -140,7 +140,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

@@ -36,7 +36,7 @@ import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -81,7 +81,8 @@ public class OperationParameterGroup extends org.geotools.parameter.GeneralOpera
     /**
      * Construct a parameter group from a set of properties.
      * This parameter group will be required exactly once. The properties map is
-     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
@@ -94,7 +95,8 @@ public class OperationParameterGroup extends org.geotools.parameter.GeneralOpera
 
     /**
      * Construct a parameter group from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
@@ -199,7 +201,7 @@ public class OperationParameterGroup extends org.geotools.parameter.GeneralOpera
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final OperationParameterGroup that = (OperationParameterGroup) object;
             // TODO: We should use Arrays.deepEquals instead in J2SE 1.5.

@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Locale;
 
 // OpenGIS dependencies
-import org.opengis.referencing.Info;
-import org.opengis.referencing.Identifier;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,6 +36,8 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.metadata.Identifier;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -115,7 +115,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static Map toMap(final Info parameters, Identifier[] identifiers) {
+    private static Map toMap(final IdentifiedObject parameters, Identifier[] identifiers) {
         if (identifiers == null) {
             ensureNonNull("parameters", parameters);
             identifiers = parameters.getIdentifiers();

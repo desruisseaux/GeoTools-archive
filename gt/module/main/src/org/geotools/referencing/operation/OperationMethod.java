@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -50,7 +50,7 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see Operation
  */
-public class OperationMethod extends Info
+public class OperationMethod extends IdentifiedObject
                           implements org.opengis.referencing.operation.OperationMethod
 {
     /**
@@ -64,7 +64,7 @@ public class OperationMethod extends Info
     private static final GeneralOperationParameter[] EMPTY_PARAMETER = new GeneralOperationParameter[0];
 
     /**
-     * List of localizable properties. To be given to {@link Info} constructor.
+     * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {"formula"};
 
@@ -92,8 +92,9 @@ public class OperationMethod extends Info
 
     /**
      * Construct an operation method from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
-     * Additionally, the following properties are understood by this construtor:
+     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}. Additionally, the following properties are understood by this
+     * construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -198,7 +199,7 @@ public class OperationMethod extends Info
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

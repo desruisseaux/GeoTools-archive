@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Collections;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 
 // OpenGIS dependencies
@@ -149,7 +149,7 @@ public class GeodeticDatum extends Datum implements org.opengis.referencing.datu
      *
      * @todo Compare Bursa Wolf transformation parameters.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -167,7 +167,7 @@ public class GeodeticDatum extends Datum implements org.opengis.referencing.datu
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two geodetic datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

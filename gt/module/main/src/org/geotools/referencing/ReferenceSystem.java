@@ -37,14 +37,14 @@ import org.opengis.metadata.extent.Extent;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferenceSystem extends Info implements org.opengis.referencing.ReferenceSystem {
+public class ReferenceSystem extends IdentifiedObject implements org.opengis.referencing.ReferenceSystem {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -2017349900886658590L;
 
     /**
-     * List of localizable properties. To be given to {@link Info} constructor.
+     * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {"scope"};
 
@@ -61,8 +61,9 @@ public class ReferenceSystem extends Info implements org.opengis.referencing.Ref
 
     /**
      * Construct a reference system from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
-     * Additionally, the following properties are understood by this construtor:
+     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}. Additionally, the following properties are understood by this
+     * construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -127,7 +128,7 @@ public class ReferenceSystem extends Info implements org.opengis.referencing.Ref
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
                 return true;

@@ -30,7 +30,7 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.XMath;
 import org.geotools.resources.cts.Resources;
@@ -53,7 +53,7 @@ import org.geotools.measure.CoordinateFormat;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ellipsoid {
+public class Ellipsoid extends IdentifiedObject implements org.opengis.referencing.datum.Ellipsoid {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -108,7 +108,8 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     
     /**
      * Constructs a new ellipsoid using the specified axis length. The properties map
-     * is given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.
@@ -153,7 +154,8 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
 
     /**
      * Constructs a new ellipsoid using the specified axis length. The properties map
-     * is given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis The equatorial radius.
@@ -192,9 +194,9 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     }
     
     /**
-     * Constructs a new ellipsoid using the specified axis length and inverse flattening value.
-     * The properties map is given unchanged to the {@linkplain Info#Info(Map) super-class
-     * constructor}.
+     * Constructs a new ellipsoid using the specified axis length and inverse flattening value. The
+     * properties map is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.
@@ -439,7 +441,7 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -459,7 +461,7 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
      * In other words, two ellipsoids will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

@@ -23,11 +23,17 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
+import java.util.Date;
 import java.util.Locale;
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Series;
+
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.PresentationForm;
 
 
 /**
@@ -56,6 +62,16 @@ public class Citation implements org.opengis.metadata.citation.Citation, Seriali
      * An immutable empty array of strings.
      */
     private static final String[] EMPTY = new String[0];
+
+    /**
+     * An immutable empty array of responsible party.
+     */
+    private static final ResponsibleParty[] EMPTY_RESPONSIBLE = new ResponsibleParty[0];
+
+    /**
+     * An immutable empty array of presentation form.
+     */
+    private static final PresentationForm[] EMPTY_PRESENTATION = new PresentationForm[0];
 
     /**
      * The title.
@@ -94,6 +110,123 @@ public class Citation implements org.opengis.metadata.citation.Citation, Seriali
      */
     public String[] getAlternateTitles(final Locale locale) {
         return EMPTY;
+    }
+    
+    /**
+     * Reference date for the cited resource.
+     *
+     * @todo This information is mandatory. We should not returns <code>null</code>.
+     */
+    public Date[] getDates() {
+        return null;
+    }
+    
+    /**
+     * Version of the cited resource.
+     *
+     * @param  locale The desired locale for the edition to be returned, or <code>null</code>
+     *         for an edition in some default locale (may or may not be the
+     *         {@linkplain Locale#getDefault() system default}).
+     * @return The edition in the given locale.
+     *         If no edition is available in the given locale, then some default locale is used.
+     */
+    public String getEdition(Locale locale) {
+        return null;
+    }
+    
+    /**
+     * Date of the edition, or <code>null</code> if none.
+     */
+    public Date getEditionDate() {
+        return null;
+    }
+    
+    /**
+     * Unique identifier for the resource. Example: Universal Product Code (UPC),
+     * National Stock Number (NSN).
+     */
+    public String[] getIdentifiers() {
+        return EMPTY;
+    }
+    
+    /**
+     * Reference form of the unique identifier (ID). Example: Universal Product Code (UPC),
+     * National Stock Number (NSN).
+     */
+    public String[] getIdentifierTypes() {
+        return EMPTY;
+    }
+
+    /**
+     * Name and position information for an individual or organization that is responsible
+     * for the resource. Returns an empty string if there is none.
+     */
+    public ResponsibleParty[] getCitedResponsibleParties() {
+        return EMPTY_RESPONSIBLE;
+    }
+    
+    /**
+     * Mode in which the resource is represented, or an empty string if none.
+     */
+    public PresentationForm[] getPresentationForm() {
+        return EMPTY_PRESENTATION;
+    }
+    
+    /**
+     * Information about the series, or aggregate dataset, of which the dataset is a part.
+     * Returns <code>null</code> if none.
+     *
+     * @param  locale The desired locale for the series to be returned, or <code>null</code>
+     *         for a series in some default locale (may or may not be the
+     *         {@linkplain Locale#getDefault() system default}).
+     * @return The series in the given locale.
+     *         If no series is available in the given locale, then some default locale is used.
+     */
+    public Series getSeries(Locale locale) {
+        return null;
+    }
+    
+    /**
+     * Other information required to complete the citation that is not recorded elsewhere.
+     * Returns <code>null</code> if none.
+     *
+     * @param  locale The desired locale for the details to be returned, or <code>null</code>
+     *         for details in some default locale (may or may not be the
+     *         {@linkplain Locale#getDefault() system default}).
+     * @return The details in the given locale.
+     *         If no details is available in the given locale, then some default locale is used.
+     */
+    public String getOtherCitationDetails(Locale locale) {
+        return null;
+    }
+    
+    /**
+     * Common title with holdings note. Note: title identifies elements of a series
+     * collectively, combined with information about what volumes are available at the
+     * source cited. Returns <code>null</code> if there is no title.
+     *
+     * @param  locale The desired locale for the title to be returned, or <code>null</code>
+     *         for a title in some default locale (may or may not be the
+     *         {@linkplain Locale#getDefault() system default}).
+     * @return The title in the given locale.
+     *         If no title is available in the given locale, then some default locale is used.
+     */
+    public String getCollectiveTitle(Locale locale) {
+        return null;
+    }
+    
+    /**
+     * International Standard Book Number, or <code>null</code> if none.
+     */
+    public String getISBN() {
+        return null;
+    }
+    
+    /**
+     * International Standard Serial Number, or <code>null</code> if none.
+     */
+    public String getISSN() {
+        return null;
     }
 
     /**

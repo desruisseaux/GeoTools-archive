@@ -27,7 +27,7 @@ import java.util.Map;
 import java.io.Serializable;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
@@ -41,7 +41,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  *
  * @see org.geotools.parameter.GeneralParameterValue
  */
-public class GeneralOperationParameter extends Info
+public class GeneralOperationParameter extends IdentifiedObject
         implements org.opengis.parameter.GeneralOperationParameter, Serializable
 {
     /**
@@ -62,8 +62,8 @@ public class GeneralOperationParameter extends Info
     private final int maximumOccurs;
 
     /**
-     * Construct a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * Construct a parameter from a set of properties. The properties map is given unchanged
+     * to the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
@@ -129,7 +129,7 @@ public class GeneralOperationParameter extends Info
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final GeneralOperationParameter that = (GeneralOperationParameter) object;
             return this.minimumOccurs == that.minimumOccurs &&

@@ -32,7 +32,7 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
-import org.opengis.referencing.Identifier;
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
@@ -55,7 +55,9 @@ import org.geotools.referencing.wkt.Formattable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Info extends Formattable implements org.opengis.referencing.Info, Serializable {
+public class IdentifiedObject extends Formattable
+                           implements org.opengis.referencing.IdentifiedObject, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -141,16 +143,17 @@ public class Info extends Formattable implements org.opengis.referencing.Info, S
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    public Info(final Map properties) throws IllegalArgumentException {
+    public IdentifiedObject(final Map properties) throws IllegalArgumentException {
         this(properties, null, null);
     }
 
     /**
      * Construct an object from a set of properties and copy unrecognized properties in the
      * specified map. The <code>properties</code> argument is treated as in the {@linkplain
-     * Info#Info(Map) one argument constructor}. All properties unknow to this <code>Info</code>
-     * constructor are copied in the <code>subProperties</code> map, after their key has been
-     * normalized (usually lower case, leading and trailing space removed).
+     * IdentifiedObject#IdentifiedObject(Map) one argument constructor}. All properties unknow to
+     * this <code>IdentifiedObject</code> constructor are copied in the <code>subProperties</code>
+     * map, after their key has been normalized (usually lower case, leading and trailing space
+     * removed).
      *
      * If <code>localizables</code> is non-null, then all keys listed in this argument are treated
      * as localizable one (i.e. may have a suffix like "_fr", "_de", etc.). Localizable properties
@@ -164,7 +167,9 @@ public class Info extends Formattable implements org.opengis.referencing.Info, S
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    protected Info(final Map properties, final Map subProperties, final String[] localizables)
+    protected IdentifiedObject(final Map properties,
+                               final Map subProperties,
+                               final String[] localizables)
             throws IllegalArgumentException
     {
         ensureNonNull("properties", properties);
@@ -276,7 +281,7 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two info objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(Info,boolean) equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals(IdentifiedObject,boolean) equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
@@ -313,11 +318,11 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
      *         matches the specified <code>identifier</code>.
      */
-    public static boolean identifierMatches(final org.opengis.referencing.Info info,
+    public static boolean identifierMatches(final org.opengis.referencing.IdentifiedObject info,
                                             final String identifier)
     {
-        if (info instanceof Info) {
-            return ((Info) info).identifierMatches(identifier);
+        if (info instanceof IdentifiedObject) {
+            return ((IdentifiedObject) info).identifierMatches(identifier);
         } else {
             return identifierMatches(info, info.getIdentifiers(), identifier);
         }
@@ -332,7 +337,7 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
      *         matches the specified <code>identifier</code>.
      */
-    private static boolean identifierMatches(final org.opengis.referencing.Info info,
+    private static boolean identifierMatches(final org.opengis.referencing.IdentifiedObject info,
                                              final Identifier[] identifiers,
                                              String identifier)
     {
@@ -374,7 +379,7 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * @return <code>true</code> if both objects are equal.
      */
     public final boolean equals(final Object object) {
-        return (object instanceof Info) && equals((Info)object, true);
+        return (object instanceof IdentifiedObject) && equals((IdentifiedObject)object, true);
     }
 
     /**
@@ -395,7 +400,7 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object!=null && object.getClass().equals(getClass())) {
             if (!compareMetadata) {
                 return true;
@@ -422,10 +427,10 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     }
 
     /**
-     * Compare two Geotools's <code>Info</code> objects for equality. This method is equivalent to
-     * <code>object1.<b>equals</b>(object2, <var>compareMetadata</var>)</code> except that one or
-     * both arguments may be null. This convenience method is provided for implementation of
-     * <code>equals</code> in subclasses.
+     * Compare two Geotools's <code>IdentifiedObject</code> objects for equality. This method is
+     * equivalent to <code>object1.<b>equals</b>(object2, <var>compareMetadata</var>)</code> except
+     * that one or both arguments may be null. This convenience method is provided for
+     * implementation of <code>equals</code> in subclasses.
      *
      * @param  object1 The first object to compare (may be <code>null</code>).
      * @param  object2 The second object to compare (may be <code>null</code>).
@@ -433,15 +438,15 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    static boolean equals(final Info    object1,
-                          final Info    object2,
-                          final boolean compareMetadata)
+    static boolean equals(final IdentifiedObject object1,
+                          final IdentifiedObject object2,
+                          final boolean  compareMetadata)
     {
         return (object1==object2) || (object1!=null && object1.equals(object2, compareMetadata));
     }
 
     /**
-     * Compare two OpenGIS's <code>Info</code> objects for equality. This convenience
+     * Compare two OpenGIS's <code>IdentifiedObject</code> objects for equality. This convenience
      * method is provided for implementation of <code>equals</code> in subclasses.
      *
      * @param  object1 The first object to compare (may be <code>null</code>).
@@ -450,18 +455,18 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    protected static boolean equals(final org.opengis.referencing.Info object1,
-                                    final org.opengis.referencing.Info object2,
+    protected static boolean equals(final org.opengis.referencing.IdentifiedObject object1,
+                                    final org.opengis.referencing.IdentifiedObject object2,
                                     final boolean compareMetadata)
     {
-        if (!(object1 instanceof Info)) return equals(object1, object2);
-        if (!(object2 instanceof Info)) return equals(object2, object1);
-        return equals((Info)object1, (Info)object2, compareMetadata);
+        if (!(object1 instanceof IdentifiedObject)) return equals(object1, object2);
+        if (!(object2 instanceof IdentifiedObject)) return equals(object2, object1);
+        return equals((IdentifiedObject)object1, (IdentifiedObject)object2, compareMetadata);
     }
 
     /**
-     * Compare two array of OpenGIS's <code>Info</code> objects for equality. This convenience
-     * method is provided for implementation of <code>equals</code> in subclasses.
+     * Compare two array of OpenGIS's <code>IdentifiedObject</code> objects for equality. This
+     * convenience method is provided for implementation of <code>equals</code> in subclasses.
      *
      * @param  array1 The first array to compare (may be <code>null</code>).
      * @param  array2 The second array to compare (may be <code>null</code>).
@@ -469,8 +474,8 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both arrays are equal.
      */
-    protected static boolean equals(final org.opengis.referencing.Info[] array1,
-                                    final org.opengis.referencing.Info[] array2,
+    protected static boolean equals(final org.opengis.referencing.IdentifiedObject[] array1,
+                                    final org.opengis.referencing.IdentifiedObject[] array2,
                                     final boolean compareMetadata)
     {
         if (array1 != array2) {

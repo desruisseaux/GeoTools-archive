@@ -41,7 +41,7 @@ import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
@@ -258,7 +258,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

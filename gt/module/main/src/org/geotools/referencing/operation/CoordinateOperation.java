@@ -31,12 +31,12 @@ import java.util.HashMap;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.quality.PositionalAccuracy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -61,7 +61,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CoordinateOperation extends Info
+public class CoordinateOperation extends IdentifiedObject
                               implements org.opengis.referencing.operation.CoordinateOperation
 {
     /**
@@ -75,7 +75,7 @@ public class CoordinateOperation extends Info
     private static final PositionalAccuracy[] EMPTY_ACCURACY = new PositionalAccuracy[0];
 
     /**
-     * List of localizable properties. To be given to {@link Info} constructor.
+     * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {"scope"};
 
@@ -119,8 +119,9 @@ public class CoordinateOperation extends Info
 
     /**
      * Construct a coordinate operation from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
-     * Additionally, the following properties are understood by this construtor:
+     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}. Additionally, the following properties are understood by this
+     * construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -305,7 +306,7 @@ public class CoordinateOperation extends Info
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

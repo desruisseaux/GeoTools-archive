@@ -32,8 +32,7 @@ import javax.units.SI;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.referencing.Info;
-import org.opengis.referencing.Identifier;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationMethod;

@@ -34,7 +34,6 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.EngineeringDatum;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CartesianCS;

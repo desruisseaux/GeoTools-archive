@@ -29,7 +29,7 @@ import javax.units.Unit;
 import javax.units.NonSI;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 
@@ -43,7 +43,9 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PrimeMeridian extends Info implements org.opengis.referencing.datum.PrimeMeridian {
+public class PrimeMeridian extends IdentifiedObject
+                        implements org.opengis.referencing.datum.PrimeMeridian
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -89,7 +91,8 @@ public class PrimeMeridian extends Info implements org.opengis.referencing.datum
 
     /**
      * Construct a prime meridian from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties          Set of properties. Should contains at least <code>"name"</code>.
      * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
@@ -140,7 +143,7 @@ public class PrimeMeridian extends Info implements org.opengis.referencing.datum
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -158,7 +161,7 @@ public class PrimeMeridian extends Info implements org.opengis.referencing.datum
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
      * In other words, two prime meridians will return the same hash value if
      * they are equal in the sense of
-     * <code>{@link #equals equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

@@ -30,7 +30,7 @@ import org.opengis.cs.CS_LinearUnit;
 import org.opengis.cs.CS_AngularUnit;
 
 // OpenGIS dependencies (GeoAPI)
-import org.opengis.referencing.Identifier;
+import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
@@ -80,10 +80,10 @@ import java.io.Serializable;
  *
  * @see org.opengis.cs.CS_Info
  *
- * @deprecated Replaced by {@link org.geotools.referencing.Info} and
+ * @deprecated Replaced by {@link org.geotools.referencing.IdentifiedObject} and
  *             {@link org.geotools.referencing.Identifier}.
  */
-public class Info implements org.opengis.referencing.Info, Serializable {
+public class Info implements org.opengis.referencing.IdentifiedObject, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -210,7 +210,7 @@ public class Info implements org.opengis.referencing.Info, Serializable {
      *
      * @see org.opengis.cs.CS_Info#getAlias()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.Info#getIdentifiers}.
+     * @deprecated Replaced by {@link org.geotools.referencing.IdentifiedObject#getIdentifiers}.
      */
     public String getAlias(final Locale locale) {
         return getProperty("alias");

@@ -32,12 +32,12 @@ import javax.units.UnitFormat;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
-import org.opengis.referencing.Info;
-import org.opengis.referencing.Identifier;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -53,7 +53,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * Known Text</cite> (WKT)</A>.
  *
  * A formatter is constructed with a specified locale, which will be used for querying
- * {@linkplain org.geotools.referencing.Info#getName names} and
+ * {@linkplain org.geotools.referencing.IdentifiedObject#getName names} and
  * {@linkplain org.geotools.metadata.citation.Citation#getTitle authority titles}.
  *
  * @version $Id$
@@ -218,7 +218,8 @@ public class Formatter {
         appendSeparator(true);
         final int base = buffer.length();
         buffer.append(OPEN);
-        final Info info = (formattable instanceof Info) ? (Info) formattable : null;
+        final IdentifiedObject info = (formattable instanceof IdentifiedObject)
+                                    ? (IdentifiedObject) formattable : null;
         if (info != null) {
             buffer.append(QUOTE);
             buffer.append(info.getName(locale));
@@ -264,11 +265,11 @@ public class Formatter {
     }
 
     /**
-     * Append the specified OpenGIS's <code>Info</code> object.
+     * Append the specified OpenGIS's <code>IdentifiedObject</code> object.
      *
      * @param info The info object to append to the WKT.
      */
-    public void append(final Info info) {
+    public void append(final IdentifiedObject info) {
         if (info instanceof Formattable) {
             append((Formattable) info);
         } else {
@@ -406,7 +407,7 @@ public class Formatter {
      * @param  info The object to looks for a preferred identifier.
      * @return The preferred identifier, or <code>null</code> if none.
      */
-    private Identifier getIdentifier(final Info info) {
+    private Identifier getIdentifier(final IdentifiedObject info) {
         Identifier first = null;
         if (info != null) {
             final Identifier[] identifiers = info.getIdentifiers();
@@ -434,7 +435,7 @@ public class Formatter {
      * @param  info The object to looks for a preferred identifier.
      * @return The preferred identifier, or <code>null</code> if none.
      */
-    public String getName(final Info info) {
+    public String getName(final IdentifiedObject info) {
         final Identifier identifier = getIdentifier(info);
         return (identifier!=null) ? identifier.getCode() : info.getName(locale);
     }

@@ -63,12 +63,12 @@ import org.opengis.metadata.citation.Citation;
  *   <tr>
  *     <td nowrap>&nbsp;<code>"name"</code>&nbsp;</td>
  *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Info#getName}</td>
+ *     <td nowrap>&nbsp;{@link IdentifiedObject#getName}</td>
  *   </tr>
  *   <tr>
  *     <td nowrap>&nbsp;<code>"remarks"</code>&nbsp;</td>
  *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Info#getRemarks}</td>
+ *     <td nowrap>&nbsp;{@link IdentifiedObject#getRemarks}</td>
  *   </tr>
  *   <tr>
  *     <td nowrap>&nbsp;<code>"authority"</code>&nbsp;</td>
@@ -93,7 +93,7 @@ import org.opengis.metadata.citation.Citation;
  *   <tr>
  *     <td nowrap>&nbsp;<code>"identifiers"</code>&nbsp;</td>
  *     <td nowrap>&nbsp;<code>{@linkplain Identifier}</code>[]&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Info#getIdentifiers}</td>
+ *     <td nowrap>&nbsp;{@link IdentifiedObject#getIdentifiers}</td>
  *   </tr>
  * </table>
  *
@@ -924,7 +924,7 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * @param  info The object to canonicalize.
      * @return An unique instance of the specified object.
      */
-    private static Object canonicalize(final org.opengis.referencing.Info info) {
+    private static Object canonicalize(final org.opengis.referencing.IdentifiedObject info) {
         return Identifier.POOL.canonicalize(info);
     }
 }

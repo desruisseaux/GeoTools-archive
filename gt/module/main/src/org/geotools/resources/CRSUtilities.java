@@ -66,19 +66,19 @@ public final class CRSUtilities {
 
     /**
      * Compare the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain org.geotools.referencing.Info}, then this
-     * method will ignore the metadata during the comparaison.
+     * implementations of {@linkplain org.geotools.referencing.IdentifiedObject},
+     * then this method will ignore the metadata during the comparaison.
      *
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
      * @return <code>true</code> if both objects are equals.
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
-        if (object1 instanceof org.geotools.referencing.Info &&
-            object2 instanceof org.geotools.referencing.Info)
+        if (object1 instanceof org.geotools.referencing.IdentifiedObject &&
+            object2 instanceof org.geotools.referencing.IdentifiedObject)
         {
-            return ((org.geotools.referencing.Info) object1).equals(
-                   ((org.geotools.referencing.Info) object2), false);
+            return ((org.geotools.referencing.IdentifiedObject) object1).equals(
+                   ((org.geotools.referencing.IdentifiedObject) object2), false);
         }
         return Utilities.equals(object1, object2);
     }

@@ -34,7 +34,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -127,10 +127,10 @@ public class MatrixParameters extends OperationParameterGroup {
 
     /**
      * Construct a parameter group. The properties map is given unchanged to the
-     * {@linkplain Info#Info(Map) super-class constructor}. The <code>parameters</code>
-     * array should contains parameters <strong>other</strong> than matrix elements. The
-     * first parameter is assumed to be the number of rows, and the second parameter the
-     * number of columns. All extra parameters are ignored.
+     * {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
+     * The <code>parameters</code> array should contains parameters <strong>other</strong>
+     * than matrix elements. The first parameter is assumed to be the number of rows, and
+     * the second parameter the number of columns. All extra parameters are ignored.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The <code>"num_row"</code> and <code>"num_col"</code> parameters.
@@ -398,7 +398,7 @@ public class MatrixParameters extends OperationParameterGroup {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final MatrixParameters that = (MatrixParameters) object;
             return this.separator == that.separator &&

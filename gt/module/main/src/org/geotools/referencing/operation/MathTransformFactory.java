@@ -42,7 +42,6 @@ import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
 import org.geotools.referencing.Identifier;         // For javadoc
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.operation.GeneralMatrix;

@@ -40,7 +40,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -237,7 +237,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
             for (int i=0; i<values.length; i++) {
                 final GeneralParameterValue value = values[i];
                 if (value instanceof ParameterValue) {
-                    if (Info.identifierMatches(value.getDescriptor(), name)) {
+                    if (IdentifiedObject.identifierMatches(value.getDescriptor(), name)) {
                         return (ParameterValue) value;
                     }
                 } else if (value instanceof org.opengis.parameter.ParameterValueGroup) {

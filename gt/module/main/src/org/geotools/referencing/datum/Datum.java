@@ -33,7 +33,7 @@ import org.opengis.util.CodeList;
 import org.opengis.metadata.extent.Extent;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -54,7 +54,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @see org.geotools.referencing.cs.CoordinateSystem
  * @see org.geotools.referencing.crs.CoordinateReferenceSystem
  */
-public class Datum extends Info implements org.opengis.referencing.datum.Datum {
+public class Datum extends IdentifiedObject implements org.opengis.referencing.datum.Datum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -62,7 +62,7 @@ public class Datum extends Info implements org.opengis.referencing.datum.Datum {
     
     /**
      * List of localizable properties. To be given to
-     * {@link org.geotools.referencing.Info} constructor.
+     * {@link org.geotools.referencing.IdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {"anchorPoint", "scope"};
 
@@ -92,8 +92,8 @@ public class Datum extends Info implements org.opengis.referencing.datum.Datum {
 
     /**
      * Construct a datum from a set of properties. The properties given in argument follow
-     * the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
-     * Additionally, the following properties are understood by this construtor:
+     * the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class
+     * constructor}. Additionally, the following properties are understood by this construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -228,7 +228,7 @@ public class Datum extends Info implements org.opengis.referencing.datum.Datum {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
                 return true;

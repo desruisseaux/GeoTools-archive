@@ -23,7 +23,7 @@ package org.geotools.parameter;
 import java.util.Locale;
 
 // OpenGIS dependencies
-import org.opengis.referencing.Identifier;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;

@@ -240,15 +240,13 @@ public final class MathTransformParser extends AbstractParser {
     
     /**
      * Format the specified object. Current implementation just append {@link Object#toString},
-     * since the <code>toString()</code> implementation for most {@link org.geotools.cs.Info}
-     * objects is to returns a WKT.
+     * since the <code>toString()</code> implementation for most
+     * {@link org.geotools.cs.IdentifiedObject} objects is to returns a WKT.
      *
-     * @task TODO: Provides pacakge private <code>Info.toString(WKTFormat)</code> implementations.
-     *             It would allows us to invoke <code>((Info)obj).toString(this)</code> here.
+     * @task TODO: Provides pacakge private <code>IdentifiedObject.toString(WKTFormat)</code> implementations.
+     *             It would allows us to invoke <code>((IdentifiedObject)obj).toString(this)</code> here.
      */
     public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
         return toAppendTo.append(obj);
     }     
 }
-
-

@@ -30,7 +30,7 @@ import java.util.Collections;
 import org.opengis.referencing.datum.VerticalDatumType;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -160,7 +160,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -176,7 +176,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two vertical datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

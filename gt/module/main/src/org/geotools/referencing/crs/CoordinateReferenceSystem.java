@@ -31,7 +31,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.ReferenceSystem;
 
@@ -112,7 +112,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final CoordinateReferenceSystem that = (CoordinateReferenceSystem) object;
             return equals(this.coordinateSystem, that.coordinateSystem);
@@ -125,7 +125,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two CRS objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(Info,boolean) equals}(Info, <strong>false</strong>)</code>.
+     * <code>{@link #equals(IdentifiedObject,boolean) equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

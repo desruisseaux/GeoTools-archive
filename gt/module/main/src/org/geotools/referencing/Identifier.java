@@ -49,8 +49,10 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Move to the metadata package.
  */
-public class Identifier implements org.opengis.referencing.Identifier, Serializable {
+public class Identifier implements org.opengis.metadata.Identifier, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -292,8 +294,8 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
     
     /**
      * Makes sure an argument is non-null. This is method duplicate
-     * {@link Info#ensureNonNull(String, Object)} except for the more accurate stack trace.
-     * It is duplicated there in order to avoid a dependency to {@link Info}.
+     * {@link IdentifiedObject#ensureNonNull(String, Object)} except for the more accurate stack trace.
+     * It is duplicated there in order to avoid a dependency to {@link IdentifiedObject}.
      *
      * @param  name   Argument name.
      * @param  object User argument.
@@ -460,7 +462,7 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
 
     /**
      * Comments on or information about this identifier. In the first use of an
-     * <code>Identifier</code> for an {@link Info} object, these remarks are information about this
+     * <code>Identifier</code> for an {@link IdentifiedObject} object, these remarks are information about this
      * object, including data source information. Additional uses of a <code>Identifier</code>
      * for an object, if any, are aliases, and the remarks are then about that alias.
      *

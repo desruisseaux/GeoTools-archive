@@ -31,7 +31,7 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -53,7 +53,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.referencing.datum.Datum
  * @see org.geotools.referencing.crs.CoordinateReferenceSystem
  */
-public class CoordinateSystem extends Info implements org.opengis.referencing.cs.CoordinateSystem {
+public class CoordinateSystem extends IdentifiedObject
+                           implements org.opengis.referencing.cs.CoordinateSystem
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -76,7 +78,8 @@ public class CoordinateSystem extends Info implements org.opengis.referencing.cs
 
     /**
      * Construct a coordinate system from a set of properties. The properties map
-     * is given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The set of axis.
@@ -153,7 +156,7 @@ public class CoordinateSystem extends Info implements org.opengis.referencing.cs
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

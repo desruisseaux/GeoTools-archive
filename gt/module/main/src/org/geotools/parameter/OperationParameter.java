@@ -33,7 +33,7 @@ import javax.units.Unit;
 import org.opengis.util.CodeList;
 
 // Geotools dependencies
-import org.geotools.referencing.Info;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
@@ -226,7 +226,8 @@ public class OperationParameter extends GeneralOperationParameter implements org
 
     /**
      * Construct a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
+     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
@@ -386,7 +387,7 @@ public class OperationParameter extends GeneralOperationParameter implements org
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareMetadata) {
+    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final OperationParameter that = (OperationParameter) object;
             return equals(this.primitiveClass, that.primitiveClass)   &&
