@@ -45,11 +45,6 @@
       <groupId>gt2</groupId>
       <version>2.1.x</version>
     </dependency>
-    <dependency>
-      <artifactId>dir_ds</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.1.x</version>
-    </dependency>
     
     <dependency>
       <id>log4j</id>
