@@ -39,7 +39,13 @@ Bermuda 1957;Bermuda_1957;;Bermuda 1957
 Bern 1938;Bern_1938;;
 Bissau;Bissau;D_Bissau;
 Bogota 1975;Bogota_1975;D_Bogota;Bogota Observatory
-Bogota 1975 (Bogota);Bogota_1975_Bogota;D_Bogota;Bogota Observatory
+Bogota 1975 (Bogota);Bogota_1975_Bogota
+#
+# NOTE: Previous line was:
+#       Bogota 1975 (Bogota);Bogota_1975_Bogota;D_Bogota;Bogota Observatory
+#       But it introduces a name clash on "D_Bogota" and "Bogota Observatory".
+#       A workaround could be to add supplementary "EPSG" and "Oracle" columns.
+#
 Bukit Rimpah;Bukit_Rimpah;;
 Camacupa;Camacupa;D_Camacupa;
 Campo Inchauspe;Campo_Inchauspe;D_Campo_Inchauspe;Campo Inchauspe
@@ -83,7 +89,6 @@ Final Datum 1958;Final_Datum_1958;D_FD_1958;
 Fort Marigot;Fort_Marigot;D_Fort_Marigot;
 Gandajika 1970;Gandajika_1970;;Gandajika Base
 Garoua;Garoua;D_Garoua;
-Garoua;Garoua;;
 Geocentric Datum of Australia 1994;Geocentric_Datum_of_Australia_1994;;GDA 94
 Geodetic Datum of 1965;Geodetic_Datum_of_1965;;
 Grand Comoros;Grand_Comoros;D_Grand_Comoros;
@@ -230,7 +235,7 @@ Porto Santo 1995;Porto_Santo_1995;D_Porto_Santo_1995;
 Posiciones Geodesicas Argentinas;Posiciones_Geodesicas_Argentinas;;
 Posiciones Geodesicas Argentinas 1998;Posiciones_Geodesicas_Argentinas_1998;;
 Provisional South American Datum 1956;Provisional_South_American_Datum_1956;D_Provisional_S_American_1956;Provisional South American
-Puerto Rico;Puerto_Rico;D_Puerto_Rico;
+Puerto Rico;Puerto_Rico;D_Puerto_Rico;Puerto Rico
 Pulkovo 1942;Pulkovo_1942;D_Pulkovo_1942;Pulkovo 1942
 Pulkovo 1942/58;Pulkovo_1942/58;D_Pulkovo_1942_Adj_1958;
 Pulkovo 1942/83;Pulkovo_1942/83;D_Pulkovo_1942_Adj_1983;
@@ -238,8 +243,14 @@ Pulkovo 1995;Pulkovo_1995;D_Pulkovo_1995;
 Qatar 1948;Qatar_1948;;
 Qatar 1974;Qatar_1974;;
 Qatar National Datum 1995;Qatar_National_Datum_1995;D_Qatar;Qatar National
-Qornoq;Qornoq;D_Qornoq;
-Qornoq 1927;Qornoq_1927;D_Qornoq_1927;Qornoq
+Qornoq;Qornoq;D_Qornoq;Qornoq
+Qornoq 1927;Qornoq_1927;D_Qornoq_1927;
+#
+# NOTE: The two previous lines were:
+#       Qornoq;Qornoq;D_Qornoq;
+#       Qornoq 1927;Qornoq_1927;D_Qornoq_1927;Qornoq
+#       But it introduces a name clash on "Qornoq".
+#
 Rassadiran;Rassadiran;D_Rassadiran;
 Red Geodesica Venezolana;Red_Geodesica_Venezolana;D_REGVEN;
 Reseau de Reference des Antilles Francaises 1991;Reseau_de_Reference_des_Antilles_Francaises_1991;;
@@ -361,7 +372,6 @@ Zanderij;Zanderij;D_Zanderij;Zanderij
 ;;D_Sphere_ARC_INFO;
 ;;D_Sphere_EMEP;
 ;;D_Struve_1860;
-;;D_Tananarive_1925;
 ;;D_Tern_Island_1961;
 ;;D_TM75;
 ;;D_Tristan_1968;
@@ -396,7 +406,6 @@ Zanderij;Zanderij;D_Zanderij;Zanderij
 ;;;Midway Astro 1961
 ;;;Ordnance Survey Great Brit
 ;;;Pitcairn Astro 1967
-;;;Puerto Rico
 ;;;Sao Braz
 ;;;Southeast Base
 ;;;Southwest Base
