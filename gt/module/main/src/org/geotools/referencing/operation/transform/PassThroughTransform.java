@@ -87,7 +87,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      *        Affected ordinates will range from <code>firstAffectedOrdinate</code>
      *        inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
      */
-    protected PassThroughTransform(final int firstAffectedOrdinate,
+    public PassThroughTransform(final int firstAffectedOrdinate,
                                    final MathTransform subTransform,
                                    final int numTrailingOrdinates)
     {
