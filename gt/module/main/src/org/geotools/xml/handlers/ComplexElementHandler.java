@@ -213,8 +213,16 @@ public class ComplexElementHandler extends XMLElementHandler {
             if( i2[1] == 0 && i == i2[0] ){
             	// done running
             	if (count < type.getChild().getMinOccurs()) {
-            		throw new SAXException("Too few elements declared for "
-                        + type.getName() + "("+elem.getName()+")");
+                	StringBuffer buf = new StringBuffer();
+                	buf.append("Too few elements for " );
+                	buf.append( elem.getNamespace()+":"+elem.getName() );
+                	buf.append( " (type = "+type.getName()+") " );
+                	buf.append( ": " );
+                	buf.append( count );
+                	buf.append( " children, " );
+                	buf.append( type.getChild().getMinOccurs() );
+                	buf.append( " minOccurs" );        	  		
+            		throw new SAXException( buf.toString() );
                 }
             }else{
                 if(cache == i2[0]){
@@ -229,7 +237,8 @@ public class ComplexElementHandler extends XMLElementHandler {
         if(count > type.getChild().getMaxOccurs()){
         	StringBuffer buf = new StringBuffer();
         	buf.append("Too many elements for " );
-        	buf.append( type.getName() );
+        	buf.append( elem.getNamespace()+":"+elem.getName() );
+        	buf.append( " (type = "+type.getName()+") " );
         	buf.append( ": " );
         	buf.append( count );
         	buf.append( " children, " );
@@ -239,8 +248,12 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         if (i != elements.size()) {
-            throw new SAXException("Invalid element order according: "
-                + type.getName() + "[" + i + "]");
+        	StringBuffer buf = new StringBuffer();
+        	buf.append("Invalid Element ordering for " );
+        	buf.append( elem.getNamespace()+":"+elem.getName() );
+        	buf.append( " (type = "+type.getName()+") " );
+        	buf.append( ". There were "+(elements.size()-i)+"elements which were unaccounted for" );      	  		
+    		throw new SAXException( buf.toString() );
         }
     }
 
