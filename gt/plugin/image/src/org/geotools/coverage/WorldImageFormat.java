@@ -1,4 +1,4 @@
-package src.org.geotools.coverage;
+package org.geotools.coverage;
 
 import java.io.File;
 import java.net.URL;

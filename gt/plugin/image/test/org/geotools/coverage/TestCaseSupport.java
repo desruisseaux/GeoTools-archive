@@ -4,7 +4,7 @@
  * Created on April 30, 2003, 12:16 PM
  */
 
-package test.org.geotools.coverage;
+package org.geotools.coverage;
 
 import java.io.InputStream;
 import java.net.URL;

@@ -1,5 +1,5 @@
 
-package src.org.geotools.coverage;
+package org.geotools.coverage;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.RenderedImage;

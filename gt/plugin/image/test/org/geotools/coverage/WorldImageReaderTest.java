@@ -4,18 +4,18 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package test.org.geotools.coverage;
+package org.geotools.coverage;
 
 import java.io.File;
 import java.io.IOException;
 
-import net.refractions.udig.TestCaseSupport;
+import refractions.udig.TestCaseSupport;
 
 import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.FrameFactory;
 
-import src.org.geotools.coverage.WorldImageReader;
-import src.org.geotools.coverage.WorldImageWriter;
+import org.geotools.coverage.WorldImageReader;
+import org.geotools.coverage.WorldImageWriter;
 
 /**
  * @author rgould

@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package test.org.geotools.coverage;
+package org.geotools.coverage;
 
 import java.io.File;
 import java.net.MalformedURLException;
