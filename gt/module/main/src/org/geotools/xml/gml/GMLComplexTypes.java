@@ -168,12 +168,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -205,12 +205,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -255,12 +255,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -297,12 +297,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -339,12 +339,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -380,12 +380,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -421,12 +421,12 @@ public class GMLComplexTypes {
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-            if (g.getSRID() != 0) {
-                // deprecated version
-                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-            } else {
+//            if (g.getSRID() != 0) {
+//                // deprecated version
+//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+//            } else {
                 ai = null;
-            }
+//            }
         }
 
         if (e == null) {
@@ -2724,13 +2724,13 @@ public class GMLComplexTypes {
                 ai.addAttribute("", "srsName", "", "anyURI",
                     g.getUserData().toString());
             } else {
-                if (g.getSRID() != 0) {
-                    // deprecated version
-                    ai.addAttribute("", "srsName", "", "anyURI",
-                        "" + g.getSRID());
-                } else {
+//                if (g.getSRID() != 0) {
+//                    // deprecated version
+//                    ai.addAttribute("", "srsName", "", "anyURI",
+//                        "" + g.getSRID());
+//                } else {
                     ai = null;
-                }
+//                }
             }
 
             if ((g == null) || (g.getNumPoints() == 0)

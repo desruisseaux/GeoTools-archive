@@ -17,7 +17,7 @@
 package org.geotools.xml;
 
 import java.io.IOException;
-import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class XMLSAXHandler extends DefaultHandler {
 //System.out.println("***"+pubId+"*"+sysId+"*");
         // avoid dtd files
 		if(sysId != null && sysId.endsWith("dtd")){
-		    return new InputSource(new StringBufferInputStream(""));
+		    return new InputSource(new StringReader(""));
 		}
 		try {
             return super.resolveEntity(pubId,sysId);
