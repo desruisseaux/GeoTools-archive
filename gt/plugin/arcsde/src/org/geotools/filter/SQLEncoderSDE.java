@@ -20,6 +20,8 @@ import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.arcsde.ArcSDEAdapter;
+
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
 
@@ -37,7 +39,7 @@ import com.esri.sde.sdk.client.SeLayer;
  * </p>
  *
  * @author Chris Holmes, TOPP
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  *
  * @see org.geotools.data.sde.GeometryEncoderSDE
  */
@@ -131,7 +133,7 @@ public class SQLEncoderSDE extends SQLEncoder
      * @throws RuntimeException DOCUMENT ME!
      */
     public void visit(FidFilter filter) {
-        long[] fids = getNumericFids(filter.getFids());
+        long[] fids = ArcSDEAdapter.getNumericFids(filter.getFids());
         int nFids = fids.length;
 
         if (nFids == 0) {
@@ -162,51 +164,6 @@ public class SQLEncoderSDE extends SQLEncoder
             out.write(sb.toString());
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param stringFids DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public static long[] getNumericFids(String[] stringFids)
-        throws IllegalArgumentException {
-        int nfids = stringFids.length;
-        long[] fids = new long[nfids];
-
-        for (int i = 0; i < nfids; i++) {
-            fids[i] = getNumericFid(stringFids[i]);
-        }
-
-        return fids;
-    }
-
-    /**
-     * Returns the numeric identifier of a FeatureId, given by the full
-     * qualified name of the featureclass prepended to the ArcSDE feature id.
-     * ej: SDE.SDE.SOME_LAYER.1
-     *
-     * @param fid a geotools FeatureID
-     *
-     * @return an ArcSDE feature ID
-     *
-     * @throws IllegalArgumentException If the given string is not properly
-     *         formatted [anystring].[long value]
-     */
-    public static long getNumericFid(String fid)
-        throws IllegalArgumentException {
-        int dotIndex = fid.lastIndexOf('.');
-
-        try {
-            return Long.decode(fid.substring(++dotIndex)).longValue();
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("FeatureID " + fid
-                + " does not seems as a valid ArcSDE FID");
         }
     }
 }

@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * @author Gabriel Rold?n
  * @version $Id: ArcSDEAdapter.java,v 1.4 2004/06/22 20:13:15 jfear Exp $
  */
-class ArcSDEAdapter {
+public class ArcSDEAdapter {
     /** Logger for ths class' package */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEAdapter.class.getPackage()
                                                                              .getName());
@@ -506,6 +506,51 @@ class ArcSDEAdapter {
     }
 
     /**
+	 * Returns the numeric identifier of a FeatureId, given by the full
+	 * qualified name of the featureclass prepended to the ArcSDE feature id.
+	 * ej: SDE.SDE.SOME_LAYER.1
+	 *
+	 * @param fid a geotools FeatureID
+	 *
+	 * @return an ArcSDE feature ID
+	 *
+	 * @throws IllegalArgumentException If the given string is not properly
+	 *         formatted [anystring].[long value]
+	 */
+	public static long getNumericFid(String fid)
+	    throws IllegalArgumentException {
+	    int dotIndex = fid.lastIndexOf('.');
+	
+	    try {
+	        return Long.decode(fid.substring(++dotIndex)).longValue();
+	    } catch (Exception ex) {
+	        throw new IllegalArgumentException("FeatureID " + fid
+	            + " does not seems as a valid ArcSDE FID");
+	    }
+	}
+
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @param stringFids DOCUMENT ME!
+	 *
+	 * @return DOCUMENT ME!
+	 *
+	 * @throws IllegalArgumentException DOCUMENT ME!
+	 */
+	public static long[] getNumericFids(String[] stringFids)
+	    throws IllegalArgumentException {
+	    int nfids = stringFids.length;
+	    long[] fids = new long[nfids];
+	
+	    for (int i = 0; i < nfids; i++) {
+	        fids[i] = ArcSDEAdapter.getNumericFid(stringFids[i]);
+	    }
+	
+	    return fids;
+	}
+
+	/**
      * DOCUMENT ME!
      *
      * @author $author$

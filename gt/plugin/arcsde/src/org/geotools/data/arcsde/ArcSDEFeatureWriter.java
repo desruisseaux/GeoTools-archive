@@ -38,6 +38,7 @@ import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
@@ -208,15 +209,9 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
                 SeDelete seDelete = new SeDelete(connection);
 
-                // PENDING JMF: I'm not sure we really know just how we are going to know the feature
-                // id at this point.  I expect it is possible that it may have alternative names.  Can
-                // we work with it that way, or are we only going to be able to modify data in layers
-                // we have actually created?
-                String featureId = feature.getID().substring(feature.getID()
-                                                                    .lastIndexOf('.')
-                        + 1, feature.getID().length());
-                seDelete.fromTable(layer.getQualifiedName(),
-                    spatialColumnName + " = " + featureId);
+                long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
+                SeObjectId objectID = new SeObjectId(featureId);
+                seDelete.byId(layer.getQualifiedName(), objectID);                
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw new IOException(e.getMessage());
