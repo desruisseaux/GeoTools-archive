@@ -54,6 +54,11 @@
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
+      <id>units</id>
+      <version>0.01</version>
+      <url>http://jsr-108.sourceforge.net</url>
+    </dependency>
+    <dependency>
       <id>vecmath</id>
       <version>1.2.1</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
