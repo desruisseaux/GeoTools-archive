@@ -17,8 +17,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data;
+package org.geotools.data.crs;
 
+import org.geotools.data.FeatureReader;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -83,43 +84,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         }
 
         coordianteSystem = cs;
-
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(type
-                .getTypeName());
-                        
-        typeFactory.setNamespace(type.getNamespace());
-        typeFactory.setName(type.getTypeName());
-        
-        GeometryAttributeType defaultGeometryType = null;
-        for( int i=0; i<type.getAttributeCount(); i++ ){
-            AttributeType attributeType = type.getAttributeType( i );
-            if( attributeType instanceof GeometryAttributeType ){
-                GeometryAttributeType geometryType =
-                    (GeometryAttributeType) attributeType;
-                GeometryAttributeType forcedGeometry;
-                    
-                ;
-                forcedGeometry = (GeometryAttributeType)
-                    AttributeTypeFactory.newAttributeType(
-                        geometryType.getName(),
-                        geometryType.getClass(),
-                        geometryType.isNillable(),
-                        geometryType.getFieldLength(),
-                        geometryType.createDefaultValue(),
-                        cs
-                    );
-                if( defaultGeometryType == null ||
-                    geometryType == type.getDefaultGeometry() ){
-                    defaultGeometryType = forcedGeometry;                        
-                }
-                typeFactory.addType( forcedGeometry );                
-            }
-            else {
-                typeFactory.addType( attributeType );
-            }            
-        }
-        typeFactory.setDefaultGeometry( defaultGeometryType );
-        schema = typeFactory.getFeatureType();
+        schema = CRSService.transform( type, cs );        
         this.reader = reader;
     }
 

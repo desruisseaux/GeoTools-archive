@@ -24,12 +24,47 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.NoSuchAuthorityCodeException;
+import org.geotools.cs.PrimeMeridian;
+import org.geotools.ct.CannotCreateTransformException;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
+import org.geotools.ct.MathTransform;
+import org.geotools.data.FeatureReader;
 import org.geotools.factory.FactoryFinder;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Utility method isolating data source providers from CRS production.
@@ -41,7 +76,38 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jody Garnett, Refractions Research
  */
 public class CRSService {
-    
+
+    /**
+     * GeoGraphicCoordinateSystem sutiable for distance on sphere calcualtions.
+     * <p>
+     * We will use a geographic coordinate system,  i.e. one that use (longitude,latitude)
+     * coordinates.   Latitude values are increasing north and longitude values area
+     * increasing east.  Angular units are degrees and prime meridian is Greenwich.
+     * Ellipsoid is WGS 84  (a commonly used one for remote sensing data and GPS).
+     * </p>
+     */
+    static public final CoordinateReferenceSystem GEOGRAPHIC;
+    static {
+        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();        
+        /*
+         * Construct the source CoordinateSystem.           Note that the Geotools library
+         * provides simpler ways to construct geographic coordinate systems using default
+         * values for some arguments.  But we show here the complete way in order to show
+         * the range of possibilities and to stay closer to the OpenGIS's specification.
+         */
+        Unit       angularUnit = Unit.DEGREE;
+        HorizontalDatum  datum = HorizontalDatum.WGS84;
+        PrimeMeridian meridian = PrimeMeridian.GREENWICH;
+        
+        CoordinateReferenceSystem geographic;
+        try {
+            geographic = csFactory.createGeographicCoordinateSystem(
+                    "geographic", angularUnit, datum, meridian, AxisInfo.LONGITUDE, AxisInfo.LATITUDE );
+        } catch (FactoryException e) {
+            geographic = null;
+        }
+        GEOGRAPHIC = geographic;
+    }
     /**
      * List of CoordinateSystemAuthorityFactory.
      * <p>
@@ -145,5 +211,265 @@ public class CRSService {
 	 */	
 	public CoordinateReferenceSystem createCRS( String code ) throws FactoryException {
 	    return createCoordianteSystem( code );
+	}
+	/** 
+	 * A "safe" cast to the old CoordinateSystem class.
+	 * 
+	 * @param crs CoordinateReferenceSystem
+	 * @return CoordianteSystem for provided CRS, or null if this is not posssible.
+	 */
+	public static CoordinateSystem cs( CoordinateReferenceSystem crs ){
+	    if( crs instanceof CoordinateSystem  ){
+	        return (CoordinateSystem) crs;
+	    }
+	    String wkt = crs.toWKT();
+	    CoordinateSystemFactory factory = CoordinateSystemFactory.getDefault(); 
+	    try {
+            return factory.createFromWKT( wkt );
+        } catch (FactoryException huh) {
+            huh.printStackTrace();
+            return null;
+        }
+	}
+		
+	public static MathTransform reproject( CoordinateReferenceSystem from, CoordinateReferenceSystem to ) throws CannotCreateTransformException{
+	    return reproject( cs( from ), cs( to ) );
+	}
+	
+	public static MathTransform reproject( CoordinateSystem from, CoordinateSystem to ) throws CannotCreateTransformException{
+    	CoordinateTransformationFactory factory =
+    	    CoordinateTransformationFactory.getDefault();
+    	
+        CoordinateTransformation transformation;
+
+        transformation = factory.createFromCoordinateSystems( from, to );
+        return transformation.getMathTransform();        
+    }
+	
+	static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
+        FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
+        
+        factory.setNamespace( schema.getNamespace() );
+        factory.setName( schema.getTypeName() );
+        
+        GeometryAttributeType defaultGeometryType = null;
+        for( int i=0; i<schema.getAttributeCount(); i++ ){
+            AttributeType attributeType = schema.getAttributeType( i );
+            if( attributeType instanceof GeometryAttributeType ){
+                GeometryAttributeType geometryType = (GeometryAttributeType) attributeType;
+                GeometryAttributeType geometry;
+                
+                geometry = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
+                        geometryType.getName(),
+                        geometryType.getClass(),
+                        geometryType.isNillable(),
+                        geometryType.getFieldLength(),
+                        geometryType.createDefaultValue(),
+                        crs
+                	);
+                
+                if( defaultGeometryType == null || 
+                    geometryType == schema.getDefaultGeometry() ){
+                    defaultGeometryType = geometry;
+                }
+                factory.addType( geometry );                
+            }
+			else {
+			    factory.addType( attributeType );
+			}            
+		}
+		factory.setDefaultGeometry( defaultGeometryType );
+		return factory.getFeatureType();
+	}
+	
+	/**
+	 * Applies transform to all geometry attribute.
+	 *   
+	 * @throws TransformException
+	 * @throws MismatchedDimensionException
+	 */
+	static Feature transform( Feature feature, FeatureType schema, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+	    FeatureType type = feature.getFeatureType();
+	    GeometryAttributeType geomType = schema.getDefaultGeometry();
+	    Geometry geom = (Geometry) feature.getAttribute( geomType.getName() );
+	    	    
+	    geom = transform( geom, transform );	    
+	    try {	        
+            feature.setAttribute( geomType.getName(), geom );
+        } catch (IllegalAttributeException shouldNotHappen) {
+            // we are expecting the transform to return the same geometry type
+        }
+	    return feature;
+	}
+	
+	public static Geometry transform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+	    if( transform.isIdentity() ) return geom;
+	    if( geom instanceof LineString ){
+	        return transform( (LineString) geom, transform );	        
+	    }
+	    if( geom instanceof MultiLineString ){
+	        return transform( (MultiLineString) geom, transform );	        
+	    }
+	    if( geom instanceof Polygon ){
+	        return transform( (Polygon) geom, transform );	        
+	    }
+	    if( geom instanceof Point ){
+	        return transform( (Point) geom, transform );	        
+	    }
+	    if( geom instanceof MultiPoint ){
+	        return transform( (MultiPoint) geom, transform );	        
+	    }
+	    if( geom instanceof MultiPolygon ){
+	        return transform( (MultiPolygon) geom, transform );	        
+	    }
+	    return null; // could not transform!
+	}
+	
+	public static Envelope transform( Envelope envelope, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    CoordinatePoint pt;
+	    Envelope bbox = new Envelope();
+	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMinY() ), null );
+	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+	    
+	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMinY() ), null );
+	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+	    
+	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMaxY() ), null );
+	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+	    
+	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMaxY() ), null );
+	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+	    
+	    return bbox;	    	    
+	}
+	public static Point transform( Point point, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = point.getFactory();
+	    	    
+	    Coordinate coords[] = point.getCoordinateSequence().toCoordinateArray();
+	    
+	    for( int i=0; i<coords.length; i++ ){
+	        CoordinatePoint pt = new CoordinatePoint( coords[i].x, coords[i].y  );
+            pt = transform.transform( pt, null );
+            coords[i].x = pt.getOrdinate( 0 );
+            coords[i].y = pt.getOrdinate( 1 );            
+	    }
+	    return factory.createPoint( coords[0] );	    
+	}	
+	public static LineString transform( LineString line, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = line.getFactory();
+	    Coordinate coords[] = line.getCoordinateSequence().toCoordinateArray();
+	    
+	    for( int i=0; i<coords.length; i++ ){
+	        CoordinatePoint pt = new CoordinatePoint( coords[i].x, coords[i].y  );
+            pt = transform.transform( pt, null );
+            coords[i].x = pt.getOrdinate( 0 );
+            coords[i].y = pt.getOrdinate( 1 );            
+	    }
+	    return factory.createLineString( coords );	    
+	}
+	public static LinearRing transform( LinearRing ring, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = ring.getFactory();
+	    Coordinate coords[] = ring.getCoordinateSequence().toCoordinateArray();
+	    
+	    for( int i=0; i<coords.length; i++ ){
+	        CoordinatePoint pt = new CoordinatePoint( coords[i].x, coords[i].y  );
+            pt = transform.transform( pt, null );
+            coords[i].x = pt.getOrdinate( 0 );
+            coords[i].y = pt.getOrdinate( 1 );            
+	    }
+	    return factory.createLinearRing( coords );	    
+	}
+	public static Polygon transform( Polygon polygon, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = polygon.getFactory();
+	    
+	    LinearRing ring = transform( (LinearRing) polygon.getExteriorRing(), transform );
+	    LinearRing  holes[] = new LinearRing[ polygon.getNumInteriorRing() ];
+	    for( int i=0; i< holes.length; i++ ){
+	        holes[i] = transform( (LinearRing) polygon.getInteriorRingN( i ), transform );
+	    }
+	    return factory.createPolygon( ring, holes );
+	}
+	
+	public static MultiPoint transform( MultiPoint multi, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = multi.getFactory();
+	    	    
+	    Coordinate coords[] = multi.getCoordinates();
+	    
+	    for( int i=0; i<coords.length; i++ ){
+	        CoordinatePoint pt = new CoordinatePoint( coords[i].x, coords[i].y  );
+            pt = transform.transform( pt, null );
+            coords[i].x = pt.getOrdinate( 0 );
+            coords[i].y = pt.getOrdinate( 1 );            
+	    }
+	    return factory.createMultiPoint( coords );
+	}
+	public static MultiLineString transform( MultiLineString multi, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = multi.getFactory();
+	    	    
+	    LineString geoms[] = new LineString[ multi.getNumGeometries() ];
+	    for( int i=0; i< geoms.length; i++ ){
+	        geoms[i] = transform( (LineString) multi.getGeometryN( i ), transform );
+	    }
+	    return factory.createMultiLineString( geoms );
+	}
+	public static MultiPolygon transform( MultiPolygon multi, MathTransform transform ) throws MismatchedDimensionException, TransformException {
+	    GeometryFactory factory = multi.getFactory();
+	    	    
+	    Polygon geoms[] = new Polygon[ multi.getNumGeometries() ];
+	    for( int i=0; i< geoms.length; i++ ){
+	        geoms[i] = transform( (Polygon) multi.getGeometryN( i ), transform );
+	    }
+	    return factory.createMultiPolygon( geoms );
+	}
+	
+	/**
+	 * Force GeometryAttributes to a user supplied CoordinateReferenceSystem
+	 * <p>
+	 * Opperates as a FeatureReader wrapper (well Decorator pattern since the result is
+	 * also a FeatureReader).
+	 * </p>
+	 * Example Use:
+	 * <pre><code>
+	 * FeatureReader reader = CRSSerivce.readerForce( origionalReader, forceCS );
+	 * 
+	 * CoordinateReferenceSystem orgionalCS =
+	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 * 
+	 * CoordinateReferenceSystem newCS =
+	 *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 * 
+	 * assertEquals( forceCS, newCS );
+	 * </code></pre>
+	 * </p>
+	 *
+	 * @author jgarnett, Refractions Research, Inc.
+	 * @author $Author: jive $ (last modification)
+	 */
+	public static FeatureReader readerForce( FeatureReader reader, CoordinateReferenceSystem crs ) throws SchemaException {
+	    return new ForceCoordinateSystemFeatureReader( reader, crs );
+	}
+	/**
+	 * Reproject GeometryAttributes to a user supplied CoordinateReferenceSystem.
+	 * </p>
+	 * 
+	 * <p>
+	 * Example Use:
+	 * <pre><code>
+	 * FeatureReader reader = CRSService.readerReproject( origionalReader, newCS );
+	 * 
+	 * CoordinateReferenceSystem orgionalCS =
+	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 * 
+	 * CoordinateReferenceSystem newCS =
+	 *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 * 
+	 * assertEquals( forceCS, newCS );
+	 * </code></pre>
+	 * </p>
+	 * @throws SchemaException
+	 * @throws CannotCreateTransformException
+	 */
+	public static FeatureReader readerReproject( FeatureReader reader, CoordinateReferenceSystem crs ) throws CannotCreateTransformException, SchemaException {
+	    return new ReprojectFeatureReader( reader, crs );
 	}
 }
