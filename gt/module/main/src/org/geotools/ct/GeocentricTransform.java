@@ -265,7 +265,7 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
         final int dimSource = getDimSource();
         final boolean hasHeight = (dimSource>=3);
         boolean   computeHeight = hasHeight;
-        assert computeHeight=true; // Intentional side effect
+        assert (computeHeight=true) == true; // Intentional side effect FIXME are you insane?
         if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
             step    = -dimSource;
             srcOff -= (numPts-1)*step;
@@ -335,7 +335,7 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
         final int dimSource = getDimSource();
         final boolean hasHeight = (dimSource>=3);
         boolean   computeHeight = hasHeight;
-        assert computeHeight=true; // Intentional side effect
+        assert (computeHeight=true) == true; // Intentional side effect // FIXME are you insane?
         if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
             step    = -dimSource;
             srcOff -= (numPts-1)*step;
