@@ -23,14 +23,12 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
-import java.util.Iterator;
-import javax.imageio.spi.RegisterableService;
-import javax.imageio.spi.ServiceRegistry;
 import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -72,7 +70,6 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.NameFactory;
 
 
@@ -94,37 +91,12 @@ import org.geotools.util.NameFactory;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractAuthorityFactory extends AbstractFactory
-        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory, RegisterableService
+        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
 {
-    /**
-     * The minimum priority that a factory can have. Factories with lowest priority will be used
-     * only if there is no other factory in the same {@linkplain ServiceRegistry#getCategories
-     * category} for the same {@linkplain #getAuthority authority} and from the same
-     * {@linkplain #getVendor vendor}.
-     *
-     * @see #onRegistration
-     */
-    public static final int MIN_PRIORITY = 1;
-
-    /**
-     * The maximum priority that a factory can have. Factories with highest priority will be
-     * preferred to any other factory in the same {@linkplain ServiceRegistry#getCategories
-     * category}, for the same {@linkplain #getAuthority authority} and from the same
-     * {@linkplain #getVendor vendor}.
-     *
-     * @see #onRegistration
-     */
-    public static final int MAX_PRIORITY = 10;
-
     /**
      * The underlying factories used for objects creation.
      */
     protected final FactoryGroup factories;
-
-    /**
-     * The priority for this factory.
-     */
-    final int priority;
 
     /**
      * Constructs an instance using the specified set of factories.
@@ -134,8 +106,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      *        {@link #MIN_PRIORITY} and {@link #MAX_PRIORITY} inclusive.
      */
     protected AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
+        super(priority);
         this.factories = factories;
-        this.priority  = priority;
         ensureNonNull("factories", factories);
     }
 
@@ -148,6 +120,25 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      */
     boolean isReady() {
         return true;
+    }
+
+    /**
+     * Returns the organization or party responsible for definition and maintenance of the
+     * database.
+     */
+    public abstract Citation getAuthority();
+
+    /**
+     * Returns {@code true} if this factory is for the same authority than the specified
+     * object. This method if for implementation of {@linkplain #onRegistration} method.
+     */
+    final boolean sameAuthority(final Factory factory) {
+        if (factory instanceof AuthorityFactory) {
+            final Citation authority = getAuthority();
+            return authority!=null &&
+                   authority.equals(((AuthorityFactory) factory).getAuthority());
+        }
+        return false;
     }
 
     /**
@@ -751,64 +742,6 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         } catch (ClassCastException exception) {
             throw noSuchAuthorityCode(VerticalCRS.class, code, exception);
         }
-    }
-
-    /**
-     * Called when this factory is added to the given <code>category</code> of the given
-     * <code>registry</code>. The factory may already be registered under another category
-     * or categories.
-     * <br><br>
-     * This method is invoked automatically when this factory is registered as a plugin,
-     * and should not be invoked directly by the user. The default implementation iterates
-     * through all services under the same category, for the same {@linkplain #getAuthority
-     * authority} and from the same {@linkplain #getVendor vendor}, and set the ordering
-     * according the priority given at construction time.
-     *
-     * @param registry a <code>ServiceRegistry</code> where this factory has been registered.
-     * @param category a <code>Class</code> object indicating the registry category under which
-     *                 this object has been registered.
-     *
-     * @see #MIN_PRIORITY
-     * @see #MAX_PRIORITY
-     * @see FactoryFinder
-     */
-    public void onRegistration(final ServiceRegistry registry, final Class category) {
-        for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
-            final Object provider = it.next();
-            if (provider instanceof AbstractAuthorityFactory) {
-                final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) provider;
-                final Citation vendor    = getVendor();
-                final Citation authority = getAuthority();
-                if (vendor    != null  &&  vendor   .equals(factory.getVendor   ()) &&
-                    authority != null  &&  authority.equals(factory.getAuthority()))
-                {
-                    if (priority > factory.priority) {
-                        registry.setOrdering(category, this, factory);
-                    } else if (priority < factory.priority) {
-                        registry.setOrdering(category, factory, this);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Called when this factory is removed from the given <code>category</code> of the given
-     * <code>registry</code>.  The object may still be registered under another category or
-     * categories.
-     * <br><br>
-     * This method is invoked automatically when this factory is no longer registered as a plugin,
-     * and should not be invoked directly by the user.
-     *
-     * @param registry a <code>ServiceRegistry</code> from which this object is being
-     *        (wholly or partially) deregistered.
-     * @param category a <code>Class</code> object indicating the registry category from
-     *        which this object is being deregistered.
-     *
-     * @see FactoryFinder
-     */
-    public void onDeregistration(final ServiceRegistry registry, final Class category) {
-        // No action needed.
     }
 
     /**

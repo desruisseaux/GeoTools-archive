@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -117,8 +117,7 @@ import org.geotools.resources.gui.ResourceKeys;
  *   <li>{@link #getArea()}, which must return a bounding box for the content
  *       to paint. This area can be expressed in arbitrary units. For example,
  *       an object wanting to display a geographic map with a content ranging
- *       from 10ï¿½ to 15ï¿½E and 40ï¿½ to 45ï¿½N should override this method as
- *       follows:
+ *       from 10° to 15°E and 40° to 45°N should override this method as follows:
  *
  *       <pre>
  *       &nbsp;public Rectangle2D getArea() {
@@ -1317,7 +1316,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-    * Adds an object to the list of objects interested in being notified
+     * Adds an object to the list of objects interested in being notified
      * about zoom changes.
      */
     public void addZoomChangeListener(final ZoomChangeListener listener) {
@@ -1751,10 +1750,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * button inside the magnifying glass. The default implementation displays
      * a contextual menu which contains magnifying glass options.
      *
-     * @param  event Mouse event containing amongst others, the 
-     *         coordinates ???? pointï¿½es.
-     * @return The contextual menu, or <code>null</code> to avoid displaying
-     *         the menu.
+     * @param  event Mouse event containing amongst others, the mouse position.
+     * @return The contextual menu, or <code>null</code> to avoid displaying the menu.
      */
     protected JPopupMenu getMagnifierMenu(final MouseEvent event) {
         final Resources resources = Resources.getResources(getLocale());

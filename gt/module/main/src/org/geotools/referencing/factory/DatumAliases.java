@@ -56,6 +56,7 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.OperationNotFoundException;  // For javadoc
 import org.opengis.util.GenericName;
+import org.opengis.util.ScopedName;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
@@ -63,7 +64,6 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.datum.Datum;                // For javadoc
 import org.geotools.referencing.datum.BursaWolfParameters;  // For javadoc
 import org.geotools.util.LocalName;
-import org.geotools.util.ScopedName;
 import org.geotools.util.NameFactory;
 import org.geotools.resources.XArray;
 
@@ -95,6 +95,9 @@ import org.geotools.resources.XArray;
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ *
+ * @todo Invokes {@link #freeUnused} automatically after some amount of time, in order to release
+ *       memory for unusued aliases. A timer should be set in {@code reload()} method.
  */
 public class DatumAliases extends AbstractFactory implements DatumFactory {
     /**
@@ -108,7 +111,15 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     private static final String SEPARATORS = ",";
 
     /**
-     * The URL of the alias table. This file is read by {@link #load} when first needed.
+     * Array used as a marker for alias that has been discarted because never used.
+     * This array may appears in {@link #aliasMap} values.
+     *
+     * @see #freeUnused
+     */
+    private static final Object[] NEED_LOADING = new Object[0];
+
+    /**
+     * The URL of the alias table. This file is read by {@link #reload} when first needed.
      */
     private final URL aliasURL;
 
@@ -118,11 +129,11 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      * of objects created, all values are initially {@code String[]} objects. They are
      * converted to {@code GenericName[]} only when first needed.
      */
-    private Map/*<String,Object[]>*/ aliasMap;
+    private final Map/*<String,Object[]>*/ aliasMap = new HashMap();
 
     /**
      * The authorities. This is the first line in the alias table.
-     * This array is constructed by {@link #load} when first needed.
+     * This array is constructed by {@link #reload} when first needed.
      */
     private LocalName[] authorities;
 
@@ -134,16 +145,12 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     private DatumFactory factory;
 
     /**
-     * Flag set to {@code true} when the {@link #aliasMap} need to be reloaded.
-     * This flag is set by {@link #freeUnused} when at least one set of aliases
-     * has been discarted.
-     */
-    private boolean reload;
-
-    /**
      * Constructs a new datum factory with the default backing factory and alias table.
      */
     public DatumAliases() {
+        // Uses a slightly higher priority than the default factory, in order
+        // to get WKT parser and authorities factories to use the aliases table.
+        super(NORM_PRIORITY + 1);
         aliasURL = DatumAliases.class.getResource(ALIAS_TABLE);
         if (aliasURL == null) {
             throw new NoSuchElementException(ALIAS_TABLE);
@@ -170,6 +177,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      * @param aliasURL The url to the alias table.
      */
     public DatumAliases(final DatumFactory factory, final URL aliasURL) {
+        super(NORM_PRIORITY + 1);
         this.factory  = factory;
         this.aliasURL = aliasURL;
         ensureNonNull("factory",  factory );
@@ -196,6 +204,13 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     }
 
     /**
+     * Returns a caseless version of the specified key, to be stored in the map.
+     */
+    private static String toCaseless(final String key) {
+        return key.replace('_', ' ').trim().toLowerCase();
+    }
+
+    /**
      * Read the next line from the specified input stream, skipping all blank
      * and comment lines. Returns {@code null} on end of stream.
      */
@@ -214,11 +229,10 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      *
      * @throws IOException if the loading failed.
      */
-    private void load() throws IOException {
+    private void reload() throws IOException {
         assert Thread.holdsLock(this);
+        LOGGER.fine("Loading datum aliases from \""+aliasURL.toString()+"\"."); // TODO: localize
         final BufferedReader in = new BufferedReader(new InputStreamReader(aliasURL.openStream()));
-        final Map oldMap = aliasMap;
-        aliasMap = new HashMap();
         /*
          * Parses the title line. This line contains authority names as column titles.
          * The authority names will be used as the scope for each identifiers to be
@@ -233,6 +247,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
                 elements.add(name.length()!=0 ? new LocalName(name) : null);
             }
             authorities = (LocalName[]) elements.toArray(new LocalName[elements.size()]);
+            final Map/*<String,String>*/ canonical = new HashMap();
             /*
              * Parses all aliases. They are stored as arrays of strings for now, but will be
              * converted to array of generic names by {@link #getAliases} when first needed.
@@ -240,11 +255,21 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
              * scoped name will be created at this time.
              */
             while ((line=readLine(in)) != null) {
-                elements.clear();
+                elements .clear();
+                canonical.clear();
                 st = new StringTokenizer(line, SEPARATORS);
                 while (st.hasMoreTokens()) {
-                    final String alias = st.nextToken().trim();
-                    elements.add(alias.length()!=0 ? alias : null);
+                    String alias = st.nextToken().trim();
+                    if (alias.length() != 0) {
+                        final String previous = (String) canonical.put(alias, alias);
+                        if (previous != null) {
+                            canonical.put(previous, previous);
+                            alias = previous;
+                        }
+                    } else {
+                        alias = null;
+                    }
+                    elements.add(alias);
                 }
                 // Trim trailing null values only (we must keep other null values).
                 for (int i=elements.size(); --i>=0;) {
@@ -252,28 +277,30 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
                     elements.remove(i);
                 }
                 if (!elements.isEmpty()) {
+                    /*
+                     * Copies the aliases array in the aliases map for all local names. If a
+                     * previous value is found as an array of GenericName objects, those generic
+                     * names are conserved in the map (instead of the string values parsed above)
+                     * in order to avoid constructing them again when they will be needed.
+                     */
                     final String[] names = (String[]) elements.toArray(new String[elements.size()]);
                     for (int i=0; i<names.length; i++) {
                         final String name = names[i];
-                        final String[] previous = (String[])aliasMap.put(name.toLowerCase(), names);
-                        if (previous!=null && !Arrays.equals(previous, names)) {
-                            // TODO: localize
-                            LOGGER.warning("Inconsistent aliases for datum \""+name+"\".");
+                        final String key  = toCaseless(name);
+                        final Object[] previous = (Object[]) aliasMap.put(key, names);
+                        if (previous!=null && previous!=NEED_LOADING) {
+                            if (previous instanceof GenericName[]) {
+                                aliasMap.put(key, previous);
+                            } else if (!Arrays.equals(previous, names)) {
+                                // TODO: localize
+                                LOGGER.warning("Inconsistent aliases for datum \""+name+"\".");
+                            }
                         }
                     }
                 }
             }
         }
         in.close();
-        /*
-         * Final step: reinject all entries from the old map. This is for reusing values that were
-         * already converted from String[] to GenericName[]. This step assumes that the content of
-         * the file didn't changed between two invocations of the 'load()' method.
-         */
-        if (oldMap != null) {
-            aliasMap.putAll(oldMap);
-        }
-        reload = false;
     }
 
     /**
@@ -284,7 +311,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     private void log(final IOException exception) {
         final LogRecord record = new LogRecord(Level.WARNING, "Can't read \"" + aliasURL + "\".");
         record.setSourceClassName("DatumAliases");
-        record.setSourceMethodName("load");
+        record.setSourceMethodName("reload");
         record.setThrown(exception);
         LOGGER.log(record);
     }
@@ -298,34 +325,40 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      *         or {@code null} if the name is not in our list of aliases.
      *
      * @see #addAliases
-     * @see #load
+     * @see #reload
      */
     private GenericName[] getAliases(String name) {
         assert Thread.holdsLock(this);
-        if (aliasMap == null) try {
-            load();
+        if (aliasMap.isEmpty()) try {
+            reload();
         } catch (IOException exception) {
             log(exception);
-            if (aliasMap == null) {
-                return null;
-            }
+            // Continue in case the requested alias has been read before the failure occured.
         }
         /*
-         * Gets the aliases for the specified name. If there is no entry for this name but
-         * 'freeUnused()' has been invoked previously, reload the file and try again since
-         * the requested name may be one of the set of discarted aliases.
+         * Gets the aliases for the specified name.  If an entry exists for this name with a null
+         * value, this means that 'freeUnused()' has been invoked previously. Reload the file and
+         * try again since the requested name may be one of the set of discarted aliases.
          */
-        name = name.trim().toLowerCase();
+        name = toCaseless(name);
         Object[] aliases = (Object[]) aliasMap.get(name);
         if (aliases == null) {
-            if (reload) try {
-                load();
+            // Unknow name. We are done.
+            return null;
+        }
+        if (aliases == NEED_LOADING) {
+            // Known name, but the list of alias has been previously
+            // discarted because never used. Reload the file.
+            try {
+                reload();
             } catch (IOException exception) {
                 log(exception);
-                return null;
+                // Continue in case the requested alias has been read before the failure occured.
             }
             aliases = (Object[]) aliasMap.get(name);
-            if (aliases == null) {
+            if (aliases == NEED_LOADING) {
+                // Should never happen, unless reloading failed or some lines have
+                // been deleted in the file since last time the file has been loaded.
                 return null;
             }
         }
@@ -346,7 +379,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
                 if (count < authorities.length) {
                     final LocalName authority = authorities[count];
                     if (authority != null) {
-                        names[count++] = new ScopedName(authority, alias);
+                        names[count++] = new org.geotools.util.ScopedName(authority, alias);
                         continue;
                     }
                 }
@@ -356,7 +389,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
         names = (GenericName[]) XArray.resize(names, count);
         for (int i=0; i<names.length; i++) {
             final String alias = names[i].asLocalName().toString();
-            final Object[] previous = (Object[]) aliasMap.put(alias.toLowerCase(), names);
+            final Object[] previous = (Object[]) aliasMap.put(toCaseless(alias), names);
             assert previous==names || Arrays.equals(aliases, previous) : alias;
         }
         return names;
@@ -423,9 +456,10 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     private static final int putAll(final GenericName[] names, final Map map) {
         int ignored = 0;
         for (int i=0; i<names.length; i++) {
-            final GenericName name = names[i];
-            final String       key = name.asLocalName().toString().trim().toLowerCase();
-            final GenericName  old = (GenericName) map.put(key, name);
+            final GenericName   name = names[i];
+            final GenericName scoped = name.asScopedName();
+            final String         key = toCaseless((scoped!=null ? scoped : name).toString());
+            final GenericName    old = (GenericName) map.put(key, name);
             if (old instanceof ScopedName) {
                 map.put(key, old); // Preserves the user value, except if it was unscoped.
                 ignored++;
@@ -559,15 +593,14 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
 
     /**
      * Free all aliases that have been unused up to date. If one of those alias is needed at a
-     * later time, the aliases table will be reloaded. Note that reloading may occurs on any
-     * invocation of {@code createFoo} methods, including prime meridians and ellipsoids.
+     * later time, the aliases table will be reloaded.
      */
     public synchronized void freeUnused() {
         if (aliasMap != null) {
-            for (final Iterator it=aliasMap.values().iterator(); it.hasNext();) {
-                if (!(it.next() instanceof GenericName[])) {
-                    it.remove();
-                    reload = true;
+            for (final Iterator it=aliasMap.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry entry = (Map.Entry) it.next();
+                if (!(entry.getValue() instanceof GenericName[])) {
+                    entry.setValue(NEED_LOADING);
                 }
             }
         }

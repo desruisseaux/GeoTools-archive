@@ -92,11 +92,6 @@ import org.geotools.resources.cts.Resources;
  */
 public class Parser extends MathTransformParser {
     /**
-     * TEMPORARY HACK: Set to 'true' in order to test the proposed new DatumAliases implementation.
-     */
-    private static final boolean NEW_ALIASES = false;
-
-    /**
      * The mapping between WKT element name and the object class to be created.
      * Will be created by {@link #getClassOf} only when first needed.
      */
@@ -183,8 +178,7 @@ public class Parser extends MathTransformParser {
                   final MathTransformFactory mtFactory)
     {
         super(symbols, mtFactory);
-        this.datumFactory = (NEW_ALIASES) ? new org.geotools.referencing.factory.DatumAliases(datumFactory) : datumFactory;
-//        this.datumFactory = datumFactory;
+        this.datumFactory = datumFactory;
         this. csFactory   =    csFactory;
         this.crsFactory   =   crsFactory;
         final AxisDirection[] values = AxisDirection.values();
@@ -571,20 +565,6 @@ public class Parser extends MathTransformParser {
         BursaWolfParameters toWGS84 = parseToWGS84(element); // Optional; may be null.
         Map              properties = parseAuthority(element, name);
         element.close();
-        if (!NEW_ALIASES) {
-            //if our name is in our list of datum aliases, add the aliases to the property
-            //the following can be removed when this is done in the DatumFactory
-            org.geotools.resources.DatumAliases aliases = new org.geotools.resources.DatumAliases();
-            if (aliases.containsAlias(name)) {
-                if (properties.size() == 1) {
-                    properties = new HashMap(properties);
-                }
-                Identifier[] identifiers = aliases.getAliases(name);
-                if (identifiers != null) {
-                    properties.put(IdentifiedObject.ALIAS_PROPERTY, identifiers);
-                }
-            }
-        }
         if (toWGS84 != null) {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);

@@ -25,6 +25,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import javax.units.ConversionException;
 import javax.units.Unit;
 
@@ -33,6 +36,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.datum.Datum;
@@ -71,10 +75,15 @@ import org.geotools.resources.XArray;
  * one factory. Concequently, they can't be a method in a single factory. Furthermore, since
  * they are helper methods and somewhat implementation-dependent, they are not part of GeoAPI.
  *
- * @version $Id
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FactoryGroup {
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPS = 1E-8;
+
     /**
      * The {@linkplain Datum datum} factory.
      * If null, then a default factory will be created only when first needed.
@@ -222,12 +231,14 @@ public class FactoryGroup {
 
     /**
      * Creates a projected coordinate reference system from a set of parameters.
-     * The client must supply at least the <code>"semi_major"</code> and
+     * The client shall supply at least the <code>"semi_major"</code> and
      * <code>"semi_minor"</code> parameters for cartographic projection.
+     * If the two above-cited parameters were not supplied, they will be inferred
+     * from the {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Geographic coordinate reference system to base projection on.
-     * @param  method The operation method, or <code>null</code> for a default one.
+     * @param  method The operation method, or {@code null} for a default one.
      * @param  parameters The parameter values to give to the projection.
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
@@ -240,12 +251,14 @@ public class FactoryGroup {
             throws FactoryException
     {
         /*
-         * Complete missing informations in the parameter block, if any.
+         * If the user's parameter do not contains semi-major and semi-minor axis length, infers
+         * them from the ellipsoid. This is a convenience service since the user often omit those
+         * parameters (because they duplicate datum information).
          */
         final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
         final Unit axisUnit = ellipsoid.getAxisUnit();
-        set(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit);
-        set(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit);
+        ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit);
+        ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit);
         /*
          * Computes matrix for swapping axis and performing units conversion.
          * There is one matrix to apply before projection on (longitude,latitude)
@@ -285,24 +298,58 @@ public class FactoryGroup {
     }
 
     /**
-     * Set the value for the specified parameter, if not already set.
+     * Ensure that the specified parameters are set. The {@code value} is set if and only if
+     * no value were already set by the user.
+     *
+     * @param parameters The set of projection parameters.
+     * @param name       The parameter name to set.
+     * @param value      The value to set, or to expect if the parameter is already set.
+     * @param unit       The value unit.
+     *
+     * @todo The FactoryGroup class is not the most appropriate place for setting axis length.
+     *       A more appropriate place would be MathTransformProvider.ensureValidValues(...).
+     *       But is may be too geotools-specific...
      */
-    private static void set(final ParameterValueGroup parameters, final String name,
-                            final double value, final Unit unit)
+    private static void ensureSet(final ParameterValueGroup parameters,
+                                  final String name, final double value, final Unit unit)
     {
         final ParameterValue parameter;
         try {
             parameter = parameters.parameter(name);
         } catch (ParameterNotFoundException ignore) {
-            // Parameter not found. Ignore.
+            /*
+             * Parameter not found. This exception should not occurs most of the time.
+             * If it occurs, we will not try to set the parameter here, but the same
+             * exception is likely to occurs at MathTransform creation time. The later
+             * is the expected place for this exception, so we will let it happen there.
+             */
             return;
         }
         try {
-            parameter.doubleValue();
+            if (Math.abs(parameter.doubleValue(unit)/value - 1) <= EPS) {
+                return;
+            }
+        } catch (InvalidParameterTypeException exception) {
+            /*
+             * The parameter is not a floating point value. Don't try to set it. An exception is
+             * likely to be thrown at MathTransform creation time, which is the expected place.
+             */
+            return;
         } catch (IllegalStateException exception) {
-            // Parameter not set. Set it now.
+            /*
+             * No value were set for this parameter, and there is no default value.
+             */
             parameter.setValue(value, unit);
+            return;
         }
+        /*
+         * A value were set, but is different from the expected value.
+         */
+        // TODO: localize
+        final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
+        record.setSourceClassName("FactoryGroup");
+        record.setSourceMethodName("createProjectedCRS");
+        Logger.getLogger("org.geotools.referencing.factory").log(record);
     }
 
     /**

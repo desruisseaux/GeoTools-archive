@@ -21,6 +21,7 @@ package org.geotools.referencing;
 // J2SE dependencies and extensions
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -238,16 +239,42 @@ public class CreationTest extends TestCase {
         DatumFactory         factory = new GeotoolsFactory();
         final Map         properties = Collections.singletonMap("name", name1);
         GeodeticDatum datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
-        assertTrue(datum.getAlias().length == 0);
+        assertEquals(0, datum.getAlias().length);
 
-        factory = new DatumAliases(factory);
-        datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
-        final GenericName[] aliases = datum.getAlias();
-        assertTrue(aliases.length == 2);
-        assertEquals(name1, aliases[0].asLocalName().toString());
-        assertEquals(name2, aliases[1].asLocalName().toString());
-        assertTrue  (aliases[0] instanceof ScopedName);
-        assertTrue  (aliases[1] instanceof ScopedName);
+        for (int i=0; i<3; i++) {
+            switch (i) {
+                case  0: factory = new DatumAliases(factory);       break;
+                case  1: factory = FactoryFinder.getDatumFactory(); break;
+                case  2: ((DatumAliases) factory).freeUnused();     break;
+                default: throw new AssertionError(); // Should not occurs.
+            }
+            final String pass = "Pass #"+i;
+            datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
+            final GenericName[] aliases = datum.getAlias();
+            assertEquals(pass, 2, aliases.length);
+            assertEquals(pass, name1, aliases[0].asLocalName().toString());
+            assertEquals(pass, name2, aliases[1].asLocalName().toString());
+            assertTrue  (pass, aliases[0] instanceof ScopedName);
+            assertTrue  (pass, aliases[1] instanceof ScopedName);
+        }
+
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "Tokyo"), ellipsoid, meridian);
+        GenericName[] aliases = datum.getAlias();
+        assertEquals(3, aliases.length);
+
+        ((DatumAliases) factory).freeUnused();
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "_toKyo  _"), ellipsoid, meridian);
+        assertEquals(3, datum.getAlias().length);
+        assertTrue(Arrays.equals(aliases, datum.getAlias()));
+
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "D_Tokyo"), ellipsoid, meridian);
+        assertEquals(3, datum.getAlias().length);
+
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "Luxembourg 1930"), ellipsoid, meridian);
+        assertEquals(2, datum.getAlias().length);
+
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "Dummy"), ellipsoid, meridian);
+        assertEquals("Non existing datum should have no alias.", 0, datum.getAlias().length);
     }
 
     /**
