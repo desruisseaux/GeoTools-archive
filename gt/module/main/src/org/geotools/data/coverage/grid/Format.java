@@ -11,6 +11,7 @@ package org.geotools.data.coverage.grid;
 
 // OpenGIS dependencies
 
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -70,19 +71,26 @@ public interface Format {
      * <p>
      * To use:
      * <pre><code>
-     * ParameterGroupDescriptor params = format.getReadParameters();
-     * ParameterGroup values = params.createValues();
+     * ParameterDescriptorGroup paramDescriptor = f.getReadParameters();
+     * ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
      * </code></pre>
      * </p>
      * @UML operation getParameterInfo
      * @UML mandatory numParameters
      */
-    ParameterValueGroup getReadParameters();
+    ParameterDescriptorGroup getReadParameters();
 
     /**
      * Retrieve the parameter information for a {@link GridCoverageWriter#write write} operation.
+     * <p>
+     * To use:
+     * <pre><code>
+     * ParameterDescriptorGroup paramDescriptor = f.getWriteParameters();
+     * ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+     * </code></pre>
+     * </p>
      */
-    ParameterValueGroup getWriteParameters();
+    ParameterDescriptorGroup getWriteParameters();
     
     /**
      * @todo javadoc
