@@ -18,15 +18,20 @@
 package org.geotools.data.vpf.util;
 
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
-import org.geotools.data.vpf.io.Coordinate2DDouble;
-import org.geotools.data.vpf.io.Coordinate2DFloat;
-import org.geotools.data.vpf.io.Coordinate3DDouble;
-import org.geotools.data.vpf.io.Coordinate3DFloat;
+//import org.geotools.data.vpf.io.Coordinate2DDouble;
+//import org.geotools.data.vpf.io.Coordinate2DFloat;
+//import org.geotools.data.vpf.io.Coordinate3DDouble;
+//import org.geotools.data.vpf.io.Coordinate3DFloat;
 import org.geotools.data.vpf.io.VPFDate;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
- * Class DataUtils.java is responsible for
+ * Class DataUtils.java is responsible for a bunch of 
+ * miscellaneous operations for reading and converting
+ * data
  * 
  * <p>
  * Created: Wed Jan 29 10:06:37 2003
@@ -84,7 +89,7 @@ public class DataUtils implements DataTypesDefinition {
             if (isNull) {
                 result = null;
             } else {
-                result = sb.toString();
+                result = sb.toString().trim();
             }
 
             break;
@@ -110,77 +115,136 @@ public class DataUtils implements DataTypesDefinition {
             break;
 
         case DATA_2_COORD_F:
-        {
-            float[][] coords = new float[bytes.length / DATA_2_COORD_F_LEN][2];
-            byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
+//        {
+//            // I doubt this is being used
+//          float[][] coords = new float[bytes.length / DATA_2_COORD_F_LEN][2];
+//          byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
+//
+//          for (int i = 0; i < coords.length; i++) {
+//              copyArrays(floatData, bytes, i * DATA_2_COORD_F_LEN);
+//              coords[i][0] = decodeFloat(floatData);
+//              copyArrays(floatData, bytes, i * (DATA_2_COORD_F_LEN + 1));
+//              coords[i][1] = decodeFloat(floatData);
+//          }
+//          DirectPosition[] coords = new DirectPosition2D[bytes.length / DATA_2_COORD_F_LEN];
+//          double xval, yval;
+//          byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
+//
+//          for (int i = 0; i < coords.length; i++) {
+//              copyArrays(floatData, bytes, i * DATA_2_COORD_F_LEN);
+//              xval = decodeFloat(floatData);
+//              copyArrays(floatData, bytes, i * (DATA_2_COORD_F_LEN + 1));
+//              yval = decodeFloat(floatData);
+//              coords[i] = new DirectPosition2D(xval, yval);
+//          }
 
-            for (int i = 0; i < coords.length; i++) {
-                copyArrays(floatData, bytes, i * DATA_2_COORD_F_LEN);
-                coords[i][0] = decodeFloat(floatData);
-                copyArrays(floatData, bytes, i * (DATA_2_COORD_F_LEN + 1));
-                coords[i][1] = decodeFloat(floatData);
-            }
-
-            result = new Coordinate2DFloat(coords);
-        }
-
-        break;
+//          result = coords;
+//            result = new Coordinate2DFloat(coords);
+//        }
+//
+//        break;
 
         case DATA_2_COORD_R:
-        {
-            double[][] coords = new double[bytes.length / DATA_2_COORD_R_LEN][2];
-            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
-
-            for (int i = 0; i < coords.length; i++) {
-                copyArrays(doubleData, bytes, i * DATA_2_COORD_R_LEN);
-                coords[i][0] = decodeDouble(doubleData);
-                copyArrays(doubleData, bytes, i * (DATA_2_COORD_R_LEN + 1));
-                coords[i][1] = decodeDouble(doubleData);
-            }
-
-            result = new Coordinate2DDouble(coords);
-        }
-
-        break;
-
+//        {
+            // I doubt this is being used
+//            DirectPosition[] coords = new DirectPosition2D[bytes.length / DATA_2_COORD_R_LEN];
+//            double xval, yval;
+//            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(doubleData, bytes, i * DATA_2_COORD_R_LEN);
+//                xval = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_2_COORD_R_LEN + 1));
+//                yval = decodeDouble(doubleData);
+//                coords[i] = new DirectPosition2D(xval, yval);
+//            }
+//
+//            result = coords;
+//            double[][] coords = new double[bytes.length / DATA_2_COORD_R_LEN][2];
+//            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(doubleData, bytes, i * DATA_2_COORD_R_LEN);
+//                coords[i][0] = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_2_COORD_R_LEN + 1));
+//                coords[i][1] = decodeDouble(doubleData);
+//            }
+//
+//            result = new Coordinate2DDouble(coords);
+//        }
+//
+//        break;
+//
         case DATA_3_COORD_F:
-        {
-            float[][] coords = new float[bytes.length / DATA_3_COORD_F_LEN][3];
-            byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
-
-            for (int i = 0; i < coords.length; i++) {
-                copyArrays(floatData, bytes, i * DATA_3_COORD_F_LEN);
-                coords[i][0] = decodeFloat(floatData);
-                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 1));
-                coords[i][1] = decodeFloat(floatData);
-                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 2));
-                coords[i][2] = decodeFloat(floatData);
-            }
-
-            result = new Coordinate3DFloat(coords);
-        }
-
-        break;
-
+//        {
+          // I doubt this is being used
+//            DirectPosition[] coords = new DirectPosition2D[bytes.length / DATA_2_COORD_R_LEN];
+//            double xval, yval, zval;
+//            byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(floatData, bytes, i * DATA_3_COORD_F_LEN);
+//                xval = decodeFloat(floatData);
+//                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 1));
+//                yval = decodeFloat(floatData);
+//                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 2));
+//                zval = decodeFloat(floatData);
+//                coords[i] = new GeneralDirectPosition(xval, yval, zval);
+//            }
+//
+//            result = coords;
+//            float[][] coords = new float[bytes.length / DATA_3_COORD_F_LEN][3];
+//            byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(floatData, bytes, i * DATA_3_COORD_F_LEN);
+//                coords[i][0] = decodeFloat(floatData);
+//                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 1));
+//                coords[i][1] = decodeFloat(floatData);
+//                copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 2));
+//                coords[i][2] = decodeFloat(floatData);
+//            }
+//
+//            result = new Coordinate3DFloat(coords);
+//        }
+//
+//        break;
+//
         case DATA_3_COORD_R:
-        {
-            double[][] coords = new double[bytes.length / DATA_3_COORD_R_LEN][3];
-            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
-
-            for (int i = 0; i < coords.length; i++) {
-                copyArrays(doubleData, bytes, i * DATA_3_COORD_R_LEN);
-                coords[i][0] = decodeDouble(doubleData);
-                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 1));
-                coords[i][1] = decodeDouble(doubleData);
-                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 2));
-                coords[i][2] = decodeDouble(doubleData);
-            }
-
-            result = new Coordinate3DDouble(coords);
+//        {
+            // I doubt this is being used
+//            DirectPosition[] coords = new DirectPosition2D[bytes.length / DATA_2_COORD_R_LEN];
+//            double xval, yval, zval;
+//            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(doubleData, bytes, i * DATA_3_COORD_R_LEN);
+//                xval = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 1));
+//                yval = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 2));
+//                zval = decodeDouble(doubleData);
+//                coords[i] = new GeneralDirectPosition(xval, yval, zval);
+//            }
+//
+//            result = coords;
+//            double[][] coords = new double[bytes.length / DATA_3_COORD_R_LEN][3];
+//            byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
+//
+//            for (int i = 0; i < coords.length; i++) {
+//                copyArrays(doubleData, bytes, i * DATA_3_COORD_R_LEN);
+//                coords[i][0] = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 1));
+//                coords[i][1] = decodeDouble(doubleData);
+//                copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 2));
+//                coords[i][2] = decodeDouble(doubleData);
+//            }
+//
+//            result = new Coordinate3DDouble(coords);
+//        }
+        {    
+            throw new RuntimeException("If this code is actually being used, replace it with equivalent code from VPFFile.");
         }
-
-        break;
-
         case DATA_DATE_TIME:
             result = new VPFDate(bytes);
 
