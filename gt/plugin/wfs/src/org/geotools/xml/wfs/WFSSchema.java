@@ -422,7 +422,6 @@ public class WFSSchema implements Schema {
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
-            //System.out.println("Searching for "+name+" in "+getName());
             return (getChild() == null) ? null : getChild().findChildElement(name);
         }
 

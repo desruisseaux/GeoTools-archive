@@ -54,7 +54,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class XSISAXHandler extends DefaultHandler {
     // the logger -- should be used for debugging (assuming there are bugs LOL)
-    private final static Logger logger = Logger.getLogger(
+    protected final static Logger logger = Logger.getLogger(
             "net.refractions.xsi.sax");
 
     // the stack of handers representing a portion of the parse tree
@@ -116,7 +116,7 @@ public class XSISAXHandler extends DefaultHandler {
         try {
             handlers.push(rootHandler);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }
@@ -137,12 +137,11 @@ public class XSISAXHandler extends DefaultHandler {
         try {
             String text = String.copyValueOf(ch, start, length);
 
-            //            System.out.println("CHARS: " + text);
             if ((text != null) && !"".equals(text.trim())) {
                 ((XSIElementHandler) handlers.peek()).characters(text);
             }
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }
@@ -163,12 +162,11 @@ public class XSISAXHandler extends DefaultHandler {
         throws SAXException {
         logger.info("END: " + qName);
 
-        //        System.out.println("END: " + qName);
         try {
             ((XSIElementHandler) handlers.pop()).endElement(namespaceURI,
                 localName);
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }
@@ -190,7 +188,6 @@ public class XSISAXHandler extends DefaultHandler {
         String qName, Attributes atts) throws SAXException {
         logger.info("START: " + qName);
 
-        //        System.out.println("START: " + qName);
         try {
             XSIElementHandler eh = ((XSIElementHandler) handlers.peek())
                 .getHandler(namespaceURI, localName);
@@ -207,7 +204,7 @@ public class XSISAXHandler extends DefaultHandler {
             handlers.push(eh);
             eh.startElement(namespaceURI, localName, atts);
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }

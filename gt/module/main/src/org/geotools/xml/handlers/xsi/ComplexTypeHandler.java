@@ -415,7 +415,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     protected ComplexType compress(SchemaHandler parent)
         throws SAXException {
         logger.info("Start compressing ComplexType " + getName());
-//System.out.println("Start compressing ComplexType " + getName());
 
         if (cache != null) {
             return cache;
@@ -542,11 +541,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
                             + ((ct == null) ? null
                                             : (ct.getName() + ":::"
                             + ct.getNamespace())) + " for " + name);
-//System.out.println("Looked up " + ext.getBase()+ " and found "+ ((ct == null) ? null: (ct.getName() + ":::"+ ct.getNamespace())) + " for " + name);
 
                         ElementGrouping extensionBaseType = ct.getChild();
-//System.out.println(ext.getChild()==null?"null":ext.getChild().getClass().getName());
-//System.out.println("compressing ... LocalName = "+this.name);
 						ElementGrouping extensionChild =  ((ElementGroupingHandler)ext.getChild()).compress(parent);
                         dct.child = loadNewEG(extensionBaseType,extensionChild, parent); // note should override element def only ... not spot
                     } else {
@@ -853,7 +849,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
             }
             for (int i = 0; i < children.length; i++) {
                 Element t = children[i].findChildElement(name);
-//                System.out.println("ComplexTypeHandler.SequenceGT ["+i+"] ... "+(children[i] == null?null:children[i].getClass().getName()));
                 if (t != null) { // found it
 
                     return t;
@@ -1116,17 +1111,12 @@ public class ComplexTypeHandler extends XSIElementHandler {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((parent != null) && parent.canEncode(element, value, hints)) {
-                //                System.out.println("Encoding "+element.getName());
-                //                System.out.println("Using Parent = "+(parent == null?"null":parent.getName()));
-                //                System.out.println("Value Type = "+value==null?null:value.getClass().getName());
                 parent.encode(element, value, output, hints);
             } else {
-                //System.out.println("Encoding "+getName());
-                //System.out.println(parent==null?"no parent":parent.getName());
                 throw new OperationNotSupportedException(
                     "This is a generic schema element -- cannot print yet");
 
-                // TODO fix this
+                // TODO Make generics print ... 
             }
         }
     }

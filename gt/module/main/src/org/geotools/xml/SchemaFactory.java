@@ -105,46 +105,36 @@ public class SchemaFactory {
 
                 while (e.hasMoreElements()) {
                     URL res = (URL) e.nextElement();
-//System.out.println("Service file location for Schema "+res);
                     BufferedReader rd = new BufferedReader(new InputStreamReader(
-                                res.openStream(), "UTF-8"));
+                        res.openStream(), "UTF-8"));
 
                     while (rd.ready()) {
                         String factoryClassName = rd.readLine().trim();
 
                         try {
                             Schema s = (Schema) cls[i].loadClass(factoryClassName)
-                                                      .getDeclaredMethod("getInstance",
-                                    new Class[0]).invoke(null, new Object[0]);
-
-//System.out.println(s.getTargetNamespace());
+                                .getDeclaredMethod("getInstance", new Class[0])
+                                .invoke(null, new Object[0]);
                             schemas.put(s.getTargetNamespace(), s);
                         } catch (IllegalArgumentException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         } catch (SecurityException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         } catch (IllegalAccessException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         } catch (InvocationTargetException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         } catch (NoSuchMethodException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         } catch (ClassNotFoundException e1) {
-                            // TODO log this
-                            e1.printStackTrace();
+                            XSISAXHandler.logger.warning(e1.toString());
                         }
                     }
 
                     rd.close();
                 }
             } catch (IOException e) {
-                // TODO log this
-                e.printStackTrace();
+                XSISAXHandler.logger.warning(e.toString());
             }
         }
 

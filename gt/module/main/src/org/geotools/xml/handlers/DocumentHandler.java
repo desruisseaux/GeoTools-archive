@@ -75,7 +75,6 @@ public class DocumentHandler extends XMLElementHandler {
             throw new SAXNotRecognizedException(
                 "XML Documents may only have one top-level element");
         }
-//System.out.println("HINTS TEST "+hints.containsKey(DEFAULT_NAMESPACE_HINT_KEY));
         if(hints!=null && hints.containsKey(DEFAULT_NAMESPACE_HINT_KEY)){
             Object t = hints.get(DEFAULT_NAMESPACE_HINT_KEY);
             if(t instanceof Schema)
@@ -83,7 +82,6 @@ public class DocumentHandler extends XMLElementHandler {
             else
                 ehf.startPrefixMapping("",t.toString());
         }
-//System.out.println("HINT WORKING? "+ehf.getNamespace(""));
         xeh = ehf.createElementHandler(namespaceURI, localName);
 
         return xeh;

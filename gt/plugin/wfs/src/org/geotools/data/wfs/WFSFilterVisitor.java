@@ -875,7 +875,7 @@ public class WFSFilterVisitor implements FilterVisitor {
                                         try {
                                             le.setLiteral((new GeometryFactory()).toGeometry(tmp));
                                         } catch (IllegalFilterException e) {
-                                            e.printStackTrace();
+                                            WFSDataStoreFactory.logger.warning(e.toString());
                                         }
                                     }
                                 }

@@ -79,21 +79,16 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         HashSet r = new HashSet();
 
-//int i=0;
         while (reader.hasNext()){
-//System.out.print("Adding #"+i++);
             try {
                 Feature f = reader.next();
                 r.add(f.getID());
-//System.out.println(" "+f.getID());
                 ts.addAction(new InsertAction(f));
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
-//e.printStackTrace();
                 throw new IOException(e.toString());
             } catch (IllegalAttributeException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
-//e.printStackTrace();
                 throw new IOException(e.toString());
             }
         }

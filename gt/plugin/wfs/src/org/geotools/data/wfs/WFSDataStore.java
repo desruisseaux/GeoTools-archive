@@ -343,7 +343,6 @@ public class WFSDataStore extends AbstractDataStore {
         throws SAXException, IOException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
 
-        //System.out.println("getSchemaGet -- get "+getUrl);
         if (getUrl == null) {
             return null;
         }
@@ -375,7 +374,6 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + typeName);
 
         getUrl = new URL(url);
-System.out.println(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
         InputStream is = hc.getInputStream();
@@ -407,12 +405,10 @@ System.out.println(url);
         throws IOException, SAXException {
         URL postUrl = capabilities.getDescribeFeatureType().getPost();
 
-        //System.out.println("getSchemaPost -- post "+postUrl);
         if (postUrl == null) {
             return null;
         }
 
-        //System.out.println(postUrl);
         HttpURLConnection hc = getConnection(postUrl,auth,true);
 
         // write request
@@ -430,21 +426,6 @@ System.out.println(url);
         }
         if(uri!=null)
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
-
-
-//        // START DEBUG
-//        try {
-//            System.out.println("\n");
-//            System.out.println(postUrl);
-//            System.out.println("\n");
-//            DocumentWriter.writeDocument(new String[] { typeName },
-//                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
-//            System.out.println("\n");
-//        } catch (OperationNotSupportedException e) {
-//            WFSDataStoreFactory.logger.warning(e.toString());
-//            throw new SAXException(e);
-//        }
-//        // END DEBUG
         
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
@@ -556,7 +537,6 @@ System.out.println(url);
         }
 
         getUrl = new URL(url);
-System.out.println(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
         InputStream is = hc.getInputStream();
@@ -652,20 +632,6 @@ System.out.println(url);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
-
-//        // START DEBUG
-//        try {
-//            System.out.println("\n");
-//            System.out.println(postUrl);
-//            System.out.println("\n");
-//            DocumentWriter.writeDocument(query, WFSSchema.getInstance(), new OutputStreamWriter(System.out),
-//                hints);
-//            System.out.println("\n");
-//        } catch (OperationNotSupportedException e) {
-//            WFSDataStoreFactory.logger.warning(e.toString());
-//            throw new SAXException(e);
-//        }
-//        // END DEBUG
         
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
@@ -678,17 +644,8 @@ System.out.println(url);
         os.flush();
         os.close();
 
-        
-//        // DEBUG
-//        BufferedReader br = new BufferedReader(new InputStreamReader(hc.getInputStream()));
-//        while(br.ready()){
-//            System.out.println(br.readLine());
-//        }
-//        // END DEBUG
-
         BufferedInputStream is = new BufferedInputStream(hc.getInputStream());
         
-        // 	    System.out.println("ready?"+is.available());
         WFSTransactionState ts = null;
 
         if (!(transaction == Transaction.AUTO_COMMIT)) {
@@ -809,7 +766,7 @@ System.out.println(url);
                     try {
                         t = new ForceCoordinateSystemFeatureReader(t,query.getCoordinateSystem());
                     } catch (SchemaException e) {
-                        e.printStackTrace();
+                        WFSDataStoreFactory.logger.warning(e.toString());
                         t = tmp;
                     }
                 }else{
@@ -819,7 +776,7 @@ System.out.println(url);
                         try {
                             t = new ForceCoordinateSystemFeatureReader(t,crs);
                         } catch (SchemaException e) {
-                            e.printStackTrace();
+                            WFSDataStoreFactory.logger.warning(e.toString());
                             t = tmp;
                         }
                     }
@@ -897,7 +854,6 @@ System.out.println(url);
         WFSFilterVisitor wfsfv = new WFSFilterVisitor(capabilities
                 .getFilterCapabilities(), ft, state);
 
-//System.out.println("STARTING FILTER "+q.getFilter());
         q.getFilter().accept(wfsfv);
 
         Filter[] f = new Filter[2]; 

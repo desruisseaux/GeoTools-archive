@@ -81,7 +81,6 @@ public class XMLSAXHandler extends DefaultHandler {
      * @throws SAXException
      */
     public InputSource resolveEntity( String pubId, String sysId ) throws SAXException {
-//System.out.println("***"+pubId+"*"+sysId+"*");
         // avoid dtd files
 		if(sysId != null && sysId.endsWith("dtd")){
 		    return new InputSource(new StringReader(""));
@@ -159,7 +158,7 @@ public class XMLSAXHandler extends DefaultHandler {
             document = new DocumentHandler(ehf);
             handlers.push(document);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }
@@ -184,7 +183,7 @@ public class XMLSAXHandler extends DefaultHandler {
                 ((XMLElementHandler) handlers.peek()).characters(text);
             }
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.warning(e.toString());
             throw e;
         }
     }
@@ -212,7 +211,6 @@ public class XMLSAXHandler extends DefaultHandler {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-            e.printStackTrace();
             throw new SAXException(e);
         }
     }
@@ -314,7 +312,6 @@ public class XMLSAXHandler extends DefaultHandler {
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-            e.printStackTrace();
             throw new SAXException(e);
         }
     }

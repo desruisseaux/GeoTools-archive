@@ -4092,13 +4092,11 @@ public class GMLComplexTypes {
             Feature f;
             if ((nm != null) && nm.equals(element.getName())) {
                 f = getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(STREAM_HINT)).ft);
-//System.out.println(f.getID());
                 stream(f, (FCBuffer) hints.get(STREAM_HINT));
 
                 return null;
             }
             f = getFeature(element, value, attrs, hints, null);
-//System.out.println(f.getID());
             return f;
         }
 
@@ -4216,7 +4214,6 @@ public class GMLComplexTypes {
             FeatureType ft = createFeatureType(element);
                 featureTypeMappings.put(element.getType().getNamespace() + "#"
                     + element.getName(), ft);
-//System.out.println(ft);
                 return ft;
         }
 

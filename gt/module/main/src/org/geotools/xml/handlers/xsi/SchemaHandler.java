@@ -133,7 +133,6 @@ public class SchemaHandler extends XSIElementHandler {
             throw new SAXException(e);
         }
 
-        //System.out.println("NS = "+targetNamespace);
         if ((prefixCache != null) && (targetNamespace1 != null)
                 && (!targetNamespace1.equals(""))) {
             Iterator i = prefixCache.keySet().iterator();
@@ -633,11 +632,10 @@ public class SchemaHandler extends XSIElementHandler {
         }else{
             if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
+
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                 if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     SimpleType st = lookUpSimpleType(localName, s, new LinkedList());
@@ -750,11 +748,9 @@ public class SchemaHandler extends XSIElementHandler {
         }else{
             if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                 if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     ComplexType ct = lookUpComplexType(localName, s, new LinkedList());
@@ -863,7 +859,6 @@ public class SchemaHandler extends XSIElementHandler {
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                 if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     Element ct = lookupElement(localName, s, new LinkedList());
@@ -874,11 +869,9 @@ public class SchemaHandler extends XSIElementHandler {
             }}
         if(includes!=null){
             it = includes.iterator();
-//          System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
                       while (it.hasNext()) {
                           Schema s = (Schema) it.next();
                           String ns = s.getTargetNamespace().toString();
-//          System.out.println(ns);
                           String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                           if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                               Element ct = lookupElement(localName, s, new LinkedList());
@@ -980,11 +973,9 @@ public class SchemaHandler extends XSIElementHandler {
         }else{
             if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                 if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     Group ct = lookUpGroup(localName, s, new LinkedList());
@@ -1094,7 +1085,6 @@ public class SchemaHandler extends XSIElementHandler {
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
                 if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     AttributeGroup ct = lookUpAttributeGroup(localName, s, new LinkedList());

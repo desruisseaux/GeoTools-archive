@@ -79,8 +79,6 @@ public class ElementHandlerFactory {
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
         logger.finest("URI == '" + uri + "'");
-//System.out.println("Target == '" + targ + "'");
-//System.out.println("URI == '" + uri + "'");
 
         try {
             URI tns = new URI(targ);
@@ -109,7 +107,6 @@ public class ElementHandlerFactory {
     public void startPrefixMapping(String prefix, String targ)
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
-//      System.out.println("Target == '" + targ + "' prefix = "+prefix);
 
         try {
             URI tns = new URI(targ);
@@ -161,8 +158,6 @@ public class ElementHandlerFactory {
     public XMLElementHandler createElementHandler(URI namespaceURI,
         String localName) throws SAXException {
 
-//System.out.println("making $"+namespaceURI+"$ -> "+localName);
-
         if (localName == null) {
             return null;
         }
@@ -171,7 +166,6 @@ public class ElementHandlerFactory {
             namespaceURI = defaultNS;
         }
 
-//System.out.println("making pt2 $"+namespaceURI+"$ -> "+localName + " ("+defaultNS+")");
         logger.finest("Trying to create an element handler for " + localName
             + " :: " + namespaceURI);
 

@@ -1278,12 +1278,10 @@ public class WFSCapabilitiesComplexTypes {
                         if(j>0){
                             // we have a ns prefix
                             String prefix = fsd.getName().substring(0,j);
-//System.out.println("PREFIX FOR FT = "+prefix+ " -- " + fsd.getName());
                             if(hints != null && hints.containsKey(ElementHandlerFactory.KEY)){
                                 ElementHandlerFactory ehf = (ElementHandlerFactory)hints.get(ElementHandlerFactory.KEY);
                                 fsd.setNamespace(ehf.getNamespace(prefix));
                             }
-//System.out.println("NS FOR FT = "+(fsd.getNamespace()==null?"null":fsd.getNamespace().toString()));
                         }
                     }
                 } else {
@@ -1979,7 +1977,6 @@ public class WFSCapabilitiesComplexTypes {
             Service service = new Service();
 
             for (int i = 0; i < value.length; i++) {
-                //System.out.println(value[i].getElement().getName());
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     service.setName((String) value[i].getValue());
                 }
@@ -2232,13 +2229,6 @@ public class WFSCapabilitiesComplexTypes {
             if (name == null) {
                 return null;
             }
-
-            //System.out.println("Looking for : "+name);
-            //
-            //            for (int i = 0; i < elements.length; i++)
-            //                if (name.equals(elements[i].getName())) {
-            //                    return elements[i];
-            //                }
             return seq.findChildElement(name);
         }
 

@@ -260,10 +260,8 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         if ((nillable1 == null) || "".equalsIgnoreCase(nillable1)) {
             this.nillable = false;
         } else {
-            //System.out.print("Parse Nill "+nillable+" : ");
             this.nillable = Boolean.valueOf(nillable1).booleanValue();
 
-            //System.out.println(this.nillable+" : "+name);
         }
 
         // ref

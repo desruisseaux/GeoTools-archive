@@ -138,7 +138,7 @@ public class DocumentFactory {
         try {
             parser.parse(is, xmlContentHandler);
         } catch (IOException e) {
-//e.printStackTrace();
+            XMLSAXHandler.logger.warning(e.toString());
             throw new SAXException(e);
         }
 

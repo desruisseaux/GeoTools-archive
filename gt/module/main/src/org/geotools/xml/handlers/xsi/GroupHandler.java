@@ -208,11 +208,8 @@ public class GroupHandler extends ElementGroupingHandler {
         cache.max = this.maxOccurs;
         cache.child = (this.child == null) ? null
               : this.child.compress(parent); // deal with all/choice/sequnce
-//System.out.println("***** "+name+":::"+child);
         if (ref != null) {
-//System.out.println("Group Ref = "+ref);
             Group g = parent.lookUpGroup(ref);
-//System.out.println("GroupHandler.compress()" + (g==null?"null":g.getClass().getName()));
             if (g != null) {
                 if ((id == null) || "".equalsIgnoreCase(id)) {
                     id = g.getId();
@@ -226,7 +223,6 @@ public class GroupHandler extends ElementGroupingHandler {
                 cache.child = (g.getChild() == null) ? cache.child : g.getChild();
             }
         }
-//System.out.println("$$$$$");
 
         child = null;
 
