@@ -24,9 +24,9 @@ import org.opengis.catalog.CatalogEntry;
 
 public interface DataStoreFactorySpi extends Factory, CatalogEntry {
 
-    public static final String DESCRIPTION_KEY = "org.geotools.data.DataStoreFactorySpi.DESCRIPTION_KEY";
-    public static final String NAME_KEY = "org.geotools.data.DataStoreFactorySpi.NAME_KEY";
-    public static final String ISAVAILABLE_KEY = "org.geotools.data.DataStoreFactorySpi.ISAVAILABLE_KEY";
+    public static final String DESCRIPTION_KEY = "org.geotools.data.feature.DataStoreFactorySpi.DESCRIPTION_KEY";
+    public static final String NAME_KEY = "org.geotools.feature.data.DataStoreFactorySpi.NAME_KEY";
+    public static final String ISAVAILABLE_KEY = "org.geotools.data.feature.DataStoreFactorySpi.ISAVAILABLE_KEY";
     
     DataStore createDataStore(ParamValues params) throws IOException;
    

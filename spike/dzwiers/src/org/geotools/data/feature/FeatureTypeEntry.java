@@ -26,7 +26,7 @@ import org.opengis.catalog.CatalogEntry;
  * @author dzwiers
  */
 public interface FeatureTypeEntry extends CatalogEntry {
-    public static final String FeatureTypeKey = "org.geotools.data.FeatureTypeEntry.FeatureTypeKey";
+    public static final String FeatureTypeKey = "org.geotools.data.feature.FeatureTypeEntry.FeatureTypeKey";
     
     // same as (FeatureType)getMetaData(FeatureTypeEntry.FeatureTypeKey)
     FeatureType getFeatureType();

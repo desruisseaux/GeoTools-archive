@@ -11,8 +11,8 @@ import org.opengis.catalog.CatalogEntry;
  */
 public interface FeatureFormatFactorySpi extends Factory, CatalogEntry {
 
-    public static final String DESCRIPTION_KEY = "org.geotools.data.DataFormatFactorySpi.DESCRIPTION_KEY";
-    public static final String NAME_KEY = "org.geotools.data.DataFormatFactorySpi.NAME_KEY";
+    public static final String DESCRIPTION_KEY = "org.geotools.data.feature.DataFormatFactorySpi.DESCRIPTION_KEY";
+    public static final String NAME_KEY = "org.geotools.data.feature.DataFormatFactorySpi.NAME_KEY";
 
     FeatureTypeEntry createFeatureFormat(ParamValues params) throws IOException;
    
