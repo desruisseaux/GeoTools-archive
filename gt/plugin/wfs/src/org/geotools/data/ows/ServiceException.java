@@ -36,6 +36,7 @@ public class ServiceException extends SAXException {
     private String locator = null;
 
     private ServiceException() {
+        super("");
     	// should not be called
     }
 

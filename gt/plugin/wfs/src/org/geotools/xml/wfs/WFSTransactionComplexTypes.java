@@ -230,7 +230,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -412,7 +412,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -602,7 +602,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -750,7 +750,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -870,7 +870,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -1016,7 +1016,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -1158,7 +1158,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -1281,7 +1281,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
@@ -1398,7 +1398,7 @@ public class WFSTransactionComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+            throw new SAXNotSupportedException("");
         }
 
         /**
