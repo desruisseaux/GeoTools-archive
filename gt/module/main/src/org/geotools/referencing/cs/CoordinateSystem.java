@@ -159,14 +159,7 @@ public class CoordinateSystem extends Info implements org.opengis.referencing.cs
         }
         if (super.equals(object, compareMetadata)) {
             final CoordinateSystem that = (CoordinateSystem) object;
-            if (axis.length == that.axis.length) {
-                for (int i=0; i<axis.length; i++) {
-                    if (!equals(axis[i], that.axis[i], compareMetadata)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+            return equals(this.axis, that.axis, compareMetadata);
         }
         return false;
     }

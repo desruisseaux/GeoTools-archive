@@ -373,6 +373,33 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
         if (!(object2 instanceof Info)) return equals(object2, object1);
         return equals((Info)object1, (Info)object2, compareMetadata);
     }
+
+    /**
+     * Compare two array of OpenGIS's <code>Info</code> objects for equality. This convenience
+     * method is provided for implementation of <code>equals</code> in subclasses.
+     *
+     * @param  array1 The first array to compare (may be <code>null</code>).
+     * @param  array2 The second array to compare (may be <code>null</code>).
+     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
+     *         <code>false</code> for comparing only properties relevant to transformations.
+     * @return <code>true</code> if both arrays are equal.
+     */
+    protected static boolean equals(final org.opengis.referencing.Info[] array1,
+                                    final org.opengis.referencing.Info[] array2,
+                                    final boolean compareMetadata)
+    {
+        if (array1 != array2) {
+            if (array1==null || array2==null || array1.length!=array2.length) {
+                return false;
+            }
+            for (int i=array1.length; --i>=0;) {
+                if (!equals(array1[i], array2[i], compareMetadata)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     
     /**
      * Makes sure that an argument is non-null. This is a

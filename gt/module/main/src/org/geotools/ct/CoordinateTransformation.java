@@ -65,6 +65,8 @@ import java.lang.ref.Reference;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.ct.CT_CoordinateTransformation
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation}.
  */
 public class CoordinateTransformation extends Info {
     /**
@@ -158,6 +160,8 @@ public class CoordinateTransformation extends Info {
      * Gets the name of this coordinate transformation.
      *
      * @param locale The desired locale, or <code>null</code> for the default locale.
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getName}.
      */
     public String getName(final Locale locale) {
         final String name = super.getName(locale);
@@ -174,6 +178,8 @@ public class CoordinateTransformation extends Info {
      * Gets the source coordinate system.
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getSourceCS()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getSourceCRS}.
      */
     public CoordinateSystem getSourceCS() {
         return sourceCS;
@@ -183,6 +189,8 @@ public class CoordinateTransformation extends Info {
      * Gets the target coordinate system.
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getTargetCS()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getTargetCRS}.
      */
     public CoordinateSystem getTargetCS() {
         return targetCS;
@@ -193,6 +201,10 @@ public class CoordinateTransformation extends Info {
      * For example, a datum transformation or a coordinate conversion.
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getTransformType()
+     *
+     * @deprecated No direct replacement. Check for instance of
+     *             {@link org.geotools.referencing.operation.Conversion} or
+     *             {@link org.geotools.referencing.operation.Transformation} instead.
      */
     public TransformType getTransformType() {
         return type;
@@ -203,6 +215,8 @@ public class CoordinateTransformation extends Info {
      * the source coordinate system into positions in the target coordinate system.
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getMathTransform()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getMathTransform}.
      */
     public MathTransform getMathTransform() {
         if (transform!=null) {

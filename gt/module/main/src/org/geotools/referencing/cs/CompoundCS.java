@@ -146,14 +146,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
         }
         if (super.equals(object, compareMetadata)) {
             final CompoundCS that = (CompoundCS) object;
-            if (this.cs.length == that.cs.length) {
-                for (int i=0; i<cs.length; i++) {
-                    if (!equals(this.cs[i], that.cs[i], compareMetadata)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+            return equals(this.cs, that.cs, compareMetadata);
         }
         return false;
     }

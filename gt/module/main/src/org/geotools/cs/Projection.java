@@ -60,11 +60,13 @@ import java.rmi.RemoteException;
 /**
  * A projection from geographic coordinates to projected coordinates.
  *
- * @version $Id: Projection.java,v 1.19 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_Projection
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.Projection}.
  */
 public class Projection extends Info {
     /**
@@ -217,6 +219,8 @@ public class Projection extends Info {
      *
      * @see org.opengis.cs.CS_Projection#getNumParameters()
      * @see org.opengis.cs.CS_Projection#getParameter(int)
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.Projection#getParameterValues}.
      */
     public ParameterList getParameters() {
         return clone(parameters);

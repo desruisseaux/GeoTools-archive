@@ -127,14 +127,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
         }
         if (super.equals(object, compareMetadata)) {
             final CompoundCRS that = (CompoundCRS) object;
-            if (this.crs.length == that.crs.length) {
-                for (int i=0; i<crs.length; i++) {
-                    if (!equals(this.crs[i], that.crs[i], compareMetadata)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+            return equals(this.crs, that.crs, compareMetadata);
         }
         return false;
     }
