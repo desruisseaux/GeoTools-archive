@@ -4,15 +4,12 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.coverage;
+package org.geotools.gce.image;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import junit.framework.TestCase;
-
-import org.geotools.coverage.WorldImageFormat;
 
 
 /**

@@ -4,11 +4,10 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.coverage;
+package org.geotools.gce.image;
 
 import java.io.File;
 import java.io.IOException;
-
 import junit.framework.TestCase;
 
 import org.geotools.gc.GridCoverage;
