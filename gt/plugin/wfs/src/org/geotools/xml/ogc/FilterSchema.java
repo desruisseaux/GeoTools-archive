@@ -40,6 +40,7 @@ import org.geotools.xml.ogc.FilterOpsComplexTypes.UpperBoundaryType;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
@@ -65,78 +66,78 @@ public class FilterSchema implements Schema {
     private static Element[] elements = loadElements();
     
     private static Element[] loadElements(){
-        Element comparisonOps = new DefaultElement("comparisonOps",ComparisonOpsType.getInstance()){
+        Element comparisonOps = new FilterElement("comparisonOps",ComparisonOpsType.getInstance()){
             public boolean isAbstract(){
                 return true;
             }
         };
-        Element spatialOps = new DefaultElement("spatialOps",SpatialOpsType.getInstance()){
+        Element spatialOps = new FilterElement("spatialOps",SpatialOpsType.getInstance()){
             public boolean isAbstract(){
                 return true;
             }
         };
-        Element logicOps = new DefaultElement("logicOps",LogicOpsType.getInstance()){
+        Element logicOps = new FilterElement("logicOps",LogicOpsType.getInstance()){
             public boolean isAbstract(){
                 return true;
             }
         };
-        Element expression = new DefaultElement("expression",ExpressionType.getInstance()){
+        Element expression = new FilterElement("expression",ExpressionType.getInstance()){
             public boolean isAbstract(){
                 return true;
             }
         };
         elements = new Element[] {
             // filterCapabilities -- many labels have been excluded here
-            new DefaultElement("Filter_Capabilities",Filter_CapabilitiesType.getInstance()), // 0
+            new FilterElement("Filter_Capabilities",Filter_CapabilitiesType.getInstance()), // 0
             
             // filter
-            new DefaultElement("FeatureId",FeatureIdType.getInstance(),comparisonOps),
-            new DefaultElement("Filter",FilterType.getInstance(),comparisonOps), //2
+            new FilterElement("FeatureId",FeatureIdType.getInstance(),comparisonOps),
+            new FilterElement("Filter",FilterType.getInstance(),comparisonOps), //2
             
             // COMPARISON OPERATORS
             comparisonOps,
-            new DefaultElement("PropertyIsEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsNotEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsLessThan",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsGreaterThan",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsLessThanOrEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsGreaterThanOrEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsLike",PropertyIsLikeType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsNull",PropertyIsNullType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsBetween",PropertyIsBetweenType.getInstance(),comparisonOps), //12
+            new FilterElement("PropertyIsEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsNotEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsLessThan",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsGreaterThan",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsLessThanOrEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsGreaterThanOrEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsLike",PropertyIsLikeType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsNull",PropertyIsNullType.getInstance(),comparisonOps),
+            new FilterElement("PropertyIsBetween",PropertyIsBetweenType.getInstance(),comparisonOps), //12
             
             // SPATIAL OPERATORS
             spatialOps,
-            new DefaultElement("Equals",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Disjoint",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Touches",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Within",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Overlaps",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Crosses",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Intersects",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("Contains",BinarySpatialOpType.getInstance(),spatialOps),
-            new DefaultElement("DWithin",DistanceBufferType.getInstance(),spatialOps),
-            new DefaultElement("Beyond",DistanceBufferType.getInstance(),spatialOps),
-            new DefaultElement("BBOX",BBOXType.getInstance(),spatialOps), // 24
+            new FilterElement("Equals",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Disjoint",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Touches",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Within",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Overlaps",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Crosses",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Intersects",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("Contains",BinarySpatialOpType.getInstance(),spatialOps),
+            new FilterElement("DWithin",DistanceBufferType.getInstance(),spatialOps),
+            new FilterElement("Beyond",DistanceBufferType.getInstance(),spatialOps),
+            new FilterElement("BBOX",BBOXType.getInstance(),spatialOps), // 24
             
             // LOGICAL OPERATORS
             logicOps,
-            new DefaultElement("And",BinaryLogicOpType.getInstance(),logicOps),
-            new DefaultElement("Or",BinaryLogicOpType.getInstance(),logicOps),
-            new DefaultElement("Not",UnaryLogicOpType.getInstance(),logicOps), // 28
+            new FilterElement("And",BinaryLogicOpType.getInstance(),logicOps),
+            new FilterElement("Or",BinaryLogicOpType.getInstance(),logicOps),
+            new FilterElement("Not",UnaryLogicOpType.getInstance(),logicOps), // 28
             
             // expr
             expression,
-            new DefaultElement("Add",BinaryOperatorType.getInstance(),expression),
-            new DefaultElement("Sub",BinaryOperatorType.getInstance(),expression),
-            new DefaultElement("Mul",BinaryOperatorType.getInstance(),expression),
-            new DefaultElement("Div",BinaryOperatorType.getInstance(),expression),
-            new DefaultElement("PropertyName",PropertyNameType.getInstance(),expression),
-            new DefaultElement("Function",FunctionType.getInstance(),expression),
-            new DefaultElement("Literal",LiteralType.getInstance(),expression), // 36
+            new FilterElement("Add",BinaryOperatorType.getInstance(),expression),
+            new FilterElement("Sub",BinaryOperatorType.getInstance(),expression),
+            new FilterElement("Mul",BinaryOperatorType.getInstance(),expression),
+            new FilterElement("Div",BinaryOperatorType.getInstance(),expression),
+            new FilterElement("PropertyName",PropertyNameType.getInstance(),expression),
+            new FilterElement("Function",FunctionType.getInstance(),expression),
+            new FilterElement("Literal",LiteralType.getInstance(),expression), // 36
             
             // exception
-            new DefaultElement("ServiceExceptionReport",ServiceExceptionReportType.getInstance())
+            new FilterElement("ServiceExceptionReport",ServiceExceptionReportType.getInstance())
         };
         return elements;
     }
@@ -311,17 +312,63 @@ public class FilterSchema implements Schema {
         return true;
     }
     
-    static class DefaultElement implements Element{
+    static class FilterAttribute extends DefaultAttribute{
+
+		/**
+		 * @param id
+		 * @param name
+		 * @param namespace
+		 * @param type
+		 * @param use
+		 * @param defaulT
+		 * @param fixed
+		 * @param form
+		 */
+		public FilterAttribute(String name,SimpleType type) {
+			super(null, name, NAMESPACE, type, 0, null, null, false);
+		}
+
+		/**
+		 * @param id
+		 * @param name
+		 * @param namespace
+		 * @param type
+		 * @param use
+		 * @param defaulT
+		 * @param fixed
+		 * @param form
+		 */
+		public FilterAttribute(String name, SimpleType type, int use) {
+			super(null, name, NAMESPACE, type, use, null, null, false);
+		}
+
+		/**
+		 * @param id
+		 * @param name
+		 * @param namespace
+		 * @param type
+		 * @param use
+		 * @param defaulT
+		 * @param fixed
+		 * @param form
+		 */
+		public FilterAttribute(String name, SimpleType type, int use, String defaulT, String fixed, boolean form) {
+			super(null, name, NAMESPACE, type, use, defaulT, fixed, form);
+		}
+    	
+    }
+    
+    static class FilterElement implements Element{
         
         private String name;
         private Type type;
         private Element substitutionGroup;
         
-        public DefaultElement(String name, Type type){
+        public FilterElement(String name, Type type){
             this.name = name;this.type = type;
         }
         
-        public DefaultElement(String name, Type type, Element substitutionGroup){
+        public FilterElement(String name, Type type, Element substitutionGroup){
             this.name = name;this.type = type;
             this.substitutionGroup = substitutionGroup;
         }

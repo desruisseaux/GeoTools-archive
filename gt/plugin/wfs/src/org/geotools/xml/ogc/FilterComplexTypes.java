@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FilterCapabilities;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
@@ -21,8 +23,8 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
-import org.geotools.xml.ogc.FilterSchema.DefaultElement;
 import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
+import org.geotools.xml.ogc.FilterSchema.FilterElement;
 
 /**
  * <p> 
@@ -37,8 +39,8 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
         
         private static Element[] elements = {
-                new DefaultElement("Simple_Arithmetic",EmptyType.getInstance()),
-                new DefaultElement("Functions",FunctionsType.getInstance())
+                new FilterElement("Simple_Arithmetic",EmptyType.getInstance()),
+                new FilterElement("Functions",FunctionsType.getInstance())
         };
         private static Choice choice = new DefaultChoice(elements){
             public int getMaxOccurs(){
@@ -104,10 +106,10 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
        
         private static Element[] elements = {
-                new DefaultElement("Simple_Comparisons",EmptyType.getInstance()),
-                new DefaultElement("Like",EmptyType.getInstance()),
-                new DefaultElement("Between",EmptyType.getInstance()),
-                new DefaultElement("NullCheck",EmptyType.getInstance()),
+                new FilterElement("Simple_Comparisons",EmptyType.getInstance()),
+                new FilterElement("Like",EmptyType.getInstance()),
+                new FilterElement("Between",EmptyType.getInstance()),
+                new FilterElement("NullCheck",EmptyType.getInstance()),
         };
         
         private static Choice choice = new DefaultChoice(elements) {
@@ -229,7 +231,7 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
 
         private static Element[] elements = new Element[] {
-                new DefaultElement("Function_Name", Function_NameType.getInstance()),
+                new FilterElement("Function_Name", Function_NameType.getInstance()),
         };
         private static Sequence seq = new DefaultSequence(elements){
             public int getMaxOccurs(){
@@ -286,7 +288,7 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
 
         private static Element[] elements = new Element[] {
-               new DefaultElement("Function_Names",Function_NamesType.getInstance()),
+               new FilterElement("Function_Names",Function_NamesType.getInstance()),
         };
         private static Sequence seq = new DefaultSequence(elements);
         /**
@@ -339,8 +341,8 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
         
         private static Element[] elements = new Element[]{
-                new DefaultElement("Spatial_Capabilities", Spatial_CapabilitiesType.getInstance()),
-                new DefaultElement("Scalar_Capabilities", Scalar_CapabilitiesType.getInstance())
+                new FilterElement("Spatial_Capabilities", Spatial_CapabilitiesType.getInstance()),
+                new FilterElement("Scalar_Capabilities", Scalar_CapabilitiesType.getInstance())
         };
         
         private static Sequence seq = new DefaultSequence(elements);
@@ -425,9 +427,9 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
         
         private static Element[] elements = {
-                new DefaultElement("Logical_Operators",EmptyType.getInstance()),
-                new DefaultElement("Comparison_Operators",Comparison_OperatorsType.getInstance()),
-                new DefaultElement("Arithmetic_Operators",Arithmetic_OperatorsType.getInstance()),
+                new FilterElement("Logical_Operators",EmptyType.getInstance()),
+                new FilterElement("Comparison_Operators",Comparison_OperatorsType.getInstance()),
+                new FilterElement("Arithmetic_Operators",Arithmetic_OperatorsType.getInstance()),
         };
 
         private static Choice choice = new DefaultChoice(elements){
@@ -508,7 +510,7 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
         
         private static Element[] elements = {
-                new DefaultElement("Spatial_Operators",Spatial_OperatorsType.getInstance()),
+                new FilterElement("Spatial_Operators",Spatial_OperatorsType.getInstance()),
         };
         private static Sequence seq = new DefaultSequence(elements);
         
@@ -566,17 +568,17 @@ public class FilterComplexTypes {
         public static ComplexType getInstance(){return instance;}
 
         private static Element[] elements = {
-                new DefaultElement("BBOX",EmptyType.getInstance()),
-                new DefaultElement("Equals",EmptyType.getInstance()),
-                new DefaultElement("Disjoint",EmptyType.getInstance()),
-                new DefaultElement("Intersect",EmptyType.getInstance()),
-                new DefaultElement("Touches",EmptyType.getInstance()),
-                new DefaultElement("Crosses",EmptyType.getInstance()),
-                new DefaultElement("Within",EmptyType.getInstance()),
-                new DefaultElement("Contains",EmptyType.getInstance()),
-                new DefaultElement("Overlaps",EmptyType.getInstance()),
-                new DefaultElement("Beyond",EmptyType.getInstance()),
-                new DefaultElement("DWithin",EmptyType.getInstance())
+                new FilterElement("BBOX",EmptyType.getInstance()),
+                new FilterElement("Equals",EmptyType.getInstance()),
+                new FilterElement("Disjoint",EmptyType.getInstance()),
+                new FilterElement("Intersect",EmptyType.getInstance()),
+                new FilterElement("Touches",EmptyType.getInstance()),
+                new FilterElement("Crosses",EmptyType.getInstance()),
+                new FilterElement("Within",EmptyType.getInstance()),
+                new FilterElement("Contains",EmptyType.getInstance()),
+                new FilterElement("Overlaps",EmptyType.getInstance()),
+                new FilterElement("Beyond",EmptyType.getInstance()),
+                new FilterElement("DWithin",EmptyType.getInstance())
         };
         private static Choice choice = new DefaultChoice(elements){
             public int getMaxOccurs(){
@@ -640,6 +642,7 @@ public class FilterComplexTypes {
         }
     }
     public static class ExpressionType extends FilterComplexType{
+//    	<xsd:complexType name="ExpressionType" abstract="true"/>
         private static final ComplexType instance = new ExpressionType();
         public static ComplexType getInstance(){return instance;}
         
@@ -647,14 +650,12 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -674,15 +675,13 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Expression.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
