@@ -24,18 +24,12 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterGroupDescriptor;
-import org.geotools.parameter.ParameterValue;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.geotools.data.coverage.grid.Format;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.awt.Color;
@@ -194,8 +188,8 @@ public class ArcGridReader implements GridCoverageReader {
             GRASS = false;
         }
         else {
-            compress = parameters.getValue( "Compressed" ).booleanValue();
-            GRASS = parameters.getValue( "GRASS" ).booleanValue();
+            compress = parameters.parameter( "Compressed" ).booleanValue();
+            GRASS = parameters.parameter( "GRASS" ).booleanValue();
         }              
         if ( compress )
             mReader= mExchange.getGZIPReader(mSource);
@@ -204,17 +198,17 @@ public class ArcGridReader implements GridCoverageReader {
 
     }
     boolean parseBoolean( ParameterValueGroup params, String name ){
-        OperationParameterGroup info = getFormat().getReadParameters();        
+        ParameterValueGroup info = getFormat().getReadParameters();        
         if( params == null ){
             throw new InvalidParameterValueException(
                     "A Parameter group was expected",
                     null, null );            
         }
-        OperationParameter targetInfo = info.getParameter( name );
+        ParameterValue targetInfo = info.parameter( name );
         if( targetInfo == null ){
             throw new InvalidParameterNameException( name, "Not a ArcGrid paramerter" );
         }
-        org.opengis.parameter.ParameterValue target = params.getValue( name );
+        org.opengis.parameter.ParameterValue target = params.parameter( name );
         if (target == null ){
             throw new InvalidParameterValueException(
                     "Parameter "+name+ "is requried",
