@@ -137,6 +137,7 @@ public class WFSTransactionState implements State {
         }
 
         fids = tr.getInsertResult().getFids();
+        actions = new LinkedList();
     }
 
     private TransactionResult commitPost()
@@ -194,7 +195,7 @@ public class WFSTransactionState implements State {
 
         TransactionResult ft = (TransactionResult) DocumentFactory.getInstance(is,
                 hints, Level.WARNING);
-System.out.println("RESULT IS NULL? "+(ft == null));
+//System.out.println("RESULT IS NULL? "+(ft == null));
         return ft;
     }
 

@@ -713,7 +713,7 @@ public class FilterOpsComplexTypes {
                 } else {
                     if (filter instanceof FidFilter) {
                         //deal with multi instance inside the type-writer
-                        elems[4].getType().encode(elems[4], filter, output,
+                        elems[3].getType().encode(elems[3], filter, output,
                             hints);
                     } else {
                         if (filter instanceof GeometryFilter) {

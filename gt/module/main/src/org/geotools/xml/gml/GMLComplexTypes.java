@@ -83,7 +83,7 @@ import javax.naming.OperationNotSupportedException;
  * @version $Revision: 1.9 $
  *
  * @see GMLSchema
- * @see CompleType
+ * @see ComplexType
  */
 public class GMLComplexTypes {
     // used for debugging
@@ -2699,7 +2699,8 @@ public class GMLComplexTypes {
                 throw new OperationNotSupportedException("Cannot encode");
             }
 
-            Geometry g = (Geometry) value;
+            Geometry g = null;
+            	g=(Geometry) value;
 
             AttributesImpl ai = new AttributesImpl();
 
@@ -4501,10 +4502,11 @@ public class GMLComplexTypes {
         }
 
         private FeatureCollection getCollection(ElementValue[] value) {
-            FeatureCollection fc = FeatureCollections.newCollection();
-
+            //bbox slot
+            GMLFeatureCollection fc = new GMLFeatureCollection(((Geometry)value[0].getValue()).getEnvelopeInternal());
+            
+            
             for (int i = 1; i < value.length; i++) // bbox is slot 0
-
                 fc.add(value[i].getValue());
 
             return fc;
@@ -4559,7 +4561,8 @@ public class GMLComplexTypes {
                 t = (t.getParent() instanceof ComplexType)
                     ? (ComplexType) t.getParent() : null;
 
-            return ((t != null) && (value instanceof FeatureCollection));
+            return ((t != null) && (value instanceof FeatureCollection)
+            		&& ((FeatureCollection)value).getBounds()!=null);
         }
 
         /**
@@ -4584,8 +4587,15 @@ public class GMLComplexTypes {
             FeatureCollection fc = (FeatureCollection) value;
 
             if (fc.getBounds() != null) {
+            	Envelope e = fc.getBounds();
+            	Geometry g = (new GeometryFactory()).toGeometry(e);
+            	// start -- not sure if this is required ... not for gt
+//            	FeatureIterator fi = fc.features();
+//            	g.setUserData();
                 BoundingShapeType.getInstance().encode(null, fc.getBounds(),
                     output, hints);
+            }else{
+            	throw new IOException("Bounding box required for the FeatureCollection");
             }
 
             FeatureIterator i = fc.features();
@@ -5143,27 +5153,17 @@ public class GMLComplexTypes {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
 
-                if (element.findChildElement("Box") != null) {
-                    if (element.findChildElement("Box").getType().canEncode(element
-                                .findChildElement("Box"), value, hints)) {
-                        element.findChildElement("Box").getType().encode(element
-                            .findChildElement("Box"), value, output, hints);
-                    }
-                }else{
-                    if(element.getType() instanceof ComplexType){
-                        ComplexType ct = (ComplexType)element.getType();
-                        Element[] elems = ct.getChildElements();
-                        if(elems!=null)
-                        for(int i=0;i<elems.length;i++)
-                            if(elems[i].getType().canEncode(elems[i],value,hints)){
-                                elems[i].getType().encode(elems[i],value,output,hints);
-                                i = elems.length;
-                            }
-                    }
-                    // otherwise don't encode
-                }
+//                if (element.findChildElement("Box") != null) {
+//                    if (element.findChildElement("Box").getType().canEncode(element
+//                                .findChildElement("Box"), value, hints)) {
+//                        element.findChildElement("Box").getType().encode(element
+//                            .findChildElement("Box"), value, output, hints);
+//                    }
+//                }else{
+                	BoxType.getInstance().encode(null, value, output, hints);
+//                }
 
-                BoxType.getInstance().encode(null, value, output, hints);
+//                BoxType.getInstance().encode(null, value, output, hints);
                 output.endElement(element.getNamespace(), element.getName());
             }
         }

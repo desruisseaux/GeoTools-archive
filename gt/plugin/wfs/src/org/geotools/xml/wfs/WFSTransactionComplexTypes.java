@@ -32,6 +32,7 @@ import org.geotools.xml.PrintHandler;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema;
+import org.geotools.xml.ogc.FilterSchema.FilterElement;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.Choice;
@@ -2167,8 +2168,11 @@ public class WFSTransactionComplexTypes {
         //	      <xsd:attribute name="handle" type="xsd:string" use="optional"/>
         //	   </xsd:complexType>
         private static Element[] elems = new Element[] {
-                FilterSchema.getInstance().getElements()[1],
-				// TODO fix this for max elements
+                new FilterElement(FilterSchema.getInstance().getElements()[1].getName(), FilterSchema.getInstance().getElements()[1].getType(), FilterSchema.getInstance().getElements()[1].getSubstitutionGroup()){
+                	public int getMaxOccurs(){
+                		return Integer.MAX_VALUE;
+                	}
+                },
             };
         private static Sequence child = new DefaultSequence(null, elems, 1,
                 Integer.MAX_VALUE);

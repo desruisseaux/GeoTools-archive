@@ -215,6 +215,7 @@ public class WFSFeatureReader extends FCBuffer {
                             i++;
                         }
                     }
+                    insertSearchIndex++;
                 }
             }
         }

@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -93,7 +94,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	while(fr.hasNext()){
     		count3 ++; fr.next();
     	}
-    	assertTrue(count2==count3);
+    	assertTrue("Read 1 == "+count1+", Read 2 == "+count2+" but Read 3 = "+count3,count2==count3);
     	
     	WFSTransactionState ts = (WFSTransactionState)t.getState(ds);
     	FidFilter ff = FilterFactory.createFilterFactory().createFidFilter();
@@ -117,16 +118,20 @@ public class WFSDataStoreWriteTest extends TestCase {
     		count1 ++; fr.next();
     	}
 
-    	System.out.println("Delete Remove");
+    	System.out.println("Delete Remove "+ff);
     	fs.removeFeatures(ff);
 
     	System.out.println("Delete Read 2");
     	fr = fs.getFeatures().reader();
     	int count2 = 0;
     	while(fr.hasNext()){
-    		count2 ++; fr.next();
+    		count2 ++;
+    		if(count2<5)
+    			System.out.println("# == "+count2+" "+fr.next().getID());
+    		else
+    			fr.next();
     	}
-    	assertTrue(count2>count1);
+    	assertTrue("Read 1 == "+count1+" Read 2 == "+count2,count2<count1);
 
     	System.out.println("Delete Commit");
     	t.commit();
@@ -227,6 +232,18 @@ public class WFSDataStoreWriteTest extends TestCase {
         
         FeatureReader inserts = DataUtilities.reader(new Feature[] {f});
         FidFilter fp = doInsert(post,ft,inserts);
+        // geoserver does not return the correct fid here ... 
+        // get the 3rd feature ... and delete it?
+        
+        inserts.close();
+        inserts = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);
+        int i = 0;
+        while(inserts.hasNext() && i<3){
+        	f = inserts.next();i++;
+        }
+        inserts.close();
+        fp = FilterFactory.createFilterFactory().createFidFilter(f.getID());
+        
         doDelete(post,ft,fp);
         doUpdate(post,ft);
     }

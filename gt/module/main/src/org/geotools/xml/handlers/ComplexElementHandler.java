@@ -185,19 +185,24 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         int i = 0;
-        boolean changed = true;
-
-        for (;
-                (i < elements.size()) && changed
-                && (i < type.getChild().getMaxOccurs());) {
-            int t = i;
-            i = valid(type.getChild(), i);
-            changed = (t != i);
+        int count =0;
+        int[] i2 = new int[2];i2[1]=1;
+        while(i<elements.size() && i2[1] == 1){
+        	i2[0] = i;i2[1] = 0;
+            i2 = valid(type.getChild(), i);
+            if( i2[1] == 0 && i == i2[0] ){
+            	// done running
+            	if (count < type.getChild().getMinOccurs()) {
+            		throw new SAXException("Too few elements declared for "
+                        + type.getName());
+                }
+            }else{
+            	i = i2[0];count++;
+            }
         }
-
-        if (i < type.getChild().getMinOccurs()) {
-            throw new SAXException("Too few elements declared for "
-                + type.getName());
+        if(count > type.getChild().getMaxOccurs()){
+    		throw new SAXException("Too many elements declared for "
+                    + type.getName());
         }
 
         if (i != elements.size()) {
@@ -211,9 +216,9 @@ public class ComplexElementHandler extends XMLElementHandler {
      * The index is the starting index in the list of elements, for the particular
      * ElementGrouping. The last index matched is returned.
      */
-    private int valid(ElementGrouping eg, int index) throws SAXException {
+    private int[] valid(ElementGrouping eg, int index) throws SAXException {
         if (eg == null) {
-            return index;
+            return new int[]{index,1};
         }
 
         switch (eg.getGrouping()) {
@@ -236,14 +241,14 @@ public class ComplexElementHandler extends XMLElementHandler {
             return valid((Element) eg, index);
         }
 
-        return index;
+        return new int[]{index,1};
     }
 
     /*
      * Validates an All tag
      * @see valid(ElementGrouping)
      */
-    private int valid(All all, int index) throws SAXException {
+    private int[] valid(All all, int index) throws SAXException {
         Element[] elems = all.getElements();
         int[] r = new int[elems.length];
 
@@ -251,15 +256,15 @@ public class ComplexElementHandler extends XMLElementHandler {
             r[i] = 0;
 
         boolean c = true;
-
+        int head = index;
         while (c) {
             c = false;
 
             for (int i = 0; i < elems.length; i++) {
                 if (elems[i].getType().getName().equalsIgnoreCase(((XMLElementHandler) elements
-                            .get(index)).getName())) {
+                            .get(head)).getName())) {
                     r[i]++;
-                    index++;
+                    head++;
                     i = elems.length;
                     c = true;
                 }
@@ -269,58 +274,78 @@ public class ComplexElementHandler extends XMLElementHandler {
         for (int i = 0; i < r.length; i++) {
             if ((r[i] < elems[i].getMinOccurs())
                     || (r[i] > elems[i].getMaxOccurs())) {
-                throw new SAXException("Too many or too few "
-                    + elems[i].getName());
+//                throw new SAXException("Too many or too few "
+//                    + elems[i].getName());
+                return new int[]{index,0};
             }
         }
 
-        return index;
+        return new int[]{head,1};
     }
 
     /*
      * Validates an Any tag
      * @see valid(ElementGrouping)
      */
-    private int valid(Any any, int index) {
+    private int[] valid(Any any, int index) {
         if (any.getNamespace().equals(((XMLElementHandler) elements.get(index)).getElement()
                                            .getType().getNamespace())) {
-            return index + 1;
+            return new int[]{index+1,1};
         }
 
-        return index;
+        return new int[]{index,1};
     }
 
     /*
      * Validates an Choice tag
      * @see valid(ElementGrouping)
      */
-    private int valid(Choice choice, int index) throws SAXException {
+    private int[] valid(Choice choice, int index) throws SAXException {
         ElementGrouping[] eg = choice.getChildren();
 
         if (eg == null) {
-            return index;
+            return new int[]{index,1};
+        }
+        
+        int i = 0; // choice child index;
+
+        int end = index;
+        int t = index;
+        int count = 0;
+        int t2[] = null;
+        while(i<eg.length && t<elements.size()){
+        	t2 = valid(eg[i], t);
+        	if(t2[1] == 0 && t2[0] == t){// nothing, next
+    			// move along
+    			if(t2[0]>end && count>=eg[i].getMinOccurs() && count<=eg[i].getMaxOccurs())
+    				end = t2[0];
+    			count = 0;
+    			i++;
+    			t = index;
+        	}else{
+        		if(count==eg[i].getMaxOccurs()){
+        			// move along
+        			if(t2[0]>end && count>=eg[i].getMinOccurs())
+        				end = t2[0];
+        			count = 0;
+        			i++;
+        			t = index;
+        		}else{
+        			t = t2[0];
+        		}
+    		}
         }
 
-        int r = index;
-
-        for (int i = 0; i < eg.length; i++) {
-            int t = valid(eg[i], index);
-
-            if ((t > index) && (t > r)) {
-                r = t;
-            }
-        }
-
-        return r;
+        return new int[]{t,1};
     }
 
     /*
      * Validates an Group tag
      * @see valid(ElementGrouping)
      */
-    private int valid(Group group, int index) throws SAXException {
+    private int[] valid(Group group, int index) throws SAXException {
         if (group.getChild() == null) {
-            return index;
+            return new int[]{index,1};
         }
 
         return valid(group.getChild(), index);
@@ -330,85 +355,74 @@ public class ComplexElementHandler extends XMLElementHandler {
      * Validates an Element tag
      * @see valid(ElementGrouping)
      */
-    private int valid(Element element, int index) {
-    	
+    private int[] valid(Element element, int index) {
+
+    	// does this element equate to the index in the doc?
         XMLElementHandler indexHandler = ((XMLElementHandler) elements.get(index));
 
-        if ((indexHandler.getName() != null)
-                && indexHandler.getName().equalsIgnoreCase(element.getName())) {
-            return index + 1;
+        if(indexHandler == null || indexHandler.getElement() == null)
+        	return new int[]{index,0};
+        
+        if(indexHandler.getElement() == element)
+        	return new int[]{index+1,1};
+        
+        if(element.getName()==null)
+        	return new int[]{index,0};
+        
+        if(element.getName()!=null && element.getName().equalsIgnoreCase(indexHandler.getName()))
+        	return new int[]{index+1,1};
+        
+        Element e = indexHandler.getElement().getSubstitutionGroup();
+        while(e != null){
+        	if(element.getName().equalsIgnoreCase(e.getName()))
+        		return new int[]{index+1,1};
+        	e = e.getSubstitutionGroup();
         }
-
-        //try{
-        if ((indexHandler.getElement().getType() != null)
-                && (indexHandler.getElement().getType().getName() != null)
-                && indexHandler.getElement().getType().getName()
-                                   .equalsIgnoreCase(element.getType().getName())) {
-            return index + 1;
-        }
-
-        //}catch(NullPointerException e){
-        //    System.out.println("*** \n"+indexHandler.getName()+" "+element.getName());
-        //    e.printStackTrace();
-        //    throw e;
-        //}
-        if (indexHandler.getElement().getType() instanceof ComplexType) {
-            ComplexType ct = (ComplexType) indexHandler.getElement().getType();
-            ComplexType parent = (ct.getParent() instanceof ComplexType)
-                ? (ComplexType) ct.getParent() : null;
-
-            while (parent != null) {
-                if ((parent.getName() != null)
-                        && parent.getName().equalsIgnoreCase(element.getType()
-                                                                        .getName())) {
-                    return index + 1;
-                }
-
-                parent = (ct.getParent() instanceof ComplexType)
-                    ? (ComplexType) ct.getParent() : null;
-            }
-        }
-
-        return index;
+        
+        return new int[]{index,0};
     }
 
     /*
      * Validates a Sequence tag
      * @see valid(ElementGrouping)
      */
-    private int valid(Sequence seq, int index) throws SAXException {
+    private int[] valid(Sequence seq, int index) throws SAXException {
         ElementGrouping[] eg = seq.getChildren();
 
         if (eg == null) {
-            return index;
+            return new int[]{index,1};
         }
 
-        int ind = index;
-
-        for (int i = 0; i < eg.length; i++) {
-            int r = ind;
-            int r2 = ind; // will hold new index
-            int j = 0;
-
-            for (;
-                    (j < eg[i].getMaxOccurs()) && (r >= 0)
-                    && (r < elements.size()); j++) {
-                r2 = r;
-                r = valid(eg[i], r);
-            }
-
-            if (r > 0) {
-                r2 = r;
-            }
-
-            if (j < eg[i].getMinOccurs()) {
-                throw new SAXException("Too few " + eg[i]);
-            }
-
-            ind = r2;
+        int i = index; // top of element matching list
+        int t = 0; // top of child list
+        
+        int count = 0; // used for n-ary at a single spot
+        int i2[] = new int[2];
+        while(t<eg.length && i<elements.size()){
+        	i2 = valid(eg[t],i); // new top element
+        	if(i2[1]==1 && i!=i2[0]){ // the match moved ahead ... try again
+        		count++;
+        		if(count<=eg[t].getMaxOccurs()){
+        			i = i2[0];
+        		}else{
+        			// move along and retest that spot
+        			if(eg[t].getMinOccurs()>count){
+        				// not good
+        				return new int[]{index,0}; // not whole sequence
+        			}
+        			t++;count=0; // next defined type
+        		}
+        	}else{
+    			// move along and retest that spot
+    			if(eg[t].getMinOccurs()>count){
+    				// not good
+    				return new int[]{index,0}; // not whole sequence
+    			}
+    			t++;count=0; // next defined type
+        	}
         }
-
-        return ind;
+        
+        return new int[]{i,1};
     }
 
     /*

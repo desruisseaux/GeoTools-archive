@@ -409,7 +409,7 @@ public class FilterSchema implements Schema {
         }
     }
 
-    static class FilterElement implements Element {
+    public static class FilterElement implements Element {
         private String name;
         private Type type;
         private Element substitutionGroup;
