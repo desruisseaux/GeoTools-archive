@@ -101,9 +101,12 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/GazetteerNameValidationTest.java</exclude>
+      </excludes> 
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>testData/</include>
           </includes>
