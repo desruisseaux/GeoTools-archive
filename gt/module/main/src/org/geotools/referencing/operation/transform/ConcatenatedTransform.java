@@ -32,6 +32,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -258,13 +259,16 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
     
     /**
-     * Returns a name for the specified coordinate system.
+     * Returns a name for the specified math transform.
      */
     private static final String getName(final MathTransform transform) {
         if (transform instanceof AbstractMathTransform) {
-            String name = ((AbstractMathTransform) transform).getName(null);
-            if (name!=null && (name=name.trim()).length()!=0) {
-                return name;
+            ParameterValueGroup params = ((AbstractMathTransform) transform).getParameterValues();
+            if (params != null) {
+                String name = params.getDescriptor().getName(null);
+                if (name!=null && (name=name.trim()).length()!=0) {
+                    return name;
+                }
             }
         }
         return Utilities.getShortClassName(transform);

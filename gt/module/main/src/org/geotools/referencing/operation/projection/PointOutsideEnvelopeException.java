@@ -17,44 +17,35 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct.proj;
-
-// Geotools dependencies
-import org.geotools.ct.TransformException;
+package org.geotools.referencing.operation.projection;
 
 
 /**
- * Thrown by {@link MapProjection} when a map projection failed.
+ * Thrown by {@link MapProjection} when a map projection failed because the point is
+ * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
  *
  * @version $Id$
- * @author André Gosselin
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.ProjectionException}.
  */
-public class ProjectionException extends TransformException {
+public class PointOutsideEnvelopeException extends ProjectionException {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3031350727691500915L;
+    private static final long serialVersionUID = -4384490413772200352L;
     
     /**
      * Constructs a new exception with no detail message.
      */
-    public ProjectionException() {
+    public PointOutsideEnvelopeException() {
+        super();
     }
     
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param message The error message.
      */
-    public ProjectionException(final String message) {
+    public PointOutsideEnvelopeException(final String message) {
         super(message);
-    }
-    
-    /**
-     * Constructs a new exception with the specified detail message and cause.
-     */
-    public ProjectionException(final String message, final Throwable cause) {
-        super(message, cause);
     }
 }

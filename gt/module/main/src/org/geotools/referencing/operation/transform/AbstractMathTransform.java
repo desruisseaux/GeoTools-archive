@@ -25,7 +25,6 @@ package org.geotools.referencing.operation.transform;
 
 // J2SE and vecmath dependencies
 import java.io.Serializable;
-import java.util.Locale;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.GeneralPath;
@@ -34,8 +33,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.IllegalPathStateException;
 import javax.vecmath.SingularMatrixException;
 import javax.vecmath.GMatrix;
+import javax.units.NonSI;
+import javax.units.SI;
 
 // OpenGIS dependencies
+import org.opengis.referencing.Info;
+import org.opengis.referencing.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -44,12 +47,15 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.wkt.Formattable;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.UnformattableObjectException;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -75,18 +81,19 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     protected AbstractMathTransform() {
     }
-    
+
     /**
-     * Returns a human readable name, if available. If no name is available in
-     * the specified locale,   then this method returns a name in an arbitrary
-     * locale. If no name is available in any locale, then this method returns
-     * <code>null</code>. The default implementation always returns <code>null</code>.
+     * Returns the parameters for this math transform, or <code>null</code> if unknow. This method
+     * is similar to {@link org.geotools.referencing.operation.Operation#getParameterValues},
+     * except that <code>MathTransform</code> returns parameter in standard units (usually
+     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
      *
-     * @param  locale The desired locale, or <code>null</code> for a default locale.
-     * @return The transform name localized in the specified locale if possible, or
-     *         <code>null</code> if no name is available in any locale.
+     * Note that if non-null, parameter values will be used for the default implementation
+     * of {@link #formatWKT}.
+     *
+     * @return The parameters for this math transform, or <code>null</code> if unknow.
      */
-    String getName(final Locale locale) {
+    public ParameterValueGroup getParameterValues() {
         return null;
     }
     
@@ -225,18 +232,6 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         for (int i=numPts*dimTarget; --i>=0;) {
             dstPts[dstOff+i] = (float)tmpPts[i];
         }
-    }
-    
-    /**
-     * Makes sure that the specified longitude stay within &plusmn;&pi; radians. This methpod
-     * should be invoked after geographic coordinates are transformed. This method may add or
-     * substract some amount of 2&pi; radians to <var>x</var>.
-     *
-     * @param  x The longitude in radians.
-     * @return The longitude in the range &plusmn;&pi;.
-     */
-    static double ensureLongitudeInRange(final double x) {
-        return x + (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
     }
     
     /**
@@ -569,13 +564,34 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
+     * Known Text</cite> (WKT)</A> element. The default implementation gets the
+     * {@linkplain #getParameterValues parameters for this math transform}, uses the
+     * {@linkplain org.opengis.parameter.OperationParameterGroup parameter group}
+     * name as the name for the math transform and format all parameter values.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name.
+     * @return The WKT element name, which is <code>"PARAM_MT"</code> for the default
+     *         implementation.
      */
     protected String formatWKT(final Formatter formatter) {
+        final ParameterValueGroup parameters = getParameterValues();
+        if (parameters != null) {
+            formatter.append(formatter.getName(parameters.getDescriptor()));
+            formatter.append(parameters);
+        }
         return "PARAM_MT";
+    }
+    
+    /**
+     * Makes sure that the specified longitude stay within &plusmn;&pi; radians. This method
+     * is typically invoked after geographic coordinates are transformed. This method may add
+     * or substract some amount of 2&pi; radians to <var>x</var>.
+     *
+     * @param  x The longitude in radians.
+     * @return The longitude in the range &plusmn;&pi; radians.
+     */
+    protected static double rollLongitude(final double x) {
+        return x + (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
     }
     
     /**

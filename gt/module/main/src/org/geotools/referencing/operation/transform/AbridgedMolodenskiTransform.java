@@ -222,7 +222,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 dstPts[dstOff++] = 0.0;
                 dstPts[dstOff++] = (y > 0.0) ? 90.0 : -90.0;
             } else {
-                dstPts[dstOff++] = Math.toDegrees(ensureLongitudeInRange(x));
+                dstPts[dstOff++] = Math.toDegrees(rollLongitude(x));
                 dstPts[dstOff++] = Math.toDegrees(y);
             }
             if (target3D) {
@@ -271,7 +271,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 dstPts[dstOff++] = 0.0F;
                 dstPts[dstOff++] = (y > 0.0) ? 90.0F : -90.0F;
             } else {
-                dstPts[dstOff++] = (float) Math.toDegrees(ensureLongitudeInRange(x));
+                dstPts[dstOff++] = (float) Math.toDegrees(rollLongitude(x));
                 dstPts[dstOff++] = (float) Math.toDegrees(y);
             }
             if (target3D) {
@@ -342,18 +342,20 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
+     *
+     * @todo Override {@link #getParameterValues} instead.
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.append("Abridged_Molodenski");
-        formatter.appendParameter("dim", getDimSource());
-        formatter.appendParameter("dx",             dx,   SI.METER);
-        formatter.appendParameter("dy",             dy,   SI.METER);
-        formatter.appendParameter("dz",             dz,   SI.METER);
-        formatter.appendParameter("src_semi_major", a,    SI.METER);
-        formatter.appendParameter("src_semi_minor", b,    SI.METER);
-        formatter.appendParameter("tgt_semi_major", a+da, SI.METER);
-        formatter.appendParameter("tgt_semi_minor", b+db, SI.METER);
-        return super.formatWKT(formatter);
+        formatter.append(new ParameterValue("dim", getDimSource()));
+        formatter.append(new ParameterValue("dx",             dx,   SI.METER));
+        formatter.append(new ParameterValue("dy",             dy,   SI.METER));
+        formatter.append(new ParameterValue("dz",             dz,   SI.METER));
+        formatter.append(new ParameterValue("src_semi_major", a,    SI.METER));
+        formatter.append(new ParameterValue("src_semi_minor", b,    SI.METER));
+        formatter.append(new ParameterValue("tgt_semi_major", a+da, SI.METER));
+        formatter.append(new ParameterValue("tgt_semi_minor", b+db, SI.METER));
+        return "PARAM_MT";
     }
     
     /**

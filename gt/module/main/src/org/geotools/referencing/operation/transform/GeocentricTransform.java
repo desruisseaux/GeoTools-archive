@@ -484,12 +484,14 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     /**
      * Implementation of the WKT formatting. The classification is
      * "Ellipsoid_To_Geocentric" or "Geocentric_To_Ellipsoid".
+     *
+     * @todo Override {@link #getParameterValues} instead.
      */
     final String formatWKT(final Formatter formatter, final String classification) {
         formatter.append(classification);
-        formatter.appendParameter("semi_major", a, SI.METER);
-        formatter.appendParameter("semi_minor", b, SI.METER);
-        return super.formatWKT(formatter);
+        formatter.append(new ParameterValue("semi_major", a, SI.METER));
+        formatter.append(new ParameterValue("semi_minor", b, SI.METER));
+        return "PARAM_MT";
     }
     
     /**

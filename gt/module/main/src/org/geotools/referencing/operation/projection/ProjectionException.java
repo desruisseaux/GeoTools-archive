@@ -17,10 +17,10 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct.proj;
+package org.geotools.referencing.operation.projection;
 
-// Geotools dependencies
-import org.geotools.ct.TransformException;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -29,8 +29,6 @@ import org.geotools.ct.TransformException;
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.ProjectionException}.
  */
 public class ProjectionException extends TransformException {
     /**

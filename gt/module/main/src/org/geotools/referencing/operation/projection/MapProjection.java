@@ -22,29 +22,37 @@
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here.
  */
-package org.geotools.ct.proj;
+package org.geotools.referencing.operation.projection;
 
-// J2SE and JAI dependencies
+// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-import java.util.Locale;
-import java.util.Arrays;
-import java.util.Collection;
 import java.io.Serializable;
-import javax.media.jai.ParameterListDescriptor;
+import javax.units.Unit;
+import javax.units.SI;
+import javax.units.NonSI;
 
 // OpenGIS dependencies
+import org.opengis.referencing.Info;
+import org.opengis.referencing.Identifier;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.InvalidParameterNameException;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.cs.Projection;
-
-// Resources
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.AbstractMathTransform;
-import org.geotools.ct.MissingParameterException;
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.wkt.UnformattableObjectException;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -54,7 +62,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * This base class provides the basic feature needed for all methods (no need to overrides
  * methods). Subclasses must "only" implements the following methods:
  * <ul>
- *   <li>{@link #getName}</li>
+ *   <li>{@link #getParameterValues}</li>
  *   <li>{@link #transformNormalized}</li>
  *   <li>{@link #inverseTransformNormalized}</li>
  * </ul>
@@ -69,8 +77,6 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author Rueben Schulz
  *
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.MapProjection}.
  */
 public abstract class MapProjection extends AbstractMathTransform implements MathTransform2D,
                                                                              Serializable
@@ -99,42 +105,33 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     static final int MAX_ITER = 15;
     
     /**
-     * Classification string for this projection (e.g. "Transverse_Mercator").
-     */
-    private final String classification;
-    
-    /**
-     * The parameter list descriptor.
-     */
-    private final ParameterListDescriptor descriptor;
-    
-    /**
-     * Ellipsoid excentricity, equals to <code>sqrt({@link #es})</code>.
+     * Ellipsoid excentricity, equals to <code>sqrt({@link #excentricitySquared})</code>.
      * Value 0 means that the ellipsoid is spherical.
      *
-     * @see #es
+     * @see #excentricitySquared
      * @see #isSpherical
      */
-    protected final double e;
+    protected final double excentricity;
     
     /**
      * The square of excentricity: e² = (a²-b²)/a² where
+     * <var>e</var> is the {@linkplain #excentricity excentricity},
      * <var>a</var> is the {@linkplain #semiMajor semi major} axis length and
      * <var>b</var> is the {@linkplain #semiMinor semi minor} axis length.
      *
-     * @see #e
+     * @see #excentricity
      * @see #semiMajor
      * @see #semiMinor
      * @see #isSpherical
      */
-    protected final double es;
+    protected final double excentricitySquared;
 
     /**
      * <code>true</code> if this projection is spherical. Spherical model has identical
      * {@linkplain #semiMajor semi major} and {@linkplain #semiMinor semi minor} axis
-     * length, and an {@linkplain #e excentricity} zero.
+     * length, and an {@linkplain #excentricity excentricity} zero.
      *
-     * @see #e
+     * @see #excentricity
      * @see #semiMajor
      * @see #semiMinor
      */
@@ -144,7 +141,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * Length of semi-major axis, in metres. This is named '<var>a</var>' or '<var>R</var>'
      * (Radius in spherical cases) in Snyder.
      *
-     * @see #e
+     * @see #excentricity
      * @see #semiMinor
      */
     protected final double semiMajor;
@@ -152,7 +149,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Length of semi-minor axis, in metres. This is named '<var>b</var>' in Snyder.
      *
-     * @see #e
+     * @see #excentricity
      * @see #semiMajor
      */
     protected final double semiMinor;
@@ -207,7 +204,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Construct a new map projection from the suplied parameters.
      *
-     * @param  parameters The parameter values in standard units.
+     * @param  values The parameter values in standard units.
      *         The following parameter are recognized:
      *         <ul>
      *           <li>"semi_major" (mandatory: no default)</li>
@@ -218,123 +215,108 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *           <li>"false_easting"      (default to 0 )</li>
      *           <li>"false_northing"     (default to 0 )</li>
      *         </ul>
-     * @throws MissingParameterException if a mandatory parameter is missing.
+     * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected MapProjection(final Projection parameters) throws MissingParameterException {
-        descriptor       =                    parameters.getParameters().getParameterListDescriptor();
-        classification   =                    parameters.getClassName();
-        semiMajor        =                    parameters.getValue("semi_major");
-        semiMinor        =                    parameters.getValue("semi_minor");
-        centralMeridian  = longitudeToRadians(parameters.getValue("central_meridian",   0), true);
-        latitudeOfOrigin =  latitudeToRadians(parameters.getValue("latitude_of_origin", 0), true);
-        scaleFactor      =                    parameters.getValue("scale_factor",       1);
-        falseEasting     =                    parameters.getValue("false_easting",      0);
-        falseNorthing    =                    parameters.getValue("false_northing",     0);
-        isSpherical      = (semiMajor == semiMinor);
-        es               = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
-        e                = Math.sqrt(es);
-        globalScale      = scaleFactor*semiMajor;
+    protected MapProjection(final ParameterValueGroup values) throws ParameterNotFoundException {
+        semiMajor           = values.getValue("semi_major")        .doubleValue(SI.METER);
+        semiMinor           = values.getValue("semi_minor")        .doubleValue(SI.METER);
+        centralMeridian     = values.getValue("central_meridian")  .doubleValue(SI.RADIAN);
+        latitudeOfOrigin    = values.getValue("latitude_of_origin").doubleValue(SI.RADIAN);
+        scaleFactor         = values.getValue("scale_factor")      .doubleValue(Unit.ONE);
+        falseEasting        = values.getValue("false_easting")     .doubleValue(SI.METER);
+        falseNorthing       = values.getValue("false_northing")    .doubleValue(SI.METER);
+        isSpherical         = (semiMajor == semiMinor);
+        excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
+        excentricity        = Math.sqrt(excentricitySquared);
+        globalScale         = scaleFactor*semiMajor;
+        ensureLongitudeInRange("central_meridian",   centralMeridian,  true);
+        ensureLatitudeInRange ("latitude_of_origin", latitudeOfOrigin, true);
     }
     
     /**
-     * Converts latitudes expressed in degrees to radians. This method
-     * verifies that the latitude is within allowed limits (&plusmn;90°).
+     * Ensures that the latitude is within allowed limits (&plusmn;&pi;/2).
      * This method is useful to check the validity of projection parameters,
-     * like {@link #setCentralLongitude}.
+     * like {@link #latitudeOfOrigin}.
      *
-     * @param  y Latitude, to check, in degrees.
-     * @param  edge <code>true</code> to accept latitudes of &plusmn;90°.
-     * @return Latitude in radians.
-     * @throws IllegalArgumentException if the latitude is invalide.
+     * @param  y Latitude to check, in radians.
+     * @param  edge <code>true</code> to accept latitudes of &plusmn;&pi;/2.
+     * @throws IllegalArgumentException if the latitude is out of range.
      */
-    static double latitudeToRadians(final double y, boolean edge) throws IllegalArgumentException {
-        if (edge ? (y>=Latitude.MIN_VALUE && y<=Latitude.MAX_VALUE) :
-                   (y> Latitude.MIN_VALUE && y< Latitude.MAX_VALUE))
+    static void ensureLatitudeInRange(final String name, double y, final boolean edge)
+            throws IllegalArgumentException
+    {
+        if (edge ? (y>=Latitude.MIN_VALUE*Math.PI/180 && y<=Latitude.MAX_VALUE*Math.PI/180) :
+                   (y> Latitude.MIN_VALUE*Math.PI/180 && y< Latitude.MAX_VALUE*Math.PI/180))
         {
-            return Math.toRadians(y);
+            return;
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+        y = Math.toDegrees(y);
+        throw new InvalidParameterValueException(Resources.format(
+                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)), name, y);
     }
     
     /**
-     * Converts longitudes expressed in degrees to radians. This method
-     * verifies that the longitue is within allowed limits (&plusmn;180°).
+     * Ensures that the longitue is within allowed limits (&plusmn;&pi;).
      * This method is used to check the validity of projection parameters,
-     * like {@link #setCentralLongitude}.
+     * like {@link #centralMeridian}.
      *
-     * @param  x Longitude, to verify, in degrees.
-     * @param  edge <code>true</code> for accepting longitudes of &plusmn;180°.
-     * @return Longitude in radians.
-     * @throws IllegalArgumentException if a longitude is invalide.
+     * @param  x Longitude to verify, in radians.
+     * @param  edge <code>true</code> for accepting longitudes of &plusmn;&pi;.
+     * @throws IllegalArgumentException if the longitude is out of range.
      */
-    static double longitudeToRadians(final double x, boolean edge) throws IllegalArgumentException {
-        if (edge ? (x>=Longitude.MIN_VALUE && x<=Longitude.MAX_VALUE) :
-                   (x> Longitude.MIN_VALUE && x< Longitude.MAX_VALUE))
+    static void ensureLongitudeInRange(final String name, double x, final boolean edge)
+            throws IllegalArgumentException
+    {
+        if (edge ? (x>=Longitude.MIN_VALUE*Math.PI/180 && x<=Longitude.MAX_VALUE*Math.PI/180) :
+                   (x> Longitude.MIN_VALUE*Math.PI/180 && x< Longitude.MAX_VALUE*Math.PI/180))
         {
-            return Math.toRadians(x);
+            return;
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+        x = Math.toDegrees(x);
+        throw new InvalidParameterValueException(Resources.format(
+                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)), name, x);
     }
 
     /**
-     * Makes sure that the specified longitude stay within &plusmn;180 degrees. This methpod should
-     * be invoked after {@link #centralMeridian} had been added or removed to <var>x</var>. This
-     * method may add or substract an amount of 360° to <var>x</var>.
+     * Returns the {@linkplain MathTransformProvider provider} for this map projection.
      *
-     * As a special case, we do not check the range if no rotation were applied on <var>x</var>.
-     * This is because the user may have a big area ranging from -180° to +180°. With the slight
-     * rounding errors related to map projections, the 180° longitude may be slightly over the
-     * limit. Doing the check would changes its sign. For example a bounding box from 30° to +180°
-     * would become 30° to -180°, which is probably not what the user wanted.
+     * @return The provider for this map projection.
      *
-     * @param  x The longitude.
-     * @return The longitude in the range +/- 180°.
+     * @todo
      */
-    final double ensureInRange(double x) {
-        if (centralMeridian != 0) {
-            if (x > Math.PI) {
-                x -= 2*Math.PI;
-            } else if (x < -Math.PI) {
-                x += 2*Math.PI;
-            }
-        }
-        return x;
-    }
-
+//    public abstract OperationMethod getParameterValues();
+    
     /**
-     * Returns <code>true</code> if the classification for the specified projection
-     * contains the specified word. The word must be delimited by "_" character or
-     * end of line. Search is case-insensitive.
+     * Returns the value for the specified parameter name. Values are always returned
+     * in {@linkplain SI#METER meters}, {@link NonSI#DEGREE_ANGLE degrees} or as a
+     * {@linkplain Unit#ONE dimensionless} unit.
+     *
+     * @param  name The parameter name as one of WKT name.
+     * @return The parameter value for the specified name.
+     * @throws InvalidParameterNameException if <code>name</code> is not a know parameter name.
      */
-    static boolean contains(final Projection projection, final String word) {
-        final String name = projection.getClassName().trim();
-        final int  length = word.length();
-        int index = 0;
-        while ((index = name.indexOf('_', index)) >= 0) {
-            if (name.regionMatches(true, ++index, word, 0, length)) {
-                return true;
-            }
-        }
-        return true;
+    public double getParameterValue(String name) throws InvalidParameterNameException {
+        name = name.trim().toLowerCase();
+        if (name.equals("semi_major"))         return semiMajor;
+        if (name.equals("semi_minor"))         return semiMinor;
+        if (name.equals("central_meridian"))   return Math.toDegrees(centralMeridian);
+        if (name.equals("latitude_of_origin")) return Math.toDegrees(latitudeOfOrigin);
+        if (name.equals("scale_factor"))       return scaleFactor;
+        if (name.equals("false_easting"))      return falseEasting;
+        if (name.equals("false_northing"))     return falseNorthing;
+        throw new InvalidParameterNameException(Resources.format(
+                  ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "name", name), name);
     }
     
     /**
-     * Returns a human readable name localized for the specified locale.
-     */
-    public abstract String getName(final Locale locale);
-
-    
-    /**
-     * Gets the dimension of input points.
+     * Returns the dimension of input points.
      */
     public final int getDimSource() {
         return 2;
     }
     
     /**
-     * Gets the dimension of output points.
+     * Returns the dimension of output points.
      */
     public final int getDimTarget() {
         return 2;
@@ -368,13 +350,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Check if the transform of <code>point</code> is close enough to <code>target</code>.
      * "Close enough" means that the two points are separated by a distance shorter than
-     * {@link #MAX_ERROR}. This method is used for assertions with JDK 1.4.
+     * {@link #MAX_ERROR}. This method is used for assertions with JD2SE 1.4.
      *
-     * @param  point  Point to transform, in degrees if <code>inverse</code> is false.
-     * @param  target Point to compare to, in metres if <code>inverse</code> is false.
+     * @param point   Point to transform, in degrees if <code>inverse</code> is false.
+     * @param target  Point to compare to, in metres if <code>inverse</code> is false.
      * @param inverse <code>true</code> for an inverse transform instead of a direct one.
      * @return <code>true</code> if the two points are close enough.
-     * @throws ProjectionException if a transformation failed.
      */
     private boolean checkTransform(Point2D point, final Point2D target, final boolean inverse) {
         if (!(point instanceof CheckPoint)) try {
@@ -515,7 +496,6 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
-
         if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
             throw new PointOutsideEnvelopeException(Resources.format(
                     ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
@@ -524,9 +504,18 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             throw new PointOutsideEnvelopeException(Resources.format(
                     ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
         }
-
-        ptDst = transformNormalized(ensureInRange(Math.toRadians(x) - centralMeridian),
-                                                  Math.toRadians(y), ptDst);
+        /*
+         * Makes sure that the longitude before conversion stay within +/- PI radians. As a
+         * special case, we do not check the range if no rotation were applied on the longitude.
+         * This is because the user may have a big area ranging from -180° to +180°. With the
+         * slight rounding errors related to map projections, the 180° longitude may be slightly
+         * over the limit. Rolling the longitude would changes its sign. For example a bounding
+         * box from 30° to +180° would become 30° to -180°, which is probably not what the user
+         * wanted.
+         */
+        ptDst = transformNormalized(centralMeridian!=0 ?
+                                    rollLongitude(Math.toRadians(x) - centralMeridian) :
+                                    Math.toRadians(x), Math.toRadians(y), ptDst);
         ptDst.setLocation(globalScale*ptDst.getX() + falseEasting, 
                           globalScale*ptDst.getY() + falseNorthing);
 
@@ -675,11 +664,20 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         {
             final double x0 = ptSrc.getX();
             final double y0 = ptSrc.getY();
-
             ptDst = inverseTransformNormalized((x0 - falseEasting )/globalScale,
                                                (y0 - falseNorthing)/globalScale, ptDst);
-            final double x = Math.toDegrees(ensureInRange(ptDst.getX() + centralMeridian));
-            final double y = Math.toDegrees(              ptDst.getY());
+            /*
+             * Makes sure that the longitude after conversion stay within +/- PI radians. As a
+             * special case, we do not check the range if no rotation were applied on the longitude.
+             * This is because the user may have a big area ranging from -180° to +180°. With the
+             * slight rounding errors related to map projections, the 180° longitude may be slightly
+             * over the limit. Rolling the longitude would changes its sign. For example a bounding
+             * box from 30° to +180° would become 30° to -180°, which is probably not what the user
+             * wanted.
+             */
+            final double x = Math.toDegrees(centralMeridian!=0 ?
+                             rollLongitude(ptDst.getX() + centralMeridian) : ptDst.getX());
+            final double y = Math.toDegrees(ptDst.getY());
             ptDst.setLocation(x,y);
 
             if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Accept NaN values.
@@ -827,8 +825,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compares the specified object with
-     * this map projection for equality.
+     * Compares the specified object with this map projection for equality.
      */
     public boolean equals(final Object object) {
         // Do not check 'object==this' here, since this
@@ -853,70 +850,6 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     static boolean equals(final double value1, final double value2) {
         return Double.doubleToLongBits(value1) == Double.doubleToLongBits(value2);
     }
-
-    /**
-     * Retourne une chaîne de caractères représentant cette projection cartographique.
-     * Cette chaîne de caractères contiendra entre autres le nom de la projection, les
-     * coordonnées du centre et celles de l'origine.
-     *
-     * @task REVISIT: part of the implementation is identical to the package-private method
-     *       <code>AbstractMathTransform.paramMT(String)</code>.  We should consider moving
-     *       it in a formatter class, probably close to WKTParser.
-     */
-    public final String toString() {
-        final StringBuffer buffer = new StringBuffer("PARAM_MT[\"");
-        buffer.append(classification);
-        buffer.append('"');
-        toString(buffer);
-        buffer.append(']');
-        return buffer.toString();
-    }
-    
-    /**
-     * Complete the WKT for this map projection.
-     */
-    void toString(final StringBuffer buffer) {
-        final Collection names = Arrays.asList(descriptor.getParamNames());
-        addParameter(names, buffer, "semi_major",         semiMajor);
-        addParameter(names, buffer, "semi_minor",         semiMinor);
-        addParameter(names, buffer, "central_meridian",   Math.toDegrees(centralMeridian));
-        addParameter(names, buffer, "latitude_of_origin", Math.toDegrees(latitudeOfOrigin));
-        addParameter(names, buffer, "scale_factor",       scaleFactor);
-        addParameter(names, buffer, "false_easting",      falseEasting);
-        addParameter(names, buffer, "false_northing",     falseNorthing);
-    }
-    
-    /**
-     * Add the <code>", PARAMETER["<name>", <value>]"</code> string
-     * to the specified string buffer. This is a convenience method
-     * for constructing WKT for "PARAM_MT".
-     */
-    private static void addParameter(final Collection   names,
-                                     final StringBuffer buffer,
-                                     final String       key,
-                                     final double       value)
-    {
-        if (names.contains(key)) {
-            addParameter(buffer, key, value);
-        }
-    }
-    
-    /**
-     * Add the <code>", PARAMETER["<name>", <value>]"</code> string
-     * to the specified string buffer. This is a convenience method
-     * for constructing WKT for "PARAM_MT".
-     *
-     * @task REVISIT: part of the implementation is identical to the package-private method
-     *       <code>AbstractMathTransform.addParameter(StringBuffer, String, double)</code>.
-     *       We should consider moving it in a formatter class, probably close to WKTParser.
-     */
-    static void addParameter(final StringBuffer buffer, final String key, final double value) {
-        buffer.append(", PARAMETER[\"");
-        buffer.append(key);
-        buffer.append("\",");
-        buffer.append(value);
-        buffer.append(']');
-    }
     
     
     
@@ -933,10 +866,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * Iteratively solve equation (7-9) from Snyder.
      */
     final double cphi2(final double ts) throws ProjectionException {
-        final double eccnth = 0.5*e;
+        final double eccnth = 0.5*excentricity;
         double phi = (Math.PI/2) - 2.0*Math.atan(ts);
         for (int i=0; i<MAX_ITER; i++) {
-            final double con  = e*Math.sin(phi);
+            final double con  = excentricity*Math.sin(phi);
             final double dphi = (Math.PI/2) - 2.0*Math.atan(ts * Math.pow((1-con)/(1+con), eccnth)) - phi;
             phi += dphi;
             if (Math.abs(dphi) <= TOL) {
@@ -947,25 +880,24 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compute function <code>f(s,c,es) = c/sqrt(1 - s²*es)</code>
-     * needed for the true scale latitude (Snyder 14-15), where
-     * <var>s</var> and <var>c</var> are the sine and cosine of
-     * the true scale latitude, and {@link #es} the eccentricity
-     * squared.
+     * Compute function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
+     * latitude (Snyder 14-15), where <var>s</var> and <var>c</var> are the sine and cosine of
+     * the true scale latitude, and <var>e²</var> is the {@linkplain #excentricitySquared
+     * eccentricity squared}.
      */
     final double msfn(final double s, final double c) {
-        return c / Math.sqrt(1.0 - s*s*es);
+        return c / Math.sqrt(1.0 - (s*s) * excentricitySquared);
     }
     
     /**
      * Compute function (15-9) from Snyder equivalent to negative of function (7-7).
      */
     final double tsfn(final double phi, double sinphi) {
-        sinphi *= e;
+        sinphi *= excentricity;
         /*
          * NOTE: change sign to get the equivalent of Snyder (7-7).
          */
         return Math.tan(0.5 * ((Math.PI/2) - phi)) /
-               Math.pow((1-sinphi)/(1+sinphi), 0.5*e);
+               Math.pow((1-sinphi)/(1+sinphi), 0.5*excentricity);
     }
 }

@@ -58,7 +58,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.parameter.OperationParameter
  * @see org.geotools.parameter.ParameterValueGroup
  */
-public class ParameterValue extends GeneralParameterValue implements org.opengis.parameter.ParameterValue {
+public class ParameterValue extends GeneralParameterValue
+                         implements org.opengis.parameter.ParameterValue
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -243,7 +245,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     /**
      * Returns the parameter name in the default locale.
      */
-    private static String getName(final GeneralOperationParameter descriptor) {
+    static String getName(final GeneralOperationParameter descriptor) {
         return descriptor.getName(Locale.getDefault());
     }
 
@@ -267,7 +269,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      * Returns the unit type as one of error message code. Used for
      * checking unit type are better error message formatting if needed.
      */
-    private static int getUnitMessageID(final Unit unit) {
+    static int getUnitMessageID(final Unit unit) {
         if (SI.METER .isCompatible(unit)) return ResourceKeys.ERROR_NON_LINEAR_UNIT_$1;
         if (SI.SECOND.isCompatible(unit)) return ResourceKeys.ERROR_NON_TEMPORAL_UNIT_$1;
         if (SI.RADIAN.isCompatible(unit)) return ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1;

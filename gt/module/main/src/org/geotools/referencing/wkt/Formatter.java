@@ -102,6 +102,13 @@ public class Formatter {
     private final Locale locale;
 
     /**
+     * The preferred authority for object or parameter names.
+     *
+     * @todo Probably need a less restrictive comparaison process.
+     */
+    private final Citation authority = org.geotools.metadata.citation.Citation.OPEN_GIS;
+
+    /**
      * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
      * element. This value is set for example by "GEOGCS", which force its enclosing "PRIMEM" to
      * take the same units than itself.
@@ -226,31 +233,27 @@ public class Formatter {
             }
         }
         buffer.insert(base, keyword);
-        if (info != null) {
-            final Identifier[] identifiers = info.getIdentifiers();
-            for (int i=0; i<identifiers.length; i++) {
-                final Identifier identifier = identifiers[i];
-                final Citation authority = identifier.getAuthority();
-                if (authority != null) {
-                    final String title = authority.getTitle(locale);
-                    if (title != null) {
+        final Identifier identifier = getIdentifier(info);
+        if (identifier != null) {
+            final Citation authority = identifier.getAuthority();
+            if (authority != null) {
+                final String title = authority.getTitle(locale);
+                if (title != null) {
+                    buffer.append(SEPARATOR);
+                    buffer.append(SPACE);
+                    buffer.append("AUTHORITY");
+                    buffer.append(OPEN);
+                    buffer.append(QUOTE);
+                    buffer.append(title);
+                    final String code = identifier.getCode();
+                    if (code != null) {
+                        buffer.append(QUOTE);
                         buffer.append(SEPARATOR);
-                        buffer.append(SPACE);
-                        buffer.append("AUTHORITY");
-                        buffer.append(OPEN);
                         buffer.append(QUOTE);
-                        buffer.append(title);
-                        final String code = identifier.getCode();
-                        if (code != null) {
-                            buffer.append(QUOTE);
-                            buffer.append(SEPARATOR);
-                            buffer.append(QUOTE);
-                            buffer.append(code);
-                        }
-                        buffer.append(QUOTE);
-                        buffer.append(CLOSE);
-                        break;
+                        buffer.append(code);
                     }
+                    buffer.append(QUOTE);
+                    buffer.append(CLOSE);
                 }
             }
         }
@@ -297,10 +300,9 @@ public class Formatter {
     }
 
     /**
-     * Append a {@linkplain ParameterValue parameter} in WKT form.
-     *
-     * @see #appendParameter(String, int)
-     * @see #appendParameter(String, double, Unit)
+     * Append a {@linkplain ParameterValue parameter} in WKT form. If the supplied parameter
+     * is actually a {@linkplain ParameterValueGroup parameter group}, all parameters will be
+     * inlined.
      */
     public void append(final GeneralParameterValue parameter) {
         if (parameter instanceof ParameterValueGroup) {
@@ -317,65 +319,21 @@ public class Formatter {
             if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
                 unit = contextualUnit;
             }
-            final String name = descriptor.getName(locale);
-            final String value;
+            appendSeparator(false);
+            buffer.append("PARAMETER");
+            buffer.append(OPEN);
+            buffer.append(QUOTE);
+            buffer.append(getName(descriptor));
+            buffer.append(QUOTE);
+            buffer.append(SEPARATOR);
+            buffer.append(SPACE);
             if (unit != null) {
-                value = String.valueOf(param.doubleValue(unit));
+                buffer.append(param.doubleValue(unit));
             } else {
-                value = String.valueOf(param.getValue());
+                buffer.append(param.getValue());
             }
-            appendParameter(name, value);
+            buffer.append(CLOSE);
         }
-    }
-
-    /**
-     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
-     *
-     * @param name The parameter name.
-     * @param value The parameter value.
-     *
-     * @see #append(GeneralParameterValue)
-     * @see #appendParameter(String, int)
-     * @see #appendParameter(String, double, Unit)
-     */
-    private void appendParameter(final String name, final String value) {
-        appendSeparator(false);
-        buffer.append("PARAMETER");
-        buffer.append(OPEN);
-        buffer.append(QUOTE);
-        buffer.append(name);
-        buffer.append(QUOTE);
-        buffer.append(SEPARATOR);
-        buffer.append(SPACE);
-        buffer.append(value);
-        buffer.append(CLOSE);
-    }
-
-    /**
-     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
-     *
-     * @param name The parameter name.
-     * @param value The parameter value.
-     *
-     * @see #append(GeneralParameterValue)
-     * @see #appendParameter(String, double, Unit)
-     */
-    public void appendParameter(final String name, final int value) {
-        appendParameter(name, String.valueOf(value));
-    }
-
-    /**
-     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
-     *
-     * @param name  The parameter name.
-     * @param value The parameter value.
-     * @param unit  The units for the parameter value, or <code>null</code>.
-     *
-     * @see #append(GeneralParameterValue)
-     * @see #appendParameter(String, int)
-     */
-    public void appendParameter(final String name, final double value, final Unit unit) {
-        appendParameter(name, String.valueOf(value));
     }
 
     /**
@@ -436,6 +394,49 @@ public class Formatter {
         buffer.append(QUOTE);
         buffer.append(text);
         buffer.append(QUOTE);
+    }
+
+    /**
+     * Returns the preferred identifier for the specified object. If the specified
+     * object contains an identifier from the preferred authority (usually
+     * {@linkplain org.geotools.metadata.citation.Citation#OPEN_GIS OpenGIS}), then
+     * this identifier is returned. Otherwise, the first identifier is returned. If
+     * the specified object contains no identifier, then this method returns <code>null</code>.
+     *
+     * @param  info The object to looks for a preferred identifier.
+     * @return The preferred identifier, or <code>null</code> if none.
+     */
+    private Identifier getIdentifier(final Info info) {
+        Identifier first = null;
+        if (info != null) {
+            final Identifier[] identifiers = info.getIdentifiers();
+            if (identifiers != null) {
+                for (int i=0; i<identifiers.length; i++) {
+                    final Identifier id = identifiers[i];
+                    if (authority.equals(id.getAuthority())) {
+                        return id;
+                    }
+                    if (first == null) {
+                        first = id;
+                    }
+                }
+            }
+        }
+        return first;
+    }
+
+    /**
+     * Returns the preferred name for the specified object. If the specified
+     * object contains a name from the preferred authority (usually
+     * {@linkplain org.geotools.metadata.citation.Citation#OPEN_GIS OpenGIS}),
+     * then this name is returned. Otherwise, the first name found is returned.
+     *
+     * @param  info The object to looks for a preferred identifier.
+     * @return The preferred identifier, or <code>null</code> if none.
+     */
+    public String getName(final Info info) {
+        final Identifier identifier = getIdentifier(info);
+        return (identifier!=null) ? identifier.getCode() : info.getName(locale);
     }
 
     /**

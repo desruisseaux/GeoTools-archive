@@ -404,13 +404,15 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
 
     /**
      * Implementation of {@link #formatWKT(Formatter)} for the specified matrix.
+     *
+     * @todo Override {@link #getParameterValues} instead.
      */
     static String formatWKT(final Formatter formatter, final Matrix matrix) {
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         formatter.append("Affine");
-        formatter.appendParameter("num_row", numRow);
-        formatter.appendParameter("num_col", numCol);
+        formatter.append(new ParameterValue("num_row", numRow));
+        formatter.append(new ParameterValue("num_col", numCol));
         final StringBuffer eltBuf = new StringBuffer("elt_");
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
@@ -420,7 +422,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                     eltBuf.append(j);
                     eltBuf.append('_');
                     eltBuf.append(i);
-                    formatter.appendParameter(eltBuf.toString(), value, null);
+                    formatter.append(new ParameterValue(eltBuf.toString(), value, null));
                 }
             }
         }

@@ -69,8 +69,8 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractMathTransform}
- *             in the <code>org.geotools.referencing.operation</code> package.
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.AbstractMathTransform}
+ *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 public abstract class AbstractMathTransform implements MathTransform {
     /**

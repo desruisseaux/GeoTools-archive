@@ -55,6 +55,7 @@ import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.UnformattableObjectException;
 
 
 /**
@@ -1207,6 +1208,6 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @todo Not yet implemented.
      */
     public String toWKT() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnformattableObjectException("Not yet implemented.");
     }
 }
