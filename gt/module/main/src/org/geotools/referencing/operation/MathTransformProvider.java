@@ -321,6 +321,23 @@ public abstract class MathTransformProvider extends OperationMethod {
     {
         return getValue(group, param).doubleValue();
     }
+    
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by constructor for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  group The parameter value group to search into.
+     * @param  param The parameter to look for.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     */
+    protected static String stringValue(final ParameterValueGroup group,
+                                       final OperationParameter  param)
+            throws ParameterNotFoundException
+    {
+        return getValue(group, param).stringValue();
+    }
 
     /**
      * Returns the resources key for {@linkplain #getName localized name}.
