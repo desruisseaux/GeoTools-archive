@@ -18,7 +18,11 @@ package org.geotools.xml.wfs;
 
 import org.geotools.data.Query;
 import org.geotools.data.wfs.LockRequest;
+import org.geotools.data.wfs.TransactionRequest;
+import org.geotools.data.wfs.Action;
+import org.geotools.feature.Feature;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
@@ -31,6 +35,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
+import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.FeatureCollectionType;
@@ -46,6 +51,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
@@ -214,8 +220,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return TransactionRequest.class;
         }
 
         /**
@@ -223,8 +228,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof TransactionRequest; 
         }
 
         /**
@@ -234,8 +238,36 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+            	throw new IOException("Cannot encode");
+
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[3].getName(),null,"string","ALL");
+            TransactionRequest transactionRequest = (TransactionRequest)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),attributes);
+            elems[0].getType().encode(elems[0],transactionRequest.getLockId(),output,hints);
+            
+            Iterator actions = transactionRequest.getActions().iterator();
+            while(actions.hasNext()){
+            	Action a = (Action)actions.next();
+            	switch(a.getType()){
+            	case Action.DELETE:
+            		elems[3].getType().encode(elems[3],a,output,hints);
+            		break;
+            	case Action.INSERT:
+            		elems[1].getType().encode(elems[1],a,output,hints);
+            		break;
+            	case Action.UPDATE:
+            		elems[2].getType().encode(elems[2],a,output,hints);
+            		break;
+            	default:
+            		elems[4].getType().encode(elems[4],a,output,hints);
+            	}
+            }
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -511,8 +543,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof LockRequest; 
         }
 
         /**
@@ -522,8 +553,25 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+            	throw new IOException("Cannot encode");
+
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[3].getName(),null,"string","ALL");
+            LockRequest lockRequest = (LockRequest)value;
+            if(lockRequest!=null && lockRequest.getDuration()>0)
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),elems[2].getName(),null,"integer",""+lockRequest.getDuration());
+            
+            output.startElement(element.getNamespace(),element.getName(),attributes);
+            Object[] t = new Object[2];
+            for(int i=0;i<lockRequest.getTypeNames().length;i++){
+            	t[0] = lockRequest.getTypeNames()[i];
+            	t[1] = lockRequest.getFilters()[i];
+            	elems[0].getType().encode(elems[0],t,output,hints);
+            }
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -613,8 +661,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Object[].class;
         }
 
         /**
@@ -622,8 +669,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Object[] && ((Object[])value).length == 2;
         }
 
         /**
@@ -633,8 +679,19 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+            	throw new IOException("Cannot encode");
+
+            Object[] t = (Object[])value;
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",(String)t[0]);
+            LockRequest lockRequest = (LockRequest)value;
+            if(lockRequest!=null && lockRequest.getDuration()>0)
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),elems[2].getName(),null,"integer",""+lockRequest.getDuration());
+            
+            output.startElement(element.getNamespace(),element.getName(),attributes);
+            elems[0].getType().encode(elems[0],t[1],output,hints);
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -708,8 +765,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Action.class;
         }
 
         /**
@@ -717,8 +773,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.INSERT;
         }
 
         /**
@@ -728,8 +783,23 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+        	output.startElement(element.getNamespace(),element.getName(),null);
+        	Action a = (Action)value;
+        	// find element definition
+        	// should exist when original from a WFS ...
+        	Feature f = a.getFeature();
+        	Schema schema = SchemaFactory.getInstance(f.getFeatureType().getNamespace());
+        	Element[] els = schema.getElements();
+        	Element e = null;
+        	if(els!=null)
+        	for(int i=0;i<els.length;i++)
+        		if(f.getFeatureType().getTypeName().equals(els[i].getName())){
+        			e = els[i];
+        			i = els.length;
+        		}
+        	// write it
+        	elems[0].getType().encode(e,f,output,hints);
+        	output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -822,8 +892,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Action.class;
         }
 
         /**
@@ -831,8 +900,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.UPDATE;
         }
 
         /**
@@ -842,8 +910,32 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+        	Action a = (Action)value;
+        	
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",a.getTypeName());
+            
+        	output.startElement(element.getNamespace(),element.getName(),attributes);
+
+        	Feature f1 = a.getFeature();
+        	Feature f2 = a.getUpdateFeature();
+        	
+        	Object[] v1 = f1.getAttributes(null);
+        	Object[] v2 = f2.getAttributes(null);
+        	if(v1!=null && v2!=null){
+        		if(v1.length!=v2.length); 
+        			// TODO do something?
+        		for(int i=0;i<v2.length;i++)
+        			if(!((v1[i]==null && v2[i]==null ) || v1[i].equals(v2[i]))){
+        				Object[] t = new Object[2];
+        				t[0] = f2.getFeatureType().getAttributeType(i);
+        				t[1] = v2[i];
+        				elems[0].getType().encode(elems[0],t,output,hints);
+        			}
+        	}
+        	elems[1].getType().encode(elems[1],a.getFidFilter(),output,hints);
+        	
+        	output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -935,8 +1027,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Action.class;
         }
 
         /**
@@ -944,8 +1035,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.DELETE;
         }
 
         /**
@@ -955,8 +1045,16 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+        	Action a = (Action)value;
+        	
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",a.getTypeName());
+            
+        	output.startElement(element.getNamespace(),element.getName(),attributes);
+
+        	elems[0].getType().encode(elems[0],a.getFidFilter(),output,hints);
+        	
+        	output.endElement(element.getNamespace(),element.getName());
         }
     }
 
@@ -1043,8 +1141,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Action.class;
         }
 
         /**
@@ -1052,8 +1149,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == 0;
         }
 
         /**
@@ -1063,8 +1159,13 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+        	
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string","www.refractions.net");
+            // TODO? force failures on unknown actions? allowing ignores here
+            attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string","true");
+            
+        	output.element(element.getNamespace(),element.getName(),attributes);
         }
     }
 
@@ -1149,8 +1250,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Object[].class;
         }
 
         /**
@@ -1158,8 +1258,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Object[] && ((Object[])value).length==2;
         }
 
         /**
@@ -1169,8 +1268,18 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+        	
+        	if(!canEncode(element,value,hints))
+        		throw new OperationNotSupportedException("Cannot encode "+element+" in PropertyType");
+        	
+        	Object[] t = (Object[])value;
+        	output.startElement(element.getNamespace(),element.getName(),null);
+        	
+        	elems[0].getType().encode(elems[0],t[0],output,hints);
+        	if(t[1]!=null)
+        		elems[1].getType().encode(elems[1],t[1],output,hints);
+        	
+        	output.endElement(element.getNamespace(),element.getName());
         }
     }
 
