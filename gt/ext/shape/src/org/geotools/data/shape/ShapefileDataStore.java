@@ -41,18 +41,17 @@ import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
+import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultFIDReader;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
-import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.shape.dbf.DbaseFileException;
 import org.geotools.data.shape.dbf.DbaseFileHeader;
 import org.geotools.data.shape.dbf.DbaseFileReader;
@@ -352,7 +351,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
 
     /**
-     * Use the rtree index if available and adds a small optimization: if no attributes
+     * Use the spatial index if available and adds a small optimization: if no attributes
      * are going to be read, don't uselessly open and read the dbf file.
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String, org.geotools.data.Query)
      */
@@ -397,7 +396,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     throws SchemaException, IOException
     {
         return new org.geotools.data.FIDFeatureReader(r,
-            new DefaultFIDReader(typeName), readerSchema);
+            new ShapeFIDReader(typeName, r), readerSchema);
     }
 
     /**
@@ -996,6 +995,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         protected ShapefileReader.Record record;
         protected List goodRecs;
         private int cnt;
+        private int recno;
 
         /**
          * Create the shape reader
@@ -1017,6 +1017,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 Collections.sort(this.goodRecs, dataComparator);
             }
             this.cnt = 0;
+            this.recno = 0;
         }
 
         public void close() throws IOException {
@@ -1062,16 +1063,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             
             if (this.goodRecs != null) {
                 Data data = (Data)this.goodRecs.get(this.cnt);
+                this.recno = ((Integer)data.getValue(0)).intValue();
                 
                 if (dbf != null) {
-                    Integer i = (Integer)data.getValue(0);
-                    dbf.goTo(i.intValue());
+                    dbf.goTo(this.recno);
                 }
                 
                 Long l = (Long)data.getValue(1);
                 shp.goTo((int)l.longValue());
                 
                 this.cnt++;
+            } else {
+                this.recno++;
             }
             
             record = shp.nextRecord();
@@ -1079,6 +1082,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             if (dbf != null) {
                 row = dbf.readRow();
             }
+        }
+        
+        public int getRecordNumber() {
+            return this.recno;
         }
 
         public Object read(int param)
