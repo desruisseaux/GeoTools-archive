@@ -42,7 +42,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  * @see org.geotools.parameter.GeneralParameterValue
  */
 public abstract class GeneralParameterDescriptor extends IdentifiedObject
-        implements org.opengis.parameter.GeneralOperationParameter, Serializable
+        implements org.opengis.parameter.GeneralParameterDescriptor, Serializable
 {
     /**
      * Serial number for interoperability with different versions.

@@ -23,19 +23,22 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameterGroup;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
@@ -81,9 +84,9 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *
      * @param descriptor The descriptor for this group.
      */
-    public ParameterValueGroup(final OperationParameterGroup descriptor) {
+    public ParameterValueGroup(final ParameterDescriptorGroup descriptor) {
         super(descriptor);
-        final GeneralOperationParameter[] parameters = descriptor.getParameters();
+        final GeneralParameterDescriptor[] parameters = descriptor.getParameters();
         values = new GeneralParameterValue[parameters.length];
         for (int i=0; i<values.length; i++) {
             ensureNonNull("createValue", values[i] = parameters[i].createValue());
@@ -96,13 +99,13 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * @param descriptor The descriptor for this group.
      * @param values The list of parameter values.
      */
-    public ParameterValueGroup(final OperationParameterGroup descriptor,
+    public ParameterValueGroup(final ParameterGroupDescriptor descriptor,
                                      GeneralParameterValue[] values)
     {
         super(descriptor);
         ensureNonNull("values", values);
         this.values = values = (GeneralParameterValue[]) values.clone();
-        final GeneralOperationParameter[] parameters = descriptor.getParameters();
+        final GeneralParameterDescriptor[] parameters = descriptor.getParameters();
         final Map occurences = new LinkedHashMap(Math.round(parameters.length/0.75f)+1, 0.75f);
         for (int i=0; i<parameters.length; i++) {
             ensureNonNull("parameters", parameters, i);
@@ -140,8 +143,8 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
         ensureValidOccurs(values, occurences);
         final Set descriptors = occurences.keySet();
         return new org.geotools.parameter.ParameterGroupDescriptor(properties,
-                                          (GeneralOperationParameter[]) descriptors.toArray(
-                                          new GeneralOperationParameter[descriptors.size()]));
+                                          (GeneralParameterDescriptor[]) descriptors.toArray(
+                                          new GeneralParameterDescriptor[descriptors.size()]));
     }
 
     /**
@@ -160,12 +163,12 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
          */
         for (int i=0; i<values.length; i++) {
             ensureNonNull("values", values, i);
-            final GeneralOperationParameter descriptor = values[i].getDescriptor();
+            final GeneralParameterDescriptor descriptor = values[i].getDescriptor();
             final int[] count = (int[]) occurences.get(descriptor);
             if (count == null) {
                 throw new IllegalArgumentException(Resources.format(
                           ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1,
-                          descriptor.getName(Locale.getDefault())));
+                          descriptor.getName().toString()));
             }
             count[0]++;
         }
@@ -174,14 +177,14 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
          */
         for (final Iterator it=occurences.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
-            final GeneralOperationParameter descriptor = (GeneralOperationParameter) entry.getKey();
+            final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) entry.getKey();
             final int count = ((int[]) entry.getValue())[0];
             final int min   = descriptor.getMinimumOccurs();
             final int max   = descriptor.getMaximumOccurs();
             if (!(count>=min && count<=max)) {
                 throw new IllegalArgumentException(Resources.format(
                           ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4,
-                          descriptor.getName(Locale.getDefault()), new Integer(count),
+                          descriptor.getName().toString(), new Integer(count),
                           new Integer(min), new Integer(max)));
             }
         }
@@ -192,8 +195,20 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *
      * @return The values.
      */
-    public GeneralParameterValue[] getValues() {
-        return (GeneralParameterValue[]) values.clone();
+    public synchronized List values() {
+        // don't need a clone because we will copy
+        // still need synchronized incase we interupt add updating the values pointer
+        // (usually only a problem on 64 bit multiprocessor machines, but with a 
+        /// JIT all bets are off).
+        GeneralParameterValue params[] = values; 
+        if( params == null ){
+            return Collections.EMPTY_LIST;
+        }
+        List list = new ArrayList();
+        for( int i=0; i<params.length; i++){
+            list.add( params[i].clone() );
+        }
+        return list;        
     }
 
     /**
@@ -227,7 +242,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * @return The parameter value for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter value for the given identifier code.
      */
-    public ParameterValue getValue(String name) throws ParameterNotFoundException {
+    public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         List subgroups = null;
@@ -254,7 +269,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
             if (subgroups==null || subgroups.isEmpty()) {
                 break;
             }
-            values = ((org.opengis.parameter.ParameterValueGroup) subgroups.remove(0)).getValues();
+            values = Parameters.array( (org.opengis.parameter.ParameterValueGroup) subgroups.remove(0));
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
@@ -310,5 +325,112 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
             copy.values[i] = (GeneralParameterValue) copy.values[i].clone();
         }
         return copy;
+    }
+
+    /**
+     * Adds a parameter to this group.
+     * <p>
+     * If an existing ParameterValue is already included:
+     * <ul>
+     * <li>For maxOccurs == 1, the new parameter will replace the existing parameter.
+     * <li>For maxOccurs > 1, the new parameter will be added
+     * <li>If adding the new parameter will increase the numbe past what
+     * is allowable by maxOccurs an InvalidParameterTypeException will be thrown.
+     * </p>
+     * <p>
+     * 
+     * @param parameter New parameter to be added to this group
+     * @throws InvalidParameterTypeException if adding this parameter
+     *  would result in more parameters than allowed by maxOccurs, or if this
+     *  parameter is not allowable by the groups descriptor 
+     */
+    public void add( ParameterValue parameter ) throws InvalidParameterTypeException{
+        add( (GeneralParameterValue) parameter );
+    }
+    
+    /**
+     * Adds new parameter group to this group.
+     * <p>
+     * If an existing ParameterValueGroup is already included:
+     * <ul>
+     * <li>For maxOccurs == 1, the new group will replace the existing group.
+     * <li>For maxOccurs > 1, the new group will be added
+     * <li>If adding the new group will increase the number past what
+     * is allowable by maxOccurs an InvalidParameterTypeException will be thrown.
+     * </p>
+     * <p>
+     * 
+     * @param group New ParameterValueGroup to be added to this group
+     * @throws InvalidParameterTypeException if adding this parameter
+     *  would result in more parameters than allowed by maxOccurs, or if this
+     *  parameter is not allowable by the groups descriptor 
+     */
+    public void add( org.opengis.parameter.ParameterValueGroup group ) throws InvalidParameterTypeException {
+        add( (GeneralParameterValue) group );
+    }    
+    private synchronized void add( GeneralParameterValue param ){
+	    GeneralParameterDescriptor type = param.getDescriptor();        
+	    if( !Parameters.allowed( (ParameterGroupDescriptor) this.getDescriptor(), type ) ){
+	        throw new InvalidParameterTypeException(
+                "Not allowed in ParameterValueGroup",
+                type.getName().toString());
+	    }
+	    final int MIN = type.getMinimumOccurs();
+	    final int MAX = type.getMaximumOccurs();
+	    
+	    if( MIN == 0 && MAX == 1 ){
+	        // optional parameter group - we will simply replace what is there
+	        int index = Parameters.indexOf( this, type ); 
+	        if(  index == -1 ){
+	            addImpl( param );                
+	        }
+	        else {
+	            values[ index ] = param;
+	        }
+	    }
+	    else if ( Parameters.count( this, type ) < MAX ){            
+	        addImpl( param );
+	    }        
+	    else {
+	        throw new InvalidParameterTypeException(
+                "Cannot exceed maximum allowed in ParameterValueGroup",
+                type.getName().toString()
+                );
+	    }
+	}     
+    // Actually perform the add
+    private synchronized void addImpl( GeneralParameterValue param ){
+        final int LENGTH = this.values == null ? 0 : this.values.length;
+        GeneralParameterValue params[] = new GeneralParameterValue[ LENGTH+1 ];
+        if( LENGTH > 0 ){
+            System.arraycopy( this.values, 0, params, 0, LENGTH );
+        }
+        params[ LENGTH ] = param ;
+        this.values = params;
+    }
+    
+    /**
+     * Convenience method used to locate ParameterValue(s) by descriptor.
+     * <p>
+     * This method does not search in subgroups.
+     * </p>
+     * @param type ParameterDescriptor used for lookup
+     * @return Array of ParameterValuelength corasponding to cardinality of the descriptor
+     */
+    public ParameterValue[] parameter( ParameterDescriptor parameterType ){
+        List found = Parameters.list( this, parameterType );
+        return (ParameterValue[]) found.toArray( new ParameterValue[ found.size()] );
+    }
+    /**
+     * Convenience method used to locate ParameterValueGroup(s) by descriptor.
+     * <p>
+     * This method does not search in subgroups.
+     * </p>
+     * @param groupType ParameterGroupDescriptor
+     * @return Array of ParameterValueGroup length corasponding to cardinality of the descriptor
+     */
+    public org.opengis.parameter.ParameterValueGroup[] group( ParameterGroupDescriptor groupType ){
+        List found = Parameters.list( this, groupType );
+        return (org.opengis.parameter.ParameterValueGroup[]) found.toArray( new org.opengis.parameter.ParameterValueGroup[ found.size()] );
     }
 }

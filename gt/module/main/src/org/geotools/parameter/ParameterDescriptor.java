@@ -62,7 +62,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  * @see org.geotools.parameter.ParameterValue
  * @see org.geotools.parameter.ParameterGroupDescriptor
  */
-public class ParameterDescriptor extends GeneralParameterDescriptor implements org.opengis.parameter.OperationParameter {
+public class ParameterDescriptor extends GeneralParameterDescriptor implements org.opengis.parameter.ParameterDescriptor {
     /**
      * Serial number for interoperability with different versions.
      */

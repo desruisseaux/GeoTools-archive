@@ -22,6 +22,9 @@
  */
 package org.geotools.parameter;
 
+
+import org.opengis.parameter.ParameterDescriptor;
+
 // J2SE dependencies
 import java.net.URL;
 
@@ -32,7 +35,6 @@ import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.OperationParameter;
 
 
 /**
@@ -72,7 +74,7 @@ public class ParameterRealValue extends GeneralParameterValue
      * @param  descriptor The abstract definition of this parameter.
      * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
      */
-    public ParameterRealValue(final OperationParameter descriptor) {
+    public ParameterRealValue(final ParameterDescriptor descriptor) {
         super(descriptor);
         final Class type = descriptor.getValueClass();
         final Class expected = Double.class;
@@ -93,7 +95,7 @@ public class ParameterRealValue extends GeneralParameterValue
      * @param  value The parameter value.
      * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
      */
-    public ParameterRealValue(final OperationParameter descriptor, final double value) {
+    public ParameterRealValue(final ParameterDescriptor descriptor, final double value) {
         this(descriptor);
         setValue(value);
     }
@@ -105,7 +107,7 @@ public class ParameterRealValue extends GeneralParameterValue
      * @return The unit of measure, or <code>null</code> if none.
      */
     public Unit getUnit() {
-        return ((OperationParameter) descriptor).getUnit();
+        return ((ParameterDescriptor) descriptor).getUnit();
     }
 
     /**
@@ -235,7 +237,7 @@ public class ParameterRealValue extends GeneralParameterValue
      */
     public void setValue(double value, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit thisUnit = ((OperationParameter) descriptor).getUnit();
+        final Unit thisUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (thisUnit == null) {
             throw new IllegalStateException(Resources.format(
                   ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, ParameterValue.getName(descriptor)));
@@ -245,7 +247,7 @@ public class ParameterRealValue extends GeneralParameterValue
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
         value = unit.getConverterTo(thisUnit).convert(value);
-        ParameterValue.ensureValidValue((OperationParameter) descriptor, new Double(value));
+        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
         this.value = value;
     }
 
@@ -257,7 +259,7 @@ public class ParameterRealValue extends GeneralParameterValue
      *         (for example a value out of range).
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        ParameterValue.ensureValidValue((OperationParameter) descriptor, new Double(value));
+        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
         this.value = value;
     }
 
@@ -291,7 +293,7 @@ public class ParameterRealValue extends GeneralParameterValue
      *         the value is numeric and out of range).
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        ParameterValue.ensureValidValue((OperationParameter) descriptor, value);
+        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, value);
         this.value = ((Number) value).doubleValue();
     }
 

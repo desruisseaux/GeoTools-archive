@@ -26,7 +26,7 @@ package org.geotools.parameter;
 import java.io.Serializable;
 
 // OpenGIS dependencies
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -51,14 +51,14 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
     /**
      * The abstract definition of this parameter or group of parameters.
      */
-    final GeneralOperationParameter descriptor;
+    final GeneralParameterDescriptor descriptor;
 
     /**
      * Construct a parameter value from the specified descriptor.
      *
      * @param descriptor The abstract definition of this parameter or group of parameters.
      */
-    protected GeneralParameterValue(GeneralOperationParameter descriptor) {
+    protected GeneralParameterValue(GeneralParameterDescriptor descriptor) {
         this.descriptor = descriptor;
         ensureNonNull("descriptor", descriptor);
     }
@@ -68,7 +68,7 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
      *
      * @return The abstract definition of this parameter or group of parameters.
      */
-    public GeneralOperationParameter getDescriptor() {
+    public GeneralParameterDescriptor getDescriptor() {
         return descriptor;
     }
 

@@ -37,8 +37,8 @@ import javax.units.Converter;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
@@ -155,7 +155,7 @@ public class ParameterValue extends GeneralParameterValue
      *
      * @param descriptor The abstract definition of this parameter.
      */
-    public ParameterValue(final OperationParameter descriptor) {
+    public ParameterValue(final ParameterDescriptor descriptor) {
         super(descriptor);
         value = descriptor.getDefaultValue();
         unit  = descriptor.getUnit();
@@ -212,7 +212,7 @@ public class ParameterValue extends GeneralParameterValue
      * @param  value The value to check, or <code>null</code>.
      * @throws InvalidParameterValueException if the parameter value is invalid.
      */
-    public static void ensureValidValue(final OperationParameter descriptor, final Object value)
+    public static void ensureValidValue(final ParameterDescriptor descriptor, final Object value)
             throws InvalidParameterValueException
     {
         if (value == null) {
@@ -248,14 +248,14 @@ public class ParameterValue extends GeneralParameterValue
      */
     private String getClassTypeError() {
         return Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
-               Utilities.getShortName(((OperationParameter)descriptor).getValueClass()));
+               Utilities.getShortName(((ParameterDescriptor)descriptor).getValueClass()));
     }
 
     /**
      * Returns the parameter name in the default locale.
      */
-    static String getName(final GeneralOperationParameter descriptor) {
-        return descriptor.getName(Locale.getDefault());
+    static String getName(final GeneralParameterDescriptor descriptor) {
+        return descriptor.getName().toString();
     }
 
     /**
@@ -500,7 +500,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public void setValue(final double value, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
+        final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (targetUnit == null) {
             throw new IllegalStateException(Resources.format(
                       ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
@@ -510,7 +510,7 @@ public class ParameterValue extends GeneralParameterValue
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
         final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
-        ensureValidValue((OperationParameter) descriptor, converted);
+        ensureValidValue((ParameterDescriptor) descriptor, converted);
         this.value = wrap(value);
         this.unit  = unit;
     }
@@ -529,7 +529,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public void setValue(final double value) throws InvalidParameterValueException {
         final Double check = wrap(value);
-        ensureValidValue((OperationParameter) descriptor, check);
+        ensureValidValue((ParameterDescriptor) descriptor, check);
         this.value = check;
     }
 
@@ -544,7 +544,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public void setValue(final int value) throws InvalidParameterValueException {
         final Integer check = wrap(value);
-        ensureValidValue((OperationParameter) descriptor, check);
+        ensureValidValue((ParameterDescriptor) descriptor, check);
         this.value = check;
     }
 
@@ -558,7 +558,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public void setValue(final boolean value) throws InvalidParameterValueException {
         final Boolean check = Boolean.valueOf(value);
-        ensureValidValue((OperationParameter) descriptor, check);
+        ensureValidValue((ParameterDescriptor) descriptor, check);
         this.value = check;
     }
 
@@ -575,7 +575,7 @@ public class ParameterValue extends GeneralParameterValue
      * @see #getValue
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        ensureValidValue((OperationParameter) descriptor, value);
+        ensureValidValue((ParameterDescriptor) descriptor, value);
         this.value = value;
     }
 
@@ -590,7 +590,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public void setValue(double[] values, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
+        final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (targetUnit == null) {
             throw new IllegalStateException(Resources.format(
                       ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
@@ -604,7 +604,7 @@ public class ParameterValue extends GeneralParameterValue
         for (int i=0; i<converted.length; i++) {
             converted[i] = converter.convert(converted[i]);
         }
-        ensureValidValue((OperationParameter) descriptor, converted);
+        ensureValidValue((ParameterDescriptor) descriptor, converted);
         this.value = values;
         this.unit  = unit;
     }
@@ -670,8 +670,8 @@ public class ParameterValue extends GeneralParameterValue
      */
     protected Object valueOf( String text ) throws IOException {
         
-        OperationParameter descriptor =
-            (OperationParameter) this.getDescriptor();
+        ParameterDescriptor descriptor =
+            (ParameterDescriptor) this.getDescriptor();
         
         Class type = descriptor.getValueClass();
         

@@ -19,17 +19,15 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
-import java.util.Locale;
-
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameterGroup;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
@@ -51,7 +49,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  *
  * @see MatrixParameters
  */
-public class MatrixParameterValues extends ParameterValueGroup implements OperationParameterGroup {
+public class MatrixParameterValues extends ParameterValueGroup implements ParameterDescriptorGroup {
     
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +85,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * since the description depends on <code>"num_row"</code> and <code>"num_col"</code>
      * parameter values.
      */
-    public GeneralOperationParameter getDescriptor() {
+    public GeneralParameterDescriptor getDescriptor() {
         return this;
     }
 
@@ -95,8 +93,8 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
      * specified at construction time.
      */
-    public String getName(final Locale locale) {
-        return descriptor.getName(locale);
+    public InternationalString getName() {
+        return descriptor.getName();
     }
 
     /**
@@ -111,8 +109,8 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
      * specified at construction time.
      */
-    public String getRemarks(Locale locale) {
-        return descriptor.getRemarks(locale);
+    public InternationalString getRemarks() {
+        return descriptor.getRemarks();
     }
 
     /**
@@ -143,7 +141,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public OperationParameter getParameter(final String name)
+    public ParameterDescriptor getParameter(final String name)
             throws ParameterNotFoundException
     {
         return ((MatrixParameters) descriptor).getParameter(name, numRow.intValue(),
@@ -185,7 +183,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
          * class for other parameters, especially "num_row" and "num_col".
          */
         try {
-            return super.getValue(name);
+            return super.parameter(name);
         } catch (ParameterNotFoundException exception) {
             if (cause!=null) try {
                 exception.initCause(cause);
@@ -252,7 +250,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * Returns the parameters descriptors in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      */
-    public GeneralOperationParameter[] getParameters() {
+    public GeneralParameterDescriptor[] getParameters() {
         return ((MatrixParameters) descriptor).getParameters(numRow.intValue(),
                                                              numCol.intValue());
     }

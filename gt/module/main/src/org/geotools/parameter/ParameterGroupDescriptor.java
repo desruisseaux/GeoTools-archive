@@ -30,8 +30,8 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
@@ -52,7 +52,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.parameter.ParameterDescriptor
  */
 public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralParameterDescriptor
-                                  implements org.opengis.parameter.OperationParameterGroup
+                                  implements org.opengis.parameter.ParameterDescriptorGroup
 {
     /**
      * Serial number for interoperability with different versions.
@@ -62,7 +62,7 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
     /**
      * The {@linkplain #getParameters operation parameters} for this group.
      */
-    private final GeneralOperationParameter[] parameters;
+    private final GeneralParameterDescriptor[] parameters;
 
     /**
      * Construct a parameter group from a name.
@@ -72,7 +72,7 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
      */
     public ParameterGroupDescriptor(final String name,
-                                   final GeneralOperationParameter[] parameters)
+                                   final GeneralParameterDescriptor[] parameters)
     {
         this(Collections.singletonMap("name", name), parameters);
     }
@@ -87,7 +87,7 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
      */
     public ParameterGroupDescriptor(final Map properties,
-                                   final GeneralOperationParameter[] parameters)
+                                   final GeneralParameterDescriptor[] parameters)
     {
         this(properties, 1, 1, parameters);
     }
@@ -107,11 +107,11 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
     public ParameterGroupDescriptor(final Map properties,
                                    final int minimumOccurs,
                                    final int maximumOccurs,
-                                   final GeneralOperationParameter[] parameters)
+                                   final GeneralParameterDescriptor[] parameters)
     {
         super(properties, minimumOccurs, maximumOccurs);
         ensureNonNull("parameters", parameters);
-        this.parameters = new GeneralOperationParameter[parameters.length];
+        this.parameters = new GeneralParameterDescriptor[parameters.length];
         for (int i=0; i<parameters.length; i++) {
             this.parameters[i] = parameters[i];
             ensureNonNull("parameters", parameters, i);
@@ -135,8 +135,8 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
      *
      * @return The parameters.
      */
-    public GeneralOperationParameter[] getParameters() {
-        return (GeneralOperationParameter[]) parameters.clone();
+    public GeneralParameterDescriptor[] getParameters() {
+        return (GeneralParameterDescriptor[]) parameters.clone();
     }
 
     /**
@@ -159,19 +159,19 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
      * @return The parameter for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter for the given identifier code.
      */
-    public OperationParameter getParameter(String name) throws ParameterNotFoundException {
+    public ParameterDescriptor getParameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         List subgroups = null;
-        GeneralOperationParameter[] parameters = this.parameters;
+        GeneralParameterDescriptor[] parameters = this.parameters;
         while (parameters != null) {
             for (int i=0; i<parameters.length; i++) {
-                final GeneralOperationParameter param = parameters[i];
-                if (param instanceof OperationParameter) {
+                final GeneralParameterDescriptor param = parameters[i];
+                if (param instanceof ParameterDescriptor) {
                     if (identifierMatches(param, name)) {
-                        return (OperationParameter) param;
+                        return (ParameterDescriptor) param;
                     }
-                } else if (param instanceof org.opengis.parameter.OperationParameterGroup) {
+                } else if (param instanceof org.opengis.parameter.ParameterDescriptorGroup) {
                     if (subgroups == null) {
                         subgroups = new LinkedList();
                     }
@@ -186,7 +186,7 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
             if (subgroups==null || subgroups.isEmpty()) {
                 break;
             }
-            parameters = ((org.opengis.parameter.OperationParameterGroup) subgroups.remove(0)).getParameters();
+            parameters = ((org.opengis.parameter.ParameterDescriptorGroup) subgroups.remove(0)).getParameters();
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);

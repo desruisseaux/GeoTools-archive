@@ -25,10 +25,10 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.referencing.operation.Matrix;
@@ -84,17 +84,17 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * on matrix element values. Concequently, the same descriptors can be reused for all
      * {@link MatrixParameterValues} instances.
      */
-    private final OperationParameter[] parameters = new OperationParameter[CACHE_SIZE*CACHE_SIZE];
+    private final ParameterDescriptor[] parameters = new ParameterDescriptor[CACHE_SIZE*CACHE_SIZE];
 
     /**
      * The descriptor for the <code>"num_row"</code> parameter.
      */
-    protected final OperationParameter numRow;
+    protected final ParameterDescriptor numRow;
 
     /**
      * The descriptor for the <code>"num_col"</code> parameter.
      */
-    protected final OperationParameter numCol;
+    protected final ParameterDescriptor numCol;
 
     /**
      * The prefix to insert in front of parameter name for each matrix elements.
@@ -121,7 +121,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
          *       used in this implementation is inefficient  for large amount of matrix
          *       elements.
          */
-        this(properties, new OperationParameter[] {
+        this(properties, new ParameterDescriptor[] {
             new org.geotools.parameter.ParameterDescriptor("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
             new org.geotools.parameter.ParameterDescriptor("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
         }, "elt_", '_');
@@ -140,7 +140,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @param separator  The separator between the row and the column index in parameter names.
      */
     public MatrixParameters(final Map            properties,
-                            OperationParameter[] parameters,
+            				ParameterDescriptor[] parameters,
                             final String         prefix,
                             final char           separator)
     {
@@ -185,7 +185,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public final OperationParameter getParameter(final String name)
+    public final ParameterDescriptor getParameter(final String name)
             throws ParameterNotFoundException
     {
         return getParameter(name,
@@ -202,7 +202,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    final OperationParameter getParameter(String name, final int numRow, final int numCol)
+    final ParameterDescriptor getParameter(String name, final int numRow, final int numCol)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
@@ -247,7 +247,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter descriptor for the specified matrix element.
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    public final OperationParameter getParameter(final int row, final int column)
+    public final ParameterDescriptor getParameter(final int row, final int column)
             throws IndexOutOfBoundsException
     {
         return getParameter(row, column,
@@ -265,14 +265,14 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter descriptor for the specified matrix element.
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    final OperationParameter getParameter(final int row,    final int column,
+    final ParameterDescriptor getParameter(final int row,    final int column,
                                           final int numRow, final int numCol)
             throws IndexOutOfBoundsException
     {
         checkIndice("row",    row,    numRow);
         checkIndice("column", column, numCol);
         int index = -1;
-        OperationParameter param;
+        ParameterDescriptor param;
         if (row<CACHE_SIZE && column<CACHE_SIZE) {
             index = row*CACHE_SIZE + column;
             param = parameters[index];
@@ -301,7 +301,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      *
      * @return The matrix parameters, including all elements.
      */
-    public final GeneralOperationParameter[] getParameters() {
+    public final GeneralParameterDescriptor[] getParameters() {
         return getParameters(((Number) this.numRow.getDefaultValue()).intValue(),
                              ((Number) this.numCol.getDefaultValue()).intValue());
     }
@@ -314,8 +314,8 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @param numCol The number of columns.
      * @return The matrix parameters, including all elements.
      */
-    final GeneralOperationParameter[] getParameters(final int numRow, final int numCol) {
-        final OperationParameter[] parameters = new OperationParameter[numRow*numCol + 2];
+    final GeneralParameterDescriptor[] getParameters(final int numRow, final int numCol) {
+        final ParameterDescriptor[] parameters = new ParameterDescriptor[numRow*numCol + 2];
         int k = 0;
         parameters[k++] = this.numRow;
         parameters[k++] = this.numCol;
@@ -353,12 +353,12 @@ public class MatrixParameters extends ParameterGroupDescriptor {
             return ((MatrixParameterValues) parameters).getMatrix();
         }
         // Fallback on the general case (others implementations)
-        final ParameterValue numRowParam = parameters.getValue(numRow.getName(null));
-        final ParameterValue numColParam = parameters.getValue(numCol.getName(null));
+        final ParameterValue numRowParam = parameters.parameter(numRow.getName().toString());
+        final ParameterValue numColParam = parameters.parameter(numCol.getName().toString());
         final int numRow = numRowParam.intValue();
         final int numCol = numColParam.intValue();
         final GeneralMatrix matrix = new GeneralMatrix(numRow, numCol);
-        final GeneralParameterValue[] params = parameters.getValues();
+        final GeneralParameterValue[] params = Parameters.array( parameters );
         if (params != null) {
             for (int i=0; i<params.length; i++) {
                 final GeneralParameterValue param = params[i];
@@ -366,7 +366,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
                     continue;
                 }
                 RuntimeException cause = null;
-                final String name = param.getDescriptor().getName(null);
+                final String name = param.getDescriptor().getName().toString();
                 if (name.regionMatches(true, 0, prefix, 0, prefix.length())) {
                     final int split = name.indexOf(separator, prefix.length());
                     if (split >= 0) try {
