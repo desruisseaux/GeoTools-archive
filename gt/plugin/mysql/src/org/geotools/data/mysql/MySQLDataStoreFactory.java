@@ -27,11 +27,13 @@ import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 
 
 /**
- * Creates a PostgisDataStore baed on the correct params.
+ * Creates a MySQLDataStoreFactory based on the correct params.
  * 
  * <p>
  * This factory should be registered in the META-INF/ folder, under services/
@@ -42,6 +44,9 @@ import java.util.Map;
  */
 public class MySQLDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
+
+    private static final Logger LOGGER = Logger.getLogger(MySQLDataStoreFactory.class.getName());
+        
     /** Creates MySQL JDBC driver class. */
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
@@ -54,8 +59,8 @@ public class MySQLDataStoreFactory
             "mysql host machine", true, "localhost");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", Integer.class,
-            "mysql connection port", true, new Integer(3306));
+    static final Param PORT = new Param("port", String.class,
+            "mysql connection port", true, "3306");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DATABASE = new Param("database", String.class,
@@ -63,7 +68,7 @@ public class MySQLDataStoreFactory
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
-            "user name to login as");
+            "user name to login as", false);
 
     /** Param, package visibiity for JUnit tests */
     static final Param PASSWD = new Param("passwd", String.class,
@@ -150,6 +155,10 @@ public class MySQLDataStoreFactory
                 if (!(((value = params.get(arrayParameters[i].key)) != null)
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            LOGGER.fine("Failed on : " + arrayParameters[i].key);
+                            LOGGER.fine(params.toString());
+                        }
                         return (false);
                     }
                 }
@@ -158,10 +167,10 @@ public class MySQLDataStoreFactory
             return (false);
         }
 
-        if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
-            return (false);
-        } else {
+        if ((((String) params.get("dbtype")).equalsIgnoreCase("mysql"))) {
             return (true);
+        } else {
+            return (false);
         }
     }
 
@@ -182,28 +191,21 @@ public class MySQLDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if (canProcess(params)) {
-        } else {
+        if (!canProcess(params)) {
+            LOGGER.warning("Can not process : " + params);
             throw new IOException("The parameteres map isn't correct!!");
         }
 
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        Integer port = (Integer) PORT.lookUp(params);
+        String port = (String) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
 
-        // Try processing params first so we can get an error message
-        // back to the user
-        //
-        if (!canProcess(params)) {
-            return null;
-        }
-
         MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,
-                port.intValue(), database);
+                new Integer(port).intValue(), database);
 
         connFact.setLogin(user, passwd);
 
@@ -216,6 +218,7 @@ public class MySQLDataStoreFactory
         try {
             pool = connFact.getConnectionPool();
         } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Could not create connection to MySQL database.", e);
             throw new DataSourceException("Could not create connection", e);
         }
 
@@ -238,27 +241,37 @@ public class MySQLDataStoreFactory
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         throw new UnsupportedOperationException(
-            "Postgis cannot create a new Database");
+            "MySQL cannot create a new Database");
     }
+
+    /**
+     * @return "MySQL"
+     */
     public String getDisplayName() {
         return "MySQL";
     }
+    
     /**
      * Describe the nature of the datasource constructed by this factory.
      *
      * @return A human readable description that is suitable for inclusion in a
-     *         list of available datasources.
+     *         list of available datasources.  Currently uses the string "MySQL Database"
      */
     public String getDescription() {
         return "MySQL Database";
     }
+
+    /**
+     *
+     */
     public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
-        Integer port = (Integer) PORT.lookUp(params);
+        String port = (String) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
     }
+
     /**
      * Test to see if this datastore is available, if it has all the
      * appropriate libraries to construct a datastore.  This datastore just
@@ -272,6 +285,7 @@ public class MySQLDataStoreFactory
         try {
             Class.forName(DRIVER_CLASS);
         } catch (ClassNotFoundException cnfe) {
+            LOGGER.warning("MySQL data sources are not available: " + cnfe.getMessage());
             return false;
         }
         return true;
