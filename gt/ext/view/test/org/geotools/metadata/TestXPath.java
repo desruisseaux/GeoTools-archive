@@ -65,7 +65,7 @@ public class TestXPath extends TestCase {
         elem=(Metadata.Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"FileData");
-        assertEquals(elem.getType(),FileMetadata.class);
+        assertEquals(elem.getType(),StupidFileData.class);
                 
         
     }
@@ -90,7 +90,7 @@ public class TestXPath extends TestCase {
     public void testMatchStringMetadataWildCards() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         List result=XPath.getElement("FileData/\\w*",data);
-        assertEquals(result.size(),5);
+        assertEquals(result.size(),3);
 
         result=XPath.getElement("\\w*/Name",data);
         assertEquals(result.size(),1);
@@ -99,27 +99,25 @@ public class TestXPath extends TestCase {
     
         result=XPath.getElement("\\w*",data);
         assertEquals(result.size(),2);
-        element=(Metadata.Element)result.get(0);        
-        assertEquals(element.getType(),FileMetadata.class);
-        element=(Metadata.Element)result.get(1);        
-        assertEquals(element.getType(),String.class);
+        element=(Metadata.Element)result.get(0);
+        Metadata.Element element1=(Metadata.Element)result.get(1);
+        if( element.getType().isAssignableFrom(String.class) )
+            assertEquals(StupidFileData.class, element1.getType());
+        else
+            assertEquals(StupidFileData.class, element.getType());
         
         // Now test getValue
         data=new StupidNestedMetadataImpl();
         result=XPath.getValue("FileData/\\w*",data);
-        assertEquals(result.size(),5);
+        assertEquals(result.size(),3);
 
         result=XPath.getValue("\\w*/Name",data);
         assertEquals(result.size(),1);
         String name=(String)result.get(0);
-        assertEquals(name,"ArcGrid.asc");
+        assertEquals(name,"Stupid");
     
         result=XPath.getValue("\\w*",data);
         assertEquals(result.size(),2);
-        Object elem=(Object)result.get(0);
-        assertEquals(elem.getClass(),FileMetadataImpl.class);   
-        elem=result.get(1);
-        assertEquals(element.getType(),String.class);        
     }
 
 }
