@@ -21,10 +21,28 @@
  */
 package org.geotools.map;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 import org.geotools.cs.LocalCoordinateSystem;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.gc.GridCoverage;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
@@ -32,6 +50,7 @@ import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -180,7 +199,77 @@ public class DefaultMapContext implements MapContext {
         DefaultMapLayer layer = new DefaultMapLayer(featureSource, style, "");
         this.addLayer(layer);
     }
-
+    /**
+     * Add a new layer and trigger a {@link LayerListEvent}.
+     *
+     * @param featureSource Then new layer that has been added.
+     * @param style DOCUMENT ME!
+     */
+    public void addLayer(GridCoverage gc, Style style ) {
+        this.addLayer( wrapGc( gc ), style );
+    }
+    /**
+     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
+     *  (temporary).
+     *
+     * @param gc the grid coverage
+     *
+     * @return a feature with the grid coverage envelope as the geometry and the grid coverage
+     *         itself in the "grid" attribute
+     *
+     * @throws IllegalAttributeException Should never be thrown
+     * @throws SchemaException Should never be thrown
+     */
+    private static FeatureCollection wrapGc(GridCoverage gc) {
+        // create surrounding polygon
+        PrecisionModel pm = new PrecisionModel();
+        CoordinateSequenceFactory csf = DefaultCoordinateSequenceFactory.instance();
+        GeometryFactory gf = new GeometryFactory(pm, 0);
+        Coordinate[] coord = new Coordinate[5];
+        Rectangle2D rect = gc.getEnvelope().toRectangle2D();
+        coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
+        coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
+        coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
+        coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
+        coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
+        
+        LinearRing ring = new LinearRing(csf.create(coord), gf);
+        Polygon bounds = new Polygon(ring, null, gf);
+        
+        // create the feature type
+        AttributeType geom = AttributeTypeFactory.newAttributeType("geom", Polygon.class);
+        AttributeType grid = AttributeTypeFactory.newAttributeType("grid", GridCoverage.class);
+        
+        FeatureType schema = null;
+        AttributeType[] attTypes = {geom, grid};
+        
+        // Fix the schema name
+        String typeName = gc.getName( null );
+        if( typeName == null ){
+            typeName = "GridCoverage";
+        }
+        try {
+            schema = FeatureTypeFactory.newFeatureType(attTypes, typeName );
+        } catch (FactoryConfigurationError e) {
+            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            return null;
+        } catch (SchemaException e) {
+            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            return null;
+        }
+        
+        // create the feature
+        Feature feature;
+        try {
+            feature = schema.create(new Object[] {bounds, gc});
+        } catch (IllegalAttributeException e1) {
+            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            return null;
+        }
+        FeatureCollection collection = FeatureCollections.newCollection();
+        collection.add( feature );
+        return collection;
+    }
     /**
      * Add a new layer and trigger a {@link LayerListEvent}.
      *

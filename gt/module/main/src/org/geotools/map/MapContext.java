@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.gc.GridCoverage;
 import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.styling.Style;
@@ -71,6 +72,14 @@ public interface MapContext {
      * @param layer Then new layer that has been added.
      */
     void addLayer(FeatureCollection collection, Style style);
+    
+    /**
+     * Add a new layer and trigger a {@link LayerListEvent}
+     * 
+     * @param layer
+     * @return
+     */
+    void addLayer( GridCoverage gridCoverage, Style style );
 
     /**
      * Remove a layer, if present, and trigger a {@link LayerListEvent}.

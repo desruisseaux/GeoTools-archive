@@ -25,7 +25,6 @@ import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import org.geotools.data.arcgrid.ArcGridDataSource;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;

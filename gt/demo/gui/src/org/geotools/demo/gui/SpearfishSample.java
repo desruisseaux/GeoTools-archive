@@ -11,12 +11,15 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.data.arcgrid.ArcGridDataSource;
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.parameter.ParameterValueGroup;
 import org.geotools.renderer.j2d.RenderedMapScale;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.Graphic;
@@ -30,6 +33,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.opengis.parameter.OperationParameterGroup;
 
 /**
  * Simple map viewer
@@ -45,13 +49,27 @@ public class SpearfishSample {
         // Prepare feature sources		
         // ... digital elevation dem. 
         URL demURL = getResource("org/geotools/sampleData/spearfish_dem.asc.gz");
+        
         // ... If you are working with files from the local file system, use the 
         // following line instead
         // URL demURL = (new java.io.File("/path/to/spearfish/dem")).toURL();
-        ArcGridDataSource dsDem = new ArcGridDataSource(demURL);
-        dsDem.setUseGzipCompression(true);
-        dsDem.setGRASSFormatEnabled(true);
-        FeatureCollection fcDem = dsDem.getFeatures();
+        // create the grid coverage reader
+        URL url = ArcGridReader.class.getClassLoader().getResource("org/geotools/sampleData/spearfish_dem.asc.gz");
+        Format f = new org.geotools.data.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url);  //should this work also?
+        GridCoverageReader reader = f.getReader(url);
+        
+        //get the parameters and set them
+        OperationParameterGroup paramDescriptor = f.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+        params.getValue( "Compressed" ).setValue( true );
+        params.getValue( "GRASS" ).setValue( true );
+        
+        //read the grid
+        if (reader.hasMoreGridCoverages()) {                 //not yet implemented
+            System.out.println("Reader has a GC to read");   
+        }
+        GridCoverage gcDem = reader.read( params );
+        
         // ... roads
         URL roadsURL = getResource("org/geotools/sampleData/roads.shp");
         ShapefileDataStore dsRoads = new ShapefileDataStore(roadsURL);
@@ -120,7 +138,7 @@ public class SpearfishSample {
 
         // Build the map
         MapContext map = new DefaultMapContext();
-        map.addLayer(fcDem, demStyle);
+        map.addLayer( gcDem, demStyle);
         map.addLayer(fsStreams, streamsStyle);
         map.addLayer(fsRoads, roadsStyle);
         map.addLayer(fsRestricted, restrictedStyle);
