@@ -106,7 +106,15 @@ public class AnyHandler extends ElementGroupingHandler {
 
         try {
             if (namespace != null) {
-                this.namespace = new URI(namespace);
+                if(namespace.toLowerCase().equals("##any")){
+                    this.namespace = Any.ALL;
+                }else{
+                if(namespace.toLowerCase().equals("##other")){
+                    // TODO improve this
+                    this.namespace = Any.ALL;
+                }else{
+                    this.namespace = new URI(namespace);
+                }}
             }
         } catch (URISyntaxException e) {
             logger.warning(e.toString());

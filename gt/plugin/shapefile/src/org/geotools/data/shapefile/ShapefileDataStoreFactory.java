@@ -38,9 +38,9 @@ import java.util.Map;
  */
 public class ShapefileDataStoreFactory
     implements FileDataStoreFactorySpi {
-    private static final Param URLP = new Param("url", URL.class,
+    public static final Param URLP = new Param("url", URL.class,
         "url to a .shp file");
-    private static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
+    public static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
         Boolean.class, "enable/disable the use of memory-mapped io",false);
 
     /**
