@@ -36,6 +36,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.OpImage;
 import javax.media.jai.OperationRegistry;
@@ -264,6 +265,24 @@ public final class ImageUtilities {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the interpolation name for the specified interpolation object.
+     * This method tries to infer the name from the object's class name.
+     *
+     * @param Interpolation The interpolation object.
+     */
+    public static String getInterpolationName(final Interpolation interp) {
+        final String prefix = "Interpolation";
+        for (Class classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
+            String name = Utilities.getShortName(classe);
+            int index = name.lastIndexOf(prefix);
+            if (index >= 0) {
+                return name.substring(index + prefix.length());
+            }
+        }
+        return Utilities.getShortClassName(interp);
     }
 
     /**

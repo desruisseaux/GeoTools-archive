@@ -42,6 +42,8 @@ package org.geotools.gp;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.opengis.coverage.processing.OperationNotFoundException}.
  */
 public class OperationNotFoundException extends IllegalArgumentException {
     /**

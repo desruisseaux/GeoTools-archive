@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -58,6 +46,7 @@ import org.geotools.gc.ParameterInfo;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.DescriptorNaming;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.opengis.gp.GP_Operation;
@@ -263,17 +252,11 @@ public abstract class Operation implements Serializable {
 
     /**
      * Returns the interpolation name for the specified interpolation.
+     *
+     * @deprecated Use {@link ImageUtilities#getInterpolationName} instead.
      */
     static String getInterpolationName(final Interpolation interp) {
-        final String prefix = "Interpolation";
-        for (Class classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
-            String name = Utilities.getShortName(classe);
-            int index = name.lastIndexOf(prefix);
-            if (index >= 0) {
-                return name.substring(index + prefix.length());
-            }
-        }
-        return Utilities.getShortClassName(interp);
+        return ImageUtilities.getInterpolationName(interp);
     }
     
     /**

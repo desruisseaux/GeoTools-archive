@@ -30,6 +30,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 // JAI dependencies
@@ -40,6 +41,7 @@ import javax.media.jai.util.CaselessStringKey;  // For javadoc
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.coverage.grid.GridPacking;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridNotEditableException;
 import org.opengis.coverage.grid.InvalidRangeException;
@@ -49,6 +51,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.gcs.ResourceKeys;
 
 
 /**
@@ -182,6 +186,98 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
     }
 
     /**
+     * Returns information for the packing of grid coverage values.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public GridPacking getGridPacking() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a block of grid coverage data for all sample dimensions. 
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public byte[] getPackedDataBlock(final GridRange range) throws InvalidRangeException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of byte values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public boolean[] getDataBlock(final GridRange range, boolean[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of byte values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public byte[] getDataBlock(final GridRange range, byte[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of short values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public short[] getDataBlock(final GridRange range, short[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of integer values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public int[] getDataBlock(final GridRange range, int[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of float values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public float[] getDataBlock(final GridRange range, final float[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Returns a sequence of double values for a block.
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     * We don't know at this time if and when this method will be implemented, since
+     * the API is going to change when we will shift to ISO 19123.
+     */
+    public double[] getDataBlock(final GridRange range, final double[] destination)
+            throws InvalidRangeException, ArrayIndexOutOfBoundsException
+    {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
      * Set a block of values for all sample dimensions. The default implementation always throws
      * an exception, since this grid coverage is not editable by default.
      */
@@ -254,21 +350,34 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
     /**
      * Returns a localized error message for {@link IndexOutOfBoundsException}.
      */
-    private static String indexOutOfBounds(final int index) {
-        return org.geotools.resources.cts.Resources.format(
+    private String indexOutOfBounds(final int index) {
+        return org.geotools.resources.cts.Resources.getResources(getLocale()).getString(
                org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
                "index", new Integer(index));
     }
 
     /**
-     * Constructs a string for the specified point.
+     * Constructs an error message for a point outside the coverage.
      * This is used for formatting error messages.
      *
      * @param  point The coordinate point to format.
-     * @return The coordinate point as a string, without '(' or ')' characters.
+     * @return An error message.
      */
-    static String toString(final Point2D point) {
-        return toString((DirectPosition) new DirectPosition2D(point));
+    protected String pointOutsideCoverage(final Point2D point) {
+        return pointOutsideCoverage((DirectPosition) new DirectPosition2D(point));
+    }
+
+    /**
+     * Constructs an error message for a point outside the coverage.
+     * This is used for formatting error messages.
+     *
+     * @param  point The coordinate point to format.
+     * @return An error message.
+     */
+    protected String pointOutsideCoverage(final DirectPosition point) {
+        final Locale locale = getLocale();
+        return Resources.getResources(locale).
+                getString(ResourceKeys.ERROR_POINT_OUTSIDE_COVERAGE_$1, toString(point, locale));
     }
 
     /**
@@ -276,12 +385,25 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      * This is used for formatting error messages.
      *
      * @param  point The coordinate point to format.
+     * @param  locale The locale for formatting numbers.
      * @return The coordinate point as a string, without '(' or ')' characters.
      */
-    static String toString(final DirectPosition point) {
+    static String toString(final Point2D point, final Locale locale) {
+        return toString((DirectPosition) new DirectPosition2D(point), locale);
+    }
+
+    /**
+     * Constructs a string for the specified point.
+     * This is used for formatting error messages.
+     *
+     * @param  point The coordinate point to format.
+     * @param  locale The locale for formatting numbers.
+     * @return The coordinate point as a string, without '(' or ')' characters.
+     */
+    static String toString(final DirectPosition point, final Locale locale) {
         final StringBuffer buffer = new StringBuffer();
         final FieldPosition dummy = new FieldPosition(0);
-        final NumberFormat format = NumberFormat.getNumberInstance();
+        final NumberFormat format = NumberFormat.getNumberInstance(locale);
         final int       dimension = point.getDimension();
         for (int i=0; i<dimension; i++) {
             if (i != 0) {

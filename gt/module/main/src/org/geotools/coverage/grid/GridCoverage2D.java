@@ -44,9 +44,12 @@ import java.awt.image.WritableRaster;
 import java.awt.image.WritableRenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +84,6 @@ import org.opengis.coverage.SampleDimensionType;  // For javadoc
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.coverage.grid.GridPacking;
 import org.opengis.coverage.grid.InvalidRangeException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -164,10 +166,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     
     /**
      * The raster data.
-     * NOTE: This field should be final.
-     *       It is not only for internal reason (namely: deserialization).
      */
-    private transient PlanarImage image;
+    protected transient final PlanarImage image;
 
     /**
      * The serialized image, as an instance of {@link SerializableRenderedImage}.
@@ -178,7 +178,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * The grid geometry.
      */
-    private final GridGeometry2D gridGeometry;
+    protected final GridGeometry2D gridGeometry;
     
     /**
      * The image's envelope. This envelope must have at least two
@@ -875,7 +875,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(toString(coord));
+        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
     }
     
     /**
@@ -901,7 +901,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(toString(coord));
+        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
     }
 
     /**
@@ -927,7 +927,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(toString(coord));
+        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
     }
 
     /**
@@ -989,90 +989,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         size[gridGeometry.xAxis] = image.getTileWidth();
         size[gridGeometry.yAxis] = image.getTileHeight();
         return size;
-    }
-
-    /**
-     * Returns information for the packing of grid coverage values.
-     *
-     * @todo Not yet implemented.
-     */
-    public GridPacking getGridPacking() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a block of grid coverage data for all sample dimensions. 
-     *
-     * @todo Not yet implemented.
-     */
-    public byte[] getPackedDataBlock(final GridRange range) throws InvalidRangeException {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of byte values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public boolean[] getDataBlock(final GridRange range, boolean[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of byte values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public byte[] getDataBlock(final GridRange range, byte[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of short values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public short[] getDataBlock(final GridRange range, short[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of integer values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public int[] getDataBlock(final GridRange range, int[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of float values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public float[] getDataBlock(final GridRange range, final float[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * Return a sequence of double values for a block.
-     *
-     * @todo Not yet implemented.
-     */
-    public double[] getDataBlock(final GridRange range, final double[] destination)
-            throws InvalidRangeException, ArrayIndexOutOfBoundsException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     /**
@@ -1423,12 +1339,29 @@ testLinear: for (int i=0; i<numBands; i++) {
     }
 
     /**
-     * Construct the {@link PlanarImage} from the {@linkplain SerializableRenderedImage}
+     * Constructs the {@link PlanarImage} from the {@linkplain SerializableRenderedImage}
      * after deserialization.
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        image = PlanarImage.wrapRenderedImage(serializedImage);
+        try {
+            /*
+             * Set the 'image' field using reflection, because this field is final.
+             * This is a legal usage for deserialization according Field.set(...)
+             * documentation in J2SE 1.5.
+             */
+            final Field field = GridCoverage2D.class.getDeclaredField("image");
+            field.setAccessible(true);
+            field.set(this, PlanarImage.wrapRenderedImage(serializedImage));
+        } catch (NoSuchFieldException cause) {
+            InvalidClassException e = new InvalidClassException(cause.getLocalizedMessage());
+            e.initCause(cause);
+            throw e;
+        } catch (IllegalAccessException cause) {
+            InvalidObjectException e = new InvalidObjectException(cause.getLocalizedMessage());
+            e.initCause(cause);
+            throw e;
+        }
     }
 
     /**

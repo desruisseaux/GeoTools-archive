@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.util.Locale;
 
 // OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
@@ -303,7 +304,7 @@ public class GridGeometry2D extends GridGeometryGT {
             } catch (TransformException exception) {
                 throw new CannotEvaluateException(
                           Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
-                          AbstractGridCoverage.toString(point), exception));
+                          AbstractGridCoverage.toString(point, Locale.getDefault()), exception));
             }
         }
         throw new InvalidGridGeometryException(Resources.format(
