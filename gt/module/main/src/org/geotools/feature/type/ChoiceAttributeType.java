@@ -17,9 +17,12 @@
 package org.geotools.feature.type;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.util.Set;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.Arrays;
 
 
 
@@ -96,6 +99,9 @@ public class ChoiceAttributeType implements AttributeType {
      * @task REVISIT: Perhaps we should add a getTypes() method that returns an
      *       array of classes, that would represent the classes that you can
      *       choose from.
+     * @task REVISIT: Would also be good if this could dynamically figure out
+     *       the broadest class - like Number if the choices were Double and 
+     *       Integer.
      *
      * @see org.geotools.feature.AttributeType#getType()
      */
@@ -304,6 +310,8 @@ public class ChoiceAttributeType implements AttributeType {
         return (i == children.length) ? (-1) : i;
     }
 
+    
+
     /**
      * Gets the attributeType at the specified index.
      *
@@ -317,5 +325,108 @@ public class ChoiceAttributeType implements AttributeType {
 
     public AttributeType[] getAttributeTypes() {
         return (AttributeType[]) children.clone();
+    }
+
+       public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+	
+        if (!(other instanceof ChoiceAttributeType)) {
+	    return false;
+	}
+        ChoiceAttributeType att = (ChoiceAttributeType) other;
+
+        if (name == null) {
+            if (att.getName() != null) {
+                return false;
+            }
+        } else if (!name.equals(att.getName())) {
+            return false;
+        }
+
+	//hmmm... This makes the assumption that the order of the choices
+	//matters - not sure if that's true.  Though the order does matter a
+	//a bit for our parse method, so this is probably right, since two
+	//with different orders could have diff. behaviors for that method.
+        if (!Arrays.equals(children, att.getAttributeTypes())) {
+	    return false;
+	}
+	
+        return true;
+	}
+	
+	/**
+     * Override of hashCode.
+     *
+     * @return hashCode for this object.
+     */
+    public int hashCode() {
+        int hash = name.hashCode();
+         for (int i = 0, ii = children.length; i < ii; i++) {
+            hash ^= children[i].hashCode();
+        }
+	 return hash;
+    }
+
+    /**
+     * Gets a representation of this object as a string.
+     *
+     * @return A representation of this object as a string
+     */
+    public String toString() {
+        String details = "name=" + name;
+        details += (" , nillable=" + nill)  + ", min=" + min 
+	    + ", max=" + max;
+	details += ", choices: " + Arrays.asList(children);
+
+        return "ChoiceAttributeType [" + details + "]";
+    }
+
+
+    /**
+     * A special class that is made so a Choice can serve as the Default 
+     * Geometry in a FeatureType, by implementing GeometryAttributeType.
+     * It must be a choice between other GeometryAttributeTypes.
+     * @task TODO: Need to write code to check that all the geometry
+     * attributes are in the same crs.  Right now we just blindly assume
+     * they are and return the first.
+     * @author Chris Holmes, TOPP
+     */
+    public static final class Geometric extends ChoiceAttributeType implements GeometryAttributeType {
+	public Geometric(Geometric copy) {
+	    super(copy);
+	}
+    // The field for 'Class type' should be added when GT has moved to java 1.5
+    public Geometric(String name, boolean nillable, int min,
+        int max, GeometryAttributeType[] children, Filter restriction) {
+	super(name, nillable, min, max, children, restriction);
+    }
+
+    public Geometric(String name, boolean nillable,
+    		GeometryAttributeType[] children) {
+    	super(name, nillable, children);
+    }
+
+	public CoordinateReferenceSystem getCoordinateSystem() {
+	    //Hack - this is not guaranteed to be right, since right now we
+	    //don't check in the constructors that all crses are the same.
+	    GeometryAttributeType first = (GeometryAttributeType)getAttributeType(0); 
+	    return first.getCoordinateSystem();
+	}
+
+	public GeometryFactory getGeometryFactory() {
+	    //Hack - this is not guaranteed to be right, since right now we
+	    //don't check in the constructors that all crses are the same.
+	    GeometryAttributeType first = (GeometryAttributeType)getAttributeType(0); 
+	    return first.getGeometryFactory();
+	}
+
+    /* (non-Javadoc)
+     * @see org.geotools.feature.AttributeType#isGeometry()
+     */
+    public boolean isGeometry() {
+        return true;
+    }
     }
 }
