@@ -319,9 +319,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
                         val = null;
                     }
                     
-                    if (val <= 0) {
-                        val = null;
-                    }
+                    
                     break;
             }
             
