@@ -16,10 +16,11 @@
  */
 package org.geotools.data.wms.gce;
 
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptor;
 import org.opengis.metadata.Identifier;
 
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameter;
 
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +35,7 @@ import javax.units.Unit;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMSOperationParameter implements OperationParameter {
+public class WMSOperationParameter extends Parameter {
     Identifier[] identifiers;
     int maxOccurs;
     int minOccurs;
@@ -44,6 +45,9 @@ public class WMSOperationParameter implements OperationParameter {
     Set validValues;
     List availableLayers;
     Class valueClass = WMSParameterValue.class;
+    
+    // TODO wrong ... richard for you to fix
+    public WMSOperationParameter(){super(null);}
 
     /* (non-Javadoc)
      * @see org.opengis.parameter.ParameterDescriptor#getValueClass()
@@ -88,13 +92,6 @@ public class WMSOperationParameter implements OperationParameter {
     public Unit getUnit() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.parameter.GeneralParameterDescriptor#createValue()
-     */
-    public GeneralParameterValue createValue() {
-        return new WMSParameterValue(null, this);
     }
 
     /* (non-Javadoc)

@@ -16,7 +16,8 @@
  */
 package org.geotools.data.wms.gce;
 
-import org.opengis.parameter.GeneralOperationParameter;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptor;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValue;
@@ -32,15 +33,16 @@ import javax.units.Unit;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMSParameterValue implements ParameterValue {
+public class WMSParameterValue extends Parameter {
     private Object value;
-    private GeneralOperationParameter descriptor;
+    private ParameterDescriptor descriptor;
 
     /**
      * @param value
      * @param descriptor
      */
-    public WMSParameterValue(Object value, GeneralOperationParameter descriptor) {
+    public WMSParameterValue(Object value, ParameterDescriptor descriptor) {
+        super(descriptor);
         this.value = value;
         this.descriptor = descriptor;
     }
@@ -180,12 +182,5 @@ public class WMSParameterValue implements ParameterValue {
     public Object clone() {
         // TODO Auto-generated method stub
         return new WMSParameterValue(new String((String) value), descriptor);
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.parameter.GeneralParameterValue#getDescriptor()
-     */
-    public GeneralOperationParameter getDescriptor() {
-        return descriptor;
     }
 }

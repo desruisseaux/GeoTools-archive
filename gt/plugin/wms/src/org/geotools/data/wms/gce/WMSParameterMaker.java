@@ -19,10 +19,9 @@ package org.geotools.data.wms.gce;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Utils;
+import org.geotools.parameter.Parameter;
 
 import org.opengis.metadata.Identifier;
-
-import org.opengis.parameter.GeneralOperationParameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +43,7 @@ public class WMSParameterMaker {
         this.capabilities = capabilities;
     }
 
-    public GeneralOperationParameter createVersionReadParam() {
+    public Parameter createVersionReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "VERSION";
         param.maxOccurs = 1;
@@ -62,7 +61,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createFormatReadParam() {
+    public Parameter createFormatReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "FORMAT";
         param.maxOccurs = 1;
@@ -85,7 +84,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createRequestReadParam() {
+    public Parameter createRequestReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "REQUEST";
         param.maxOccurs = 1;
@@ -100,7 +99,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createSRSReadParam() {
+    public Parameter createSRSReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "SRS";
         param.maxOccurs = 1;
@@ -124,7 +123,7 @@ public class WMSParameterMaker {
         }
     }
 
-    public GeneralOperationParameter createWidthReadParam() {
+    public Parameter createWidthReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "WIDTH";
         param.maxOccurs = 1;
@@ -136,7 +135,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createHeightReadParam() {
+    public Parameter createHeightReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "HEIGHT";
         param.maxOccurs = 1;
@@ -148,7 +147,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createLayersReadParam() {
+    public Parameter createLayersReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "LAYERS";
         param.maxOccurs = 1;
@@ -164,7 +163,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createBBoxMinXReadParam() {
+    public Parameter createBBoxMinXReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BBOX_MINX";
         param.maxOccurs = 1;
@@ -176,7 +175,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createBBoxMinYReadParam() {
+    public Parameter createBBoxMinYReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BBOX_MINY";
         param.maxOccurs = 1;
@@ -188,7 +187,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createBBoxMaxXReadParam() {
+    public Parameter createBBoxMaxXReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BBOX_MAXX";
         param.maxOccurs = 1;
@@ -200,7 +199,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createBBoxMaxYReadParam() {
+    public Parameter createBBoxMaxYReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BBOX_MAXY";
         param.maxOccurs = 1;
@@ -212,7 +211,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createTransparentReadParam() {
+    public Parameter createTransparentReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "TRANSPARENT";
         param.maxOccurs = 1;
@@ -226,7 +225,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createBGColorReadParam() {
+    public Parameter createBGColorReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BGCOLOR";
         param.maxOccurs = 1;
@@ -239,7 +238,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createExceptionsReadParam() {
+    public Parameter createExceptionsReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "EXCEPTIONS";
         param.maxOccurs = 1;
@@ -254,7 +253,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createTimeReadParam() {
+    public Parameter createTimeReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "TIME";
         param.maxOccurs = 1;
@@ -266,7 +265,7 @@ public class WMSParameterMaker {
         return param;
     }
 
-    public GeneralOperationParameter createElevationReadParam() {
+    public Parameter createElevationReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "ELEVATION";
         param.maxOccurs = 1;

@@ -33,7 +33,6 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -131,16 +130,16 @@ public class WMSReader implements GridCoverageReader {
         String maxx = "";
         String maxy = "";
 
-        GeneralParameterValue[] values = parameters.getValues();
-        for (int i = 0; i < values.length; i++) {
-            ParameterValue value = (ParameterValue) values[i];
+        List values = parameters.values();
+        for (int i = 0; i < values.size(); i++) {
+            ParameterValue value = (ParameterValue) values.get(i);
 
             if ((value == null) || (value.getValue() == null)) {
-                System.out.println( "parameter "+i+" "+(value == null ? "null" : value.getDescriptor().getName(null) ));
+//                System.out.println( "parameter "+i+" "+(value == null ? "null" : value.getDescriptor().getName(null) ));
                 continue;
             }
-            System.out.println( "parameter "+i+" "+value.getDescriptor().getName(null)+" : "+value.getValue() );
-            if (value.getDescriptor().getName(null).equals("LAYERS")) {
+//            System.out.println( "parameter "+i+" "+value.getDescriptor().getName(null)+" : "+value.getValue() );
+            if (value.getDescriptor().getName().equals("LAYERS")) {
                 String layers = "";
                 String styles = "";
 
@@ -163,31 +162,31 @@ public class WMSReader implements GridCoverageReader {
                 continue;
             }
 
-            if (value.getDescriptor().getName(null).equals("BBOX_MINX")) {
+            if (value.getDescriptor().getName().equals("BBOX_MINX")) {
                 minx = (String) value.getValue();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName(null).equals("BBOX_MINY")) {
+            if (value.getDescriptor().getName().equals("BBOX_MINY")) {
                 miny = (String) value.getValue();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName(null).equals("BBOX_MAXX")) {
+            if (value.getDescriptor().getName().equals("BBOX_MAXX")) {
                 maxx = (String) value.getValue();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName(null).equals("BBOX_MAXY")) {
+            if (value.getDescriptor().getName().equals("BBOX_MAXY")) {
                 maxy = (String) value.getValue();
 
                 continue;
             }
 
-            if (value.getDescriptor().getName(null).equals("TRANSPARENT")) {
+            if (value.getDescriptor().getName().equals("TRANSPARENT")) {
                 if (value.booleanValue()) {
                     request.setProperty("TRANSPARENT", "TRUE");
                 } else {
@@ -197,7 +196,7 @@ public class WMSReader implements GridCoverageReader {
                 continue;
             }
 
-            request.setProperty(value.getDescriptor().getName(null),
+            request.setProperty(value.getDescriptor().getName().toString(),
                 value.stringValue());
         }
 
