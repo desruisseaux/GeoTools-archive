@@ -3,10 +3,8 @@
  */
 package org.geotools.data.coverage.grid.stream.test;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -57,8 +55,7 @@ public class IOExchangeTest extends TestCase{
 		assertEquals(char1,reader.read());
 		
 		//Test File
-		URI uri=new URI(fileString);
-		File file=new File(uri);
+		File file=TestData.file(this, TEST_FILE);
 		boolean ex=file.exists();
 		reader=mExchange.getReader(file);
 		assertNotNull(reader);

@@ -42,14 +42,12 @@ public class FSCatalogEntryTest extends TestCase {
 	}
 
 	void init()throws Exception{
-		resource = TestData.getResource(this,"ArcGrid.asc");
-		f=new File(new URI(URLDecoder.decode(resource.toString(),"UTF-8")));
+		f=TestData.file(this,"ArcGrid.asc");
 		entry=new FSCatalogEntry(f,GridFormatFinder.getFormatArray());
 	}
 	
 	public void testFSCatalogEntry()throws Exception {
-		resource = TestData.getResource(this,"ArcGrid.asc");
-		f=new File(URLDecoder.decode(resource.toString(),"UTF-8"));	
+		f=TestData.file(this,"ArcGrid.asc");
 		entry=new FSCatalogEntry(f, GridFormatFinder.getFormatArray());
 		assertNotNull(entry);
 	}
