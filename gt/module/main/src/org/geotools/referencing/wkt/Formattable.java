@@ -29,7 +29,6 @@ import java.util.prefs.Preferences;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
-import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
 
@@ -47,9 +46,10 @@ import org.geotools.resources.Utilities;
 public class Formattable {
     /**
      * The "Indentation" preference name.
-     * Note: this string is also hard-coded in AffineTransform2D.
+     *
+     * @todo this string is also hard-coded in AffineTransform2D.
      */
-    private static final String INDENTATION = "Indentation";
+    static final String INDENTATION = "Indentation";
 
     /**
      * Default constructor.
@@ -162,22 +162,5 @@ public class Formattable {
      */
     protected String formatWKT(final Formatter formatter) {
         return Utilities.getShortClassName(this);
-    }
-
-    /**
-     * Set the preferred indentation from the command line. This indentation is used by
-     * {@link #toWKT()}. This method can be invoked from the command line using the following
-     * syntax:
-     *
-     * <blockquote>
-     * <code>java org.geotools.referencing.wkt.Formattable -identation=</code><var>&lt;preferred
-     * indentation&gt;</var>
-     * </blockquote>
-     */
-    public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final int indentation = arguments.getRequiredInteger(INDENTATION);
-        arguments.getRemainingArguments(0);
-        Preferences.userNodeForPackage(Formattable.class).putInt(INDENTATION, indentation);
     }
 }

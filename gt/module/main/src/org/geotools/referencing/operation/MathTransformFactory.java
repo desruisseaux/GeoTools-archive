@@ -25,9 +25,12 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Collections;
+import java.io.IOException;
 import java.text.ParseException;
 import javax.imageio.spi.ServiceRegistry;
 
@@ -36,6 +39,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -43,15 +47,18 @@ import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.referencing.Identifier;         // For javadoc
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.wkt.MathTransformParser;
+import org.geotools.parameter.ParameterWriter;
 
 // Resources
 import org.geotools.util.WeakHashSet;
 import org.geotools.resources.LazySet;
+import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -411,5 +418,93 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
                 registry.registerServiceProvider(providers.next(), category);
             }
         }
+    }
+
+    /**
+     * Dump to the standard output stream a list of available math transforms.
+     * This method can be invoked from the command line. It provides a mean to
+     * verify which transforms were found in the classpath. The syntax is:
+     * <BR>
+     * <BLOCKQUOTE><CODE>
+     * java org.geotools.referencing.operation.MathTransformFactory
+     * <VAR>&lt;options&gt;</VAR> <VAR>&lt;classification&gt;</VAR>
+     * </CODE></BLOCKQUOTE>
+     *
+     * <P>where options are:</P>
+     *
+     * <TABLE>
+     *   <TR><TD NOWRAP><CODE>-all</CODE></TD>
+     *       <TD NOWRAP>&nbsp;List the parameters for all transforms</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
+     *       <TD NOWRAP>&nbsp;Set the character encoding</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-locale</CODE> <VAR>&lt;language&gt;</VAR></TD>
+     *       <TD NOWRAP>&nbsp;Set the language for the output (e.g. "fr" for French)</TD></TR>
+     * </TABLE>
+     *
+     * <P>and <VAR>&lt;classification&gt;</VAR> is the optional name of a math
+     * transform (e.g. <CODE>"Affine"</CODE>, <CODE>"EPSG:9624"</CODE> or just
+     * <CODE>"9624"</CODE> for the affine transform).</P>
+     *
+     * <P><strong>Note for Windows users:</strong> If the output contains strange
+     * symbols, try to supply an "<code>-encoding</code>" argument. Example:</P>
+     *
+     * <blockquote><code>
+     * java org.geotools.referencing.operation.MathTransformFactory -encoding Cp850
+     * </code></blockquote>
+     *
+     * <P>The codepage number (850 in the previous example) can be obtained from the DOS
+     * commande line using the "<code>chcp</code>" command with no arguments.</P>
+     *
+     * @param args Command line arguments.
+     */
+    public static void main(String[] args) {
+        /*
+         * Parse the command-line arguments and print the summary.
+         */
+        final Arguments arguments = new Arguments(args);
+        final boolean printAll = arguments.getFlag("-all");
+        args = arguments.getRemainingArguments(1);
+        final MathTransformFactory factory = new MathTransformFactory();
+        final ParameterWriter writer = new ParameterWriter(arguments.out);
+        writer.setLocale(arguments.locale);
+        Set transforms = Collections.EMPTY_SET;
+        if (printAll || args.length==0) {
+            transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
+            transforms.addAll(factory.getAvailableTransforms());
+            try {
+                writer.summary(transforms);
+            } catch (IOException exception) {
+                // Should not happen, since we are writting to System.out.
+                exception.printStackTrace(arguments.out);
+                arguments.out.flush();
+                return;
+            }
+        }
+        if (!printAll) {
+            if (args.length == 0) {
+                transforms = Collections.EMPTY_SET;
+            } else try {
+                transforms = Collections.singleton(factory.getProvider(args[0]));
+            } catch (NoSuchIdentifierException exception) {
+                arguments.out.println(exception.getLocalizedMessage());
+                return;
+            }
+        }
+        /*
+         * Iterates through all math transform to print. It may be a singleton
+         * if the user ask for a specific math transform.
+         */
+        final Iterator it = transforms.iterator();
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        try {
+            while (it.hasNext()) {
+                arguments.out.write(lineSeparator);
+                writer.format((OperationMethod) it.next());
+            }
+        } catch (IOException exception) {
+            // Should not happen, since we are writting to System.out.
+            exception.printStackTrace(arguments.out);
+        }
+        arguments.out.flush();
     }
 }

@@ -450,6 +450,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             properties.put(NAME_PROPERTY,        name);
             properties.put(IDENTIFIERS_PROPERTY, name);
             properties.put(ALIAS_PROPERTY, new Identifier[] {
+                    name,
                 new Identifier(Citation.EPSG, "9624"),
                 new Identifier(Citation.GEOTOOLS,
                     Resources.formatInternational(ResourceKeys.AFFINE_TRANSFORM))

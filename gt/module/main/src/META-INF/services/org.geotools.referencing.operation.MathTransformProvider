@@ -6,3 +6,5 @@ org.geotools.referencing.operation.transform.GeocentricTransform$ProviderInverse
 org.geotools.referencing.operation.transform.AbridgedMolodenskiTransform$Provider
 org.geotools.referencing.operation.transform.MolodenskiTransform$Provider
 org.geotools.referencing.operation.transform.NADCONTransform$Provider
+org.geotools.referencing.operation.projection.Mercator$Provider1SP
+org.geotools.referencing.operation.projection.Mercator$Provider2SP

@@ -200,7 +200,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     private LocalizationGrid gridShift = null;
 
     /**
-     * The {@link #gridShift} values as a {@link LocalizationGridTransform2D}.
+     * The {@link #gridShift} values as a <code>LocalizationGridTransform2D</code>.
      * Used for interpolating shift values.
      */
     private MathTransform gridShiftTransform = null;

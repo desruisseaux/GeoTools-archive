@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;  // For javadoc
 import java.util.Iterator;
+import java.util.Comparator;
 import java.util.logging.Logger;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
@@ -97,6 +98,50 @@ public class IdentifiedObject extends Formattable
      * for setting the value to be returned by {@link #getRemarks()}.
      */
     public static final String REMARKS_PROPERTY = "remarks";
+   
+    /**
+     * A comparator for sorting identified objects by {@linkplain #getName name}.
+     */
+    public static final Comparator NAME_COMPARATOR = new NameComparator();
+    private static final class NameComparator implements Comparator, Serializable {
+        public int compare(final Object o1, final Object o2) {
+            return doCompare(((org.opengis.referencing.IdentifiedObject) o1).getName().getCode(),
+                             ((org.opengis.referencing.IdentifiedObject) o2).getName().getCode());
+        }
+        protected Object readResolve() throws ObjectStreamException {
+            return NAME_COMPARATOR;
+        }
+    }
+
+    /**
+     * A comparator for sorting identified objects by {@linkplain #getIdentifiers identifiers}.
+     */
+    public static final Comparator IDENTIFIER_COMPARATOR = new IdentifierComparator();
+    private static final class IdentifierComparator implements Comparator, Serializable {
+        public int compare(final Object o1, final Object o2) {
+            final Identifier[] a1 = ((org.opengis.referencing.IdentifiedObject)o1).getIdentifiers();
+            final Identifier[] a2 = ((org.opengis.referencing.IdentifiedObject)o2).getIdentifiers();
+            return doCompare((a1!=null && a1.length!=0) ? a1[0].getCode() : null,
+                             (a2!=null && a2.length!=0) ? a2[0].getCode() : null);
+        }
+        protected Object readResolve() throws ObjectStreamException {
+            return IDENTIFIER_COMPARATOR;
+        }
+    }
+
+    /**
+     * A comparator for sorting identified objects by {@linkplain #getRemarks remarks}.
+     */
+    public static final Comparator REMARKS_COMPARATOR = new RemarksComparator();
+    private static final class RemarksComparator implements Comparator, Serializable {
+        public int compare(final Object o1, final Object o2) {
+            return doCompare(((org.opengis.referencing.IdentifiedObject) o1).getRemarks(),
+                             ((org.opengis.referencing.IdentifiedObject) o2).getRemarks());
+        }
+        protected Object readResolve() throws ObjectStreamException {
+            return NAME_COMPARATOR;
+        }
+    }
     
     /**
      * An empty array of alias.
@@ -636,6 +681,20 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             }
         }
         return true;
+    }
+
+    /**
+     * Compare two objects for order. Any object may be null. This method is
+     * used for implementation of {@link #NAME_COMPARATOR} and its friends.
+     */
+    private static int doCompare(final Comparable c1, final Comparable c2) {
+        if (c1 == null) {
+            return (c2==null) ? 0 : -1;
+        }
+        if (c2 == null) {
+            return +1;
+        }
+        return c1.compareTo(c2);
     }
     
     /**

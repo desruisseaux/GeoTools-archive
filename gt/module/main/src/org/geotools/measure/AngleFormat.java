@@ -273,7 +273,14 @@ public class AngleFormat extends Format {
             case SECONDS_FIELD: suffix2=s;              // fall through
         }
     }
-    
+
+    /**
+     * Construct a new <code>AngleFormat</code> for the specified locale.
+     */
+    public static AngleFormat getInstance(final Locale locale) {
+        return new AngleFormat("D\u00B0MM.m'", locale);
+    }
+
     /**
      * Construct a new <code>AngleFormat</code> using
      * the current default locale and a default pattern.

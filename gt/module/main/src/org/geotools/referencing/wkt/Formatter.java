@@ -25,6 +25,7 @@ package org.geotools.referencing.wkt;
 // J2SE dependencies and extensions
 import java.util.Locale;
 import java.util.Iterator;
+import java.util.prefs.Preferences;
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import javax.units.NonSI;
@@ -48,6 +49,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -577,5 +579,23 @@ public class Formatter {
         contextualUnit = null;
         invalidWKT     = false;
         margin         = 0;
+    }
+
+    /**
+     * Set the preferred indentation from the command line. This indentation is used by
+     * {@link Formattable#toWKT()} when no indentation were explicitly requested. This
+     * method can be invoked from the command line using the following syntax:
+     *
+     * <blockquote>
+     * <code>java org.geotools.referencing.wkt.Formatter -identation=</code><var>&lt;preferred
+     * indentation&gt;</var>
+     * </blockquote>
+     */
+    public static void main(final String[] args) {
+        final Arguments arguments = new Arguments(args);
+        final int indentation = arguments.getRequiredInteger(Formattable.INDENTATION);
+        arguments.getRemainingArguments(0);
+        Preferences.userNodeForPackage(Formattable.class)
+                   .putInt(Formattable.INDENTATION, indentation);
     }
 }

@@ -323,7 +323,30 @@ public final class FactoryFinder {
     /**
      * Dump to the standard output stream a list of available factory implementations.
      * This method can be invoked from the command line. It provides a mean to verify
-     * if some implementations were found in the classpath.
+     * if some implementations were found in the classpath. The syntax is:
+     * <BR>
+     * <BLOCKQUOTE><CODE>
+     * java org.geotools.referencing.FactoryFinder <VAR>&lt;options&gt;</VAR>
+     * </CODE></BLOCKQUOTE>
+     *
+     * <P>where options are:</P>
+     *
+     * <TABLE>
+     *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
+     *       <TD NOWRAP>&nbsp;Set the character encoding</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-locale</CODE> <VAR>&lt;language&gt;</VAR></TD>
+     *       <TD NOWRAP>&nbsp;Set the language for the output (e.g. "fr" for French)</TD></TR>
+     * </TABLE>
+     *
+     * <P><strong>Note for Windows users:</strong> If the output contains strange
+     * symbols, try to supply an "<code>-encoding</code>" argument. Example:</P>
+     *
+     * <blockquote><code>
+     * java org.geotools.referencing.FactoryFinder -encoding Cp850
+     * </code></blockquote>
+     *
+     * <P>The codepage number (850 in the previous example) can be obtained from the DOS
+     * commande line using the "<code>chcp</code>" command with no arguments.</P>
      *
      * @param args Command line arguments.
      */

@@ -129,7 +129,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      *
      * <P>The first entry in the <code>identifiers</code> array is both the
      * {@linkplain ParameterDescriptorGroup#getName main name} and the
-     * {@linkplain ParameterDescriptorGroup#getIdentifier identifiers}.
+     * {@linkplain ParameterDescriptorGroup#getIdentifiers identifiers}.
      * All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</P>
      *
      * @param identifiers  The operation identifier. Most contains at least one entry.

@@ -229,11 +229,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
 
     /**
-     * Returns the parameter value for the specified operation parameter.
-     * Values are automatically converted into the standard units specified
-     * by the supplied <code>param</code> argument.
-     * This convenience method is used by subclasses for initializing
-     * {@linkplain MathTransform math transform} from a set of parameters.
+     * Returns the parameter value for the specified operation parameter. Values are
+     * automatically converted into the standard units specified by the supplied
+     * <code>param</code> argument, except {@link NonSI#DEGREE_ANGLE degrees} which
+     * are converted to {@link SI#RADIAN radians}.
      *
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
@@ -248,7 +247,16 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     {
         final Unit unit = param.getUnit();
         final ParameterValue value = group.parameter(param.getName().getCode());
-        return (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
+        double v;
+        if (unit != null) {
+            v = value.doubleValue(unit);
+            if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                v = Math.toRadians(v);
+            }
+        } else {
+            v = value.doubleValue();
+        }
+        return v;
     }
 
     /**

@@ -96,7 +96,7 @@ public class Mercator extends MapProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    static final class Provider1SP extends Provider {
+    public static final class Provider1SP extends Provider {
         /**
          * The parameters group.
          */
@@ -137,16 +137,16 @@ public class Mercator extends MapProjection {
     }
 
     /**
-     * The {@link MathTransformProvider} for a {@link Mercator} projection 2SP.
+     * The {@link MathTransformProvider} for a {@link Mercator} 2SP projection.
      *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
-     * @see org.geotools.ct.MathTransformFactory
+     * @see MathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    static final class Provider2SP extends Provider {
+    public static final class Provider2SP extends Provider {
         /**
          * The operation parameter descriptor for the {@link #standardParallel standard parallel}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
@@ -242,7 +242,7 @@ public class Mercator extends MapProjection {
     }
 
     /**
-     * {@link inheritDoc}
+     * {@inheritDoc}
      */
     public ParameterValueGroup getParameterValues() {
         return null; // TODO
