@@ -330,13 +330,36 @@ public class GeneralMatrix extends GMatrix implements Matrix {
      * and the column index as the second. Values are copied; changes to the
      * returned array will not change this matrix.
      */
+    public static double[][] getElements(final Matrix matrix) {
+        if (matrix instanceof GeneralMatrix) {
+            return ((GeneralMatrix) matrix).getElements();
+        }
+        final int numCol = matrix.getNumCol();
+        final double[][] rows = new double[matrix.getNumRow()][];
+        for (int j=0; j<rows.length; j++) {
+            final double[] row;
+            rows[j] = row = new double[numCol];
+            for (int i=0; i<row.length; i++) {
+                row[i] = matrix.getElement(j, i);
+            }
+        }
+        return rows;
+    }
+    
+    /**
+     * Retrieves the specifiable values in the transformation matrix into a
+     * 2-dimensional array of double precision values. The values are stored
+     * into the 2-dimensional array using the row index as the first subscript
+     * and the column index as the second. Values are copied; changes to the
+     * returned array will not change this matrix.
+     */
     public final double[][] getElements() {
         final int numCol = getNumCol();
-        final double[][] matrix = new double[getNumRow()][];
-        for (int j=0; j<matrix.length; j++) {
-            getRow(j, matrix[j]=new double[numCol]);
+        final double[][] rows = new double[getNumRow()][];
+        for (int j=0; j<rows.length; j++) {
+            getRow(j, rows[j]=new double[numCol]);
         }
-        return matrix;
+        return rows;
     }
     
     /**
