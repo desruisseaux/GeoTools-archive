@@ -35,6 +35,8 @@ import org.geotools.filter.IllegalFilterException;
  *
  */
 public class WFSDataStoreWriteTest extends TestCase {
+    public void testEmpty(){/**/}
+
     
     public WFSDataStoreWriteTest(){
         Logger.global.setLevel(Level.SEVERE);
