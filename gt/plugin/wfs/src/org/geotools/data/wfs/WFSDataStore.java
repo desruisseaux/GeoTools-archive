@@ -62,6 +62,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
@@ -309,7 +310,7 @@ public class WFSDataStore extends AbstractDataStore {
         CoordinateReferenceSystem crs;
         try {
             if(crsName!=null){
-                crs = FactoryFinder.decode(crsName);
+                crs = CRS.decode(crsName);
             	t = FeatureTypes.transform(t,crs);
             }
         } catch (FactoryException e) {
@@ -741,7 +742,7 @@ System.out.println(url);
         if(fsd.getSRS()!=null){
             // reproject this
             try {
-                crs = FactoryFinder.decode(fsd.getSRS());
+                crs = CRS.decode(fsd.getSRS());
                 maxbbox = FactoryFinder.toGeographic(maxbbox,crs);
             } catch (FactoryException e) {
                 e.printStackTrace();maxbbox = null;

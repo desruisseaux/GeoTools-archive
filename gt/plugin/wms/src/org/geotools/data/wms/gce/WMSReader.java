@@ -30,7 +30,7 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
@@ -224,7 +224,7 @@ public class WMSReader implements GridCoverageReader {
             	String srs = value.stringValue();
 
             	try {
-					crs = FactoryFinder.decode(srs);
+					crs = CRS.decode(srs);
 				} catch (NoSuchAuthorityCodeException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

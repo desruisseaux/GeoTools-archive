@@ -20,6 +20,7 @@ package org.geotools.referencing.crs;
 
 import junit.framework.TestCase;
 
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -57,20 +58,20 @@ public class ReprojectionServiceTest extends TestCase {
         super.tearDown();
     }
 	public void testEPSG42102() throws Exception {
-	    CoordinateReferenceSystem bc = FactoryFinder.decode("EPSG:42102");
+	    CoordinateReferenceSystem bc = CRS.decode("EPSG:42102");
 		assertNotNull( "bc", bc );
 	}
     
 	public void testAUTO4200() throws Exception {	
-        //CoordinateReferenceSystem utm = FactoryFinder.decode("AUTO:42001,0.0,0.0");
-		//assertNotNull( "auto-utm", utm );		
+	    CoordinateReferenceSystem utm = CRS.decode("AUTO:42001,0.0,0.0");
+		assertNotNull( "auto-utm", utm );		
 	}
 
     public void test4269() throws Exception {
-        CoordinateReferenceSystem latlong = FactoryFinder.decode("EPSG:4269");        
+        CoordinateReferenceSystem latlong = CRS.decode("EPSG:4269");        
         assertNotNull( "latlong", latlong );
         try {
-            latlong = FactoryFinder.decode("4269");
+            latlong = CRS.decode("4269");
             fail( "Shoudl not be able to decode 4269 without EPSG authority");
         } catch (NoSuchAuthorityCodeException e) {
             // expected
@@ -79,8 +80,8 @@ public class ReprojectionServiceTest extends TestCase {
     }
     
     public void testTranform() throws Exception {
-        CoordinateReferenceSystem bc = FactoryFinder.decode("EPSG:42102");
-        CoordinateReferenceSystem latlong = FactoryFinder.decode("EPSG:4269");
+        CoordinateReferenceSystem bc = CRS.decode("EPSG:42102");
+        CoordinateReferenceSystem latlong = CRS.decode("EPSG:4269");
         
         /*
         MathTransform transform = CRSService.reproject( bc, latlong, true );

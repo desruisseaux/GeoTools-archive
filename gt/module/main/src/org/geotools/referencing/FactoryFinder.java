@@ -44,7 +44,6 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
@@ -225,48 +224,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCRSFactories() {
         return new LazySet(getProviders(CRSFactory.class));
-    }
-    
-    /**
-     * Locate for CoordinateReferenceSystem for specific code.
-     * <p>
-     * Note the code needs to mention the authority.
-     * <pre><code>
-     * EPSG:1234
-     * AUTO:42001, ..., ..., ...
-     * </code></pre>
-     * </p>
-     * </p>
-     * @param code
-     * @return coordinate system for the provided code
-     * @throws NoSuchAuthorityCodeException If the code could not be understood 
-     */ 
-    public static CoordinateReferenceSystem decode( String code ) throws NoSuchAuthorityCodeException {
-        int split = code.indexOf(':');
-        if( split == -1 ){
-            throw new NoSuchAuthorityCodeException("No authority was defined - did you forget 'EPSG:number'?", "unknown", code );
-        }
-        final String AUTHORITY = code.substring( 0, split );
-        Throwable trouble = null;
-        for( Iterator i = getAuthorityFactories().iterator(); i.hasNext(); ){
-            AuthorityFactory factory = (AuthorityFactory) i.next();
-            factory.getAuthority().getIdentifierTypes().contains( AUTHORITY );
-            try {
-                CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
-                if( crs != null ) return crs;
-            } catch (FactoryException e) {
-                trouble = e;
-            }
-            catch (Throwable e) {
-                trouble = e;
-            }
-        }        
-        if( trouble instanceof NoSuchAuthorityCodeException){
-            throw (NoSuchAuthorityCodeException) trouble;
-        }
-        NoSuchAuthorityCodeException notFound = new NoSuchAuthorityCodeException( "Unabled to locate code", "not found", code); //$NON-NLS-1$ //$NON-NLS-2$
-        if( trouble != null ) notFound.initCause( trouble );        
-        throw notFound; 
     }
     
     /**

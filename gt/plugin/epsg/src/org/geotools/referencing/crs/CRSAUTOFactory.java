@@ -88,6 +88,10 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
      */
     private final Map facts = new HashMap();
 	 
+    /**
+     * Construct <code>CRSAUTOFactory</code>.
+     *
+     */
     public CRSAUTOFactory(){
         this(FactoryFinder.getCRSFactory());
     }
@@ -123,7 +127,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
     }
         
     public Object createObject(String code) throws FactoryException {
-        return (Object) createCoordinateReferenceSystem(code);
+        return createCoordinateReferenceSystem(code);
     }
     
     public ProjectedCRS createProjectedCRS(String code) throws FactoryException {

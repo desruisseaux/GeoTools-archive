@@ -29,7 +29,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 
 
@@ -62,7 +62,7 @@ public class PrjFileReader {
         
         String wkt = charBuffer.toString();
         wkt = rewrite(wkt);
-        cs = FactoryFinder.decode(wkt);
+        cs = CRS.decode(wkt);
     }
     
     public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem(){
