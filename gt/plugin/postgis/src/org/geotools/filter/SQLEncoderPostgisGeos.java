@@ -168,6 +168,23 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
 
         try {
 
+        	// DJB:  disjoint is not correctly handled in the pre-march 22/05 version
+        	//       I changed it to not do a "&&" index search for disjoint because
+        	//       Geom1 and Geom2 can have a bbox overlap and be disjoint
+        	//       I also added test case.
+        	//NOTE:  this will not use the index, but its unlikely that using the index
+        	//       for a disjoint query will be the correct thing to do.
+        
+        	
+        	// DJB NOTE:  need to check for a NOT(A intersects G) filter
+        	//          -->  NOT( (A && G) AND intersects(A,G))
+        	// and check that it does the right thing.
+        	
+        	
+        	constrainBBOX = constrainBBOX && (filterType != AbstractFilter.GEOMETRY_DISJOINT);
+        	
+
+        
 	    if (constrainBBOX) {
             
                 if (left == null) {
