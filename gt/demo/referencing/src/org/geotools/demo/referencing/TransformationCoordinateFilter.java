@@ -34,8 +34,7 @@ import org.geotools.pt.CoordinatePoint;
  */
 public class TransformationCoordinateFilter implements CoordinateFilter{
     /* Transform to apply to each coordinate*/
-    MathTransform transform;
-    CoordinatePoint point;
+    private MathTransform transform;
     
     /** Creates a new instance of TransformationCoordinateFilter */
     public TransformationCoordinateFilter(MathTransform transform) {
@@ -44,7 +43,7 @@ public class TransformationCoordinateFilter implements CoordinateFilter{
     
     /*performs a transformation on a coordinate*/
     public void filter(com.vividsolutions.jts.geom.Coordinate coordinate) {
-        point = new CoordinatePoint(coordinate.x, coordinate.y);
+        CoordinatePoint point = new CoordinatePoint(coordinate.x, coordinate.y);
         try {
             point = transform.transform(point, point);
         }
