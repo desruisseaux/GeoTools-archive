@@ -121,7 +121,7 @@ public class NumberedLineWriter extends FilterWriter {
             out.write("] ");
         }
         out.write(c);
-        if (newLine = (c=='\r' || c=='\n')) {
+        if ((newLine = (c=='\r' || c=='\n')) == true) {
             waitLF = (c=='\r');
         }
     }

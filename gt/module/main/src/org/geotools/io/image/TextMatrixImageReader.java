@@ -208,7 +208,7 @@ public class TextMatrixImageReader extends TextImageReader {
                 }
             }
         }
-        if (completed=all) {
+        if ((completed=all)==true) {
             data = XArray.resize(data, offset);
             expectedHeight = height;
         }
