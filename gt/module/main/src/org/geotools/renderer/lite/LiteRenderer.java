@@ -109,6 +109,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.styling.StyleFactory;
 
 
 /**
@@ -935,7 +936,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                     }
                 }
             }
-            reader.close();
+        reader.close();
         }
     }
 
@@ -1827,7 +1828,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                 break;
             }
         }
-
+      
         return mark;
     }
 
@@ -2154,6 +2155,9 @@ public class LiteRenderer implements Renderer, Renderer2D {
             }
 
             Mark mark = getMark(gr, feature);
+            if(mark == null) {
+                mark = StyleFactory.createStyleFactory().getDefaultMark();
+            }
             int size = 200;
 
             image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
