@@ -1,6 +1,7 @@
 package org.geotools.catalog;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.geotools.expr.Expr;
 import org.geotools.feature.AttributeType;
@@ -69,7 +70,7 @@ public class Query {
 		return filter.contains( fakeFeature );
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
-		public String getNamespace() {
+		public URI getNamespace() {
 			return null;
 		}
 		public String getTypeName() {
@@ -96,7 +97,7 @@ public class Query {
 		public AttributeType getAttributeType(int position) {
 			return null;
 		}
-		public boolean isDescendedFrom(String nsURI, String typeName) {
+		public boolean isDescendedFrom(URI nsURI, String typeName) {
 			return false;
 		}
 		public boolean isDescendedFrom(FeatureType type) {
