@@ -2,10 +2,10 @@ package org.geotools.data;
 
 import org.geotools.data.memory.MemoryDataStore;
 
-public class FeatureSourceMetadataEnityTest extends DataTestCase {
+public class FeatureTypeMetadataEnityTest extends DataTestCase {
     MemoryDataStore store;
     
-    public FeatureSourceMetadataEnityTest(String test) {
+    public FeatureTypeMetadataEnityTest(String test) {
         super(test);
     }
     protected void setUp() throws Exception {
@@ -15,11 +15,11 @@ public class FeatureSourceMetadataEnityTest extends DataTestCase {
         store.addFeatures( riverFeatures );
         store.addFeatures( lakeFeatures );                               
     }
-//    public void testRoadMeta(){
-//        FeatureSourceMetadataEnity roadMeta =
-//            new FeatureSourceMetadataEnity( store, "road" );
-//        
-//    }
+    public void testRoadMeta(){
+        FeatureTypeMetadataEntity roadMeta =
+            new FeatureTypeMetadataEntity( store, null, "road" );
+        
+    }
     protected void tearDown() throws Exception {
         super.tearDown();
     }

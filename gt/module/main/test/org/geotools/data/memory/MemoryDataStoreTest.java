@@ -49,6 +49,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import java.io.IOException;
+import java.net.URI;
 import java.util.NoSuchElementException;
 
 
@@ -90,7 +91,7 @@ public class MemoryDataStoreTest extends DataTestCase {
     public void testFixture() throws Exception {
         FeatureType type = DataUtilities.createType("namespace.typename",
                 "name:String,id:0,geom:MultiLineString");
-        assertEquals("namespace", "namespace", type.getNamespace());
+        assertEquals("namespace", new URI("namespace"), type.getNamespace());
         assertEquals("typename", "typename", type.getTypeName());
         assertEquals("attributes", 3, type.getAttributeCount());
 
