@@ -123,4 +123,30 @@ public final class NameFactory {
         }
         return new ScopedName(create(names, length-1, separator), separator, names[length-1]);
     }
+
+    /**
+     * Returns the specified name in an array. The {@code value} may be either a {@link String},
+     * {@code String[]}, {@link GenericName} or {@code GenericName[]}. This method is used in
+     * {@link org.geotools.referencing.IdentifiedObject} constructors.
+     *
+     * @param  value The object to cast into an array of generic names.
+     * @return The generic names.
+     * @throws ClassCastException if {@code value} can't be cast.
+     */
+    public static GenericName[] toArray(final Object value) throws ClassCastException {
+        if (value instanceof CharSequence) {
+            return new GenericName[] {create(value.toString())};
+        } else if (value instanceof CharSequence[]) {
+            final CharSequence[] values = (CharSequence[]) value;
+            final GenericName[] names = new GenericName[values.length];
+            for (int i=0; i<values.length; i++) {
+                names[i] = create(values[i].toString());
+            }
+            return names;
+        } else if (value instanceof GenericName) {
+            return new GenericName[] {(GenericName) value};
+        } else {
+            return (GenericName[]) value;
+        }
+    }
 }

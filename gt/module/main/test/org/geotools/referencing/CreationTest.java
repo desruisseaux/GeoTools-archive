@@ -54,15 +54,19 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
+import org.opengis.util.GenericName;
+import org.opengis.util.ScopedName;
 
 // Geotools dependencies
+import org.geotools.referencing.factory.DatumAliases;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.GeotoolsFactory;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Arguments;
 
 
 /**
- * Test the creation of {@link CoordinateReferenceSystem} objects.
+ * Tests the creation of {@link CoordinateReferenceSystem} objects and dependencies.
  *
  * @version $Id$
  */
@@ -96,7 +100,7 @@ public class CreationTest extends TestCase {
     }
 
     /**
-     * Test the creation of new coordinate reference systems.
+     * Tests the creation of new coordinate reference systems.
      *
      * @throws FactoryException if a coordinate reference system can't be created.
      */
@@ -180,7 +184,7 @@ public class CreationTest extends TestCase {
     }
 
     /**
-     * Test all map projection creation.
+     * Tests all map projection creation.
      */
     public void testMapProjections() throws FactoryException {
         out.println();
@@ -223,7 +227,32 @@ public class CreationTest extends TestCase {
     }
 
     /**
+     * Tests datum aliases. Note: ellipsoid and prime meridian are dummy values just
+     * (not conform to the usage in real world) just for testing purpose.
+     */
+    public void testDatumAliases() throws FactoryException {
+        final String           name1 = "Nouvelle_Triangulation_Francaise_Paris";
+        final String           name2 = "NTF (Paris meridian)";
+        final Ellipsoid    ellipsoid = org.geotools.referencing.datum.Ellipsoid.WGS84;
+        final PrimeMeridian meridian = org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+        DatumFactory         factory = new GeotoolsFactory();
+        final Map         properties = Collections.singletonMap("name", name1);
+        GeodeticDatum datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
+        assertTrue(datum.getAlias().length == 0);
+
+        factory = new DatumAliases(factory);
+        datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
+        final GenericName[] aliases = datum.getAlias();
+        assertTrue(aliases.length == 2);
+        assertEquals(name1, aliases[0].asLocalName().toString());
+        assertEquals(name2, aliases[1].asLocalName().toString());
+        assertTrue  (aliases[0] instanceof ScopedName);
+        assertTrue  (aliases[1] instanceof ScopedName);
+    }
+
+    /**
      * Run the test from the command line.
+     * Options: {@code -verbose}.
      *
      * @param args the command line arguments.
      */

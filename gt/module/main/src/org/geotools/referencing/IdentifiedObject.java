@@ -314,20 +314,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // -------------------------------------------------------
                 case 92902992: {
                     if (key.equals(ALIAS_PROPERTY)) {
-                        if (value instanceof String) {
-                            alias = new GenericName[] {NameFactory.create((String) value)};
-                        } else if (value instanceof String[]) {
-                            final String[] values = (String[]) value;
-                            final GenericName[] names = new GenericName[values.length];
-                            for (int i=0; i<values.length; i++) {
-                                names[i] = NameFactory.create(values[i]);
-                            }
-                            alias = names;
-                        } else if (value instanceof GenericName) {
-                            alias = new GenericName[] {(GenericName) value};
-                        } else {
-                            alias = value;
-                        }
+                        alias = NameFactory.toArray(value);
                         continue NEXT_KEY;
                     }
                     break;

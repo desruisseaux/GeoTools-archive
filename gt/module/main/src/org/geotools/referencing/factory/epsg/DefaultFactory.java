@@ -37,6 +37,9 @@ import javax.sql.DataSource;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
@@ -321,6 +324,9 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *   <strong>{@code -encoding} <var>charset</var></strong><br>
      *       Sets the console encoding for this application output. This value has
      *       no impact on the data exchanged with the EPSG database.
+     *
+     *   <strong>{@code -transform}</strong><br>
+     *       Output the math transforms between every pairs of CRS.
      * </blockquote>
      *
      * @param args A list of EPSG code to display.
@@ -330,6 +336,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments arguments = new Arguments(args);
         final String   datasource = arguments.getOptionalString("-datasource");
+        final boolean     printMT = arguments.getFlag("-transform");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         if (datasource != null) {
             final Preferences prefs = Preferences.userNodeForPackage(DefaultFactory.class);
@@ -339,6 +346,14 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 prefs.put(DATASOURCE_NODE, datasource);
             }
         }
+        /*
+         * Constructs and prints each object. In the process, keep all coordinate reference systems.
+         * They will be used later for printing math transforms. This is usefull in order to check
+         * if the EPSG database provides enough information that Geotools know about for creating
+         * the coordinate operation.
+         */
+        int count = 0;
+        final CoordinateReferenceSystem[] crs = new CoordinateReferenceSystem[args.length];
         try {
             AuthorityFactory factory = null;
             try {
@@ -346,7 +361,12 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                     if (factory == null) {
                         factory = FactoryFinder.getCRSAuthorityFactory("EPSG");
                     }
-                    arguments.out.println(factory.createObject(args[i]));
+                    final Object object = factory.createObject(args[i]);
+                    arguments.out.println(object);
+                    arguments.out.println();
+                    if (object instanceof CoordinateReferenceSystem) {
+                        crs[count++] = (CoordinateReferenceSystem) object;
+                    }
                 }
             } finally {
                 if (factory instanceof AbstractAuthorityFactory) {
@@ -355,6 +375,24 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             }
         } catch (Exception exception) {
             exception.printStackTrace(arguments.err);
+        }
+        /*
+         * If the user asked for math transforms, prints them now.
+         */
+        if (printMT) {
+            final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory();
+            for (int i=0; i<count; i++) {
+                for (int j=i+1; j<count; j++) {
+                    try {
+                        arguments.out.println(factory.createOperation(crs[i], crs[j]).getMathTransform());
+                    } catch (OperationNotFoundException exception) {
+                        arguments.out.println(exception.getLocalizedMessage());
+                    } catch (FactoryException exception) {
+                        exception.printStackTrace(arguments.err);
+                    }
+                    arguments.out.println();
+                }
+            }
         }
         arguments.out.flush();
     }

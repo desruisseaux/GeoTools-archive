@@ -106,7 +106,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The pool of cached objects.
      */
-    private final LinkedHashMap pool = new LinkedHashMap();
+    private final LinkedHashMap pool = new LinkedHashMap(32, 0.75f, true);
 
     /**
      * The maximum number of objects to keep by strong reference. If a greater amount of
