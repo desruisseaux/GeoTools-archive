@@ -152,6 +152,25 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
         if (sym instanceof TextSymbolizer) {
             visit((TextSymbolizer) sym);
         }
+        
+        if (sym instanceof RasterSymbolizer) {
+            visit((RasterSymbolizer) sym);
+        }
+    }
+    
+    public void visit(RasterSymbolizer rs) {
+        if (rs.getGeometryPropertyName() != null) {
+            attributeNames.add(rs.getGeometryPropertyName());
+            attributeNames.add("grid");
+        }
+        
+        if (rs.getImageOutline() != null) {
+            rs.getImageOutline().accept(this);
+        }
+        
+        if (rs.getOpacity() != null) {
+            rs.getOpacity().accept(this);
+        }
     }
 
     /**

@@ -24,6 +24,7 @@ import java.awt.image.RenderedImage;
 import javax.media.jai.ImageMIPMap;
 
 import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -93,11 +94,10 @@ public final class GridCoverageRenderer {
      */
     public GridCoverageRenderer(GridCoverage gridCoverage) {
         this.gridCoverage = gridCoverage;
-        
-        if (gridCoverage instanceof GridCoverageImpl) {
-        	image = ((GridCoverageImpl) gridCoverage).getRenderedImage();
-        }
 
+        if (gridCoverage instanceof RenderedCoverage) {
+            image = ((RenderedCoverage) gridCoverage).getRenderedImage();
+        } 
 //  FIXME
 //        try {
 //            image = gridCoverage.geophysics(false).getRenderedImage();
@@ -144,16 +144,16 @@ public final class GridCoverageRenderer {
 
         if (images == null) {
 //  FIXME
-//            final AffineTransform transform;
-//            transform = new AffineTransform(gridToCoordinate);
-//            transform.translate(-0.5, -0.5); // Map to upper-left corner.
-//
-//            try {
-//                graphics.drawRenderedImage(image, transform);
-//            } catch (Exception e) {
-//                image = getGoodImage(image);
-//                graphics.drawRenderedImage(image, transform);
-//            }
+            final AffineTransform transform;
+            transform = new AffineTransform(gridToCoordinate);
+            transform.translate(-0.5, -0.5); // Map to upper-left corner.
+
+            try {
+                graphics.drawRenderedImage(image, transform);
+            } catch (Exception e) {
+                image = getGoodImage(image);
+                graphics.drawRenderedImage(image, transform);
+            }
         } else {
             /*
              * Compute the most appropriate level as a function of the required
