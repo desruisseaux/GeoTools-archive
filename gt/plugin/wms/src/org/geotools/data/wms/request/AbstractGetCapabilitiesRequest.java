@@ -24,7 +24,7 @@ import java.net.URL;
  *
  * @author Richard Gould
  */
-public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest {
+public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest implements GetCapabilitiesRequest{
     /** Represents the SERVICE parameter */
     public static final String SERVICE = "SERVICE"; //$NON-NLS-1$
 

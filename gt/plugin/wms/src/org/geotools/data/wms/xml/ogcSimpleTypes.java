@@ -1,5 +1,6 @@
 package org.geotools.data.wms.xml;
 
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.impl.FacetGT;
@@ -15,16 +16,18 @@ public class ogcSimpleTypes {
                 org.geotools.xml.xsi.XSISimpleTypes.String.getInstance()/* simpleType name is string */
         };
         private static Facet[] facets = new Facet[]{
-            new FacetGT(Facet.ENUMERATION, "/"),
-            new FacetGT(Facet.ENUMERATION, "/OGC_CAPABILITIES/ServiceMetadata"),
-            new FacetGT(Facet.ENUMERATION, "/OGC_CAPABILITIES/OperationSignatures"),
-            new FacetGT(Facet.ENUMERATION, "/OGC_CAPABILITIES/ContentMetadata"),
-            new FacetGT(Facet.ENUMERATION, "/OGC_CAPABILITIES/Common")
+            new FacetGT(Facet.ENUMERATION, GetCapabilitiesRequest.SECTION_ALL),
+            new FacetGT(Facet.ENUMERATION, GetCapabilitiesRequest.SECTION_SERVICE),
+            new FacetGT(Facet.ENUMERATION, GetCapabilitiesRequest.SECTION_OPERATIONS),
+            new FacetGT(Facet.ENUMERATION, GetCapabilitiesRequest.SECTION_CONTENT),
+            new FacetGT(Facet.ENUMERATION, GetCapabilitiesRequest.SECTION_COMMON)
         };
 
         private CapabilitiesSectionType() {
             super("ogc:CapabilitiesSectionType", 4, parents, facets);
         }
+        
+        
     }
 
     protected static class FormatType extends ogcSimpleType {

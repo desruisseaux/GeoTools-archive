@@ -1,12 +1,20 @@
 package org.geotools.data.wms.xml;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.impl.AttributeGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.styling.sldSchema;
+import org.xml.sax.helpers.AttributesImpl;
 
 public class ogcComplexTypes {
 
@@ -75,10 +83,10 @@ public class ogcComplexTypes {
         }
 
         private static Attribute[] attrs = new Attribute[]{
-                new AttributeGT(null, "version", ogcSchema.NAMESPACE,
+                new AttributeGT(null, "version", OGCSchema.NAMESPACE,
                         org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
                         Attribute.REQUIRED, null, null, false),
-                new AttributeGT(null, "service", ogcSchema.NAMESPACE, ogcSimpleTypes.OWSType
+                new AttributeGT(null, "service", OGCSchema.NAMESPACE, ogcSimpleTypes.OWSType
                         .getInstance(), Attribute.REQUIRED, ogcSimpleTypes.OWSType.getInstance()
                         .getFacets()[0].getValue(), ogcSimpleTypes.OWSType.getInstance()
                         .getFacets()[0].getValue(), false)};
@@ -145,10 +153,10 @@ public class ogcComplexTypes {
         }
 
         private static Attribute[] attrs = new Attribute[]{
-                new AttributeGT(null, "version", ogcSchema.NAMESPACE,
+                new AttributeGT(null, "version", OGCSchema.NAMESPACE,
                         org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
                         Attribute.REQUIRED, null, null, false),
-                new AttributeGT(null, "service", ogcSchema.NAMESPACE, ogcSimpleTypes.OWSType
+                new AttributeGT(null, "service", OGCSchema.NAMESPACE, ogcSimpleTypes.OWSType
                         .getInstance(), Attribute.REQUIRED, ogcSimpleTypes.OWSType.getInstance()
                         .getFacets()[0].getValue(), ogcSimpleTypes.OWSType.getInstance()
                         .getFacets()[0].getValue(), false)};
@@ -180,21 +188,70 @@ public class ogcComplexTypes {
         }
 
         private static Attribute[] attrs = new Attribute[]{
-                new AttributeGT(null, "service", ogcSchema.NAMESPACE, ogcSimpleTypes.OWSType.getInstance(), Attribute.REQUIRED, 
+                new AttributeGT(null, "service", OGCSchema.NAMESPACE, ogcSimpleTypes.OWSType.getInstance(), Attribute.REQUIRED, 
                         null, null, false),
-                new AttributeGT(null, "version", ogcSchema.NAMESPACE, org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
+                new AttributeGT(null, "version", OGCSchema.NAMESPACE, org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
                         Attribute.REQUIRED, null, null, false),
-                new AttributeGT(null, "updateSequence", ogcSchema.NAMESPACE, 
+                new AttributeGT(null, "updateSequence", OGCSchema.NAMESPACE, 
                         org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
                         Attribute.OPTIONAL, null, null, false)};
 
-        private static Element[] elems = new Element[]{new ogcElement("Section", null, null, 0, 1)};
+        private static Element[] elems = new Element[]{new ogcElement("Section", ogcSimpleTypes.CapabilitiesSectionType.getInstance(), null, 0, 1)};
 
         private static ElementGrouping child = new SequenceGT(null,
-                new ElementGrouping[]{new ogcElement("Section", null, null, 0, 1)}, 1, 1);
+                new ElementGrouping[]{new ogcElement("Section", ogcSimpleTypes.CapabilitiesSectionType.getInstance(), null, 0, 1)}, 1, 1);
 
         private _GetCapabilities() {
             super(null, child, attrs, elems, null, false, false);
+        }
+        
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            if (element.getType() != null && getName().equals(element.getType().getName())) {
+                for (int i = 0; i < ogcSimpleTypes.CapabilitiesSectionType.getInstance().getFacets().length; i++) {
+                    Facet facet = ogcSimpleTypes.CapabilitiesSectionType.getInstance().getFacets()[i];
+                    if (facet.getValue().equals(value)) {
+                        return true;
+                    }
+                }
+                
+                if (value == null || value == "") { //$NON-NLS-1$
+                    return true;
+                }
+            }
+            return super.canEncode(element, value, hints);
+        }
+        public void encode( Element element, Object value, PrintHandler output, Map hints )
+                throws OperationNotSupportedException {
+            
+            if (canEncode(element, value, hints)) {
+                AttributesImpl attributes = new AttributesImpl();
+//                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
+//                    attrs[0].getName(), null, "string", attrs[0].getFixed());
+//                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
+//                    attrs[1].getName(), null, "string", attrs[1].getFixed());
+//                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
+//                    attrs[2].getName(), null, "string", attrs[2].getFixed());
+                
+                
+                try {
+                    output.startElement(element.getNamespace(), element.getName(), attributes);
+                    
+                    output.endElement(element.getNamespace(), element.getName());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                
+            } else {
+                throw new UnsupportedOperationException();
+            }
+            
+        }
+        public Class getInstanceType() {
+            return String.class;
+        }
+        
+        public String getName() {
+            return "GetCapabilities";
         }
     }
 }

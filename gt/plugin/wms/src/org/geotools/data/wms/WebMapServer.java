@@ -7,8 +7,12 @@
  */
 package org.geotools.data.wms;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -22,6 +26,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryRequest;
@@ -31,6 +37,7 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
@@ -45,6 +52,7 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.data.wms.xml.OGCSchema;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.DocumentFactory;
@@ -323,12 +331,22 @@ public class WebMapServer implements Discovery {
         hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
         hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
         
-//        DocumentWriter.
+
 
         URLConnection urlConnection = url.openConnection();
         //        urlConnection.setRequestProperty("accept", "application/vnd.ogc.wms+xml, text/xml, *; q=.2, */*; q=.2");
         //        urlConnection.setRequestProperty("accept-encoding", "compress; q=1.0, gzip; q=0, *");
 
+//        OutputStream outputStream = urlConnection.getOutputStream();
+//        Writer out = new BufferedWriter(new OutputStreamWriter(outputStream));
+//        Map writerHints = new HashMap();
+//        hints.put(DocumentWriter.BASE_ELEMENT, OGCSchema.getInstance().getElements()[OGCSchema.GET_CAPABILITIES]);
+//        try {
+//            DocumentWriter.writeDocument(GetCapabilitiesRequest.SECTION_ALL, OGCSchema.getInstance(), out, writerHints);
+//        } catch (OperationNotSupportedException e) {
+//            e.printStackTrace();
+//        }         
+        
         InputStream io = urlConnection.getInputStream();
         
         if (urlConnection.getContentEncoding() != null && urlConnection.getContentEncoding().indexOf("gzip") != -1) {
@@ -374,6 +392,9 @@ public class WebMapServer implements Discovery {
         URL finalURL = request.getFinalURL();
 
         URLConnection connection = finalURL.openConnection();
+
+        
+
         InputStream inputStream = connection.getInputStream();
         
         if (connection.getContentEncoding() != null && connection.getContentEncoding().indexOf("gzip") != -1) {
