@@ -90,10 +90,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             false);
     
     protected Map cache = new HashMap();
-    protected static Logger logger = {
-    	logger = Logger.getLogger("org.geotools.data.wfs");
-    	logger.setLevel(Level.OFF);
-    };
+    protected static final Logger logger = logger();
+    private static Logger logger(){
+    	Logger r = Logger.getLogger("org.geotools.data.wfs");
+    	r.setLevel(Level.OFF);
+    	return r;
+    }
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
