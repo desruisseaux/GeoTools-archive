@@ -138,6 +138,18 @@ final class MetadataResult {
      * @return The attribute value.
      * @throws SQLException if an SQL operation failed.
      */
+    public Object getArray(final int identifier, final String columnName) throws SQLException {
+        return getResultSet(identifier).getArray(columnName).getArray();
+    }
+
+    /**
+     * Returns the attribute value in the given column for the given record.
+     *
+     * @param  identifier The object identifier, usually the primary key value.
+     * @param  columnName The column name of the attribute to search.
+     * @return The attribute value.
+     * @throws SQLException if an SQL operation failed.
+     */
     public int getInt(final int identifier, final String columnName) throws SQLException {
         return getResultSet(identifier).getInt(columnName);
     }

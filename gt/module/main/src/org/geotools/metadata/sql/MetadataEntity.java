@@ -82,8 +82,7 @@ final class MetadataEntity implements InvocationHandler {
         final Class type = method.getDeclaringClass();
         if (type.getName().startsWith(source.metadataPackage)) {
             if (args!=null && args.length!=0) {
-                // TODO: localize
-                throw new MetadataException("Unexpected argument");
+                throw new MetadataException("Unexpected argument."); // TODO: localize
             }
             /*
              * The method invoked is a method from the metadata interface.
@@ -93,7 +92,7 @@ final class MetadataEntity implements InvocationHandler {
             try {
                 return source.getValue(type, method, identifier);
             } catch (SQLException e) {
-                throw new MetadataException(e);
+                throw new MetadataException("Failed to query the database.", e); // TODO: localize
             }
         } else {
             /*
@@ -107,9 +106,9 @@ final class MetadataEntity implements InvocationHandler {
             try {
                 return method.invoke(this, args);
             } catch (IllegalAccessException e) {
-                throw new MetadataException(e);
+                throw new MetadataException("Illegal method call.", e); // TODO: localize
             } catch (InvocationTargetException e) {
-                throw new MetadataException(e);
+                throw new MetadataException("Illegal method call.", e); // TODO: localize
             }
         }
     }

@@ -22,20 +22,32 @@ package org.geotools.metadata.sql;
 // J2SE dependencies
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
-import org.geotools.util.SimpleInternationalString;
+// OpenGIS dependencies
 import org.opengis.metadata.MetaData;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -99,6 +111,11 @@ public class MetadataSource {
     private final Properties geoApiToIso = new Properties();
 
     /**
+     * Type of collections.
+     */
+    private final Properties collectionTypes = new Properties();
+
+    /**
      * The class loader to use for proxy creation.
      */
     private final ClassLoader loader;
@@ -111,10 +128,15 @@ public class MetadataSource {
     public MetadataSource(final Connection connection) {
         this.connection = connection;
         try {
-            final InputStream in = MetaData.class.getClassLoader()
-                  .getResourceAsStream("org/opengis/metadata/GeoAPI_to_ISO.properties");
+            InputStream in = MetaData.class.getResourceAsStream("GeoAPI_to_ISO.properties");
             geoApiToIso.load(in);
             in.close();
+            in = MetaData.class.getResourceAsStream("CollectionTypes.properties");
+            // TODO: remove the (!= null) check after the next geoapi update.
+            if (in != null) {
+                collectionTypes.load(in);
+                in.close();
+            }
         } catch (IOException exception) {
             /*
              * Note: we do not expose the checked IOException because in a future
@@ -122,7 +144,7 @@ public class MetadataSource {
              *       disaspear. This is because a J2SE 1.5 enabled version should
              *       use method's annotations instead.
              */
-            throw new MetadataException(exception);
+            throw new MetadataException("Can't read resources.", exception); // TODO: localize
         }
         loader = getClass().getClassLoader();
     }
@@ -160,10 +182,9 @@ public class MetadataSource {
      * @return The value of the requested attribute.
      * @throws SQLException if the SQL query failed.
      */
-    final Object getValue(final Class type, final Method method, final int identifier)
+    final synchronized Object getValue(final Class type, final Method method, final int identifier)
             throws SQLException
     {
-        assert Thread.holdsLock(this);
         final String className = getClassName(type);
         MetadataResult result = (MetadataResult) statements.get(type);
         if (result == null) {
@@ -172,7 +193,38 @@ public class MetadataSource {
         }
         final String columnName = getColumnName(className, method);
         final Class valueType = method.getReturnType();
-        if (valueType.isInterface() && valueType.getName().startsWith(metadataPackage)) {
+        /*
+         * Process the ResultSet value according the expected return type. If a collection
+         * is expected, then assumes that the ResultSet contains an array and invokes the
+         * 'getValue' method for each element.
+         */
+        if (Collection.class.isAssignableFrom(valueType)) {
+            final Collection collection;
+            if (Set.class.isAssignableFrom(valueType)) {
+                collection = new LinkedHashSet();
+            } else if (List.class.isAssignableFrom(valueType)) {
+                collection = new ArrayList();
+            } else {
+                // TODO: localize
+                throw new MetadataException("Unsupported collection type: "+getClassName(valueType));
+            }
+            final Object elements = result.getArray(identifier, columnName);
+            if (elements != null) {
+                final Class  elementType = getElementType(className, method);
+                final boolean isMetadata = isMetadata(elementType);
+                final int         length = Array.getLength(elements);
+                for (int i=0; i<length; i++) {
+                    collection.add(isMetadata ? getEntry(elementType, Array.getInt(elements, i))
+                                              : convert (elementType, Array.get   (elements, i)));
+                }
+            }
+            return collection;
+        }
+        /*
+         * If a GeoAPI interface or a code list is expected, then assumes that the ResultSet
+         * value is a foreigner key. Queries again the database in the foreigner table.
+         */
+        if (valueType.isInterface() && isMetadata(valueType)) {
             return getEntry(valueType, result.getInt(identifier, columnName));
         }
         if (CodeList.class.isAssignableFrom(valueType)) {
@@ -182,10 +234,31 @@ public class MetadataSource {
          * Not a foreigner key. Get the value and transform it to the
          * espected type, if needed.
          */
-        final Object value = result.getObject(identifier, columnName);
-        if (value != null) {
+        return convert(valueType, result.getObject(identifier, columnName));
+    }
+
+    /**
+     * Returns {@code true} if the specified type belong to the metadata package.
+     */
+    private boolean isMetadata(final Class valueType) {
+        return valueType.getName().startsWith(metadataPackage);
+    }
+
+    /**
+     * Converts the specified non-metadata value into an object of the expected type.
+     * The expected value is an instance of a class outside the metadata package, for
+     * example {@link String}, {@link InternationalString}, {@link URL}, etc.
+     */
+    private static Object convert(final Class valueType, final Object value) {
+        if (value!=null && !valueType.isAssignableFrom(value.getClass())) {
             if (InternationalString.class.isAssignableFrom(valueType)) {
                return new SimpleInternationalString(value.toString());
+            }
+            if (URL.class.isAssignableFrom(valueType)) try {
+                return new URL(value.toString());
+            } catch (MalformedURLException exception) {
+                // TODO: localize and provides more details.
+                throw new MetadataException("Illegal value.", exception);
             }
         }
         return value;
@@ -218,11 +291,11 @@ public class MetadataSource {
             values = (CodeList[]) type.getMethod("values", (Class []) null)
                                       .invoke   (null,     (Object[]) null);
         } catch (NoSuchMethodException exception) {
-            throw new MetadataException(exception);
+            throw new MetadataException("Can't read code list.", exception); // TODO: localize
         } catch (IllegalAccessException exception) {
-            throw new MetadataException(exception);
+            throw new MetadataException("Can't read code list.", exception); // TODO: localize
         } catch (InvocationTargetException exception) {
-            throw new MetadataException(exception);
+            throw new MetadataException("Can't read code list.", exception); // TODO: localize
         }
         CodeList candidate;
         final StringBuffer candidateName = new StringBuffer(className);
@@ -280,6 +353,26 @@ public class MetadataSource {
         final String methodName = method.getName();
         final String columnName = geoApiToIso.getProperty(className+'.'+methodName);
         return (columnName != null) ? columnName : methodName;
+    }
+
+    /**
+     * Returns the element type in collection for the specified method.
+     */
+    private Class getElementType(final String className, final Method method) {
+        final String key = className+'.'+method.getName();
+        final String typeName = collectionTypes.getProperty(key);
+        Exception cause = null;
+        if (typeName != null) try {
+            return Class.forName(typeName);
+        } catch (ClassNotFoundException exception) {
+            cause = exception;
+        }
+        // TODO: localize.
+        final MetadataException e = new MetadataException("Unknow element type for "+key);
+        if (cause != null) {
+            e.initCause(cause);
+        }
+        throw e;
     }
 
     /**

@@ -33,12 +33,6 @@ import java.sql.SQLException;
  */
 public class MetadataException extends RuntimeException {
     /**
-     * Creates a new instance of <code>MetadataException</code> without detail message.
-     */
-    public MetadataException() {
-    }
-
-    /**
      * Constructs an instance of <code>MetadataException</code> with the specified
      * detail message.
      *
@@ -49,12 +43,12 @@ public class MetadataException extends RuntimeException {
     }
 
     /**
-     * Constructs an instance of <code>MetadataException</code> with the specified
-     * cause.
+     * Constructs an instance of <code>MetadataException</code> with the specified cause.
      *
+     * @param message The detail message.
      * @param cause The cause of this exception.
      */
-    public MetadataException(final Throwable cause) {
-        super(cause.getLocalizedMessage(), cause);
+    public MetadataException(final String message, final Exception cause) {
+        super(message, cause);
     }
 }
