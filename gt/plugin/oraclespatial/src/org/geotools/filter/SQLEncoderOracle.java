@@ -110,7 +110,7 @@ public class SQLEncoderOracle extends SQLEncoder {
         this.fidColumn = fidColumn;
         srids.put(null, new Integer(defaultSRID));
 
-        setColnameEscape("\"");
+        setSqlNameEscape("\"");
     }
 
     public SQLEncoderOracle(int defaultSRID) {
@@ -139,7 +139,7 @@ public class SQLEncoderOracle extends SQLEncoder {
         LOGGER.fine("SQLEncoderOracle: Geometric Column is: "
             + currentGeomColumnName);
 
-        setColnameEscape("\"");
+        setSqlNameEscape("\"");
     }
 
     /**
