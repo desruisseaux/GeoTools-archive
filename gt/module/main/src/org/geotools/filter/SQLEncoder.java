@@ -61,9 +61,9 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     //private static String escapedWildcardMulti = "\\.\\*";
 
     /** 
-     * Character used to escape column names 
+     * Character used to escape database schema, table and column names 
      */
-    private String colnameEscape = "";
+    private String sqlNameEscape = "";
     
     /** error message for exceptions */
     private static final String IO_ERROR = "io problem writing filter";
@@ -504,7 +504,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         LOGGER.finer("exporting ExpressionAttribute");
 
         try {
-            out.write(colnameEscape + expression.getAttributePath() + colnameEscape);
+            out.write(escapeName(expression.getAttributePath()));
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
@@ -610,18 +610,43 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     }
 
     
-    /**
-     * @return
-     */
-    protected String getColnameEscape() {
-        return colnameEscape;
-    }
+	/**
+	* Sets the SQL name escape string.
+	* <p>
+	* The value of this string is prefixed and appended to table schema names,
+	* table names and column names in an SQL statement to support
+	* mixed-case and non-English names.
+	* Without this, the DBMS may assume a mixed-case name in the query should be treated
+	* as upper-case and an SQLCODE of -204 or 206 may result if the name is not found.
+	* </p>
+	* <p>
+	* Typically this is the double-quote character, ", but may not be for all databases.
+	* <p>
+	* For example, consider the following query:
+	* </p>
+	* <xmp>
+	* SELECT Geom FROM Spear.ArchSites
+	* May be interpreted by the database as:
+	* SELECT GEOM FROM SPEAR.ARCHSITES
+	* 
+	* If the column and table names were actually created using mixed-case, the query
+	* needs to be specified as:
+	* SELECT "Geom" from "Spear"."ArchSites"
+	* </xmp>
+	* 
+	 * @param string the character to be used to escape database names
+	 */
+	public void setSqlNameEscape(String string) {
+		sqlNameEscape = string;
+	}
 
-    /**
-     * @param string
-     */
-    protected void setColnameEscape(String string) {
-        colnameEscape = string;
-    }
+	/**
+	* Surrounds a name with the SQL escape character.
+	* 
+	 * @param name
+	 */
+	public String escapeName(String name) {
+		return sqlNameEscape + name + sqlNameEscape;
+	}
 
 }
