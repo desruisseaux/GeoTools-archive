@@ -1452,7 +1452,7 @@ public final class SDO {
         final int LEN = 3;
         double[] array = new double[NUMBER * LEN];
         double[] ords;
-        int offset = -1;
+        int offset = 0;
 
         for (int i = 0; i < NUMBER; i++) {
             ords = (double[]) list.get(i);
