@@ -109,7 +109,10 @@ public class FeatureAttributeType implements AttributeType {
 	 * @see org.geotools.feature.AttributeType#parse(java.lang.Object)
 	 */
 	public Object parse(Object value) throws IllegalArgumentException {
-		if(value instanceof Object[])
+	    if (value instanceof Feature) {
+		return value;
+	    }
+	    if(value instanceof Object[])
 			try {
 				return featureType.create((Object[])value);
 			} catch (IllegalAttributeException e) {
@@ -134,7 +137,8 @@ public class FeatureAttributeType implements AttributeType {
                 throw ee;
             }
         }
-        if(obj instanceof Object[]){
+        //users should call parse first - ch.
+        /*if(obj instanceof Object[]){
             try {
                 featureType.create((Object[])obj);
                 return;
@@ -143,8 +147,8 @@ public class FeatureAttributeType implements AttributeType {
                 ee.initCause(e);
                 throw ee;
             }
-        }
-		throw new IllegalArgumentException("Not an Object []");
+	    }*/
+		throw new IllegalArgumentException("Not a Feature");
 		
 	}
 
