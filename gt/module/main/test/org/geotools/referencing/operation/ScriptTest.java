@@ -2,7 +2,6 @@
  * A first attempt to port script test to ...referencing
  *
  * To do:
- *   Uncomment MT_Proj_TestScript - need some projections implemented
  *   Uncomment <projection>_TestScripts in main (to test CRS parsing)
  *      - requires a CRS parser
  *   Uncomment FactoryFinder.getCoordinateOperationFactory() in SetUp()
@@ -18,6 +17,7 @@
  *   Uncomment MathTransform wkt check in addDefinition()
  *      - reqires fix / clarification to AbstractMathTransform formatWKT()
  *   Uncomment MT_Molodensky_TestScript - needs MolodenskyTransform implemented
+ *   Uncomment MT_Proj_TestScript - need some projections implemented
  */
 
 
@@ -692,9 +692,9 @@ public class ScriptTest extends TestCase {
      * @throws FactoryException if a line can't be parsed.
      * @throws TransformException if the transformation can't be run.
      */
-//    public void testMTproj() throws IOException, FactoryException {
-//        runScript(MT_PROJ_SCRIPT);
-//    }
+    public void testMTproj() throws IOException, FactoryException {
+        runScript(MT_PROJ_SCRIPT);
+    }
     
     /**
      * Run the {@link #MT_ABRIDGED_MOL_SCRIPT}.
@@ -773,7 +773,7 @@ public class ScriptTest extends TestCase {
             done = true;
         }
         if (script==null || script.equalsIgnoreCase("MT_Projection")) {
-//            test.testMTproj();
+            test.testMTproj();
             done = true;
         }
         if (script==null || script.equalsIgnoreCase("MT_AbridgedMolodensky")) {
