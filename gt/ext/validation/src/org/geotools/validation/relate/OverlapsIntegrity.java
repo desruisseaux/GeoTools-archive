@@ -235,7 +235,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 		{
 			/** Close the connections to the feature readers*/
 			try {
-				fr1.close();
+				if (fr1 != null)
+					fr1.close();
 				if (fr2 != null)
 					fr2.close();
 			} catch (IOException e4) {
@@ -289,7 +290,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 		int counter = 0;
 		FeatureType ft = featureSourceA.getSchema();
 		
-		Filter filter = filterBBox(bBox, ft);
+		//Filter filter = filterBBox(bBox, ft);
 
 		//FeatureResults featureResults = featureSourceA.getFeatures(filter);
 		FeatureResults featureResults = featureSourceA.getFeatures();
@@ -299,7 +300,6 @@ public class OverlapsIntegrity extends RelationIntegrity
 		try 
 		{
 			fr1 = featureResults.reader();
-
 			if (fr1 == null)
 				return success;
 		
@@ -363,7 +363,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 			
 			/** Close the connections to the feature readers*/
 			try {
-				fr1.close();
+				if (fr1 != null)
+					fr1.close();
 				if (fr2 != null)
 					fr2.close();
 			} catch (IOException e4) {
