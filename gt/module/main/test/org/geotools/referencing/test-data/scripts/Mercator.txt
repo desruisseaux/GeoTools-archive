@@ -1,9 +1,12 @@
-// The following were calculated with ArcGIS 8.3 
-// (minor changes needed in projection names and parameters between ArcGIS and gt2:
-// ArcGIS does not distinguish between Mercator_1SP and Mercator_2SP)
-// points with an //Error: comment could not be calculated with ArcGIS, 
-// and were instead calculated with libproj4
-// Note that the mercator is undefined at the poles
+// Test points for the Mercator Projection
+//
+// The following test points were calculated with ArcGIS 8.3 
+// ArcGIS does not distinguish between Mercator_1SP and Mercator_2SP:
+// 1SP is the case where latitude_of_origin = 0.0.
+// Points with an //Error: comment could not be calculated with ArcGIS, 
+// and were instead calculated with libproj4.
+// Note: the mercator is undefined at the poles and these points have been
+// removed from the following test.
 //
 // Rueben Schulz - May 15, 2004
 //
@@ -17,6 +20,7 @@
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
 // than the value specified in the last "test tolerance" statement, then a failure is reported.
+// Inverse transforms are tested if java assertions are enabled.
 // If some test fails, "print" statements can be added in this script for debugging purpose:
 //
 //    print crs            (prints the source and target CRS, and the transform between them)
@@ -148,7 +152,7 @@ target pt = (-16697923.618991, -11023512.6309428)
 ////////////////////////////////////////////
 //Elliptical 2SP tests
 set _Mercator3_ = PROJCS["Mercator_2SP", _WGS84_, PROJECTION["Mercator_2SP"], PARAMETER["central_meridian", 45.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 1000000.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 49.0], AXIS["x",EAST], AXIS["y",NORTH]]
-set _Mercator4_ = PROJCS["Mercator_2SP", _WGS84_, PROJECTION["Mercator_2SP"], PARAMETER["central_meridian", -80.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 1000000.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -33.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Mercator4_ = PROJCS["Mercator_2SP", _WGS84_, PROJECTION["Mercator"], PARAMETER["central_meridian", -80.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 1000000.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -33.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _WGS84_
 target crs = _Mercator3_
