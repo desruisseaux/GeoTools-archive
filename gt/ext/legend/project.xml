@@ -46,10 +46,11 @@
       <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <id>main</id>
-      <version>2.1.x</version>
-      <url>http://www.geotools.org</url>
-    </dependency>
+       <artifactId>main</artifactId>
+       <groupId>gt2</groupId>
+       <version>2.1.x</version>
+       <url>http://www.geotools.org</url>
+     </dependency>
     <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
