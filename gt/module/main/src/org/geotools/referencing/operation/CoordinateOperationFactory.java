@@ -405,7 +405,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                 }
             }
         }
-        return helper.getCRSFactory().createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
+        return factories.getCRSFactory().createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -441,7 +441,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * The specified geographic coordinate system doesn't use standard axis
          * (EAST, NORTH) or the greenwich meridian. Create a new one meeting those criterions.
          */
-        return helper.getCRSFactory().createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
+        return factories.getCRSFactory().createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -818,7 +818,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          */
         final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
         final GeocentricCRS stepCRS;
-        final CRSFactory crsFactory = helper.getCRSFactory();
+        final CRSFactory crsFactory = factories.getCRSFactory();
         if (getGreenwichLongitude(targetPM) == 0) {
             stepCRS = crsFactory.createGeocentricCRS(
                       getTemporaryName(targetCRS), targetDatum, STANDARD);
@@ -1150,7 +1150,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * needed. It may also be a geodetic datum change, in which case the height is part
          * of computation. Try to convert the source CRS into a 3D-geodetic CRS.
          */
-        final CoordinateReferenceSystem source3D = helper.toGeodetic3D(sourceCRS);
+        final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
         if (source3D != sourceCRS) {
             return createOperation(source3D, targetCRS);
         }
@@ -1182,7 +1182,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * 'sourceCRS' is a 3D-geodetic CRS and 'targetCRS' is a 2D + 1D one. Test for this case.
          * Otherwise, the 'createOperationStep' invocation will throws the appropriate exception.
          */
-        final CoordinateReferenceSystem target3D = helper.toGeodetic3D(targetCRS);
+        final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
         if (target3D != targetCRS) {
             return createOperation(sourceCRS, target3D);
         }
@@ -1218,8 +1218,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          */
         for (int i=0; i<targets.length; i++) {
             if (needsGeodetic3D(sources, targets[i])) {
-                final CoordinateReferenceSystem source3D = helper.toGeodetic3D(sourceCRS);
-                final CoordinateReferenceSystem target3D = helper.toGeodetic3D(targetCRS);
+                final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
+                final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
                 if (source3D!=sourceCRS || target3D!=targetCRS) {
                     return createOperation(source3D, target3D);
                 }
@@ -1323,7 +1323,7 @@ search: for (int j=0; j<targets.length; j++) {
             if (ordered.length == 1) {
                 sourceStepCRS = ordered[0];
             } else {
-                sourceStepCRS = helper.getCRSFactory().createCompoundCRS(
+                sourceStepCRS = factories.getCRSFactory().createCompoundCRS(
                                     getTemporaryName(sourceCRS), ordered);
             }
             operation = createFromAffineTransform(AXIS_CHANGES, sourceCRS, sourceStepCRS, select);
@@ -1350,7 +1350,7 @@ search: for (int j=0; j<targets.length; j++) {
             } else if (ordered.length == 1) {
                 targetStepCRS = ordered[0];
             } else {
-                targetStepCRS = helper.getCRSFactory().createCompoundCRS(
+                targetStepCRS = factories.getCRSFactory().createCompoundCRS(
                                     getTemporaryName(target), ordered);
             }
             lower  = upper;

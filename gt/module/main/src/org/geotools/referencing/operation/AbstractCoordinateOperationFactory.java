@@ -124,7 +124,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     /**
      * The set of helper methods on factories.
      */
-    final FactoryGroup helper;
+    final FactoryGroup factories;
 
     /**
      * The underlying math transform factory. This factory
@@ -147,7 +147,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
         this.mtFactory = mtFactory;
         ensureNonNull("mtFactory", mtFactory);
-        helper = new FactoryGroup(null, null, null, mtFactory);
+        factories = new FactoryGroup(null, null, null, mtFactory);
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
      */
     public AbstractCoordinateOperationFactory(final FactoryGroup factories) {
         ensureNonNull("factories", factories);
-        helper = factories;
+        this.factories = factories;
         mtFactory = factories.getMathTransformFactory();
     }
 
@@ -270,7 +270,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         final Map properties;
         final MathTransform transform;
         final Singleton method = new Singleton();
-        transform = helper.createParameterizedTransform(parameters, method);
+        transform = factories.createParameterizedTransform(parameters, method);
         if (name == DATUM_SHIFT) {
             properties = new HashMap(4);
             properties.put(NAME_PROPERTY, name);

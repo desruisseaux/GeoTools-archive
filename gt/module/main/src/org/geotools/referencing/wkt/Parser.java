@@ -111,7 +111,7 @@ public class Parser extends MathTransformParser {
      * Set of helper methods working on factories. Will be constructed
      * only the first time it is needed.
      */
-    private transient FactoryGroup helper;
+    private transient FactoryGroup factories;
 
     /**
      * The list of {@linkplain AxisDirection axis directions} from their name.
@@ -798,10 +798,10 @@ public class Parser extends MathTransformParser {
                 axis1 = createAxis("Y", AxisDirection.NORTH, linearUnit);
             }
             element.close();
-            if (helper == null) {
-                helper = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
+            if (factories == null) {
+                factories = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
             }
-            return helper.createProjectedCRS(properties, geoCRS, projection,
+            return factories.createProjectedCRS(properties, geoCRS, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
