@@ -16,11 +16,11 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.geom.AffineTransform;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 
 
 /**
@@ -30,7 +30,7 @@ import java.awt.geom.PathIterator;
  * @author Andrea Aime
  * @version $Id$
  */
-class LineIterator implements PathIterator {
+class LineIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 
@@ -170,34 +170,34 @@ class LineIterator implements PathIterator {
         }
     }
 
-    /**
-     * Returns the coordinates and type of the current path segment in the
-     * iteration. The return value is the path-segment type: SEG_MOVETO,
-     * SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or SEG_CLOSE. A float array of
-     * length 6 must be passed in and can be used to store the coordinates of
-     * the point(s). Each point is stored as a pair of float x,y coordinates.
-     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns
-     * two points, SEG_CUBICTO returns 3 points and SEG_CLOSE does not return
-     * any points.
-     *
-     * @param coords an array that holds the data returned from this method
-     *
-     * @return the path-segment type of the current path segment.
-     *
-     * @see #SEG_MOVETO
-     * @see #SEG_LINETO
-     * @see #SEG_QUADTO
-     * @see #SEG_CUBICTO
-     * @see #SEG_CLOSE
-     */
-    public int currentSegment(float[] coords) {
-        double[] dcoords = new double[2];
-        int result = currentSegment(dcoords);
-        coords[0] = (float) dcoords[0];
-        coords[1] = (float) dcoords[1];
-
-        return result;
-    }
+//    /**
+//     * Returns the coordinates and type of the current path segment in the
+//     * iteration. The return value is the path-segment type: SEG_MOVETO,
+//     * SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or SEG_CLOSE. A float array of
+//     * length 6 must be passed in and can be used to store the coordinates of
+//     * the point(s). Each point is stored as a pair of float x,y coordinates.
+//     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns
+//     * two points, SEG_CUBICTO returns 3 points and SEG_CLOSE does not return
+//     * any points.
+//     *
+//     * @param coords an array that holds the data returned from this method
+//     *
+//     * @return the path-segment type of the current path segment.
+//     *
+//     * @see #SEG_MOVETO
+//     * @see #SEG_LINETO
+//     * @see #SEG_QUADTO
+//     * @see #SEG_CUBICTO
+//     * @see #SEG_CLOSE
+//     */
+//    public int currentSegment(float[] coords) {
+//        double[] dcoords = new double[2];
+//        int result = currentSegment(dcoords);
+//        coords[0] = (float) dcoords[0];
+//        coords[1] = (float) dcoords[1];
+//
+//        return result;
+//    }
 
     /**
      * Returns the winding rule for determining the interior of the path.

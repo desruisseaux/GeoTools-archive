@@ -16,13 +16,15 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 
 
 /**
@@ -38,8 +40,8 @@ class GeomCollectionIterator implements PathIterator {
     private AffineTransform at;
 
     /** The set of geometries that we will iterate over */
-    private Geometry[] geoms;
-
+    private GeometryCollection gc;
+    
     /** The current geometry */
     private int currentGeom = 0;
 
@@ -55,11 +57,6 @@ class GeomCollectionIterator implements PathIterator {
     /** Maximum distance for point elision when generalizing */
     private double maxDistance = 1.0;
 
-    /** Horizontal scale, got from the affine transform and cached */
-    private double xScale;
-
-    /** Vertical scale, got from the affine transform and cached */
-    private double yScale;
 
     /**
      * Creates a new instance of GeomCollectionIterator
@@ -69,25 +66,21 @@ class GeomCollectionIterator implements PathIterator {
      */
     public GeomCollectionIterator(GeometryCollection gc, AffineTransform at) {
         int numGeometries = gc.getNumGeometries();
-        geoms = new Geometry[numGeometries];
-
-        for (int i = 0; i < numGeometries; i++) {
-            geoms[i] = gc.getGeometryN(i);
-        }
+//        geoms = new Geometry[numGeometries];
+//
+//        for (int i = 0; i < numGeometries; i++) {
+//            geoms[i] = gc.getGeometryN(i);
+//        }
+        
+        this.gc = gc;
 
         if (at == null) {
             at = new AffineTransform();
         }
 
         this.at = at;
-        xScale = Math.sqrt(
-                (at.getScaleX() * at.getScaleX())
-                + (at.getShearX() * at.getShearX()));
-        yScale = Math.sqrt(
-                (at.getScaleY() * at.getScaleY())
-                + (at.getShearY() * at.getShearY()));
 
-        currentIterator = getIterator(geoms[0]);
+        currentIterator = getIterator(gc.getGeometryN(0));
     }
 
     /**
@@ -161,6 +154,9 @@ class GeomCollectionIterator implements PathIterator {
         } else if (g instanceof LinearRing) {
             LinearRing lr = (LinearRing) g;
             pi = new LineIterator(lr, at, generalize, maxDistance);
+        } else if (g instanceof Point) {
+            Point p = (Point) g;
+            pi = new PointIterator(p, at);
         }
 
         return pi;
@@ -243,9 +239,9 @@ class GeomCollectionIterator implements PathIterator {
      */
     public void next() {
         if (currentIterator.isDone()) {
-            if (currentGeom < (geoms.length - 1)) {
+            if (currentGeom < (gc.getNumGeometries() - 1)) {
                 currentGeom++;
-                currentIterator = getIterator(geoms[currentGeom]);
+                currentIterator = getIterator(gc.getGeometryN(currentGeom));
             } else {
                 done = true;
             }

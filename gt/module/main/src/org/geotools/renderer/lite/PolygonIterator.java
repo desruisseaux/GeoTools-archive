@@ -20,16 +20,16 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 
 
 /**
- * A path iterator for the LiteShape class, specialized to iterate over Polygon objects.
+ * A path iterator for the LiteShape class, specialized to iterate over Polygon
+ * objects.
  *
  * @author Andrea Aime
  * @version $Id$
  */
-class PolygonIterator implements PathIterator {
+class PolygonIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 
@@ -83,8 +83,10 @@ class PolygonIterator implements PathIterator {
         }
 
         this.at = at;
-        xScale = Math.sqrt((at.getScaleX() * at.getScaleX()) + (at.getShearX() * at.getShearX()));
-        yScale = Math.sqrt((at.getScaleY() * at.getScaleY()) + (at.getShearY() * at.getShearY()));
+        xScale = Math.sqrt((at.getScaleX() * at.getScaleX())
+                + (at.getShearX() * at.getShearX()));
+        yScale = Math.sqrt((at.getScaleY() * at.getScaleY())
+                + (at.getShearY() * at.getShearY()));
 
         coords = rings[0].getCoordinates();
     }
@@ -107,16 +109,18 @@ class PolygonIterator implements PathIterator {
      * @param p The polygon
      * @param at The affine transform applied to coordinates during iteration
      * @param generalize if true apply simple distance based generalization
-     * @param maxDistance during iteration, a point will be skipped if it's distance from the
-     *        previous is less than maxDistance
+     * @param maxDistance during iteration, a point will be skipped if it's
+     *        distance from the previous is less than maxDistance
      */
-    public PolygonIterator(Polygon p, AffineTransform at, boolean generalize, double maxDistance) {
+    public PolygonIterator(Polygon p, AffineTransform at, boolean generalize,
+        double maxDistance) {
         this(p, at, generalize);
         this.maxDistance = maxDistance;
     }
 
     /**
-     * Sets the distance limit for point skipping during distance based generalization
+     * Sets the distance limit for point skipping during distance based
+     * generalization
      *
      * @param distance the maximum distance for point skipping
      */
@@ -125,7 +129,8 @@ class PolygonIterator implements PathIterator {
     }
 
     /**
-     * Returns the distance limit for point skipping during distance based generalization
+     * Returns the distance limit for point skipping during distance based
+     * generalization
      *
      * @return the maximum distance for distance based generalization
      */
@@ -134,12 +139,14 @@ class PolygonIterator implements PathIterator {
     }
 
     /**
-     * Returns the coordinates and type of the current path segment in the iteration. The return
-     * value is the path-segment type: SEG_MOVETO, SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or
-     * SEG_CLOSE. A double array of length 6 must be passed in and can be used to store the
-     * coordinates of the point(s). Each point is stored as a pair of double x,y coordinates.
-     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns two points,
-     * SEG_CUBICTO returns 3 points and SEG_CLOSE does not return any points.
+     * Returns the coordinates and type of the current path segment in the
+     * iteration. The return value is the path-segment type: SEG_MOVETO,
+     * SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or SEG_CLOSE. A double array of
+     * length 6 must be passed in and can be used to store the coordinates of
+     * the point(s). Each point is stored as a pair of double x,y coordinates.
+     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns
+     * two points, SEG_CUBICTO returns 3 points and SEG_CLOSE does not return
+     * any points.
      *
      * @param coords an array that holds the data returned from this method
      *
@@ -170,33 +177,6 @@ class PolygonIterator implements PathIterator {
     }
 
     /**
-     * Returns the coordinates and type of the current path segment in the iteration. The return
-     * value is the path-segment type: SEG_MOVETO, SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or
-     * SEG_CLOSE. A float array of length 6 must be passed in and can be used to store the
-     * coordinates of the point(s). Each point is stored as a pair of float x,y coordinates.
-     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns two points,
-     * SEG_CUBICTO returns 3 points and SEG_CLOSE does not return any points.
-     *
-     * @param coords an array that holds the data returned from this method
-     *
-     * @return the path-segment type of the current path segment.
-     *
-     * @see #SEG_MOVETO
-     * @see #SEG_LINETO
-     * @see #SEG_QUADTO
-     * @see #SEG_CUBICTO
-     * @see #SEG_CLOSE
-     */
-    public int currentSegment(float[] coords) {
-        double[] dcoords = new double[2];
-        int result = currentSegment(dcoords);
-        coords[0] = (float) dcoords[0];
-        coords[1] = (float) dcoords[1];
-
-        return result;
-    }
-
-    /**
      * Return the winding rule for determining the interior of the path.
      *
      * @return <code>WIND_EVEN_ODD</code> by default.
@@ -208,15 +188,17 @@ class PolygonIterator implements PathIterator {
     /**
      * Tests if the iteration is complete.
      *
-     * @return <code>true</code> if all the segments have been read; <code>false</code> otherwise.
+     * @return <code>true</code> if all the segments have been read;
+     *         <code>false</code> otherwise.
      */
     public boolean isDone() {
         return done;
     }
 
     /**
-     * Moves the iterator to the next segment of the path forwards along the primary direction of
-     * traversal as long as there are more points in that direction.
+     * Moves the iterator to the next segment of the path forwards along the
+     * primary direction of traversal as long as there are more points in that
+     * direction.
      */
     public void next() {
         if (currentCoord == coords.length) {
@@ -240,10 +222,13 @@ class PolygonIterator implements PathIterator {
                         currentCoord++;
 
                         if (currentCoord < coords.length) {
-                            distx = Math.abs(coords[currentCoord].x - oldCoord.x);
-                            disty = Math.abs(coords[currentCoord].y - oldCoord.y);
+                            distx = Math.abs(coords[currentCoord].x
+                                    - oldCoord.x);
+                            disty = Math.abs(coords[currentCoord].y
+                                    - oldCoord.y);
                         }
-                    } while (((distx * xScale) < maxDistance) && ((disty * yScale) < maxDistance)
+                    } while (((distx * xScale) < maxDistance)
+                            && ((disty * yScale) < maxDistance)
                             && (currentCoord < coords.length));
 
                     if (currentCoord < coords.length) {
