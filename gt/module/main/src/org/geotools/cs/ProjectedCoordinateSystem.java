@@ -159,7 +159,7 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
             final ParameterList parameters = projection.getParameters();
             parameters.setParameter("semi_major", semiMajor);
             parameters.setParameter("semi_minor", semiMinor);
-            projection = new Projection(projection.getName().toString(),
+            projection = new Projection(projection.getName().getCode(),
                                         projection.getClassName(),
                                         parameters);
         }
