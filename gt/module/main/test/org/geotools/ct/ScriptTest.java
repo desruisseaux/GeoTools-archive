@@ -39,6 +39,7 @@ import java.util.StringTokenizer;
 
 // Input/output
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.InputStream;
@@ -46,6 +47,7 @@ import java.io.LineNumberReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.Reader;
 
 // Collections
 import java.util.Map;
@@ -62,6 +64,7 @@ import junit.framework.AssertionFailedError;
 import org.geotools.cs.*;
 import org.geotools.ct.*;
 import org.geotools.pt.CoordinatePoint;
+import org.geotools.referencing.BasicTest;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.TestData;
 
@@ -448,8 +451,12 @@ public class ScriptTest extends TestCase {
                 dataFolder = new File(System.getProperty("basedir", "."));
                 dataFolder = new File(dataFolder, "/tests/unit/");
                 dataFolder = new File(dataFolder, script);
-//                in = new FileInputStream(dataFolder);
-                reader = new LineNumberReader(TestData.getReader(this, script));
+//              in = new FileInputStream(dataFolder);
+                Reader scriptReader = TestData.getReader( BasicTest.class, script);
+                if( scriptReader == null ){
+                	throw new FileNotFoundException("Could not locate test-data "+script );
+                }
+                reader = new LineNumberReader( scriptReader );
             }
             else{
                 reader = new LineNumberReader(new InputStreamReader(in));
