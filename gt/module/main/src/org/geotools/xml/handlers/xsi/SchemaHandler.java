@@ -648,7 +648,7 @@ public class SchemaHandler extends XSIElementHandler {
             }
         }
 
-        SimpleType sti = XSISimpleTypes.find(qname);
+        SimpleType sti = XSISimpleTypes.find(localName);
 
         if (sti != null) {
             return sti;
