@@ -840,9 +840,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
                     }
                 }
                 normalized[1] = normalized[1].inverse(); // Image's Y axis is downward.
-                matrix = GeneralMatrix.createAffineTransform(srcEnvelope, axis, dstEnvelope, normalized);
+                matrix = new GeneralMatrix(srcEnvelope, axis, dstEnvelope, normalized);
             } else {
-                matrix = GeneralMatrix.createAffineTransform(srcEnvelope, dstEnvelope);
+                matrix = new GeneralMatrix(srcEnvelope, dstEnvelope);
             }
             return new RenderContext(matrix.toAffineTransform2D(), hints);
         }
