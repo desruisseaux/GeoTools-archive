@@ -757,7 +757,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals( rd12Bounds, some.getBounds() );
         assertEquals( some.getSchema(), road.getSchema() );
         
-        DefaultQuery query = new DefaultQuery( rd12Filter, new String[]{ "name", });
+        DefaultQuery query = new DefaultQuery( "road", rd12Filter, new String[]{ "name", });
         
         FeatureResults half = road.getFeatures( query );
         assertEquals( 2, half.getCount());

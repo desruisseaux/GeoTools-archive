@@ -18,6 +18,7 @@ import junit.framework.TestSuite;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -66,12 +67,14 @@ public class FeatureCollectionTest extends TestCase {
   public void testBounds() throws Exception {
     PrecisionModel pm = new PrecisionModel();
     Geometry[] g = new Geometry[4];
-    g[0] = new Point(new Coordinate(0,0), pm,0);
-    g[1] = new Point(new Coordinate(0,10), pm,0);
-    g[2] = new Point(new Coordinate(10,0), pm,0);
-    g[3] = new Point(new Coordinate(10,10), pm,0);
+    GeometryFactory gf = new GeometryFactory();
+    
+    g[0] = gf.createPoint( new Coordinate(0,0) );
+    g[1] = gf.createPoint( new Coordinate(0,10));
+    g[2] = gf.createPoint( new Coordinate(10,0));
+    g[3] = gf.createPoint( new Coordinate(10,10));
 
-    GeometryCollection gc = new GeometryCollection(g, pm,0);
+    GeometryCollection gc = gf.createGeometryCollection( g );
     FeatureTypeFactory factory = FeatureTypeFactory.newInstance("bounds");
     factory.addType(AttributeTypeFactory.newAttributeType("p1", Point.class));
     FeatureType t = factory.createFeatureType();
