@@ -8,5 +8,15 @@
   {@linkplain org.geotools.referencing.ReferenceSystem Reference systems} implementation. An
   explanation for this package is provided in the {@linkplain org.opengis.referencing OpenGIS&reg; javadoc}.
   The remaining discussion on this page is specific to the Geotools implementation.
+
+  <P ALIGN="justify">This package provides implementations for general positioning, coordinate
+  reference systems (CRS), and coordinate transformations. Coordinates can have any number of
+  dimensions. So this implementation can handle 2D and 3D coordinates, as well as 4D, 5D etc.</P>
+
+  <P ALIGN="justify">Most interfaced objects are immutable. This means that implementations promise
+  not to change an object's internal state once they have handed out an interface pointer. Since
+  most interfaced objects are specified to be immutable, there do not need to be any constraints
+  on operation sequencing. This means that these interfaces can be used in parallel computing
+  environments (e.g. internet servers).</P>
   </BODY>
 </HTML>

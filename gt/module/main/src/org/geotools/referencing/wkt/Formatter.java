@@ -56,6 +56,9 @@ import org.geotools.util.UnsupportedImplementationException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
+ * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>.
  */
 public class Formatter {
     /**
