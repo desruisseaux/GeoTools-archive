@@ -245,8 +245,11 @@ public class XMLSAXHandler extends DefaultHandler {
 
             if (!((t == null) || "".equals(t))) {
                 String[] targ2uri = t.split("\\s+");
-
+                
                 if (targ2uri != null) {
+                    if(targ2uri.length !=0 && targ2uri.length%2!=0)
+                        throw new SAXException("Bad Schema location attribute: you must have an even number of terms");
+                    
                     for (int i = 0; i < (targ2uri.length / 2); i++) {
                         String uri = targ2uri[(i * 2) + 1];
                         String targ = targ2uri[i * 2];

@@ -59,8 +59,8 @@ public class SchemaMergeTest extends TestCase {
 
 		        Schema schema = contentHandler.getSchema();
 		        
-//		        assertTrue("Should only have 2 elements, had "+schema.getElements().length,schema.getElements().length == 2);
-//		        assertTrue("Should only have 1 complexType, had "+schema.getComplexTypes().length,schema.getComplexTypes().length == 1);
+		        assertTrue("Should only have 2 elements, had "+schema.getElements().length,schema.getElements().length == 2);
+		        assertTrue("Should only have 1 complexType, had "+schema.getComplexTypes().length,schema.getComplexTypes().length == 1);
 		        
 	        } catch (Exception e) {
 	            e.printStackTrace();
