@@ -835,26 +835,8 @@ public final class NumberParser {
     int ostart = start;
     int oend = end;
     
-    boolean trimming = true;
-    while (trimming && start < end) {
-      switch ( s.charAt(start) ) {
-          case ' ': case '\n': case '\t': case '\r': case 0:
-          start ++;
-          break;
-        default:
-          trimming = false;
-      }
-    }
-    trimming = true;
-    while (trimming && end > start) {
-      switch ( s.charAt(end) ) {
-          case ' ': case '\n': case '\t': case '\r': case 0:
-          end --;
-          break;
-        default:
-          trimming = false;
-      }
-    }
+    start = trimFront(s,start,end);
+    end = trimBack(s,start,end);
     
     int result = 0;
     boolean negative = false;
@@ -914,6 +896,100 @@ public final class NumberParser {
     }
   }
   
+  public long parseLong(String s) {
+      return parseLong(s,0,s.length() - 1);
+  }
+  
+  public long parseLong(CharSequence s,int start, int end) throws NumberFormatException {
+      
+      if (s == null) {
+          throw new NumberFormatException("null");
+      }
+      
+      start = trimFront(s,start,end);
+      end = trimBack(s,start,end);
+      
+      long result = 0;
+      boolean negative = false;
+      int i = start, max = end + 1;
+      long limit;
+      long multmin;
+      int digit;
+      
+      if (max > 0) {
+          if (s.charAt(start) == '-') {
+              negative = true;
+              limit = Long.MIN_VALUE;
+              i++;
+          } else {
+              limit = -Long.MAX_VALUE;
+          }
+          multmin = limit / 10;
+          if (i < max) {
+              digit = Character.digit(s.charAt(i++),10);
+              if (digit < 0) {
+                  throw formatException(s,start,end);
+              } else {
+                  result = -digit;
+              }
+          }
+          while (i < max) {
+              // Accumulating negatively avoids surprises near MAX_VALUE
+              digit = Character.digit(s.charAt(i++),10);
+              if (digit < 0) {
+                  throw formatException(s,start,end);
+              }
+              if (result < multmin) {
+                  throw formatException(s,start,end);
+              }
+              result *= 10;
+              if (result < limit + digit) {
+                  throw formatException(s,start,end);
+              }
+              result -= digit;
+          }
+      } else {
+          throw formatException(s,start,end);
+      }
+      if (negative) {
+          if (i > 1) {
+              return result;
+          } else {	/* Only got "-" */
+              throw formatException(s,start,end);
+          }
+      } else {
+          return -result;
+      }
+  }
+  
+  private int trimFront(CharSequence in,int start,int end) {
+      boolean trimming = true;
+      while (trimming && start < end) {
+          switch ( in.charAt(start) ) {
+              case ' ': case '\n': case '\t': case '\r': case 0:
+                  start ++;
+                  break;
+              default:
+                  trimming = false;
+          }
+      }
+      return start;
+  }
+  
+  private int trimBack(CharSequence in,int start,int end) {
+      boolean trimming = true;
+      while (trimming && end > start) {
+          switch ( in.charAt(end) ) {
+              case ' ': case '\n': case '\t': case '\r': case 0:
+                  end --;
+                  break;
+              default:
+                  trimming = false;
+          }
+      }
+      return end;
+  }
+  
   private static NumberFormatException formatException(CharSequence s,int start,int end) {
     return new NumberFormatException("'" + s.subSequence(start, end + 1).toString() + "'");
   }
@@ -936,27 +1012,8 @@ public final class NumberParser {
     int ostart= start;
     int oend = end;
     
-    // added trimming for 'zero' character which sometimes gets passed in as junk
-    boolean trimming = true;
-    while (trimming && start < end) {
-      switch ( in.charAt(start) ) {
-          case ' ': case '\n': case '\t': case '\r': case 0:
-          start ++;
-          break;
-        default:
-          trimming = false;
-      }
-    }
-    trimming = true;
-    while (trimming && end > start) {
-      switch ( in.charAt(end) ) {
-          case ' ': case '\n': case '\t': case '\r': case 0:
-          end --;
-          break;
-        default:
-          trimming = false;
-      }
-    }
+    start = trimFront(in,start,end);
+    end = trimBack(in,start,end);
     
     parseNumber:
       try{
