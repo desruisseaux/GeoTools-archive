@@ -134,21 +134,49 @@ public class AreaGeometryFactory extends VPFGeometryFactory
                     //   | ^^        |
                     //   | This one  |
                     //   \-----------/
-                    if (faceId == leftFace && faceId == rightFace && prevNodeId != -1) {
+                    if (faceId == leftFace && faceId == rightFace) {
                         addPoints = false;
+
                         if (prevNodeId == startNode) {
                             isLeft = false;
                             prevNodeId = endNode;
-                        } else {
+                        } else if (prevNodeId == endNode) {
                             isLeft = true;
                             prevNodeId = startNode;
+                        } else if (prevNodeId == -1) {
+                            // This edge is the first one to be encountered.  
+                            // This is a messy case where we've got to figure out if
+                            // we should start to the left or right.  This peeks ahead
+                            // at the left and right edges to see which has a start node
+                            // that's the same as this edge's end node.  Hopefully someone
+                            // smarter can come up with a better solution.
+                            int leftEdgeStartNode =
+                                ((Integer)edgeFile.getRowFromId("id", leftEdge).getAttribute("start_node")).intValue();
+                            int rightEdgeStartNode =
+                                ((Integer)edgeFile.getRowFromId("id", rightEdge).getAttribute("start_node")).intValue();
+                            
+                            if (leftEdgeStartNode == endNode) {
+                                isLeft = true;
+                                prevNodeId = startNode;
+                            } else if (rightEdgeStartNode == endNode) {
+                                isLeft = false;
+                                prevNodeId = endNode;
+                            } else {
+                                // Something really bad happened because we should never get here
+                                throw new SQLException(
+                                    "This edge is not part of this face.");
+                            }
+                        } else {
+                            // Something really bad happened because we should never get here
+                            throw new SQLException(
+                                "This edge is not part of this face.");
                         }
-                    } else if (faceId == leftFace) {
-                        isLeft = true;
-                        prevNodeId = startNode;
                     } else if (faceId == rightFace) {
                         isLeft = false;
                         prevNodeId = endNode;
+                    } else if (faceId == leftFace) {
+                        isLeft = true;
+                        prevNodeId = startNode;
                     } else {
                         throw new SQLException(
                             "This edge is not part of this face.");
