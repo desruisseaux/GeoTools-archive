@@ -2,8 +2,8 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-imagedatasource</name>
-  <id>imagedatasource</id>
+  <name>geotools-image</name>
+  <id>image</id>
   <currentVersion>2.1.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>Imagedatasource module</shortDescription>
