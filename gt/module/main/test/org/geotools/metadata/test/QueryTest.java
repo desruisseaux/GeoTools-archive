@@ -30,11 +30,11 @@ public class QueryTest extends TestCase {
      */
     public void testAcceptsMetadata() throws IOException{
         StupidNestedMetadata mdata=new StupidNestedMetadataImpl();
-        Expr expr=Exprs.meta("FileData/Name");
+        Expr expr=Exprs.meta("fileData/name");
         Query q= new Query(expr);
         assertTrue(q.accepts(mdata));
         
-        expr=Exprs.meta("Data");
+        expr=Exprs.meta("data");
         q= new Query(expr);
         assertTrue(q.accepts(mdata));
 
