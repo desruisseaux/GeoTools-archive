@@ -15,6 +15,7 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -65,28 +66,26 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         
         //read in the grid coverage
         GridCoverageReader reader = new ArcGridReader(TestData.getResource( this, testParam.fileName ));        
-        ParameterDescriptorGroup paramDescriptor = f.getReadParameters();
-        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();        
+
+        ParameterValueGroup params = f.getReadParameters();        
         
         params.parameter( "Compressed" ).setValue( testParam.compressed );
         params.parameter( "GRASS" ).setValue( testParam.grass );
-        GridCoverage gc1 = reader.read( params );
+        GridCoverage gc1 = reader.read( (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[params.values().size()]) );
 
         //write grid coverage out to temp file
         GridCoverageWriter writer = new ArcGridWriter(tmpFile);
-        paramDescriptor = f.getWriteParameters();
-        params = (ParameterValueGroup) paramDescriptor.createValue();
+        params = f.getWriteParameters();
         params.parameter( "Compressed" ).setValue( testParam.compressed );
         params.parameter( "GRASS" ).setValue( testParam.grass );
-        writer.write(gc1, params);
+        writer.write(gc1, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[params.values().size()]));
         
         //read the grid coverage back in from temp file
         reader = new ArcGridReader(tmpFile);
-        paramDescriptor = f.getReadParameters();
-        params = (ParameterValueGroup) paramDescriptor.createValue();
+        params = f.getReadParameters();
         params.parameter( "Compressed" ).setValue( testParam.compressed );
         params.parameter( "GRASS" ).setValue( testParam.grass );
-        GridCoverage gc2 = reader.read( params );
+        GridCoverage gc2 = reader.read( (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[params.values().size()]) );
        
         //check that the original and temporary grid are the same
         compare(gc1, gc2);

@@ -73,8 +73,7 @@ public class ArcGridReaderTest extends TestCaseSupport {
         URL gzipUrl = TestData.getResource( this, GZIP_TESTFILE );
         reader=new ArcGridReader( gzipUrl );
         
-        ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
-        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();        
+        ParameterValueGroup params = format.getReadParameters();        
         
         ParameterValue grass = params.parameter( "GRASS" );
         grass.setValue( true );
