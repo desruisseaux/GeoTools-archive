@@ -26,11 +26,12 @@ public class TestFixture {
 	public DefaultRepository repository;
 	
 	public TestFixture() throws Exception {
+		repository = new DefaultRepository();
+		repository.load( TestData.file( this, "registry.properties" ));
+		
 		pluginDTOs = XMLReader.loadPlugIns(TestData.file( this, "plugins" ));
 		testSuiteDTOs = XMLReader.loadValidations( TestData.file( this, "validation" ), pluginDTOs );		
 		processor = new ValidationProcessor();
-		processor.load(pluginDTOs, testSuiteDTOs );
-		repository = new DefaultRepository();
-		repository.load( TestData.file( this, "registry.properties" ));
+		processor.load( pluginDTOs, testSuiteDTOs );
 	}
 }

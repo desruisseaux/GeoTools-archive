@@ -456,7 +456,8 @@ public class ValidationProcessor {
         //
         while (i.hasNext()) 
         {
-            TestSuiteDTO dto = (TestSuiteDTO) testSuiteDTOs.get(i.next());
+        	String testSuite = (String) i.next();
+            TestSuiteDTO dto = (TestSuiteDTO) testSuiteDTOs.get( testSuite );
             Iterator j = dto.getTests().keySet().iterator();
 			// go through each test plugIn
             //
@@ -490,7 +491,7 @@ public class ValidationProcessor {
      * @param plugInDTOs
      * @throws ValidationException
      */
-    public void load(Map testSuiteDTOs, Map plugInDTOs) throws Exception {
+    public void load(Map plugInDTOs, Map testSuiteDTOs) throws Exception {
         // step 1 make a list required plug-ins
     	//
     	Set plugInNames = queryPlugInNames( testSuiteDTOs );
