@@ -52,6 +52,14 @@ import javax.xml.parsers.SAXParserFactory;
  * @version $Id$
  */
 public class DocumentFactory {
+
+	/**
+	 * When this hint is contained and set to Boolean.FALSE, element ordering will not 
+	 * be validated. This key may also affect data validation within the parse routines. 
+	 * The inherent safety of the resulting objects is weekend by turning this param to false.
+	 */
+    public static final String VALIDATION_HINT = "DocumentFactory_VALIDATION_HINT";
+    
     /**
      * <p>
      * calls getInstance(URI,Level) with Level.WARNING

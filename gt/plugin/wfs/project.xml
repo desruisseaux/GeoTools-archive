@@ -57,6 +57,9 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+          <exclude>**/WFSDataStoreWriteTest.java</exclude>
+      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>

@@ -217,6 +217,10 @@ public class WFSFilterVisitor implements FilterVisitor {
 	            	return;
 	            }
 	            
+            	preStack.pop(); // left side
+            	preStack.pop(); // middle
+            	preStack.pop(); // right side
+	            
 	            preStack.push(filter);
 	        } else {
             	postStack.push(filter);
@@ -252,6 +256,10 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            return;
 	        }
+            
+        	preStack.pop(); // left side
+        	preStack.pop(); // right side
+        	
 	        preStack.push(filter);
 	    }
 	
@@ -445,6 +453,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            return;
 	        }
+            
+        	preStack.pop(); // left side
+        	preStack.pop(); // right side
 	        preStack.push(filter);
 	    }
 	
@@ -467,6 +478,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            return;
 	        }
+            
+        	preStack.pop(); // value
 	        preStack.push(filter);
 	    }
 	
@@ -570,6 +583,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        	postStack.pop();
 	        	postStack.push(filter);
 	        }
+            
+        	preStack.pop(); // null
 	        preStack.push(filter);
 	    }
 	
@@ -658,6 +673,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            return;
 	        }
+            
+        	preStack.pop(); // left side
+        	preStack.pop(); // right side
 	        preStack.push(expression);
 	    }
 	

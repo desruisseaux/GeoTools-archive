@@ -16,6 +16,7 @@
  */
 package org.geotools.xml.handlers;
 
+import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Any;
@@ -149,8 +150,12 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         // validate the complex element ... throws an exception when it's been bad
-        validateElementOrder();
-
+        boolean validate = hints == null || !hints.containsKey(DocumentFactory.VALIDATION_HINT) ||
+			hints.get(DocumentFactory.VALIDATION_HINT)==null || !(hints.get(DocumentFactory.VALIDATION_HINT) instanceof Boolean) ||
+			((Boolean)hints.get(DocumentFactory.VALIDATION_HINT)).booleanValue();
+        if(validate)
+        	validateElementOrder();
+        
         ElementValue[] vals = new ElementValue[elements.size()
             + (type.isMixed() ? 1 : 0)];
 

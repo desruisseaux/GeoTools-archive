@@ -200,7 +200,8 @@ public class WFSDataStoreWriteTest extends TestCase {
     }
     
     public void testGeoServer() throws NoSuchElementException, IllegalFilterException, FactoryConfigurationError, IOException, IllegalAttributeException{
-        URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
+//        URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
+    	URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
 
         DataStore post = getDataStore(url,true);
         FeatureType ft = post.getSchema("topp:states");
