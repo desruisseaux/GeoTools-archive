@@ -38,7 +38,7 @@ import java.awt.geom.Rectangle2D;
  * @author Andrea Aime
  * @version $Id$
  */
-class LiteShape implements Shape {
+public class LiteShape implements Shape {
     /** The wrapped JTS geometry */
     private Geometry geometry;
 

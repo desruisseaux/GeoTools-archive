@@ -38,7 +38,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @task Add support for SLD stylers
  */
-final class GridCoverageRenderer {
+public final class GridCoverageRenderer {
     /** Tells if we should try an optimisation using pyramidal images. */
     private static final boolean USE_PYRAMID = false;
 
