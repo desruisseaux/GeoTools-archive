@@ -50,6 +50,7 @@ public class AreaGeometryFactory extends VPFGeometryFactory
      */
     public void createGeometry(VPFFeatureType featureType, Feature values)
         throws SQLException, IOException, IllegalAttributeException {
+        
         int tempEdgeId;
         boolean isLeft = false;
         Coordinate previousCoordinate = null;
@@ -109,16 +110,38 @@ public class AreaGeometryFactory extends VPFGeometryFactory
                                                     .getAttribute("start_edge"))
                     .intValue();
                 int nextEdgeId = startEdgeId;
+                int prevNodeId = -1;
 
                 while (nextEdgeId > 0) {
                     Feature edgeRow = edgeFile.getRowFromId("id", nextEdgeId);
 
-                    if (faceId == ((TripletId) edgeRow.getAttribute("left_face"))
-                            .getId()) {
+                    // Read all the important stuff from the edge row data
+                    int leftFace  = ((TripletId) edgeRow.getAttribute("left_face")).getId();
+                    int rightFace = ((TripletId) edgeRow.getAttribute("right_face")).getId();
+                    int startNode = ((Integer) edgeRow.getAttribute("start_node")).intValue();
+                    int endNode   = ((Integer) edgeRow.getAttribute("end_node")).intValue();
+                    int leftEdge  = ((TripletId) edgeRow.getAttribute("left_edge")).getId();
+                    int rightEdge = ((TripletId) edgeRow.getAttribute("right_edge")).getId();
+                    boolean addPoints = true;
+
+                    // If both faceIds are this faceId then this is a line extending into
+                    // the face and not an edge line of the face so don't add it's points
+                    // to the coordinates list.  Except if it's the first edge encountered.
+                    if (faceId == leftFace && faceId == rightFace && prevNodeId != -1) {
+                        addPoints = false;
+                        if (prevNodeId == startNode) {
+                            isLeft = false;
+                            prevNodeId = endNode;
+                        } else {
+                            isLeft = true;
+                            prevNodeId = startNode;
+                        }
+                    } else if (faceId == leftFace) {
                         isLeft = true;
-                    } else if (faceId == ((TripletId) edgeRow.getAttribute(
-                                "right_face")).getId()) {
+                        prevNodeId = startNode;
+                    } else if (faceId == rightFace) {
                         isLeft = false;
+                        prevNodeId = endNode;
                     } else {
                         throw new SQLException(
                             "This edge is not part of this face.");
@@ -126,52 +149,45 @@ public class AreaGeometryFactory extends VPFGeometryFactory
 
                     // Get the geometry of the edge and add it to our line geometry
                     LineString edgeGeometry = (LineString) edgeRow.getAttribute(
-                            "coordinates");
+                                                                 "coordinates");
+                    
+                    if ( addPoints )
+                    {
+                        if (isLeft) {
+                            // We must take the coordinate values backwards
+                            for (int inx = edgeGeometry.getNumPoints() - 1;
+                                 inx >= 0; inx--) {
+                                coordinate = edgeGeometry.getCoordinateSequence().getCoordinate(inx);
 
-                    if (isLeft) {
-                        // We must take the coordinate values backwards
-                        for (int inx = edgeGeometry.getNumPoints() - 1;
-                                inx >= 0; inx--) {
-                            coordinate = edgeGeometry.getCoordinateSequence()
-                                                     .getCoordinate(inx);
-
-                            if ((previousCoordinate == null)
+                                if ((previousCoordinate == null)
                                     || (!coordinate.equals3D(previousCoordinate))) {
-                                coordinates.add(coordinate);
-                                previousCoordinate = coordinate;
+                                    coordinates.add(coordinate);
+                                    previousCoordinate = coordinate;
+                                }
+                            }
+                        } else {
+                            for (int inx = 0; inx < edgeGeometry.getNumPoints(); inx++) {
+                                coordinate = edgeGeometry.getCoordinateSequence().getCoordinate(inx);
+
+                                if ((previousCoordinate == null)
+                                    || (!coordinate.equals3D(previousCoordinate))) {
+                                    coordinates.add(coordinate);
+                                    previousCoordinate = coordinate;
+                                }
                             }
                         }
                     } else {
-                        for (int inx = 0; inx < edgeGeometry.getNumPoints();
-                                inx++) {
-                            coordinate = edgeGeometry.getCoordinateSequence()
-                                                     .getCoordinate(inx);
-
-                            if ((previousCoordinate == null)
-                                    || (!coordinate.equals3D(previousCoordinate))) {
-                                coordinates.add(coordinate);
-                                previousCoordinate = coordinate;
-                            }
-                        }
+                        coordinate = edgeGeometry.getCoordinateSequence().getCoordinate(
+                                           isLeft ? 0 : edgeGeometry.getNumPoints() - 1);
                     }
+                    
+                    tempEdgeId = isLeft ? leftEdge : rightEdge;
 
-                    TripletId triplet = (TripletId) edgeRow.getAttribute(isLeft
-                            ? "left_edge" : "right_edge");
-                    tempEdgeId = triplet.getId();
-
-                    if ((tempEdgeId == startEdgeId)
-                            || (tempEdgeId == nextEdgeId)) {
+                    if (tempEdgeId == startEdgeId) {
                         nextEdgeId = 0;
                     } else {
                         // Here is where we need to consider crossing tiles
-                        //                        if(triplet.getTileId() == 0){
                         nextEdgeId = tempEdgeId;
-
-                        //                        }else {
-                        //                            nextEdgeId = triplet.getNextId();
-                        //                          Integer tileId = new Integer(triplet.getTileId());
-                        //                            tileDirectory = tileDirectory.concat(File.separator).concat(featureType.getFeatureClass().getCoverage().getModule().getTileMap().get(tileId).toString()).trim();
-                        //                        }
                     }
                 }
 
