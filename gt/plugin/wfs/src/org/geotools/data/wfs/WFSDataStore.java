@@ -94,7 +94,7 @@ public class WFSDataStore extends AbstractDataStore {
     	// not called
     }
 
-    WFSDataStore(URL host, Boolean get, Boolean post, String username,
+    protected WFSDataStore(URL host, Boolean get, Boolean post, String username,
         String password, int timeout, int buffer)
         throws SAXException, IOException {
         super(false); // TODO update when writeable
@@ -183,7 +183,7 @@ public class WFSDataStore extends AbstractDataStore {
         return new BufferedOutputStream(result);
     }
 
-    static URL createGetCapabilitiesRequest(URL host) {
+    protected static URL createGetCapabilitiesRequest(URL host) {
         if (host == null) {
             return null;
         }

@@ -100,7 +100,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
             Integer.class,
             "This allows the user to specify a buffer size in features. This param has a default value of 10 features.",
             false);
-    private Map cache = new HashMap();
+    protected Map cache = new HashMap();
     private Logger logger = Logger.getLogger("org.geotools.data.wfs");
 
     /**
