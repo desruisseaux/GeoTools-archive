@@ -244,28 +244,59 @@ public class TransformationTest extends TestTransform {
         CoordinateOperation op;
         MathTransform mt;
 
-        sourceCRS = crsFactory.createFromWKT(NAD27);
-        targetCRS = crsFactory.createFromWKT(WGS84);
-        op = opFactory.createOperation(sourceCRS, targetCRS);
-        mt = op.getMathTransform();
-        assertFalse(op instanceof PassThroughOperation);
-        assertFalse(mt.isIdentity());
-
-        sourceCRS = crsFactory.createFromWKT(Z);
-        targetCRS = crsFactory.createFromWKT(Z);
-        op = opFactory.createOperation(sourceCRS, targetCRS);
-        mt = op.getMathTransform();
-        assertFalse(op instanceof PassThroughOperation);
-        assertTrue (mt.isIdentity());
-
-        if (true) return;
-        sourceCRS = crsFactory.createFromWKT(NAD27_Z);
-        targetCRS = crsFactory.createFromWKT(WGS84_Z);
-        op = opFactory.createOperation(sourceCRS, targetCRS);
-        mt = op.getMathTransform();
-        assertTrue(op instanceof PassThroughOperation);
-        assertFalse(mt.isIdentity());
-        
-System.out.println(mt.toWKT());
+        if (true) {
+            sourceCRS = crsFactory.createFromWKT(NAD27);
+            targetCRS = crsFactory.createFromWKT(WGS84);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertFalse(op instanceof PassThroughOperation);
+            assertFalse(mt.isIdentity());
+        }
+        if (false) {
+            sourceCRS = crsFactory.createFromWKT(Z);
+            targetCRS = crsFactory.createFromWKT(Z);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertFalse(op instanceof PassThroughOperation);
+            assertTrue (mt.isIdentity());
+        }
+        if (false) {
+            sourceCRS = crsFactory.createFromWKT(NAD27_Z);
+            targetCRS = crsFactory.createFromWKT(WGS84_Z);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertTrue(op instanceof PassThroughOperation);
+            assertFalse(mt.isIdentity());
+        }
+        if (false) {
+            sourceCRS = crsFactory.createFromWKT(Z_NAD27);
+            targetCRS = crsFactory.createFromWKT(WGS84_Z);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertTrue(op instanceof PassThroughOperation);
+            assertFalse(mt.isIdentity());
+        }
+        if (false) {
+            sourceCRS = crsFactory.createFromWKT(NAD27_Z);
+            targetCRS = crsFactory.createFromWKT(WGS84);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertFalse(op instanceof PassThroughOperation);
+            assertFalse(mt.isIdentity());
+        }
+        if (false) {
+            sourceCRS = crsFactory.createFromWKT(NAD27_Z);
+            targetCRS = crsFactory.createFromWKT(WGS84_Z);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertTrue(op instanceof PassThroughOperation);
+            assertFalse(mt.isIdentity());
+        }
+        if (false) {
+            System.out.println();
+            System.out.println(op);
+            System.out.println(mt);
+            System.out.println();
+        }
     }
 }

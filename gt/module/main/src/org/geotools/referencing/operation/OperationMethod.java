@@ -318,9 +318,6 @@ public class OperationMethod extends IdentifiedObject
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
-     *
-     * @todo This operation is not always a projection. Returning "PROJECTION" in
-     *       all cases is not the best thing to do.
      */
     protected String formatWKT(final Formatter formatter) {
         return "PROJECTION";

@@ -33,6 +33,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
@@ -334,7 +335,6 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
-         * This parameter is specific to Geotools.
          */
         public static final ParameterDescriptor DIM =
                 AbridgedMolodenskiTransform.Provider.DIM;
@@ -404,10 +404,30 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
             });
 
         /**
+         * The provider for the 3D case. Will be constructed
+         * by {@link #getMethod} when first needed.
+         */
+        private transient Provider withHeight;
+
+        /**
          * Constructs a provider.
          */
         public Provider() {
-            super(3, 3, PARAMETERS);
+            super(2, 2, PARAMETERS);
+        }
+        
+        /**
+         * Constructs a provider from a set of parameters.
+         *
+         * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+         * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+         * @param parameters       The set of parameters (never <code>null</code>).
+         */
+        private Provider(final int sourceDimensions,
+                         final int targetDimensions,
+                         final ParameterDescriptorGroup parameters)
+        {
+            super(sourceDimensions, targetDimensions, parameters);
         }
 
         /**
@@ -442,6 +462,24 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                                            doubleValue(DX,             values),
                                            doubleValue(DY,             values),
                                            doubleValue(DZ,             values));
+        }
+
+        /**
+         * Returns the operation method for the specified math transform. This method is invoked
+         * automatically after <code>createMathTransform</code>. The default implementation returns
+         * an operation with dimensions that matches the math transform dimensions.
+         */
+        protected OperationMethod getMethod(final MathTransform mt) {
+            switch (mt.getSourceDimensions()) {
+                case 3: {
+                    if (withHeight == null) {
+                        withHeight = new Provider(3, 3, PARAMETERS);
+                    }
+                    return withHeight;
+                }
+                case 2: return this;
+                default: throw new IllegalArgumentException();
+            }
         }
     }
 }

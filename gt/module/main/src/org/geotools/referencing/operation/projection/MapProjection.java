@@ -914,9 +914,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * {@link AssertionError} will be thrown. Subclasses should override this method if they need
      * to relax the tolerance level.
      *
-     * @param dx The longitude in degrees.
-     * @param dy The latitude in degrees.
-     * @return   The tolerance level for assertions, in meters.
+     * @param  longitude The longitude in degrees.
+     * @param  latitude The latitude in degrees.
+     * @return The tolerance level for assertions, in meters.
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
         if (Math.abs(longitude - centralMeridian)/2 +

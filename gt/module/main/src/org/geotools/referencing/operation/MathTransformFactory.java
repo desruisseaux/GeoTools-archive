@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 // OpenGIS dependencies
@@ -569,9 +570,13 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             writer.setLocale(arguments.locale);
             Set transforms = Collections.EMPTY_SET;
             if (printAll || args.length==0) {
+                final Set scopes = new HashSet();
+                scopes.add("OGC");
+                scopes.add("EPSG");
+                scopes.add("Geotools"); // Limit the number of columns to output.
                 transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
                 transforms.addAll(factory.getAvailableMethods(type));
-                writer.summary(transforms);
+                writer.summary(transforms, scopes);
             }
             if (!printAll) {
                 if (args.length == 0) {

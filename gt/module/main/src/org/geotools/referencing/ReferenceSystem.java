@@ -46,14 +46,14 @@ public class ReferenceSystem extends IdentifiedObject
     private static final long serialVersionUID = 3337659819553899435L;
 
     /**
-     * Key for the <code>"validArea"</code> property to be given to the
+     * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given to the
      * {@linkplain #ReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea()}.
      */
     public static final String VALID_AREA_PROPERTY = "validArea";
 
     /**
-     * Key for the <code>"scope"</code> property to be given to the
+     * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
      * {@linkplain #ReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getScope()}.
      */

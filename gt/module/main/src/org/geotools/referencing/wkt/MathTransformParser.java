@@ -67,7 +67,7 @@ public class MathTransformParser extends AbstractParser {
 
     /**
      * The method for the last math transform passed.
-     * @see #getOperationMethod();
+     * @see #getOperationMethod
      */
     private final Singleton method = new Singleton();
     

@@ -33,15 +33,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
-import org.geotools.io.TableWriter;
-import org.geotools.measure.Angle;
-import org.geotools.measure.AngleFormat;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -52,6 +46,16 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.GenericName;
+
+// Geotools dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.measure.Angle;
+import org.geotools.measure.AngleFormat;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -208,30 +212,15 @@ public class ParameterWriter extends FilterWriter {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         out.write(' ');
         out.write(name);
+        out.write(lineSeparator);
         GenericName[] alias = group.getAlias();
         if (alias != null) {
-            final int margin = name.length() + 3;
-            int length = margin;
-            boolean hasWrote = false;
-            final Identifier identifier = group.getName();
             for (int i=0; i<alias.length; i++) {
-                if (!identifier.equals(alias[i])) {
-                    out.write(hasWrote ? "\", " : " (alias ");
-                    String aliasName = alias[i].toInternationalString().toString(locale);
-                    if ((length += aliasName.length()) >= 100) {
-                        out.write(lineSeparator);
-                        out.write(Utilities.spaces(margin));
-                    }
-                    out.write('"');
-                    out.write(aliasName);
-                    hasWrote = true;
-                }
-            }
-            if (hasWrote) {
-                out.write("\")");
+                out.write(i!=0 ? "       " : " alias ");
+                out.write(alias[i].toInternationalString().toString(locale));
+                out.write(lineSeparator);
             }
         }
-        out.write(lineSeparator);
         /*
          * Format the table header (i.e. column names).
          */
@@ -384,12 +373,13 @@ public class ParameterWriter extends FilterWriter {
     /**
      * Format a summary of a collection of {@linkplain IdentifiedObject identified objects}.
      * The summary contains the identifier name and alias aligned in a table.
-     * .
      *
-     * @param parameters The collection of parameters to format.
+     * @param  parameters  The collection of parameters to format.
+     * @param  authorities The set of scopes to include in the table, of <code>null</code> for all
+     *                     of them. A restricted a set will produce a table with less columns.
      * @throws IOException if an error occured will writing to the stream.
      */
-    public void summary(final Collection parameters) throws IOException {
+    public void summary(final Collection parameters, final Set/*<Sring>*/ scopes) throws IOException {
         /*
          * Prepare the list of alias before any write to the output stream.
          * We need to prepare the list first, because not all identified objects
@@ -414,6 +404,9 @@ public class ParameterWriter extends FilterWriter {
                     final GenericName name  = alias.asLocalName();
                     final Object title;
                     if (scope != null) {
+                        if (scopes!=null && !scopes.contains(scope.toString())) {
+                            continue;
+                        }
                         title = scope.toInternationalString().toString(locale);
                     } else {
                         title = new Integer(i);

@@ -41,12 +41,15 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Operation;
+import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -416,5 +419,22 @@ public abstract class MathTransformProvider extends OperationMethod {
      */
     protected org.opengis.referencing.operation.OperationMethod getMethod(final MathTransform mt) {
         return this;
+    }
+    
+    /**
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
+     */
+    protected String formatWKT(final Formatter formatter) {
+        final Class type = getOperationType();
+        if (Projection.class.isAssignableFrom(type)) {
+            return super.formatWKT(formatter);
+        }
+        formatter.setInvalidWKT();
+        return "OperationMethod";
     }
 }

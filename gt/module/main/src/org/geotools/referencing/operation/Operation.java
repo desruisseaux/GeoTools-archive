@@ -37,6 +37,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.util.UnsupportedImplementationException;
 
 
@@ -171,5 +172,18 @@ public class Operation extends SingleOperation
      */
     public int hashCode() {
         return super.hashCode() ^ method.hashCode();
+    }
+    
+    /**
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
+     */
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append(method);
+        return super.formatWKT(formatter);
     }
 }

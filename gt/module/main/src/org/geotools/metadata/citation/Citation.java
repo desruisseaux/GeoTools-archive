@@ -116,8 +116,8 @@ public class Citation extends MetadataEntity
      * <p>
      * Warning: different from AUTO2 used for WMS 1.3.0.
      * </p>
-     * @see http://www.opengeospatial.org/
-     * @see http://www.opengis.org/docs/01-068r3.pdf
+     * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
+     * @see <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1 specification</A>
      * @see org.geotools.metadata.citation.ResponsibleParty#OGC
      *
      * @todo May need to move to a class more closely related to CRS factories.
@@ -155,7 +155,7 @@ public class Citation extends MetadataEntity
      * <p>
      * Warning: different from AUTO used for WMS 1.1.1. and earlier.
      * </p>
-     * @see http://portal.opengis.org/files/?artifact_id=5316
+     * @see <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0 specification</A>
      * @see org.geotools.metadata.citation.ResponsibleParty#OGC
      *
      * @todo May need to move to a class more closely related to CRS factories.

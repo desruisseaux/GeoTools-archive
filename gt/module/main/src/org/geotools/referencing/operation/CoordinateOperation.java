@@ -38,7 +38,6 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.crs.GeneralDerivedCRS;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -82,6 +81,38 @@ public class CoordinateOperation extends IdentifiedObject
      * @todo Declare constants
      */
     private static final String[] LOCALIZABLES = {"scope"};
+
+    /**
+     * Key for the <code>{@value #OPERATION_VERSION_PROPERTY}</code> property to be given
+     * to the {@linkplain #CoordinateOperation(Map, CoordinateReferenceSystem,
+     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
+     * for setting the value to be returned by {@link #getOperationVersion}.
+     */
+    public static final String OPERATION_VERSION_PROPERTY = "operationVersion";
+
+    /**
+     * Key for the <code>{@value #POSITIONAL_ACCURACY_PROPERTY}</code> property to be given
+     * to the {@linkplain #CoordinateOperation(Map, CoordinateReferenceSystem,
+     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
+     * for setting the value to be returned by {@link #getPositionalAccuracy}.
+     */
+    public static final String POSITIONAL_ACCURACY_PROPERTY = "positionalAccuracy";
+
+    /**
+     * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given
+     * to the {@linkplain #CoordinateOperation(Map, CoordinateReferenceSystem,
+     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
+     * for setting the value to be returned by {@link #getValidArea}.
+     */
+    public static final String VALID_AREA_PROPERTY = "validArea";
+
+    /**
+     * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
+     * {@linkplain #CoordinateOperation(Map, CoordinateReferenceSystem,
+     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
+     * for setting the value to be returned by {@link #getScope}.
+     */
+    public static final String SCOPE_PROPERTY = "scope";
 
     /**
      * The source CRS, or <code>null</code> if not available.
@@ -134,22 +165,22 @@ public class CoordinateOperation extends IdentifiedObject
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"operationVersion"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #OPERATION_VERSION_PROPERTY "operationVersion"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getOperationVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"positionalAccuracy"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #POSITIONAL_ACCURACY_PROPERTY "positionalAccuracy"}&nbsp;</td>
      *     <td nowrap>&nbsp;<code>{@linkplain PositionalAccuracy}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getPositionalAccuracy}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"validArea"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"scope"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
@@ -181,23 +212,23 @@ public class CoordinateOperation extends IdentifiedObject
     {
         super(properties, subProperties, LOCALIZABLES);
         PositionalAccuracy[] positionalAccuracy;
-        validArea          = (Extent)               subProperties.get("validArea"         );
-        scope              = (InternationalString)  subProperties.get("scope"             );
-        operationVersion   = (String)               subProperties.get("operationVersion"  );
-        positionalAccuracy = (PositionalAccuracy[]) subProperties.get("positionalAccuracy");
+        validArea          = (Extent)               subProperties.get(VALID_AREA_PROPERTY         );
+        scope              = (InternationalString)  subProperties.get(SCOPE_PROPERTY              );
+        operationVersion   = (String)               subProperties.get(OPERATION_VERSION_PROPERTY  );
+        positionalAccuracy = (PositionalAccuracy[]) subProperties.get(POSITIONAL_ACCURACY_PROPERTY);
         if (positionalAccuracy==null || positionalAccuracy.length==0) {
             positionalAccuracy = null;
         } else {
             positionalAccuracy = (PositionalAccuracy[]) positionalAccuracy.clone();
             for (int i=0; i<positionalAccuracy.length; i++) {
-                ensureNonNull("positionalAccuracy", positionalAccuracy, i);
+                ensureNonNull(POSITIONAL_ACCURACY_PROPERTY, positionalAccuracy, i);
             }
         }
         this.positionalAccuracy = positionalAccuracy;
         this.sourceCRS = sourceCRS;
         this.targetCRS = targetCRS;
         this.transform = transform;
-        ensureNonNull("transform", transform);
+        ensureNonNull ("transform", transform);
         checkDimension("sourceCRS", sourceCRS, transform.getSourceDimensions());
         checkDimension("targetCRS", targetCRS, transform.getTargetDimensions());
     }
@@ -343,19 +374,5 @@ public class CoordinateOperation extends IdentifiedObject
         if (targetCRS != null) code ^= targetCRS.hashCode();
         if (transform != null) code ^= transform.hashCode();
         return code;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        formatter.append(sourceCRS.getName().getCode());
-        formatter.append(targetCRS.getName().getCode());
-        return super.formatWKT(formatter);
     }
 }

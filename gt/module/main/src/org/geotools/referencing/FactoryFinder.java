@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import javax.imageio.spi.RegisterableService;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;

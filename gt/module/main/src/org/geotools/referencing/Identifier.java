@@ -75,28 +75,28 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
     private static final long serialVersionUID = 8474731565582774497L;
 
     /**
-     * Key for the <code>"code"</code> property to be given to the
+     * Key for the <code>{@value #CODE_PROPERTY}</code> property to be given to the
      * {@linkplain #Identifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getCode()}.
      */
     public static final String CODE_PROPERTY = "code";
 
     /**
-     * Key for the <code>"authority"</code> property to be given to the
+     * Key for the <code>{@value #AUTHORITY_PROPERTY}</code> property to be given to the
      * {@linkplain #Identifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAuthority()}.
      */
     public static final String AUTHORITY_PROPERTY = "authority";
 
     /**
-     * Key for the <code>"version"</code> property to be given to the
+     * Key for the <code>{@value #VERSION_PROPERTY}</code> property to be given to the
      * {@linkplain #Identifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getVersion()}.
      */
     public static final String VERSION_PROPERTY = "version";
     
     /**
-     * Key for the <code>"remarks"</code> property to be given to the
+     * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
      * {@linkplain #Identifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRemarks()}.
      */

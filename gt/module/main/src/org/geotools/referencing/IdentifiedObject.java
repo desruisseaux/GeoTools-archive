@@ -68,28 +68,28 @@ public class IdentifiedObject extends Formattable
     private static final long serialVersionUID = -5173281694258483264L;
 
     /**
-     * Key for the <code>"name"</code> property to be given to the
+     * Key for the <code>{@value #NAME_PROPERTY}</code> property to be given to the
      * {@linkplain #IdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getName}.
      */
     public static final String NAME_PROPERTY = "name";
 
     /**
-     * Key for the <code>"aliases"</code> property to be given to the
+     * Key for the <code>{@value #ALIAS_PROPERTY}</code> property to be given to the
      * {@linkplain #IdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAlias()}.
      */
     public static final String ALIAS_PROPERTY = "alias";
 
     /**
-     * Key for the <code>"identifiers"</code> property to be given to the
+     * Key for the <code>{@value #IDENTIFIERS_PROPERTY}</code> property to be given to the
      * {@linkplain #IdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getIdentifiers()}.
      */
     public static final String IDENTIFIERS_PROPERTY = "identifiers";
     
     /**
-     * Key for the <code>"remarks"</code> property to be given to the
+     * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
      * {@linkplain #IdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRemarks()}.
      */
@@ -285,6 +285,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // Fix case for common keywords. They are not used
                 // by this class, but are used by some subclasses.
                 case -1528693765: if (key.equals("anchorpoint"))      key="anchorPoint";      break;
+                case   109688209: if (key.equals("operationversion")) key="operationVersion"; break;
                 case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
                 case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
                 // ----------------------------

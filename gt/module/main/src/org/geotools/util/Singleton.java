@@ -60,7 +60,7 @@ public class Singleton extends AbstractSet {
     /**
      * Returns the element in this singleton.
      *
-     * @param  The singleton element (never null).
+     * @return The singleton element (never null).
      * @throws NoSuchElementException if this singleton is empty.
      */
     public Object get() throws NoSuchElementException {

@@ -29,6 +29,7 @@ import java.util.prefs.Preferences;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.cs.CoordinateSystem;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -57,16 +58,10 @@ public class Formattable {
     static final String INDENTATION = "Indentation";
 
     /**
-     * The formatter for the {@link #toString()} method.
-     * Will be constructed only when first needed.
-     */
-    private static Formatter DEFAULT_FORMATTER;
-
-    /**
      * The formatter for the {@link #toWKT()} method.
      * Will be constructed only when first needed.
      */
-    private static Formatter WKT_FORMATTER;
+    private static Formatter FORMATTER;
 
     /**
      * Default constructor.
@@ -76,31 +71,17 @@ public class Formattable {
 
     /**
      * Returns a string representation for this object. The default implementation returns
-     * a string similar to the <cite>Well Known Text</cite> (WKT) format. The difference
-     * consist in usage of classnames instead of WKT keywords. For example the
+     * the same string similar than {@link #toWKT()}, except that no exception is thrown if
+     * the string contains non-standard keywords. For example the
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
-     * specification</A> do not defines any keyword for
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate system} objects. If this
-     * object is an instance of {@link org.geotools.referencing.cs.CartesianCS}, then the WKT will
+     * specification</A> do not defines any keyword for {@linkplain CoordinateSystem coordinate
+     * system} objects. If this object is an instance of
+     * {@link org.geotools.referencing.cs.CartesianCS}, then the WKT will
      * be formatted as <code>"CartesianCS[AXIS["</code>...<code>"], AXIS["</code>...<code>"],
      * </code><i>etc.</i><code>]"</code>.
      */
     public String toString() {
-        // No need to synchronize. This is not a big deal
-        // if two formatters co-exist for a short time.
-        Formatter formatter = DEFAULT_FORMATTER;
-        if (formatter == null) {
-            formatter = new Formatter(new Symbols(Locale.getDefault()), getIndentation());
-            DEFAULT_FORMATTER = formatter;
-        }
-        synchronized (formatter) {
-            try {
-                formatter.append(this);
-                return formatter.toString();
-            } finally {
-                formatter.clear();
-            }
-        }
+        return toWKT(org.geotools.metadata.citation.Citation.OPEN_GIS, getIndentation(), false);
     }
 
     /**
@@ -162,20 +143,31 @@ public class Formattable {
     public String toWKT(final Citation authority, final int indentation)
             throws UnformattableObjectException
     {
+        return toWKT(authority, indentation, true);
+    }
+
+    /**
+     * Returns a WKT for this object using the specified indentation and authority.
+     * If <code>strict</code> is true, then an exception is thrown if the WKT contains
+     * invalid keywords.
+     */
+    private String toWKT(final Citation authority, final int indentation, final boolean strict)
+             throws UnformattableObjectException
+    {
         if (authority == null) {
             throw new IllegalArgumentException(Resources.format(
                       ResourceKeys.ERROR_NULL_ARGUMENT_$1, "authority"));
         }
         // No need to synchronize. This is not a big deal
         // if two formatters co-exist for a short time.
-        Formatter formatter = WKT_FORMATTER;
+        Formatter formatter = FORMATTER;
         if (formatter             == null        ||
             formatter.indentation != indentation ||
             formatter.authority   != authority)
         {
             formatter = new Formatter(Symbols.DEFAULT, indentation);
             formatter.authority = authority;
-            WKT_FORMATTER = formatter;
+            FORMATTER = formatter;
         }
         synchronized (formatter) {
             try {
@@ -187,7 +179,7 @@ public class Formattable {
                 } else {
                     formatter.append(this);
                 }
-                if (formatter.isInvalidWKT()) {
+                if (strict && formatter.isInvalidWKT()) {
                     // TODO localize.
                     throw new UnformattableObjectException("Not a valid WKT format.");
                 }

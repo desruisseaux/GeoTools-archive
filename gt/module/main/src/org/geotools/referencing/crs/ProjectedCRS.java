@@ -100,9 +100,9 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     }
 
     /**
-     * Constructs a projected CRS from a set of properties. The properties are given unchanged to the
-     * {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map,CoordinateReferenceSystem,MathTransform,CoordinateSystem)
-     * super-class constructor}.
+     * Constructs a projected CRS from a set of properties. The properties are given unchanged
+     * to the {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map, OperationMethod,
+     * CoordinateReferenceSystem, MathTransform, CoordinateSystem) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
@@ -133,11 +133,11 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      * parameters are identical except the following ones:
      * <BR>
      * <UL>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SCALE_FACTOR   scale_factor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SEMI_MAJOR     semi_major}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SEMI_MINOR     semi_minor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#FALSE_EASTING  false_easting}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#FALSE_NORTHING false_northing}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SCALE_FACTOR   scale_factor}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MAJOR     semi_major}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MINOR     semi_minor}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_EASTING  false_easting}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_NORTHING false_northing}</LI>
      * </UL>
      *
      * <P>Then the conversion between two projected CRS can sometime be represented as a linear

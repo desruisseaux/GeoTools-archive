@@ -41,6 +41,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
@@ -209,13 +210,11 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * @return A copy of the parameter values for this math transform.
      */
     private ParameterValueGroup getParameterValues(final ParameterDescriptorGroup descriptor) {
-        final int dim = getSourceDimensions();
-        final boolean includeDim = (dim != ((Number)Provider.DIM.getDefaultValue()).intValue());
-        final ParameterValue[] parameters = new ParameterValue[includeDim ? 3 : 2];
+        final ParameterValue[] parameters = new ParameterValue[hasHeight ? 2 : 3];
         int index = 0;
-        if (includeDim) {
+        if (!hasHeight) {
             final ParameterValue p = new org.geotools.parameter.Parameter(Provider.DIM);
-            p.setValue(dim);
+            p.setValue(2);
             parameters[index++] = p;
         }
         parameters[index++] = new ParameterReal(Provider.SEMI_MAJOR, a);
@@ -605,7 +604,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
 
         /**
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
-         * The default value is 3.
+         * The default value is 3, which is the value implied in OGC's WKT.
          */
         private static final ParameterDescriptor DIM =
                 new org.geotools.parameter.ParameterDescriptor(
@@ -617,8 +616,10 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                "Ellipsoid_To_Geocentric", "Geographic/geocentric conversions", 
-                "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+                        "Ellipsoid_To_Geocentric",
+                        "Geographic/geocentric conversions", 
+                        "9602",
+                        ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Construct the parameters group.
@@ -639,17 +640,30 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         }
 
         /**
-         * Constructs a provider.
+         * The provider for the 2D case. Will be constructed by {@link #getMethod}
+         * when first needed.
          */
-        public Provider() {
-            this(PARAMETERS);
-        }
+        transient Provider noHeight;
 
         /**
-         * Constructs a provider.
+         * Constructs a provider with default parameters.
          */
-        public Provider(final ParameterDescriptorGroup parameters) {
-            super(3, 3, parameters);
+        public Provider() {
+            super(3, 3, PARAMETERS);
+        }
+        
+        /**
+         * Constructs a provider from a set of parameters.
+         *
+         * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+         * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+         * @param parameters The set of parameters (never <code>null</code>).
+         */
+        Provider(final int sourceDimensions,
+                 final int targetDimensions,
+                 final ParameterDescriptorGroup parameters)
+        {
+            super(sourceDimensions, targetDimensions, parameters);
         }
 
         /**
@@ -674,6 +688,24 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             final double  semiMinor = doubleValue(SEMI_MINOR, values);
             return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
         }
+
+        /**
+         * Returns the operation method for the specified math transform. This method is invoked
+         * automatically after <code>createMathTransform</code>. The default implementation returns
+         * an operation with source dimensions that matches the math transform source dimensions.
+         */
+        protected OperationMethod getMethod(final MathTransform mt) {
+            switch (mt.getSourceDimensions()) {
+                case 2: {
+                    if (noHeight == null) {
+                        noHeight = new Provider(2, 3, PARAMETERS);
+                    }
+                    return noHeight;
+                }
+                case 3: return this;
+                default: throw new IllegalArgumentException();
+            }
+        }
     }
     
     /**
@@ -697,21 +729,30 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * @todo The EPSG code seems to be the same than for the direct transform.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                "Geocentric_To_Ellipsoid", "Geographic/geocentric conversions", 
-                "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+                        "Geocentric_To_Ellipsoid",
+                        "Geographic/geocentric conversions", 
+                        "9602",
+                        ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Create a provider.
          */
         public ProviderInverse() {
-            super(PARAMETERS);
+            super(3, 3, PARAMETERS);
         }
-
+        
         /**
-         * Returns the operation type.
+         * Constructs a provider from a set of parameters.
+         *
+         * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+         * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+         * @param parameters The set of parameters (never <code>null</code>).
          */
-        protected Class getOperationType() {
-            return Conversion.class;
+        ProviderInverse(final int sourceDimensions,
+                        final int targetDimensions,
+                        final ParameterDescriptorGroup parameters)
+        {
+            super(sourceDimensions, targetDimensions, parameters);
         }
         
         /**
@@ -725,6 +766,24 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                 throws ParameterNotFoundException
         {
             return ((GeocentricTransform) super.createMathTransform(values)).inverse();
+        }
+
+        /**
+         * Returns the operation method for the specified math transform. This method is invoked
+         * automatically after <code>createMathTransform</code>. The default implementation returns
+         * an operation with target dimensions that matches the math transform target dimensions.
+         */
+        protected OperationMethod getMethod(final MathTransform mt) {
+            switch (mt.getTargetDimensions()) {
+                case 2: {
+                    if (noHeight == null) {
+                        noHeight = new ProviderInverse(3, 2, PARAMETERS);
+                    }
+                    return noHeight;
+                }
+                case 3: return this;
+                default: throw new IllegalArgumentException();
+            }
         }
     }
 }

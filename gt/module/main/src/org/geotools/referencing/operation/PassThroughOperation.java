@@ -34,6 +34,8 @@ import org.opengis.referencing.operation.Operation;
 
 // Geotools dependencies
 import org.geotools.referencing.operation.transform.PassThroughTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -137,6 +139,31 @@ public class PassThroughOperation extends SingleOperation
      * @todo Current version work only with Geotools implementation.
      */
     public int[] getModifiedCoordinates() {
+        if (!(transform instanceof PassThroughTransform)) {
+            throw new UnsupportedImplementationException(transform.getClass());
+        }
         return ((PassThroughTransform) transform).getModifiedCoordinates();
+    }
+    
+    /**
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
+     */
+    protected String formatWKT(final Formatter formatter) {
+        try {
+            final int[] ordinates = getModifiedCoordinates();
+            for (int i=0; i<ordinates.length; i++) {
+                formatter.append(ordinates[i]);
+            }
+        } catch (UnsupportedOperationException exception) {
+            // Ignore: no indices will be formatted.
+            formatter.setInvalidWKT();
+        }
+        formatter.append(operation);
+        return super.formatWKT(formatter);
     }
 }
