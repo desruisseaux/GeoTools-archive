@@ -25,7 +25,7 @@ package org.geotools.metadata.citation;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.util.SimpleInternationalString;
+//import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
 
@@ -72,7 +72,7 @@ public class Series extends MetadataEntity
         if (name instanceof InternationalString) {
             this.name = (InternationalString) name;
         } else {
-            this.name = new SimpleInternationalString(name.toString());
+            this.name = new org.geotools.util.InternationalString(name.toString());
         }
     }
 

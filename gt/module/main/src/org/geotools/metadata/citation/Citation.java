@@ -42,7 +42,7 @@ import org.geotools.metadata.MetadataEntity;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedArrayList;
-import org.geotools.util.SimpleInternationalString;
+//import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 
 
@@ -178,7 +178,7 @@ public class Citation extends MetadataEntity
         if (title instanceof InternationalString) {
             this.title = (InternationalString) title;
         } else {
-            this.title = new SimpleInternationalString(title.toString());
+            this.title = new org.geotools.util.InternationalString(title.toString());
         }
     }
 
