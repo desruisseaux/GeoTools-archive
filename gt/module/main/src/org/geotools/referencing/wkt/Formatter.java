@@ -238,7 +238,7 @@ public class Formatter {
         if (identifier != null) {
             final Citation authority = identifier.getAuthority();
             if (authority != null) {
-                final String title = authority.getTitle(locale);
+                final String title = authority.getTitle().toString();
                 if (title != null) {
                     buffer.append(SEPARATOR);
                     buffer.append(SPACE);

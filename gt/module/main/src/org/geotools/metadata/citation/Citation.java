@@ -24,16 +24,23 @@ package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Series;
 
 // Geotools dependencies
+import org.geotools.metadata.iso19115.ListOf;
+import org.geotools.metadata.iso19115.SetOf;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.PresentationForm;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -42,7 +49,7 @@ import org.opengis.metadata.citation.PresentationForm;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Citation implements /*org.opengis.metadata.citation.Citation,*/ Serializable {
+public class Citation implements org.opengis.metadata.citation.Citation, Serializable {
     /**
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
      */
@@ -59,10 +66,120 @@ public class Citation implements /*org.opengis.metadata.citation.Citation,*/ Ser
     public static final Citation GEOTOOLS = new Citation("Geotools");
 
     /**
+     * Construct a citation with the specified title.
+     */
+    public Citation(final String title) {
+        this.title = null; // new InternationalString( title )
+    }
+    private List alternateTitles = new ListOf( InternationalString.class );
+	private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
+	
+	private InternationalString title;
+	private Map dates = new HashMap();
+	private InternationalString edition;
+	private Date editionDate;
+	private Set identifiers = new SetOf( String.class );
+	private Set identifierTypes = new SetOf( String.class );
+	
+	private Set presentationForm = new SetOf( PresentationForm.class );
+	private Series series;
+	private InternationalString otherCitationDetails;
+	private InternationalString collectiveTitle;
+	private String ISBN;
+	private String ISSN;
+    public List getAlternateTitles() {
+        return alternateTitles;
+    }
+    public void setAlternateTitles(List alternateTitles) {
+        this.alternateTitles = alternateTitles;
+    }
+    public Set getCitedResponsibleParties() {
+        return citedResponsibleParties;
+    }
+    public void setCitedResponsibleParties(Set citedResponsibleParties) {
+        this.citedResponsibleParties = citedResponsibleParties;
+    }
+    public InternationalString getCollectiveTitle() {
+        return collectiveTitle;
+    }
+    public void setCollectiveTitle(InternationalString collectiveTitle) {
+        this.collectiveTitle = collectiveTitle;
+    }
+    public Map getDates() {
+        return dates;
+    }
+    public void setDates(Map dates) {
+        this.dates = dates;
+    }
+    public InternationalString getEdition() {
+        return edition;
+    }
+    public void setEdition(InternationalString edition) {
+        this.edition = edition;
+    }
+    public Date getEditionDate() {
+        return editionDate;
+    }
+    public void setEditionDate(Date editionDate) {
+        this.editionDate = editionDate;
+    }
+    public Set getIdentifiers() {
+        return identifiers;
+    }
+    public void setIdentifiers(Set identifiers) {
+        this.identifiers.clear();
+        this.identifiers.addAll( identifiers );
+    }
+    public Set getIdentifierTypes() {
+        return identifierTypes;
+    }
+    public void setIdentifierTypes(Set identifierTypes) {
+        this.identifierTypes.clear();
+        this.identifierTypes.addAll(identifierTypes);
+    }
+    public String getISBN() {
+        return ISBN;
+    }
+    public void setISBN(String isbn) {
+        ISBN = isbn;
+    }
+    public String getISSN() {
+        return ISSN;
+    }
+    public void setISSN(String issn) {
+        ISSN = issn;
+    }
+    public InternationalString getOtherCitationDetails() {
+        return otherCitationDetails;
+    }
+    public void setOtherCitationDetails(InternationalString otherCitationDetails) {
+        this.otherCitationDetails = otherCitationDetails;
+    }
+    public Set getPresentationForm() {
+        return presentationForm;
+    }
+    public void setPresentationForm(Set presentationForm) {
+        this.presentationForm.clear();
+        this.presentationForm.addAll( presentationForm );
+    }
+    public Series getSeries() {
+        return series;
+    }
+    public void setSeries(Series series) {
+        this.series = series;
+    }
+    public InternationalString getTitle() {
+        return title;
+    }
+    public void setTitle(InternationalString title) {
+        this.title = title;
+    }
+}
+class Commented {
+    /**
      * An immutable empty array of strings.
      */
     private static final String[] EMPTY = new String[0];
-
     /**
      * An immutable empty array of responsible party.
      */
@@ -72,19 +189,8 @@ public class Citation implements /*org.opengis.metadata.citation.Citation,*/ Ser
      * An immutable empty array of presentation form.
      */
     private static final PresentationForm[] EMPTY_PRESENTATION = new PresentationForm[0];
-
-    /**
-     * The title.
-     */
-    private final String title;
-
-    /**
-     * Construct a citation with the specified title.
-     */
-    public Citation(final String title) {
-        this.title = title;
-    }
-
+    
+    private String title;
     /**
      * Name by which the cited resource is known.
      *
@@ -234,7 +340,7 @@ public class Citation implements /*org.opengis.metadata.citation.Citation,*/ Ser
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final Citation that = (Citation) object;
+            final Commented that = (Commented) object;
             return Utilities.equals(this.title, that.title);
         }
         return false;
