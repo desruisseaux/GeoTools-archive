@@ -28,11 +28,14 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.util.UnsupportedImplementationException;
+import org.geotools.referencing.ReferenceSystem;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.ReferenceSystem;
+import org.geotools.measure.Measure;
 
 
 /**
@@ -95,6 +98,28 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
             }
         }
         return unit;
+    }
+
+    /**
+     * Computes the distance between two points. This convenience method delegates the work to the
+     * underlyling {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate system}, if
+     * possible.
+     *
+     * @param  coord1 Coordinates of the first point.
+     * @param  coord2 Coordinates of the second point.
+     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @throws UnsupportedOperationException if this coordinate reference system can't compute
+     *         distances.
+     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
+     */
+    public Measure distance(final double[] coord1, final double[] coord2)
+            throws UnsupportedOperationException, MismatchedDimensionException
+    {
+        if (coordinateSystem instanceof org.geotools.referencing.cs.CoordinateSystem) {
+            return ((org.geotools.referencing.cs.CoordinateSystem) coordinateSystem)
+                    .distance(coord1, coord2);
+        }
+        throw new UnsupportedImplementationException(coordinateSystem.getClass());
     }
 
     /**

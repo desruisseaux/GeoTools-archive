@@ -22,12 +22,19 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
 
 
 /**
@@ -112,6 +119,13 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
                     org.geotools.referencing.cs.CoordinateSystemAxis.Z);
 
     /**
+     * Converters from {@linkplain CoordinateSystemAxis#getUnit axis units} to
+     * {@linkplain #getDistanceUnit distance unit}. Will be constructed only when
+     * first needed.
+     */
+    private transient Converter[] converters;
+
+    /**
      * Construct a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
@@ -173,5 +187,36 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
                        final CoordinateSystemAxis axis2)
     {
         super(properties, axis0, axis1, axis2);
+    }
+
+    /**
+     * Computes the distance between two points.
+     *
+     * @param  coord1 Coordinates of the first point.
+     * @param  coord2 Coordinates of the second point.
+     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
+     */
+    public Measure distance(final double[] coord1, final double[] coord2)
+            throws MismatchedDimensionException
+    {
+        ensureDimensionMatch("coord1", coord1);
+        ensureDimensionMatch("coord2", coord2);
+        final Unit unit = getDistanceUnit();
+        Converter[] converters = this.converters; // Avoid the need for synchronization.
+        if (converters == null) {
+            converters = new Converter[getDimension()];
+            for (int i=0; i<converters.length; i++) {
+                converters[i] = getAxis(i).getUnit().getConverterTo(unit);
+            }
+            this.converters = converters;
+        }
+        double sum = 0;
+        for (int i=0; i<converters.length; i++) {
+            final Converter  c = converters[i];
+            final double delta = c.convert(coord1[i]) - c.convert(coord2[i]);
+            sum += delta*delta;
+        }
+        return new Measure(Math.sqrt(sum), unit);
     }
 }

@@ -28,6 +28,10 @@ import java.util.Map;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
 
 
 /**
@@ -89,5 +93,21 @@ public class TimeCS extends CoordinateSystem implements org.opengis.referencing.
      */
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return AxisDirection.FUTURE.equals(direction.absolute());
+    }
+
+    /**
+     * Computes the time difference between two points.
+     *
+     * @param  coord1 Coordinates of the first point.
+     * @param  coord2 Coordinates of the second point.
+     * @return The time difference between <code>coord1</code> and <code>coord2</code>.
+     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
+     */
+    public Measure distance(final double[] coord1, final double[] coord2)
+            throws MismatchedDimensionException
+    {
+        ensureDimensionMatch("coord1", coord1);
+        ensureDimensionMatch("coord2", coord2);
+        return new Measure(Math.abs(coord1[0] - coord2[0]), getDistanceUnit());
     }
 }

@@ -35,7 +35,7 @@ import java.io.IOException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -45,10 +45,12 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
+import org.geotools.measure.Measure;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Parser;
+import org.geotools.referencing.wkt.Preprocessor;
 import org.geotools.referencing.wkt.AbstractConsole;
 import org.geotools.geometry.GeneralDirectPosition;
 
@@ -163,7 +165,7 @@ public class Console extends AbstractConsole {
      * and the system default line separator.
      */
     public Console() {
-        super(new Parser());
+        super(new Preprocessor(new Parser()));
         numberSeparator = getNumberSeparator(numberFormat);
     }
     
@@ -173,7 +175,7 @@ public class Console extends AbstractConsole {
      * @param in The input stream.
      */
     public Console(final LineNumberReader in) {
-        super(new Parser(), in);
+        super(new Preprocessor(new Parser()), in);
         numberSeparator = getNumberSeparator(numberFormat);
     }
 
@@ -315,7 +317,7 @@ public class Console extends AbstractConsole {
                 //   transform = <the transform>
                 // -------------------------------
                 if (key0.equalsIgnoreCase("transform")) {
-                    transform = (MathTransform) fromDefinition(value, MathTransform.class);
+                    transform = (MathTransform) parseObject(value, MathTransform.class);
                     sourceCRS = null;
                     targetCRS = null;
                     return;
@@ -356,13 +358,13 @@ public class Console extends AbstractConsole {
                     if (key1.equalsIgnoreCase("crs")) {
                         if (key0.equalsIgnoreCase("source")) {
                             sourceCRS = (CoordinateReferenceSystem)
-                                        fromDefinition(value, CoordinateReferenceSystem.class);
+                                        parseObject(value, CoordinateReferenceSystem.class);
                             transform = null;
                             return;
                         }
                         if (key0.equalsIgnoreCase("target")) {
                             targetCRS = (CoordinateReferenceSystem)
-                                        fromDefinition(value, CoordinateReferenceSystem.class);
+                                        parseObject(value, CoordinateReferenceSystem.class);
                             transform = null;
                             return;
                         }
@@ -446,14 +448,15 @@ public class Console extends AbstractConsole {
      */
     private void printPts() throws FactoryException, TransformException, IOException {
         update();
-        DirectPosition transformedSource;
-        DirectPosition transformedTarget;
+        DirectPosition transformedSource = null;
+        DirectPosition transformedTarget = null;
         if (transform != null) {
-            transformedSource = transform          .transform(sourcePosition, null);
-            transformedTarget = transform.inverse().transform(targetPosition, null);
-        } else {
-            transformedSource = null;
-            transformedTarget = null;
+            if (sourcePosition != null) {
+                transformedSource = transform.transform(sourcePosition, null);
+            }
+            if (targetPosition != null) {
+                transformedTarget = transform.inverse().transform(targetPosition, null);
+            }
         }
         final TableWriter table = new TableWriter(out, 0);
         table.setMultiLinesCells(true);
@@ -471,10 +474,12 @@ public class Console extends AbstractConsole {
             print(targetPosition,    table);
             table.nextLine();
         }
-//        if (transformedSource != null) {
-//            table.write("Distance:");
-//            
-//        }
+        if (sourceCRS!=null && targetCRS!=null) {
+            table.write("Distance:");
+            printDistance(sourceCRS, sourcePosition, transformedTarget, table);
+            printDistance(targetCRS, targetPosition, transformedSource, table);
+            table.nextLine();
+        }
         table.writeHorizontalSeparator();
         table.flush();
     }
@@ -503,18 +508,41 @@ public class Console extends AbstractConsole {
     }
 
     /**
-     * Print the distance between the specified points.
+     * Print the distance between two points using the specified CRS.
      */
-    private void printDistance(final DirectPosition pt1, final DirectPosition pt2,
-                               final CoordinateReferenceSystem crs)
+    private void printDistance(final CoordinateReferenceSystem crs,
+                               final DirectPosition      position1,
+                               final DirectPosition      position2,
+                               final TableWriter         table)
             throws IOException
     {
-//        final Ellipsoid ellipsoid = CRSUtilities.getEllipsoid(crs);
-//        if (ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) {
-//            final double distance = ((org.geotools.referencing.datum.Ellipsoid) ellipsoid)
-//                                    .orthodromicDistance(p1, p2);
-//        } else {
-//        }
+        if (position1 == null) {
+            // Note: 'position2' is checked below, *after* blank columns insertion.
+            return;
+        }
+        for (int i=crs.getCoordinateSystem().getDimension(); --i>=0;) {
+            table.nextColumn();
+        }
+        if (position2 != null) {
+            if (crs instanceof org.geotools.referencing.crs.CoordinateReferenceSystem) try {
+                final Measure distance;
+                distance = ((org.geotools.referencing.crs.CoordinateReferenceSystem)crs)
+                           .distance(position1.getCoordinates(), position2.getCoordinates());
+                table.setAlignment(TableWriter.ALIGN_RIGHT);
+                table.write(numberFormat.format(distance.doubleValue()));
+                table.write("  ");
+                table.nextColumn();
+                table.write(String.valueOf(distance.getUnit()));
+                table.setAlignment(TableWriter.ALIGN_LEFT);
+                return;
+            } catch (UnsupportedOperationException ignore) {
+                /*
+                 * Underlying CS do not supports distance computation.
+                 * Left the column blank.
+                 */
+            }
+        }
+        table.nextColumn();
     }
 
 

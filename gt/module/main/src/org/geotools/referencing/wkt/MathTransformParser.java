@@ -44,7 +44,8 @@ import org.geotools.resources.cts.ResourceKeys;
 
 /**
  * Parser for {@linkplain MathTransform math transform}
- * cite>Well Know Text</cite> (WKT).
+ * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+ * Known Text</cite> (WKT)</A> of math transform.
  * 
  * @version $Id$
  * @author Remi Eve

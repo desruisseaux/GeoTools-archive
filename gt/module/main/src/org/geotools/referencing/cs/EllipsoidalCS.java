@@ -22,13 +22,18 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.SI;
+import javax.units.NonSI;
+import javax.units.Unit;
+import javax.units.Converter;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -79,6 +84,18 @@ public class EllipsoidalCS extends org.geotools.referencing.cs.CoordinateSystem
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LATITUDE,
                     org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
+
+    /**
+     * The axis number for longitude, latitude and height.
+     * Will be constructed only when first needed.
+     */
+    private transient int longitudeAxis, latitudeAxis, heightAxis;
+
+    /**
+     * The unit converters for longitude, latitude and height.
+     * Will be constructed only when first needed.
+     */
+    private transient Converter longitudeConverter, latitudeConverter, heightConverter;
 
     /**
      * Construct a two-dimensional coordinate system from a name.
@@ -156,5 +173,95 @@ public class EllipsoidalCS extends org.geotools.referencing.cs.CoordinateSystem
         return AxisDirection.NORTH.equals(direction) ||
                AxisDirection.EAST .equals(direction) ||
                AxisDirection.UP   .equals(direction);
+    }
+
+    /**
+     * Update the converters.
+     */
+    private void update() {
+        for (int i=getDimension(); --i>=0;) {
+            final CoordinateSystemAxis axis = getAxis(i);
+            final AxisDirection   direction = axis.getDirection().absolute();
+            final Unit                 unit = axis.getUnit();
+            if (AxisDirection.EAST.equals(direction)) {
+                longitudeAxis      = i;
+                longitudeConverter = unit.getConverterTo(NonSI.DEGREE_ANGLE);
+                continue;
+            }
+            if (AxisDirection.NORTH.equals(direction)) {
+                latitudeAxis      = i;
+                latitudeConverter = unit.getConverterTo(NonSI.DEGREE_ANGLE);
+                continue;
+            }
+            if (AxisDirection.UP.equals(direction)) {
+                heightAxis      = i;
+                heightConverter = unit.getConverterTo(SI.METER);
+                continue;
+            }
+            // Should not happen, since 'isCompatibleDirection'
+            // has already checked axis directions.
+            throw new AssertionError(direction);
+        }
+    }
+
+    /**
+     * Returns the longitude found in the specified coordinate point,
+     * always in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     *
+     * @param  coordinates The coordinate point expressed in this coordinate system.
+     * @return The longitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected
+     *         dimension.
+     */
+    public double getLongitude(final double[] coordinates)
+            throws MismatchedDimensionException
+    {
+        ensureDimensionMatch("coordinates", coordinates);
+        if (longitudeConverter == null) {
+            update();
+        }
+        return longitudeConverter.convert(coordinates[longitudeAxis]);
+    }
+
+    /**
+     * Returns the latitude found in the specified coordinate point,
+     * always in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     *
+     * @param  coordinates The coordinate point expressed in this coordinate system.
+     * @return The latitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected
+     *         dimension.
+     */
+    public double getLatitude(final double[] coordinates)
+            throws MismatchedDimensionException
+    {
+        ensureDimensionMatch("coordinates", coordinates);
+        if (latitudeConverter == null) {
+            update();
+        }
+        return latitudeConverter.convert(coordinates[latitudeAxis]);
+    }
+
+    /**
+     * Returns the height found in the specified coordinate point,
+     * always in {@linkplain SI#METER meters}.
+     *
+     * @param  coordinates The coordinate point expressed in this coordinate system.
+     * @return The height in the specified array, in {@linkplain SI#METER meters}.
+     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected
+     *         dimension.
+     */
+    public double getHeight(final double[] coordinates)
+            throws MismatchedDimensionException
+    {
+        ensureDimensionMatch("coordinates", coordinates);
+        if (heightConverter == null) {
+            update();
+            if (heightConverter == null) {
+                throw new IllegalStateException("Not a 3D coordinate system");
+                // TODO: localize the error message.
+            }
+        }
+        return heightConverter.convert(coordinates[heightAxis]);
     }
 }

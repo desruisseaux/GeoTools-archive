@@ -27,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 // OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -34,6 +35,12 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 /**
  * Holds the coordinates for a two-dimensional position within some coordinate reference system.
+ * This class put no restriction on the axis order, i.e. it doesn't ensure that the value stored
+ * in the {@linkplain #x x} field increases toward {@linkplain AxisDirection#EAST East} and the
+ * value in the {@linkplain #y y} field toward {@linkplain AxisDirection#NORTH North}. The rational
+ * is that other {@link DirectPosition} implementation do not have restriction on axis order, and
+ * anyway such a restriction is hard to generalize (what to do with
+ * {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
  * 
  * @version $Id$
  * @author Martin Desruisseaux

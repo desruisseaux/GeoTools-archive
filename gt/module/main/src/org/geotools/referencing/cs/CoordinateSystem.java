@@ -26,6 +26,7 @@ package org.geotools.referencing.cs;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.units.SI;
 import javax.units.Unit;
 import javax.units.Converter;
 import javax.units.ConversionException;
@@ -34,11 +35,13 @@ import javax.units.ConversionException;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.measure.Measure;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -71,6 +74,12 @@ public class CoordinateSystem extends IdentifiedObject
      * The axis for this coordinate system at the specified dimension.
      */
     private final CoordinateSystemAxis[] axis;
+
+    /**
+     * The unit for measuring distance in this coordinate system, or <code>null</code> if none.
+     * Will be computed only when first needed.
+     */
+    private transient Unit distanceUnit;
 
     /**
      * Constructs a coordinate system from a name.
@@ -252,7 +261,81 @@ public class CoordinateSystem extends IdentifiedObject
         }
         return matrix;
     }
+
+    /**
+     * Suggests an unit for measuring distances in this coordinate system. The default
+     * implementation scans all {@linkplain CoordinateSystemAxis#getUnit axis units},
+     * ignoring angular ones (this also implies ignoring {@linkplain Unit#ONE dimensionless} ones).
+     * If more than one non-angular unit is found, the default implementation returns the "largest"
+     * one (e.g. kilometers instead of meters).
+     *
+     * @return Suggested distance unit.
+     * @throws ConversionException if some non-angular units are incompatibles.
+     */
+    final Unit getDistanceUnit() throws ConversionException {
+        Unit unit = distanceUnit;  // Avoid the need for synchronization.
+        if (unit == null) {
+            for (int i=0; i<axis.length; i++) {
+                final Unit candidate = axis[i].getUnit();
+                if (candidate!=null && !candidate.isCompatible(SI.RADIAN)) {
+                    // TODO: checks the unit scale type (keeps RATIO only).
+                    if (unit != null) {
+                        final Converter converter = candidate.getConverterTo(unit);
+                        if (!converter.isLinear()) {
+                            // TODO: use the localization provided in 'swapAxis'. We could also
+                            //       do a more intelligent work by checking the unit scale type.
+                            throw new ConversionException("Unit conversion is non-linear");
+                        }
+                        if (Math.abs(converter.derivative(0)) <= 1) {
+                            // The candidate is a "smaller" unit than the current one
+                            // (e.g. "m" instead of "km"). Keeps the "largest" unit.
+                            continue;
+                        }
+                    }
+                    unit = candidate;
+                }
+            }
+            distanceUnit = unit;
+        }
+        return unit;
+    }
     
+    /**
+     * Convenience method for checking object dimension validity.
+     *
+     * @param  name The name of the argument to check.
+     * @param  coordinates The coordinate array to check.
+     * @throws MismatchedDimensionException if the coordinate doesn't have the expected dimension.
+     */
+    final void ensureDimensionMatch(final String name, final double[] coordinates)
+            throws MismatchedDimensionException
+    {
+        if (coordinates.length != axis.length) {
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, name,
+                        new Integer(coordinates.length), new Integer(axis.length)));
+        }
+    }
+
+    /**
+     * Computes the distance between two points. This method is not available for all coordinate
+     * systems. For example, {@linkplain EllipsoidalCS ellipsoidal CS} doesn't have suffisient
+     * information.
+     *
+     * @param  coord1 Coordinates of the first point.
+     * @param  coord2 Coordinates of the second point.
+     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @throws UnsupportedOperationException if this coordinate system can't compute distances.
+     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
+     *
+     * @todo Provides a localized message in the exception.
+     */
+    public Measure distance(final double[] coord1, final double[] coord2)
+            throws UnsupportedOperationException, MismatchedDimensionException
+    {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Compares the specified object with this coordinate system for equality.
      *

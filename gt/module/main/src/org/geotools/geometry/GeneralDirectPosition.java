@@ -25,15 +25,15 @@ import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-
-// OpenGIS dependencies
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -116,6 +116,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      */
     public GeneralDirectPosition(final GeneralDirectPosition point) {
         ordinates = (double[]) point.ordinates.clone();
+        crs = point.crs;
     }
 
     /**
@@ -152,18 +153,18 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * Convenience method for checking coordinate reference system validity.
      *
      * @param  crs The coordinate reference system to check.
-     * @param  minimalDimension the minimum dimension expected.
+     * @param  dimension the dimension expected.
      * @throws IllegalArgumentException if the CRS dimension is not valid.
      */
     static void checkCoordinateReferenceSystemDimension(final CoordinateReferenceSystem crs,
-                                                        final int minimalDimension)
+                                                        final int expected)
     {
         if (crs != null) {
             final int dimension = crs.getCoordinateSystem().getDimension();
-            if (dimension < minimalDimension) {
+            if (dimension != expected) {
                 throw new IllegalArgumentException(Resources.format(
                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, crs.getName().getCode(),
-                                    new Integer(dimension), new Integer(minimalDimension)));
+                                    new Integer(dimension), new Integer(expected)));
             }
         }
     }
@@ -180,7 +181,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     static void ensureDimensionMatch(final String name,
                                      final int dimension,
                                      final int expectedDimension)
-        throws MismatchedDimensionException
+            throws MismatchedDimensionException
     {
         if (dimension != expectedDimension) {
             throw new MismatchedDimensionException(Resources.format(
@@ -253,7 +254,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * @param  point The new coordinate for this point.
      * @throws MismatchedDimensionException if this coordinate point is not two-dimensional.
      *
-     * @task TODO: Check axis order.
+     * @todo Check axis order.
      */
     public void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ordinates.length != 2) {
@@ -270,15 +271,14 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      *
      * @throws IllegalStateException if this coordinate point is not two-dimensional.
      *
-     * @task TODO: Check axis order.
+     * @todo Check axis order.
      */
     public Point2D toPoint2D() throws IllegalStateException {
-        if (ordinates.length == 2) {
-            return new Point2D.Double(ordinates[0], ordinates[1]);
-        } else {
+        if (ordinates.length != 2) {
             throw new IllegalStateException(Resources.format(
                         ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(ordinates.length)));
         }
+        return new Point2D.Double(ordinates[0], ordinates[1]);
     }
     
     /**
