@@ -53,13 +53,13 @@
      this is tell people which targets to use, if we could detect 
      the directory they are starting it in then we could automate this
      ================================================================== -->
-  <goal name="info">
-    <echo>	
+	<goal name="info">
+		<echo>	
       Information on Building Geotools2.0-B6-DEV
       -----------------------	
       Make sure you use 'maven build' in the top directory at least once in order
       to build all modules before working on individual ones.
-
+		
       If building everything use:
         maven build         -- this will try to build all modules regardless
         maven createRelease -- uses argument: -Drelease.version=2.0-B5-DEV
@@ -76,65 +76,65 @@
         maven build-fail    - this will stop at the first failure
         maven allsite       - this will build the web site for all modules
     -->
-  </goal>
-  <preGoal name="checkstyle:init">
-    <echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
-    <j:set var="maven.checkstyle.properties"
-           value="../../geotools_checks.xml"/>
-  </preGoal>
-  <goal name="mergeTestReports">
-    <echo>merging test reports into higher directory</echo>
-    <ant:copy todir="../../target/test-reports">
-      <ant:fileset dir="target/test-reports">
-        <ant:include name="*.xml"/>
+	</goal>
+        <preGoal name="checkstyle:init">
+            <echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
+            <j:set var="maven.checkstyle.properties" value="${basedir}/../../geotools_checks.xml"/>
+
+        </preGoal>
+        <goal name="mergeTestReports">
+            <echo>merging test reports into higher directory</echo>
+           <ant:copy todir="../../target/test-reports">
+               <ant:fileset dir="target/test-reports">
+               <ant:include name="*.xml"/>
       </ant:fileset>
     </ant:copy>
-  </goal>
-  <goal name="build:log">
-    <echo file="../../buildReport.txt" append="true">
-      ${pom.id}</echo>
+        </goal>        
+	<goal name="build:log">
+		<echo file="../../buildReport.txt" append="true">
+    ${pom.id}</echo>
       <!-- imageurl="file://${basedir}/xdocs/images/${pom.artifactId}.gif"/-->
-  </goal>
-  <postGoal name="clean">
-    <echo file="../../buildReport.txt" append="true">  cleaned</echo>
-  </postGoal>
-  <postGoal name="java:compile">
-    <echo file="../../buildReport.txt" append="true">, compiled</echo>
-  </postGoal>
-  <postGoal name="test:test">
-    <echo file="../../buildReport.txt" append="true">, tested</echo>
-  </postGoal>
-  <postGoal name="jar:install">
-    <tstamp/>
-    <echo file="../../buildReport.txt" append="true">, INSTALLED ${TSTAMP}</echo>
-  </postGoal>
+	</goal>
+	<postGoal name="clean">
+		<echo file="../../buildReport.txt" append="true">  cleaned</echo>
+	</postGoal>
+	<postGoal name="java:compile">
+		<echo file="../../buildReport.txt" append="true">, compiled</echo>
+	</postGoal>
+	<postGoal name="test:test">
+		<echo file="../../buildReport.txt" append="true">, tested</echo>
+	</postGoal>
+	<postGoal name="jar:install">
+		<tstamp/>
+		<echo file="../../buildReport.txt" append="true">, INSTALLED ${TSTAMP}</echo>
+	</postGoal>
 <!-- ==================================================================
      B U I L D
      Currently makes use of multiple maven:reactor tags, James is looking into a
      maven:multiproject replacement  
      ================================================================== -->
-  <goal name="build">
-    <tstamp/>
+	<goal name="build">
+		<tstamp/>
     <available classname="com.sun.media.imageio.stream.RawImageInputStream"
                property="imageio.present"/>             
     <ant:available classname="com.sun.media.imageio.stream.RawImageInputStream"
                    property="imageio.present"/>
-    <fail unless="imageio.present" 
-          message="JAI ImageIO extention not found.  Please download and install it from:  http://java.sun.com/products/java-media/jai/downloads/download-iio.html"/>               
+                        <fail unless="imageio.present" 
+                        message="JAI ImageIO extention not found.  Please download and install it from:  http://java.sun.com/products/java-media/jai/downloads/download-iio.html"/>               
     <available file="module"
                property="module.present"/>
-    <fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>
-    <j:set var="gt2home" value="${basedir}"/>
-    <echo>
+                <fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>        
+		<j:set var="gt2home" value="${basedir}"/>
+		<echo>
       looking for modules in: ${basedir}/module, ${basedir}/plugin, ${basedir}/ext
       reporting progress to ${gt2home}
     </echo>
-    <ant:delete dir="target/test-reports"/>
+     <ant:delete dir="target/test-reports"/>
     <echo file="${basedir}/buildReport.txt"
           append="false">GeoTools2 module build report ${DSTAMP}</echo>
     <maven:reactor basedir="${basedir}/module"
-                   includes="*/project.xml"
-                   goals="build:log,clean,jar:install,mergeTestReports"
+		       includes="*/project.xml"
+		       goals="build:log,clean,jar:install,mergeTestReports"
                    banner="Building Module"
                    postProcessing="true"
                    ignoreFailures="true"/>
@@ -147,9 +147,9 @@
     <maven:reactor basedir="${basedir}/ext"
                    includes="*/project.xml"
                    goals="build:log,clean,jar:install,mergeTestReports"
-                   banner="Building"
-                   postProcessing="true"
-                   ignoreFailures="true"/>
+		       banner="Building"
+		       postProcessing="true"
+		       ignoreFailures="true"/>
     <loadfile property="build.report"
                srcFile="${basedir}/buildReport.txt"
                failonerror="false"/>
@@ -171,14 +171,14 @@
 
   These build results are available in buildResults.txt
   Maven always says 'Build Sucessful', please check the above report.
-    </echo>
-  </goal>
+      </echo>
+	</goal>
 <!-- ==================================================================
      B U I L D - F A I L
      Untested at this time - James is in the process of upgrading
      ================================================================== -->
-  <goal name="build-fail">
-    <echo>
+	<goal name="build-fail">
+		<echo>
       Looking for modules in: ${basedir}/module
     </echo>
     <ant:delete dir="target/test-reports"/>
@@ -219,36 +219,36 @@
              value="failed"/>
       <j:forEach var="item"
              items="${ok}">
-        <j:if test="${item == module}">
+				<j:if test="${item == module}">
 	  <j:set var="status"
                  value="installed"/>
-        </j:if>
-      </j:forEach>
-      <echo>Module ${module} : ${status}</echo>
-    </j:forEach>
-  </goal>
-  <goal name="snapshot">
-    <echo>
-      looking for modules in: ${basedir}/geotools-src      
+				</j:if>
+			</j:forEach>
+			<echo>Module ${module} : ${status}</echo>
+		</j:forEach>
+	</goal>
+	<goal name="snapshot">
+		<echo>
+      looking for modules in: ${basedir}/geotools-src
     </echo>
     <maven:reactor basedir="${basedir}/geotools-src"
                    includes="*/project.xml"
                    goals="clean,jar:deploy-snapshot"
                    banner="Deploying"
                    ignoreFailures="true"/>
-    <echo>
+		<echo>
       modules built and deployed:  ${reactorProjects}
     </echo>
-  </goal>
+	</goal>
 <!-- ==================================================================
      W E B S I T E
      Untested at this time - James is in the process of upgrading
      Generate the documentation for each of the common projects
      ================================================================== -->
-  <preGoal name="site:generate">
-    <attainGoal name="pmd"/>
-  </preGoal>
-  <goal name="allsite">
+	<preGoal name="site:generate">
+		<attainGoal name="pmd"/>
+	</preGoal>
+	<goal name="allsite">
 		<maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" goals="site:generate" banner="Generating site for" ignoreFailures="true"/>
 		<j:set var="ok" value="${reactorProjects}"/>
 		<maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" postProcessing="true" ignoreFailures="true"/>
@@ -306,7 +306,7 @@ Module ${module} : ${status}
 		<maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" ignoreFailures="false" postProcessing="true"/>
 		<echo>after reactor
 </echo>
-    <!--
+		<!--
       ||
       || Generate the documentation for the front-end site. First we will
       || generate the navigation based on the projects that we just
