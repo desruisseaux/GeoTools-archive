@@ -16,9 +16,9 @@
  */
 package org.geotools.feature;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.filter.Filter;
 import org.geotools.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -57,8 +58,24 @@ public class DefaultAttributeType implements AttributeType {
 
     /** Indicates if nulls are allowed for this attribute */
     protected final boolean nillable;
-    protected final int fieldLength;
+    protected final int min,max;
     protected Object defaultValue;
+
+	/**
+	 * Defaults are flat, always return 1.
+	 * @task REVISIT: return 0?  That's our current assumption in some 
+	 * code, but
+	 */
+	public int getMinOccurs() {
+		return 1;
+	}
+
+	/**
+	 * Defaults are flat, always return 1.
+	 */
+	public int getMaxOccurs() {
+		return max;
+	}
 
     /**
      * Constructor with name and type.
@@ -72,30 +89,36 @@ public class DefaultAttributeType implements AttributeType {
      * @task REVISIT: make this protected?  I think it's only used by facotries
      *       at this time.
      */
+    protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
+            Object defaultValue, Filter f) {
+            this.name = (name == null) ? "" : name;
+            this.type = (type == null) ? Object.class : type;
+            this.nillable = nillable;
+            this.min = min;this.max = max;
+            this.defaultValue = defaultValue;
+            this.filter = f;
+        }
+    protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
+            Object defaultValue) {
+            this.name = (name == null) ? "" : name;
+            this.type = (type == null) ? Object.class : type;
+            this.nillable = nillable;
+            this.min = min;this.max = max;
+            this.defaultValue = defaultValue;
+        }
+
     protected DefaultAttributeType(String name, Class type, boolean nillable,
-        int fieldLength, Object defaultValue) {
-        this.name = (name == null) ? "" : name;
-        this.type = (type == null) ? Object.class : type;
-        this.nillable = nillable;
-        this.fieldLength = fieldLength;
-        this.defaultValue = defaultValue;
+                                   Object defaultValue) {
+	this(name, type, nillable, 1, 1,  defaultValue);
     }
 
     protected DefaultAttributeType(AttributeType copy) {
         this.name = copy.getName();
         this.type = copy.getType();
         this.nillable = copy.isNillable();
-        this.fieldLength = copy.getFieldLength();
+        this.min = copy.getMinOccurs();
+        this.max = copy.getMaxOccurs();
         this.defaultValue = copy.createDefaultValue();
-    }
-
-    /**
-     * False, since it is not a schema.
-     *
-     * @return False.
-     */
-    public boolean isNested() {
-        return false;
     }
 
     /**
@@ -297,7 +320,6 @@ public class DefaultAttributeType implements AttributeType {
         String details = "name=" + name;
         details += (" , type=" + type);
         details += (" , nillable=" + nillable);
-        details += (" , field length=" + fieldLength);
 
         return "DefaultAttributeType [" + details + "]";
     }
@@ -353,202 +375,7 @@ public class DefaultAttributeType implements AttributeType {
         return defaultValue;
     }
 
-    public int getFieldLength() {
-        return fieldLength;
-    }
-
-    /**
-     * Class that represents a Numeric.
-     *
-     * @task REVISIT: we need a more coherent and obvious AttributeType
-     *       hierarchy.  Better documentation as well.
-     */
-    static class Numeric extends DefaultAttributeType {
-        
-        /**
-         * Constructor with name, type and nillable.  Type should always be a
-         * Number class.
-         *
-         * @param name Name of this attribute.
-         * @param type Class type of this attribute.
-         * @param nillable If nulls are allowed for the attribute of this type.
-         * @param fieldLength DOCUMENT ME!
-         * @param defaultValue default value when none is suppled
-         *
-         * @throws IllegalArgumentException is type is not a Number.
-         *
-         * @task REVISIT: protected?
-         */
-        public Numeric(String name, Class type, boolean nillable,
-            int fieldLength, Object defaultValue)
-            throws IllegalArgumentException {
-            super(name, type, nillable, fieldLength, defaultValue);
-
-            if (!Number.class.isAssignableFrom(type)) {
-                throw new IllegalArgumentException(
-                    "Numeric requires Number class, " + "not " + type);
-            }
-        }
-
-        /**
-         * Allows this AttributeType to convert an argument to its prefered
-         * storage type. If no parsing is possible, returns the original
-         * value. If a parse is attempted, yet fails (i.e. a poor decimal
-         * format) throw the Exception. This is mostly for use internally in
-         * Features, but implementors should simply follow the rules to be
-         * safe.
-         *
-         * @param value the object to attempt parsing of.
-         *
-         * @return <code>value</code> converted to the preferred storage of
-         *         this <code>AttributeType</code>.  If no parsing was
-         *         possible then the same object is returned.
-         *
-         * @throws IllegalArgumentException if parsing is attempted and is
-         *         unsuccessful.
-         *
-         * @task REVISIT: When type is Number, should we always be using
-         *       Double? (What else would we do? - IanS)
-         */
-        public Object parse(Object value)
-            throws IllegalArgumentException {
-            // handle null values first
-            if (value == null) {
-                return value;
-            }
-
-            // no parse needed here if types are compatable
-            if ((value.getClass() == type)
-                    || type.isAssignableFrom(value.getClass())) {
-                return value;
-            }
-
-            // convert one Number to our preferred type
-            if (value instanceof Number) {
-                return convertNumber((Number) value);
-            }
-
-            // parse a String to our preferred type
-            // note, this is the final parsing attempt !
-            String str = value.toString();
-
-            try {
-                Object parsed = parseFromString(str);
-
-                if (parsed != null) {
-                    return parsed;
-                }
-            } catch (IllegalArgumentException iae) {
-                // do nothing
-            }
-
-            // check empty string or black space
-            if ((str.length() == 0) || (str.trim().length() == 0)) {
-                Object parsed = parseFromString("0");
-
-                if (parsed != null) {
-                    return parsed;
-                }
-            }
-
-            // nothing else to do
-            throw new IllegalArgumentException(
-                "Cannot parse " + value.getClass()
-            );
-        }
-        
-        /** Duplicate the given Object.
-         * In this case, since Number classes are immutable, lets return the
-         * Object.
-         */
-        public Object duplicate(Object o) {
-            return o;
-        }
-
-        protected Object parseFromString(String value)
-            throws IllegalArgumentException {
-
-            if (type == Byte.class) {
-                return Byte.decode(value);
-            }
-
-            if (type == Short.class) {
-                return Short.decode(value);
-            }
-
-            if (type == Integer.class) {
-                return Integer.decode(value);
-            }
-
-            if (type == Float.class) {
-                return Float.valueOf(value);
-            }
-
-            if (type == Double.class) {
-                return Double.valueOf(value);
-            }
-
-            if (type == Long.class) {
-                return Long.decode(value);
-            }
-
-            if (type == BigInteger.class) {
-                return new BigInteger(value);
-            }
-
-            if (type == BigDecimal.class) {
-                return new BigDecimal(value);
-            }
-
-            if (Number.class.isAssignableFrom(type)) {
-                return new Double(value);
-            }
-
-            return null;
-        }
-
-        protected Object convertNumber(Number number) {
-            if (type == Byte.class) {
-                return new Byte(number.byteValue());
-            }
-
-            if (type == Short.class) {
-                return new Short(number.shortValue());
-            }
-
-            if (type == Integer.class) {
-                return new Integer(number.intValue());
-            }
-
-            if (type == Float.class) {
-                return new Float(number.floatValue());
-            }
-
-            if (type == Double.class) {
-                return new Double(number.doubleValue());
-            }
-
-            if (type == Long.class) {
-                return new Long(number.longValue());
-            }
-
-            if (type == BigInteger.class) {
-                return BigInteger.valueOf(number.longValue());
-            }
-
-            if (type == BigDecimal.class) {
-                return BigDecimal.valueOf(number.longValue());
-            }
-
-            throw new RuntimeException("AttributeGT.Numeric cannot parse "
-                + number);
-        }
-    }
-
-    /**
-     * AttributeType that validates a Feature.
-     *
-     * @task REVISIT: hierarchy?
+    /* This should no longer be needed, as FeatureType implements AttributeType
      */
     static class Feature extends DefaultAttributeType {
         /** The featureType to use for validation. */
@@ -562,9 +389,9 @@ public class DefaultAttributeType implements AttributeType {
          * @param nillable If nulls are allowed for the attribute of this type.
          * @param defaultValue default value when none is suppled
          */
-        public Feature(String name, FeatureType type, boolean nillable,
+        public Feature(String name, FeatureType type, boolean nillable, int min, int max,
             Object defaultValue) {
-            super(name, org.geotools.feature.Feature.class, nillable, 0,
+            super(name, org.geotools.feature.Feature.class, nillable,min,max, 
                 defaultValue);
             this.featureType = type;
         }
@@ -606,93 +433,21 @@ public class DefaultAttributeType implements AttributeType {
         }
     }
 
-    static class Textual extends DefaultAttributeType {
-        public Textual(String name, boolean nillable, int fieldLength,
-            Object defaultValue) {
-            super(name, String.class, nillable, fieldLength, defaultValue);
-        }
-
-        public Object parse(Object value) throws IllegalArgumentException {
-            if (value == null) {
-                return value;
-            }
-
-            // string is immutable, so lets keep it
-            if (value instanceof String) {
-                return value;
-            }
-
-            // other char sequences are not mutable, create a String from it.
-            // this also covers any other cases...
-            return value.toString();
-        }
-        
-        /** Duplicate as a String
-         * @return a String obtained by calling toString or null.
-         */
-        public Object duplicate(Object o) {
-            if (o == null)
-                return null;
-            return o.toString();
-        }
-    }
-
-    static class Temporal extends DefaultAttributeType {
-        // this might be right, maybe not, but anyway, its a default formatting
-        static java.text.DateFormat format = java.text.DateFormat.getInstance();
-
-        public Temporal(String name, boolean nillable, int fieldLength,
-            Object defaultValue) {
-            super(name, java.util.Date.class, nillable, fieldLength,
-                defaultValue);
-        }
-
-        public Object parse(Object value) throws IllegalArgumentException {
-            if (value == null) {
-                return value;
-            }
-
-            if (type.isAssignableFrom(value.getClass())) {
-                return value;
-            }
-
-            if (value instanceof Number) {
-                return new Date(((Number) value).longValue());
-            }
-
-            if (value instanceof java.util.Calendar) {
-                return ((java.util.Calendar) value).getTime();
-            }
-
-            try {
-                return format.parse(value.toString());
-            } catch (java.text.ParseException pe) {
-                throw new IllegalArgumentException("unable to parse " + value
-                    + " as Date");
-            }
-        }
-        
-        public Object duplicate(Object o) throws IllegalAttributeException {
-            if (o == null)
-                return null;
-            if (o instanceof Date) {
-                Date d = (Date) o;
-                return new Date(d.getTime());
-            }
-            throw new IllegalAttributeException("Cannot duplicate " + o.getClass().getName());
-        }
-    }
-
+    /* TODO: revisit this - we want to move stuff out of the hierarchy, but this already
+     * has an interface outside.  We should figure out how we want our defaults vs. our
+     * interfaces for types to live.
+     */
     public static class Geometric extends DefaultAttributeType
         implements GeometryAttributeType {
         /** CoordianteSystem used by this GeometryAttributeType */
         protected CoordinateReferenceSystem coordinateSystem;
         protected GeometryFactory geometryFactory;
+        private Filter filter;
 
-        public Geometric(String name, Class type, boolean nillable,
-            int fieldLength, Object defaultValue, CoordinateReferenceSystem cs) {
-            super(name, type, nillable, fieldLength, defaultValue);
-            
+        public Geometric(String name, Class type, boolean nillable, int min, int max,
+            Object defaultValue, CoordinateReferenceSystem cs, Filter filter) {
+            super(name, type, nillable,min,max, defaultValue);
+            this.filter = filter;
             coordinateSystem = cs;
             geometryFactory = cs == null ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(cs);
             
@@ -702,6 +457,11 @@ public class DefaultAttributeType implements AttributeType {
                 ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(cs);
              */
         }
+
+       public Geometric(String name, Class type, boolean nillable,
+            Object defaultValue, CoordinateReferenceSystem cs,Filter filter) {
+            this(name, type, nillable,1,1, defaultValue, cs,filter);
+       }
 
         public Geometric(GeometryAttributeType copy, CoordinateReferenceSystem override) {
             super(copy);
@@ -748,7 +508,22 @@ public class DefaultAttributeType implements AttributeType {
             }
             throw new IllegalAttributeException("Cannot duplicate " + o.getClass().getName());
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.feature.PrimativeAttributeType#getRestriction()
+		 */
+		public Filter getRestriction() {
+			return filter;
+		}
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.AttributeType#getRestriction()
+	 */
+	public Filter getRestriction() {
+		return filter;
+	}
+	private Filter filter;
 }
 
 

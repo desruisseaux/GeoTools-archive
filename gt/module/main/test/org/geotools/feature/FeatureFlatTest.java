@@ -148,7 +148,7 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public void testToStringWontThrow() throws IllegalAttributeException {
-        Feature f = SampleFeatureFixtures.createFeature();
+        SimpleFeature f = (SimpleFeature)SampleFeatureFixtures.createFeature();
         f.setAttributes(new Object[f.getNumberOfAttributes()]);
         String s = f.toString();
     }
@@ -189,7 +189,7 @@ public class FeatureFlatTest extends TestCase {
 
     public void testAttributeAccess() throws Exception {
         // this ones kinda silly
-        Feature f = SampleFeatureFixtures.createFeature();
+    	SimpleFeature f = (SimpleFeature)SampleFeatureFixtures.createFeature();
         Object[] atts = null;
         atts = f.getAttributes(atts);
         for (int i = 0, ii = atts.length; i < ii; i++) {

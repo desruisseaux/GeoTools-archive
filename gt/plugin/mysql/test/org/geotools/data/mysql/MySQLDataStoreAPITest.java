@@ -57,6 +57,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -200,10 +201,10 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         Envelope bounds = new Envelope();
 
         try {
-            Feature f;
+            SimpleFeature f;
 
             while (reader.hasNext()) {
-                f = reader.next();
+                f = (SimpleFeature)reader.next();
 
                 int index = ((Integer) f.getAttribute("id")).intValue() - 1;
                 roadFeatures[index] = f;
@@ -1046,17 +1047,17 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeaturesWriterAdd() throws IOException, IllegalAttributeException {
         FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
-        Feature feature;
+        SimpleFeature feature;
 
         LOGGER.info("about to call has next on writer " + writer);
 
         while (writer.hasNext()) {
-            feature = writer.next();
+            feature = (SimpleFeature)writer.next();
         }
 
         assertFalse(writer.hasNext());
 
-        feature = writer.next();
+        feature = (SimpleFeature)writer.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer.write();
 

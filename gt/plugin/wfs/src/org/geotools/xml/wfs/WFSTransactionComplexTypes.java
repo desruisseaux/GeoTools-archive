@@ -911,7 +911,7 @@ public class WFSTransactionComplexTypes {
             // should exist when original from a WFS ...
             Feature f = a.getFeature();
             Schema schema = SchemaFactory.getInstance(f.getFeatureType()
-                                                       .getNamespaceURI());
+                                                       .getNamespace());
             Element[] els = schema.getElements();
             Element e = null;
 

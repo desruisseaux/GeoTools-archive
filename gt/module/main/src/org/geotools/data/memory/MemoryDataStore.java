@@ -35,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -374,7 +375,7 @@ public class MemoryDataStore extends AbstractDataStore {
                 FeatureType featureType = getSchema(typeName);
                 Map contents = features(typeName);
                 Iterator iterator = contents.values().iterator();
-                Feature live = null;
+                SimpleFeature live = null;
 
                 Feature current = null; // current Feature returned to user        
 
@@ -385,7 +386,7 @@ public class MemoryDataStore extends AbstractDataStore {
                 public Feature next() throws IOException, NoSuchElementException {
                     if (hasNext()) {
                         // existing content
-                        live = (Feature) iterator.next();
+                        live = (SimpleFeature) iterator.next();
 
                         try {
                             current = featureType.duplicate(live);

@@ -858,7 +858,7 @@ public class DataUtilities {
     public static FeatureType createSubType(FeatureType featureType,
             String[] properties, CoordinateReferenceSystem override)
             throws SchemaException {
-        return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespaceURI() );
+        return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespace() );
     }
 
     public static FeatureType createSubType(FeatureType featureType,
@@ -878,7 +878,7 @@ public class DataUtilities {
 
         boolean same = featureType.getAttributeCount() == properties.length &&
             featureType.getTypeName().equals( typeName ) &&
-            featureType.getNamespaceURI().equals( namespace );
+            featureType.getNamespace().equals( namespace );
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
             AttributeType type = featureType.getAttributeType(i);
@@ -905,7 +905,7 @@ public class DataUtilities {
         }
 
         if( typeName == null ) typeName = featureType.getTypeName();
-        if( namespace == null ) namespace = featureType.getNamespaceURI();
+        if( namespace == null ) namespace = featureType.getNamespace();
         
         return FeatureTypeFactory.newFeatureType(types, typeName, namespace);
     }
@@ -948,7 +948,7 @@ public class DataUtilities {
         }
 
         return FeatureTypeFactory.newFeatureType(types,
-            featureType.getTypeName(), featureType.getNamespaceURI());
+            featureType.getTypeName(), featureType.getNamespace());
     }
 
     /**
@@ -989,7 +989,7 @@ public class DataUtilities {
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(typeName);
         try {
             if( namespace != null ){
-                typeFactory.setNamespaceURI( new URI(namespace));
+                typeFactory.setNamespace( new URI(namespace));
             }
         } catch (URISyntaxException badNamespace ) {
             throw new SchemaException( badNamespace );            

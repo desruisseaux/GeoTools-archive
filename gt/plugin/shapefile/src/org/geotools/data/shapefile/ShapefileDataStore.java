@@ -78,7 +78,10 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.LengthFunction;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.FactoryException;
@@ -165,7 +168,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected TypeEntry createTypeEntry( final String typeName ) {
         URI namespace;
         try {
-            namespace = getSchema( typeName ).getNamespaceURI();
+            namespace = getSchema( typeName ).getNamespace();
         } catch (IOException e) {
             namespace = null;
         }
@@ -1045,7 +1048,25 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 
                 Class colType = type.getType();
                 String colName = type.getName();
-                int fieldLen = type.getFieldLength();
+
+            	int fieldLen = -1;
+            	Filter f = type.getRestriction();
+            	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == f.COMPARE_LESS_THAN || f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL)){
+            		try{
+            		CompareFilter cf = (CompareFilter)f;
+            		if(cf.getLeftValue() instanceof LengthFunction){
+            			fieldLen = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
+            		}else{
+            			if(cf.getRightValue() instanceof LengthFunction){
+            				fieldLen = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+                		}
+            		}
+            		}catch(NumberFormatException e){
+            			fieldLen = 256;
+            		}
+            	}else{
+            		fieldLen = 256;
+            	}
                 
                 if (fieldLen <= 0) {
                     fieldLen = 255;

@@ -21,6 +21,7 @@
  */
 package org.geotools.filter;
 
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -62,9 +63,12 @@ public class FilterFactoryImpl extends FilterFactory {
      * @throws IllegalFilterException if there were creation problems.
      */
     public AttributeExpression createAttributeExpression(FeatureType schema,
-        String path) throws IllegalFilterException {
-        return new AttributeExpressionImpl(schema, path);
-    }
+            String path) throws IllegalFilterException {
+            return new AttributeExpressionImpl(schema, path);
+        }
+    public AttributeExpression createAttributeExpression(AttributeType at) throws IllegalFilterException {
+            return new AttributeExpressionImpl2(at);
+        }
 
     /**
      * Creates a BBox Expression from an envelope.

@@ -442,7 +442,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         FeatureType actual = half.getSchema();
 
         assertEquals(type.getTypeName(), actual.getTypeName());
-        assertEquals(type.getNamespaceURI(), actual.getNamespaceURI());
+        assertEquals(type.getNamespace(), actual.getNamespace());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 
         for (int i = 0; i < type.getAttributeCount(); i++) {

@@ -23,10 +23,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.xml.gml.GMLSchema;
+
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -39,22 +43,34 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class DefaultFeatureCollection extends AbstractCollection implements FeatureCollection {
     /** Internal feature storage list */
-    private Set features = new LinkedHashSet();
+    private List features = new LinkedList();
 
     /** Internal listener storage list */
     private List listeners = new ArrayList(2);
 
     /** Internal envelope of bounds. */
     private Envelope bounds = null;
+    
+    private String id; /// fid
 
     /**
      * This class is protected to discourage direct usage... opportunistic
      * reuse is encouraged, but only for the purposes of testing or other
      * specialized  uses. Normal creation should occur through
      * org.geotools.core.FeatureCollections.newCollection().
+     * @param id may be null ... feature id
+     * @param FeatureType optional, may be null
      */
-    protected DefaultFeatureCollection() {
+    protected DefaultFeatureCollection(String id, FeatureType featureType) {
+    	this.id = id;
+    	if(featureType == null){
+    		List ats = new LinkedList();
+    		ats.add(new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null));
+    		featureType = new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);
+    	}
+    	this.featureType = featureType;
     }
+    private FeatureType featureType;
 
     /**
      * Gets the bounding box for the features in this feature collection.
@@ -105,7 +121,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
         bounds = null;
 
         CollectionEvent cEvent = new CollectionEvent(this, features, type);
-
+        
         for (int i = 0, ii = listeners.size(); i < ii; i++) {
             ((CollectionListener) listeners.get(i)).collectionChanged(cEvent);
         }
@@ -150,21 +166,12 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
      * @return <tt>true</tt> if this collection changed as a result of the call
      */
     public boolean add(Object o) {
+    	//TODO check inheritance with FeatureType here!!!
         Feature feature = (Feature) o;
-        if(feature.getParent() == null){
-            feature.setParent(this);
-        }
-        else{
-            try{
-            feature = feature.getFeatureType().duplicate(feature);//expensive clone
-            }
-            catch(org.geotools.feature.IllegalAttributeException iae){
-                //should be uterly impossible.
-            }
-        }
+
         // This cast is neccessary to keep with the contract of Set!
         boolean changed = features.add(feature);
-        
+
         if (changed) {
             fireChange(feature, CollectionEvent.FEATURES_ADDED);
         }
@@ -187,6 +194,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
      * @see #add(Object)
      */
     public boolean addAll(Collection c) {
+    	//TODO check inheritance with FeatureType here!!!
         boolean changed = false;
         Iterator iter = c.iterator();
 
@@ -466,4 +474,113 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
     public Object[] toArray(Object[] a) {
         return features.toArray(a);
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.FeatureCollection#getFeatureType()
+	 */
+	public FeatureType getFeatureType() {
+		return featureType;
+	}
+
+	private FeatureCollection parent;
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getParent()
+	 */
+	public FeatureCollection getParent() {
+		// TODO deal with listeners?
+		return parent;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#setParent(org.geotools.feature.FeatureCollection)
+	 */
+	public void setParent(FeatureCollection collection) {
+		parent = collection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getID()
+	 */
+	public String getID() {
+		return id;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getAttributes(java.lang.Object[])
+	 */
+	public Object[] getAttributes(Object[] attributes) {
+		return features.toArray(new Feature[features.size()]);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getAttribute(java.lang.String)
+	 */
+	public Object getAttribute(String xPath) {
+		if(xPath.indexOf(featureType.getTypeName())>-1)
+			if(xPath.endsWith("]")){
+				// TODO get index and grab it
+				return features;
+			}else{
+				return features;
+			}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getAttribute(int)
+	 */
+	public Object getAttribute(int index) {
+		if(index == 0)
+			return features;
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
+	 */
+	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+		if(position == 0 && val instanceof List){
+			List nw = (List)val;
+			Iterator i = nw.iterator();
+			while(i.hasNext()){
+				if(!(i.next() instanceof Feature))
+					return;
+			}
+			features = nw;
+			fireChange(nw,0);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getNumberOfAttributes()
+	 */
+	public int getNumberOfAttributes() {
+		return features.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#setAttribute(java.lang.String, java.lang.Object)
+	 */
+	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
+		if(xPath.indexOf(featureType.getTypeName())>-1)
+			if(xPath.endsWith("]")){
+				// TODO get index and grab it
+			}else{
+				setAttribute(0,attribute);
+			}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#getDefaultGeometry()
+	 */
+	public Geometry getDefaultGeometry() {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.Feature#setDefaultGeometry(com.vividsolutions.jts.geom.Geometry)
+	 */
+	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+		throw new IllegalAttributeException("Not Supported");
+	}
 }

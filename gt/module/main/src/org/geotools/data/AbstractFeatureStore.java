@@ -23,6 +23,7 @@ import java.util.Set;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 
 
@@ -197,7 +198,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
         Feature feature = null;
-        Feature newFeature;
+        SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
 
@@ -210,7 +211,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                         e);
                 }
 
-                newFeature = writer.next();
+                newFeature = (SimpleFeature)writer.next();
 
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));
@@ -317,7 +318,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 getTransaction());
         Feature feature;
-        Feature newFeature;
+        SimpleFeature newFeature;
 
         try {
             while (writer.hasNext()) {
@@ -333,7 +334,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                         readProblem);
                 }
 
-                newFeature = writer.next();
+                newFeature = (SimpleFeature)writer.next();
 
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));

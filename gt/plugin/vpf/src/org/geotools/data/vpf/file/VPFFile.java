@@ -44,6 +44,10 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.AnnotationFeatureType;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.LengthFunction;
+import org.geotools.filter.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
@@ -311,17 +315,17 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *  (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
-        return featureType.getNamespaceURI().toString();
+    public URI getNamespace() {
+        return featureType.getNamespace();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getNamespace()
-     */
-    public URI getNamespaceURI() {
-        return featureType.getNamespaceURI();
-    }
+//    /*
+//     *  (non-Javadoc)
+//     * @see org.geotools.feature.FeatureType#getNamespace()
+//     */
+//    public URI getNamespaceURI() {
+//        return featureType.getNamespaceURI();
+//    }
 
     /**
      * Gets the value of narrativeTable variable file name.
@@ -350,17 +354,29 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected int getRecordSize() {
         int size = 0;
-        int currentSize;
+//        int currentSize;
 
         Iterator iter = columns.iterator();
 
         while (iter.hasNext()) {
             VPFColumn column = (VPFColumn) iter.next();
-            currentSize = column.getFieldLength();
-
-            if (currentSize < 0) {
+//            currentSize = column.getFieldLength();
+            if (column.getRestriction() == Filter.NONE || column.getRestriction() == null) {
+//            if (currentSize < 0) {
                 return -1;
             } else {
+            	int currentSize = 0;
+            	if(column.getRestriction() instanceof CompareFilter){
+            		try{
+            		CompareFilter cf = (CompareFilter)column.getRestriction();
+            		if(cf.getLeftValue() instanceof LengthFunction){
+            			currentSize = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
+            		}else{
+                		if(cf.getRightValue() instanceof LengthFunction)
+                			currentSize = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+            		}
+            		}catch(Throwable t){}
+            	}
                 size += currentSize;
             }
         }
@@ -700,7 +716,8 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             for (int inx = 0; inx < columns.size(); inx++) {
                 column = (VPFColumn) columns.get(inx);
 
-                if (column.getFieldLength() < 0) {
+                if (column.getRestriction() == Filter.NONE || column.getRestriction() == null) {
+//                    if (column.getFieldLength() < 0) {
                     values[inx] = readVariableSizeData(column.getTypeChar());
                 } else {
                     values[inx] = readFixedSizeData(column.getTypeChar(),
@@ -1058,4 +1075,11 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
         return result;
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
+	 */
+	public int find(String attName) {
+        return featureType.find(attName);
+	}
 }

@@ -62,11 +62,7 @@ public class DummyFeatureType implements FeatureType {
         return null;
     }
     
-    public String getNamespace() {
-        return null;
-    }
-    
-    public URI getNamespaceURI() {
+    public URI getNamespace() {
         return null;
     }
     
@@ -89,5 +85,13 @@ public class DummyFeatureType implements FeatureType {
     public boolean isDescendedFrom(URI nsURI, String typeName) {
         return false;
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
+	 */
+	public int find(String attName) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
     
 }

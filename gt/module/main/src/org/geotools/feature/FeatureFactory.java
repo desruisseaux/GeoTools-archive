@@ -31,7 +31,7 @@ package org.geotools.feature;
  *       allow independent FeatureFactories, but I'm not sure if those are
  *       useful at all.
  */
-public interface FeatureFactory {
+public interface FeatureFactory{
     /**
      * Creates a new feature, with a generated unique featureID.  This is less
      * than ideal, as a FeatureID should be persistant over time, generally

@@ -4529,7 +4529,7 @@ public class GMLComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
             if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
-                return getCollection(value);
+                return getCollection(attrs,value);
             }
 
             FCBuffer fcb = (FCBuffer) hints.get(STREAM_HINT);
@@ -4563,9 +4563,14 @@ public class GMLComplexTypes {
             return false;
         }
 
-        private FeatureCollection getCollection(ElementValue[] value) {
+        private FeatureCollection getCollection(Attributes attrs, ElementValue[] value) {
+        	
+        	String id = "";
+        	id = attrs.getValue("", "ID");
+        	if(id == null)
+        		id = attrs.getValue(GMLSchema.NAMESPACE.toString(),"ID");
             //bbox slot
-            GMLFeatureCollection fc = new GMLFeatureCollection(((Geometry)value[0].getValue()).getEnvelopeInternal());
+            GMLFeatureCollection fc = new GMLFeatureCollection(id,((Geometry)value[0].getValue()).getEnvelopeInternal());
 
 
             for (int i = 1; i < value.length; i++) // bbox is slot 0
@@ -6350,7 +6355,7 @@ public class GMLComplexTypes {
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
-        typeFactory.setNamespaceURI(ftNS);
+        typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 
         GeometryAttributeType geometryAttribute = null;
@@ -6400,7 +6405,7 @@ public class GMLComplexTypes {
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
-        typeFactory.setNamespaceURI(ftNS);
+        typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 
         GeometryAttributeType geometryAttribute = null;

@@ -203,7 +203,7 @@ public abstract class AbstractDataStore implements DataStore {
     protected TypeEntry createTypeEntry( final String typeName ) {
         URI namespace;
         try {
-            namespace = getSchema( typeName ).getNamespaceURI();
+            namespace = getSchema( typeName ).getNamespace();
         } catch (IOException e) {
             namespace = null;
         }

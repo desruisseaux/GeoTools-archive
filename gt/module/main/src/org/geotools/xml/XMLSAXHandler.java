@@ -85,11 +85,13 @@ public class XMLSAXHandler extends DefaultHandler {
 		if(sysId != null && sysId.endsWith("dtd")){
 		    return new InputSource(new StringReader(""));
 		}
-		try {
+		try{
             return super.resolveEntity(pubId,sysId);
-        } catch (IOException e) {
-            throw new SAXException(e);
-        }
+		}catch(IOException e){
+			SAXException se = new SAXException(e.getLocalizedMessage());
+			se.initCause(e);
+			throw se;
+		}
     }
     // hints
     private Map hints;

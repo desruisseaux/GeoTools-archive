@@ -50,6 +50,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -482,7 +483,7 @@ public class MySQLDataStoreTest extends TestCase {
         assertEquals("Checking num features before add", 6, count);
         assertFalse(writer.hasNext());
 
-        Feature feature = writer.next();
+        SimpleFeature feature = (SimpleFeature)writer.next();
         Object[] atts = getTestAtts("testAdd");
         feature.setAttributes(atts);
         writer.write();

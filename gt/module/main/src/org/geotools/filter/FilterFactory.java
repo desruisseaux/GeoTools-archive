@@ -19,6 +19,7 @@ package org.geotools.filter;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 
@@ -154,7 +155,10 @@ public abstract class FilterFactory implements Factory {
      * @throws IllegalFilterException if there were creation problems.
      */
     public abstract AttributeExpression createAttributeExpression(
-        FeatureType schema, String path) throws IllegalFilterException;
+            FeatureType schema, String path) throws IllegalFilterException;
+
+    public abstract AttributeExpression createAttributeExpression(
+            AttributeType at) throws IllegalFilterException;
 
     /**
      * Creates a Literal Expression from an Object.

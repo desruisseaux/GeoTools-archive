@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
 
@@ -352,7 +353,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureWriter fw = s.getFeatureWriter(s.getTypeNames()[0],Transaction.AUTO_COMMIT);
         FeatureIterator it = fc.features();
         while (it.hasNext()) {
-            fw.next().setAttributes(it.next().getAttributes(null));
+            ((SimpleFeature)fw.next()).setAttributes(it.next().getAttributes(null));
             fw.write();
         }
         fw.close();

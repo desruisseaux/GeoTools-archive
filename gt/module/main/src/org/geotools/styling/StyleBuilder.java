@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.util.Iterator;
 
 import org.geotools.algorithms.classification.EqualClasses;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -1679,7 +1680,7 @@ public class StyleBuilder {
      */
     public Expression attributeExpression(String attributeName)
         throws org.geotools.filter.IllegalFilterException {
-        org.geotools.filter.AttributeExpression attribute = ff.createAttributeExpression(null);
+        org.geotools.filter.AttributeExpression attribute = ff.createAttributeExpression((AttributeType)null);
         attribute.setAttributePath(attributeName);
 
         return attribute;

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -170,7 +169,7 @@ e.printStackTrace();
         ns.add(WFSSchema.NAMESPACE.toString());
         i = fts.iterator();
         while(i.hasNext()){
-        	ns.add(ds.getSchema((String)i.next()).getNamespaceURI().toString());
+        	ns.add(ds.getSchema((String)i.next()).getNamespace().toString());
         }
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction

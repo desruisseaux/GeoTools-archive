@@ -48,6 +48,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -93,7 +94,7 @@ public class MemoryDataStoreTest extends DataTestCase {
     public void testFixture() throws Exception {
         FeatureType type = DataUtilities.createType("namespace.typename",
                 "name:String,id:0,geom:MultiLineString");
-        assertEquals("namespace", new URI("namespace"), type.getNamespaceURI());
+        assertEquals("namespace", new URI("namespace"), type.getNamespace());
         assertEquals("typename", "typename", type.getTypeName());
         assertEquals("attributes", 3, type.getAttributeCount());
 
@@ -527,14 +528,14 @@ public class MemoryDataStoreTest extends DataTestCase {
     public void testGetFeaturesWriterAdd()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer = data.getFeatureWriter("road");
-        Feature feature;
+        SimpleFeature feature;
 
         while (writer.hasNext()) {
-            feature = writer.next();
+            feature = (SimpleFeature)writer.next();
         }
 
         assertFalse(writer.hasNext());
-        feature = writer.next();
+        feature = (SimpleFeature)writer.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer.write();
         assertFalse(writer.hasNext());
@@ -614,8 +615,8 @@ public class MemoryDataStoreTest extends DataTestCase {
 
         FeatureType road = data.getSchema("road");
         FeatureReader reader;
-        Feature feature;
-        Feature[] ORIGIONAL = roadFeatures;
+        SimpleFeature feature;
+        SimpleFeature[] ORIGIONAL = roadFeatures;
         Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
         Feature[] ADD = new Feature[ORIGIONAL.length + 1];
         Feature[] FINAL = new Feature[ORIGIONAL.length];
@@ -651,7 +652,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         // -------------------------------
         // - tests transaction independence from DataStore
         while (writer1.hasNext()) {
-            feature = writer1.next();
+            feature = (SimpleFeature)writer1.next();
             assertEquals("road.rd1", feature.getID());
             writer1.remove();
         }
@@ -678,7 +679,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         // writer 2 adds road.rd4 on t2
         // ----------------------------
         // - tests transaction independence from each other
-        feature = writer2.next();
+        feature = (SimpleFeature)writer2.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer2.write();
 
@@ -768,7 +769,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         FeatureType actual = half.getSchema();
         
         assertEquals( type.getTypeName(), actual.getTypeName() );
-        assertEquals( type.getNamespaceURI(), actual.getNamespaceURI() );
+        assertEquals( type.getNamespace(), actual.getNamespace() );
         assertEquals( type.getAttributeCount(), actual.getAttributeCount() );
         for( int i=0; i<type.getAttributeCount(); i++){
             assertEquals( type.getAttributeType( i ), actual.getAttributeType( i ));

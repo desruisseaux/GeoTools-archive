@@ -29,6 +29,12 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.LengthFunction;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.xml.transform.TransformerBase;
 import org.geotools.xml.transform.Translator;
 import org.xml.sax.ContentHandler;
@@ -219,7 +225,7 @@ public class FeatureTypeTransformer extends TransformerBase {
             AttributeType[] attributes = type.getAttributeTypes();
 
             try {
-                startSchemaType(type.getTypeName(), type.getNamespaceURI());
+                startSchemaType(type.getTypeName(), type.getNamespace());
 
                 for (int i = 0; i < attributes.length; i++) {
                     encode(attributes[i]);
@@ -316,7 +322,21 @@ public class FeatureTypeTransformer extends TransformerBase {
          */
         protected void encodeString(AttributeType attribute)
             throws SAXException {
-            int length = attribute.getFieldLength();
+            int length = AttributeType.UNBOUNDED;
+            if(attribute.getRestriction()!=null && attribute.getRestriction()!=Filter.ALL && attribute.getRestriction()!=Filter.NONE){
+            	Filter f = attribute.getRestriction();
+            	if(f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL){
+            		CompareFilter cf = (CompareFilter)f;
+            		Expression e = cf.getLeftValue();
+            		if(e!= null && e instanceof LengthFunction){
+            			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString(),AttributeType.UNBOUNDED);
+            		}else{
+            			if(cf.getRightValue() instanceof LengthFunction){
+            				length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString(),AttributeType.UNBOUNDED);
+            			}
+            		}
+            	}
+            }
 
             AttributesImpl atts = createStandardAttributes(attribute);
 

@@ -192,7 +192,7 @@ public abstract class AttributeTypeFactory implements Factory {
      *
      * @return the new AttributeType
      */
-    protected abstract AttributeType createAttributeType(String name,
+    protected abstract AttributeType createAttributeType(String name, 
         FeatureType type, boolean isNillable);
         
     /**

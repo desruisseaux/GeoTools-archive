@@ -138,7 +138,7 @@ public class FeatureCollectionIteration {
             // recurse if attribute type is another collection
             if (FeatureCollection.class.isAssignableFrom(type.getType())) {
                 walker((FeatureCollection) feature.getAttribute(i));
-            } else if (type.isNested()) {
+            } else if (type instanceof FeatureType) {
                 // recurse if attribute type is another feature
                 walker((Feature) feature.getAttribute(i));
             } else {

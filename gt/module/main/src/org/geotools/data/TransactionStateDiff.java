@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import org.geotools.data.Transaction.State;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -172,13 +173,13 @@ public class TransactionStateDiff implements State {
         }
 
         FeatureWriter writer = store.getFeatureWriter(typeName);
-        Feature feature;
+        SimpleFeature feature;
         Feature update;
         String fid;
 
         try {
             while (writer.hasNext()) {
-                feature = writer.next();
+                feature = (SimpleFeature)writer.next();
                 fid = feature.getID();
 
                 if (diff.containsKey(fid)) {
@@ -210,7 +211,7 @@ public class TransactionStateDiff implements State {
             }
 
             Feature addedFeature;
-            Feature nextFeature;
+            SimpleFeature nextFeature;
 
             for (Iterator i = diff.values().iterator(); i.hasNext();) {
                 addedFeature = (Feature) i.next();
@@ -219,7 +220,7 @@ public class TransactionStateDiff implements State {
                 if (addedFeature != null) {
                     fid = addedFeature.getID();
 
-                    nextFeature = writer.next();
+                    nextFeature = (SimpleFeature)writer.next();
 
                     if (nextFeature == null) {
                         throw new DataSourceException("Could not add " + fid);

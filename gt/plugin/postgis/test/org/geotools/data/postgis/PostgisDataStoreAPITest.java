@@ -57,6 +57,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -197,10 +198,10 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         Envelope bounds = new Envelope();
 
         try {
-            Feature f;
+            SimpleFeature f;
 
             while (reader.hasNext()) {
-                f = reader.next();
+                f = (SimpleFeature)reader.next();
 
                 int index = ((Integer) f.getAttribute("id")).intValue() - 1;
                 roadFeatures[index] = f;
@@ -619,7 +620,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
     public void testGetSchemaRoad() throws IOException {
         FeatureType expected = roadType;
         FeatureType actual = data.getSchema("road");
-        assertEquals("namespace", expected.getNamespaceURI(), actual.getNamespaceURI());
+        assertEquals("namespace", expected.getNamespace(), actual.getNamespace());
         assertEquals("typeName", expected.getTypeName(), actual.getTypeName());
 
         //assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
@@ -639,7 +640,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
     public void testGetSchemaRiver() throws IOException {
         FeatureType expected = riverType;
         FeatureType actual = data.getSchema("river");
-        assertEquals("namespace", expected.getNamespaceURI(), actual.getNamespaceURI());
+        assertEquals("namespace", expected.getNamespace(), actual.getNamespace());
         assertEquals("typeName", expected.getTypeName(), actual.getTypeName());
 
         //assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
@@ -1107,17 +1108,17 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         throws IOException, IllegalAttributeException {
         FeatureWriter writer = data.getFeatureWriter("road",
                 Transaction.AUTO_COMMIT);
-        Feature feature;
+        SimpleFeature feature;
 
         LOGGER.info("about to call has next on writer " + writer);
 
         while (writer.hasNext()) {
-            feature = writer.next();
+            feature = (SimpleFeature)writer.next();
         }
 
         assertFalse(writer.hasNext());
 
-        feature = writer.next();
+        feature = (SimpleFeature)writer.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer.write();
 
@@ -1287,8 +1288,8 @@ public class PostgisDataStoreAPITest extends DataTestCase {
 
         FeatureType road = data.getSchema("road");
         FeatureReader reader;
-        Feature feature;
-        Feature[] ORIGIONAL = roadFeatures;
+        SimpleFeature feature;
+        SimpleFeature[] ORIGIONAL = roadFeatures;
         Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
         Feature[] ADD = new Feature[ORIGIONAL.length + 1];
         Feature[] FINAL = new Feature[ORIGIONAL.length];
@@ -1325,7 +1326,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         // -------------------------------
         // - tests transaction independence from DataStore
         while (writer1.hasNext()) {
-            feature = writer1.next();
+            feature = (SimpleFeature)writer1.next();
             assertEquals(roadFeatures[0].getID(), feature.getID());
             writer1.remove();
         }
@@ -1354,7 +1355,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         // writer 2 adds road.rd4 on t2
         // ----------------------------
         // - tests transaction independence from each other
-        feature = writer2.next();
+        feature = (SimpleFeature)writer2.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer2.write();
 
@@ -1463,7 +1464,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         FeatureType actual = half.getSchema();
 
         assertEquals(type.getTypeName(), actual.getTypeName());
-        assertEquals(type.getNamespaceURI(), actual.getNamespaceURI());
+        assertEquals(type.getNamespace(), actual.getNamespace());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
@@ -1781,7 +1782,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
 
         FeatureWriter writer = data.getFeatureWriterAppend("lake",
                 Transaction.AUTO_COMMIT);
-        Feature f = writer.next();
+        SimpleFeature f = (SimpleFeature)writer.next();
         Object[] attributes = new Object[f.getNumberOfAttributes()];
         f.setAttributes(lakeFeatures[0].getAttributes(attributes));
         writer.write();

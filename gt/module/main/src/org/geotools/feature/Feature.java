@@ -18,6 +18,7 @@ package org.geotools.feature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import javax.naming.directory.InvalidAttributesException;
 
 
 /**
@@ -131,6 +132,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author James Macgill, CCG
  * @author Rob Hranac, TOPP
  * @author Ian Schneider, USDA-ARS
+ * @author dzwiers
  * @version $Id: Feature.java,v 1.11 2003/11/26 00:30:05 jive Exp $
  *
  * @see org.geotools.feature.FeatureType
@@ -171,7 +173,9 @@ public interface Feature {
      * argument array is null, a new one will be created. Gets all attributes
      * from this feature, returned as a complex object array.  This array
      * comes with no metadata, so to interpret this collection the caller
-     * class should ask for the schema as well.
+     * class should ask for the schema as well.  This array may have multiple
+     * entries for each AttributeType depending  on the AttributeType's
+     * multiplicity.
      *
      * @param attributes An array to copy attributes into. May be null.
      *
@@ -181,30 +185,45 @@ public interface Feature {
 
     /**
      * Gets an attribute for this feature at the location specified by xPath.
-     * Due to the complex nature of xpath, the return Object may be a single
-     * attribute, a FeatureCollection containing only Features, or a
-     * java.util.Collection containing either a mix of attributes, Features,
-     * and/or FeatureCollections.
+     * Due to the complex nature of xpath, a List of all valid values will be
+     * returned when an attribute is requested. These values can range from
+     * complete Feature Collections to single primative attribute values. When
+     * a  particular instance of the Attribute is requested, then the Object
+     * will  be returned. Simply put, in the general case we are assuming the
+     * existance  of multiplicity, so specify which instance you want or you
+     * get them all.  Example of getting a list:    ./road     returns the
+     * List of road attribute instances    Example of getting an Object:
+     * ./road[0]  returns the first road
      *
      * @param xPath XPath representation of attribute location.
      *
-     * @return A copy of the requested attribute, null if the requested xpath
-     *         is not found, or NULL_ATTRIBUTE.
+     * @return A List of copies of the requested attribute, null if the
+     *         requested xpath is not found, or NULL_ATTRIBUTE.
      */
     Object getAttribute(String xPath);
 
     /**
-     * Gets an attribute by the given zero-based index.
+     * Gets an attribute by the given zero-based index. This index is based on
+     * the values  within the Feature as opposed to the AttributeType
+     * declaration. To get the values  for the 5th attributeType, use the
+     * schema to determine the xPath and class the  getAttribute(xPath)
+     * method.
      *
      * @param index The requested index. Must be 0 &lt;= idx &lt;
      *        getNumberOfAttributes().
      *
      * @return A copy of the requested attribute, or NULL_ATTRIBUTE.
+     *
+     * @see Feature#getAttribute(String)
      */
     Object getAttribute(int index);
 
     /**
-     * Sets an attribute by the given zero-based index.
+     * Sets an attribute by the given zero-based index. This index is based on
+     * the values  within the Feature as opposed to the AttributeType
+     * declaration. To get the values  for the 5th attributeType, use the
+     * schema to determine the xPath and class the  setAttribute(xPath,val)
+     * method.
      *
      * @param position The requested index. Must be 0 &lt;= idx &lt;
      *        getNumberOfAttributes()
@@ -213,40 +232,34 @@ public interface Feature {
      * @throws IllegalAttributeException if the passed in val does not validate
      *         against the AttributeType at that position.
      * @throws ArrayIndexOutOfBoundsException if an invalid position is given
+     *
+     * @see Feature#setAttribute(String, Object)
      */
     void setAttribute(int position, Object val)
         throws IllegalAttributeException, ArrayIndexOutOfBoundsException;
 
     /**
-     * Get the number of attributes this feature has. This is simply a
+     * Get the number of attributes this feature has. This is NOT simply a
      * convenience method for calling
-     * getFeatureType().getNumberOfAttributes();
+     * getFeatureType().getNumberOfAttributes().   This is the same as calling
+     * getAttributes(null).length. This represents the number of  actual
+     * attribute values in the feature, and may differ from the number of
+     * AttributeTypes  defined in the FeatureType based on the multiplicity of
+     * the AttributeTypes.
      *
      * @return The total number of attributes this Feature contains.
      */
     int getNumberOfAttributes();
 
     /**
-     * Sets all attributes for this feature, passed as a complex object array.
-     * Note that this array must conform to the internal schema for this
-     * feature, or it will throw an exception.  Checking this is, of course,
-     * left to the feature to do internally.  Well behaved features should
-     * always fully check the passed attributes against thier schema before
-     * adding them.
-     *
-     * @param attributes All feature attributes.
-     *
-     * @throws IllegalAttributeException Passed attributes do not match schema.
-     */
-    void setAttributes(Object[] attributes) throws IllegalAttributeException;
-
-    /**
      * Sets a single attribute for this feature, passed as a complex object. If
      * the attribute does not exist or the object does not conform to the
      * internal schema, an exception is thrown.  Checking this is, of course,
      * left to the feature to do internally.  Well behaved features should
-     * always fully check the passed attributes against thier schema before
-     * adding them.
+     * always fully check the passed attributes against thire schema before
+     * adding them.  NOTE: The xPath may contain instance information about
+     * multiplicity,   for example: ./road[3] which is the third road
+     * attribute in this feature.
      *
      * @param xPath XPath representation of attribute location.
      * @param attribute Feature attribute to set.
@@ -259,10 +272,12 @@ public interface Feature {
 
     /**
      * Gets the default geometry for this feature.
+     * 
      * <p>
-     * This method will return <code>null</code> if no DefaultGeometry
-     * has been defined by the schema.
+     * This method will return <code>null</code> if no DefaultGeometry has been
+     * defined by the schema.
      * </p>
+     *
      * @return Default geometry for this feature, or <code>null</code>
      */
     Geometry getDefaultGeometry();
@@ -280,19 +295,15 @@ public interface Feature {
     /**
      * Get the total bounds of this feature which is calculated by doing a
      * union of the bounds of each geometry this feature is associated with.
+     * 
      * <p>
      * This method will return an empty Envelope if the feature contains no
      * geometry information.
      * </p>
+     *
      * @return An Envelope containing the total bounds of this Feature.
      */
     Envelope getBounds();
-
-    /**
-     * A "null" Object representing a null value for a given attribute.
-     */
-
-    //    static final Object NULL_ATTRIBUTE = new NULL();
 
     /**
      * Not straight forward, this is a "null" object to represent the value

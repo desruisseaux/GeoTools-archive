@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @task TODO: look at synchronization (or locks as IanS thinks)
  */
-public class DefaultFeature implements Feature, Cloneable {
+public class DefaultFeature implements SimpleFeature, Cloneable {
 
     /** The unique id of this feature */
     protected String featureId;

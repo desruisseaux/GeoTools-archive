@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -324,7 +323,7 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(ftName!=null){
             try {
-                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespaceURI(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
             } catch (FactoryConfigurationError e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             } catch (SchemaException e1) {

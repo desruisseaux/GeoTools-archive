@@ -16,8 +16,6 @@
  */
 package org.geotools.feature;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 
 /** Represents a collection of features. Implementations and client code should
  * adhere to the rules set forth by java.util.Collection. That is, some methods are
@@ -28,18 +26,15 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Ian Schneider, USDA-ARS
  * @version $Id: FeatureCollection.java,v 1.12 2003/07/30 21:31:41 jmacgill Exp $
  */
-public interface FeatureCollection extends java.util.Collection {
-    /**
-     * Gets the bounding box for the features in this feature collection.
-     *
-     * @return the envelope of the geometries contained by this feature
-     *         collection.
-     */
-    Envelope getBounds();
+public interface FeatureCollection extends java.util.Collection, Feature {
     
     /** Obtain a FeatureIterator of the Feature Objects contained within this
      * collection. The implementation of Collection must adhere to the rules of
      * fail-fast concurrent modification.
+     * 
+     * This is almost equivalent to a Type-Safe call to 
+     * getAttribute(getFeatureType().getAttributeType(0).getName()).iterator();
+     * 
      * @return A FeatureIterator.
      */    
     FeatureIterator features();
@@ -55,4 +50,13 @@ public interface FeatureCollection extends java.util.Collection {
      * @throws NullPointerException If the listener is null.
      */
     void removeListener(CollectionListener listener) throws NullPointerException;
+
+    /**
+     * Gets a reference to the schema for this feature.
+     * 
+     * Generally this schema will have one AttributeType (the FeatureType of the children) with multiplicity *.
+     *
+     * @return A reference to this feature's schema.
+     */
+    FeatureType getFeatureType();
 }

@@ -80,8 +80,8 @@ public class BasicFeatureTypes
             
             AttributeType[] types =  new AttributeType[] {};
             tmpPoint = FeatureTypeFactory.newFeatureType(types,"pointFeature");
-            tmpLine = FeatureTypeFactory.newFeatureType(types,"lineFeature");
-            tmpPolygon  = FeatureTypeFactory.newFeatureType(types,"polygonFeature");
+            tmpLine = FeatureTypeFactory.newFeatureType(types,"polygonFeature");
+            tmpPolygon  = FeatureTypeFactory.newFeatureType(types,"lineFeature");
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.feature.type.BasicFeatureTypes" ).log(
                Level.SEVERE, "Error creating basic feature types", ex );

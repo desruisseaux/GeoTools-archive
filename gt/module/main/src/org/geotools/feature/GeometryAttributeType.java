@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author Jody Garnett, Refractions Research, Inc.
  */
-public interface GeometryAttributeType extends AttributeType {
+public interface GeometryAttributeType extends AttributeType, PrimativeAttributeType {
 
     /**
      * Retrieve the CS_CoordinateSystem used by this GeometryAttributeType.

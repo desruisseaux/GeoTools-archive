@@ -200,7 +200,7 @@ final class ActiveTypeEntry implements TypeEntry {
      * @return namespace:typeName
      */
     public String getDataName() {
-        return schema.getNamespaceURI().toString() + ":"+ schema.getTypeName();
+        return schema.getNamespace().toString() + ":"+ schema.getTypeName();
     }
     
     public Object resource() {

@@ -77,10 +77,7 @@ public class QueryRequest {
 //        }        
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
-		public String getNamespace() {
-			return null;
-		}
-		public URI getNamespaceURI() {
+		public URI getNamespace() {
 			return null;
 		}
 		public String getTypeName() {
@@ -127,6 +124,10 @@ public class QueryRequest {
 		}
 		public Feature create(Object[] attributes, String featureID) throws IllegalAttributeException {
 			return null;
+		}
+		public int find(String attName) {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 	};
 	static Feature fakeFeature = new Feature(){

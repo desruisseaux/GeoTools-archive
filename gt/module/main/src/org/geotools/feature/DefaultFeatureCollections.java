@@ -40,6 +40,9 @@ public class DefaultFeatureCollections extends FeatureCollections {
      * @return A new, empty DefaultFeatureCollection.
      */
     protected FeatureCollection createCollection() {
-        return new DefaultFeatureCollection();
+        return new DefaultFeatureCollection(null,null);
+    }
+    protected FeatureCollection createCollection(String id, FeatureType ft) {
+        return new DefaultFeatureCollection(id,ft);
     }
 }

@@ -42,7 +42,7 @@ public class FeatureTypes {
     public static FeatureType transform(FeatureType schema, CoordinateReferenceSystem crs) throws SchemaException{
     	FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
         
-        factory.setNamespaceURI( schema.getNamespaceURI() );
+        factory.setNamespace( schema.getNamespace() );
         factory.setName( schema.getTypeName() );
         
         GeometryAttributeType defaultGeometryType = null;
@@ -56,7 +56,7 @@ public class FeatureTypes {
                         geometryType.getName(),
                         geometryType.getType(),
                         geometryType.isNillable(),
-                        geometryType.getFieldLength(),
+                        0,
                         geometryType.createDefaultValue(),
                         crs
                 	);

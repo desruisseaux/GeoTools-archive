@@ -88,7 +88,7 @@ public class DefaultFeatureType implements FeatureType {
      */
     public DefaultFeatureType(String typeName, URI namespace,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
-        throws SchemaException, NullPointerException {
+        throws NullPointerException {
         if (typeName == null) {
             throw new NullPointerException(typeName);
         }
@@ -262,16 +262,7 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @return Namespace of schema.
      */
-    public String getNamespace() {
-        return namespace==null?null:namespace.toString();
-    }
-
-    /**
-     * Gets the global schema namespace.
-     *
-     * @return Namespace of schema.
-     */
-    public URI getNamespaceURI() {
+    public URI getNamespace() {
         return namespace;
     }
 
@@ -321,9 +312,9 @@ public class DefaultFeatureType implements FeatureType {
             return false;
         }
 
-        if ((namespace == null) && (other.getNamespaceURI() != null)) {
+        if ((namespace == null) && (other.getNamespace() != null)) {
             return false;
-        } else if (!namespace.equals(other.getNamespaceURI())) {
+        } else if (!namespace.equals(other.getNamespace())) {
             return false;
         }
 
@@ -357,18 +348,18 @@ public class DefaultFeatureType implements FeatureType {
         info += (" , namespace=" + namespace);
         info += (" , abstract=" + isAbstract());
 
-        String types = "types=(";
+        String types1 = "types=(";
 
         for (int i = 0, ii = this.types.length; i < ii; i++) {
-            types += this.types[i].toString();
+            types1 += this.types[i].toString();
 
             if (i < ii) {
-                types += ",";
+                types1 += ",";
             }
         }
 
-        types += ")";
-        info += (" , " + types);
+        types1 += ")";
+        info += (" , " + types1);
 
         return "DefaultFeatureType [" + info + "]";
     }
@@ -406,7 +397,7 @@ public class DefaultFeatureType implements FeatureType {
      * @return true if descendant, false otherwise.
      */
     public boolean isDescendedFrom(FeatureType type) {
-        return isDescendedFrom(type.getNamespaceURI(), type.getTypeName());
+        return isDescendedFrom(type.getNamespace(), type.getTypeName());
     }
 
     /**
@@ -415,17 +406,17 @@ public class DefaultFeatureType implements FeatureType {
      * relationship in java.
      *
      * @param nsURI The namespace URI to use.
-     * @param typeName The typeName.
+     * @param typeName1 The typeName.
      *
      * @return true if descendant, false otherwise.
      *
      * @task HACK: if nsURI is null only typeName is tested.
      */
-    public boolean isDescendedFrom(URI nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName1) {
         for (int i = 0, ii = ancestors.length; i < ii; i++) {
             if (((nsURI == null)
-                    || ancestors[i].getNamespaceURI().equals(nsURI))
-                    && ancestors[i].getTypeName().equals(typeName)) {
+                    || ancestors[i].getNamespace().equals(nsURI))
+                    && ancestors[i].getTypeName().equals(typeName1)) {
                 return true;
             }
         }        

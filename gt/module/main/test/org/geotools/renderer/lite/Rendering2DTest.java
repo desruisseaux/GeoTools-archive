@@ -195,7 +195,7 @@ public class Rendering2DTest extends TestCase {
 
         LineString line = makeSampleLineString(geomFac);
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", line.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("collection", line.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
@@ -206,7 +206,7 @@ public class Rendering2DTest extends TestCase {
         Polygon polygon = makeSamplePolygon(geomFac);
 
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", polygon.getClass(), false,
+            types[0] = AttributeTypeFactory.newAttributeType("collection", polygon.getClass(), false,
                     0, null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("edge", polygon.getClass());
@@ -217,7 +217,7 @@ public class Rendering2DTest extends TestCase {
 
         Point point = makeSamplePoint(geomFac);
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", point.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("collection", point.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
@@ -228,7 +228,7 @@ public class Rendering2DTest extends TestCase {
 
         LinearRing ring = makeSampleLinearRing(geomFac);
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", line.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("collection", line.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
@@ -238,7 +238,7 @@ public class Rendering2DTest extends TestCase {
 
         GeometryCollection coll = makeSampleGeometryCollection(geomFac);
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", coll.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass());

@@ -23,10 +23,18 @@ package org.geotools.data.vpf;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.data.vpf.util.DataUtils;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LengthFunction;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -170,12 +178,13 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         return DataUtils.getDataTypeSize(typeChar) * elementsNumber;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getFieldLength()
-     */
-    public int getFieldLength() {
-        return attribute.getFieldLength();
-    }
+    // no longer in ft
+//    /* (non-Javadoc)
+//     * @see org.geotools.feature.AttributeType#getFieldLength()
+//     */
+//    public int getFieldLength() {
+//        return attribute.getFieldLength();
+//    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.AttributeType#getName()
@@ -225,12 +234,13 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         return attribute.isGeometry();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#isNested()
-     */
-    public boolean isNested() {
-        return attribute.isNested();
-    }
+    // no longer needed
+//    /* (non-Javadoc)
+//     * @see org.geotools.feature.AttributeType#isNested()
+//     */
+//    public boolean isNested() {
+//        return attribute.isNested();
+//    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.AttributeType#isNillable()
@@ -290,4 +300,22 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
     public boolean isAttemptLookup() {
         return attemptLookup;
     }
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.AttributeType#getRestriction()
+	 */
+	public Filter getRestriction() {
+		return attribute.getRestriction();
+	}
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.AttributeType#getMinOccurs()
+	 */
+	public int getMinOccurs() {
+		return 1;
+	}
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.AttributeType#getMaxOccurs()
+	 */
+	public int getMaxOccurs() {
+		return 1;
+	}
 }

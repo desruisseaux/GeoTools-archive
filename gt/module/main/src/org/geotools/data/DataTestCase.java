@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
@@ -57,7 +58,7 @@ public class DataTestCase extends TestCase {
     protected GeometryFactory gf;
     protected FeatureType roadType; // road: id,geom,name
     protected FeatureType subRoadType; // road: id,geom    
-    protected Feature[] roadFeatures;
+    protected SimpleFeature[] roadFeatures;
     protected Envelope roadBounds;
     protected Envelope rd12Bounds;    
     protected Filter rd1Filter;
@@ -97,13 +98,13 @@ public class DataTestCase extends TestCase {
                 "id:0,geom:LineString");
         gf = new GeometryFactory();
 
-        roadFeatures = new Feature[3];
+        roadFeatures = new SimpleFeature[3];
 
         //           3,2
         //  2,2 +-----+-----+ 4,2
         //     /     rd1     \
         // 1,1+               +5,1
-        roadFeatures[0] = roadType.create(new Object[] {
+        roadFeatures[0] = (SimpleFeature)roadType.create(new Object[] {
                 new Integer(1),
                 line(new int[] { 1, 1, 2, 2, 4, 2, 5, 1 }),
                 "r1",
@@ -116,7 +117,7 @@ public class DataTestCase extends TestCase {
         //  rd2  + 3,2
         //       |
         //    3,0+
-        roadFeatures[1] = roadType.create(new Object[] {
+        roadFeatures[1] = (SimpleFeature)roadType.create(new Object[] {
                 new Integer(2), line(new int[] { 3, 0, 3, 2, 3, 3, 3, 4 }),
                 "r2"
             },
@@ -126,7 +127,7 @@ public class DataTestCase extends TestCase {
         //     rd3     + 5,3
         //            / 
         //  3,2 +----+ 4,2
-        roadFeatures[2] = roadType.create(new Object[] {
+        roadFeatures[2] = (SimpleFeature)roadType.create(new Object[] {
                 new Integer(3),
                 line(new int[] { 3, 2, 4, 2, 5, 3 }), "r3"
             },

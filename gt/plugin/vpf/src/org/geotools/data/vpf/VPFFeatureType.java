@@ -211,15 +211,15 @@ public class VPFFeatureType implements FeatureType {
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
-        return featureClass.getNamespace().toString();
+    public URI getNamespace() {
+        return featureClass.getNamespace();
     }
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getNamespace()
-     */
-    public URI getNamespaceURI() {
-        return featureClass.getNamespaceURI();
-    }
+//    /* (non-Javadoc)
+//     * @see org.geotools.feature.FeatureType#getNamespace()
+//     */
+//    public URI getNamespaceURI() {
+//        return featureClass.getNamespaceURI();
+//    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getTypeName()
@@ -263,4 +263,10 @@ public class VPFFeatureType implements FeatureType {
     public String getFaccCode() {
         return faccCode;
     }
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
+	 */
+	public int find(String attName) {
+		return featureClass.find(attName);
+	}
 }

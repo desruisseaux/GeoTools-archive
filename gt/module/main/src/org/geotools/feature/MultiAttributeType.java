@@ -43,7 +43,7 @@ public class MultiAttributeType extends DefaultAttributeType {
      * @param validator Name of this attribute.
      */
     public MultiAttributeType(AttributeType validator) {
-        super(validator.getName(), List.class, false,0,null);
+        super(validator.getName(), List.class, false,1,1,null);
         this.validator = validator;
     }
 

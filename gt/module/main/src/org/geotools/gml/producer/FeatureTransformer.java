@@ -531,7 +531,7 @@ public class FeatureTransformer extends TransformerBase {
                 FeatureType type = f.getFeatureType();
                 String name = type.getTypeName();
                 currentPrefix = getNamespaceSupport().getPrefix(f.getFeatureType()
-                                                                 .getNamespaceURI().toString());
+                                                                 .getNamespace().toString());
 
                 if (currentPrefix == null) {
                     currentPrefix = types.findPrefix(f.getFeatureType());

@@ -59,7 +59,10 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.LengthFunction;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.opengis.referencing.FactoryException;
@@ -1003,8 +1006,27 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 if (attributeType[i].isGeometry()) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
+                	int length = -1;
+                	Filter f = attributeType[i].getRestriction();
+                	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == f.COMPARE_LESS_THAN || f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL)){
+                		try{
+                		CompareFilter cf = (CompareFilter)f;
+                		if(cf.getLeftValue() instanceof LengthFunction){
+                			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
+                		}else{
+                			if(cf.getRightValue() instanceof LengthFunction){
+                    			length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+                    		}
+                		}
+                		}catch(NumberFormatException e){
+                			length = 256;
+                		}
+                	}else{
+                		length = 256;
+                	}
+                		
                     typeName = typeName + "("
-                        + attributeType[i].getFieldLength() + ")";
+                        + length + ")";
                 }
 
                 if (!attributeType[i].isNillable()) {

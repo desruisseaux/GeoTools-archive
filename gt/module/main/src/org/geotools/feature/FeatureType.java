@@ -127,39 +127,39 @@ import java.net.URI;
  *
  * @see org.geotools.feature.Feature
  * @see org.geotools.feature.FeatureTypeFactory
+ * @see org.geotools.feature.type.NestedAttributeType
  * @see org.geotools.feature.DefaultFeatureType
  */
 public interface FeatureType extends FeatureFactory {
+
+	
+    /* feature-exp2 redesign notes:
+     * The main design goal of this is to have FeatureType extend AttributeType.  
+     * This allows us to nesting of features much more nicely.  We already are
+     * going in this direction, with the FeatureAttributeType buried in 
+     * DefaultAttribute.  This is just making it explicit, so it works with 
+     * the complex objects GML can return a lot more sensible.  So much of the
+     * work in this class is figuring out what concepts are the same.  Some stuff
+     * may need to be rethought a bit, as there are a few subtle assumptions 
+     * that we are working with flat files.  We will revisit this when we 
+     * implement choice and multiplicity.
+     *
+     * 1) got rid of deprecated getNamespace() method that returned a string,
+     * replaced it with a URI return.  This has been deprecated for a bit, 
+     * and was done out of a desire to keep backwards compatibility with 2.0,
+     * but that mission failed, so we're just moving on.  This change will
+     * break a few things, but is a good one, people just need to update
+     * their client code a bit.
+     *
+     * 2) Deprecated getTypeName() to be getName().  They are the same thing,
+     * would be nice to get rid of getTypeName, but it's used super extensively.
+     * Though perhaps we could consider keeping it as a convenience, a bit more
+     * explicit, but it seems like overkill.
+     * 
+     * 3) Updated comments of the AttributeType operations that are inhierited
+     * to say what they mean in the context of a FeatureType.
+     */
   
-    
-    /*
-     * Redesign notes:
-     *
-     * All set functions have been removed from this interface, so as to
-     * not even give the appearance of mutability, as users generally
-     * expect setNamespace to actually set the namespace, instead of
-     * thoroughly reading the docs to find that they must use the copy.
-     * The mutability code has been moved to the factory, FeatureTypeFactory,
-     * so look for setNamespace,
-     *
-     * getAttributeCount added.
-     *
-     * added find()
-     *
-     */
-
-    /**
-     * Put this functionality in the factory, produce only  immutable
-     * FeatureTypes, don't give appearance of mutability, it's damn confusing
-     * to realize that you need to get the return type of these set calls in
-     * FeatureType. Sets the global schema namespace.  Note that namespaces
-     * are not required and should return null if it is not set.
-     *
-     * @return A modified copy of this schema.
-     */
-
-    //FeatureType setNamespace(String namespace);
-
     /**
      * Gets the global schema namespace.
      * <p>
@@ -173,79 +173,19 @@ public interface FeatureType extends FeatureFactory {
      * of how to store associate FeatureType and namespace information. Please
      * note that you may not have duplicate typeNames in the same Namespace.
      * </p>
-     * @return Namespace of schema (usually namespace prefix)
-     * @TODO Change to use real URI rather than string
-     * @deprecated
+     * @return Namespace of schema
      */
-    String getNamespace();
+     public abstract URI getNamespace();
     
-    /**
-     * 
-     * same as new URI(getNamespace());
-     * 
-     * @return
-     */
-    URI getNamespaceURI();
-
-    /**
-     * Put this functionality in the factory, produce only  immutable
-     * FeatureTypes, don't give appearance of mutability, it's damn confusing
-     * to realize that you need to get the return type of these set calls in
-     * FeatureType. Sets the global schema type name.  Note that type names
-     * are not required and should return null if it is not set.
-     *
-     * @return A modified copy of this schema.
-     */
-
-    //FeatureType setTypeName(String name);
 
     /**
      * Gets the type name for this schema.
      * <p>
-     * In GML this must element name of the Feature.
+     * In GML this must be the element name of the Feature.
      * </p>
-     * @return Namespace of schema.
+     * @return The name of this feature type.  
      */
-    String getTypeName();
-
-    /**
-     * Gets all of the names for the first 'level' of attributes.  This means
-     * that nested attributes must be read seperately, via the getNames()
-     * method of their schemas or the getAllNames() method.
-     *
-     * @return Non-nested attribute names.
-     */
-    AttributeType[] getAttributeTypes();
-
-    /**
-     * This is only used twice in the whole geotools code base, and  one of
-     * those is for a test, so we're removing it from the interface. If
-     * getAttributeType does not have the AttributeType it will just return
-     * null.  Gets the number of occurrences of this attribute.
-     *
-     * @param xPath XPath pointer to attribute type.
-     *
-     * @return Number of occurrences.
-     */
-    boolean hasAttributeType(String xPath);
-
-    /**
-     * Gets the attributeType at this xPath, if the specified attributeType
-     * does not exist then null is returned.
-     *
-     * @param xPath XPath pointer to attribute type.
-     *
-     * @return True if attribute exists.
-     */
-    AttributeType getAttributeType(String xPath);
-
-    //throws SchemaException;
-
-    /** Find the position of a given AttributeType.
-     * @return -1 if not found, a zero-based index if found.
-     * @param type The type to search for.
-     */
-    int find(AttributeType type);
+     public String getTypeName();
 
     /**
      * Gets the default geometry AttributeType.  If the FeatureType has more
@@ -258,21 +198,7 @@ public interface FeatureType extends FeatureFactory {
      * @return The attribute type of the default geometry, which will contain
      *         the position.
      */
-    GeometryAttributeType getDefaultGeometry();    
-
-    /**
-     * Returns the number of attributes at the first 'level' of the schema.
-     *
-     * @return the total number of first level attributes.
-     */
-    int getAttributeCount();
-
-    /** Gets the attributeType at the specified index.
-     *
-     * @return The attribute type at the specified position.
-     * @param position the position of the attribute to check.
-     */
-    AttributeType getAttributeType(int position);
+     public abstract GeometryAttributeType getDefaultGeometry();    
     
     /**
      * Test to determine whether this FeatureType is descended from the given
@@ -283,7 +209,7 @@ public interface FeatureType extends FeatureFactory {
      * @param typeName The typeName.
      * @return true if descendant, false otherwise.
      */    
-    boolean isDescendedFrom(URI nsURI, String typeName);
+     public abstract boolean isDescendedFrom(URI nsURI, String typeName);
     
     /** A convenience method for calling<br>
      * <code><pre>
@@ -294,18 +220,76 @@ public interface FeatureType extends FeatureFactory {
      * @param type The type to compare to.
      * @return true if descendant, false otherwise.
      */    
-    boolean isDescendedFrom(FeatureType type);
+     public abstract boolean isDescendedFrom(FeatureType type);
     
     /** Is this FeatureType an abstract type?
      * @return true if abstract, false otherwise.
      */    
-    boolean isAbstract();
+     public abstract boolean isAbstract();
     
     /** Obtain an array of this FeatureTypes ancestors. Implementors should return a
      * non-null array (may be of length 0).
      * @return An array of ancestors.
      */    
-    FeatureType[] getAncestors();
+     public abstract FeatureType[] getAncestors();
+     
 
-    Feature duplicate(Feature feature) throws IllegalAttributeException;
+     /**
+      * This is only used twice in the whole geotools code base, and  one of
+      * those is for a test, so we're removing it from the interface. If
+      * getAttributeType does not have the AttributeType it will just return
+      * null.  Gets the number of occurrences of this attribute.
+      *
+      * @param xPath XPath pointer to attribute type.
+      *
+      * @return Number of occurrences.
+      */
+     public boolean hasAttributeType(String xPath);
+
+     /**
+      * Returns the number of attributes at the first 'level' of the schema.
+      *
+      * @return equivalent value to getAttributeTypes().length
+      */
+     public int getAttributeCount();
+     
+
+     /**
+      * Gets the attributeType at this xPath, if the specified attributeType
+      * does not exist then null is returned.
+      *
+      * @param xPath XPath pointer to attribute type.
+      *
+      * @return True if attribute exists.
+      */
+     public AttributeType getAttributeType(String xPath);
+
+     /**
+      * Find the position of a given AttributeType.
+      *
+      * @param type The type to search for.
+      *
+      * @return -1 if not found, a zero-based index if found.
+      */
+     public int find(AttributeType type);
+     
+     /**
+      * Find the position of an AttributeType which matches the given String.
+      * @param attName the name to look for
+      * @return -1 if not found, zero-based index otherwise
+      */
+     public int find(String attName);
+
+     /**
+      * Gets the attributeType at the specified index.
+      *
+      * @param position the position of the attribute to check.
+      *
+      * @return The attribute type at the specified position.
+      */
+     public AttributeType getAttributeType(int position);
+
+     public AttributeType[] getAttributeTypes();
+     
+     public Feature duplicate(Feature feature) throws IllegalAttributeException;
 }

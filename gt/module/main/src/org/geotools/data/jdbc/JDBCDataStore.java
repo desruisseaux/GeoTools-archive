@@ -411,7 +411,7 @@ public abstract class JDBCDataStore implements DataStore {
         URI namespace;
 
         try {
-            namespace = getSchema(typeName).getNamespaceURI();
+            namespace = getSchema(typeName).getNamespace();
         } catch (IOException e) {
             namespace = null;
         }

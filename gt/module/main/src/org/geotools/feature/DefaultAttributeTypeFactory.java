@@ -16,7 +16,18 @@
  */
 package org.geotools.feature;
 
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LengthFunction;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import org.geotools.feature.type.NumericAttributeType;
+import org.geotools.feature.type.TemporalAttributeType;
+import org.geotools.feature.type.TextualAttributeType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -58,7 +69,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, FeatureType type,
         boolean isNillable) {
             
-        return new DefaultAttributeType.Feature(name, type, isNillable,null);
+        return new DefaultAttributeType.Feature(name, type, isNillable,1,1,null);
     }
     
     /**
@@ -66,19 +77,32 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
      */
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue) {
-            
+
+    	FilterFactory ff = FilterFactory.createFilterFactory();
+    	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+    	length.setArgs(new Expression[]{null});
+    	CompareFilter cf = null;
+		try {
+			cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+	    	cf.addLeftValue(length);
+	    	cf.addRightValue(ff.createLiteralExpression(fieldLength));
+		} catch (IllegalFilterException e) {
+			// TODO something
+		}
+		Filter f = cf == null?Filter.ALL:cf;
+    	
         if (Number.class.isAssignableFrom(clazz)) {
-            return new DefaultAttributeType.Numeric(
-                name, clazz, isNillable,fieldLength,defaultValue);
+            return new NumericAttributeType(
+                name, clazz, isNillable,1,1,defaultValue,f);
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
-            return new DefaultAttributeType.Textual(name,isNillable,fieldLength,defaultValue);
+            return new TextualAttributeType(name,isNillable,1,1,defaultValue,f);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-            return new DefaultAttributeType.Temporal(name,isNillable,fieldLength,defaultValue);
+            return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
-            return new DefaultAttributeType.Geometric(name,clazz,isNillable, fieldLength,defaultValue,null);
+            return new DefaultAttributeType.Geometric(name,clazz,isNillable,1,1, defaultValue,null,f);
         }
         
-        return new DefaultAttributeType(name, clazz, isNillable,fieldLength,defaultValue);
+        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,cf);
     }
     
     
@@ -87,10 +111,22 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         Object metaData ){
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
-            return new DefaultAttributeType.Geometric(name,clazz,isNillable, fieldLength,defaultValue, (CoordinateReferenceSystem) metaData);
+
+        	FilterFactory ff = FilterFactory.createFilterFactory();
+        	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+        	length.setArgs(new Expression[]{null});
+        	CompareFilter cf = null;
+    		try {
+    			cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+    	    	cf.addLeftValue(length);
+    	    	cf.addRightValue(ff.createLiteralExpression(fieldLength));
+    		} catch (IllegalFilterException e) {
+    			// TODO something
+    		}
+    		Filter f = cf == null?Filter.ALL:cf;
+            return new DefaultAttributeType.Geometric(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
-        else {
             return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
-        }
+
     }
 }

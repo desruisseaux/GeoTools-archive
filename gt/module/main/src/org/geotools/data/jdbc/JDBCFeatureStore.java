@@ -38,6 +38,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 
 /**
@@ -308,7 +309,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
         Feature feature = null;
-        Feature newFeature;
+        SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
 
@@ -321,7 +322,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                         e);
                 }
 
-                newFeature = writer.next();
+                newFeature = (SimpleFeature)writer.next();
 
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));
@@ -428,7 +429,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 getTransaction());
         Feature feature;
-        Feature newFeature;
+        SimpleFeature newFeature;
 
         try {
             while (writer.hasNext()) {
@@ -445,7 +446,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                         readProblem);
                 }
 
-                newFeature = writer.next();
+                newFeature = (SimpleFeature)writer.next();
 
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));

@@ -20,10 +20,8 @@ public class GMLFeatureCollection extends DefaultFeatureCollection {
 
 	private Envelope bounds;
 	
-	private GMLFeatureCollection(){
-       // no-op constructor   
-    }
-	protected GMLFeatureCollection(Envelope b){
+	protected GMLFeatureCollection(String id, Envelope b){
+		super(id,null);
 		bounds = b;
 	}
 	/* (non-Javadoc)

@@ -117,7 +117,7 @@ public class LabelingTest extends TestCase {
         Coordinate c = new Coordinate(x, y);
         Point point = geomFac.createPoint(c);
 		if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("point", point.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("point", point.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
@@ -166,7 +166,7 @@ public class LabelingTest extends TestCase {
         };
         LineString line= geomFac.createLineString(c);
 		if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("line", line.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("line", line.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
@@ -213,7 +213,7 @@ public class LabelingTest extends TestCase {
         };
         LinearRing line= geomFac.createLinearRing(c);
 		if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("polygon", line.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("polygon", line.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());

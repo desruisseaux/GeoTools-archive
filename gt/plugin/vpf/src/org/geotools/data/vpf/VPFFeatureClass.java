@@ -319,16 +319,17 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
-        return featureType.getNamespace().toString();
+    public URI getNamespace() {
+        return featureType.getNamespace();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getNamespace()
-     */
-    public URI getNamespaceURI() {
-        return featureType.getNamespaceURI();
-    }
+    // not needed
+//    /* (non-Javadoc)
+//     * @see org.geotools.feature.FeatureType#getNamespace()
+//     */
+//    public URI getNamespaceURI() {
+//        return featureType.getNamespaceURI();
+//    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getTypeName()
@@ -441,4 +442,11 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     public VPFGeometryFactory getGeometryFactory() {
         return geometryFactory;
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
+	 */
+	public int find(String attName) {
+		return featureType.find(attName);
+	}
 }

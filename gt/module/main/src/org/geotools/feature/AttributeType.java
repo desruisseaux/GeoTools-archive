@@ -16,6 +16,8 @@
  */
 package org.geotools.feature;
 
+import org.geotools.filter.Filter;
+
 /**
  * <p>
  * Stores metadata about a single attribute object. 
@@ -58,31 +60,33 @@ package org.geotools.feature;
  * @author Chris Holmes, TOPP
  * @version $Id: AttributeType.java,v 1.11 2003/11/06 23:34:54 ianschneider Exp $
  *
- * @task REVISIT: Think through occurences.  Perhaps a getMinOccurs and
- *       getMaxOccurs, reflecting xml, which would return 1 and 1 for a non
- *       nillable default AttributeType, 0 and 1 for a nillable one.  More
- *       complex  AttributeTypes, such as MultiAttributeType, where control of
- *       min and max occurs is possible, would then return thier proper
- *       response.
  */
-public interface AttributeType {
+public interface AttributeType{
+	
+	/**
+	 * Represents any number of elements. Same '*' in a reg-ex
+	 */
+	public static int UNBOUNDED = Integer.MAX_VALUE;
 
-    /**
-     * Whether or not this attribute is complex in any way.  AttributeGT
-     * returns false, any AttributeType that is any more complex should 
-     * return true.  This is more or less a shortcut for instanceof, when
-     * any sort of processing is to be done with AttributeTypes.  If it is
-     * not nested then the code can just do the default processing, such
-     * as printing the attribute directly, for example.  If it is nested then
-     * that indicates there is more to be done, and the actual AttributeType
-     * should be determined and processed accordingly.
-     *
-     * @return <code>true</code> if anything other than a AttributeGT,
-     * one that does not have any special handling.
-     *
-     */
-    boolean isNested();
-
+	/* feature-exp2 redesign notes:
+	 * 1) removed isNested() from the api as are going to incorporating 
+	 * more complex attribute sequences ... including sets and choices.
+         * isNested() was used very little, and was never fully thought through
+         * So killing it should not have too much of an effect.
+         * 
+         * 2) Added minOccurs and maxOccurs since we are going to get into
+         * multiplicity, where this matters.  The isNilleable is not enough
+         * 
+         * 3) deprecated isGeometry() as it is a convenience method that can
+         * be accomplished in different ways, and it means nothing for a 
+         * featureType
+         * 
+         * 4) We are planning on killing getFieldLength, as it is extremely
+	 * impercise, has no general meaning.  We are going to replace it
+	 * with the concept of xml facets, hopefully we will have time to.
+         * 
+	 */
+	
     /**
      * Gets the name of this attribute.
      *
@@ -96,7 +100,13 @@ public interface AttributeType {
      * @return Type.
      */
     Class getType();
-
+    
+    /**
+     * This represents a Facet in XML schema ... for example can be used to represent the max length of 20 for 
+     * 
+     * @return
+     */
+    Filter getRestriction();
 
     /**
      * Returns whether nulls are allowed for this attribute.
@@ -104,11 +114,28 @@ public interface AttributeType {
      * @return true if nulls are permitted, false otherwise.
      */
     boolean isNillable();
+    
+    /**
+     * Returns the Min number of occurences ...
+     * 
+     * @return 
+     */
+    int getMinOccurs();
+    
+    /**
+     * Returns the Max number of occurences ...
+     * @return
+     */
+    int getMaxOccurs();
 
     /**
      * Whether the attribute is a geometry.
      *
      * @return true if the attribute's type is a geometry.
+     * 
+     * @deprecated Replaced with the use of instanceof or getType().isAssignableTo(Geometry.class)
+     * @TODO check order for class check
+     * @TODO refactor this method away before 2.1 final
      */
     boolean isGeometry();
 
@@ -160,15 +187,4 @@ public interface AttributeType {
      */
     Object createDefaultValue();
  
-    /**
-     * Return a preferred field length value for this attribute type. This value
-     * may have different meanings depending upon the type of attribute held.
-     * For instance, for Strings, the value refers to character length, and for
-     * numeric types, it refers to precision. Other types may not have a use
-     * for this value. A value of zero means that the preferrence is not set, or
-     * is not applicable.
-     * @return The preferred fieldLength or zero if not set or applicable
-     */
-    int getFieldLength();
-
 }
