@@ -31,8 +31,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.LocalCoordinateSystem;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.map.event.MapBoundsEvent;
@@ -40,6 +38,7 @@ import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
+import org.geotools.referencing.crs.GeographicCRS;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -157,7 +156,7 @@ public class MapContextTest extends TestCase {
         assertTrue(context.getKeywords().length == 0);
         assertEquals(0, context.getLayerCount());
         assertNull(context.getAreaOfInterest());
-        assertEquals(LocalCoordinateSystem.PROMISCUOUS, context.getCoordinateReferenceSystem());
+        assertEquals(GeographicCRS.WGS84, context.getCoordinateReferenceSystem());
     }
 
     public void testLayerListEvents() throws Exception {
@@ -475,7 +474,7 @@ public class MapContextTest extends TestCase {
         clearEventTracking();
 
         Envelope env2 = new Envelope(5, 15, 0, 10);
-        context.setAreaOfInterest(env2, GeographicCoordinateSystem.WGS84);
+        context.setAreaOfInterest(env2, GeographicCRS.WGS84_3D);
         assertEquals(1, boundsChangedCount);
         assertEquals(0, layerAddedCount);
         assertEquals(0, layerRemovedCount);
@@ -485,8 +484,8 @@ public class MapContextTest extends TestCase {
         event = (MapBoundsEvent) events.get(0);
         assertEquals(env1, event.getOldAreaOfInterest());
         assertEquals(env2, context.getAreaOfInterest());
-        assertEquals(LocalCoordinateSystem.PROMISCUOUS, event.getOldCoordinateReferenceSystem());
-        assertEquals(GeographicCoordinateSystem.WGS84, context.getCoordinateReferenceSystem());
+        assertEquals(GeographicCRS.WGS84, event.getOldCoordinateReferenceSystem());
+        assertEquals(GeographicCRS.WGS84_3D, context.getCoordinateReferenceSystem());
         assertEquals(MapBoundsEvent.AREA_OF_INTEREST_MASK | MapBoundsEvent.COORDINATE_SYSTEM_MASK,
             event.getType());
 
