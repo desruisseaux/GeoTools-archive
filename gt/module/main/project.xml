@@ -247,6 +247,7 @@
       <excludes>
         <exclude>**/*CodeList*</exclude>
         <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
+        <exclude>**/org/geotools/xml/**</exclude>
       </excludes>     
       <resources>
         <resource>
