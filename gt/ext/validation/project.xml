@@ -119,7 +119,7 @@
         <resource>
           <directory>${basedir}/test</directory>
           <includes>
-            <include>testData/</include>
+            <include>**/test-data/</include>
           </includes>
         </resource>
       </resources>
