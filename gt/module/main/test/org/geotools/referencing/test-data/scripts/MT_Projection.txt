@@ -58,7 +58,7 @@ pt_target=(2663494.1734, 2152319.9230)
 //Lambert_Conformal_Conic_1SP tests
 
 set _MT_Lamb1_=PARAM_MT["Lambert_Conformal_Conic_1SP", PARAMETER["semi_major",6378206.4], PARAMETER["semi_minor",6356583.8], PARAMETER["central_meridian",-76.99999999999999], PARAMETER["latitude_of_origin",18.0], PARAMETER["scale_factor",1.0], PARAMETER["false_easting",250000.0], PARAMETER["false_northing",150000.0]]
-set _MT_Lamb2_=PARAM_MT["Lambert_Conic_Conformal_1SP", PARAMETER["semi_major",6370997.0], PARAMETER["semi_minor",6370997.0], PARAMETER["central_meridian",111.0], PARAMETER["latitude_of_origin",-55.0], PARAMETER["scale_factor",1.0], PARAMETER["false_easting",500000.0], PARAMETER["false_northing",1000000.0]]
+set _MT_Lamb2_=PARAM_MT["Lambert_Conformal_Conic_1SP", PARAMETER["semi_major",6370997.0], PARAMETER["semi_minor",6370997.0], PARAMETER["central_meridian",111.0], PARAMETER["latitude_of_origin",-55.0], PARAMETER["scale_factor",1.0], PARAMETER["false_easting",500000.0], PARAMETER["false_northing",1000000.0]]
 
 math_transform=_MT_Lamb1_
 test_tolerance=(1e-2, 1e-3)
@@ -79,7 +79,7 @@ pt_target=(4232963.1816, 2287639.9866)
 //Lambert_Conformal_Conic_2SP tests
 
 set _MT_Lamb3_=PARAM_MT["Lambert_Conformal_Conic_2SP", PARAMETER["semi_major",6378206.4], PARAMETER["semi_minor",6356583.8], PARAMETER["central_meridian",-99.00000000000001], PARAMETER["latitude_of_origin",27.833333333], PARAMETER["false_easting",609601.218], PARAMETER["false_northing",0.0], PARAMETER["standard_parallel_1",28.383333333], PARAMETER["standard_parallel_2",30.283333333]]
-set _MT_Lamb4_=PARAM_MT["Lambert_Conic_Conformal_2SP", PARAMETER["semi_major",6370997.0], PARAMETER["semi_minor",6370997.0], PARAMETER["central_meridian",-119.99999999999999], PARAMETER["latitude_of_origin",0.0], PARAMETER["false_easting",0.0], PARAMETER["false_northing",0.0], PARAMETER["standard_parallel_1",2.0], PARAMETER["standard_parallel_2",59.99999999999999]]
+set _MT_Lamb4_=PARAM_MT["Lambert_Conformal_Conic_2SP", PARAMETER["semi_major",6370997.0], PARAMETER["semi_minor",6370997.0], PARAMETER["central_meridian",-119.99999999999999], PARAMETER["latitude_of_origin",0.0], PARAMETER["false_easting",0.0], PARAMETER["false_northing",0.0], PARAMETER["standard_parallel_1",2.0], PARAMETER["standard_parallel_2",59.99999999999999]]
 set _MT_Lamb5_=PARAM_MT["Lambert_Conformal_Conic_2SP", PARAMETER["semi_major",6378137.0], PARAMETER["semi_minor",6356752.31424518], PARAMETER["central_meridian",0.0], PARAMETER["latitude_of_origin",-50.0], PARAMETER["false_easting",100000.0], PARAMETER["false_northing",0.0], PARAMETER["standard_parallel_1",-40.0], PARAMETER["standard_parallel_2",-40.0]]
 
 math_transform=_MT_Lamb3_
@@ -107,7 +107,7 @@ pt_target=(1803288.3324, 1616657.7846)
 ////////////////////////////////////////////
 //Lambert_Conformal_Conic_2SP_Belgium test
 
-set _MT_Lamb6_=PARAM_MT["Lambert_Conic_Conformal_2SP_Belgium", PARAMETER["semi_major",6378388.0], PARAMETER["semi_minor",6356911.946], PARAMETER["central_meridian",4.356939722], PARAMETER["latitude_of_origin",90.0], PARAMETER["false_easting",150000.01], PARAMETER["false_northing",5400088.44], PARAMETER["standard_parallel_1",49.833333333], PARAMETER["standard_parallel_2",51.166666666000005]]
+set _MT_Lamb6_=PARAM_MT["Lambert_Conformal_Conic_2SP_Belgium", PARAMETER["semi_major",6378388.0], PARAMETER["semi_minor",6356911.946], PARAMETER["central_meridian",4.356939722], PARAMETER["latitude_of_origin",90.0], PARAMETER["false_easting",150000.01], PARAMETER["false_northing",5400088.44], PARAMETER["standard_parallel_1",49.833333333], PARAMETER["standard_parallel_2",51.166666666000005]]
 
 math_transform=_MT_Lamb6_
 test_tolerance=(1e-2, 1e-2)
