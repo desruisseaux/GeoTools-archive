@@ -776,8 +776,38 @@ System.out.println("FILTER WAS "+query.getFilter());
 			switch(filter.getFilterType()){
 			case Filter.GEOMETRY_BBOX:
 				if((fcs.getSpatialOps() & FilterCapabilities.BBOX) != FilterCapabilities.BBOX){
-					stack.push(filter);
-					return;
+					if(parent.getDefaultGeometry()==null || parent.getDefaultGeometry().getCoordinateSystem() == null){
+						stack.push(filter);
+						return;
+					}
+					if(filter.getLeftGeometry().getType() == Expression.LITERAL_GEOMETRY){
+						LiteralExpression le = (LiteralExpression)filter.getLeftGeometry();
+						if(le == null || le.getLiteral() == null || !(le.getLiteral() instanceof Geometry)){
+							stack.push(filter);
+							return;
+						}
+						Geometry bbox = (Geometry)le.getLiteral();
+						if((!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getUserData()))){// || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
+							stack.push(filter);
+							return;
+						}
+					}else{
+						if(filter.getRightGeometry().getType() == Expression.LITERAL_GEOMETRY){
+							LiteralExpression le = (LiteralExpression)filter.getLeftGeometry();
+							if(le == null || le.getLiteral() == null || !(le.getLiteral() instanceof Geometry)){
+								stack.push(filter);
+								return;
+							}
+							Geometry bbox = (Geometry)le.getLiteral();
+							if((!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getUserData()))){// || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
+								stack.push(filter);
+								return;
+							}
+						}else{
+							stack.push(filter);
+							return;
+						}	
+					}
 				}
 				break;
 			case Filter.GEOMETRY_BEYOND:

@@ -5058,7 +5058,7 @@ public class GMLComplexTypes {
                 throw new SAXException("must be one geometry");
             }
 
-            return (Geometry) value[0].getValue();
+            return value[0].getValue() instanceof Geometry?(Geometry) value[0].getValue():null;
         }
 
         /**
