@@ -9,7 +9,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.resources.TestData;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
-import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
 
 import java.io.File;
