@@ -3,8 +3,10 @@ package org.geotools.data.gml;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpConnection;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStoreFactorySpi;
@@ -22,9 +24,10 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if( canProcess(params)){  
+        URL url = (URL) URLP.lookUp( params ); // try early error        
+        if( testURL(url)){  
             try{
-            return new GMLDataStore( (URL) URLP.lookUp( params ) );
+                return new GMLDataStore( url );
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
             }
@@ -52,9 +55,14 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     }
     public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
         URL url = (URL) URLP.lookUp( params );
-        String parent = url.getPath();
-        String name = url.getFile();
-        return new DataSourceMetadataEnity( parent, name, "Access to GML file "+url.toString());
+        if( "file".equals(url.getProtocol())){
+            String parent = url.getPath();
+            String name = url.getFile();
+            return new DataSourceMetadataEnity( parent, name, "Access to GML file "+url.toString());
+        }
+        else {
+            return new DataSourceMetadataEnity( url.getHost(), url.getFile(),  "Access to GML "+url.toString());
+        }
     }
 //    public static final Param DIRECTORY = new Param("directory", File.class,
 //            "Directory containing gml files", true);
@@ -92,18 +100,44 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     }
 
     /**
+     * @throws IOException
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#canProcess(java.net.URL)
      */
     public boolean canProcess(URL f) {
-        return (f.getFile().toUpperCase().endsWith(".XML") ||
-                f.getFile().toUpperCase().endsWith(".GML"));
+        try {
+            return testURL( f );
+        } catch (IOException e) {
+            return false;
+        }
+    }
+    public boolean testURL( URL f ) throws IOException {
+        if( f.getProtocol() == "file"){        
+            if(f.getFile().toUpperCase().endsWith(".XML")){
+                return true;
+            }
+            if(f.getFile().toUpperCase().endsWith(".GML")){
+                return true;            
+            }
+            throw new IOException("*.xml or *.gml file required");
+        }
+        if( f.getProtocol() == "http"){
+            URLConnection conn = f.openConnection();
+            if( "text/xml".equals( conn.getContentType() )){
+                return true;
+            }
+            if( "application/gml".equals( conn.getContentType() )){
+                return true;
+            }
+            throw new IOException("text/xml or application/gml mime type required");
+        }
+        return false;
     }
 
     /**
      * @throws IOException
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
      */
-    public DataStore createDataStore(URL url) throws IOException {
+    public DataStore createDataStore(URL url) throws IOException {        
         if(canProcess(url))
             try{
             return new GMLDataStore(url);
