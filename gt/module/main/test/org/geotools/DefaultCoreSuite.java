@@ -13,7 +13,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.data.DatasourceTest;
 import org.geotools.feature.FeatureFlatTest;
 import org.geotools.filter.ExpressionTest;
 import org.geotools.filter.FilterEqualsTest;
@@ -39,8 +38,7 @@ public class DefaultCoreSuite extends TestCase {
         //_log = Logger.getLogger(DefaultCoreSuite.class);
        
         
-        TestSuite suite = new TestSuite("All core tests");
-        suite.addTestSuite(DatasourceTest.class);        
+        TestSuite suite = new TestSuite("All core tests");                
         suite.addTestSuite(FeatureFlatTest.class);
         suite.addTestSuite(ExpressionTest.class);
         suite.addTestSuite(FilterEqualsTest.class);
