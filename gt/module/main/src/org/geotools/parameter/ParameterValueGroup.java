@@ -87,6 +87,17 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
     }
 
     /**
+     * Returns the value at the specified index.
+     *
+     * @param  The zero-based index.
+     * @return The value at the specified index.
+     * @throws IndexOutOfBoundsException if the specified index is out of bounds.
+     */
+    final GeneralParameterValue getValue(final int index) throws IndexOutOfBoundsException {
+        return values[index];
+    }
+
+    /**
      * Returns the first value in this group for the specified name. If no
      * {@linkplain org.geotools.parameter.ParameterValue parameter value} or
      * group is found for the given name, then this method search recursively

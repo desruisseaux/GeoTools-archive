@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -55,11 +43,13 @@ import org.geotools.resources.cts.ResourceKeys;
  * between two different local coordinate systems, as long as they are based
  * on the same local datum.
  *
- * @version $Id: LocalDatum.java,v 1.8 2004/03/08 11:30:55 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_LocalDatum
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.EngineeringDatum}.
  */
 public class LocalDatum extends Datum {
     /**

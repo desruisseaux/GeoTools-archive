@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -63,11 +51,13 @@ import org.geotools.resources.cts.ResourceKeys;
  * (E.g. from a database of transformations, which is created and
  * maintained from real-world measurements.)
  *
- * @version $Id: LocalCoordinateSystem.java,v 1.15 2004/03/08 11:30:55 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_LocalCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.EngineeringCRS}.
  */
 public class LocalCoordinateSystem extends CoordinateSystem {
     /**
@@ -214,6 +204,8 @@ public class LocalCoordinateSystem extends CoordinateSystem {
      * Gets the local datum.
      *
      * @see org.opengis.cs.CS_LocalCoordinateSystem#getLocalDatum()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.EngineeringCRS#getDatum}.
      */
     public LocalDatum getLocalDatum() {
         return datum;

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -50,11 +38,13 @@ import java.rmi.RemoteException;
 /**
  * A meridian used to take longitude measurements from.
  *
- * @version $Id: PrimeMeridian.java,v 1.8 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_PrimeMeridian
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian}.
  */
 public class PrimeMeridian extends Info {
     /**
@@ -101,6 +91,8 @@ public class PrimeMeridian extends Info {
      * The longitude is expressed in this object's angular units.
      *
      * @see org.opengis.cs.CS_PrimeMeridian#getLongitude()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian#getGreenwichLongitude}.
      */
     public double getLongitude() {
         return longitude;
@@ -123,6 +115,8 @@ public class PrimeMeridian extends Info {
      * Returns the angular units.
      *
      * @see org.opengis.cs.CS_PrimeMeridian#getAngularUnit()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian#getAngularUnit}.
      */
     public Unit getAngularUnit() {
         return unit;

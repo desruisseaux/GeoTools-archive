@@ -50,7 +50,7 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see org.opengis.cs.CS_DatumType
  *
- * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType}.
+ * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType}
  *             for the vertical case. No replacement for other cases.
  */
 public abstract class DatumType extends EnumeratedParameter {
@@ -378,6 +378,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * Horizontal datum type.
      *
      * @see org.opengis.cs.CS_DatumType
+     *
+     * @deprecated No replacement.
      */
     public static final class Horizontal extends DatumType {
         /**
@@ -436,6 +438,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * Vertical datum type.
      *
      * @see org.opengis.cs.CS_DatumType
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType}
      */
     public static final class Vertical extends DatumType {
         /**
@@ -487,6 +491,8 @@ public abstract class DatumType extends EnumeratedParameter {
     
     /**
      * Temporal datum type.
+     *
+     * @deprecated No replacement.
      */
     public static final class Temporal extends DatumType {
         /**
@@ -541,6 +547,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * Local datum type.
      *
      * @see org.opengis.cs.CS_DatumType
+     *
+     * @deprecated No replacement.
      */
     public static final class Local extends DatumType {
         /**

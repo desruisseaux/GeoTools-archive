@@ -89,8 +89,8 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
     
     /**
      * Makes sure that an argument is non-null. This method was already defined in
-     * {@link org.geotools.referencing.Info}, but is defined here again in order for
-     * a more appropriate stack trace, and for access by class which do not inherit
+     * {@link org.geotools.referencing.Info}, but is defined here again in order to
+     * get a more appropriate stack trace, and for access by class which do not inherit
      * from {@link org.geotools.referencing.Info}.
      *
      * @param  name   Argument name.
@@ -102,7 +102,7 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
     {
         if (object == null) {
             throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
         }
     }
 

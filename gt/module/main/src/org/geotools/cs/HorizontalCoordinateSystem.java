@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -51,11 +39,14 @@ import java.rmi.RemoteException;
 /**
  * A 2D coordinate system suitable for positions on the Earth's surface.
  *
- * @version $Id: HorizontalCoordinateSystem.java,v 1.10 2003/08/04 17:11:16 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_HorizontalCoordinateSystem
+ *
+ * @deprecated No direct replacement. The nearest parent is
+ *             {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
  */
 public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
     /**
@@ -124,6 +115,8 @@ public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
      * Returns the horizontal datum.
      *
      * @see org.opengis.cs.CS_HorizontalCoordinateSystem#getHorizontalDatum()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.CoordinateReferenceSystem#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;

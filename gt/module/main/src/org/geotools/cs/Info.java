@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -91,6 +79,9 @@ import java.io.Serializable;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_Info
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.Info} and
+ *             {@link org.geotools.referencing.Identifier}.
  */
 public class Info implements org.opengis.referencing.Info, Serializable {
     /**
@@ -202,6 +193,8 @@ public class Info implements org.opengis.referencing.Info, Serializable {
      *        locale is used.
      *
      * @see org.opengis.cs.CS_Info#getAuthorityCode()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.Identifier#getCode}.
      */
     public String getAuthorityCode(final Locale locale) {
         return getProperty("authorityCode");
@@ -216,6 +209,8 @@ public class Info implements org.opengis.referencing.Info, Serializable {
      *        locale is used.
      *
      * @see org.opengis.cs.CS_Info#getAlias()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.Info#getIdentifiers}.
      */
     public String getAlias(final Locale locale) {
         return getProperty("alias");
@@ -230,6 +225,8 @@ public class Info implements org.opengis.referencing.Info, Serializable {
      *        locale is used.
      *
      * @see org.opengis.cs.CS_Info#getAbbreviation()
+     *
+     * @deprecated No replacement.
      */
     public String getAbbreviation(final Locale locale) {
         return getProperty("abbreviation");
