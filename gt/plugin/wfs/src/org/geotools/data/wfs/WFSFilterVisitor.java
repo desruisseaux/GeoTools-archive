@@ -62,7 +62,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	
 	        Filter f = postStack.isEmpty() ? Filter.NONE : (Filter) postStack.pop();
-//System.out.println("POST FILTER = "+f);
 	        return f;
 	    }
 		
@@ -77,7 +76,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	
 	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.pop();
-//System.out.println("PRE FILTER = "+f);
 			return f;
 	    }
 	
@@ -268,12 +266,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        case FilterType.GEOMETRY_BBOX:
 	
 	            if ((fcs.getSpatialOps() & FilterCapabilities.BBOX) != FilterCapabilities.BBOX) {
-//	                if ((parent.getDefaultGeometry() == null)
-//	                        || (parent.getDefaultGeometry().getCoordinateSystem() == null)) {
-//	                    postStack.push(filter);
-//	
-//	                    return;
-//	                }
 	
 	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
 	                    LiteralExpression le = (LiteralExpression) filter
@@ -286,14 +278,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                        return;
 	                    }
 	
-//	                    Geometry bbox = (Geometry) le.getLiteral();
-	
-//	                    if ((!parent.getDefaultGeometry().getCoordinateSystem()
-//	                                    .equals(bbox.getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-//	                    	postStack.push(filter);
-//	
-//	                        return;
-//	                    }
 	                } else {
 	                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
 	                        LiteralExpression le = (LiteralExpression) filter
@@ -305,16 +289,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	                            return;
 	                        }
-	
-//	                        Geometry bbox = (Geometry) le.getLiteral();
-	
-//	                        if ((!parent.getDefaultGeometry()
-//	                                        .getCoordinateSystem().equals(bbox
-//	                                    .getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-//	                        	postStack.push(filter);
-//	
-//	                            return;
-//	                        }
 	                    } else {
 	                    	postStack.push(filter);
 	
@@ -505,7 +479,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                	postStack.pop();
 	                	postStack.push(filter);
 	                }else{
-	                	preStack.push(filter);
+                        while(preStack.size()>j)
+                            preStack.pop();
+                        preStack.push(filter);
 	                }
 	            }
 	        } else {
@@ -560,6 +536,10 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	                        postStack.push(filter);
 	                    }
+	                } else {
+                        while(preStack.size()>j)
+                            preStack.pop();
+                        preStack.push(filter);              
 	                }
 	            }
 	        }
