@@ -77,8 +77,8 @@ public class TransformData {
             //create the CS's and transformation
             CoordinateSystem inCS = csFactory.createFromWKT(inWKT);
             CoordinateSystem outCS = csFactory.createFromWKT(outWKT);
-            System.out.println("source CS: " + inCS.getName().toString(Locale.ENGLISH));
-            System.out.println("target CS: " + outCS.getName().toString(Locale.ENGLISH));
+            System.out.println("source CS: " + inCS.getName().getCode());
+            System.out.println("target CS: " + outCS.getName().getCode());
             CoordinateTransformation transformation = ctFactory.createFromCoordinateSystems(inCS, outCS);
             System.out.println("transform: " + transformation.getMathTransform().toString());
             CoordinateFilter transFilter = new TransformationCoordinateFilter(transformation.getMathTransform());
