@@ -106,11 +106,11 @@ public class DefaultView implements FeatureSource {
         FeatureType origionalType = source.getSchema();
         
         CoordinateSystem cs = null;
-        if( query.getCoordianteSystemReproject() != null){
-            cs = (CoordinateSystem) query.getCoordianteSystemReproject(); 
+        if( query.getCoordinateSystemReproject() != null){
+            cs = (CoordinateSystem) query.getCoordinateSystemReproject(); 
         }
-        else if( query.getCoordianteSystem() != null){
-            cs = (CoordinateSystem) query.getCoordianteSystem();
+        else if( query.getCoordinateSystem() != null){
+            cs = (CoordinateSystem) query.getCoordinateSystem();
         }                
         schema = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs, query.getTypeName(), null );        
     }

@@ -370,8 +370,8 @@ public class DefaultQuery implements Query {
                 | ((getFilter() == null) ? 0 : getFilter().hashCode())
                 | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
                 | ((getVersion() == null) ? 0 : getVersion().hashCode())
-                | ((getCoordianteSystem() == null) ? 0 : getCoordianteSystem().hashCode())
-                | ((getCoordianteSystemReproject() == null) ? 0 : getCoordianteSystemReproject().hashCode());
+                | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
+                | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode());
     }
 
     /**
@@ -402,10 +402,10 @@ public class DefaultQuery implements Query {
                                     : getTypeName().equals(other.getTypeName()))
         && ((getVersion() == null) ? (other.getVersion() == null)
                                    : getVersion().equals(other.getVersion()))
-        && ((getCoordianteSystem() == null) ? (other.getCoordianteSystem() == null)
-                                           : getCoordianteSystem().equals(other.getCoordianteSystem()))
-        && ((getCoordianteSystemReproject() == null) ? (other.getCoordianteSystemReproject() == null)
-                                                   : getCoordianteSystemReproject().equals(other.getCoordianteSystemReproject()))                                           
+        && ((getCoordinateSystem() == null) ? (other.getCoordinateSystem() == null)
+                                           : getCoordinateSystem().equals(other.getCoordinateSystem()))
+        && ((getCoordinateSystemReproject() == null) ? (other.getCoordinateSystemReproject() == null)
+                                                   : getCoordinateSystemReproject().equals(other.getCoordinateSystemReproject()))                                           
         ;
     }
     /**
@@ -451,7 +451,7 @@ public class DefaultQuery implements Query {
      * </p>
      * @return
      */
-    public CoordinateReferenceSystem getCoordianteSystem() {
+    public CoordinateReferenceSystem getCoordinateSystem() {
         return coordinateSystem;
     }
 
@@ -462,7 +462,7 @@ public class DefaultQuery implements Query {
      * </p>
      * @return
      */
-    public CoordinateReferenceSystem getCoordianteSystemReproject() {
+    public CoordinateReferenceSystem getCoordinateSystemReproject() {
         return coordinateSystemReproject;
     }
 
@@ -473,7 +473,7 @@ public class DefaultQuery implements Query {
      * </p>
      * @param system
      */
-    public void setCoordianteSystem(CoordinateReferenceSystem system) {
+    public void setCoordinateSystem(CoordinateReferenceSystem system) {
         coordinateSystem = system;
     }
 
@@ -484,7 +484,7 @@ public class DefaultQuery implements Query {
      * </p>
      * @param system
      */
-    public void setCoordianteSystemReproject(CoordinateReferenceSystem system) {
+    public void setCoordinateSystemReproject(CoordinateReferenceSystem system) {
         coordinateSystemReproject = system;
     }
 
