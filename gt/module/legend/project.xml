@@ -4,8 +4,8 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-legend</name>
   <id>legend</id>
-  <currentVersion>2.0-B5-DEV</currentVersion>
-  <shortDescription>Leged module</shortDescription>
+  <currentVersion>2.0-B6-DEV</currentVersion>
+  <shortDescription>Legend module</shortDescription>
   <description>Legend module.</description>
   <developers>
     <developer>
@@ -46,72 +46,12 @@
       <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <id>opengis</id>
-      <version>2.0-B5-DEV</version>
+      <id>main</id>
+      <version>2.0-B6-DEV</version>
       <url>http://www.geotools.org</url>
     </dependency>
     <dependency>
-      <artifactId>core</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>lite-rendering</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>filter</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>defaultcore</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>resources</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>cts-coordtrans</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>gcs-coverage</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>sldstyling</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>renderer</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>gui</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>map</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
       <artifactId>shapefile</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>data</artifactId>
       <groupId>gt2</groupId>
       <version>2.0-B5-DEV</version>
     </dependency>
@@ -128,7 +68,7 @@
       </includes>
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>**/*</include>
           </includes>
