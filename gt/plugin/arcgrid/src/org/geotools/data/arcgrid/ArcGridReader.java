@@ -33,6 +33,8 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Reader;
@@ -138,7 +140,7 @@ public class ArcGridReader implements GridCoverageReader {
             throws InvalidParameterNameException,
             InvalidParameterValueException, ParameterNotFoundException,
             IOException {
-        setEnvironment("ArcGrid", (ParameterValue[]) parameters);
+        setEnvironment("ArcGrid", (GeneralParameterValue[]) parameters);
 
         return getGridCoverage();
     }
@@ -177,19 +179,30 @@ public class ArcGridReader implements GridCoverageReader {
      * @throws IOException
      *             Thrown for any other unexpected exception
      */
-    private void setEnvironment(String name, ParameterValue[] parameters)
+    private void setEnvironment(String name, GeneralParameterValue[] parameters)
             throws InvalidParameterNameException,
             InvalidParameterValueException, IOException {
-        mReader = mExchange.getReader(mSource);
         this.name = name;
 
         if (parameters == null) {
-            return;
+            parameters=new ParameterValue[0];
         }
 
         for (int i = 0; i < parameters.length; i++) {
-            parseParameter(parameters[i], params);
+            if (parameters[i] instanceof ParameterValueGroup) {
+                GeneralParameterValue[] paramValues = ((ParameterValueGroup) parameters[i]).getValues();
+                for (int j=0; j < paramValues.length; j++) {
+                    parseParameter((ParameterValue) paramValues[j], params);
+                }
+            } else {
+                parseParameter((ParameterValue) parameters[i], params);
+            }
         }
+        if ( params.compress )
+            mReader= mExchange.getGZIPReader(mSource);
+        else
+            mReader = mExchange.getReader(mSource);
+
     }
 
     static void parseParameter(ParameterValue parameter, 

@@ -27,6 +27,8 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -124,15 +126,27 @@ public class ArcGridWriter implements GridCoverageWriter {
     private void setEnvironment(ParameterValue[] parameters)
         throws InvalidParameterNameException, InvalidParameterValueException, 
             IOException {
-        mWriter = ioexchange.getPrintWriter(destination);
-
         if (parameters == null) {
-            return;
+            parameters=new ParameterValue[0];
         }
+
 
         for (int i = 0; i < parameters.length; i++) {
-            ArcGridReader.parseParameter(parameters[i],params);
+            if (parameters[i] instanceof ParameterValueGroup) {
+                GeneralParameterValue[] paramValues = ((ParameterValueGroup) parameters[i]).getValues();
+                for (int j=0; j < paramValues.length; j++) {
+                    ArcGridReader.parseParameter((ParameterValue) paramValues[j], params);
+                }
+            } else {
+                ArcGridReader.parseParameter((ParameterValue) parameters[i], params);
+            }
         }
+
+        if( params.compress )
+            mWriter=ioexchange.getGZIPPrintWriter(destination);
+        else
+            mWriter = ioexchange.getPrintWriter(destination);
+
     }
 
 
