@@ -63,7 +63,9 @@ import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS;
+import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
@@ -852,7 +854,8 @@ System.out.println(url);
                     + 1);
 
             if (queryName.equals(fsdName)) {
-                return fsd.getLatLongBoundingBox();
+                Envelope env = fsd.getLatLongBoundingBox();
+                return new ReferencedEnvelope(env,GeographicCRS.WGS84);
             }
         }
 

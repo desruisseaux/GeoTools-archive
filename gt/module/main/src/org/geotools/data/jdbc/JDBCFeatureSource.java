@@ -37,6 +37,8 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
+import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.referencing.crs.GeographicCRS;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -305,6 +307,8 @@ public class JDBCFeatureSource implements FeatureSource {
      */
     public Envelope getBounds(Query query) throws IOException {
         if (query.getFilter() == Filter.ALL) {
+            if(featureType!=null)
+                return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
             return new Envelope();
         }
 

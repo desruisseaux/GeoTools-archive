@@ -78,6 +78,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.FactoryException;
 
@@ -681,8 +682,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             ShapefileHeader header = new ShapefileHeader();
             header.read(buffer, true);
             
-            return new Envelope(header.minX(), header.maxX(), header.minY(),
-            header.maxY());
+            Envelope env = new Envelope(header.minX(), header.maxX(), header.minY(),
+                    header.maxY());
+            if(schema!=null)
+                return new ReferencedEnvelope(env,schema.getDefaultGeometry().getCoordinateSystem());
+            return env;
         } catch (IOException ioe) {
             // What now? This seems arbitrarily appropriate !
             throw new DataSourceException("Problem getting Bbox", ioe);

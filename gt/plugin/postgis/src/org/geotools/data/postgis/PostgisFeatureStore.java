@@ -49,6 +49,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
+import org.geotools.geometry.JTS.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -830,6 +831,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             LOGGER.finer("returning bounds " + retEnv);
 
+            if(schema!=null)
+                return new ReferencedEnvelope(retEnv,schema.getDefaultGeometry().getCoordinateSystem());
             return retEnv;
         } catch (SQLException sqlException) {
             JDBCUtils.close(conn, transaction, sqlException);
