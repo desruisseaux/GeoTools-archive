@@ -13,6 +13,7 @@ import java.net.*;
 import javax.swing.*;
 import junit.framework.*;
 import org.geotools.data.*;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.*;
 import com.vividsolutions.jts.geom.*;
 
@@ -46,11 +47,14 @@ public class FeatureTableModelTest extends TestCase {
     }
     
     public void testDisplay() throws Exception{
-        MemoryDataSource datasource = new MemoryDataSource();
-        datasource.addFeature(testFeatures[0]);
-        datasource.addFeature(testFeatures[1]);
+        MemoryDataStore datastore = new MemoryDataStore();
+        datastore.addFeature(testFeatures[0]);
+        datastore.addFeature(testFeatures[1]);
         
-        FeatureCollection table = datasource.getFeatures();
+        String typeName = datastore.getTypeNames()[0];
+        FeatureCollection table =
+            datastore.getFeatureSource( typeName ).getFeatures().collection();
+        
         FeatureTableModel ftm = new FeatureTableModel();
         ftm.setFeatureCollection(table);
         
