@@ -70,13 +70,15 @@ public class Citation extends MetaData implements
         return identifiers;
     }
     public void setIdentifiers(Set identifiers) {
-        this.identifiers = identifiers;
+        this.identifiers.clear();
+        this.identifiers.addAll( identifiers );
     }
     public Set getIdentifierTypes() {
         return identifierTypes;
     }
     public void setIdentifierTypes(Set identifierTypes) {
-        this.identifierTypes = identifierTypes;
+        this.identifierTypes.clear();
+        this.identifierTypes.addAll(identifierTypes);
     }
     public String getISBN() {
         return ISBN;
@@ -100,7 +102,8 @@ public class Citation extends MetaData implements
         return presentationForm;
     }
     public void setPresentationForm(Set presentationForm) {
-        this.presentationForm = presentationForm;
+        this.presentationForm.clear();
+        this.presentationForm.addAll( presentationForm );
     }
     public Series getSeries() {
         return series;

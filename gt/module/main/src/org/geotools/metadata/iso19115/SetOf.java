@@ -25,7 +25,7 @@ import java.util.HashSet;
  */
 public class SetOf extends HashSet {
     Class type;
-    SetOf( Class type ){
+    public SetOf( Class type ){
         this.type = type;
     }
     /* (non-Javadoc)

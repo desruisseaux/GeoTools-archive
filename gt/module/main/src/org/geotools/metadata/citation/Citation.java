@@ -42,7 +42,7 @@ import org.opengis.metadata.citation.PresentationForm;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Citation implements org.opengis.metadata.citation.Citation, Serializable {
+public class Citation implements /*org.opengis.metadata.citation.Citation,*/ Serializable {
     /**
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
      */

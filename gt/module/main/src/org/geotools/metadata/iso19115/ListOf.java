@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public class ListOf extends ArrayList {
     Class type;
-    ListOf( Class type ){
+    public ListOf( Class type ){
         this.type = type;
     }
     /* Ensure that contents are limited to instances of type */
