@@ -16,6 +16,9 @@
  */
 package org.geotools.xml.wfs;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * DOCUMENT ME!
  *
@@ -24,7 +27,7 @@ package org.geotools.xml.wfs;
  *         Comments
  */
 public class WFSCapability {
-    private Object request;
+    private Set requests;
     private String vendorSpecificCapabilities;
 
     /**
@@ -32,8 +35,8 @@ public class WFSCapability {
      *
      * @return Returns the request.
      */
-    public Object getRequest() {
-        return request;
+    public Set getRequests() {
+        return requests;
     }
 
     /**
@@ -41,8 +44,14 @@ public class WFSCapability {
      *
      * @param request The request to set.
      */
-    public void setRequest(Object request) {
-        this.request = request;
+    public void setRequests(Set request) {
+        this.requests = request;
+    }
+    
+    public void addRequest(Request request){
+        if(requests == null)
+            requests = new HashSet();
+        requests.add(request);
     }
 
     /**

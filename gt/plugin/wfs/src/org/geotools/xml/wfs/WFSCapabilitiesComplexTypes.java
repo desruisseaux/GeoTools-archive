@@ -496,9 +496,9 @@ public class WFSCapabilitiesComplexTypes {
      *
      * @see WFSComplexType
      */
-    static class LatLonBoundingBoxType extends WFSComplexType {
+    static class LatLongBoundingBoxType extends WFSComplexType {
         // singleton instance
-        private static final WFSComplexType instance = new LatLonBoundingBoxType();
+        private static final WFSComplexType instance = new LatLongBoundingBoxType();
     
         // static element list
         private static Attribute[] attributes = {
@@ -830,7 +830,7 @@ public class WFSCapabilitiesComplexTypes {
                 new WFSElement("Operations",
                     OperationsType.getInstance(), 0, 1, false, null),
                 new WFSElement("LatLongBoundingBox",
-                    LatLonBoundingBoxType.getInstance(), 0,
+                    LatLongBoundingBoxType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null),
                 new WFSElement("MetadataURL",
                     MetadataURLType.getInstance(), 0,
@@ -908,6 +908,7 @@ public class WFSCapabilitiesComplexTypes {
     static class DCPTypeType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new DCPTypeType();
+        public static WFSComplexType getInstance(){return instance;}
     
         // static element list
         private static final Element[] elements = {
@@ -1111,7 +1112,8 @@ public class WFSCapabilitiesComplexTypes {
     static class RequestType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new RequestType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("GetCapabilities",
@@ -1217,7 +1219,8 @@ public class WFSCapabilitiesComplexTypes {
     static class ServiceType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new ServiceType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Name", XSISimpleTypes.String.getInstance(), 1,
@@ -1381,7 +1384,8 @@ public class WFSCapabilitiesComplexTypes {
     static class FeatureTypeListType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new FeatureTypeListType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Operations",
@@ -1468,7 +1472,8 @@ public class WFSCapabilitiesComplexTypes {
     static class CapabilityType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new CapabilityType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Request",
@@ -1603,7 +1608,8 @@ public class WFSCapabilitiesComplexTypes {
     static class WFS_CapabilitiesType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new WFS_CapabilitiesType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Service",
@@ -1810,7 +1816,8 @@ public class WFSCapabilitiesComplexTypes {
     
         // static sequence
         private static final DefaultSequence seq = new DefaultSequence(elements);
-        
+
+        public static WFSComplexType getInstance(){return instance;}
         /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
@@ -1884,7 +1891,8 @@ public class WFSCapabilitiesComplexTypes {
     static class TransactionType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new TransactionType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("DCPType",
@@ -1968,7 +1976,8 @@ public class WFSCapabilitiesComplexTypes {
     static class GetFeatureTypeType extends WFSComplexType {
         // singleton instance
         private static final WFSComplexType instance = new GetFeatureTypeType();
-    
+
+        public static WFSComplexType getInstance(){return instance;}
         // static element list
         private static final Element[] elements = {
                 new WFSElement("ResultFormat",

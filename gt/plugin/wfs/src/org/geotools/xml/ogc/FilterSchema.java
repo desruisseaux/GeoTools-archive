@@ -22,6 +22,10 @@ import org.geotools.xml.schema.SimpleType;
 public class FilterSchema implements Schema {
     
     public static final String NAMESPACE = "http://www.opengis.net/ogc";
+    
+    private static final FilterSchema instance = new FilterSchema();
+
+    public static FilterSchema getInstance(){return instance;}
 
     /**
      * @see org.geotools.xml.schema.Schema#getAttributeGroups()

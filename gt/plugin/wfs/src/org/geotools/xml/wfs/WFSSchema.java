@@ -16,13 +16,21 @@
  */
 package org.geotools.xml.wfs;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultAttribute;
+import org.geotools.xml.schema.DefaultFacet;
+import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
@@ -32,24 +40,40 @@ import org.geotools.xml.wfs.WFSBasicComplexTypes.FeatureCollectionType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.GetCapabilitiesType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.GetFeatureType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.QueryType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.CapabilityType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.DCPTypeType;
 import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.EmptyType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.FeatureTypeListType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.FeatureTypeType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.GetType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.HTTPType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.LatLongBoundingBoxType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.LockFeatureTypeType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.MetadataURLType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.OperationsType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.PostType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.RequestType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.ResultFormatType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.SchemaDescriptionLanguageType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.ServiceType;
 import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.WFS_CapabilitiesType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.DeleteElementType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.FeaturesLockedType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.FeaturesNotLockedType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.GetFeatureWithLockType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.InsertElementType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.InsertResultType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.LockFeatureType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.LockType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.NativeType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.PropertyType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.StatusType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.TransactionResultType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.TransactionType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.UpdateElementType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_LockFeatureResponseType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_TransactionResponseType;
 import org.geotools.xml.xsi.XSISimpleTypes;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**
@@ -117,6 +141,18 @@ public class WFSSchema implements Schema {
             new WFSElement("PARTIAL",EmptyType.getInstance())
     };
     
+    private static Element findElement(Schema s, String name){
+        if(name == null || "".equals(name))
+            return null;
+        Element[] elems = s.getElements();
+        if(elems == null)
+            return null;
+        for(int i=0;i<elems.length;i++)
+            if(name.equals(elems[i].getName()))
+                return elems[i];
+        return null;
+    }
+    
     static final ComplexType[] complexTypes = new ComplexType[] {
             GetCapabilitiesType.getInstance(),
             DescribeFeatureTypeType.getInstance(),
@@ -159,7 +195,10 @@ public class WFSSchema implements Schema {
     };
     
     static final SimpleType[] simpleTypes = new SimpleType[] {
-            AllSomeType.getInstance(),
+            new DefaultSimpleType(null,"AllSomeType", NAMESPACE,
+                    DefaultSimpleType.RESTRICTION, new SimpleType[] {XSISimpleTypes.String.getInstance()}, 
+                    new Facet[] {new DefaultFacet(Facet.ENUMERATION,"ALL"),
+                    new DefaultFacet(Facet.ENUMERATION,"SOME")}, SimpleType.NONE),
     };
     
     
@@ -665,8 +704,5 @@ public class WFSSchema implements Schema {
             super(null, name, WFSSchema.NAMESPACE,
                     simpleType, use, def, null, false);
         }
-    }
-    static class AllSomeType implements SimpleType{
-        
     }
 }
