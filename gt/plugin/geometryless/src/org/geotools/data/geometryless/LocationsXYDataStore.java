@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Logger;
-
+import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
@@ -22,6 +22,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderLocationsXY;
+import org.geotools.data.geometryless.attributeio.PointXYAttributeIO;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -132,15 +133,38 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
 
         try {
             int dataType = rs.getInt(DATA_TYPE);
-             LOGGER.fine("dataType: " + dataType + " " + rs.getString(TYPE_NAME) + " " + rs.getString(COLUMN_NAME) );
-   
-            if (dataType == Types.OTHER) {
-                //this is MySQL-specific; handle it
-                String typeName = rs.getString(TYPE_NAME);
-                String typeNameLower = typeName.toLowerCase();
-	return super.buildAttributeType(rs);
-            } else {
-                return super.buildAttributeType(rs);
+	    String colName = rs.getString(COLUMN_NAME);
+	    LOGGER.fine("dataType: " + dataType + " " + rs.getString(TYPE_NAME) + " " + colName );
+	    Class type = (Class) TYPE_MAPPINGS.get(new Integer(dataType));
+
+	     //This should be improved - first should probably check for 
+	     //presence of both the x and y columns, only create the geometry
+	     //if both are found, instead of just ignoring the y - right now
+	     //the y could just not exist.  And then if either do not exist
+	     //an exception should be thrown.
+	     //Also, currently the name of the geometry is hard coded - 
+	     //do we want it to be user configurable?  ch
+	     if (colName.equals(XCoordColumnName)) {
+		 //do type checking here, during config, not during reading.
+		 if (Number.class.isAssignableFrom(type)) {
+		     return AttributeTypeFactory.newAttributeType("the_geom",
+								  Point.class);
+		 } else {
+		     String excMesg = "Specified X column of " + colName + 
+			 " of type: " + type + ", can not be used as x point";
+		     throw new DataSourceException(excMesg);
+		 }
+      
+	     } else if (colName.equals(YCoordColumnName)) {
+		 if (Number.class.isAssignableFrom(type)) {
+		     return null;
+		 } else {
+		     String excMesg = "Specified X column of " + colName + 
+			 " of type: " + type + ", can not be used as x point";
+		     throw new DataSourceException(excMesg);
+		 }
+	     } else {
+		 return super.buildAttributeType(rs);
             }
         } catch (SQLException e) {
             throw new IOException("SQL exception occurred: " + e.getMessage());
@@ -152,14 +176,15 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
     
         SQLEncoder encoder = new SQLEncoderLocationsXY(XCoordColumnName,YCoordColumnName);
         encoder.setFIDMapper(getFIDMapper(typeName));
-        return new GeometrylessSQLBuilder(encoder);
+        return new LocationsXYSQLBuilder(encoder, XCoordColumnName, 
+                                         YCoordColumnName);
     }
 
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
     protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
-        return new WKTAttributeIO();
+        return new PointXYAttributeIO();
     }
 
     protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
