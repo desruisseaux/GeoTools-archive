@@ -131,6 +131,13 @@ public class ExponentialTransform1D extends AbstractMathTransform
         }
         return new ExponentialTransform1D(base, scale);
     }
+    
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
 
     /**
      * Returns the parameter values for this math transform.
@@ -138,7 +145,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, new ParameterValue[] {
+        return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
+            new ParameterValue[] {
             new ParameterReal(Provider.BASE,  base),
             new ParameterReal(Provider.SCALE, scale)});
     }

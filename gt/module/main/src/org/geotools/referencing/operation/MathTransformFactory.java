@@ -381,11 +381,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @throws FactoryException if the Well-Known Text can't be parsed,
      *         or if the math transform creation failed from some other reason.
      */
-    public MathTransform createFromWKT(final String text) throws FactoryException {
+    public synchronized MathTransform createFromWKT(final String text) throws FactoryException {
         if (parser == null) {
-            // Not a big deal if we are not synchronized. If this method is invoked in
-            // same time by two different threads, we may have two WKT Parser objects
-            // for a short time. It doesn't hurt...
             parser = new MathTransformParser(Symbols.DEFAULT, this);
         }
         try {

@@ -272,7 +272,7 @@ public class Mercator extends MapProjection {
     /**
      * {@inheritDoc}
      */
-    protected ParameterDescriptorGroup getParameterDescriptors() {
+    public ParameterDescriptorGroup getParameterDescriptors() {
         return Double.isNaN(standardParallel) ? Provider1SP.PARAMETERS
                                               : Provider2SP.PARAMETERS;
     }

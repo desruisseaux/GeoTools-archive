@@ -27,6 +27,7 @@ import java.awt.geom.AffineTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
@@ -111,6 +112,13 @@ final class IdentityTransform extends AbstractMathTransform
      */
     public int getDimTarget() {
         return dimension;
+    }
+
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return ProjectiveTransform.Provider.PARAMETERS;
     }
 
     /**

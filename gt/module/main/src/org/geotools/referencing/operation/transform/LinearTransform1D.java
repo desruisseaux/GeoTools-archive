@@ -29,6 +29,7 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
@@ -109,6 +110,13 @@ public class LinearTransform1D extends AbstractMathTransform
             return IDENTITY;
         }
         return new LinearTransform1D(scale, offset);
+    }
+
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return ProjectiveTransform.Provider.PARAMETERS;
     }
 
     /**
@@ -265,5 +273,5 @@ public class LinearTransform1D extends AbstractMathTransform
              */
         }
         return false;
-    }
+    }    
 }

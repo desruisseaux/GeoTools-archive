@@ -24,9 +24,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-
 // Geotools dependencies
 import org.geotools.util.DerivedMap;
 import org.geotools.referencing.IdentifiedObject;
@@ -43,66 +40,43 @@ import org.geotools.referencing.IdentifiedObject;
  */
 final class UnprefixedMap extends DerivedMap {
     /**
-     * The property key to process in a special way.
-     */
-    private static final String NAME_PROPERTY = IdentifiedObject.NAME_PROPERTY;
-
-    /**
      * The prefix to remove for this map.
      */
     private final String prefix;
 
     /**
      * <code>true</code> if the <code>{@linkplain #prefix}.name</code> property exists
-     * in the {@link #base} map.
+     * in the {@linkplain #base base} map. This class will inherit the name and alias
+     * from the {@linkplain #base base} map only if this field is set to <code>false</code>.
      */
-    private final boolean hasName;
+    private final boolean hasName, hasAlias;
 
     /**
      * Creates a new unprefixed map from the specified base map and prefix.
      *
-     * @param name   An explicit name to use if the <code>{@linkplain #prefix}.name</code>
-     *               property doesn't exist, or <code>null</code> to inherit it from the
-     *               <code>name</code> property in the base map.
      * @param base   The base map.
      * @param prefix The prefix to remove from the keys in the base map.
      */
-    public UnprefixedMap(final Identifier name, final Map base, final String prefix) {
-        super(replaceName(base, name));
+    public UnprefixedMap(final Map base, final String prefix) {
+        super(base);
         this.prefix = prefix.trim();
-        final String key = this.prefix + NAME_PROPERTY;
+        final String  nameKey = this.prefix + IdentifiedObject. NAME_PROPERTY;
+        final String aliasKey = this.prefix + IdentifiedObject.ALIAS_PROPERTY;
+        boolean hasName  = false;
+        boolean hasAlias = false;
         for (final Iterator it=base.keySet().iterator(); it.hasNext();) {
             final String candidate = it.next().toString().trim();
-            if (isName(key, candidate)) {
+            if (keyMatches(nameKey, candidate)) {
                 hasName = true;
-                return;
+                if (hasAlias) break;
+            } else
+            if (keyMatches(aliasKey, candidate)) {
+                hasAlias = true;
+                if (hasName) break;
             }
         }
-        hasName = false;
-    }
-
-    /**
-     * Returns a copy of the specified map with the name properties replaced
-     * by the specified <code>name</code> identifier. If <code>name</code> is
-     * null, then the specified map is returned unchanged.
-     *
-     * This method is a workaroung for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static Map replaceName(final Map base, final Identifier name) {
-        if (name == null) {
-            return base;
-        }
-        final Map map = new HashMap(Math.round(base.size()/0.75f)+1, 0.75f);
-        for (final Iterator it=base.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
-            final String key = entry.getKey().toString().trim();
-            if (!isName(NAME_PROPERTY, key)) {
-                map.put(key, entry.getValue());
-            }
-        }
-        map.put(NAME_PROPERTY, name);
-        return map;
+        this.hasName  = hasName;
+        this.hasAlias = hasAlias;
     }
 
     /**
@@ -119,7 +93,7 @@ final class UnprefixedMap extends DerivedMap {
         if (textualKey.regionMatches(true, 0, prefix, 0, length)) {
             return textualKey.substring(length).trim();
         }
-        if (!hasName && isName(NAME_PROPERTY, textualKey)) {
+        if (isPlainKey(textualKey)) {
             return textualKey;
         }
         return null;
@@ -133,7 +107,7 @@ final class UnprefixedMap extends DerivedMap {
      */
     protected Object derivedToBase(final Object key) {
         final String textualKey = key.toString().trim();
-        if (!hasName && isName(NAME_PROPERTY, textualKey)) {
+        if (isPlainKey(textualKey)) {
             return textualKey;
         }
         return prefix + textualKey;
@@ -141,9 +115,19 @@ final class UnprefixedMap extends DerivedMap {
 
     /**
      * Returns <code>true</code> if the specified candidate is <code>"name"</code>
-     * or starts with <code>"name_"</code>
+     * or <code>"alias"</code> without prefix. Key starting with <code>"name_"</code>
+     * or <code>"alias_"</code> are accepted as well.
      */
-    private static boolean isName(final String key, final String candidate) {
+    private boolean isPlainKey(final String key) {
+        return (!hasName  && keyMatches(IdentifiedObject.NAME_PROPERTY,  key)) ||
+               (!hasAlias && keyMatches(IdentifiedObject.ALIAS_PROPERTY, key));
+    }
+
+    /**
+     * Returns <code>true</code> if the specified candidate matched
+     * the specified key name.
+     */
+    private static boolean keyMatches(final String key, final String candidate) {
         final int length = key.length();
         return candidate.regionMatches(true, 0, key, 0, length) &&
                (candidate.length()==length || candidate.charAt(length)=='_');

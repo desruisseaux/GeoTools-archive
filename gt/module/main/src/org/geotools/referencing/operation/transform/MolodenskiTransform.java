@@ -158,6 +158,13 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         df    =  (ta-tb)/ta - (a-b)/a;
         e2    =  1 - (b*b)/(a*a);
     }
+
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
     
     /**
      * Returns the parameters for this math transform.
@@ -167,7 +174,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     public ParameterValueGroup getParameterValues() {
         final ParameterValue dim = new org.geotools.parameter.Parameter(Provider.DIM);
         dim.setValue(getDimSource());
-        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS,
+        return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
                    dim,
                    new ParameterReal(Provider.DX,             dx),
@@ -306,7 +313,6 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         }
         return false;
     }
-    
     
     /**
      * The provider for {@link MolodenskiTransform}. This provider will construct transforms

@@ -376,7 +376,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * This is used for a providing a default implementation of
      * {@link #getParameterValues}, as well as arguments checking.
      */
-    protected abstract ParameterDescriptorGroup getParameterDescriptors();
+    public abstract ParameterDescriptorGroup getParameterDescriptors();
 
     /**
      * Returns the parameter values for this map projection.

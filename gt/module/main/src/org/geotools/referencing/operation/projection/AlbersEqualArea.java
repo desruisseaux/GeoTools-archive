@@ -244,7 +244,7 @@ public class AlbersEqualArea extends MapProjection {
     /**
      * {@inheritDoc}
      */
-    protected ParameterDescriptorGroup getParameterDescriptors() {
+    public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
     

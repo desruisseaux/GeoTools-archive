@@ -153,6 +153,13 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     }
 
     /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
+
+    /**
      * Returns the parameter values for this math transform.
      *
      * @return A copy of the parameter values for this math transform.
@@ -160,7 +167,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     public ParameterValueGroup getParameterValues() {
         final ParameterValue dim = new org.geotools.parameter.Parameter(Provider.DIM);
         dim.setValue(getDimSource());
-        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS,
+        return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
                    dim,
                    new ParameterReal(Provider.DX,             dx),

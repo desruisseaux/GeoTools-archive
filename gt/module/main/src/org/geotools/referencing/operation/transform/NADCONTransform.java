@@ -260,19 +260,28 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     }
 
     /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
+
+    /**
      * Returns the parameter values for this math transform.
      *
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue lat_diff_file = new org.geotools.parameter.Parameter(Provider.LAT_DIFF_FILE);
+        final ParameterValue lat_diff_file =
+                new org.geotools.parameter.Parameter(Provider.LAT_DIFF_FILE);
         lat_diff_file.setValue(latGridName);
 
-        final ParameterValue long_diff_file = new org.geotools.parameter.Parameter(Provider.LONG_DIFF_FILE);
+        final ParameterValue long_diff_file =
+                new org.geotools.parameter.Parameter(Provider.LONG_DIFF_FILE);
         long_diff_file.setValue(longGridName);
 
         return new org.geotools.parameter.ParameterGroup(
-            Provider.PARAMETERS,
+            getParameterDescriptors(),
             new GeneralParameterValue[] { lat_diff_file, long_diff_file }
         );
     }
@@ -865,7 +874,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
             return;
         }
     }
-
+    
     /**
      * Inverse of a {@link NADCONTransform}.
      *

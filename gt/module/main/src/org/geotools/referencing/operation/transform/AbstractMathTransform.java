@@ -45,6 +45,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
@@ -76,6 +77,21 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Construct a math transform.
      */
     protected AbstractMathTransform() {
+    }
+
+    /**
+     * Returns the parameter descriptors for this math transform,
+     * or <code>null</code> if unknow. This method is similar to
+     * {@link org.opengis.referencing.operation.OperationMethod#getParameters}, except
+     * that <code>MathTransform</code> returns parameters in standard units (usually
+     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
+     *
+     * @return The parameter descriptors for this math transform, or <code>null</code>.
+     *
+     * @see org.opengis.referencing.operation.OperationMethod#getParameters
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return null;
     }
 
     /**

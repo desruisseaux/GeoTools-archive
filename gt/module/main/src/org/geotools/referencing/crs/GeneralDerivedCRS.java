@@ -24,6 +24,7 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Collections;
 
 // OpenGIS direct dependencies
@@ -39,7 +40,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
@@ -198,21 +198,17 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
              * inferred from the MathTransform. This work for Geotools implementation,
              * but is likely to fails to infer parameters for other implementations.
              */
-            Identifier classification = null;
+            Map inherit = properties;
             ParameterDescriptorGroup descriptors = null;
             if (baseToDerived instanceof AbstractMathTransform) {
-                // TODO: define a 'getParameterDescriptors' method in AbstractMathTransform
-                //       instead. Note that MapProjection already has such a method.
-                final ParameterValueGroup values =
-                        ((AbstractMathTransform) baseToDerived).getParameterValues();
-                if (values != null) {
-                    // TODO: remove cast once we will be allowed to use J2SE 1.5.
-                    descriptors = (ParameterDescriptorGroup) values.getDescriptor();
-                    classification = descriptors.getName();
+                descriptors = ((AbstractMathTransform) baseToDerived).getParameterDescriptors();
+                if (descriptors != null) {
+                    inherit = new HashMap(properties);
+                    inherit.putAll(getProperties(descriptors));
                 }
             }
             method = new org.geotools.referencing.operation.OperationMethod(
-                    /* properties       */ new UnprefixedMap(classification, properties, "method."),
+                    /* properties       */ new UnprefixedMap(inherit, "method."),
                     /* sourceDimensions */ dimSource,
                     /* targetDimensions */ dimTarget,
                     /* parameters       */ descriptors);
@@ -222,7 +218,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
          * will overrides the createConversion method in order to create a projection instead.
          */
         this.conversionFromBase = createConversion(
-                /* properties */ new UnprefixedMap(null, properties, "conversion."),
+                /* properties */ new UnprefixedMap(properties, "conversion."),
                 /* sourceCRS  */ base,
                 /* targetCRS  */ this,
                 /* transform  */ baseToDerived,

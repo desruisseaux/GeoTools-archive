@@ -910,11 +910,10 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * @param  wkt Coordinate system encoded in Well-Known Text format.
      * @throws FactoryException if the object creation failed.
      */
-    public CoordinateReferenceSystem createFromWKT(final String wkt) throws FactoryException {
+    public synchronized CoordinateReferenceSystem createFromWKT(final String wkt)
+            throws FactoryException
+    {
         if (parser == null) {
-            // Not a big deal if we are not synchronized. If this method is invoked in
-            // same time by two different threads, we may have two WKT Parser objects
-            // for a short time. It doesn't hurt...
             parser = new Parser(Symbols.DEFAULT, this, this, this,
                                 FactoryFinder.getMathTransformFactory());
         }

@@ -369,7 +369,7 @@ public class LambertConformal extends MapProjection{
     /**
      * {@inheritDoc}
      */
-    protected ParameterDescriptorGroup getParameterDescriptors() {
+    public ParameterDescriptorGroup getParameterDescriptors() {
         return (belgium) ? 
                     Provider2SP_Belgium.PARAMETERS :
                     ((sp2) ? Provider2SP.PARAMETERS : Provider1SP.PARAMETERS);

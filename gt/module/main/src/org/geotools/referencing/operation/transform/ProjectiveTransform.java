@@ -44,6 +44,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies and resources
@@ -55,7 +56,6 @@ import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameterValues;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -164,6 +164,13 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             return IdentityTransform.create(2);
         }
         return new AffineTransform2D(matrix);
+    }
+
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
     }
 
     /**

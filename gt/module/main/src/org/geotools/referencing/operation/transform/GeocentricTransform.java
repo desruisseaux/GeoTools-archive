@@ -186,21 +186,19 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
 
     /**
-     * Returns the parameter values for this math transform.
-     *
-     * @return A copy of the parameter values for this math transform.
+     * Returns the parameter descriptors for this math transform.
      */
-    public ParameterValueGroup getParameterValues() {
-        return getParameterValues(Provider.PARAMETERS);
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
     }
 
     /**
      * Returns the parameter values for this math transform.
      *
-     * @param  descriptor The parameters descriptor.
      * @return A copy of the parameter values for this math transform.
      */
-    final ParameterValueGroup getParameterValues(final ParameterDescriptorGroup descriptor) {
+    public ParameterValueGroup getParameterValues() {
+        final ParameterDescriptorGroup descriptor = getParameterDescriptors();
         final int dim = getDimSource();
         final boolean includeDim = (dim != ((Number)Provider.DIM.getDefaultValue()).intValue());
         final ParameterValue[] parameters = new ParameterValue[includeDim ? 3 : 2];
@@ -518,14 +516,12 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public Inverse() {
             GeocentricTransform.this.super();
         }
-
+    
         /**
-         * Returns the parameter values for this math transform.
-         *
-         * @return A copy of the parameter values for this math transform.
+         * Returns the parameter descriptors for this math transform.
          */
-        public ParameterValueGroup getParameterValues() {
-            return GeocentricTransform.this.getParameterValues(ProviderInverse.PARAMETERS);
+        public ParameterDescriptorGroup getParameterDescriptors() {
+            return ProviderInverse.PARAMETERS;
         }
 
         /**
