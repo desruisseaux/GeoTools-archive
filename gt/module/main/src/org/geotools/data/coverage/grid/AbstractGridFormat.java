@@ -20,8 +20,7 @@
 package org.geotools.data.coverage.grid;
 
 import org.geotools.data.coverage.grid.Format;
-import org.geotools.parameter.ParameterGroupDescriptor;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 import java.util.Map;
 
@@ -64,8 +63,8 @@ public abstract class AbstractGridFormat implements Format {
      * Naturally, any methods that are overridden need not have an entry in the Map
      */
     protected Map mInfo;
-    protected OperationParameterGroup readParameters;
-    protected OperationParameterGroup writeParameters;
+    protected ParameterValueGroup readParameters;
+    protected ParameterValueGroup writeParameters;
 
     /**
      * @see org.opengis.coverage.grid.Format#getName()
@@ -105,14 +104,14 @@ public abstract class AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getReadParameters()
      */
-    public OperationParameterGroup getReadParameters() {
+    public ParameterValueGroup getReadParameters() {
         return readParameters;
     }
 
     /**
      * @see org.opengis.coverage.grid.Format#getWriteParameters()
      */
-    public OperationParameterGroup getWriteParameters() {
+    public ParameterValueGroup getWriteParameters() {
         return writeParameters;
     }
     

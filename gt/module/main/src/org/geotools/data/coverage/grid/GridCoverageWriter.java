@@ -17,7 +17,6 @@ import java.io.IOException;
 import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.geotools.data.coverage.grid.Format;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterNotFoundException;     // For javadoc
 import org.opengis.parameter.InvalidParameterNameException;  // For javadoc
 import org.opengis.parameter.InvalidParameterValueException; // For javadoc
