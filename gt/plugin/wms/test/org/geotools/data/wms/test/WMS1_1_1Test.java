@@ -6,14 +6,24 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMS1_1_1;
 import org.geotools.data.wms.WMSParser;
+import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.resources.TestData;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.handlers.DocumentHandler;
+import org.geotools.xml.schema.Schema;
 
 /**
  * @author Kefka

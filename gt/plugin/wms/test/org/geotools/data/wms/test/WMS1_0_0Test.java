@@ -36,8 +36,11 @@ import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -73,12 +76,10 @@ public class WMS1_0_0Test extends TestCase {
 
         checkProperties(properties);
 
-        WebMapServer wms = new WebMapServer(server, true);
+        WebMapServer wms = new WebMapServer(server);
         WMSCapabilities capabilities = wms.getCapabilities();
 
-        if (!(wms.getProblem() instanceof IOException)) {
-            assertNotNull(capabilities);
-        }
+        assertNotNull(capabilities);
     }
 
     protected void checkProperties(Properties properties) {
@@ -128,7 +129,7 @@ public class WMS1_0_0Test extends TestCase {
     }
     
     public void testCreateGetMapRequest() throws Exception {
-        CustomWMS wms = new CustomWMS(server, true);
+        CustomWMS wms = new CustomWMS(server);
         WMSCapabilities caps = wms.getCapabilities();
         GetMapRequest request = wms.createGetMapRequest();
         request.setFormat("image/jpeg");
@@ -161,9 +162,11 @@ public class WMS1_0_0Test extends TestCase {
         /**
          * @param serverURL
          * @param wait
+         * @throws URISyntaxException
+         * @throws SAXException
          */
-        public CustomWMS( URL serverURL, boolean wait ) {
-            super(serverURL, wait);
+        public CustomWMS( URL serverURL) throws SAXException, URISyntaxException {
+            super(serverURL);
             // TODO Auto-generated constructor stub
         }
         

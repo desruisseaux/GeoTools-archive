@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xLink.XLinkSchema;
@@ -138,6 +140,101 @@ public class WMSComplexTypes {
         }
     }
     
+    protected static class _WMT_MS_CapabilitiesType extends WMSComplexType {
+        private static final WMSComplexType instance = new _WMT_MS_CapabilitiesType();
+        private static Element[] elems = new Element[] {
+            new WMSElement("Service", _ServiceType.getInstance()),
+            new WMSElement("Capability", _CapabilityType.getInstance())
+        };
+        
+        private static Sequence seq = new SequenceGT(elems);
+        
+        private static Attribute[] attrs = new Attribute[] {
+            new WMSAttribute(null, "version", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.REQUIRED, null, null, false),
+            new WMSAttribute("updateSequence", XSISimpleTypes.String.getInstance())
+        };
+        
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+
+            WMSCapabilities capabilities = null;
+            Service service = null;
+            
+            for (int i = 0; i < value.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    service = ((Service) value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    capabilities = (WMSCapabilities) value[i].getValue();
+                }
+            }
+            
+            capabilities.setVersion(attrs.getValue("", "version"));
+
+            //Update sequence ignored
+            
+            capabilities.setService(service);
+            
+            return capabilities;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "WMT_MS_Capabilities";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSCapabilities.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+    }
+    
     protected static class _WMS_CapabilitiesType extends WMSComplexType {
         private static final WMSComplexType instance = new _WMS_CapabilitiesType();
         
@@ -149,7 +246,7 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         
         private static Attribute[] attrs = new Attribute[] {
-            new WMSAttribute(null, "version", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.REQUIRED, null, "1.3.0", false),
+            new WMSAttribute(null, "version", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.REQUIRED, null, null, false),
             new WMSAttribute("updateSequence", XSISimpleTypes.String.getInstance())
         };
         
@@ -691,6 +788,8 @@ public class WMSComplexTypes {
         private static Element[] elems = new Element [] {
             new WMSElement("Request", _RequestType.getInstance()),
             new WMSElement("Exception", _ExceptionType.getInstance()),
+            new WMSElement("VendorSpecificCapabilities", _VendorSpecificCapabilitiesType.getInstance(), 0, 1),
+            new WMSElement("UserDefinedSymbolization", _UserDefinedSymbolizationType.getInstance(), 0, 1),
             new WMSElement("_ExtendedCapabilities", __ExtendedCapabilitiesType.getInstance(), 0, Integer.MAX_VALUE),
             new WMSElement("Layer", _LayerType.getInstance(), 0, 1)
         };
@@ -732,11 +831,17 @@ public class WMSComplexTypes {
 //                    //TODO exception ignored for now
 //                }
                 
-//                if (sameName(elems[2], value[i])) {
-//                 TODO ExtendedCapabilities ignored   
-//                }
+//              if (sameName(elems[2], value[i])) {
+//              TODO ExtendedCapabilities ignored   
+//             }
+//              if (sameName(elems[3], value[i])) {
+//              TODO VendorSpecificCapabilities ignored   
+//             }
+//              if (sameName(elems[4], value[i])) {
+//              TODO UserDefinedSymbolization ignored   
+//             }
                 
-                if (sameName(elems[3], value[i])) {
+                if (sameName(elems[5], value[i])) {
                     
                     List layerList = (List) value[i].getValue();
                     
@@ -775,6 +880,125 @@ public class WMSComplexTypes {
         public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }        
+    }
+    
+    protected static class _VendorSpecificCapabilitiesType extends WMSComplexType {
+    	private static final WMSComplexType instance = new __ExtendedCapabilitiesType();
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "VendorSpecificCapabilities";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        
+    }
+    
+    protected static class _UserDefinedSymbolizationType extends WMSComplexType {
+        private static final WMSComplexType instance = new __ExtendedCapabilitiesType();
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+        
+        private static Attribute[] attrs = new Attribute [] {
+            new WMSAttribute(null, "SupportSLD", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.OPTIONAL, "0", null, false),
+            new WMSAttribute(null, "UserLayer", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.OPTIONAL, "0", null, false),
+            new WMSAttribute(null, "UserStyle", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.OPTIONAL, "0", null, false),
+            new WMSAttribute(null, "RemoteWFS", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.OPTIONAL, "0", null, false)
+        };
+        
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return attrs;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "UserDefinedSymbolization";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class __ExtendedCapabilitiesType extends WMSComplexType {
@@ -852,6 +1076,10 @@ public class WMSComplexTypes {
             new WMSElement("GetCapabilities", OperationType.getInstance()),
             new WMSElement("GetMap", OperationType.getInstance()),
             new WMSElement("GetFeatureInfo", OperationType.getInstance()),
+            new WMSElement("DescribeLayer", OperationType.getInstance()),
+            new WMSElement("GetLegendGraphic", OperationType.getInstance()),
+            new WMSElement("GetStyles", OperationType.getInstance()),
+            new WMSElement("PutStyles", OperationType.getInstance()),
             new WMSElement("_ExtendedOperation", OperationType.getInstance(), 0, Integer.MAX_VALUE)
         };
         private static Sequence seq = new SequenceGT(elems);
@@ -885,7 +1113,12 @@ public class WMSComplexTypes {
             
             request.setGetCapabilities((WMSOperationType) value[0].getValue());
             request.setGetMap((WMSOperationType) value[1].getValue());
-            request.setGetFeatureInfo((WMSOperationType) value[2].getValue());
+            
+            if (value.length >= 3) {
+                request.setGetFeatureInfo((WMSOperationType) value[2].getValue());
+            }
+            
+            //TODO WMS-SLD requests here
             
             return request;
         }
@@ -1296,10 +1529,18 @@ public class WMSComplexTypes {
             new WMSElement("Style", _StyleType.getInstance(), 0, Integer.MAX_VALUE),
             new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance(), 0, 1),
             new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance(), 0, 1),
-            new WMSElement("Layer", _LayerType.getInstance(), 0, Integer.MAX_VALUE)
+            new WMSElement("Layer", _LayerType.getInstance(), 0, Integer.MAX_VALUE),
+            new WMSElement("SRS", XSISimpleTypes.String.getInstance(), 0, Integer.MAX_VALUE),
+            new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance(), 0, 1)
         };
         
-        private static Sequence seq = new SequenceGT(elems);
+        private static Sequence seq = new SequenceGT(new ElementGrouping[] {
+                elems[0], elems[1], elems[2], elems[3], 
+                new ChoiceGT(null, 0, Integer.MAX_VALUE, new Element[] { elems[4], elems[18] }),
+                new ChoiceGT(null, 0, 1, new Element[] { elems[5], elems[19] }), 
+                elems[6], elems[7], elems[8], elems[9], elems[10], elems[11], 
+                elems[12], elems[13], elems[14], elems[15], elems[16], elems[17],
+                });
         
         private static Attribute[] attributes = new Attribute[] {
             new WMSAttribute(null, "queryable", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.REQUIRED, "0", null, false),
@@ -1357,11 +1598,12 @@ public class WMSComplexTypes {
 //                    //TODO keywords ignored
 //                }
                 
-                if (sameName(elems[4], value[i])) {
-                    crs.add(value[i].getValue());
+                if (sameName(elems[4], value[i]) || sameName(elems[18], value[i])) {
+                    String[] crss = ((String) value[i].getValue()).split(" ");
+                    crs.addAll(Arrays.asList(crss));
                 }
                 
-                if (sameName(elems[5], value[i])) {
+                if (sameName(elems[5], value[i]) || sameName(elems[19], value[i])) {
                     layer.setLatLonBoundingBox((LatLonBoundingBox) value[i].getValue());
                 }
                 
@@ -1413,6 +1655,7 @@ public class WMSComplexTypes {
             
             layer.setSrs(crs);
             layer.setBoundingBoxes(boundingBoxes);
+            layer.setStyles(styles);
             
             //Attributes -- only do queryable for now
             
@@ -1545,11 +1788,90 @@ public class WMSComplexTypes {
         }  
     }
     
+    protected static class _LatLonBoundingBoxType extends WMSComplexType {
+        private static final WMSComplexType instance = new _LatLonBoundingBoxType();
+        
+        private static Attribute[] attrs = new Attribute[] {
+            new WMSAttribute(null, "minx", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
+            new WMSAttribute(null, "miny", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
+            new WMSAttribute(null, "maxx", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
+            new WMSAttribute(null, "maxy", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
+        };
+        
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            LatLonBoundingBox bbox = new LatLonBoundingBox();
+            
+            bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
+            bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
+            bbox.setMinY(Double.parseDouble(attrs.getValue("miny")));
+            bbox.setMaxY(Double.parseDouble(attrs.getValue("maxy")));
+            
+            return bbox;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "LatLonBoundingBox";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return LatLonBoundingBox.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+    }
+    
     protected static class _BoundingBoxType extends WMSComplexType {
         private static final WMSComplexType instance = new _BoundingBoxType();
 
         private static Attribute[] attrs = new Attribute[] {
-            new WMSAttribute(null, "CRS", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.REQUIRED, null, null, false),
+            new WMSAttribute(null, "CRS", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL, null, null, false),
+            new WMSAttribute(null, "SRS", WMSSchema.NAMESPACE, XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL, null, null, false),
             new WMSAttribute(null, "minx", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
             new WMSAttribute(null, "miny", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
             new WMSAttribute(null, "maxx", WMSSchema.NAMESPACE, XSISimpleTypes.Double.getInstance(), Attribute.REQUIRED, null, null, false),
@@ -1589,7 +1911,16 @@ public class WMSComplexTypes {
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
             BoundingBox bbox = new BoundingBox();
             
-            bbox.setCrs(attrs.getValue("CRS"));
+            String crs = attrs.getValue("CRS");
+            if (crs == null || crs.length() == 0) {
+                crs = attrs.getValue("SRS");
+                
+                if (crs == null || crs.length() == 0) {
+                    throw new SAXException("Bounding Box element contains no CRS/SRS attribute");
+                }
+            }
+            
+            bbox.setCrs(crs);
             bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
             bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
             bbox.setMinY(Double.parseDouble(attrs.getValue("miny")));

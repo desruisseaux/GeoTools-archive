@@ -16,6 +16,19 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryRequest;
@@ -26,23 +39,11 @@ import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.AbstractResponse;
-import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.geotools.xml.DocumentFactory;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -133,86 +134,21 @@ import java.util.TreeSet;
  * @author Richard Gould, Refractions Research
  */
 public class WebMapServer implements Discovery {
-    /**
-     * Returned by getStatus(). Indicates that the server is currently
-     * performing a request.
-     */
-    public static final int IN_PROGRESS = 1;
-
-    /**
-     * Returned by getStatus(). Indicates that the capabilities document has
-     * not yet been retrieved.
-     */
-    public static final int NOTCONNECTED = 0;
-
-    /**
-     * Returned by getStatus(). Indicates that there was an error with the most
-     * recently executed request.
-     */
-    public static final int ERROR = -1;
-
-    /**
-     * Returned by getStatus(). Indicates that the capabilities document has
-     * been successfully retrieved.
-     */
-    public static final int CONNECTED = 2;
     private final URL serverURL;
     private WMSCapabilities capabilities;
-    private Exception problem;
-    private AbstractRequest currentRequest;
 
-    /** Feedback: Why only one? */
-    private Thread requestRetriever;
+    private AbstractRequest currentRequest;
     private AbstractResponse currentResponse;
+
     protected Specification[] specs;
     private Specification specification;
 
-    /**
-     * Create a WebMapServer and immediately retrieve the GetCapabilities
-     * document in another thread. If there is an error while attempting to
-     * retrieve the GetCapabilities document, the exception will be placed in
-     * the problem field and can be retrieved using getProblem(). An error can
-     * be detected if getStatus returns ERROR.
-     *
-     * @param serverURL the URL that points to the WMS's GetCapabilities
-     *        document
-     */
-    public WebMapServer(URL serverURL) {
-        this(serverURL, false);
-    }
-
-    /**
-     * Create a WebMapServer based on the URL located in serverURL. This will
-     * attempt to retrieve the serverURL in a thread unless wait is true, in
-     * which case it will retrieved later when requested or when needed. If
-     * there is an error while attempting to retrieve the GetCapabilities
-     * document, the exception will be placed in the problem field and can be
-     * retrieved using getProbelm(). An error can be detected if getStatus
-     * returns ERROR.
-     *
-     * @param serverURL the URL that points to the WMS's GetCapabilities
-     *        document
-     * @param wait true if the GetCapabilities document should not be retrieved
-     *        immediately
-     */
-    public WebMapServer(final URL serverURL, boolean wait) {
+    public WebMapServer(final URL serverURL) throws SAXException, URISyntaxException {
         this.serverURL = serverURL;
 
         setupSpecifications();
         
-
-
-        if (wait) {
-            return;
-        }
-
-        GetCapabilitiesRequest request = negotiateVersion(serverURL);
-
-        if (getProblem() != null) {
-            return;
-        }
-
-        issueRequest(request, !wait);
+        getCapabilities();
     }
 
     protected void setupSpecifications() {
@@ -297,8 +233,12 @@ public class WebMapServer implements Discovery {
      * @param server DOCUMENT ME!
      *
      * @return GetCapabilitiesRequest suitable for use with a parser
+     * @throws URISyntaxException
+     * @throws SAXException
+     * @throws IOException
+     * @throws JDOMException
      */
-    private GetCapabilitiesRequest negotiateVersion(URL server) {
+    private WMSCapabilities negotiateVersion(URL server) throws SAXException, URISyntaxException {
         List versions = new ArrayList(specs.length);
 
         for (int i = 0; i < specs.length; i++) {
@@ -319,22 +259,9 @@ public class WebMapServer implements Discovery {
 
             //Grab document
             URL url = request.getFinalURL();
-            Document document = buildDocument(url);
+            WMSCapabilities capabilities = parseCapabilities(url);
 
-            if (getProblem() != null) {
-                /*
-                 * There was an error accessing the server.
-                 *
-                 * Not sure if there is any way at all to recover from this,
-                 * as the WMS specification states that if a request is made
-                 * for a higher or lower version, it should return a valid getCaps,
-                 * but in this instance, it hasn't.
-                 *
-                 */
-                return null;
-            }
-
-            String serverVersion = queryVersion(document);
+            String serverVersion = capabilities.getVersion();
 
             int compare = serverVersion.compareTo(clientVersion);
 
@@ -342,7 +269,7 @@ public class WebMapServer implements Discovery {
                 //we have an exact match and have capabilities as well!
                 this.specification = specification;
 
-                return request;
+                return capabilities;
             }
 
             if (versions.contains(serverVersion)) {
@@ -440,70 +367,8 @@ public class WebMapServer implements Discovery {
         return after;
     }
 
-    private String queryVersion(Document document) {
-        Element element = document.getRootElement();
-
-        return element.getAttributeValue("version"); //$NON-NLS-1$
-    }
-
-    private Document buildDocument(URL url) {
-        Document document = null;
-
-        try {
-            SAXBuilder builder = new SAXBuilder(false);
-            
-            URLConnection connection = url.openConnection();
-
-            document = builder.build(connection.getInputStream());
-        } catch (JDOMException badXML) {
-            problem = badXML;
-
-            return null;
-        } catch (IOException badIO) {
-            problem = badIO;
-
-            return null;
-        }
-
-        return document;
-    }
-
-    /**
-     * Gets the current status of the GetCapabilities document.
-     * 
-     * <UL>
-     * <li>
-     * IN_PROGRESS: The thread is currently retrieving a request
-     * </li>
-     * <li>
-     * NOTCONNECTED: Thread has not attempt to retrieve document yet
-     * </li>
-     * <li>
-     * CONNECTED: The most recently issued request has been successfully
-     * retrieved.
-     * </li>
-     * <li>
-     * ERROR: An error has occured. It can be retrieved using getProblem()
-     * </li>
-     * </ul>
-     * 
-     *
-     * @return the current status of the GetCapabilities document
-     */
-    public int getStatus() {
-        if ((requestRetriever != null) && requestRetriever.isAlive()) {
-            return IN_PROGRESS;
-        }
-
-        if (problem != null) {
-            return ERROR;
-        }
-
-        if (capabilities == null) {
-            return NOTCONNECTED;
-        }
-
-        return CONNECTED;
+    private WMSCapabilities parseCapabilities(URL url) throws SAXException, URISyntaxException {
+		return (WMSCapabilities) DocumentFactory.getInstance(url.toURI(), null, Level.FINE);
     }
 
     /**
@@ -512,61 +377,29 @@ public class WebMapServer implements Discovery {
      * be checked with getProblem()
      *
      * @return a WMT_MS_Capabilities, or null if there was an error
+     * @throws URISyntaxException
+     * @throws SAXException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws ParseCapabilitiesException
      */
-    public WMSCapabilities getCapabilities() {
+    public WMSCapabilities getCapabilities() throws SAXException, URISyntaxException {
         if (capabilities == null) {
-            if ((requestRetriever != null) && requestRetriever.isAlive()) {
-                try {
-                    requestRetriever.join();
-
-                    if (capabilities == null) {
-                        issueRequest(specification.createGetCapabilitiesRequest(
-                                serverURL), false);
-                    }
-
-                    return capabilities;
-                } catch (InterruptedException e) {
-                    problem = e;
-
-                    return null;
-                }
-            }
-
-            GetCapabilitiesRequest request = negotiateVersion(serverURL);
-
-            if (getProblem() != null) {
-                return null;
-            }
-
-            issueRequest(request, false);
+             capabilities = negotiateVersion(serverURL);
         }
 
         return capabilities;
     }
 
-    public AbstractResponse issueRequest(AbstractRequest request,
-        boolean threaded) {
-        this.problem = null;
+    public AbstractResponse issueRequest(AbstractRequest request) throws IOException {
         this.currentRequest = request;
-
-        if (threaded) {
-            requestRetriever = new Thread(new Runnable() {
-                        public void run() {
-                            issueRequest();
-                        }
-                    }, "WebMapServer Request Thread");
-            requestRetriever.start();
-
-            return null;
-        }
 
         issueRequest();
 
         return currentResponse;
     }
 
-    private void issueRequest() {
-        try {
+    private void issueRequest() throws IOException {
             URL finalURL = currentRequest.getFinalURL();
 
             URLConnection connection = finalURL.openConnection();
@@ -580,28 +413,10 @@ public class WebMapServer implements Discovery {
                         inputStream);
             } else if (currentRequest instanceof GetMapRequest) {
                 currentResponse = new GetMapResponse(contentType, inputStream);
-            } else if (currentRequest instanceof GetCapabilitiesRequest) {
-                try {
-                    Document document = buildDocument(finalURL);
-
-                    WMSParser parser = specification.createParser(document);
-
-                    currentResponse = new GetCapabilitiesResponse(parser,
-                            document);
-                    capabilities = ((GetCapabilitiesResponse) currentResponse)
-                        .getCapabilities();
-                } catch (ParseCapabilitiesException e) {
-                    problem = e;
-                } catch (IOException e) {
-                    problem = e;
-                }
             } else {
                 throw new RuntimeException(
                     "Request is an invalid type. I do not know it.");
             }
-        } catch (IOException e) {
-            problem = e;
-        }
     }
 
     /**
@@ -625,14 +440,14 @@ public class WebMapServer implements Discovery {
         return namedLayers;
     }
 
-    public Exception getProblem() {
-        return problem;
-    }
-
-    public GetMapRequest createGetMapRequest() {
+    public GetMapRequest createGetMapRequest() throws SAXException, URISyntaxException {
         if (capabilities == null) {
-            throw new RuntimeException(
-                "Unable to create a GetMapRequest when the GetCapabilities document has not been retrieved");
+            getCapabilities();
+            
+            if (capabilities == null) {
+                throw new RuntimeException(
+                	"Unable to create a GetMapRequest when the GetCapabilities document is null.");
+            }
         }
 
         GetMapRequest request = specification.createGetMapRequest(getCapabilities().getRequest()
@@ -691,7 +506,7 @@ public class WebMapServer implements Discovery {
         //return getCapabilities().getCapability().getException().getFormats();
     }
 
-    private Set getSRSs() {
+    private Set getSRSs() throws SAXException, URISyntaxException {
         Set srss = new TreeSet();
 
         Layer[] layers = getCapabilities().getLayers();

@@ -6,8 +6,12 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
@@ -16,6 +20,12 @@ import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMSParser;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.resources.TestData;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.handlers.DocumentHandler;
+import org.geotools.xml.schema.Schema;
 
 /**
  * @author Kefka
@@ -134,7 +144,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 	}
 
     public void testCreateGetMapRequest() throws Exception {
-        WebMapServer wms = new WebMapServer(server, true);
+        WebMapServer wms = new WebMapServer(server);
         WMSCapabilities caps = wms.getCapabilities();
         GetMapRequest request = wms.createGetMapRequest();
         request.setFormat("image/jpeg");
@@ -158,5 +168,22 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 	protected void parserCheck(WMSParser parser) {
 		assertEquals(parser.getClass(), WMS1_1_0.Parser.class);
 	}
+
+    protected WMSCapabilities createCapabilities( String capFile ) throws Exception {	
+        System.out.println("**************************************************************************");
+        File getCaps = TestData.file(this, capFile);
+        URL getCapsURL = getCaps.toURL();
+        Map hints = new HashMap();
+        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+    	Object object = DocumentFactory.getInstance(getCapsURL.toURI(), hints, Level.FINE);
+    
+        Schema schema = WMSSchema.getInstance();
+    	SchemaFactory.getInstance(WMSSchema.NAMESPACE);
+    			
+    	assertTrue("Capabilities failed to parse", object instanceof WMSCapabilities);
+    	
+    	WMSCapabilities capabilities = (WMSCapabilities) object;
+    	return capabilities;
+    }
 }
 

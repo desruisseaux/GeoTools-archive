@@ -6,46 +6,13 @@
  */
 package org.geotools.data.wms.xml;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.data.wms.xml.WMSComplexTypes.OperationType;
-import org.geotools.data.wms.xml.WMSComplexTypes._AttributionType;
-import org.geotools.data.wms.xml.WMSComplexTypes._AuthorityURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._BoundingBoxType;
-import org.geotools.data.wms.xml.WMSComplexTypes._CapabilityType;
-import org.geotools.data.wms.xml.WMSComplexTypes._ContactAddressType;
-import org.geotools.data.wms.xml.WMSComplexTypes._ContactInformationType;
-import org.geotools.data.wms.xml.WMSComplexTypes._ContactPersonPrimaryType;
-import org.geotools.data.wms.xml.WMSComplexTypes._DCPTypeType;
-import org.geotools.data.wms.xml.WMSComplexTypes._DataURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._DimensionType;
-import org.geotools.data.wms.xml.WMSComplexTypes._EX_GeographicBoundingBoxType;
-import org.geotools.data.wms.xml.WMSComplexTypes._ExceptionType;
-import org.geotools.data.wms.xml.WMSComplexTypes._FeatureListURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._GetType;
-import org.geotools.data.wms.xml.WMSComplexTypes._HTTPType;
-import org.geotools.data.wms.xml.WMSComplexTypes._IdentifierType;
-import org.geotools.data.wms.xml.WMSComplexTypes._KeywordListType;
-import org.geotools.data.wms.xml.WMSComplexTypes._KeywordType;
-import org.geotools.data.wms.xml.WMSComplexTypes._LayerType;
-import org.geotools.data.wms.xml.WMSComplexTypes._LegendURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._LogoURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._MetadataURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._OnlineResourceType;
-import org.geotools.data.wms.xml.WMSComplexTypes._PostType;
-import org.geotools.data.wms.xml.WMSComplexTypes._RequestType;
-import org.geotools.data.wms.xml.WMSComplexTypes._ServiceType;
-import org.geotools.data.wms.xml.WMSComplexTypes._StyleSheetURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._StyleType;
-import org.geotools.data.wms.xml.WMSComplexTypes._StyleURLType;
-import org.geotools.data.wms.xml.WMSComplexTypes._WMS_CapabilitiesType;
-import org.geotools.data.wms.xml.WMSComplexTypes.__ExtendedCapabilitiesType;
-import org.geotools.xml.PrintHandler;
+import org.geotools.data.wms.xml.WMSComplexTypes.*;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
@@ -63,8 +30,6 @@ import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author Richard Gould
@@ -79,6 +44,7 @@ public class WMSSchema implements Schema {
     
     static final Element[] elements = new Element[] {
         new WMSElement("WMS_Capabilities", _WMS_CapabilitiesType.getInstance()),
+        new WMSElement("WMT_MS_Capabilities", _WMT_MS_CapabilitiesType.getInstance()),
         
         new WMSElement("Name", XSISimpleTypes.String.getInstance()),
         new WMSElement("Title", XSISimpleTypes.String.getInstance()),
@@ -112,10 +78,16 @@ public class WMSSchema implements Schema {
         new WMSElement("MaxHeight", XSISimpleTypes.PositiveInteger.getInstance()),
         
         new WMSElement("Capability", _CapabilityType.getInstance()),
+        new WMSElement("VendorSpecificCapabilities", _VendorSpecificCapabilitiesType.getInstance()),
+        new WMSElement("UserDefinedSymbolization", _UserDefinedSymbolizationType.getInstance()),
         new WMSElement("Request", _RequestType.getInstance()),
         new WMSElement("GetCapabilities", OperationType.getInstance()),
         new WMSElement("GetMap", OperationType.getInstance()),
         new WMSElement("GetFeatureInfo", OperationType.getInstance()),
+        new WMSElement("DescribeLayer", OperationType.getInstance()),
+        new WMSElement("GetLegendGraphic", OperationType.getInstance()),
+        new WMSElement("GetStyles", OperationType.getInstance()),
+        new WMSElement("PutStyles", OperationType.getInstance()),
         new WMSElement("_ExtendedOperation", OperationType.getInstance()), //is abstract
         
         new WMSElement("DCPType", _DCPTypeType.getInstance()),
@@ -129,6 +101,7 @@ public class WMSSchema implements Schema {
         new WMSElement("Layer", _LayerType.getInstance()),
         new WMSElement("CRS", XSISimpleTypes.String.getInstance()),
         new WMSElement("EX_GeographicBoundingBox", _EX_GeographicBoundingBoxType.getInstance()),
+        new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance()),
         new WMSElement("BoundingBox", _BoundingBoxType.getInstance()),
         new WMSElement("Dimension", _DimensionType.getInstance()),
         new WMSElement("Attribution", _AttributionType.getInstance()),

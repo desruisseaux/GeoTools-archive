@@ -139,18 +139,4 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 		assertEquals(bbox.getMinY(), -62.9231796264648, 0.0);
 		assertEquals(bbox.getMaxY(), 68.6906585693359, 0.0);
 	}
-
-    protected WMSCapabilities createCapabilities( String capFile ) throws Exception {		
-        File getCaps = TestData.file(this, capFile);
-        URL getCapsURL = getCaps.toURL();
-		Object object = DocumentFactory.getInstance(getCapsURL.toURI(), null, Level.FINE);
-
-        Schema schema = WMSSchema.getInstance();
-		SchemaFactory.getInstance(WMSSchema.NAMESPACE);
-				
-		assertTrue("Capabilities failed to parse", object instanceof WMSCapabilities);
-		
-		WMSCapabilities capabilities = (WMSCapabilities) object;
-		return capabilities;
-    }
 }

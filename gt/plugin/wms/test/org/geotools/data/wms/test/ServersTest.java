@@ -38,13 +38,9 @@ public class ServersTest extends TestCase {
     	
     	for (int i = 0; i < servers.length; i++) {
     		if (servers[i] != null) {
-    		    WebMapServer wms = new WebMapServer(servers[i], true);
+    		    WebMapServer wms = new WebMapServer(servers[i]);
     			//assertNotNull("Missing Capabilities",wms.getCapabilities());
     		    WMSCapabilities capabilities = wms.getCapabilities();
-    			Exception problem = wms.getProblem();
-
-    			if(problem!=null && !(problem instanceof IOException))
-    		    	throw problem;
     		}
     	}
     }

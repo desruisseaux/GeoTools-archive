@@ -19,7 +19,9 @@ package org.geotools.data.wms.test;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -36,6 +38,7 @@ import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -54,8 +57,9 @@ public class WebMapServerTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        serverURL = new URL(
-                "http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
+        serverURL = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&?VERSION=1.3.0&REQUEST=GetCapabilities");
+        //serverURL = new URL(
+         //       "http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
         featureURL = new URL(
                 "http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
         brokenURL = new URL("http://afjklda.com");
@@ -64,42 +68,14 @@ public class WebMapServerTest extends TestCase {
     /*
      * Class under test for void WebMapServer(URL)
      */
-    public void testWebMapServerURL() {
+    public void testWebMapServerURL() throws Exception {
         WebMapServer wms = new WebMapServer(serverURL);
-
-        while (wms.getStatus() == WebMapServer.IN_PROGRESS) {
-        }
 
         assertNotNull(wms.getCapabilities());
     }
 
-    /*
-     * Class under test for void WebMapServer(URL, boolean)
-     */
-    public void testWebMapServerURLboolean() {
-        WebMapServer wms = new WebMapServer(serverURL, true);
-        assertEquals(wms.getStatus(), WebMapServer.NOTCONNECTED);
-        wms.getCapabilities();
-        assertEquals(wms.getStatus(), WebMapServer.CONNECTED);
-    }
-
-    public void testGetStatus() {
-        WebMapServer wms = new WebMapServer(serverURL, true);
-        assertEquals(wms.getStatus(), WebMapServer.NOTCONNECTED);
-        wms.getCapabilities();
-        assertEquals(wms.getStatus(), WebMapServer.CONNECTED);
-        wms = new WebMapServer(serverURL);
-        assertEquals(wms.getStatus(), WebMapServer.IN_PROGRESS);
-        wms = new WebMapServer(brokenURL, true);
-        wms.getCapabilities();
-        assertEquals(wms.getStatus(), WebMapServer.ERROR);
-    }
-
-    public void testGetCapabilities() {
+    public void testGetCapabilities() throws Exception {
         WebMapServer wms = new WebMapServer(serverURL);
-
-        while (wms.getStatus() == WebMapServer.IN_PROGRESS) {
-        }
 
         assertNotNull(wms.getCapabilities());
     }
@@ -113,11 +89,20 @@ public class WebMapServerTest extends TestCase {
 
         //request.setVersion("1.1.1");
 
-        List simpleLayers = request.getAvailableLayers();
-        Iterator iter = simpleLayers.iterator();
-
+        List simpleLayers = new ArrayList();
+        Iterator iter = request.getAvailableLayers().iterator();
+        int count = -1;
         while (iter.hasNext()) {
+
             SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+            
+            count++;
+            if (count >= 5) { 
+                break;
+            }
+            
+            simpleLayers.add(simpleLayer);
+            
             Object[] styles = simpleLayer.getValidStyles().toArray();
 
             if (styles.length == 0) {
@@ -129,6 +114,7 @@ public class WebMapServerTest extends TestCase {
             Random random = new Random();
             int randomInt = random.nextInt(styles.length);
             simpleLayer.setStyle((String) styles[randomInt]);
+
         }
 
         request.setLayers(simpleLayers);
@@ -137,17 +123,19 @@ public class WebMapServerTest extends TestCase {
         request.setSRS((String) srss.iterator().next());
         request.setDimensions("400", "400");
 
+        String format = "image/gif";
         List formats = request.getAvailableFormats();
-        request.setFormat((String) formats.get(0));
+        if (!formats.contains("image/gif")) {
+            format = (String) formats.get(0);
+        } 
+        request.setFormat(format);
 
         request.setBBox("366800,2170400,816000,2460400");
 
-        //List exceptions = request.getAvailableExceptions();
-        //request.setExceptions((String) exceptions.get(0));
-        GetMapResponse response = (GetMapResponse) wms.issueRequest(request,
-                false);
+        System.out.println(request.getFinalURL());
+        GetMapResponse response = (GetMapResponse) wms.issueRequest(request);
 
-        assertEquals(response.getContentType(), (String) formats.get(0));
+        assertEquals(response.getContentType(), format);
 
         BufferedImage image = ImageIO.read(response.getInputStream());
         assertEquals(image.getHeight(), 400);
@@ -198,13 +186,8 @@ public class WebMapServerTest extends TestCase {
     }
 
     }*/
-    public void testGetProblem() {
-        WebMapServer wms = new WebMapServer(brokenURL);
-        wms.getCapabilities();
-        assertNotNull(wms.getProblem());
-    }
     
-    public void testIterator() {
+    public void testIterator() throws SAXException, URISyntaxException {
         WebMapServer wms = new WebMapServer(serverURL);
         wms.getCapabilities();
         
