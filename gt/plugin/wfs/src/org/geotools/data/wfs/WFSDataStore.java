@@ -634,17 +634,17 @@ public class WFSDataStore extends AbstractDataStore {
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
 
-        Writer sw = new StringWriter();
-        try{
-            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
-        }catch(OperationNotSupportedException e){
-            logger.warning(e.toString());
-            throw new SAXException(e);
-        }
-        System.out.println("WFS FILTER START");
-        System.out.println(sw);
-        System.out.println("WFS FILTER END");
-        System.out.println("FILTER WAS "+query.getFilter());
+//        Writer sw = new StringWriter();
+//        try{
+//            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
+//        }catch(OperationNotSupportedException e){
+//            logger.warning(e.toString());
+//            throw new SAXException(e);
+//        }
+//        System.out.println("WFS FILTER START");
+//        System.out.println(sw);
+//        System.out.println("WFS FILTER END");
+//        System.out.println("FILTER WAS "+query.getFilter());
         
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
