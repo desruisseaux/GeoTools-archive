@@ -80,6 +80,10 @@ public class PgWKBAttributeIO implements AttributeIO {
     private Geometry WKB2Geometry(byte[] wkbBytes)
         throws IOException {
         // convert the byte[] to a JTS Geometry object
+    	
+    	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL 
+    		return null; 
+    	
         JTSFactory factory = new JTSFactory();
         WKBParser parser = new WKBParser(factory);
         try {
