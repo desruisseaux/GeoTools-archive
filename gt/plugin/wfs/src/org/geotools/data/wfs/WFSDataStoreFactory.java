@@ -66,26 +66,26 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         URL host = null;
-        if(params.containsKey(SERVER_URL)){
-            host = (URL)params.get(SERVER_URL.key);
+        if(params.containsKey(SERVER_URL.key)){
+            host = (URL) SERVER_URL.lookUp( params );
             host = WFSDataStore.createGetCapabilitiesRequest(host);
         }else{
-            host = ((URL)params.get(GET_CAPABILITIES_URL.key));
+            host = ((URL)GET_CAPABILITIES_URL.lookUp(params));
         }
         
         Boolean get,post;get = post = null;
         if(params.containsKey(USE_GET.key))
-            get = (Boolean)params.get(USE_GET.key);
+            get = (Boolean)USE_GET.lookUp(params);
         if(params.containsKey(USE_POST.key))
-            get = (Boolean)params.get(USE_POST.key);
+            get = (Boolean)USE_POST.lookUp(params);
         if(get != null && post != null)
             throw new IOException("Cannot define both get and post");
         
         String user,pass; user = pass = null;
         if(params.containsKey(USERNAME.key))
-            user = (String)params.get(USERNAME.key);
+            user = (String)USERNAME.lookUp(params);
         if(params.containsKey(PASSWORD.key))
-            pass = (String)params.get(PASSWORD.key);
+            pass = (String)PASSWORD.lookUp(params);
         if((user == null && pass!=null) || (pass == null && user!=null))
             throw new IOException("Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
         
