@@ -103,14 +103,14 @@ public abstract class Unit implements Serializable {
     /**
      * Convenience constant for base unit of length.
      *
-     * @deprecated Replaced by {@link SI#METRE}.
+     * @deprecated Replaced by {@link SI#METER}.
      */
     public static final Unit METRE = get("m");
     
     /**
      * Convenience constant for derived unit of length.
      *
-     * @deprecated Replaced by <code>SI.KILO({@linkplain SI#METRE})</code>.
+     * @deprecated Replaced by <code>SI.KILO({@linkplain SI#METER})</code>.
      */
     public static final Unit KILOMETRE = METRE.scale(1000);
     

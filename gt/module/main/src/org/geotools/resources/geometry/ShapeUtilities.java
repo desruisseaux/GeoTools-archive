@@ -76,8 +76,8 @@ public final class ShapeUtilities {
      * parallèles, ou soit parce qu'ils ne se prolongent pas assez loin
      * pour se toucher), alors cette méthode retourne <code>null</code>.
      *
-     * @param  line1 Première ligne.
-     * @param  line2 Deuxième ligne.
+     * @param  a Première ligne.
+     * @param  b Deuxième ligne.
      * @return Si une intersection fut trouvée, les coordonnées de cette
      *         intersection. Si aucune intersection n'a été trouvée, alors
      *         cette méthode retourne <code>null</code>.

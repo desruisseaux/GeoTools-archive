@@ -38,7 +38,7 @@ package org.geotools.util;
  *
  * @see java.lang.Cloneable
  * @see <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4098033.html">Cloneable
- *      doesn't define <code>clone()</code></A> on Sun's bug parade
+ *      doesn't define <code>clone()</code></A>
  *
  * @deprecated Use {@link org.opengis.util.Cloneable} from GeoAPI instead. This interface will
  *             be removed in a future version.

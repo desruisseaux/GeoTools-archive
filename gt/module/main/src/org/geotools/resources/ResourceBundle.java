@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.resources;
 
@@ -396,8 +383,8 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getMenuLabel(final int keyID) throws MissingResourceException {
-        return getString(keyID)+"...";
+    public final String getMenuLabel(final int key) throws MissingResourceException {
+        return getString(key)+"...";
     }
 
     /**
@@ -409,8 +396,8 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getLabel(final int keyID) throws MissingResourceException {
-        return getString(keyID)+": ";
+    public final String getLabel(final int key) throws MissingResourceException {
+        return getString(key)+": ";
     }
 
     /**
@@ -422,8 +409,8 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getString(final int keyID) throws MissingResourceException {
-        return getString(String.valueOf(keyID));
+    public final String getString(final int key) throws MissingResourceException {
+        return getString(String.valueOf(key));
     }
 
     /**
@@ -450,15 +437,15 @@ public class ResourceBundle extends java.util.ResourceBundle {
      *         found.
      *
      * @see #getString(String)
-     * @see #getString(String,Object,Object)
-     * @see #getString(String,Object,Object,Object)
+     * @see #getString(int,Object,Object)
+     * @see #getString(int,Object,Object,Object)
      * @see MessageFormat
      */
-    public final String getString(final int   keyID,
+    public final String getString(final int    key,
                                   final Object arg0)
             throws MissingResourceException
     {
-        final Object      object = getObject(String.valueOf(keyID));
+        final Object      object = getObject(String.valueOf(key));
         final Object[] arguments = toArray(arg0);
         synchronized (this) {
             if (format == null) {
@@ -480,13 +467,13 @@ public class ResourceBundle extends java.util.ResourceBundle {
                     locale = resourceLocale;
                 }
                 format = new MessageFormat(object.toString(), locale);
-            } else if (keyID != lastKey) {
+            } else if (key != lastKey) {
                 /*
                  * Method {@link MessageFormat#applyPattern} is costly! We will avoid
                  * calling it again if {@link #format} already has the right pattern.
                  */
                 format.applyPattern(object.toString());
-                lastKey = keyID;
+                lastKey = key;
             }
             return format.format(arguments);
         }
@@ -503,11 +490,11 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getString(final int   keyID,
+    public final String getString(final int    key,
                                   final Object arg0,
                                   final Object arg1)
                                   throws MissingResourceException {
-        return getString(keyID, new Object[] {arg0, arg1});
+        return getString(key, new Object[] {arg0, arg1});
     }
 
     /**
@@ -522,12 +509,12 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getString(final int   keyID,
+    public final String getString(final int    key,
                                   final Object arg0,
                                   final Object arg1,
                                   final Object arg2)
                                   throws MissingResourceException {
-        return getString(keyID, new Object[] {arg0, arg1, arg2});
+        return getString(key, new Object[] {arg0, arg1, arg2});
     }
 
     /**
@@ -543,13 +530,13 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getString(final int   keyID,
+    public final String getString(final int    key,
                                   final Object arg0,
                                   final Object arg1,
                                   final Object arg2,
                                   final Object arg3)
                                   throws MissingResourceException {
-        return getString(keyID, new Object[] {arg0, arg1, arg2, arg3});
+        return getString(key, new Object[] {arg0, arg1, arg2, arg3});
     }
 
     /**
@@ -566,14 +553,14 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @throws MissingResourceException If no object for the given key can be
      *         found.
      */
-    public final String getString(final int   keyID,
+    public final String getString(final int    key,
                                   final Object arg0,
                                   final Object arg1,
                                   final Object arg2,
                                   final Object arg3,
                                   final Object arg4)
                                   throws MissingResourceException {
-        return getString(keyID, new Object[] {arg0, arg1, arg2, arg3, arg4});
+        return getString(key, new Object[] {arg0, arg1, arg2, arg3, arg4});
     }
 
     /**

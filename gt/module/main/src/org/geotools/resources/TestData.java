@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 /**
- * This class provides access to test-data directories assocaited
+ * Provides access to test-data directories associated
  * with junit tests.
  * <p>
  * We have chosen test-data to follow the javadoc "doc-files" convention 
@@ -54,19 +54,20 @@ import java.net.URL;
  * By convention you should try and locate testdata near the junit test
  * cases that uses it.
  * </p>
- * @author  jamesm
+ * @version $Id$
+ * @author James McGill
  */
 public class TestData {
     /**
      * Provided a BufferedReader for named test data.
      * 
-     * @param host Object associated with named data
-     * @name name of test data to load
+     * @param caller Object associated with named data
+     * @param name of test data to load
      */
     public static final BufferedReader getReader(final Class caller, final String name) throws IOException {
     	URL url = caller.getResource("test-data/"+name);
     	if( url == null ) {
-    		return null; // echo handling of getResource( ... )    		
+            return null; // echo handling of getResource( ... )    		
     	}
     	return new BufferedReader(new InputStreamReader( url.openStream()));
     }	
@@ -74,26 +75,29 @@ public class TestData {
      * Provided a BufferedReader for named test data.
      * 
      * @param host Object associated with named data
-     * @name name of test data to load
+     * @param name of test data to load
      */
     public static final BufferedReader getReader(final Object host, final String name) throws IOException {
     	URL url = host.getClass().getResource("test-data/"+name);
     	if( url == null ) {
-    		return null; // echo handling of getResource( ... )    		
+            return null; // echo handling of getResource( ... )    		
     	}
     	return new BufferedReader(new InputStreamReader( url.openStream()));
     }
+
     // REVISIT: Should this be getURL() - or simply url
     // I tend to save getX method for accessors.
-    /** Locate named test-data resource for caller.
+    /**
+     * Locate named test-data resource for caller.
+     *
      * @param caller Class used to locate test-data
      * @param name name of test-data 
      * @return URL or null of named test-data could not be found
      */
     public static final URL getResource(final Class caller, final String name) throws IOException {
-       return caller.getResource("test-data/"+name);
-       
+        return caller.getResource("test-data/"+name);
     }
+
     // REVISIT: Should this be getURL() - or simply url
     // I tend to save getX method for accessors.
     /** 
@@ -104,8 +108,6 @@ public class TestData {
      * @return URL or null of named test-data could not be found 
      */
     public static final URL getResource(final Object caller, final String name) throws IOException {
-       return caller.getClass().getResource("test-data/"+name);       
+        return caller.getClass().getResource("test-data/"+name);       
     }
-    
-    
 }

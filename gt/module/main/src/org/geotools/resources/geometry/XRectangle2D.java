@@ -40,7 +40,7 @@ import org.geotools.resources.Utilities;
  * {@link #xmin}, {@link #xmax}, {@link #ymin} et {@link #ymax}. Methods likes
  * <code>contains</code> and <code>intersects</code> are faster, which make this
  * class more appropriate for using intensively inside a loop. Furthermore, this
- * class work correctly with {@linkplain Double#POSITIVE_INFINITE infinites} and
+ * class work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
  * {@linkplain Double#NaN NaN} values.
  *
  * @version $Id: XRectangle2D.java,v 1.6 2003/11/15 14:21:59 aaime Exp $
@@ -259,7 +259,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * Sets the location and size of this <code>Rectangle2D</code>
      * to the specified double values.
      *
-     * @param x,&nbsp;y the coordinates to which to set the
+     * @param x the <var>x</var> coordinates to which to set the
+     *        location of the upper left corner of this <code>Rectangle2D</code>
+     * @param y the <var>y</var> coordinates to which to set the
      *        location of the upper left corner of this <code>Rectangle2D</code>
      * @param width the value to use to set the width of this <code>Rectangle2D</code>
      * @param height the value to use to set the height of this <code>Rectangle2D</code>
@@ -289,7 +291,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * intersects the interior of a specified set of rectangular
      * coordinates.
      *
-     * @param x,&nbsp;y the coordinates of the upper left corner
+     * @param x the <var>x</var> coordinates of the upper left corner
+     *        of the specified set of rectangular coordinates
+     * @param y the <var>y</var> coordinates of the upper left corner
      *        of the specified set of rectangular coordinates
      * @param width the width of the specified set of rectangular coordinates
      * @param height the height of the specified set of rectangular coordinates
@@ -311,7 +315,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * Tests if the <strong>interior</strong> of this shape intersects the
      * <strong>interior</strong> of a specified rectangle. This methods overrides the default
      * {@link Rectangle2D} implementation in order to work correctly with
-     * {@linkplain Double#POSITIVE_INFINITE infinites} and {@linkplain Double#NaN NaN} values.
+     * {@linkplain Double#POSITIVE_INFINITY infinites} and {@linkplain Double#NaN NaN} values.
      *
      * @param  rect the specified rectangle.
      * @return <code>true</code> if this shape and the specified rectangle intersect each other.
@@ -337,10 +341,10 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *   <li>This method doesn't test only if the <em>interiors</em> intersect.
      *       It tests for the edges as well.</li>
      *   <li>This method tests also rectangle with zero {@linkplain Rectangle2D#getWidth width} or
-     *       {@linkplain Rectangle2D#getHeight height} (which are {@linkplain Shape#isEmpty empty}
-     *       according {@link Shape} contract). However, rectangle with negative width or height
-     *       are still considered as empty.</li>
-     *   <li>This method work correctly with {@linkplain Double#POSITIVE_INFINITE infinites} and
+     *       {@linkplain Rectangle2D#getHeight height} (which are {@linkplain Rectangle2D#isEmpty
+     *       empty} according {@link Shape} contract). However, rectangle with negative width or
+     *       height are still considered as empty.</li>
+     *   <li>This method work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
      *       {@linkplain Double#NaN NaN} values.</li>
      * </ul>
      *
@@ -376,7 +380,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * determine this intersection are prohibitively expensive. This is similar to
      * {@link Shape#intersects(Rectangle2D)}, except that this method tests also rectangle with
      * zero {@linkplain Rectangle2D#getWidth width} or {@linkplain Rectangle2D#getHeight height}
-     * (which are {@linkplain Shape#isEmpty empty} according {@link Shape} contract). However,
+     * (which are {@linkplain Rectangle2D#isEmpty empty} according {@link Shape} contract). However,
      * rectangle with negative width or height are still considered as empty.
      * <br><br>
      * This method is said <cite>inclusive</cite> because it try to mimic
@@ -410,8 +414,10 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * Tests if the interior of this <code>Rectangle2D</code> entirely
      * contains the specified set of rectangular coordinates.
      *
-     * @param x,&nbsp;y the coordinates of the upper left corner
-     *        of the specified set of rectangular coordinates
+     * @param x the <var>x</var> coordinates of the upper left corner
+     *          of the specified set of rectangular coordinates
+     * @param y the <var>y</var> coordinates of the upper left corner
+     *          of the specified set of rectangular coordinates
      * @param width the width of the specified set of rectangular coordinates
      * @param height the height of the specified set of rectangular coordinates
      * @return <code>true</code> if this <code>Rectangle2D</code>
@@ -431,7 +437,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Tests if the interior of this shape entirely contains the specified rectangle.
      * This methods overrides the default {@link Rectangle2D} implementation in order
-     * to work correctly with {@linkplain Double#POSITIVE_INFINITE infinites} and
+     * to work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
      * {@linkplain Double#NaN NaN} values.
      *
      * @param  rect the specified rectangle.
@@ -452,7 +458,8 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Tests if a specified coordinate is inside the boundary of this <code>Rectangle2D</code>.
      *
-     * @param x,&nbsp;y the coordinates to test.
+     * @param x the <var>x</var> coordinates to test.
+     * @param y the <var>y</var> coordinates to test.
      * @return <code>true</code> if the specified coordinates are
      *         inside the boundary of this <code>Rectangle2D</code>;
      *         <code>false</code> otherwise.
@@ -469,7 +476,6 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * whether or not the specified coordinates are on the same side
      * of the edge as the rest of this <code>Rectangle2D</code>.
      *
-     * @param x,&nbsp;y the specified coordinates
      * @return the logical OR of all appropriate out codes.
      *
      * @see #OUT_LEFT
@@ -540,8 +546,6 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * edges of a rectangle. Therefore, if the added point falls on
      * the left or bottom edge of the enlarged rectangle,
      * <code>contains</code> returns <code>false</code> for that point.
-     *
-     * @param newx,&nbsp;newy the coordinates of the new point
      */
     public void add(final double x, final double y) {
         if (x<xmin) xmin=x;

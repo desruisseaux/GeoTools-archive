@@ -189,7 +189,7 @@ public class AngleFormat extends Format {
      * suite des degrés, minutes et secondes (<code>suffix0..2</code>).
      * Ces champs doivent être <code>null</code> s'il n'y a rien à insérer.
      */
-    private String prefix=null, suffix0="°", suffix1="'", suffix2="\"";
+    private String prefix=null, suffix0="\u00B0", suffix1="'", suffix2="\"";
     
     /**
      * Indique s'il faut utiliser le séparateur décimal pour séparer la partie
@@ -267,10 +267,10 @@ public class AngleFormat extends Format {
      */
     private void setSuffix(final int index, String s) {
         switch (index) {
-            case  PREFIX_FIELD:  prefix=s; s="°";  // fall through
-            case DEGREES_FIELD: suffix0=s; s="'";  // fall through
-            case MINUTES_FIELD: suffix1=s; s="\""; // fall through
-            case SECONDS_FIELD: suffix2=s;         // fall through
+            case  PREFIX_FIELD:  prefix=s; s="\u00B0";  // fall through
+            case DEGREES_FIELD: suffix0=s; s="'";       // fall through
+            case MINUTES_FIELD: suffix1=s; s="\"";      // fall through
+            case SECONDS_FIELD: suffix2=s;              // fall through
         }
     }
     
@@ -279,7 +279,7 @@ public class AngleFormat extends Format {
      * the current default locale and a default pattern.
      */
     public AngleFormat() {
-        this("D°MM.m'");
+        this("D\u00B0MM.m'");
     }
     
     /**
@@ -788,10 +788,10 @@ public class AngleFormat extends Format {
         }
         while (Character.isSpaceChar(c=source.charAt(start++)));
         switch (c) {
-            case '°' : pos.setIndex(start); return DEGREES_FIELD;
-            case '\'': pos.setIndex(start); return MINUTES_FIELD;
-            case '"' : pos.setIndex(start); return SECONDS_FIELD;
-            default  : return SYMBOLS.length; // Unknow field.
+            case '\u00B0' : pos.setIndex(start); return DEGREES_FIELD;
+            case '\''     : pos.setIndex(start); return MINUTES_FIELD;
+            case '"'      : pos.setIndex(start); return SECONDS_FIELD;
+            default       : return SYMBOLS.length; // Unknow field.
         }
     }
     
