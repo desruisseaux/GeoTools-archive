@@ -45,8 +45,8 @@ import junit.textui.TestRunner;
 import org.geotools.cv.*;
 import org.geotools.gc.*;
 import org.geotools.gp.*;
-import org.geotools.util.*;
-import org.geotools.resources.*;
+import org.geotools.util.RangeSetTest;
+import org.geotools.util.MonolineFormatter;
 import org.geotools.io.coverage.*;
 
 
