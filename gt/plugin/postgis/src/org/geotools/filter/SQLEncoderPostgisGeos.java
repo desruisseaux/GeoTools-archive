@@ -165,7 +165,26 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
         boolean constrainBBOX = (literalGeometryCount == 1);
 
         try {
-            out.write("(");
+
+	    if (constrainBBOX) {
+            
+                if (left == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    left.accept(this);
+                }
+
+                out.write(" && ");
+
+                if (right == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    right.accept(this);
+                }
+                out.write(" AND ");
+            }                   
+
+	    
 
             String closingParenthesis = ")";
 
@@ -193,7 +212,6 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
                 throw new RuntimeException("does not support filter type "
                     + filterType);
             }
-
             out.write("(");
 
             if (left == null) {
@@ -208,26 +226,6 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
                 out.write("\"" + defaultGeom + "\"");
             } else {
                 right.accept(this);
-            }
-
-            out.write(")");
-
-            if (constrainBBOX) {
-                out.write(" AND ");
-
-                if (left == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    left.accept(this);
-                }
-
-                out.write(" && ");
-
-                if (right == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    right.accept(this);
-                }
             }
 
             out.write(closingParenthesis);
