@@ -1006,7 +1006,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      *         store. This exception usually have {@link SQLException} as its cause.
      *
      * @todo Current implementation maps all "vertical" datum to
-     *       {@link VerticalDatumType#ELLIPSOIDAL}. We don't know yet how
+     *       {@link VerticalDatumType#GEOIDAL}. We don't know yet how
      *       to maps the exact vertical datum type from the EPSG database.
      */
     public synchronized Datum createDatum(final String code) throws FactoryException {
@@ -1072,7 +1072,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                     datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
                 } else if (type.equalsIgnoreCase("vertical")) {
                     // TODO: Find the right datum type.
-                    datum = factory.createVerticalDatum(properties, VerticalDatumType.ELLIPSOIDAL);
+                    datum = factory.createVerticalDatum(properties, VerticalDatumType.GEOIDAL);
                 } else if (type.equalsIgnoreCase("engineering")) {
                     datum = factory.createEngineeringDatum(properties);
                 } else {
