@@ -29,7 +29,6 @@ import java.util.Collections;
 
 // Parsing
 import java.util.Locale;
-import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.ParseException;
 
@@ -86,33 +85,33 @@ public abstract class Parser extends AbstractParser {
     private final Map directions;
     
     /**
-     * Construct a parser for the specified locale using default factories.
+     * Construct a parser for the specified set of symbols using default factories.
      *
-     * @param locale The locale for parsing and formatting numbers.
+     * @param symbols The symbols for parsing and formatting numbers.
      */
-    public Parser(final Locale locale) {
-        this(locale,
+    public Parser(final Symbols symbols) {
+        this(symbols,
              FactoryFinder.getDatumFactory(),
              FactoryFinder.getCSFactory(),
              FactoryFinder.getCRSFactory());
     }
     
     /**
-     * Construct a parser for the specified locale using the specified factories.
+     * Construct a parser for the specified set of symbols using the specified factories.
      *
-     * @param locale       The locale for parsing and formatting numbers.
+     * @param symbols      The symbols for parsing and formatting numbers.
      * @param datumFactory The factory to use for creating {@linkplain Datum datum}.
      * @param csFactory    The factory to use for creating {@linkplain CoordinateSystem
      *                     coordinate systems}.
      * @param crsFactory   The factory to use for creating {@linkplain CoordinateReferenceSystem
      *                     coordinate reference systems}.
      */
-    public Parser(final Locale             locale,
+    public Parser(final Symbols           symbols,
                   final DatumFactory datumFactory,
                   final CSFactory       csFactory,
                   final CRSFactory     crsFactory)
     {
-        super(locale);
+        super(symbols);
         this.datumFactory = datumFactory;
         this. csFactory   =    csFactory;
         this.crsFactory   =   crsFactory;
@@ -658,7 +657,7 @@ public abstract class Parser extends AbstractParser {
 //    {
 //        final Object key = element.peek();
 //        if (key instanceof Element) {
-//            final String keyword = ((Element) key).keyword.trim().toUpperCase(locale);
+//            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
 //            if (  "GEOGCS".equals(keyword)) return parseGeoGCS (element);
 //            if (  "PROJCS".equals(keyword)) return parseProjCS (element);
 //            if (  "GEOCCS".equals(keyword)) return parseGeoCCS (element);
@@ -679,7 +678,7 @@ public abstract class Parser extends AbstractParser {
 //    protected Object parse(final Element element) throws ParseException {
 //        final Object key = element.peek();
 //        if (key instanceof Element) {
-//            final String keyword = ((Element) key).keyword.trim().toUpperCase(locale);
+//            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
 //            if (       "AXIS".equals(keyword)) return parseAxis      (element, true);
 //            if (     "PRIMEM".equals(keyword)) return parsePrimem    (element, Unit.DEGREE);
 //            if (    "TOWGS84".equals(keyword)) return parseToWGS84   (element);
@@ -703,17 +702,5 @@ public abstract class Parser extends AbstractParser {
 //        final CoordinateSystem cs = parseCoordinateSystem(element);
 //        element.close();
 //        return cs;
-//    }
-//
-//    /**
-//     * Format the specified object. Current implementation just append {@link Object#toString},
-//     * since the <code>toString()</code> implementation for most {@link org.geotools.cs.Info}
-//     * objects is to returns a WKT.
-//     *
-//     * @todo Provides pacakge private <code>Info.toString(AbstractParser)</code> implementations.
-//     *       It would allows us to invoke <code>((Info)obj).toString(this)</code> here.
-//     */
-//    public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-//        return toAppendTo.append(obj);
 //    }
 }

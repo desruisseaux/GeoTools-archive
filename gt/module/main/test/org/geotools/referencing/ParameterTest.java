@@ -657,7 +657,7 @@ public class ParameterTest extends TestCase {
      * Test WKT formatting of transforms backed by matrix.
      */
     public void testMatrix() {
-        final Formatter  formatter = new Formatter(null);
+        final Formatter  formatter = new Formatter();
         final GeneralMatrix matrix = new GeneralMatrix(4);
         matrix.setElement(0,2,  4);
         matrix.setElement(1,0, -2);

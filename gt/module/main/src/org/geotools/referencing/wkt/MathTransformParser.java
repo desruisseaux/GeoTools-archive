@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Locale;
 import java.text.ParsePosition;
 import java.text.ParseException;
-import java.text.FieldPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
@@ -59,23 +58,30 @@ public final class MathTransformParser extends AbstractParser {
     private final MathTransformFactory mtFactory;
     
     /**
-     * Construct a parser for the specified locale using default factories.
-     *
-     * @param locale The locale for parsing and formatting numbers.
+     * Construct a parser using the default set of symbols.
      */
-    public MathTransformParser(final Locale locale) {
-        this(locale, (org.geotools.referencing.operation.MathTransformFactory)FactoryFinder.getMathTransformFactory());
+    public MathTransformParser() {
+        this(Symbols.DEFAULT);
     }
     
     /**
-     * Construct a parser for the specified locale and factory.
+     * Construct a parser for the specified set of symbols using default factories.
      *
-     * @param locale The locale for parsing and formatting numbers.
+     * @param symbols The symbols for parsing and formatting numbers.
+     */
+    public MathTransformParser(final Symbols symbols) {
+        this(symbols, (org.geotools.referencing.operation.MathTransformFactory)FactoryFinder.getMathTransformFactory());
+    }
+    
+    /**
+     * Construct a parser for the specified set of symbols and factory.
+     *
+     * @param symbols The symbols for parsing and formatting numbers.
      * @param mtFactory The {@link MathTransformFactory} to use to create 
      * {@link MathTransform} objects.
      */
-    public MathTransformParser(final Locale locale, final MathTransformFactory mtFactory) {
-        super(locale);
+    public MathTransformParser(final Symbols symbols, final MathTransformFactory mtFactory) {
+        super(symbols);
         this.mtFactory = mtFactory;
     }
     
@@ -102,7 +108,7 @@ public final class MathTransformParser extends AbstractParser {
     private MathTransform parseMathTransform(final Element element, final boolean required) throws ParseException {
         final Object key = element.peek();
         if (key instanceof Element) {
-            final String keyword = ((Element) key).keyword.trim().toUpperCase(locale);
+            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
             if ("PARAM_MT"      .equals(keyword))  return parseParamMT      (element);
             if ("CONCAT_MT"     .equals(keyword))  return parseConcatMT     (element);
             if ("INVERSE_MT"    .equals(keyword))  return parseInverseMT    (element);
@@ -239,16 +245,4 @@ public final class MathTransformParser extends AbstractParser {
         element.close();
         return transform;
     }
-    
-    /**
-     * Format the specified object. Current implementation just append {@link Object#toString},
-     * since the <code>toString()</code> implementation for most
-     * {@link org.geotools.cs.IdentifiedObject} objects is to returns a WKT.
-     *
-     * @task TODO: Provides pacakge private <code>IdentifiedObject.toString(WKTFormat)</code> implementations.
-     *             It would allows us to invoke <code>((IdentifiedObject)obj).toString(this)</code> here.
-     */
-    public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-        return toAppendTo.append(obj);
-    }     
 }

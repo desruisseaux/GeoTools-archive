@@ -23,6 +23,7 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 // GeoAPI dependencies
@@ -47,9 +48,22 @@ public class Formattable {
     /**
      * The "Indentation" preference name.
      *
-     * @todo this string is also hard-coded in AffineTransform2D.
+     * @todo this string is also hard-coded in AffineTransform2D, because we
+     *       don't want to make it public (neither {@link #getIndentation}).
      */
     static final String INDENTATION = "Indentation";
+
+    /**
+     * The formatter for the {@link #toString()} method.
+     * Will be constructed only when first needed.
+     */
+    private static Formatter DEFAULT_FORMATTER;
+
+    /**
+     * The formatter for the {@link #toWKT()} method.
+     * Will be constructed only when first needed.
+     */
+    private static Formatter WKT_FORMATTER;
 
     /**
      * Default constructor.
@@ -69,10 +83,22 @@ public class Formattable {
      * </code><i>etc.</i><code>]"</code>.
      */
     public String toString() {
-        final Formatter formatter = new Formatter(null, 2);
-        formatter.usesClassname = true;
-        formatter.append(this);
-        return formatter.toString();
+        // No need to synchronize. This is not a big deal
+        // if two formatters co-exist for a short time.
+        Formatter formatter = DEFAULT_FORMATTER;
+        if (formatter == null) {
+            formatter = new Formatter(new Symbols(Locale.getDefault()), getIndentation());
+            formatter.usesClassname = true;
+            DEFAULT_FORMATTER = formatter;
+        }
+        synchronized (formatter) {
+            try {
+                formatter.append(this);
+                return formatter.toString();
+            } finally {
+                formatter.clear();
+            }
+        }
     }
 
     /**
@@ -95,14 +121,7 @@ public class Formattable {
      *         implementations can be formatted as WKT.
      */
     public String toWKT() throws UnformattableObjectException {
-        int indentation = 2;
-        try {
-            indentation = Preferences.userNodeForPackage(Formattable.class)
-                                     .getInt(INDENTATION, indentation);
-        } catch (SecurityException ignore) {
-            // Ignore. Will fallback on the default indentation.
-        }
-        return toWKT(indentation);
+        return toWKT(getIndentation());
     }
 
     /**
@@ -120,20 +139,32 @@ public class Formattable {
      *         implementations can be formatted as WKT.
      */
     public String toWKT(final int indentation) throws UnformattableObjectException {
-        final Formatter formatter = new Formatter(null, indentation);
-        if (this instanceof GeneralParameterValue) {
-            // Special processing for parameter values, which is formatted
-            // directly in 'Formatter'. Note that in GeoAPI, this interface
-            // doesn't share the same parent interface than other interfaces.
-            formatter.append((GeneralParameterValue) this);
-        } else {
-            formatter.append(this);
+        // No need to synchronize. This is not a big deal
+        // if two formatters co-exist for a short time.
+        Formatter formatter = WKT_FORMATTER;
+        if (formatter==null || formatter.indentation!=indentation) {
+            formatter = new Formatter(Symbols.DEFAULT, indentation);
+            WKT_FORMATTER = formatter;
         }
-        if (formatter.isInvalidWKT()) {
-            // TODO localize.
-            throw new UnformattableObjectException("Not a valid WKT format.");
+        synchronized (formatter) {
+            try {
+                if (this instanceof GeneralParameterValue) {
+                    // Special processing for parameter values, which is formatted
+                    // directly in 'Formatter'. Note that in GeoAPI, this interface
+                    // doesn't share the same parent interface than other interfaces.
+                    formatter.append((GeneralParameterValue) this);
+                } else {
+                    formatter.append(this);
+                }
+                if (formatter.isInvalidWKT()) {
+                    // TODO localize.
+                    throw new UnformattableObjectException("Not a valid WKT format.");
+                }
+                return formatter.toString();
+            } finally {
+                formatter.clear();
+            }
         }
-        return formatter.toString();
     }
      
     /**
@@ -162,5 +193,27 @@ public class Formattable {
      */
     protected String formatWKT(final Formatter formatter) {
         return Utilities.getShortClassName(this);
+    }
+
+    /**
+     * Returns the default indentation.
+     */
+    static int getIndentation() {
+        try {
+            return Preferences.userNodeForPackage(Formattable.class).getInt(INDENTATION, 2);
+        } catch (SecurityException ignore) {
+            // Ignore. Will fallback on the default indentation.
+            return 2;
+        }
+    }
+
+    /**
+     * Set the default value for indentation.
+     *
+     * @throws SecurityException if a security manager is present and
+     *         it denies <code>RuntimePermission("preferences")</code>.
+     */
+    static void setIndentation(final int indentation) throws SecurityException {
+        Preferences.userNodeForPackage(Formattable.class).putInt(INDENTATION, indentation);
     }
 }

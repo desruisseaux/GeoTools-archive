@@ -25,9 +25,9 @@ package org.geotools.referencing.wkt;
 // J2SE dependencies and extensions
 import java.util.Locale;
 import java.util.Iterator;
-import java.util.prefs.Preferences;
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
+import java.text.NumberFormat;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -59,7 +59,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT)</A>.
  *
- * A formatter is constructed with a specified locale, which will be used for querying
+ * A formatter is constructed with a specified set of symbols.
+ * The {@linkplain Locale locale} associated with the symbols is used for querying
  * {@linkplain org.opengis.metadata.citation.Citation#getTitle authority titles}.
  *
  * @version $Id$
@@ -67,57 +68,12 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
- *
- * @todo Symbols are hard-coded as static constants for now. They should be declared in a
- *       <code>Symbols</code> class, which should be shared with {@link AbstractParser}.
  */
 public class Formatter {
     /**
-     * The character used for opening brace.
-     * Usually <code>'['</code>, but <code>'('</code> is legal as well.
+     * The symbols to use for this formatter.
      */
-    private static final char OPEN = '[';
-
-    /**
-     * The character used for closing brace.
-     * Usually <code>']'</code>, but <code>')'</code> is legal as well.
-     */
-    private static final char CLOSE = ']';
-
-    /**
-     * The character used for opening an array or enumeration.
-     * Usually <code>'{'</code>.
-     */
-    private static final char OPEN_ARRAY = '{';
-
-    /**
-     * The character used for closing an array or enumeration.
-     * Usually <code>'}'</code>.
-     */
-    private static final char CLOSE_ARRAY = '}';
-
-    /**
-     * The character used for quote.
-     * Usually <code>'"'</code>.
-     */
-    private static final char QUOTE = '"';
-
-    /**
-     * The character used as a separator. Usually <code>','</code>, but would need
-     * to be changed if a non-English locale is used for formatting numbers.
-     */
-    private static final char SEPARATOR = ',';
-
-    /**
-     * The character used for space.
-     * Usually <code>'&nbsp;'</code>, but could be a no-break space too if unicode is allowed.
-     */
-    private static final char SPACE = ' ';
-
-    /**
-     * The locale for querying localizable information.
-     */
-    private final Locale locale;
+    private final Symbols symbols;
 
     /**
      * The preferred authority for object or parameter names.
@@ -132,7 +88,12 @@ public class Formatter {
     private Unit contextualUnit;
 
     /**
-     * The format to use for formatting units.
+     * The object to use for formatting numbers.
+     */
+    private final NumberFormat numberFormat;
+
+    /**
+     * The object to use for formatting units.
      */
     private final UnitFormat unitFormat = UnitFormat.getAsciiInstance();
 
@@ -142,14 +103,15 @@ public class Formatter {
     private final FieldPosition dummy = new FieldPosition(0);
 
     /**
-     * The buffer in which to format.
+     * The buffer in which to format. Consider this field as private final; the only
+     * method to set the buffer to a new value is {@link AbstractParser#format}.
      */
-    private final StringBuffer buffer = new StringBuffer();
+    StringBuffer buffer;
 
     /**
      * The amount of space to use in indentation, or 0 if indentation is disabled.
      */
-    private final int indentation;
+    final int indentation;
 
     /**
      * The amount of space to write on the left side of each line. This amount is increased
@@ -169,13 +131,20 @@ public class Formatter {
     boolean usesClassname;
 
     /**
+     * Creates a new instance of the formatter with the default symbols.
+     */
+    public Formatter() {
+        this(Symbols.DEFAULT, 0);
+    }
+
+    /**
      * Creates a new instance of the formatter. The whole WKT will be formatted
      * on a single line.
      *
-     * @param locale The locale, or <code>null</code>.
+     * @param symbols The symbols.
      */
-    public Formatter(final Locale locale) {
-        this(locale, 0);
+    public Formatter(final Symbols symbols) {
+        this(symbols, 0);
     }
 
     /**
@@ -184,17 +153,38 @@ public class Formatter {
      * the value specified to this constructor. If the specified indentation is 0,
      * then the whole WKT will be formatted on a single line.
      *
-     * @param locale The locale, or <code>null</code>.
+     * @param symbols The symbols.
      * @param indentation The amount of spaces to use in indentation. Typical values are 2 or 4.
      */
-    public Formatter(final Locale locale, final int indentation) {
-        this.locale = locale;
+    public Formatter(final Symbols symbols, final int indentation) {
+        this.symbols     = symbols;
         this.indentation = indentation;
         if (indentation < 0) {
             throw new IllegalArgumentException(Resources.format(
                                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
                                                "indentation", new Integer(indentation)));
         }
+        if (symbols.numberFormat != Symbols.DEFAULT.numberFormat) {
+            numberFormat = (NumberFormat) symbols.numberFormat.clone();
+        } else {
+            numberFormat = null;
+        }
+        buffer = new StringBuffer();
+    }
+
+    /**
+     * Constructor for private use by {@link AbstractParser#format} only.
+     * This constructor help to share some objects with {@link AbstractFormat}.
+     */
+    Formatter(final Symbols symbols, final NumberFormat numberFormat) {
+        this.symbols = symbols;
+        indentation  = Formattable.getIndentation();
+        if (symbols.numberFormat != Symbols.DEFAULT.numberFormat) {
+            this.numberFormat = numberFormat;
+        } else {
+            this.numberFormat = null;
+        }
+        // Do not set the buffer. It will be set by AbstractParser.format.
     }
 
     /**
@@ -210,12 +200,12 @@ public class Formatter {
                 return;
             }
             c = buffer.charAt(--length);
-            if (c == OPEN) {
+            if (c == symbols.open) {
                 return;
             }
         } while (Character.isSpaceChar(c));
-        buffer.append(SEPARATOR);
-        buffer.append(SPACE);
+        buffer.append(symbols.separator);
+        buffer.append(symbols.space);
         if (indent && indentation != 0) {
             buffer.append('\n');
             buffer.append(Utilities.spaces(margin += indentation));
@@ -233,13 +223,13 @@ public class Formatter {
     public void append(final Formattable formattable) {
         appendSeparator(true);
         final int base = buffer.length();
-        buffer.append(OPEN);
+        buffer.append(symbols.open);
         final IdentifiedObject info = (formattable instanceof IdentifiedObject)
                                     ? (IdentifiedObject) formattable : null;
         if (info != null) {
-            buffer.append(QUOTE);
+            buffer.append(symbols.quote);
             buffer.append(getName(info));
-            buffer.append(QUOTE);
+            buffer.append(symbols.quote);
         }
         String keyword = formattable.formatWKT(this);
         if (usesClassname) {
@@ -256,25 +246,25 @@ public class Formatter {
             if (authority != null) {
                 final InternationalString title = authority.getTitle();
                 if (title != null) {
-                    buffer.append(SEPARATOR);
-                    buffer.append(SPACE);
+                    buffer.append(symbols.separator);
+                    buffer.append(symbols.space);
                     buffer.append("AUTHORITY");
-                    buffer.append(OPEN);
-                    buffer.append(QUOTE);
-                    buffer.append(title.toString(locale));
+                    buffer.append(symbols.open);
+                    buffer.append(symbols.quote);
+                    buffer.append(title.toString(symbols.locale));
                     final String code = identifier.getCode();
                     if (code != null) {
-                        buffer.append(QUOTE);
-                        buffer.append(SEPARATOR);
-                        buffer.append(QUOTE);
+                        buffer.append(symbols.quote);
+                        buffer.append(symbols.separator);
+                        buffer.append(symbols.quote);
                         buffer.append(code);
                     }
-                    buffer.append(QUOTE);
-                    buffer.append(CLOSE);
+                    buffer.append(symbols.quote);
+                    buffer.append(symbols.close);
                 }
             }
         }
-        buffer.append(CLOSE);
+        buffer.append(symbols.close);
         if (margin >= 0) {
             margin -= indentation;
         }
@@ -337,18 +327,18 @@ public class Formatter {
             }
             appendSeparator(false);
             buffer.append("PARAMETER");
-            buffer.append(OPEN);
-            buffer.append(QUOTE);
+            buffer.append(symbols.open);
+            buffer.append(symbols.quote);
             buffer.append(getName(descriptor));
-            buffer.append(QUOTE);
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
+            buffer.append(symbols.quote);
+            buffer.append(symbols.separator);
+            buffer.append(symbols.space);
             if (unit != null) {
                 buffer.append(param.doubleValue(unit));
             } else {
-                append(buffer, param.getValue());
+                appendObject(param.getValue());
             }
-            buffer.append(CLOSE);
+            buffer.append(symbols.close);
         }
     }
 
@@ -356,31 +346,31 @@ public class Formatter {
      * Append the specified value to a string buffer. If the value is an array, then the
      * array elements are appended recursively (i.e. the array may contains sub-array).
      */
-    private static void append(final StringBuffer buffer, final Object value) {
+    private void appendObject(final Object value) {
         if (value == null) {
             buffer.append("null");
             return;
         }
         if (value.getClass().isArray()) {
-            buffer.append(OPEN_ARRAY);
+            buffer.append(symbols.openArray);
             final int length = Array.getLength(value);
             for (int i=0; i<length; i++) {
                 if (i != 0) {
-                    buffer.append(SEPARATOR);
-                    buffer.append(SPACE);
+                    buffer.append(symbols.separator);
+                    buffer.append(symbols.space);
                 }
-                append(buffer, Array.get(value, i));
+                appendObject(Array.get(value, i));
             }
-            buffer.append(CLOSE_ARRAY);
+            buffer.append(symbols.closeArray);
             return;
         }
         final boolean isNumeric = (value instanceof Number);
         if (!isNumeric) {
-            buffer.append(QUOTE);
+            buffer.append(symbols.quote);
         }
         buffer.append(value);
         if (!isNumeric) {
-            buffer.append(QUOTE);
+            buffer.append(symbols.quote);
         }
     }
 
@@ -390,7 +380,14 @@ public class Formatter {
      */
     public void append(final int number) {
         appendSeparator(false);
-        buffer.append(number);
+        if (numberFormat != null) {
+            final int fraction = numberFormat.getMinimumFractionDigits();
+            numberFormat.setMinimumFractionDigits(0);
+            numberFormat.format(number, buffer, dummy);
+            numberFormat.setMinimumFractionDigits(fraction);
+        } else {
+            buffer.append(number);
+        }
     }
 
     /**
@@ -399,7 +396,11 @@ public class Formatter {
      */
     public void append(final double number) {
         appendSeparator(false);
-        buffer.append(number);
+        if (numberFormat != null) {
+            numberFormat.format(number, buffer, dummy);
+        } else {
+            buffer.append(number);
+        }
     }
 
     /**
@@ -410,14 +411,14 @@ public class Formatter {
         if (unit != null) {
             appendSeparator(false);
             buffer.append(usesClassname ? "Unit" : "UNIT");
-            buffer.append(OPEN);
-            buffer.append(QUOTE);
+            buffer.append(symbols.open);
+            buffer.append(symbols.quote);
             if (NonSI.DEGREE_ANGLE.equals(unit)) {
                 buffer.append("degree");
             } else {
                 unitFormat.format(unit, buffer, dummy);
             }
-            buffer.append(QUOTE);
+            buffer.append(symbols.quote);
             Unit base = null;
             if (SI.METER.isCompatible(unit)) {
                 base = SI.METER;
@@ -429,7 +430,7 @@ public class Formatter {
             if (base != null) {
                 append(unit.getConverterTo(base).convert(1));
             }
-            buffer.append(CLOSE);
+            buffer.append(symbols.close);
         }
     }
 
@@ -439,9 +440,9 @@ public class Formatter {
      */
     public void append(final String text) {
         appendSeparator(false);
-        buffer.append(QUOTE);
+        buffer.append(symbols.quote);
         buffer.append(text);
-        buffer.append(QUOTE);
+        buffer.append(symbols.quote);
     }
 
     /**
@@ -595,7 +596,6 @@ public class Formatter {
         final Arguments arguments = new Arguments(args);
         final int indentation = arguments.getRequiredInteger(Formattable.INDENTATION);
         arguments.getRemainingArguments(0);
-        Preferences.userNodeForPackage(Formattable.class)
-                   .putInt(Formattable.INDENTATION, indentation);
+        Formattable.setIndentation(indentation);
     }
 }

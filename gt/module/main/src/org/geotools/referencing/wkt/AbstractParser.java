@@ -24,8 +24,13 @@ import java.util.Locale;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.DecimalFormat;
+import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.ParseException;
+
+// OpenGIS dependencies
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.parameter.GeneralParameterValue;
 
 
 /**
@@ -34,76 +39,30 @@ import java.text.ParseException;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @todo Use the symbols from a <code>Symbols</code>, which should be shared with {@link Formatter}.
  */
 public abstract class AbstractParser extends Format {
     /**
-     * The locale for number parsing and formatting.
+     * A formatter using the same symbols than this parser.
+     * Will be created by the {@link #format} method only when first needed.
      */
-    final Locale locale;
+    private transient Formatter formatter;
 
     /**
-     * The object to use for parsing and formatting numbers.
-     * Note: {@link NumberFormat} object are usually not thread safe.
-     * Consider using this format in a synchronized block if thread safe
-     * behavior is wanted.
+     * The symbols to use for parsing WKT.
      */
-    final NumberFormat number;
+    final Symbols symbols;
 
     /**
-     * The character to use as an element separator.
-     * This is usually the coma <code>','</code>.
+     * The object to use for formatting numbers.
      */
-    final char elementSeparator;
-
-    /**
-     * The character to use as text delimitor.
-     * This is usually the quote <code>'"'</code>.
-     */
-    final char textDelimitor = '"';
-
-    /**
-     * List of caracters acceptable as opening bracket. The closing bracket must
-     * be the character in the <code>closingBrackets</code> array at the same index
-     * than the opening bracket.
-     */
-    final char[] openingBrackets = {'[', '('};
-
-    /**
-     * List of caracters acceptable as closing bracket.
-     */
-    final char[] closingBrackets = {']', ')'};
-
-    /**
-     * The character to use for openining element's parameters.
-     * This is usually <code>'['</code> or <code>'('</code>.
-     * This character is used for formatting WKT.
-     */
-    final char openingBracket = '[';
-
-    /**
-     * The character to use for closing element's parameters.
-     * This is usually <code>']'</code> or <code>')'</code>.
-     * This character is used for formatting WKT.
-     */
-    final char closingBracket = ']';
+    final NumberFormat numberFormat;
     
     /**
-     * Construct a format for the specified locale.
-     *
-     * @param locale The locale for parsing and formatting numbers.
+     * Construct a parser using the specified set of symbols.
      */
-    public AbstractParser(final Locale locale) {
-        this.locale = locale;
-        this.number = NumberFormat.getNumberInstance(locale);
-        char decimalSeparator = '.';
-        if (number instanceof DecimalFormat) {
-            final DecimalFormat df = (DecimalFormat) number;
-            decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
-        }
-        elementSeparator = (decimalSeparator==',') ? ';' : ',';
-        number.setGroupingUsed(false);
+    public AbstractParser(final Symbols symbols) {
+        this.symbols      = symbols;
+        this.numberFormat = (NumberFormat) symbols.numberFormat.clone();
     }
 
     /**
@@ -114,7 +73,7 @@ public abstract class AbstractParser extends Format {
      *                    In output, the first character after the separator.
      */
     protected final Element getTree(final String text, final ParsePosition position)
-        throws ParseException
+            throws ParseException
     {
         return new Element(new Element(this, text, position));
     }
@@ -162,4 +121,31 @@ public abstract class AbstractParser extends Format {
             return null;
         }
     }
+
+    /**
+     * Format the specified object as a Well Know Text.
+     * Formatting will uses the same set of symbols than the one used for parsing.
+     */
+    public StringBuffer format(final Object        object,
+                               final StringBuffer  toAppendTo,
+                               final FieldPosition pos)
+    {
+        if (formatter == null) {
+            formatter = new Formatter(symbols, numberFormat);
+        }
+        try {
+            formatter.buffer = toAppendTo;
+            if (object instanceof GeneralParameterValue) {
+                // Special processing for parameter values, which is formatted
+                // directly in 'Formatter'. Note that in GeoAPI, this interface
+                // doesn't share the same parent interface than other interfaces.
+                formatter.append((GeneralParameterValue) object);
+            } else {
+                formatter.append((IdentifiedObject) object);
+            }
+            return toAppendTo;
+        } finally {
+            formatter.buffer = null;
+        }
+    }     
 }

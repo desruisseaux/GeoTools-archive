@@ -88,10 +88,9 @@ public final class Element {
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
-     * @param  separator  The character to search.
      */ 
-    Element(final AbstractParser format, final String text, final ParsePosition position)
-        throws ParseException
+    Element(final AbstractParser parser, final String text, final ParsePosition position)
+            throws ParseException
     {
         /*
          * Find the first keyword in the specified string. If a keyword is found, then
@@ -111,7 +110,7 @@ public final class Element {
             position.setErrorIndex(lower);
             throw unparsableString(text, position);
         }
-        keyword = text.substring(lower, upper).toUpperCase(format.locale);
+        keyword = text.substring(lower, upper).toUpperCase(parser.symbols.locale);
         position.setIndex(upper);
         /*
          * Parse the opening bracket. According CTS's specification, two characters
@@ -121,12 +120,13 @@ public final class Element {
          */
         int bracketIndex = -1;
         do {
-            if (++bracketIndex >= format.openingBrackets.length) {
+            if (++bracketIndex >= parser.symbols.openingBrackets.length) {
                 list = null;
                 return;
             }
         }
-        while (!parseOptionalSeparator(text, position, format.openingBrackets[bracketIndex]));
+        while (!parseOptionalSeparator(text, position,
+                parser.symbols.openingBrackets[bracketIndex]));
         list = new LinkedList();
         /*
          * Parse all elements inside the bracket. Elements are parsed sequentially
@@ -139,18 +139,18 @@ public final class Element {
          */
         do {
             if (position.getIndex() >= length) {
-                throw missingCharacter(format.closingBracket, length);
+                throw missingCharacter(parser.symbols.close, length);
             }
             //
             // Try to parse the next element as a quoted string. We will take
             // it as a string if the first non-blank character is a quote.
             //
-            if (parseOptionalSeparator(text, position, format.textDelimitor)) {
+            if (parseOptionalSeparator(text, position, parser.symbols.quote)) {
                 lower = position.getIndex();        
-                upper = text.indexOf(format.textDelimitor, lower);
+                upper = text.indexOf(parser.symbols.quote, lower);
                 if (upper < lower) {
                     position.setErrorIndex(++lower);
-                    throw missingCharacter(format.textDelimitor, lower);
+                    throw missingCharacter(parser.symbols.quote, lower);
                 }
                 list.add(text.substring(lower, upper).trim());
                 position.setIndex(upper + 1);
@@ -162,10 +162,7 @@ public final class Element {
             //
             lower = position.getIndex();        
             if (!Character.isUnicodeIdentifierStart(text.charAt(lower))) {
-                final Number number;
-                synchronized (format.number) {
-                    number = format.number.parse(text, position);
-                }
+                final Number number = parser.numberFormat.parse(text, position);
                 if (number == null) {
                     // Do not update the error index; it is already updated by NumberFormat.
                     throw unparsableString(text, position);
@@ -174,9 +171,9 @@ public final class Element {
                 continue;
             }
             // Otherwise, add the element as a child element.
-            list.add(new Element(format, text, position));
-        } while (parseOptionalSeparator(text, position, format.elementSeparator));
-        parseSeparator(text, position, format.closingBrackets[bracketIndex]);
+            list.add(new Element(parser, text, position));
+        } while (parseOptionalSeparator(text, position, parser.symbols.separator));
+        parseSeparator(text, position, parser.symbols.closingBrackets[bracketIndex]);
     }
 
     /**

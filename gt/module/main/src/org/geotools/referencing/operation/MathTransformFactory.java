@@ -386,7 +386,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             // Not a big deal if we are not synchronized. If this method is invoked in
             // same time by two different threads, we may have two WKTParser objects
             // for a short time. It doesn't hurt...
-            parser = new MathTransformParser(Locale.US);
+            parser = new MathTransformParser();
         }
         try {
             return (MathTransform) parser.parseObject(text);
