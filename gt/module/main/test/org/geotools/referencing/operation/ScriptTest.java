@@ -105,7 +105,7 @@ import org.opengis.referencing.FactoryException;
  *
  * This is probably the most important test case for the whole CTS module.
  *
- * @version $Id:$
+ * @version $Id$
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux
