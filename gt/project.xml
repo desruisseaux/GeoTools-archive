@@ -20,7 +20,7 @@
                visit each for more details on the status of each module.</description>
   <url>http://www.geotools.org/</url>
   <cvsWebUrl/>
-  <issueTrackingUrl/>
+  <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
   <siteAddress>modules.geotools.org</siteAddress>
   <siteDirectory>/seis/raid1/Apache/htdocs/software/geotools/${pom.artifactId}</siteDirectory>
   <distributionDirectory>/public/html/geotools</distributionDirectory>
