@@ -58,9 +58,6 @@
         maven test
         maven java:compile
         
-      If bulding a war file (e.g. wmsserver module)
-        maven war  
-        
       If building everyting use:
         maven build       -- this will try to build all modules regardless
         maven build-fail  -- this will stop at the first failure
@@ -109,16 +106,23 @@
               
                         <fail unless="imageio.present" 
                         message="JAI ImageIO extention not found.  Please download and install it from:  http://java.sun.com/products/java-media/jai/downloads/download-iio.html"/>               
-                <available file="geotools-src" property="geotools-src.present"/>
-                <fail unless="geotools-src.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>        
+                <available file="module" property="module.present"/>
+                <fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>        
 		<j:set var="gt2home" value="${basedir}"/>
 		<echo>
-      looking for modules in: ${basedir}/geotools-src
+      looking for modules in: ${basedir}/module, ${basedir}/plugin, ${basedir}/ext
       reporting progress to ${gt2home}
     </echo>
      <ant:delete dir="target/test-reports"/>
 		<echo file="${basedir}/buildReport.txt" append="false">GeoTools2 module build report ${DSTAMP}</echo>
-		<maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building" postProcessing="true" ignoreFailures="true"/>
+		<maven:reactor
+		       basedir="${basedir}/module"
+		       includes="*/project.xml"
+		       goals="build:log,clean,jar:install,mergeTestReports"
+		       banner="Building"
+		       postProcessing="true"
+		       ignoreFailures="true"/>
+
 		<loadfile property="build.report" srcFile="${basedir}/buildReport.txt" failonerror="false"/>
 		<echo>BUILD REPORT (from buildReport.txt):
       Sucessfull modules should read 'cleaned, compiled, tested, INSTALLED HHMM'
@@ -128,6 +132,7 @@
       The next line of output will say 'Build Sucessful'  even if some/all modules failed, please check the above report.
       </echo>
 	</goal>
+
 	<goal name="build-fail">
 		<echo>
       looking for modules in: ${basedir}/geotools-src
