@@ -73,9 +73,9 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         
         assertNull(capabilities.getRequest().getGetFeatureInfo());
         
-        assertEquals(capabilities.getLayers().length, 4);
+        assertEquals(capabilities.getLayerList().size(), 4);
         
-        Layer layer = capabilities.getLayers()[0];
+        Layer layer = (Layer) capabilities.getLayerList().get(0);
         assertNotNull(layer);
         assertNull(layer.getName());
         assertEquals(layer.getTitle(), "Microsoft TerraServer Map Server");
@@ -89,7 +89,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         assertEquals(layer.getBoundingBoxes().size(), 0);
         assertEquals(layer.getStyles().size(), 0);
         
-        layer = capabilities.getLayers()[1];
+        layer = (Layer) capabilities.getLayerList().get(1);
         assertEquals(layer.getName(), "DOQ");
         assertEquals(layer.getTitle(), "USGS Digital Ortho-Quadrangles");
         // changed expected to 14 to account for inherited srs
@@ -130,7 +130,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         		-168.67, 17.84, -65.15, 71.55);
           
         
-        layer = capabilities.getLayers()[2];
+        layer = (Layer) capabilities.getLayerList().get(2);
         assertNotNull(layer);
         assertEquals(layer.getName(), "DRG");
         assertEquals(layer.getTitle(), "USGS Raster Graphics (Topo Maps)");
@@ -138,7 +138,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         validateLatLonBoundingBox(layer.getLatLonBoundingBox(), 
         		-168.67, 17.84, -65.15, 71.55);
         
-        layer = capabilities.getLayers()[3];
+        layer = (Layer) capabilities.getLayerList().get(3);
         assertNotNull(layer);
         assertEquals(layer.getName(), "UrbanArea");
         assertEquals(layer.getTitle(), "USGS Urban Areas Ortho-Imagery");

@@ -36,7 +36,7 @@ public class LayerInheritanceTest extends TestCase {
 		WMSCapabilities capabilities = (WMSCapabilities) object;
 		
 		// Get first test layer, it's nested 3 deep
-		Layer layer = capabilities.getLayers()[2];
+		Layer layer = (Layer) capabilities.getLayerList().get(2);
 		assertNotNull(layer);
 		assertNotNull(layer.getParent());
 		
@@ -58,7 +58,7 @@ public class LayerInheritanceTest extends TestCase {
 		assertTrue(layer.getStyles().contains("default"));
 		
 		// Next test layer, nested 3 deep but different path
-		layer = capabilities.getLayers()[4];
+		layer = (Layer) capabilities.getLayerList().get(4);
 		assertNotNull(layer);
 		assertNotNull(layer.getParent());
 		

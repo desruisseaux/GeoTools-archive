@@ -16,6 +16,11 @@
  */
 package org.geotools.data.ows;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Represents a base object for a WMS getCapabilities response.
  *
@@ -24,26 +29,36 @@ package org.geotools.data.ows;
 public class WMSCapabilities {
     private Service service;
     private WMSRequest request;
-    private Layer[] layers;
+    private Layer layer;
     private String version;
     private String[] exceptions;
+    
+    private List layers; //cache
 
-    /**
-     * The layers contained in this Capabilities document, organized according
-     * to the order they are encountered. Each Layer maintains knowledge of its
-     * parent. The hierarchy can be reconstructed using that.
-     *
-     * @return Returns an array of the layers.
-     */
-    public Layer[] getLayers() {
-        return layers;
+    public Layer getLayer() {
+        return layer;
     }
 
-    /**
-     * @param layers The layers to set.
-     */
-    public void setLayers(Layer[] layers) {
-        this.layers = layers;
+    public void setLayer(Layer layer) {
+        this.layer = layer;
+    }
+    
+    public List getLayerList() {
+        if (layers == null) {
+            layers = new ArrayList();
+            layers.add(layer);
+            addChildrenRecursive(layers, layer);
+        }        
+        return Collections.unmodifiableList(layers);
+    }
+    
+    private void addChildrenRecursive(List layers, Layer layer) {
+        if (layer.getChildren() != null) {
+            for (int i = 0; i < layer.getChildren().length; i++) {
+                layers.add(layer.getChildren()[i]);
+                addChildrenRecursive(layers, layer.getChildren()[i]);
+            }
+        }
     }
 
     /**

@@ -1357,14 +1357,9 @@ public class WMSComplexTypes {
 
 				if (sameName(elems[5], value[i])) {
 
-					List layerList = (List) value[i].getValue();
+					Layer layer = (Layer) value[i].getValue();
 
-					Layer[] layers = new Layer[layerList.size()];
-					for (int ii = 0; ii < layerList.size(); ii++) {
-						layers[ii] = (Layer) layerList.get(ii);
-					}
-
-					capabilities.setLayers(layers);
+					capabilities.setLayer(layer);
 				}
 			}
 
@@ -2480,11 +2475,9 @@ public class WMSComplexTypes {
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
 
-			List layers = new LinkedList();
+            List childLayers = new ArrayList();
 
 			Layer layer = new Layer();
-
-			layers.add(0, layer);
 
 			Set crs = new TreeSet();
 			HashMap boundingBoxes = new HashMap();
@@ -2559,10 +2552,9 @@ public class WMSComplexTypes {
 					// TODO maxScaleDenominator ignored
 				}
 				if (sameName(elems[18], value[i])) {
-					List childLayers = (List) value[i].getValue();
-					Layer childLayer = (Layer) childLayers.get(0);
+					Layer childLayer = (Layer) value[i].getValue();
 					childLayer.setParent(layer);
-					layers.addAll(childLayers);
+					childLayers.add(childLayer);
 				}
 
 			}
@@ -2570,6 +2562,8 @@ public class WMSComplexTypes {
 			layer.setSrs(crs);
 			layer.setBoundingBoxes(boundingBoxes);
 			layer.setStyles(styles);
+            
+            layer.setChildren((Layer[]) childLayers.toArray(new Layer[childLayers.size()]));
 
 			// Attributes -- only do queryable for now
 
@@ -2583,7 +2577,7 @@ public class WMSComplexTypes {
 				}
 			}
 
-			return layers;
+			return layer;
 		}
 
 		/*
@@ -2601,7 +2595,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return List.class;
+			return Layer.class;
 		}
 
 		/*

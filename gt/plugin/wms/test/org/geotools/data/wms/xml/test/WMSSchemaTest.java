@@ -71,7 +71,7 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[3], "text/swf");
 		assertEquals(capabilities.getRequest().getGetFeatureInfo().getGet(), new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
 		
-		Layer topLayer = capabilities.getLayers()[0];
+		Layer topLayer = (Layer) capabilities.getLayerList().get(0);
 		assertNotNull(topLayer);
 		assertNull(topLayer.getParent());
 		assertFalse(topLayer.isQueryable());
@@ -96,7 +96,7 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(bbox.getMinY(), -90.0000000017335, 0.0);
 		assertEquals(bbox.getMaxY(), 90, 0.0);
 		
-		Layer layer = capabilities.getLayers()[1];
+		Layer layer = (Layer) capabilities.getLayerList().get(1);
 		assertEquals(layer.getParent(), topLayer);
 		assertTrue(layer.isQueryable());
 		assertEquals(layer.getName(), "Bathymetry");
@@ -118,9 +118,9 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(bbox.getMinY(), -90, 0.0);
 		assertEquals(bbox.getMaxY(), 90, 0.0);
 		
-		assertEquals(capabilities.getLayers().length, 21);
+		assertEquals(capabilities.getLayerList().size(), 21);
 		
-		layer = capabilities.getLayers()[20];
+		layer = (Layer) capabilities.getLayerList().get(20);
 		assertEquals(layer.getParent(), topLayer);
 		assertTrue(layer.isQueryable());
 		assertEquals(layer.getName(), "Ocean features");

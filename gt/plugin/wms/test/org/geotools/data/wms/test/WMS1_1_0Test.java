@@ -167,9 +167,9 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[1], "text/html");
 		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[2], "application/vnd.ogc.gml");
 		
-		assertEquals(capabilities.getLayers().length, 12);
+		assertEquals(capabilities.getLayerList().size(), 12);
 		
-		Layer layer = capabilities.getLayers()[0];
+		Layer layer = (Layer) capabilities.getLayerList().get(0);
 		assertNull(layer.getParent());
 		assertEquals(layer.getName(), "DEMO");
 		assertEquals(layer.getTitle(), "GMap WMS Demo Server");
@@ -186,14 +186,14 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(layer.getBoundingBoxes().size(), 1);
 		assertNotNull(layer.getBoundingBoxes().get("EPSG:42304"));
 		
-		Layer layer2 = capabilities.getLayers()[1];
+		Layer layer2 = (Layer) capabilities.getLayerList().get(1);
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "bathymetry");
 		assertEquals(layer2.getTitle(), "Elevation/Bathymetry");
 		assertTrue(layer2.getSrs().contains("EPSG:42304"));
 		assertFalse(layer2.isQueryable());
 		
-		layer2 = capabilities.getLayers()[2];
+		layer2 = (Layer) capabilities.getLayerList().get(2);
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "land_fn");
 		assertEquals(layer2.getTitle(), "Foreign Lands");
@@ -205,7 +205,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertFalse(layer2.isQueryable());
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
 
-		layer2 = capabilities.getLayers()[3];
+		layer2 = (Layer) capabilities.getLayerList().get(3);
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "park");
 		assertEquals(layer2.getTitle(), "Parks");
@@ -217,7 +217,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertTrue(layer2.isQueryable());
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
 
-		layer2 = capabilities.getLayers()[11];
+		layer2 = (Layer) capabilities.getLayerList().get(11);
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "grid");
 		assertEquals(layer2.getTitle(), "Grid");

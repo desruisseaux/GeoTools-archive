@@ -97,7 +97,7 @@ public class WMSParameterMaker {
                 "Value contains the desired SRS for the entire map");
 
         Set srs = new TreeSet();
-        retrieveSRSs(capabilities.getLayers(), srs);
+        retrieveSRSs((Layer[]) capabilities.getLayerList().toArray(new Layer[capabilities.getLayerList().size()]), srs);
 
         Object[] validValues = (Object[]) srs.toArray();
 
@@ -141,7 +141,7 @@ public class WMSParameterMaker {
                 + "styles that layer can be drawn with.");
 
         List layers = Arrays.asList(WMSUtils.findDrawableLayers(
-                    capabilities.getLayers()));
+                    capabilities.getLayerList()));
 
         GeneralParameterDescriptor[] layerParams = new ParameterDescriptor[layers
             .size()];

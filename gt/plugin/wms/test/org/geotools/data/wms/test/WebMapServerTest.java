@@ -235,7 +235,7 @@ public class WebMapServerTest extends TestCase {
         
         WMSCapabilities caps = wms.getCapabilities();
         
-        Layer layer = caps.getLayers()[1];
+        Layer layer = (Layer) caps.getLayerList().get(1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
         
         Envelope envelope = wms.getEnvelope(layer, crs);
@@ -255,7 +255,7 @@ public class WebMapServerTest extends TestCase {
         assertEquals(envelope.getMaximum(0), 3.0728e+06, 0.0);
         assertEquals(envelope.getMaximum(1), 3.84e+06, 0.0);
         
-        layer = caps.getLayers()[2];
+        layer = (Layer) caps.getLayerList().get(2);
         crs = CRS.decode("EPSG:4326");
         
         envelope = wms.getEnvelope(layer, crs);

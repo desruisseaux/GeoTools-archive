@@ -520,13 +520,13 @@ public class WebMapServer implements Discovery {
      * It flattens the hierarchy. Each element is of type Layer.
      * </p>
      * 
-     * @return an iterator that will iterate through the layers
+     * @return a List containing each Layer
      */
     public List entries() {
         ArrayList layers = new ArrayList();
 
-        for( int i = 0; i < capabilities.getLayers().length; i++ ) {
-            Layer layer = capabilities.getLayers()[i];
+        for( int i = 0; i < capabilities.getLayerList().size(); i++ ) {
+            Layer layer = (Layer) capabilities.getLayerList().get(i);
 
             if ((layer.getName() != null) && (layer.getName().length() != 0)) { //$NON-NLS-1$
 

@@ -58,6 +58,7 @@ public class Layer implements Comparable {
     private List styles;
     private Boolean queryable = null;
     private Layer parent;
+    private Layer[] children;
     
     public Layer() {
         
@@ -293,5 +294,11 @@ public class Layer implements Comparable {
 
     public void setLatLonBoundingBox(LatLonBoundingBox latLonBoundingBox) {
         this.latLonBoundingBox = latLonBoundingBox;
+    }
+    public Layer[] getChildren() {
+        return children;
+    }
+    public void setChildren( Layer[] children ) {
+        this.children = children;
     }
 }
