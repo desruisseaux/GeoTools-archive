@@ -36,8 +36,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
-import org.geotools.data.DataSource;
-import org.geotools.data.DataSourceFinder;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -315,7 +317,7 @@ public class LegendIconMaker {
                 new File("u:/work/MMPPAS/step1/testdata/geog/eds_region.shp").toURL()
                                                                              .toString());
 
-            DataSource datasource1 = DataSourceFinder.getDataSource(params1);
+            DataStore data = DataStoreFinder.getDataStore(params1);
             int width = UIManager.getIcon("Tree.openIcon").getIconWidth();
             Expression fcolor1 = FilterFactory.createFilterFactory()
                                               .createLiteralExpression(Color.PINK
@@ -332,9 +334,13 @@ public class LegendIconMaker {
                                                            .createPolygonSymbolizer(stroke,
                     fill, "testGeometry");
             JLabel iconJLabel = new JLabel("Legend Icon Example");
+            
+            String typeName = data.getTypeNames()[0];
+            FeatureSource eds_region = data.getFeatureSource( typeName );
+            
             iconJLabel.setIcon(LegendIconMaker.makeLegendIcon(width,
                     new Color(0, 0, 0, 0), new Symbolizer[] { polySymbolizer },
-                    (Feature) datasource1.getFeatures().toArray()[0]));
+                    (Feature) eds_region.getFeatures().collection().toArray()[0]));
 
             JFrame f = new JFrame();
             f.getContentPane().setBackground(new Color(204, 204, 255));
