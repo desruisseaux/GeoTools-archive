@@ -1,5 +1,11 @@
 package org.geotools.metadata;
 
+import java.io.IOException;
+
+import org.geotools.expr.Expr;
+import org.geotools.feature.Feature;
+import org.geotools.filter.Filter;
+
 /**
  * Represents a query against metadata.
  * <p>
@@ -26,6 +32,30 @@ package org.geotools.metadata;
  * @author Jody Garnett, Refractions Research
  * @version 2.1
  */
-public abstract class Query {	
-	abstract public boolean accepts( Metadata meta );
+public class Query {
+	Expr expr;
+	public Query( Expr expr ){
+		this.expr = expr;
+	}
+	public boolean accepts( Feature feature ) throws IOException{
+		Metadata meta = null;
+		
+		// Get metdata for feature
+		// meta = geature.getMetadata();
+		Expr query = null;
+		if( meta != null ){
+			query = expr.resolve( meta );
+		}
+		else {
+			query = expr; 
+		}		
+		Filter filter = query.filter( feature.getFeatureType() );
+		
+		return filter.contains( feature );
+	}
+	public boolean accepts( Metadata meta ){
+		Expr query = expr.resolve( meta );
+		Filter filter = query.filter( null );
+		return filter.contains( );
+	}
 }

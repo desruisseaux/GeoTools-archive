@@ -57,7 +57,8 @@ import com.vividsolutions.jts.geom.Envelope;
   * @author Jody Garnett
   */
  abstract class AbstractExpr implements Expr {
- 	protected FilterFactory factory = FilterFactory.createFilterFactory();
+ 	
+ 	protected FilterFactory factory = FilterFactory.createFilterFactory(); 	
 	/**
 	 * Bind all meta entries according to provided metadata.
 	 * <p>
