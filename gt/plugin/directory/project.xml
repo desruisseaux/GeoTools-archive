@@ -65,8 +65,6 @@
           <includes>
             <include>META-INF/</include>
             <include>**/test-data/</include>
-            <include>**/data.zip</include>
-            <include>**/*.wkt</include>
           </includes>
         </resource>
       </resources>
