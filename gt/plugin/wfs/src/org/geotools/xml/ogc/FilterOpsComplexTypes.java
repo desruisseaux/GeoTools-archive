@@ -1239,11 +1239,13 @@ public class FilterOpsComplexTypes {
             output.startElement(element.getNamespace(),element.getName(),null);
             if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY){
                 elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
-                elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                Geometry g = ((Geometry)((LiteralExpression)lf.getLeftGeometry()).getLiteral()).getEnvelope();
+                elems[1].getType().encode(elems[1],g,output,hints); // geom
             }else{
                 if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY){
                     elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
-                    elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+                    Geometry g = ((Geometry)((LiteralExpression)lf.getRightGeometry()).getLiteral()).getEnvelope();
+                    elems[1].getType().encode(elems[1],g,output,hints); // geom
                 }else{
                     throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name : BBOXType");
                 }

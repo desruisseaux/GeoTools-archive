@@ -1181,7 +1181,10 @@ public class FilterComplexTypes {
                 code = attrs.getValue(getNamespace().toString(),"code");
             
 //            ServiceException se = new ServiceException(msg,code == null?0:Integer.parseInt(code.trim()),locator);
-            ServiceException se = new ServiceException(msg,code,locator);
+System.out.println("msg="+msg==null?"null":msg);
+System.out.println("code="+code==null?"null":code);
+System.out.println("locator="+locator==null?"null":locator);
+            ServiceException se = new ServiceException(msg==null?"":msg,code==null?"":code,locator==null?"":locator);
             if(cache(element,hints)){
                 return se;
             }

@@ -476,22 +476,25 @@ public class WFSDataStore extends AbstractDataStore{
         Writer w = new OutputStreamWriter(os);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
-//
-//Writer sw = new StringWriter();
-//try{
-//	if(query == null){
-//		query = new DefaultQuery(typeName);
-//   	}else{
-//    if(!typeName.equals(query.getTypeName())){
-//    	logger.warning("typeName != query.getTypeName() :: causes conflict");
-//    }}
-//    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
-//}catch(OperationNotSupportedException e){
-//    logger.warning(e.toString());
-//    throw new SAXException(e);
-//}
-//System.out.println(sw);
-//        
+
+Writer sw = new StringWriter();
+try{
+	if(query == null){
+		query = new DefaultQuery(typeName);
+   	}else{
+    if(!typeName.equals(query.getTypeName())){
+    	logger.warning("typeName != query.getTypeName() :: causes conflict");
+    }}
+    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
+}catch(OperationNotSupportedException e){
+    logger.warning(e.toString());
+    throw new SAXException(e);
+}
+System.out.println("WFS FILTER START");
+System.out.println(sw);
+System.out.println("WFS FILTER END");
+System.out.println("FILTER WAS "+query.getFilter());
+        
         
         try{
         	if(query == null){

@@ -104,7 +104,7 @@ public class DocumentWriter {
      * @see WRITE_SCHEMA
      */
     public static void writeDocument(Object value, Schema schema, File f,
-            Map hints) throws OperationNotSupportedException, IOException, SAXException {
+            Map hints) throws OperationNotSupportedException, IOException {
         if ((f == null) || (!f.canWrite())) {
             throw new IOException("Cannot write to " + f);
         }
@@ -151,7 +151,7 @@ public class DocumentWriter {
      * @see SCHEMA_ORDER
      */
     public static void writeDocument(Object value, Schema schema, Writer w,
-                Map hints) throws OperationNotSupportedException, IOException, SAXException {
+                Map hints) throws OperationNotSupportedException, IOException {
 
         if (hints!=null && hints.containsKey(WRITE_SCHEMA)) {
             Writer w2 = (Writer)hints.get(WRITE_SCHEMA);
@@ -191,7 +191,7 @@ public class DocumentWriter {
      * @see WRITE_SCHEMA
      */
     public static void writeFragment(Object value, Schema schema, File f,
-            Map hints) throws OperationNotSupportedException, IOException, SAXException {
+            Map hints) throws OperationNotSupportedException, IOException {
         if ((f == null) || (!f.canWrite())) {
             throw new IOException("Cannot write to " + f);
         }
@@ -223,7 +223,7 @@ public class DocumentWriter {
      * @see SCHEMA_ORDER
      */
     public static void writeFragment(Object value, Schema schema, Writer w,
-                Map hints) throws OperationNotSupportedException, IOException, SAXException {
+                Map hints) throws OperationNotSupportedException, IOException {
         WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
 
         writeFragment(value,wch);
@@ -231,7 +231,7 @@ public class DocumentWriter {
         w.flush();
     }
     
-    private static void writeFragment(Object value, WriterContentHandler wch) throws OperationNotSupportedException, IOException, SAXException {
+    private static void writeFragment(Object value, WriterContentHandler wch) throws OperationNotSupportedException, IOException {
     Map hints = wch.hints;
 
     Element e = null;
@@ -1329,8 +1329,9 @@ public class DocumentWriter {
                     if ((imports[i].getURI() != null)
                             && imports[i].getURI().isAbsolute()
                             && imports[i].includesURI(imports[i].getURI())) {
-                        s += (" " + imports[i].getTargetNamespace() + " "
-                        + imports[i].getURI());
+                    	if(!imports[i].getURI().equals(imports[i].getTargetNamespace()))
+                    		s += (" " + imports[i].getTargetNamespace() + " "
+                    				+ imports[i].getURI());
                     }
                 }}
 

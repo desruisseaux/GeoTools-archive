@@ -127,7 +127,7 @@ public class WFSDataStoreReadTest extends TestCase {
     public void testGeomatics() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://gws2.pcigeomatics.com/wfs1.0.0/wfs?service=WFS&request=getcapabilities");
         System.out.println("\nGeomatics");
-        doFeatureType(url,true,false);
+        doFeatureType(url,false,false);
         // TODO uncomment when server bug is fixed
         doFeatureReader(url,false,false);
         doFeatureReaderWithFilter(url,false,false);
