@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+
 /**
  * <p>
  * An instance of this interface should represent an Attribute from an XML
@@ -98,7 +99,7 @@ public interface Attribute {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public URI getNamespace();
 

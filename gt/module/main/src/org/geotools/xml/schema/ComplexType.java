@@ -73,8 +73,8 @@ public interface ComplexType extends Type {
     public Attribute[] getAttributes();
 
     /**
-     * Specifies a mask which denotes which substitution mechanisms may be
-     * used for this complex type definition.
+     * Specifies a mask which denotes which substitution mechanisms may be used
+     * for this complex type definition.
      *
      * @return
      *
@@ -93,6 +93,7 @@ public interface ComplexType extends Type {
      * @see ElementGrouping
      */
     public ElementGrouping getChild();
+
     public Element[] getChildElements();
 
     /**

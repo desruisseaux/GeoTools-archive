@@ -27,14 +27,14 @@ public interface AttributeValue {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public String getValue();
 
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public Attribute getAttribute();
 }

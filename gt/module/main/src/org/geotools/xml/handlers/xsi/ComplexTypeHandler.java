@@ -325,18 +325,17 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
         if ("extension".equalsIgnoreCase(block)) {
             return EXTENSION;
-        } else {
-            if ("restriction".equalsIgnoreCase(block)) {
-                return RESTRICTION;
-            } else {
-                if ("#all".equalsIgnoreCase(block)) {
-                    return ALL;
-                } else {
-                    throw new SAXException("Unknown Block Type: '" + block
-                        + "'");
-                }
-            }
         }
+
+        if ("restriction".equalsIgnoreCase(block)) {
+            return RESTRICTION;
+        }
+
+        if ("#all".equalsIgnoreCase(block)) {
+            return ALL;
+        }
+
+        throw new SAXException("Unknown Block Type: '" + block + "'");
     }
 
     /**
@@ -715,11 +714,10 @@ public class ComplexTypeHandler extends XSIElementHandler {
                     return new DefaultSequence((Sequence) g.getChild(),
                         ((ElementGroupingHandler) ext.getChild()).compress(
                             parent));
-                } else {
-                    return new DefaultSequence((Choice) g.getChild(),
-                        ((ElementGroupingHandler) ext.getChild()).compress(
-                            parent));
                 }
+
+                return new DefaultSequence((Choice) g.getChild(),
+                    ((ElementGroupingHandler) ext.getChild()).compress(parent));
             }
 
         case ElementGrouping.SEQUENCE:
@@ -930,43 +928,66 @@ public class ComplexTypeHandler extends XSIElementHandler {
         boolean abstracT;
         boolean mixed;
 
-        public Element[] getChildElements(){
-            if(child == null)
+        public Element[] getChildElements() {
+            if (child == null) {
                 return null;
+            }
+
             return getChildElements(child);
         }
-        public Element[] getChildElements(ElementGrouping child){
-            switch(child.getGrouping()){
-        	case ElementGrouping.ALL:
-        	    return ((All)child).getElements();
-        	case ElementGrouping.ANY:
-        	    return null;
-        	case ElementGrouping.CHOICE:
-        	    ElementGrouping[] children = ((Choice)child).getChildren();
-        		List l = new LinkedList();
-        		for(int i=0;i<children.length;i++){
-        		    Element[] t = getChildElements(children[i]);
-        		    if(t!=null)
-        		        l.addAll(Arrays.asList(t));
-        		}
-        		return l.size()>0?(Element[])l.toArray(new Element[l.size()]):null;
-        	case ElementGrouping.ELEMENT:
-        	    return new Element[] {(Element)child,};
-        	case ElementGrouping.GROUP:
-        	    ElementGrouping c = ((Group)child).getChild();
-        	    return getChildElements(c);
-        	case ElementGrouping.SEQUENCE:
-        	    children = ((Sequence)child).getChildren();
-    			l = new LinkedList();
-    			for(int i=0;i<children.length;i++){
-    			    Element[] t = getChildElements(children[i]);
-    			    if(t!=null)
-    			        l.addAll(Arrays.asList(t));
-    			}
-    			return l.size()>0?(Element[])l.toArray(new Element[l.size()]):null;
+
+        public Element[] getChildElements(ElementGrouping child) {
+            switch (child.getGrouping()) {
+            case ElementGrouping.ALL:
+                return ((All) child).getElements();
+
+            case ElementGrouping.ANY:
+                return null;
+
+            case ElementGrouping.CHOICE:
+
+                ElementGrouping[] children = ((Choice) child).getChildren();
+                List l = new LinkedList();
+
+                for (int i = 0; i < children.length; i++) {
+                    Element[] t = getChildElements(children[i]);
+
+                    if (t != null) {
+                        l.addAll(Arrays.asList(t));
+                    }
+                }
+
+                return (l.size() > 0)
+                ? (Element[]) l.toArray(new Element[l.size()]) : null;
+
+            case ElementGrouping.ELEMENT:
+                return new Element[] { (Element) child, };
+
+            case ElementGrouping.GROUP:
+
+                ElementGrouping c = ((Group) child).getChild();
+
+                return getChildElements(c);
+
+            case ElementGrouping.SEQUENCE:
+                children = ((Sequence) child).getChildren();
+                l = new LinkedList();
+
+                for (int i = 0; i < children.length; i++) {
+                    Element[] t = getChildElements(children[i]);
+
+                    if (t != null) {
+                        l.addAll(Arrays.asList(t));
+                    }
+                }
+
+                return (l.size() > 0)
+                ? (Element[]) l.toArray(new Element[l.size()]) : null;
             }
+
             return null;
         }
+
         /**
          * @see org.geotools.xml.schema.ComplexType#cache()
          */
@@ -1116,17 +1137,18 @@ public class ComplexTypeHandler extends XSIElementHandler {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-//            System.out.println("Checking to encode "+element.getName());
-//            System.out.println("Parent = "+(parent == null?"null":parent.getName()));
-//            System.out.println("Value Type = "+value==null?null:value.getClass().getName());
-            if (parent!=null && parent.canEncode(element,value,hints)){
-//                System.out.println("Parent can Encode :)");
-            	return true;
+            //            System.out.println("Checking to encode "+element.getName());
+            //            System.out.println("Parent = "+(parent == null?"null":parent.getName()));
+            //            System.out.println("Value Type = "+value==null?null:value.getClass().getName());
+            if ((parent != null) && parent.canEncode(element, value, hints)) {
+                //                System.out.println("Parent can Encode :)");
+                return true;
             }
+
             // TODO check children if length works
-//            if(value instanceof Object[]){
-//                Object[] vals = (Object[])value;
-//            }
+            //            if(value instanceof Object[]){
+            //                Object[] vals = (Object[])value;
+            //            }
             return false;
         }
 
@@ -1137,16 +1159,14 @@ public class ComplexTypeHandler extends XSIElementHandler {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            if (parent!=null && parent.canEncode(element, value, hints)) {
-
-//                System.out.println("Encoding "+element.getName());
-//                System.out.println("Using Parent = "+(parent == null?"null":parent.getName()));
-//                System.out.println("Value Type = "+value==null?null:value.getClass().getName());
-
+            if ((parent != null) && parent.canEncode(element, value, hints)) {
+                //                System.out.println("Encoding "+element.getName());
+                //                System.out.println("Using Parent = "+(parent == null?"null":parent.getName()));
+                //                System.out.println("Value Type = "+value==null?null:value.getClass().getName());
                 parent.encode(element, value, output, hints);
             } else {
-//System.out.println("Encoding "+getName());
-//System.out.println(parent==null?"no parent":parent.getName());
+                //System.out.println("Encoding "+getName());
+                //System.out.println(parent==null?"no parent":parent.getName());
                 throw new OperationNotSupportedException(
                     "This is a generic schema element -- cannot print yet");
 

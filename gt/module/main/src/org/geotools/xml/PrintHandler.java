@@ -24,8 +24,8 @@ import java.net.URI;
 
 
 /**
- * PrintHandler accepts SAXish events and generated output. 
- * 
+ * PrintHandler accepts SAXish events and generated output.
+ *
  * @author dzwiers
  */
 public interface PrintHandler {
@@ -36,7 +36,7 @@ public interface PrintHandler {
      * @param localName DOCUMENT ME!
      * @param attributes DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void startElement(URI namespaceURI, String localName,
         Attributes attributes) throws IOException;
@@ -48,7 +48,7 @@ public interface PrintHandler {
      * @param localName DOCUMENT ME!
      * @param attributes DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void element(URI namespaceURI, String localName,
         Attributes attributes) throws IOException;
@@ -59,7 +59,7 @@ public interface PrintHandler {
      * @param namespaceURI DOCUMENT ME!
      * @param localName DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void endElement(URI namespaceURI, String localName)
         throws IOException;
@@ -71,7 +71,7 @@ public interface PrintHandler {
      * @param arg1 DOCUMENT ME!
      * @param arg2 DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void characters(char[] arg0, int arg1, int arg2)
         throws IOException;
@@ -81,7 +81,7 @@ public interface PrintHandler {
      *
      * @param s DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void characters(String s) throws IOException;
 
@@ -92,7 +92,7 @@ public interface PrintHandler {
      * @param arg1 DOCUMENT ME!
      * @param arg2 DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void ignorableWhitespace(char[] arg0, int arg1, int arg2)
         throws IOException;
@@ -100,22 +100,22 @@ public interface PrintHandler {
     /**
      * DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void startDocument() throws IOException;
 
     /**
      * DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public void endDocument() throws IOException;
-    
+
     public Schema getDocumentSchema();
-    
+
     public Element findElement(Object value);
-    
+
     public Element findElement(String name);
-    
+
     public Object getHint(Object key);
 }

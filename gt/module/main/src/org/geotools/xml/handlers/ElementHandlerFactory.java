@@ -61,7 +61,7 @@ public class ElementHandlerFactory {
     /**
      * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
      */
-    public void endPrefixMapping(String prefix) throws SAXException {
+    public void endPrefixMapping(String prefix) {
         Schema s = (Schema) prefixSchemas.remove(prefix);
 
         if (s != null) {
@@ -78,19 +78,19 @@ public class ElementHandlerFactory {
         logger.finest("Target == '" + targ + "'");
         logger.finest("URI == '" + uri + "'");
 
-        try{
-        URI tns = new URI(targ);
-        Schema s = SchemaFactory.getInstance(tns, uri, logger.getLevel());
+        try {
+            URI tns = new URI(targ);
+            Schema s = SchemaFactory.getInstance(tns, uri, logger.getLevel());
 
-        if(s!=null){
-        if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
-            defaultNS = s.getTargetNamespace();
-        }
+            if (s != null) {
+                if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
+                    defaultNS = s.getTargetNamespace();
+                }
 
-        targSchemas.put(s.getTargetNamespace(), s);
-        prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
-        }
-        }catch(URISyntaxException e){
+                targSchemas.put(s.getTargetNamespace(), s);
+                prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+            }
+        } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
@@ -103,18 +103,22 @@ public class ElementHandlerFactory {
     public void startPrefixMapping(String prefix, String targ)
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
-        try{
-        URI tns = new URI(targ);
-        Schema s = SchemaFactory.getInstance(tns);
-        if(s == null)
-            return;
-        
-        if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
-            defaultNS = s.getTargetNamespace();
-        }
-        targSchemas.put(s.getTargetNamespace(), s);
-        prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
-        }catch(URISyntaxException e){
+
+        try {
+            URI tns = new URI(targ);
+            Schema s = SchemaFactory.getInstance(tns);
+
+            if (s == null) {
+                return;
+            }
+
+            if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
+                defaultNS = s.getTargetNamespace();
+            }
+
+            targSchemas.put(s.getTargetNamespace(), s);
+            prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+        } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }

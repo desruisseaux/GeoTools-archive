@@ -90,8 +90,7 @@ public class SchemaHandler extends XSIElementHandler {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    public void startPrefixMapping(String pref, String uri)
-        throws SAXException {
+    public void startPrefixMapping(String pref, String uri) {
         if (targetNamespace == null) {
             if (prefixCache == null) {
                 prefixCache = new HashMap();
@@ -118,13 +117,15 @@ public class SchemaHandler extends XSIElementHandler {
         if (targetNamespace == null) {
             targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
         }
+
         try {
             this.targetNamespace = new URI(targetNamespace);
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-//System.out.println("NS = "+targetNamespace);
+
+        //System.out.println("NS = "+targetNamespace);
         if ((prefixCache != null) && (targetNamespace != null)
                 && (!targetNamespace.equals(""))) {
             Iterator i = prefixCache.keySet().iterator();
@@ -349,11 +350,13 @@ public class SchemaHandler extends XSIElementHandler {
                 uri = thisURI.resolve(uri);
             }
         }
-//System.out.println(prefix + ":"+targetNamespace);
-        if(prefix == null){
-//System.out.println("prefix is null");
-			prefix = (String)prefixCache.get(targetNamespace);
-//System.out.println("prefix is now "+prefix);
+
+        //System.out.println(prefix + ":"+targetNamespace);
+        if (prefix == null) {
+            //System.out.println("prefix is null");
+            prefix = (String) prefixCache.get(targetNamespace);
+
+            //System.out.println("prefix is now "+prefix);
         }
 
         Iterator it = null;
@@ -396,15 +399,18 @@ public class SchemaHandler extends XSIElementHandler {
                 if (obj instanceof ImportHandler) {
                     ImportHandler imp = (ImportHandler) obj;
                     URI incURI = null;
-                    if(imp.getSchemaLocation()!= null && thisURI!=null)
+
+                    if ((imp.getSchemaLocation() != null) && (thisURI != null)) {
                         incURI = thisURI.normalize().resolve(imp
-                            .getSchemaLocation());
+                                .getSchemaLocation());
+                    }
+
                     Schema cs = SchemaFactory.getInstance(imp.getNamespace(),
                             incURI, logger.getLevel());
 
                     imports.add(cs);
                 } else {
-                    imports.add((Schema) obj);
+                    imports.add(obj);
                 }
             }
 
@@ -603,7 +609,7 @@ public class SchemaHandler extends XSIElementHandler {
                     SimpleTypeHandler sst = (SimpleTypeHandler) o;
 
                     if (qName.equalsIgnoreCase(sst.getName())) {
-                        return (SimpleType) sst.compress(this);
+                        return sst.compress(this);
                     }
                 } else {
                     SimpleType sst = (SimpleType) o;
@@ -707,7 +713,7 @@ public class SchemaHandler extends XSIElementHandler {
                 ComplexTypeHandler sst = (ComplexTypeHandler) o;
 
                 if (qName.equalsIgnoreCase(sst.getName())) {
-                    return (ComplexType) sst.compress(this);
+                    return sst.compress(this);
                 }
             } else {
                 ComplexType sst = (ComplexType) o;
@@ -1002,7 +1008,7 @@ public class SchemaHandler extends XSIElementHandler {
                 AttributeGroupHandler sst = (AttributeGroupHandler) o;
 
                 if (qName.equalsIgnoreCase(sst.getName())) {
-                    return (AttributeGroup) sst.compress(this);
+                    return sst.compress(this);
                 }
             } else {
                 AttributeGroup sst = (AttributeGroup) o;
@@ -1093,7 +1099,7 @@ public class SchemaHandler extends XSIElementHandler {
                 AttributeHandler sst = (AttributeHandler) o;
 
                 if (qName.equalsIgnoreCase(sst.getName())) {
-                    return (Attribute) sst.compress(this);
+                    return sst.compress(this);
                 }
             } else {
                 Attribute sst = (Attribute) o;
@@ -1331,7 +1337,7 @@ public class SchemaHandler extends XSIElementHandler {
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-//System.out.println("NS END = "+targetNamespace);
+        //System.out.println("NS END = "+targetNamespace);
     }
 
     /**

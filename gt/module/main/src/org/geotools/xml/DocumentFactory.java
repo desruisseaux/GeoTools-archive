@@ -110,7 +110,7 @@ public class DocumentFactory {
      * described as Schemas will result in errors, as opposed to a vid parse.
      * </p>
      *
-     * @param desiredDocument
+     * @param is
      * @param hints May be null.
      * @param level
      *
@@ -141,6 +141,7 @@ public class DocumentFactory {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         spf.setValidating(false);
+
         try {
             return spf.newSAXParser();
         } catch (ParserConfigurationException e) {

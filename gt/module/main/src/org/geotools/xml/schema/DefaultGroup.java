@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+
 /**
  * <p>
  * DOCUMENT ME!

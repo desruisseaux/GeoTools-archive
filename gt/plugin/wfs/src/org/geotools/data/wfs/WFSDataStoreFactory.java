@@ -1,116 +1,193 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.wfs;
 
+import org.geotools.data.AbstractDataStoreFactory;
+import org.geotools.data.DataSourceMetadataEnity;
+import org.geotools.data.DataStore;
+import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.AbstractDataStoreFactory;
-import org.geotools.data.DataSourceMetadataEnity;
-import org.geotools.data.DataStore;
-import org.xml.sax.SAXException;
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
-public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements DataStoreFactorySpi{
+public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements DataStoreFactorySpi{
 
     // note one of the two is required
-    public static final Param GET_CAPABILITIES_URL = new Param("WFSDataStoreFactory:GET_CAPABILITIES_URL",URL.class,"Represents a URL to the getCapabilities document. This URL does not need to be altered in any way. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.",false);
-    public static final Param SERVER_URL = new Param("WFSDataStoreFactory:SERVER_URL",URL.class,"Represents a URL to the wfs server. This URL represents the server bases url, and should have the capability request post-pended. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.");
-    
+    public static final Param GET_CAPABILITIES_URL = new Param("WFSDataStoreFactory:GET_CAPABILITIES_URL",
+            URL.class,
+            "Represents a URL to the getCapabilities document. This URL does not need to be altered in any way. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.",
+            false);
+    public static final Param SERVER_URL = new Param("WFSDataStoreFactory:SERVER_URL",
+            URL.class,
+            "Represents a URL to the wfs server. This URL represents the server bases url, and should have the capability request post-pended. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.");
+
     // note may not have both, when neither is specified will prefer post
-    public static final Param USE_POST = new Param("WFSDataStoreFactory:USE_POST",Boolean.class,"This specifies whether to use the POST portions of the getCapabilities document. When false the POST portion of the document should be ignored. When true, the POST portion should be used first. If this attribute is missing, and GET is specified, POST requests will be attempted when GET requests are not supported and POST requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",false);
-    public static final Param USE_GET = new Param("WFSDataStoreFactory:USE_GET",Boolean.class,"This specifies whether to use the GET portions of the getCapabilities document. When false the GET portion of the document should be ignored. When true, the GET portion should be used first. If this attribute is missing, and POST is specified, GET requests will be attempted when POST requests are not supported and GET requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",false);
-    
+    public static final Param USE_POST = new Param("WFSDataStoreFactory:USE_POST",
+            Boolean.class,
+            "This specifies whether to use the POST portions of the getCapabilities document. When false the POST portion of the document should be ignored. When true, the POST portion should be used first. If this attribute is missing, and GET is specified, POST requests will be attempted when GET requests are not supported and POST requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",
+            false);
+    public static final Param USE_GET = new Param("WFSDataStoreFactory:USE_GET",
+            Boolean.class,
+            "This specifies whether to use the GET portions of the getCapabilities document. When false the GET portion of the document should be ignored. When true, the GET portion should be used first. If this attribute is missing, and POST is specified, GET requests will be attempted when POST requests are not supported and GET requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",
+            false);
+
     // password stuff -- see java.net.Authentication
     // either both or neither
-    public static final Param USERNAME = new Param("WFSDataStoreFactory:USERNAME",String.class,"This allows the user to specify a username. This param should not be used without the PASSWORD param.",false);
-    public static final Param PASSWORD = new Param("WFSDataStoreFactory:PASSWORD",String.class,"This allows the user to specify a username. This param should not be used without the USERNAME param.",false);
+    public static final Param USERNAME = new Param("WFSDataStoreFactory:USERNAME",
+            String.class,
+            "This allows the user to specify a username. This param should not be used without the PASSWORD param.",
+            false);
+    public static final Param PASSWORD = new Param("WFSDataStoreFactory:PASSWORD",
+            String.class,
+            "This allows the user to specify a username. This param should not be used without the USERNAME param.",
+            false);
 
     // timeout -- optional
-    public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",Integer.class,"This allows the user to specify a timeout in milliseconds. This param has a default value of 1000ms.",false);
-    
+    public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",
+            Integer.class,
+            "This allows the user to specify a timeout in milliseconds. This param has a default value of 1000ms.",
+            false);
+
     // buffer size -- optional
-    public static final Param BUFFER_SIZE = new Param("WFSDataStoreFactory:BUFFER_SIZE",Integer.class,"This allows the user to specify a buffer size in features. This param has a default value of 10 features.",false);
-    
+    public static final Param BUFFER_SIZE = new Param("WFSDataStoreFactory:BUFFER_SIZE",
+            Integer.class,
+            "This allows the user to specify a buffer size in features. This param has a default value of 10 features.",
+            false);
     private Map cache = new HashMap();
-    private Logger logger = Logger.getLogger("org.geotools.data.wfs"); 
-    
+    private Logger logger = Logger.getLogger("org.geotools.data.wfs");
+
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
         // TODO check that we can use hashcodes in this manner -- think it's ok, particularily for regular usage
-        if(cache.containsKey(params))
-            return (DataStore)cache.get(params);
+        if (cache.containsKey(params)) {
+            return (DataStore) cache.get(params);
+        }
+
         return createNewDataStore(params);
     }
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
      */
-    public DataSourceMetadataEnity createMetadata(Map params) throws IOException {
+    public DataSourceMetadataEnity createMetadata(Map params)
+        throws IOException {
         URL host = null;
-        if(params.containsKey(SERVER_URL.key)){
-            host = (URL)params.get(SERVER_URL.key);
-        }else{
-            host = ((URL)params.get(GET_CAPABILITIES_URL.key));
+
+        if (params.containsKey(SERVER_URL.key)) {
+            host = (URL) params.get(SERVER_URL.key);
+        } else {
+            host = ((URL) params.get(GET_CAPABILITIES_URL.key));
         }
-        return new DataSourceMetadataEnity(host.toString(), getDisplayName(), getDescription() );
+
+        return new DataSourceMetadataEnity(host.toString(), getDisplayName(),
+            getDescription());
     }
 
     /**
-     * @throws 
+     * DOCUMENT ME!
+     *
+     * @param params DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException
+     *
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         URL host = null;
-        if(params.containsKey(SERVER_URL.key)){
-            host = (URL) SERVER_URL.lookUp( params );
+
+        if (params.containsKey(SERVER_URL.key)) {
+            host = (URL) SERVER_URL.lookUp(params);
             host = WFSDataStore.createGetCapabilitiesRequest(host);
-        }else{
-            host = ((URL)GET_CAPABILITIES_URL.lookUp(params));
+        } else {
+            host = ((URL) GET_CAPABILITIES_URL.lookUp(params));
         }
-        
-        Boolean get,post;get = post = null;
-        if(params.containsKey(USE_GET.key))
-            get = (Boolean)USE_GET.lookUp(params);
-        if(params.containsKey(USE_POST.key))
-            post = (Boolean)USE_POST.lookUp(params);
+
+        Boolean get;
+        Boolean post;
+        get = post = null;
+
+        if (params.containsKey(USE_GET.key)) {
+            get = (Boolean) USE_GET.lookUp(params);
+        }
+
+        if (params.containsKey(USE_POST.key)) {
+            post = (Boolean) USE_POST.lookUp(params);
+        }
+
         // sHould be for true only ... TODO fix this up
-//        if(get != null && post != null)
-//            throw new IOException("Cannot define both get and post");
-        
-        String user,pass; user = pass = null;
+        //        if(get != null && post != null)
+        //            throw new IOException("Cannot define both get and post");
+        String user;
+
+        // sHould be for true only ... TODO fix this up
+        //        if(get != null && post != null)
+        //            throw new IOException("Cannot define both get and post");
+        String pass;
+        user = pass = null;
+
         int timeout = 3000;
         int buffer = 10;
-        if(params.containsKey(TIMEOUT.key))
-            timeout = ((Integer)TIMEOUT.lookUp(params)).intValue();
-        if(params.containsKey(BUFFER_SIZE.key))
-            buffer = ((Integer)BUFFER_SIZE.lookUp(params)).intValue();
-        if(params.containsKey(USERNAME.key))
-            user = (String)USERNAME.lookUp(params);
-        if(params.containsKey(PASSWORD.key))
-            pass = (String)PASSWORD.lookUp(params);
-        if((user == null && pass!=null) || (pass == null && user!=null))
-            throw new IOException("Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
-        
+
+        if (params.containsKey(TIMEOUT.key)) {
+            timeout = ((Integer) TIMEOUT.lookUp(params)).intValue();
+        }
+
+        if (params.containsKey(BUFFER_SIZE.key)) {
+            buffer = ((Integer) BUFFER_SIZE.lookUp(params)).intValue();
+        }
+
+        if (params.containsKey(USERNAME.key)) {
+            user = (String) USERNAME.lookUp(params);
+        }
+
+        if (params.containsKey(PASSWORD.key)) {
+            pass = (String) PASSWORD.lookUp(params);
+        }
+
+        if (((user == null) && (pass != null))
+                || ((pass == null) && (user != null))) {
+            throw new IOException(
+                "Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
+        }
+
         DataStore ds = null;
+
         try {
-            ds = new WFSDataStore(host,get,post,user,pass,timeout,buffer);
-            cache.put(params,ds);
+            ds = new WFSDataStore(host, get, post, user, pass, timeout, buffer);
+            cache.put(params, ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
             throw new IOException(e.toString());
         }
-        
+
         return ds;
     }
 
@@ -125,7 +202,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements D
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[]{GET_CAPABILITIES_URL,SERVER_URL,USE_POST,USE_GET,USERNAME,PASSWORD};
+        return new Param[] {
+            GET_CAPABILITIES_URL, SERVER_URL, USE_POST, USE_GET, USERNAME,
+            PASSWORD
+        };
     }
 
     /**
@@ -135,61 +215,77 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements D
         if (params == null) {
             return false;
         }
-        
+
         // TODO check types here?
-        
         // check url
-        if(params.containsKey(GET_CAPABILITIES_URL.key)){
-            if(params.containsKey(SERVER_URL.key))
-                return false;	// cannot have both
-        }else{
-            if(!params.containsKey(SERVER_URL.key))
-                return false;	// must have atleast one
+        if (params.containsKey(GET_CAPABILITIES_URL.key)) {
+            if (params.containsKey(SERVER_URL.key)) {
+                return false; // cannot have both
+            }
+        } else {
+            if (!params.containsKey(SERVER_URL.key)) {
+                return false; // must have atleast one
+            }
         }
-        
+
         // check post / get
-        Boolean get,post;
+        Boolean get;
+
+        // check post / get
+        Boolean post;
         post = get = null;
-        if(params.containsKey(USE_POST.key))
+
+        if (params.containsKey(USE_POST.key)) {
             try {
-                post = (Boolean)USE_POST.lookUp(params);
+                post = (Boolean) USE_POST.lookUp(params);
             } catch (IOException e) {
                 return false;
             }
-        if(params.containsKey(USE_GET.key))
-            try {
-                get = (Boolean)USE_GET.lookUp(params);
-            } catch (IOException e) {
-                return false;
-            }
-        if((post!=null && post.booleanValue() && get!=null && get.booleanValue()) || 
-                (post!=null && !post.booleanValue() && get!=null && !get.booleanValue()))
-            return false;
-        
-        // check password / username
-        if(params.containsKey(USERNAME.key)){
-            if(!params.containsKey(PASSWORD.key))
-                return false;	// must have both
-        }else{
-            if(params.containsKey(PASSWORD.key))
-                return false;	// must have both
         }
-        
-        // check for type
-        if(params.containsKey(TIMEOUT.key))
+
+        if (params.containsKey(USE_GET.key)) {
             try {
-               TIMEOUT.lookUp(params);
+                get = (Boolean) USE_GET.lookUp(params);
             } catch (IOException e) {
                 return false;
             }
-            
-        if(params.containsKey(BUFFER_SIZE.key))
+        }
+
+        if (((post != null) && post.booleanValue() && (get != null)
+                && get.booleanValue())
+                || ((post != null) && !post.booleanValue() && (get != null)
+                && !get.booleanValue())) {
+            return false;
+        }
+
+        // check password / username
+        if (params.containsKey(USERNAME.key)) {
+            if (!params.containsKey(PASSWORD.key)) {
+                return false; // must have both
+            }
+        } else {
+            if (params.containsKey(PASSWORD.key)) {
+                return false; // must have both
+            }
+        }
+
+        // check for type
+        if (params.containsKey(TIMEOUT.key)) {
+            try {
+                TIMEOUT.lookUp(params);
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        if (params.containsKey(BUFFER_SIZE.key)) {
             try {
                 BUFFER_SIZE.lookUp(params);
             } catch (IOException e) {
                 return false;
             }
-        
+        }
+
         return true;
     }
 

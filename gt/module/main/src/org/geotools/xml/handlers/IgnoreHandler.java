@@ -20,7 +20,6 @@ import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
 import java.net.URI;
 import java.util.Map;
 
@@ -87,8 +86,8 @@ public class IgnoreHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(URI namespaceURI, String localName,
-        Attributes attr) throws SAXException {
+    public void startElement(URI namespaceURI, String localName, Attributes attr)
+        throws SAXException {
         // do nothing
     }
 }

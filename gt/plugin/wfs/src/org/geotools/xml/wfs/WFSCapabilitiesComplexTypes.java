@@ -20,11 +20,11 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.ows.Service;
+import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
+import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultChoice;
@@ -303,10 +303,10 @@ public class WFSCapabilitiesComplexTypes {
         private static final Element[] elements = {
                 new WFSElement("GML2", EmptyType.getInstance(), 1, 1, false,
                     null),
-                    new WFSElement("GML2-GZIP", EmptyType.getInstance(), 0, 1,
-                            false, null),
-                            new WFSElement("GML2-ZIP", EmptyType.getInstance(), 0, 1,
-                                    false, null)
+                new WFSElement("GML2-GZIP", EmptyType.getInstance(), 0, 1,
+                    false, null),
+                new WFSElement("GML2-ZIP", EmptyType.getInstance(), 0, 1,
+                    false, null)
             };
 
         // static sequence
@@ -331,7 +331,6 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-
             if ((element == null) || (value == null)) {
                 throw new SAXException(
                     "Invalid inputs for parsing a GetCapabilitiesType");
@@ -341,11 +340,15 @@ public class WFSCapabilitiesComplexTypes {
                 throw new SAXException(
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
+
             List l = new LinkedList();
-            for(int i=0;i<value.length;i++){
-                if(value[i].getElement().getName()!=null)
+
+            for (int i = 0; i < value.length; i++) {
+                if (value[i].getElement().getName() != null) {
                     l.add(value[i].getElement().getName());
+                }
             }
+
             return l;
         }
 
@@ -455,18 +458,22 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-
-            if(element == null || value == null)
+            if ((element == null) || (value == null)) {
                 throw new SAXException("missing inputs");
-            
-            if(value.length<1)
-                throw new SAXException("Too few children");
-            
-            int t = 0;
-            for(int i=0;i<value.length;i++){
-                t = t | FeatureSetDescription.findOperation(value[i].getElement().getName());
             }
-            
+
+            if (value.length < 1) {
+                throw new SAXException("Too few children");
+            }
+
+            int t = 0;
+
+            for (int i = 0; i < value.length; i++) {
+                t = t
+                    | FeatureSetDescription.findOperation(value[i].getElement()
+                                                                  .getName());
+            }
+
             return new Integer(t);
         }
 
@@ -603,39 +610,36 @@ public class WFSCapabilitiesComplexTypes {
                     "Should only have one child value -- the String value of inline text");
             }
 
-//            MetadataURL mdurl = new MetadataURL();
-
-//            String t = "";
-//
-//            t = attrs.getValue("", "type");
-//
-//            if ((t == null) || "".equals(t)) {
-//                t = attrs.getValue(WFSSchema.NAMESPACE, "type");
-//            }
-//
-//            mdurl.setType(MetadataURL.parseType(t));
-
-//            t = attrs.getValue("", "format");
-//
-//            if ((t == null) || "".equals(t)) {
-//                t = attrs.getValue(WFSSchema.NAMESPACE, "format");
-//            }
-//
-//            mdurl.setFormat(t);
-//
-//            t = (String) value[0].getValue();
-//
-//            URL url = null;
-//
-//            try {
-//                url = new URL(t);
-//            } catch (MalformedURLException e) {
-//                throw new SAXException(e);
-//            }
-//
-//            mdurl.setOnlineResource(url);
-
-//            return mdurl;
+            //            MetadataURL mdurl = new MetadataURL();
+            //            String t = "";
+            //
+            //            t = attrs.getValue("", "type");
+            //
+            //            if ((t == null) || "".equals(t)) {
+            //                t = attrs.getValue(WFSSchema.NAMESPACE, "type");
+            //            }
+            //
+            //            mdurl.setType(MetadataURL.parseType(t));
+            //            t = attrs.getValue("", "format");
+            //
+            //            if ((t == null) || "".equals(t)) {
+            //                t = attrs.getValue(WFSSchema.NAMESPACE, "format");
+            //            }
+            //
+            //            mdurl.setFormat(t);
+            //
+            //            t = (String) value[0].getValue();
+            //
+            //            URL url = null;
+            //
+            //            try {
+            //                url = new URL(t);
+            //            } catch (MalformedURLException e) {
+            //                throw new SAXException(e);
+            //            }
+            //
+            //            mdurl.setOnlineResource(url);
+            //            return mdurl;
             return null;
         }
 
@@ -650,7 +654,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-//            return MetadataURL.class;
+            //            return MetadataURL.class;
             return null;
         }
 
@@ -739,7 +743,7 @@ public class WFSCapabilitiesComplexTypes {
             double maxy;
             minx = miny = maxx = maxy = 0;
 
-            if ((element == null) || attrs == null) {
+            if ((element == null) || (attrs == null)) {
                 throw new SAXException(
                     "Invalid parameters for LatLongBoundingBoxType");
             }
@@ -874,7 +878,8 @@ public class WFSCapabilitiesComplexTypes {
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
-                s = attrs.getValue(WFSSchema.NAMESPACE.toString(), "onlineResource");
+                s = attrs.getValue(WFSSchema.NAMESPACE.toString(),
+                        "onlineResource");
             }
 
             try {
@@ -1102,7 +1107,8 @@ public class WFSCapabilitiesComplexTypes {
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
-                s = attrs.getValue(WFSSchema.NAMESPACE.toString(), "onlineResource");
+                s = attrs.getValue(WFSSchema.NAMESPACE.toString(),
+                        "onlineResource");
             }
 
             try {
@@ -1279,14 +1285,13 @@ public class WFSCapabilitiesComplexTypes {
                                         if (elements[6].getName().equals(value[i].getElement()
                                                                                      .getName())) {
                                             // LatLongBoundingBox
-                                            llbb.add(value[i]
-                                                .getValue());
+                                            llbb.add(value[i].getValue());
                                         } else {
                                             if (elements[7].getName().equals(value[i].getElement()
                                                                                          .getName())) {
                                                 // MetadataURL
-//                                                mdurl.add((MetadataURL) value[i]
-//                                                    .getValue());
+                                                //                                                mdurl.add((MetadataURL) value[i]
+                                                //                                                    .getValue());
                                             } else {
                                                 // error
                                                 throw new SAXException(
@@ -1307,17 +1312,18 @@ public class WFSCapabilitiesComplexTypes {
             }
 
             if (llbb.size() > 0) {
-            	Envelope e = (Envelope)llbb.get(0);
-            	for(int i=1;i<llbb.size();i++)
-            		e.expandToInclude((Envelope)llbb.get(i));
+                Envelope e = (Envelope) llbb.get(0);
+
+                for (int i = 1; i < llbb.size(); i++)
+                    e.expandToInclude((Envelope) llbb.get(i));
+
                 fsd.setLatLongBoundingBox(e);
             }
 
-//            if (mdurl.size() > 0) {
-//                fsd.setMetadataURL((MetadataURL[]) mdurl.toArray(
-//                        new MetadataURL[mdurl.size()]));
-//            }
-
+            //            if (mdurl.size() > 0) {
+            //                fsd.setMetadataURL((MetadataURL[]) mdurl.toArray(
+            //                        new MetadataURL[mdurl.size()]));
+            //            }
             if ((fsd.getName() == null) || (fsd.getSRS() == null)
                     || (llbb.size() < 1)) {
                 throw new SAXException(
@@ -1471,11 +1477,6 @@ public class WFSCapabilitiesComplexTypes {
         // singleton instance
         private static final WFSComplexType instance = new LockFeatureTypeType();
 
-
-        public static WFSComplexType getInstance() {
-            return instance;
-        }
-        
         // static element list
         private static final Element[] elements = {
                 new WFSElement("DCPType", DCPTypeType.getInstance(), 1,
@@ -1484,6 +1485,10 @@ public class WFSCapabilitiesComplexTypes {
 
         // static sequence
         private static final DefaultSequence seq = new DefaultSequence(elements);
+
+        public static WFSComplexType getInstance() {
+            return instance;
+        }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
@@ -1528,7 +1533,8 @@ public class WFSCapabilitiesComplexTypes {
 
             for (int i = 0; i < value.length; i++) {
                 c[i] = (OperationType) value[i].getValue();
-//                c[i].setType(OperationType.LOCK_FEATURE);
+
+                //                c[i].setType(OperationType.LOCK_FEATURE);
             }
 
             return c;
@@ -1654,131 +1660,187 @@ public class WFSCapabilitiesComplexTypes {
             OperationType[] result = new OperationType[6];
 
             for (int i = 0; i < value.length; i++) {
-                OperationType[] t = (OperationType[])value[i].getValue();
+                OperationType[] t = (OperationType[]) value[i].getValue();
 
-                if(t!=null){
-                if(elements[0].getName().equals(value[i].getElement().getName())){
-                    if(result[0] == null){
-                        result[0] = new OperationType();
-                    }
-                    // merge them
-                    for(int j=0;j<t.length;j++){
-                        if(result[0].getGet() == null && t[j].getGet()!=null)
-                            result[0].setGet(t[j].getGet());
-                        if(result[0].getPost() == null && t[j].getPost()!=null)
-                            result[0].setPost(t[j].getPost());
-                    }
-                }else{
-                    if(elements[1].getName().equals(value[i].getElement().getName())){
-
-                        if(result[1] == null){
-                            result[1] = new OperationType();
+                if (t != null) {
+                    if (elements[0].getName().equals(value[i].getElement()
+                                                                 .getName())) {
+                        if (result[0] == null) {
+                            result[0] = new OperationType();
                         }
+
                         // merge them
-                        for(int j=0;j<t.length;j++){
-                            if(result[1].getGet() == null && t[j].getGet()!=null)
-                                result[1].setGet(t[j].getGet());
-                            if(result[1].getPost() == null && t[j].getPost()!=null)
-                                result[1].setPost(t[j].getPost());
-                            if(t[j].getFormats()!=null){
-                                if(result[1].getFormats() == null){
-                                    result[1].setFormats(t[j].getFormats());
-                            }else{
-                                List st = (List)result[0].getFormats();
-                                if(t[j].getFormats() == null)
-                                    t[j].setFormats(st);
-                                    else
-                                        if(st!=null)
-                                ((List)t[j].getFormats()).addAll(st);
-                                }
+                        for (int j = 0; j < t.length; j++) {
+                            if ((result[0].getGet() == null)
+                                    && (t[j].getGet() != null)) {
+                                result[0].setGet(t[j].getGet());
+                            }
+
+                            if ((result[0].getPost() == null)
+                                    && (t[j].getPost() != null)) {
+                                result[0].setPost(t[j].getPost());
                             }
                         }
-                    }else{
-                        if(elements[2].getName().equals(value[i].getElement().getName())){
-
-                            if(result[2] == null){
-                                result[2] = new OperationType();
+                    } else {
+                        if (elements[1].getName().equals(value[i].getElement()
+                                                                     .getName())) {
+                            if (result[1] == null) {
+                                result[1] = new OperationType();
                             }
+
                             // merge them
-                            for(int j=0;j<t.length;j++){
-                                if(result[2].getGet() == null && t[j].getGet()!=null)
-                                    result[2].setGet(t[j].getGet());
-                                if(result[2].getPost() == null && t[j].getPost()!=null)
-                                    result[2].setPost(t[j].getPost());
-                            }
-                        }else{
-                            if(elements[3].getName().equals(value[i].getElement().getName())){
-
-                                if(result[3] == null){
-                                    result[3] = new OperationType();
+                            for (int j = 0; j < t.length; j++) {
+                                if ((result[1].getGet() == null)
+                                        && (t[j].getGet() != null)) {
+                                    result[1].setGet(t[j].getGet());
                                 }
-                                // merge them
-                                for(int j=0;j<t.length;j++){
-                                    if(result[3].getGet() == null && t[j].getGet()!=null)
-                                        result[3].setGet(t[j].getGet());
-                                    if(result[3].getPost() == null && t[j].getPost()!=null)
-                                        result[3].setPost(t[j].getPost());
-                                    if(t[j].getFormats()!=null){
-                                        if(result[3].getFormats() == null){
-                                            result[3].setFormats(t[j].getFormats());
-                                    }else{
-                                        List st = (List)result[0].getFormats();
-                                        if(t[j].getFormats() == null)
+
+                                if ((result[1].getPost() == null)
+                                        && (t[j].getPost() != null)) {
+                                    result[1].setPost(t[j].getPost());
+                                }
+
+                                if (t[j].getFormats() != null) {
+                                    if (result[1].getFormats() == null) {
+                                        result[1].setFormats(t[j].getFormats());
+                                    } else {
+                                        List st = (List) result[0].getFormats();
+
+                                        if (t[j].getFormats() == null) {
                                             t[j].setFormats(st);
-                                            else
-                                                if(st!=null)
-                                        ((List)t[j].getFormats()).addAll(st);
+                                        } else if (st != null) {
+                                            ((List) t[j].getFormats()).addAll(st);
                                         }
                                     }
                                 }
-                            }else{
-                                if(elements[4].getName().equals(value[i].getElement().getName())){
+                            }
+                        } else {
+                            if (elements[2].getName().equals(value[i].getElement()
+                                                                         .getName())) {
+                                if (result[2] == null) {
+                                    result[2] = new OperationType();
+                                }
 
-                                    if(result[4] == null){
-                                        result[4] = new OperationType();
+                                // merge them
+                                for (int j = 0; j < t.length; j++) {
+                                    if ((result[2].getGet() == null)
+                                            && (t[j].getGet() != null)) {
+                                        result[2].setGet(t[j].getGet());
                                     }
+
+                                    if ((result[2].getPost() == null)
+                                            && (t[j].getPost() != null)) {
+                                        result[2].setPost(t[j].getPost());
+                                    }
+                                }
+                            } else {
+                                if (elements[3].getName().equals(value[i].getElement()
+                                                                             .getName())) {
+                                    if (result[3] == null) {
+                                        result[3] = new OperationType();
+                                    }
+
                                     // merge them
-                                    for(int j=0;j<t.length;j++){
-                                        if(result[4].getGet() == null && t[j].getGet()!=null)
-                                            result[4].setGet(t[j].getGet());
-                                        if(result[4].getPost() == null && t[j].getPost()!=null)
-                                            result[4].setPost(t[j].getPost());
-                                        if(t[j].getFormats()!=null){
-                                            if(result[4].getFormats() == null){
-                                                result[4].setFormats(t[j].getFormats());
-                                        }else{
-                                            List st = (List)result[0].getFormats();
-                                            if(t[j].getFormats() == null)
-                                                t[j].setFormats(st);
-                                                else
-                                                    if(st!=null)
-                                            ((List)t[j].getFormats()).addAll(st);
+                                    for (int j = 0; j < t.length; j++) {
+                                        if ((result[3].getGet() == null)
+                                                && (t[j].getGet() != null)) {
+                                            result[3].setGet(t[j].getGet());
+                                        }
+
+                                        if ((result[3].getPost() == null)
+                                                && (t[j].getPost() != null)) {
+                                            result[3].setPost(t[j].getPost());
+                                        }
+
+                                        if (t[j].getFormats() != null) {
+                                            if (result[3].getFormats() == null) {
+                                                result[3].setFormats(t[j]
+                                                    .getFormats());
+                                            } else {
+                                                List st = (List) result[0]
+                                                    .getFormats();
+
+                                                if (t[j].getFormats() == null) {
+                                                    t[j].setFormats(st);
+                                                } else if (st != null) {
+                                                    ((List) t[j].getFormats())
+                                                    .addAll(st);
+                                                }
                                             }
                                         }
                                     }
-                                }else{
-                                    if(elements[5].getName().equals(value[i].getElement().getName())){
+                                } else {
+                                    if (elements[4].getName().equals(value[i].getElement()
+                                                                                 .getName())) {
+                                        if (result[4] == null) {
+                                            result[4] = new OperationType();
+                                        }
 
-                                        if(result[5] == null){
-                                            result[5] = new OperationType();
-                                        }
                                         // merge them
-                                        for(int j=0;j<t.length;j++){
-                                            if(result[5].getGet() == null && t[j].getGet()!=null)
-                                                result[5].setGet(t[j].getGet());
-                                            if(result[5].getPost() == null && t[j].getPost()!=null)
-                                                result[5].setPost(t[j].getPost());
+                                        for (int j = 0; j < t.length; j++) {
+                                            if ((result[4].getGet() == null)
+                                                    && (t[j].getGet() != null)) {
+                                                result[4].setGet(t[j].getGet());
+                                            }
+
+                                            if ((result[4].getPost() == null)
+                                                    && (t[j].getPost() != null)) {
+                                                result[4].setPost(t[j].getPost());
+                                            }
+
+                                            if (t[j].getFormats() != null) {
+                                                if (result[4].getFormats() == null) {
+                                                    result[4].setFormats(t[j]
+                                                        .getFormats());
+                                                } else {
+                                                    List st = (List) result[0]
+                                                        .getFormats();
+
+                                                    if (t[j].getFormats() == null) {
+                                                        t[j].setFormats(st);
+                                                    } else if (st != null) {
+                                                        ((List) t[j].getFormats())
+                                                        .addAll(st);
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }else{
-                                        // error
-                                        throw new SAXException("Unknown child element "+value[i].getElement().getName()+" found in RequestType");
-                                    }   
-                                }   
-                            }   
-                        }   
-                    }    
+                                    } else {
+                                        if (elements[5].getName().equals(value[i].getElement()
+                                                                                     .getName())) {
+                                            if (result[5] == null) {
+                                                result[5] = new OperationType();
+                                            }
+
+                                            // merge them
+                                            for (int j = 0; j < t.length;
+                                                    j++) {
+                                                if ((result[5].getGet() == null)
+                                                        && (t[j].getGet() != null)) {
+                                                    result[5].setGet(t[j]
+                                                        .getGet());
+                                                }
+
+                                                if ((result[5].getPost() == null)
+                                                        && (t[j].getPost() != null)) {
+                                                    result[5].setPost(t[j]
+                                                        .getPost());
+                                                }
+                                            }
+                                        } else {
+                                            // error
+                                            throw new SAXException(
+                                                "Unknown child element "
+                                                + value[i].getElement().getName()
+                                                + " found in RequestType");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-            }}
+            }
 
             return result;
         }
@@ -1888,7 +1950,7 @@ public class WFSCapabilitiesComplexTypes {
             Service service = new Service();
 
             for (int i = 0; i < value.length; i++) {
-//System.out.println(value[i].getElement().getName());
+                //System.out.println(value[i].getElement().getName());
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     service.setName((String) value[i].getValue());
                 }
@@ -1902,8 +1964,8 @@ public class WFSCapabilitiesComplexTypes {
                 }
 
                 if (elements[3].getName().equals(value[i].getElement().getName())) {
-                    service.setKeywordList(((String) value[i]
-                            .getValue()).split(" "));
+                    service.setKeywordList(((String) value[i].getValue()).split(
+                            " "));
                 }
 
                 if (elements[4].getName().equals(value[i].getElement().getName())) {
@@ -1915,13 +1977,12 @@ public class WFSCapabilitiesComplexTypes {
                     }
                 }
 
-//                if (elements[5].getName().equals(value[i].getElement().getName())) {
-//                    service.setFees((String) value[i].getValue());
-//                }
-
-//                if (elements[6].getName().equals(value[i].getElement().getName())) {
-//                    service.setAccessConstraints((String) value[i].getValue());
-//                }
+                //                if (elements[5].getName().equals(value[i].getElement().getName())) {
+                //                    service.setFees((String) value[i].getValue());
+                //                }
+                //                if (elements[6].getName().equals(value[i].getElement().getName())) {
+                //                    service.setAccessConstraints((String) value[i].getValue());
+                //                }
             }
 
             // check the required elements 
@@ -2063,16 +2124,15 @@ public class WFSCapabilitiesComplexTypes {
                 }
             }
 
-//            FeatureSetDescription[] fsd = new FeatureSetDescription[fts.size()];
-//
-//            for (int i = 0; i < fsd.length; i++) {
-//                fsd[i] = (FeatureSetDescription) fts.get(i);
-//
-//                if (fsd[i].getOperations() == FeatureSetDescription.NO_OPERATION) {
-//                    fsd[i].setOperations(operations);
-//                }
-//            }
-
+            //            FeatureSetDescription[] fsd = new FeatureSetDescription[fts.size()];
+            //
+            //            for (int i = 0; i < fsd.length; i++) {
+            //                fsd[i] = (FeatureSetDescription) fts.get(i);
+            //
+            //                if (fsd[i].getOperations() == FeatureSetDescription.NO_OPERATION) {
+            //                    fsd[i].setOperations(operations);
+            //                }
+            //            }
             return fts;
         }
 
@@ -2143,13 +2203,13 @@ public class WFSCapabilitiesComplexTypes {
             if (name == null) {
                 return null;
             }
-//System.out.println("Looking for : "+name);
-//
-//            for (int i = 0; i < elements.length; i++)
-//                if (name.equals(elements[i].getName())) {
-//                    return elements[i];
-//                }
 
+            //System.out.println("Looking for : "+name);
+            //
+            //            for (int i = 0; i < elements.length; i++)
+            //                if (name.equals(elements[i].getName())) {
+            //                    return elements[i];
+            //                }
             return seq.findChildElement(name);
         }
 
@@ -2263,23 +2323,22 @@ public class WFSCapabilitiesComplexTypes {
         private static final Element[] elements = {
                 new WFSElement("Service", ServiceType.getInstance(), 1, 1,
                     false, null),
-                new WFSElement("Capability", CapabilityType.getInstance(),
-                    1, 1, false, null),
+                new WFSElement("Capability", CapabilityType.getInstance(), 1,
+                    1, false, null),
                 new WFSElement("FeatureTypeList",
                     FeatureTypeListType.getInstance(), 1, 1, false, null),
                 
 
                 // TODO Add Filter_Capababilities from filterCapabilities.xsd
                 new WFSElement("Filter_Capabilities",
-                        Filter_CapabilitiesType.getInstance(), 1, 1, false, null){
-
-                    /**
-                     * @see schema.Element#getNamespace()
-                     */
-                    public URI getNamespace() {
-                        return FilterSchema.NAMESPACE;
+                    Filter_CapabilitiesType.getInstance(), 1, 1, false, null) {
+                        /**
+                         * @see schema.Element#getNamespace()
+                         */
+                        public URI getNamespace() {
+                            return FilterSchema.NAMESPACE;
+                        }
                     }
-                }
             };
         private static final Attribute[] attributes = {
                 new WFSAttribute("version",
@@ -2361,25 +2420,26 @@ public class WFSCapabilitiesComplexTypes {
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             if (element != null) {
-                if (element.getType() != this){
-                    if(!(element.getType() instanceof ComplexType)) {
-                    ComplexType t = (ComplexType) element.getType();
+                if (element.getType() != this) {
+                    if (!(element.getType() instanceof ComplexType)) {
+                        ComplexType t = (ComplexType) element.getType();
 
-                    // TODO use equals here
-                    while ((t != null) && (t != this))
-                        t = (t.getParent() instanceof ComplexType)
-                            ? (ComplexType) t.getParent() : null;
+                        // TODO use equals here
+                        while ((t != null) && (t != this))
+                            t = (t.getParent() instanceof ComplexType)
+                                ? (ComplexType) t.getParent() : null;
 
-                    if (t == null) {
+                        if (t == null) {
+                            throw new SAXNotSupportedException(
+                                "The specified element was not a declared as a WFS_Capabilities element, or derived element");
+                        }
+                    } else {
+                        // error -- cannot encode
                         throw new SAXNotSupportedException(
                             "The specified element was not a declared as a WFS_Capabilities element, or derived element");
                     }
-                } else {
-                    // error -- cannot encode
-                    throw new SAXNotSupportedException(
-                        "The specified element was not a declared as a WFS_Capabilities element, or derived element");
                 }
-            }}
+            }
 
             if ((value == null) || (value.length != 4)) {
                 throw new SAXException(
@@ -2404,8 +2464,10 @@ public class WFSCapabilitiesComplexTypes {
                         }
 
                         result.setVendorSpecificCapabilities((String) temp[0]);
-                        OperationType[] tmp = (OperationType[])temp[1];
-                        if(tmp!=null){
+
+                        OperationType[] tmp = (OperationType[]) temp[1];
+
+                        if (tmp != null) {
                             result.setGetCapabilities(tmp[0]);
                             result.setDescribeFeatureType(tmp[1]);
                             result.setTransaction(tmp[2]);
@@ -2417,13 +2479,13 @@ public class WFSCapabilitiesComplexTypes {
                         if (elements[2].getName().equals(value[i].getElement()
                                                                      .getName())) {
                             // FeatureTypeList
-                            result.setFeatureTypes((List) value[i]
-                                .getValue());
+                            result.setFeatureTypes((List) value[i].getValue());
                         } else {
                             if (elements[3].getName().equals(value[i].getElement()
                                                                          .getName())) {
                                 // Filter_Capabilities
-                                result.setFilterCapabilities((FilterCapabilities)value[i].getValue());
+                                result.setFilterCapabilities((FilterCapabilities) value[i]
+                                    .getValue());
                             } else {
                                 // error
                                 throw new SAXException("The element "
@@ -2515,9 +2577,9 @@ public class WFSCapabilitiesComplexTypes {
             List l = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
-//System.out.println(value[i].getElement().getName()+" "+value[i].getValue().getClass());
-                    OperationType t = (OperationType) value[i].getValue();
-                        l.add(t);
+                //System.out.println(value[i].getElement().getName()+" "+value[i].getValue().getClass());
+                OperationType t = (OperationType) value[i].getValue();
+                l.add(t);
             }
 
             return l.toArray(new OperationType[(l.size())]);
@@ -2638,15 +2700,18 @@ public class WFSCapabilitiesComplexTypes {
                 } else {
                     OperationType t = (OperationType) value[i].getValue();
                     l.add(t);
-//                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
+
+                    //                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
                 }
             }
 
             OperationType[] ot = new OperationType[l.size()];
-            for(int i=0;i<ot.length;i++){
-                ot[i] = (OperationType)l.get(i);
+
+            for (int i = 0; i < ot.length; i++) {
+                ot[i] = (OperationType) l.get(i);
                 ot[i].setFormats(sdl);
             }
+
             return ot;
         }
 
@@ -2750,14 +2815,13 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-
             List l = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
-                    OperationType t = (OperationType) value[i].getValue();
-                    l.add(t);
-
+                OperationType t = (OperationType) value[i].getValue();
+                l.add(t);
             }
+
             return l.toArray(new OperationType[l.size()]);
         }
 
@@ -2868,8 +2932,8 @@ public class WFSCapabilitiesComplexTypes {
 
             for (int i = 0; i < value.length; i++) {
                 if ((sdl == null) && (value[i].getElement() != null)
-                        && elements[0].getName().equals(
-                            value[i].getElement().getName())) {
+                        && elements[0].getName().equals(value[i].getElement()
+                                                                    .getName())) {
                     sdl = (List) value[i].getValue();
                 } else {
                     OperationType t = (OperationType) value[i].getValue();
@@ -2878,10 +2942,12 @@ public class WFSCapabilitiesComplexTypes {
             }
 
             OperationType[] ot = new OperationType[l.size()];
-            for(int i=0;i<ot.length;i++){
-                ot[i] = (OperationType)l.get(i);
+
+            for (int i = 0; i < ot.length; i++) {
+                ot[i] = (OperationType) l.get(i);
                 ot[i].setFormats(sdl);
             }
+
             return ot;
         }
 

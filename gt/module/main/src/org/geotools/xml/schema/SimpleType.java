@@ -100,7 +100,7 @@ public interface SimpleType extends Type {
      * @param value DOCUMENT ME!
      * @param hints DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public boolean canCreateAttributes(Attribute attribute, Object value,
         Map hints);

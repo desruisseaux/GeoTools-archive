@@ -34,7 +34,6 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.File;
 import java.io.FileWriter;
@@ -54,6 +53,7 @@ import javax.naming.OperationNotSupportedException;
 
 /**
  * This is the thing that writes documents.
+ * 
  * <p>
  * This will create valid XML documents, given an object and a schema.
  * </p>
@@ -61,38 +61,67 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers
  */
 public class DocumentWriter {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static final Logger logger = Logger.getLogger(
             "net.refractions.xml.write");
     private static Level level = Level.WARNING;
-    
-    public static void setLevel(Level l){
-    	level = l;
-    	logger.setLevel(l);
-    }
 
-    /** Writer ... include the key to represent true when writing to files, include a Writer to write to otherwise. */
+    /**
+     * Writer ... include the key to represent true when writing to files,
+     * include a Writer to write to otherwise.
+     */
     public static final String WRITE_SCHEMA = "DocumentWriter_WRITE_SCHEMA";
-    /** Element or String ... include a ref to an Element to be used, or a string representing the name of the element */
+
+    /**
+     * Element or String ... include a ref to an Element to be used, or a
+     * string representing the name of the element
+     */
     public static final String BASE_ELEMENT = "DocumentWriter_BASE_ELEMENT";
-    /** Schema[] or String[]... The order to search the schemas for a valid element, either an array of ref to Schema instances or an Array or TargetNamespaces */
+
+    /**
+     * Schema[] or String[]... The order to search the schemas for a valid
+     * element, either an array of ref to Schema instances or an Array or
+     * TargetNamespaces
+     */
     public static final String SCHEMA_ORDER = "DocumentWriter_SCHEMA_ORDER";
+
     // TODO implement this searchOrder
-    /** boolean ... include the key to use the "nearest" strategy for searching schemas. This will be ignored if a schema order was set. When not included the schema order as they appear in the orginal schema will be used.*/
+
+    /**
+     * boolean ... include the key to use the "nearest" strategy for searching
+     * schemas. This will be ignored if a schema order was set. When not
+     * included the schema order as they appear in the orginal schema will be
+     * used.
+     */
     public static final String USE_NEAREST = "DocumentWriter_USE_NEAREST";
-    
+
     /** a map of URI->URI representing targetNamespace->Location */
     public static final String SCHEMA_LOCATION_HINT = "DocumentWriter_SCHEMA_LOCATION_HINT";
 
+    public static void setLevel(Level l) {
+        level = l;
+        logger.setLevel(l);
+    }
+
     /**
      * Write value to file using provided schema.
+     * 
      * <p>
      * Hints:
+     * 
      * <ul>
-     * <li>WRITE_SCHEMA - (non null) write to outputfilename.xsd 
-     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
-     * <li>USE_NEAREST - (Boolean) not implemented
-     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * <li>
+     * WRITE_SCHEMA - (non null) write to outputfilename.xsd
+     * </li>
+     * <li>
+     * BASE_ELEMENT - (Element) mapping of value to element instance
+     * </li>
+     * <li>
+     * USE_NEAREST - (Boolean) not implemented
+     * </li>
+     * <li>
+     * SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </li>
      * </ul>
      * </p>
      *
@@ -100,19 +129,19 @@ public class DocumentWriter {
      * @param schema
      * @param f
      * @param hints
+     *
      * @throws OperationNotSupportedException
      * @throws IOException
-     * @throws SAXException
      *
      * @see WRITE_SCHEMA
      */
     public static void writeDocument(Object value, Schema schema, File f,
-            Map hints) throws OperationNotSupportedException, IOException {
+        Map hints) throws OperationNotSupportedException, IOException {
         if ((f == null) || (!f.canWrite())) {
             throw new IOException("Cannot write to " + f);
         }
 
-        if (hints!=null && hints.containsKey(WRITE_SCHEMA)) {
+        if ((hints != null) && hints.containsKey(WRITE_SCHEMA)) {
             Map hints2 = new HashMap(hints);
             hints2.remove(WRITE_SCHEMA);
 
@@ -125,61 +154,82 @@ public class DocumentWriter {
             // would be thrown anyway
             //                throw new IOException("Schema Cannot be written to "+f2);
         }
+
         FileWriter wf = new FileWriter(f);
-        writeDocument(value,schema,wf,hints);
+        writeDocument(value, schema, wf, hints);
         wf.close();
     }
+
     /**
      * Entry Point to Document writer.
+     * 
      * <p>
      * Hints:
+     * 
      * <ul>
-     * <li>WRITE_SCHEMA - (Writer) will be used to write the schema
-     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
-     * <li>USE_NEAREST - (Boolean) not implemented
-     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * <li>
+     * WRITE_SCHEMA - (Writer) will be used to write the schema
+     * </li>
+     * <li>
+     * BASE_ELEMENT - (Element) mapping of value to element instance
+     * </li>
+     * <li>
+     * USE_NEAREST - (Boolean) not implemented
+     * </li>
+     * <li>
+     * SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </li>
      * </ul>
      * </p>
+     *
      * @param value
      * @param schema
      * @param w
      * @param hints optional hints for writing
+     *
      * @throws OperationNotSupportedException
      * @throws IOException
-     * @throws SAXException
-     * 
+     *
      * @see BASE_ELEMENT
      * @see USE_NEAREST
      * @see WRITE_SCHEMA
      * @see SCHEMA_ORDER
      */
     public static void writeDocument(Object value, Schema schema, Writer w,
-                Map hints) throws OperationNotSupportedException, IOException {
-
-        if (hints!=null && hints.containsKey(WRITE_SCHEMA)) {
-            Writer w2 = (Writer)hints.get(WRITE_SCHEMA);
+        Map hints) throws OperationNotSupportedException, IOException {
+        if ((hints != null) && hints.containsKey(WRITE_SCHEMA)) {
+            Writer w2 = (Writer) hints.get(WRITE_SCHEMA);
             writeSchema(schema, w2, hints);
 
             // would be thrown anyway
             //                throw new IOException("Schema Cannot be written to "+f2);
         }
-        WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
+
+        WriterContentHandler wch = new WriterContentHandler(schema, w, hints); // should deal with xmlns declarations
         wch.startDocument();
 
-        writeFragment(value,wch);
-        
+        writeFragment(value, wch);
+
         wch.endDocument();
         w.flush();
     }
 
     /**
      * Write value to file using provided schema.
+     * 
      * <p>
      * Hints:
+     * 
      * <ul>
-     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
-     * <li>USE_NEAREST - (Boolean) not implemented
-     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * <li>
+     * BASE_ELEMENT - (Element) mapping of value to element instance
+     * </li>
+     * <li>
+     * USE_NEAREST - (Boolean) not implemented
+     * </li>
+     * <li>
+     * SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </li>
      * </ul>
      * </p>
      *
@@ -187,83 +237,104 @@ public class DocumentWriter {
      * @param schema
      * @param f
      * @param hints
+     *
      * @throws OperationNotSupportedException
      * @throws IOException
-     * @throws SAXException
      *
      * @see WRITE_SCHEMA
      */
     public static void writeFragment(Object value, Schema schema, File f,
-            Map hints) throws OperationNotSupportedException, IOException {
+        Map hints) throws OperationNotSupportedException, IOException {
         if ((f == null) || (!f.canWrite())) {
             throw new IOException("Cannot write to " + f);
         }
+
         FileWriter wf = new FileWriter(f);
-        writeFragment(value,schema,wf,hints);
+        writeFragment(value, schema, wf, hints);
         wf.close();
     }
+
     /**
      * Entry Point to Document writer.
+     * 
      * <p>
      * Hints:
+     * 
      * <ul>
-     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
-     * <li>USE_NEAREST - (Boolean) not implemented
-     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * <li>
+     * BASE_ELEMENT - (Element) mapping of value to element instance
+     * </li>
+     * <li>
+     * USE_NEAREST - (Boolean) not implemented
+     * </li>
+     * <li>
+     * SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </li>
      * </ul>
      * </p>
+     *
      * @param value
      * @param schema
      * @param w
      * @param hints optional hints for writing
+     *
      * @throws OperationNotSupportedException
      * @throws IOException
-     * @throws SAXException
-     * 
+     *
      * @see BASE_ELEMENT
      * @see USE_NEAREST
      * @see WRITE_SCHEMA
      * @see SCHEMA_ORDER
      */
     public static void writeFragment(Object value, Schema schema, Writer w,
-                Map hints) throws OperationNotSupportedException, IOException {
-        WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
+        Map hints) throws OperationNotSupportedException, IOException {
+        WriterContentHandler wch = new WriterContentHandler(schema, w, hints); // should deal with xmlns declarations
 
-        writeFragment(value,wch);
-        
+        writeFragment(value, wch);
+
         w.flush();
     }
-    
-    private static void writeFragment(Object value, WriterContentHandler wch) throws OperationNotSupportedException, IOException {
-    Map hints = wch.hints;
 
-    Element e = null;
-    logger.setLevel(level);
-    if(hints!=null && hints.containsKey(BASE_ELEMENT)){
-        e = (Element)hints.get(BASE_ELEMENT);
-        if(e!=null && e.getType()!=null)
-            e = e.getType().canEncode(e,value,hints)?e:null;
-    }
-    if(e==null)
-        e = wch.findElement(value);
-    if(e!=null)
-        e.getType().encode(e,value,wch,hints);
-    else
-        throw new OperationNotSupportedException("Could not find an appropriate Element to use for encoding of a "+(value==null?null:value.getClass().getName()));
+    private static void writeFragment(Object value, WriterContentHandler wch)
+        throws OperationNotSupportedException, IOException {
+        Map hints = wch.hints;
+
+        Element e = null;
+        logger.setLevel(level);
+
+        if ((hints != null) && hints.containsKey(BASE_ELEMENT)) {
+            e = (Element) hints.get(BASE_ELEMENT);
+
+            if ((e != null) && (e.getType() != null)) {
+                e = e.getType().canEncode(e, value, hints) ? e : null;
+            }
+        }
+
+        if (e == null) {
+            e = wch.findElement(value);
+        }
+
+        if (e != null) {
+            e.getType().encode(e, value, wch, hints);
+        } else {
+            throw new OperationNotSupportedException(
+                "Could not find an appropriate Element to use for encoding of a "
+                + ((value == null) ? null : value.getClass().getName()));
+        }
     }
 
     /**
      * DOCUMENT ME!
      *
      * @param schema DOCUMENT ME!
-     * @param f DOCUMENT ME!
+     * @param w DOCUMENT ME!
      * @param hints DOCUMENT ME!
      *
-     * @throws IOException  
+     * @throws IOException
      */
     public static void writeSchema(Schema schema, Writer w, Map hints)
         throws IOException {
-        WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
+        WriterContentHandler wch = new WriterContentHandler(schema, w, hints); // should deal with xmlns declarations
         Element[] elems = schema.getElements();
 
         if (elems == null) {
@@ -288,7 +359,8 @@ public class DocumentWriter {
 
         ai.addAttribute("", "targetNamespace", "", "anyUri",
             schema.getTargetNamespace().toString());
-        ai.addAttribute("", "xmlns", "", "anyUri", XSISimpleTypes.NAMESPACE.toString());
+        ai.addAttribute("", "xmlns", "", "anyUri",
+            XSISimpleTypes.NAMESPACE.toString());
         ai.addAttribute("", "xmlns:" + schema.getPrefix(), "", "anyUri",
             schema.getTargetNamespace().toString());
 
@@ -1298,6 +1370,9 @@ public class DocumentWriter {
         private boolean firstElement = true; // needed for NS declarations
         private Writer writer;
         private Map prefixMappings; // when the value is null it has not been included yet into the document ...
+        private Schema schema;
+        private Map hints;
+        private Schema[] searchOrder = null;
 
         public WriterContentHandler(Schema schema, Writer writer, Map hints) {
             this.writer = writer;
@@ -1316,34 +1391,47 @@ public class DocumentWriter {
         }
 
         private void printXMLNSDecs(Map hints) throws IOException {
-
             Schema[] imports = getSchemaOrdering();
             String s = "";
-            Map schemaLocs = (Map)(hints==null?null:hints.get(SCHEMA_LOCATION_HINT));
-            schemaLocs = schemaLocs==null?new HashMap():schemaLocs;
-			
-                for (int i = 0; i < imports.length; i++) {
-                    if(imports[i]==schema){
-                        writer.write(" xmlns=\"" + schema.getTargetNamespace() + "\"");
-                        if(schema.getURI()!=null && !schema.getTargetNamespace().equals(schema.getURI()))
-                            s = schema.getTargetNamespace()+" "+schema.getURI();
-                    }else{
-                    	writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
-                    		+ imports[i].getTargetNamespace() + "\"");
-                    }
+            Map schemaLocs = (Map) ((hints == null) ? null
+                                                    : hints.get(SCHEMA_LOCATION_HINT));
+            schemaLocs = (schemaLocs == null) ? new HashMap() : schemaLocs;
 
-                    URI location = imports[i].getURI();
-                    boolean forced = false;
-                    if(schemaLocs.containsKey(imports[i].getTargetNamespace())){
-                    	location = (URI)schemaLocs.get(imports[i].getTargetNamespace());
-                    	forced = true;
+            for (int i = 0; i < imports.length; i++) {
+                if (imports[i] == schema) {
+                    writer.write(" xmlns=\"" + schema.getTargetNamespace()
+                        + "\"");
+
+                    if ((schema.getURI() != null)
+                            && !schema.getTargetNamespace().equals(schema
+                                .getURI())) {
+                        s = schema.getTargetNamespace() + " " + schema.getURI();
                     }
-                    if (location != null && location.isAbsolute())
-                    	if(imports[i].includesURI(location) || forced)
-                    		if(location!=null && !location.equals(imports[i].getTargetNamespace()))
-                    			s += (" " + imports[i].getTargetNamespace() + " "
-                    				+ location);
+                } else {
+                    writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
+                        + imports[i].getTargetNamespace() + "\"");
                 }
+
+                URI location = imports[i].getURI();
+                boolean forced = false;
+
+                if (schemaLocs.containsKey(imports[i].getTargetNamespace())) {
+                    location = (URI) schemaLocs.get(imports[i]
+                            .getTargetNamespace());
+                    forced = true;
+                }
+
+                if ((location != null) && location.isAbsolute()) {
+                    if (imports[i].includesURI(location) || forced) {
+                        if ((location != null)
+                                && !location.equals(
+                                    imports[i].getTargetNamespace())) {
+                            s += (" " + imports[i].getTargetNamespace() + " "
+                            + location);
+                        }
+                    }
+                }
+            }
 
             s = s.trim();
 
@@ -1358,24 +1446,29 @@ public class DocumentWriter {
             Attributes attributes) throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
-
-            if(prefix != null){
-            if (!prefix.equals("")) {
-                prefix = prefix + ":";
-            }}else{
-                if(namespaceURI.equals(schema.getTargetNamespace()))
+            if (prefix != null) {
+                if (!prefix.equals("")) {
+                    prefix = prefix + ":";
+                }
+            } else {
+                if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
-                else{
+                } else {
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
-                    if(prefix == null)
+
+                    if (prefix == null) {
                         prefix = "";
-                    if(prefix!="")
+                    }
+
+                    if (prefix != "") {
                         prefix += ":";
+                    }
                 }
             }
 
             writer.write("<");
             writer.write(prefix + localName);
+
             if (firstElement) {
                 printXMLNSDecs(hints);
                 firstElement = false;
@@ -1394,27 +1487,32 @@ public class DocumentWriter {
             }
 
             writer.write(">");
+
             // TODO format here
-//            writer.write("\n");
+            //            writer.write("\n");
         }
 
         public void element(URI namespaceURI, String localName,
             Attributes attributes) throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
-
-            if(prefix != null){
-            if (!prefix.equals("")) {
-                prefix = prefix + ":";
-            }}else{
-                if(namespaceURI.equals(schema.getTargetNamespace()))
+            if (prefix != null) {
+                if (!prefix.equals("")) {
+                    prefix = prefix + ":";
+                }
+            } else {
+                if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
-                else{
+                } else {
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
-                    if(prefix == null)
+
+                    if (prefix == null) {
                         prefix = "";
-                    if(prefix!="")
+                    }
+
+                    if (prefix != "") {
                         prefix += ":";
+                    }
                 }
             }
 
@@ -1439,6 +1537,7 @@ public class DocumentWriter {
             }
 
             writer.write("/>");
+
             // TODO format here
             writer.write("\n");
         }
@@ -1447,25 +1546,30 @@ public class DocumentWriter {
             throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
-
-            if(prefix != null){
-            if (!prefix.equals("")) {
-                prefix = prefix + ":";
-            }}else{
-                if(namespaceURI.equals(schema.getTargetNamespace()))
+            if (prefix != null) {
+                if (!prefix.equals("")) {
+                    prefix = prefix + ":";
+                }
+            } else {
+                if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
-                else{
+                } else {
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
-                    if(prefix == null)
+
+                    if (prefix == null) {
                         prefix = "";
-                    if(prefix!="")
+                    }
+
+                    if (prefix != "") {
                         prefix += ":";
+                    }
                 }
             }
 
             writer.write("</");
             writer.write(prefix + localName);
             writer.write(">");
+
             // TODO format here
             writer.write("\n");
         }
@@ -1490,6 +1594,7 @@ public class DocumentWriter {
 
         public void startDocument() throws IOException {
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
             // TODO format here
             writer.write("\n");
         }
@@ -1498,127 +1603,164 @@ public class DocumentWriter {
             // TODO format here
             writer.write("\n");
             writer.flush();
-            
-//            writer.close();
+
+            //            writer.close();
         }
-        
-        private Schema schema;
-        private Map hints;
-        public Schema getDocumentSchema(){
+
+        public Schema getDocumentSchema() {
             return schema;
         }
-        
-        public Object getHint(Object key){
+
+        public Object getHint(Object key) {
             return hints.get(key);
         }
-        
-        public Element findElement(Object value){
-            Schema[] searchOrder;
-            try {
-                searchOrder = getSchemaOrdering();
-            } catch (IOException e) {
-                logger.warning(e.toString());
-                return null;
-            }
-            for(int i=0;i<searchOrder.length;i++){
-                Element[] elems = searchOrder[i].getElements();
-                if(elems!=null){
-                for(int j=0;j<elems.length;j++)
-                    if(elems[j].getType()!=null && elems[j].getType().canEncode(elems[j],value,hints))
-                        return elems[j];
-                }
-            }
-            return null;
-        }
-        
-        public Element findElement(String name){
-            Schema[] searchOrder;
-            try {
-                searchOrder = getSchemaOrdering();
-            } catch (IOException e) {
-                logger.warning(e.toString());
-                return null;
-            }
-            for(int i=0;i<searchOrder.length;i++){
-                Element[] elems = searchOrder[i].getElements();
-                if(elems!=null)
-                for(int j=0;j<elems.length;j++)
-                    if(elems[j].getName()!=null && elems[j].getName().equals(name))
-                        return elems[j];
-            }
-            return null;
-        }
-        
-        private Schema[] searchOrder = null;
-        private Schema[] getSchemaOrdering() throws IOException{
-            if(searchOrder!=null)
-                return searchOrder;
-            
-            if((hints == null || hints.get(SCHEMA_ORDER) == null) && (schema.getImports() == null || schema.getImports().length == 0)){
-                
-                    searchOrder = new Schema[] {schema,};
-            }else{
-                List so = new LinkedList();
-            if(hints!=null && hints.containsKey(SCHEMA_ORDER)){
-                Object order = hints.get(SCHEMA_ORDER);
-                List targNS = new LinkedList();
-                targNS.add(schema.getTargetNamespace());
-                if(schema.getImports() != null)
-                for(int i=0;i<schema.getImports().length;i++)
-                    if(!targNS.contains(schema.getImports()[i].getTargetNamespace()))
-                        targNS.add(schema.getImports()[i].getTargetNamespace());
 
-                if(order instanceof Schema[]){
-                    Schema[] sOrder = (Schema[])order;
-                    for(int i=0;i<sOrder.length;i++){
-                        int nsIndex = targNS.indexOf(sOrder[i].getTargetNamespace());
-                        if(nsIndex>=0){ // found
-                            so.add(sOrder[i]);
-                            targNS.remove(nsIndex);
-                        }
-                    }
-                }else{
-                    String[] stringOrder = (String[])order;
-                    for(int i=0;i<stringOrder.length;i++){
-                        int nsIndex = targNS.indexOf(stringOrder[i]);
-                        try{
-                        if(nsIndex>=0){ // found
-                            URI uri = new URI(stringOrder[i]);
-                                so.add(SchemaFactory.getInstance(uri)); 
-                            targNS.remove(nsIndex);
-                        }else{
-                            URI uri = new URI(stringOrder[i]);
-                                so.add(SchemaFactory.getInstance(uri));  
-                        }
-                        }catch(URISyntaxException e){
-                            logger.warning(e.toString());
-                            throw new IOException(e.toString());
-                        }
-                    }
-                }
-                if(!targNS.contains(schema.getTargetNamespace())){
-                    so.add(schema);
-                }
-                for(int i=0;i<schema.getImports().length;i++){
-                    int nsIndex = targNS.indexOf(schema.getImports()[i].getTargetNamespace());
-                    if(nsIndex>=0){ // found
-                        so.add(schema.getImports()[i]);
-                        targNS.remove(nsIndex);
-                    }
-                }
-            }else{
-            if(hints!=null && hints.containsKey(USE_NEAREST)){
-                // TODO fill this in
-                so.add(schema);
-                for(int i=0;i<schema.getImports().length;i++)
-                    so.add(schema.getImports()[i]);
-            }else{
-                so.add(schema);
-                for(int i=0;i<schema.getImports().length;i++)
-                    so.add(schema.getImports()[i]);
-            }}
-            searchOrder = (Schema[])so.toArray(new Schema[so.size()]);
+        public Element findElement(Object value) {
+            Schema[] searchOrder;
+
+            try {
+                searchOrder = getSchemaOrdering();
+            } catch (IOException e) {
+                logger.warning(e.toString());
+
+                return null;
             }
+
+            for (int i = 0; i < searchOrder.length; i++) {
+                Element[] elems = searchOrder[i].getElements();
+
+                if (elems != null) {
+                    for (int j = 0; j < elems.length; j++)
+                        if ((elems[j].getType() != null)
+                                && elems[j].getType().canEncode(elems[j],
+                                    value, hints)) {
+                            return elems[j];
+                        }
+                }
+            }
+
+            return null;
+        }
+
+        public Element findElement(String name) {
+            Schema[] searchOrder;
+
+            try {
+                searchOrder = getSchemaOrdering();
+            } catch (IOException e) {
+                logger.warning(e.toString());
+
+                return null;
+            }
+
+            for (int i = 0; i < searchOrder.length; i++) {
+                Element[] elems = searchOrder[i].getElements();
+
+                if (elems != null) {
+                    for (int j = 0; j < elems.length; j++)
+                        if ((elems[j].getName() != null)
+                                && elems[j].getName().equals(name)) {
+                            return elems[j];
+                        }
+                }
+            }
+
+            return null;
+        }
+
+        private Schema[] getSchemaOrdering() throws IOException {
+            if (searchOrder != null) {
+                return searchOrder;
+            }
+
+            if (((hints == null) || (hints.get(SCHEMA_ORDER) == null))
+                    && ((schema.getImports() == null)
+                    || (schema.getImports().length == 0))) {
+                searchOrder = new Schema[] { schema, };
+            } else {
+                List so = new LinkedList();
+
+                if ((hints != null) && hints.containsKey(SCHEMA_ORDER)) {
+                    Object order = hints.get(SCHEMA_ORDER);
+                    List targNS = new LinkedList();
+                    targNS.add(schema.getTargetNamespace());
+
+                    if (schema.getImports() != null) {
+                        for (int i = 0; i < schema.getImports().length; i++)
+                            if (!targNS.contains(
+                                        schema.getImports()[i]
+                                        .getTargetNamespace())) {
+                                targNS.add(schema.getImports()[i]
+                                    .getTargetNamespace());
+                            }
+                    }
+
+                    if (order instanceof Schema[]) {
+                        Schema[] sOrder = (Schema[]) order;
+
+                        for (int i = 0; i < sOrder.length; i++) {
+                            int nsIndex = targNS.indexOf(sOrder[i]
+                                    .getTargetNamespace());
+
+                            if (nsIndex >= 0) { // found
+                                so.add(sOrder[i]);
+                                targNS.remove(nsIndex);
+                            }
+                        }
+                    } else {
+                        String[] stringOrder = (String[]) order;
+
+                        for (int i = 0; i < stringOrder.length; i++) {
+                            int nsIndex = targNS.indexOf(stringOrder[i]);
+
+                            try {
+                                if (nsIndex >= 0) { // found
+
+                                    URI uri = new URI(stringOrder[i]);
+                                    so.add(SchemaFactory.getInstance(uri));
+                                    targNS.remove(nsIndex);
+                                } else {
+                                    URI uri = new URI(stringOrder[i]);
+                                    so.add(SchemaFactory.getInstance(uri));
+                                }
+                            } catch (URISyntaxException e) {
+                                logger.warning(e.toString());
+                                throw new IOException(e.toString());
+                            }
+                        }
+                    }
+
+                    if (!targNS.contains(schema.getTargetNamespace())) {
+                        so.add(schema);
+                    }
+
+                    for (int i = 0; i < schema.getImports().length; i++) {
+                        int nsIndex = targNS.indexOf(schema.getImports()[i]
+                                .getTargetNamespace());
+
+                        if (nsIndex >= 0) { // found
+                            so.add(schema.getImports()[i]);
+                            targNS.remove(nsIndex);
+                        }
+                    }
+                } else {
+                    if ((hints != null) && hints.containsKey(USE_NEAREST)) {
+                        // TODO fill this in
+                        so.add(schema);
+
+                        for (int i = 0; i < schema.getImports().length; i++)
+                            so.add(schema.getImports()[i]);
+                    } else {
+                        so.add(schema);
+
+                        for (int i = 0; i < schema.getImports().length; i++)
+                            so.add(schema.getImports()[i]);
+                    }
+                }
+
+                searchOrder = (Schema[]) so.toArray(new Schema[so.size()]);
+            }
+
             return searchOrder;
         }
     }

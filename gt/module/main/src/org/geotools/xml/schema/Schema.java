@@ -16,9 +16,8 @@
  */
 package org.geotools.xml.schema;
 
-import java.net.URI;
-
 import org.geotools.factory.Factory;
+import java.net.URI;
 
 
 /**
@@ -42,15 +41,14 @@ import org.geotools.factory.Factory;
  * </p>
  * 
  * <p>
- * This method must be inplemented within extensions: 
- *  public static Schema getInstance();. It will be used by the Schema factory to 
- *  load the required extensions into memory.
- *  </p>
+ * This method must be inplemented within extensions:  public static Schema
+ * getInstance();. It will be used by the Schema factory to  load the required
+ * extensions into memory.
+ * </p>
  *
  * @author dzwiers www.refractions.net
  */
-public interface Schema extends Factory{
-    
+public interface Schema extends Factory {
     /**
      * Used to denote byte masks representing either XML block attributes or
      * XML final attributes.
@@ -227,7 +225,7 @@ public interface Schema extends Factory{
      * @return
      */
     public URI getTargetNamespace();
-    
+
     // may be different than targNS
     public URI getURI();
 
@@ -251,7 +249,8 @@ public interface Schema extends Factory{
      * </p>
      * 
      * <p>
-     * Used to determine if the uri should provided should be included in an instance document.
+     * Used to determine if the uri should provided should be included in an
+     * instance document.
      * </p>
      *
      * @param uri

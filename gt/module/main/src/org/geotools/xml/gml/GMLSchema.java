@@ -41,7 +41,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
-
 import javax.naming.OperationNotSupportedException;
 
 
@@ -56,12 +55,6 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers www.refractions.net
  */
 public class GMLSchema implements Schema {
-	
-	public static void setLogLevel(Level l){
-		GMLComplexTypes.logger.setLevel(l);
-		FCBuffer.logger.setLevel(l);
-	}
-    
     /** GML target namespace */
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/gml");
 
@@ -84,11 +77,17 @@ public class GMLSchema implements Schema {
 
     // static simpleType set
     private static SimpleType[] simpleTypes = { new GMLNullType(), };
+    private static Schema instance = new GMLSchema();
 
     /**
      * Creates a new GMLSchema object.
      */
     public GMLSchema() {
+    }
+
+    public static void setLogLevel(Level l) {
+        GMLComplexTypes.logger.setLevel(l);
+        FCBuffer.logger.setLevel(l);
     }
 
     /**
@@ -384,6 +383,7 @@ public class GMLSchema implements Schema {
     public URI getTargetNamespace() {
         return NAMESPACE;
     }
+
     public URI getURI() {
         return NAMESPACE;
     }
@@ -408,13 +408,12 @@ public class GMLSchema implements Schema {
      * @see schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-//        if (uri.toString().toLowerCase().endsWith("geometry.xsd")
-//                || uri.toString().toLowerCase().endsWith("feature.xsd")) {
-//            return true;
-//        }
-//
-//        return false;
-
+        //        if (uri.toString().toLowerCase().endsWith("geometry.xsd")
+        //                || uri.toString().toLowerCase().endsWith("feature.xsd")) {
+        //            return true;
+        //        }
+        //
+        //        return false;
         // this is a spec ... we never want the def modified.
         // TODO see if this affects printing
         return true;
@@ -432,6 +431,13 @@ public class GMLSchema implements Schema {
      */
     public String getPrefix() {
         return "gml";
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Schema#getInstance()
+     */
+    public static Schema getInstance() {
+        return instance;
     }
 
     static class AttributeList {
@@ -1049,13 +1055,5 @@ public class GMLSchema implements Schema {
         public Element findChildElement(String name) {
             return null; // will never happen
         }
-    }
-
-    private static Schema instance = new GMLSchema();
-    /**
-     * @see org.geotools.xml.schema.Schema#getInstance()
-     */
-    public static Schema getInstance() {
-        return instance;
     }
 }

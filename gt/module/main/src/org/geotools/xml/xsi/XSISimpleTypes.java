@@ -28,7 +28,6 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,8 +52,9 @@ import javax.naming.OperationNotSupportedException;
 public class XSISimpleTypes {
     private static Map m;
 
-    /** DOCUMENT ME!  */
-    public static final URI NAMESPACE = makeURI("http://www.w3.org/2001/XMLSchema");
+    /** DOCUMENT ME! */
+    public static final URI NAMESPACE = makeURI(
+            "http://www.w3.org/2001/XMLSchema");
 
     // convinience method to deal with the URISyntaxException
     private static URI makeURI(java.lang.String s) {
@@ -65,6 +65,7 @@ public class XSISimpleTypes {
             return null;
         }
     }
+
     /**
      * <p>
      * Searches for the requested SimpleType, if not found this method returns
@@ -90,7 +91,7 @@ public class XSISimpleTypes {
      *
      * @param type DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public static SimpleType find(Class type) {
         // assuming strings and class values will not conflict
@@ -229,14 +230,13 @@ public class XSISimpleTypes {
      * @author dzwiers
      */
     protected static abstract class XSISimpleType implements SimpleType {
-
         /**
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
             return null;
         }
-        
+
         /**
          * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
          *      java.lang.Object, java.util.Map)
@@ -285,7 +285,7 @@ public class XSISimpleTypes {
             } else {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
-                output.characters((value == null? "":value.toString()));
+                output.characters(((value == null) ? "" : value.toString()));
                 output.endElement(element.getNamespace(), element.getName());
             }
         }
@@ -370,6 +370,7 @@ public class XSISimpleTypes {
      */
     public static class Integer extends XSISimpleType {
         private static SimpleType instance = new Integer();
+
         /**
          * @see org.geotools.xml.xsi.Type#getName()
          */

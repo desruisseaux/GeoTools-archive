@@ -75,7 +75,7 @@ public abstract class XSIElementHandler implements Serializable {
      * the sub-packages
      */
     protected XSIElementHandler() {
-    	logger.setLevel(level);
+        logger.setLevel(level);
     }
 
     /**
@@ -170,8 +170,10 @@ public abstract class XSIElementHandler implements Serializable {
             if (getLocalName() != null) {
                 return getLocalName().equals(ob.getLocalName());
             }
+
             return (null == ob.getLocalName());
         }
+
         return false;
     }
 
@@ -188,7 +190,7 @@ public abstract class XSIElementHandler implements Serializable {
      * @param l
      */
     public static void setLogLevel(Level l) {
-    	level = l;
+        level = l;
         logger.setLevel(l);
     }
 }

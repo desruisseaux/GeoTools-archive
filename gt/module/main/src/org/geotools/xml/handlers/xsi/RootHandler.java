@@ -78,7 +78,9 @@ public class RootHandler extends XSIElementHandler {
 
             return schema;
         }
-        logger.warning("Starting schema with "+localName+" element.");
+
+        logger.warning("Starting schema with " + localName + " element.");
+
         return null;
     }
 
@@ -119,8 +121,7 @@ public class RootHandler extends XSIElementHandler {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    public void startPrefixMapping(String arg0, String arg1)
-        throws SAXException {
+    public void startPrefixMapping(String arg0, String arg1) {
         schema.startPrefixMapping(arg0, arg1);
     }
 

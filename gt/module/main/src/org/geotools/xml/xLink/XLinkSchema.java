@@ -59,15 +59,8 @@ import javax.naming.OperationNotSupportedException;
  * @see Schema
  */
 public class XLinkSchema implements Schema {
-
-
     private static Schema instance = new XLinkSchema();
-    /**
-     * @see org.geotools.xml.schema.Schema#getInstance()
-     */
-    public static Schema getInstance() {
-        return instance;
-    }
+
     // local list of attribute declarations
     private static final Attribute[] attributes = loadAttributes();
 
@@ -76,6 +69,13 @@ public class XLinkSchema implements Schema {
 
     /** The full xLink namespace */
     public static final URI NAMESPACE = makeURI("http://www.w3.org/1999/xlink");
+
+    /**
+     * @see org.geotools.xml.schema.Schema#getInstance()
+     */
+    public static Schema getInstance() {
+        return instance;
+    }
 
     /*
      * loads the list of attribute declarations for the XLink Schema
@@ -189,6 +189,7 @@ public class XLinkSchema implements Schema {
     public URI getTargetNamespace() {
         return NAMESPACE;
     }
+
     public URI getURI() {
         return NAMESPACE;
     }
@@ -204,12 +205,11 @@ public class XLinkSchema implements Schema {
      * @see schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-//        if (uri.toString().toLowerCase().endsWith("xlinks.xsd")) {
-//            return true;
-//        }
-//
-//        return false;
-
+        //        if (uri.toString().toLowerCase().endsWith("xlinks.xsd")) {
+        //            return true;
+        //        }
+        //
+        //        return false;
         // this is a spec ... we never want the def modified.
         // TODO see if this affects printing
         return true;
@@ -228,7 +228,7 @@ public class XLinkSchema implements Schema {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public String getPrefix() {
         return "xLink";
@@ -266,13 +266,13 @@ public class XLinkSchema implements Schema {
         // list of allowable enumeration values
         private static List lookUpTable = loadTable();
 
-
         /**
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
             return null; // will never happen
         }
+
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
          *      java.lang.Object, java.util.Map)
@@ -440,13 +440,13 @@ public class XLinkSchema implements Schema {
             return null;
         }
 
-
         /**
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
             return null; // will never happen
         }
+
         /**
          * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
          *      java.lang.Object, java.util.Map)

@@ -21,7 +21,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import junit.framework.*;
 import org.geotools.feature.*;
-import java.io.*;
 import java.util.logging.Logger;
 
 
@@ -34,7 +33,8 @@ public abstract class FilterTestSupport extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    protected static AttributeTypeFactory attFactory = AttributeTypeFactory
+        .newInstance();
 
     /** Schema on which to preform tests */
     protected static FeatureType testSchema = null;
@@ -55,9 +55,9 @@ public abstract class FilterTestSupport extends TestCase {
     protected void setUp() throws SchemaException, IllegalAttributeException {
         if (setup) {
             return;
-        } else {
-            prepareFeatures();
         }
+
+        prepareFeatures();
 
         setup = true;
     }
@@ -94,13 +94,13 @@ public abstract class FilterTestSupport extends TestCase {
                 String.class);
 
         AttributeType[] types = {
-            geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-            shortAttribute, intAttribute, longAttribute, floatAttribute,
-            doubleAttribute, stringAttribute
-        };
+                geometryAttribute, booleanAttribute, charAttribute,
+                byteAttribute, shortAttribute, intAttribute, longAttribute,
+                floatAttribute, doubleAttribute, stringAttribute
+            };
 
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types,"testSchema");
+        testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
 
         GeometryFactory geomFac = new GeometryFactory();
 

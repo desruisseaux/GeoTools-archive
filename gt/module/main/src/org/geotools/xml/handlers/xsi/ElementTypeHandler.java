@@ -16,8 +16,6 @@
  */
 package org.geotools.xml.handlers.xsi;
 
-import java.net.URI;
-
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -25,6 +23,7 @@ import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
+import java.net.URI;
 
 
 /**
@@ -261,9 +260,10 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         if ((nillable == null) || "".equalsIgnoreCase(nillable)) {
             this.nillable = false;
         } else {
-//System.out.print("Parse Nill "+nillable+" : ");
+            //System.out.print("Parse Nill "+nillable+" : ");
             this.nillable = Boolean.valueOf(nillable).booleanValue();
-//System.out.println(this.nillable+" : "+name);
+
+            //System.out.println(this.nillable+" : "+name);
         }
 
         // ref
@@ -440,7 +440,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
                 }
             }
 
-            return type==null?null:type.findChildElement(name);
+            return (type == null) ? null : type.findChildElement(name);
         }
 
         /**

@@ -99,6 +99,7 @@ public class XMLSAXHandler extends DefaultHandler {
         this.hints = hints;
         logger.setLevel(level);
     }
+
     /**
      * <p>
      * This contructor is intended to create an XMLSAXHandler to be used when
@@ -106,7 +107,6 @@ public class XMLSAXHandler extends DefaultHandler {
      * be provided, as this will allow the parser to resolve relative uri's.
      * </p>
      *
-     * @param intendedDocument
      * @param hints DOCUMENT ME!
      */
     public XMLSAXHandler(Map hints) {
@@ -183,13 +183,13 @@ public class XMLSAXHandler extends DefaultHandler {
         logger.info("END: " + qName);
 
         try {
-            ((XMLElementHandler) handlers.pop()).endElement(new URI(namespaceURI),
-                localName, hints);
+            ((XMLElementHandler) handlers.pop()).endElement(new URI(
+                    namespaceURI), localName, hints);
         } catch (Exception e) {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-e.printStackTrace();
+            e.printStackTrace();
             throw new SAXException(e);
         }
     }
@@ -230,11 +230,15 @@ e.printStackTrace();
                         String targ = targ2uri[i * 2];
                         String prefix = (String) schemaProxy.get(targ);
                         URI targUri = null;
+
                         try {
-                            targUri = instanceDocument==null?new URI(uri):instanceDocument.resolve(uri);
+                            targUri = (instanceDocument == null) ? new URI(uri)
+                                                                 : instanceDocument
+                                .resolve(uri);
                         } catch (URISyntaxException e1) {
                             logger.warning(e1.toString());
                         }
+
                         ehf.startPrefixMapping(prefix, targ, targUri);
                         schemaProxy.remove(targ);
                     }
@@ -248,7 +252,8 @@ e.printStackTrace();
                     String targ = (String) it.next();
                     String prefix = (String) schemaProxy.get(targ);
                     ehf.startPrefixMapping(prefix, targ);
-//                    schemaProxy.remove(targ);
+
+                    //                    schemaProxy.remove(targ);
                     it.remove();
                 }
             }
@@ -271,8 +276,8 @@ e.printStackTrace();
             //                                ((Sequence)((ComplexType)parent.getType()).getChild()).getChildren().length)+"":"null"))));
             logger.finest("This Node = " + localName + " :: " + namespaceURI);
 
-            XMLElementHandler eh = parent.getHandler(new URI(namespaceURI), localName,
-                    hints);
+            XMLElementHandler eh = parent.getHandler(new URI(namespaceURI),
+                    localName, hints);
 
             if (eh == null) {
                 eh = new IgnoreHandler();
@@ -286,7 +291,7 @@ e.printStackTrace();
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-e.printStackTrace();
+            e.printStackTrace();
             throw new SAXException(e);
         }
     }
@@ -299,7 +304,7 @@ e.printStackTrace();
      * @param l
      */
     public static void setLogLevel(Level l) {
-    	level = l;
+        level = l;
         logger.setLevel(l);
         XMLElementHandler.setLogLevel(l);
     }

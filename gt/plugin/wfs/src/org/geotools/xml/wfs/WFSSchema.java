@@ -91,16 +91,6 @@ public class WFSSchema implements Schema {
 
     /** WFS target namespace */
     public static URI NAMESPACE = makeURI("http://www.opengis.net/wfs");
-
-    // convinience method to deal with the URISyntaxException
-    private static URI makeURI(String s) {
-        try {
-            return new URI(s);
-        } catch (URISyntaxException e) {
-            // do nothing
-            return null;
-        }
-    }
     static final Element[] elements = new Element[] {
             new WFSElement("GetCapabilities", GetCapabilitiesType.getInstance()),
             new WFSElement("DescribeFeatureType",
@@ -118,7 +108,7 @@ public class WFSSchema implements Schema {
             new WFSElement("OnlineResource", XSISimpleTypes.String.getInstance()),
             new WFSElement("SRS", XSISimpleTypes.String.getInstance()),
             new WFSElement("Title", XSISimpleTypes.String.getInstance()), // 11
-            
+
             // TODO check if these should be here - from capabilities ... used in operation type
             new WFSElement("Query", EmptyType.getInstance()),
             new WFSElement("Insert", EmptyType.getInstance()),
@@ -183,6 +173,16 @@ public class WFSSchema implements Schema {
                     new DefaultFacet(Facet.ENUMERATION, "SOME")
                 }, SimpleType.NONE),
         };
+
+    // convinience method to deal with the URISyntaxException
+    private static URI makeURI(String s) {
+        try {
+            return new URI(s);
+        } catch (URISyntaxException e) {
+            // do nothing
+            return null;
+        }
+    }
 
     /**
      * @see org.geotools.xml.schema.Schema#getInstance()
@@ -311,14 +311,13 @@ public class WFSSchema implements Schema {
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-//        if (uri.toString().toLowerCase().endsWith("wfs-basic.xsd")
-//                || uri.toString().toLowerCase().endsWith("wfs-capabilities.xsd")
-//                || uri.toString().toLowerCase().endsWith("wfs-transaction.xsd")) {
-//            return true;
-//        }
-//
-//        return false;
-        
+        //        if (uri.toString().toLowerCase().endsWith("wfs-basic.xsd")
+        //                || uri.toString().toLowerCase().endsWith("wfs-capabilities.xsd")
+        //                || uri.toString().toLowerCase().endsWith("wfs-transaction.xsd")) {
+        //            return true;
+        //        }
+        //
+        //        return false;
         // this is a spec ... we never want the def modified.
         // TODO see if this affects printing
         return true;
@@ -430,7 +429,7 @@ public class WFSSchema implements Schema {
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
-//System.out.println("Searching for "+name+" in "+getName());
+            //System.out.println("Searching for "+name+" in "+getName());
             return (getChild() == null) ? null : getChild().findChildElement(name);
         }
 

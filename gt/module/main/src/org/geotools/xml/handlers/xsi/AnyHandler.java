@@ -16,15 +16,14 @@
  */
 package org.geotools.xml.handlers.xsi;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Any;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 /**
@@ -104,9 +103,11 @@ public class AnyHandler extends ElementGroupingHandler {
         if (namespace == null) {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
+
         try {
-            if(namespace!=null)
+            if (namespace != null) {
                 this.namespace = new URI(namespace);
+            }
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
@@ -154,18 +155,17 @@ public class AnyHandler extends ElementGroupingHandler {
 
         if ("lax".equalsIgnoreCase(process)) {
             return LAX;
-        } else {
-            if ("skip".equalsIgnoreCase(process)) {
-                return SKIP;
-            } else {
-                if ("strict".equalsIgnoreCase(process)) {
-                    return STRICT;
-                } else {
-                    throw new SAXException("Unknown Process Type: '" + process
-                        + "'");
-                }
-            }
         }
+
+        if ("skip".equalsIgnoreCase(process)) {
+            return SKIP;
+        }
+
+        if ("strict".equalsIgnoreCase(process)) {
+            return STRICT;
+        }
+
+        throw new SAXException("Unknown Process Type: '" + process + "'");
     }
 
     /**
@@ -207,7 +207,8 @@ public class AnyHandler extends ElementGroupingHandler {
         da.maxOccurs = maxOccurs;
 
         cache = da;
-        id = null; namespace = null;
+        id = null;
+        namespace = null;
 
         return da;
     }

@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+
 /**
  * <p>
  * This interface is intended to represent the Group construct within XML
@@ -85,7 +86,7 @@ public interface Group extends ElementGrouping {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public URI getNamespace();
 }

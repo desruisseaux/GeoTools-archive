@@ -23,7 +23,6 @@ import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
 import java.net.URI;
 import java.util.Map;
 
@@ -119,8 +118,8 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(URI namespaceURI, String localName,
-        Attributes attr) throws SAXException {
+    public void startElement(URI namespaceURI, String localName, Attributes attr)
+        throws SAXException {
         this.attr = new AttributesImpl(attr);
     }
 

@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+
 /**
  * <p>
  * This interface is intended to represent an XML Schema AttributeGroup. In
@@ -72,7 +73,7 @@ public interface AttributeGroup {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public URI getNamespace();
 }

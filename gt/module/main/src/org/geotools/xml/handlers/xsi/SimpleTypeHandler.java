@@ -283,7 +283,7 @@ public class SimpleTypeHandler extends XSIElementHandler {
         SimpleType[] children = new SimpleType[1];
 
         if (rest.getSimpleType() != null) {
-            children[0] = ((SimpleTypeHandler) rest.getSimpleType()).compress(parent);
+            children[0] = (rest.getSimpleType()).compress(parent);
         } else {
             children[0] = parent.lookUpSimpleType(rest.getItemType());
         }

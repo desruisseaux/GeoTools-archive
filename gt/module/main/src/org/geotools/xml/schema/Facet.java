@@ -24,40 +24,40 @@ package org.geotools.xml.schema;
  * @author dzwiers
  */
 public interface Facet {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int ENUMERATION = 1;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int FRACTIONDIGITS = 2;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int LENGTH = 3;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MAXEXCLUSIVE = 4;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MAXINCLUSIVE = 5;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MAXLENGTH = 6;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MINEXCLUSIVE = 7;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MININCLUSIVE = 8;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int MINLENGTH = 9;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int PATTERN = 10;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int TOTALDIGITS = 11;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static int WHITESPACE = 12;
 
     /**

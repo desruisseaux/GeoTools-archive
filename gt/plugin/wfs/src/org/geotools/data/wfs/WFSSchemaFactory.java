@@ -1,7 +1,20 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.wfs;
-
-import java.net.URI;
 
 import org.geotools.data.ows.ServiceException;
 import org.geotools.xml.SchemaFactory;
@@ -12,68 +25,77 @@ import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import java.net.URI;
 
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public class WFSSchemaFactory extends SchemaFactory {
-        
     // HACK for setting up the static field to use.
-    protected WFSSchemaFactory(){
+    protected WFSSchemaFactory() {
         is = this;
     }
-    
-    protected XSISAXHandler getSAXHandler(URI uri){
+
+    protected XSISAXHandler getSAXHandler(URI uri) {
         return new WFSXSISAXHandler(uri);
     }
-    
-    protected static class WFSXSISAXHandler extends XSISAXHandler{
+
+    protected static class WFSXSISAXHandler extends XSISAXHandler {
         public WFSXSISAXHandler(URI uri) {
             super(uri);
             rootHandler = new WFSRootHandler(uri);
         }
     }
-    
-    protected static class WFSRootHandler extends RootHandler{
+
+    protected static class WFSRootHandler extends RootHandler {
+        private ServiceExceptionReportHandler se = null;
 
         public WFSRootHandler(URI uri) {
             super(uri);
         }
-        public XSIElementHandler getHandler(String namespaceURI, String localName)
-            throws SAXException {
+
+        public XSIElementHandler getHandler(String namespaceURI,
+            String localName) throws SAXException {
             XSIElementHandler r = null;
-            r = super.getHandler(namespaceURI,localName);
-            if(r!=null)
+            r = super.getHandler(namespaceURI, localName);
+
+            if (r != null) {
                 return r;
-            if ( "ServiceExceptionReport".equalsIgnoreCase(localName)
+            }
+
+            if ("ServiceExceptionReport".equalsIgnoreCase(localName)
                     && FilterSchema.NAMESPACE.toString().equalsIgnoreCase(namespaceURI)) {
-//                FilterSchema.getInstance().getElements()[37]
-//                ServiceException
+                //                FilterSchema.getInstance().getElements()[37]
+                //                ServiceException
                 if (se == null) {
                     se = new ServiceExceptionReportHandler();
                 }
 
                 return se;
             }
+
             return null;
         }
 
-        private ServiceExceptionReportHandler se = null;
         public Schema getSchema() throws SAXException {
-            if(se!=null){
-                if(se.getException()!=null)
+            if (se != null) {
+                if (se.getException() != null) {
                     throw se.getException();
+                }
             }
+
             return super.getSchema();
         }
     }
-    
-    private static class ServiceExceptionReportHandler extends XSIElementHandler{
+
+    private static class ServiceExceptionReportHandler extends XSIElementHandler {
+        private ServiceException exception;
+        private boolean inside = false;
 
         /**
          * @see org.geotools.xml.XSIElementHandler#getHandlerType()
@@ -81,33 +103,43 @@ public class WFSSchemaFactory extends SchemaFactory {
         public int getHandlerType() {
             return DEFAULT;
         }
-        
-        protected ServiceException getException(){
+
+        protected ServiceException getException() {
             return exception;
         }
 
         /**
-         * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+         * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+         *      java.lang.String)
          */
-        public void endElement(String namespaceURI, String localName) throws SAXException {
-            inside = false;   
+        public void endElement(String namespaceURI, String localName)
+            throws SAXException {
+            inside = false;
         }
 
         /**
-         * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+         * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+         *      java.lang.String, org.xml.sax.Attributes)
          */
-        public void startElement(String namespaceURI, String localName, Attributes attr) throws SAXException {
-            if("ServiceException".equalsIgnoreCase(localName)){
+        public void startElement(String namespaceURI, String localName,
+            Attributes attr) throws SAXException {
+            if ("ServiceException".equalsIgnoreCase(localName)) {
                 inside = true;
-                if(attr!=null){
-                String locator = attr.getValue("","locator");
-                if(locator == null)
-                    locator = attr.getValue(namespaceURI,"locator");
-                
-                String code = attr.getValue("","code");
-                if(code == null)
-                    code = attr.getValue(namespaceURI,"code");
-                exception = new ServiceException("",code,locator);
+
+                if (attr != null) {
+                    String locator = attr.getValue("", "locator");
+
+                    if (locator == null) {
+                        locator = attr.getValue(namespaceURI, "locator");
+                    }
+
+                    String code = attr.getValue("", "code");
+
+                    if (code == null) {
+                        code = attr.getValue(namespaceURI, "code");
+                    }
+
+                    exception = new ServiceException("", code, locator);
                 }
             }
         }
@@ -116,21 +148,23 @@ public class WFSSchemaFactory extends SchemaFactory {
          * @see org.geotools.xml.XSIElementHandler#characters(java.lang.String)
          */
         public void characters(String text) throws SAXException {
-            if(inside){
-                exception = new ServiceException(text,exception.getCode(),exception.getLocator());
+            if (inside) {
+                exception = new ServiceException(text, exception.getCode(),
+                        exception.getLocator());
             }
         }
-        private ServiceException exception;
-        private boolean inside = false;
-        /**
-         * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
-         */
-        public XSIElementHandler getHandler(String namespaceURI, String localName) throws SAXException {
 
-            if ( "ServiceException".equalsIgnoreCase(localName)
+        /**
+         * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+         *      java.lang.String)
+         */
+        public XSIElementHandler getHandler(String namespaceURI,
+            String localName) throws SAXException {
+            if ("ServiceException".equalsIgnoreCase(localName)
                     && FilterSchema.NAMESPACE.toString().equalsIgnoreCase(namespaceURI)) {
                 return this;
             }
+
             return null;
         }
 
@@ -149,6 +183,5 @@ public class WFSSchemaFactory extends SchemaFactory {
             // TODO Auto-generated method stub
             return 0;
         }
-        
     }
 }

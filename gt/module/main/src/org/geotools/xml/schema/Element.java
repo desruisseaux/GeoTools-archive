@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+
 /**
  * <p>
  * Instances of this interface are intended to represent XML Schema Elements.
@@ -102,7 +103,7 @@ public interface Element extends ElementGrouping {
     /**
      * DOCUMENT ME!
      *
-     * @return  
+     * @return
      */
     public URI getNamespace();
 

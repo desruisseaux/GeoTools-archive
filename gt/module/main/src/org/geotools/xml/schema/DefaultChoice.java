@@ -46,7 +46,7 @@ public class DefaultChoice implements Choice {
         this.max = max;
         this.children = children;
     }
-    
+
     public DefaultChoice(ElementGrouping[] children) {
         this.min = 1;
         this.max = 1;
