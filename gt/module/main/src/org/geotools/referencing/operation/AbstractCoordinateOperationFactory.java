@@ -140,7 +140,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     private final WeakHashSet pool = new WeakHashSet();
 
     /**
-     * Constructs a coordinate operation factory.
+     * Constructs a coordinate operation factory from a math transform.
      *
      * @param mtFactory The math transform factory to use.
      */
@@ -148,6 +148,17 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         this.mtFactory = mtFactory;
         ensureNonNull("mtFactory", mtFactory);
         helper = new FactoryGroup(null, null, null, mtFactory);
+    }
+
+    /**
+     * Constructs a coordinate operation factory from a group of factories.
+     *
+     * @param factories The factories to use.
+     */
+    public AbstractCoordinateOperationFactory(final FactoryGroup factories) {
+        ensureNonNull("factories", factories);
+        helper = factories;
+        mtFactory = factories.getMathTransformFactory();
     }
 
     /**

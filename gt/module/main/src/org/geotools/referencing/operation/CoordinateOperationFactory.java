@@ -71,6 +71,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -111,20 +112,14 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                 } else {
                     operation = null;
                 }
-                // TODO: Note: we can't log a message in class initializer. We
-                //       will log later, when the first instance will be created.
-                needLog = true;
+                Logger.getLogger("org.geotools.referencing").config("Datum shift method set to \"" + 
+                            (operation!=null ? operation : "Geocentric") + '"');
             }
         } catch (SecurityException ignore) {
             // Ignore. We will keep the default value.
         }
         MOLODENSKI = operation;
     }
-
-    /**
-     * <code>true</code> if a message should be logged as a result of {@link #MOLODENSKI} setting.
-     */
-    private static boolean needLog;
 
     /**
      * A unit of one millisecond.
@@ -139,19 +134,21 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
     }
 
     /**
-     * Constructs a coordinate operation factory.
+     * Constructs a coordinate operation factory from the specified math transform factory.
      *
      * @param mtFactory The math transform factory to use.
      */
     public CoordinateOperationFactory(final MathTransformFactory mtFactory) {
         super(mtFactory);
-        if (needLog) {
-            needLog = false;
-            // TODO: localize
-            Logger.getLogger("org.geotools.referencing")
-                  .config("Datum shift method set to \"" + 
-                          (MOLODENSKI!=null ? MOLODENSKI : "Geocentric") + '"');
-        }
+    }
+
+    /**
+     * Constructs a coordinate operation factory from a group of factories.
+     *
+     * @param factories The factories to use.
+     */
+    public CoordinateOperationFactory(final FactoryGroup factories) {
+        super(factories);
     }
 
     /**
