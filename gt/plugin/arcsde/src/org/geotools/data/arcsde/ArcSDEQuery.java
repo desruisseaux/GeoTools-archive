@@ -261,7 +261,7 @@ class ArcSDEQuery {
             SeConnection conn = getConnection();
             try {
 				String[] propsToQuery = getPropertiesToFetch();
-				this.query = createSeQuery(conn, propsToQuery, false);
+				this.query = createSeQuery(conn, propsToQuery, true);
 			} catch (DataSourceException e) {
 				throw e;
 			} catch (IOException e) {
@@ -497,8 +497,12 @@ class ArcSDEQuery {
 
             // ///////////////////////
             ex.printStackTrace();
+	    /*
+	     * temporary work around until we found the source of the problem
+	     * for which Brock is getting a DATABASE LEVEL ERROR OCCURED
             throw new DataSourceException("Can't consult the query extent: "
                 + ex.getSeError().getErrDesc(), ex);
+	    */
         } finally {
             close(extentQuery);
             releaseConnection();
@@ -870,7 +874,7 @@ class ArcSDEQuery {
          * DOCUMENT ME!
          *
          * @return the SeSqlConstruct corresponding to the given SeLayer and
-         *         SQL based filter.
+         *         SQL based filter. Should never return null.
          *
          * @throws DataSourceException if an error occurs encoding the sql
          *         filter to a SQL where clause, or creating the
