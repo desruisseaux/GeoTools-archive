@@ -37,6 +37,7 @@ import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.filter.FilterSchema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

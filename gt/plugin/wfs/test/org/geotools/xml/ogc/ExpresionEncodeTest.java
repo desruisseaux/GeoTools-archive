@@ -28,6 +28,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.xml.DocumentWriter;
+import org.geotools.xml.filter.FilterSchema;
 
 /**
  *  For now just writes the expression built.

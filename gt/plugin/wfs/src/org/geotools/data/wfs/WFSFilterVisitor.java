@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
@@ -15,6 +14,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterCapabilitiesMask;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.FilterVisitor;
@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class WFSFilterVisitor implements FilterVisitor {
 	    private Stack postStack = new Stack();
 	    private Stack preStack = new Stack();
-	    private FilterCapabilities fcs = null;
+	    private FilterCapabilitiesMask fcs = null;
 	    private FeatureType parent = null;
 	    private WFSTransactionState state = null;
 	
@@ -45,7 +45,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	    	// do nothing
 	    }
 	
-	    WFSFilterVisitor(FilterCapabilities fcs, FeatureType parent, WFSTransactionState state) {
+	    WFSFilterVisitor(FilterCapabilitiesMask fcs, FeatureType parent, WFSTransactionState state) {
 	        this.fcs = fcs;
 	        this.parent = parent;
 	        this.state = state;
@@ -175,7 +175,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
 	     */
 	    public void visit(BetweenFilter filter) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.BETWEEN) == FilterCapabilities.BETWEEN) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.BETWEEN) == FilterCapabilitiesMask.BETWEEN) {
 	            int i = postStack.size();
 	            filter.getLeftValue().accept(this);
 	
@@ -226,7 +226,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     */
 	    public void visit(CompareFilter filter) {
 	        // supports it as a group -- no need to check the type
-	        if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS) != FilterCapabilities.SIMPLE_COMPARISONS) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.SIMPLE_COMPARISONS) != FilterCapabilitiesMask.SIMPLE_COMPARISONS) {
 	            postStack.push(filter);
 	            return;
 	        }
@@ -265,7 +265,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        switch (filter.getFilterType()) {
 	        case FilterType.GEOMETRY_BBOX:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.BBOX) != FilterCapabilities.BBOX) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.BBOX) != FilterCapabilitiesMask.BBOX) {
 	
 	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
 	                    LiteralExpression le = (LiteralExpression) filter
@@ -301,7 +301,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_BEYOND:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.BEYOND) != FilterCapabilities.BEYOND) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.BEYOND) != FilterCapabilitiesMask.BEYOND) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -311,7 +311,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_CONTAINS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.CONTAINS) != FilterCapabilities.CONTAINS) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.CONTAINS) != FilterCapabilitiesMask.CONTAINS) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -321,7 +321,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_CROSSES:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.CROSSES) != FilterCapabilities.CROSSES) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.CROSSES) != FilterCapabilitiesMask.CROSSES) {
 		        	postStack.push(filter);
 	
 	                return;
@@ -331,7 +331,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_DISJOINT:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.DISJOINT) != FilterCapabilities.DISJOINT) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.DISJOINT) != FilterCapabilitiesMask.DISJOINT) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -341,7 +341,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_DWITHIN:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.DWITHIN) != FilterCapabilities.DWITHIN) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.DWITHIN) != FilterCapabilitiesMask.DWITHIN) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -351,7 +351,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_EQUALS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.EQUALS) != FilterCapabilities.EQUALS) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.EQUALS) != FilterCapabilitiesMask.EQUALS) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -359,7 +359,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_INTERSECTS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.INTERSECT) != FilterCapabilities.INTERSECT) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.INTERSECT) != FilterCapabilitiesMask.INTERSECT) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -369,7 +369,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_OVERLAPS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.OVERLAPS) != FilterCapabilities.OVERLAPS) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.OVERLAPS) != FilterCapabilitiesMask.OVERLAPS) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -379,7 +379,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_TOUCHES:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.TOUCHES) != FilterCapabilities.TOUCHES) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.TOUCHES) != FilterCapabilitiesMask.TOUCHES) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -389,7 +389,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_WITHIN:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.WITHIN) != FilterCapabilities.WITHIN) {
+	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.WITHIN) != FilterCapabilitiesMask.WITHIN) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -435,7 +435,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
 	     */
 	    public void visit(LikeFilter filter) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.LIKE) != FilterCapabilities.LIKE) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.LIKE) != FilterCapabilitiesMask.LIKE) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -460,7 +460,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
 	     */
 	    public void visit(LogicFilter filter) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.LOGICAL) != FilterCapabilitiesMask.LOGICAL) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -550,7 +550,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
 	     */
 	    public void visit(NullFilter filter) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.NULL_CHECK) != FilterCapabilities.NULL_CHECK) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.NULL_CHECK) != FilterCapabilitiesMask.NULL_CHECK) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -633,7 +633,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
 	     */
 	    public void visit(MathExpression expression) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC) != FilterCapabilities.SIMPLE_ARITHMETIC) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.SIMPLE_ARITHMETIC) != FilterCapabilitiesMask.SIMPLE_ARITHMETIC) {
 	        	postStack.push(expression);
 	
 	            return;
@@ -669,7 +669,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
 	     */
 	    public void visit(FunctionExpression expression) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.FUNCTIONS) != FilterCapabilities.FUNCTIONS) {
+	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.FUNCTIONS) != FilterCapabilitiesMask.FUNCTIONS) {
 	        	postStack.push(expression);
 	
 	            return;

@@ -18,12 +18,12 @@ package org.geotools.data.wfs;
 
 import java.net.URI;
 
-import org.geotools.data.ows.ServiceException;
+import org.geotools.ows.ServiceException;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.XSISAXHandler;
+import org.geotools.xml.filter.FilterSchema;
 import org.geotools.xml.handlers.xsi.RootHandler;
-import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

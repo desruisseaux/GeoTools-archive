@@ -1501,6 +1501,9 @@ public class SchemaHandler extends XSIElementHandler {
          * @see org.geotools.xml.xsi.Schema#includesURI(java.net.URI)
          */
         public boolean includesURI(URI uri1) {
+            if (this.uri == null) {
+                return false;
+            }
             return this.uri.equals(uri1);
         }
 

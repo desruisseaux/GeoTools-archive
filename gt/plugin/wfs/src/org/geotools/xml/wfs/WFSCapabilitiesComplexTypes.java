@@ -27,15 +27,15 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FeatureSetDescription;
-import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.filter.FilterCapabilitiesMask;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.filter.FilterSchema;
+import org.geotools.xml.filter.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.handlers.ElementHandlerFactory;
-import org.geotools.xml.ogc.FilterSchema;
-import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
@@ -2507,7 +2507,7 @@ public class WFSCapabilitiesComplexTypes {
                             if (elements[3].getName().equals(value[i].getElement()
                                                                          .getName())) {
                                 // Filter_Capabilities
-                                result.setFilterCapabilities((FilterCapabilities) value[i]
+                                result.setFilterCapabilities((FilterCapabilitiesMask) value[i]
                                     .getValue());
                             } else {
                                 if(validation){

@@ -21,8 +21,8 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.xml.filter.FilterSchema;
 import org.geotools.xml.gml.GMLSchema;
-import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
