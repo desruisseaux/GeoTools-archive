@@ -194,7 +194,7 @@ public class MapInfoDataSource extends AbstractDataSource implements DataSource 
     
     protected File file( String filename, String ext ) throws FileNotFoundException{
     	File file = new File(filename);
-    	if( file.exists() ) return file;
+    	//if( file.exists() ) return file;
     	
     	file = new File( setExtension( filename, ext.toUpperCase() ));
     	if( file.exists() ) return file;
