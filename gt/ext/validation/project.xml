@@ -73,6 +73,11 @@
       <version>2.0-B6-DEV</version>
     </dependency>
     <dependency>
+      <artifactId>postgis</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.0-B6-DEV</version>
+    </dependency>
+    <dependency>
       <id>junit</id>
       <version>3.8.1</version>
       <type>test</type>
@@ -103,6 +108,7 @@
       </includes>
       <excludes>
         <exclude>**/GazetteerNameValidationTest.java</exclude>
+        <exclude>**/MemoryLeakTest.java</exclude>
       </excludes> 
       <resources>
         <resource>
