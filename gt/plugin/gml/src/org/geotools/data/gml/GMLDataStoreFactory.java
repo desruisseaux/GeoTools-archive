@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpConnection;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStoreFactorySpi;
@@ -27,14 +26,12 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
         URL url = (URL) URLP.lookUp( params ); // try early error        
         if( testURL(url)){  
             try{
-                return new GMLDataStore( url );
+                return new GMLDataStore( url.toURI() );
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
             }
         }
-        else {
-            throw new IOException( "Provided file was not valid");
-        }        
+        throw new IOException( "Provided file was not valid");       
     }
 
     /**
@@ -60,9 +57,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
             String name = url.getFile();
             return new DataSourceMetadataEnity( parent, name, "Access to GML file "+url.toString());
         }
-        else {
-            return new DataSourceMetadataEnity( url.getHost(), url.getFile(),  "Access to GML "+url.toString());
-        }
+        return new DataSourceMetadataEnity( url.getHost(), url.getFile(),  "Access to GML "+url.toString());
     }
 //    public static final Param DIRECTORY = new Param("directory", File.class,
 //            "Directory containing gml files", true);
@@ -140,7 +135,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     public DataStore createDataStore(URL url) throws IOException {        
         if(canProcess(url))
             try{
-            return new GMLDataStore(url);
+            return new GMLDataStore(url.toURI());
 
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());

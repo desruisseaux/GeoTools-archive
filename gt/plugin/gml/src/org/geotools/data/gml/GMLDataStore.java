@@ -33,11 +33,22 @@ public class GMLDataStore extends AbstractFileDataStore {
     /**
      * Creates a dataStore for the directory specified.
      * 
+     * @deprecated This should not be used unless you are very confident
      * @param dir
      * @throws URISyntaxException
      */
-    protected GMLDataStore(URL url) throws URISyntaxException{
-        this.uri = new URI(url.toExternalForm()); // this is a url if it came from the factory
+    public GMLDataStore(URL url) throws URISyntaxException{
+        this.uri = url.toURI(); // this is a url if it came from the factory
+    }
+    
+    /**
+     * Creates a dataStore for the directory specified.
+     * 
+     * @param dir
+     * @throws URISyntaxException
+     */
+    protected GMLDataStore(URI url) throws URISyntaxException{
+        this.uri = url;
     }
 
     /**
