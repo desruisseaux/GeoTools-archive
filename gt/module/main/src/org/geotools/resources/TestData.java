@@ -61,6 +61,7 @@ import java.net.URLDecoder;
  * </p>
  * @version $Id$
  * @author James McGill
+ * @author Simone Giannecchiin (simboss)
  */
 public class TestData {
     /**
