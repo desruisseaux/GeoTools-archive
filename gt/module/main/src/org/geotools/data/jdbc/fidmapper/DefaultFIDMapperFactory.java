@@ -147,10 +147,8 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             return new AutoIncrementFIDMapper(ci.colName, ci.dataType);
         } else if (isIntegralType(ci.dataType)) {
             return new MaxIncFIDMapper(tableName, ci.colName, ci.dataType);
-        } else if (isTextType(ci.dataType)) {
-            return new BasicFIDMapper(ci.colName, ci.size);
         } else {
-            return null;
+            return new BasicFIDMapper(ci.colName, ci.size);
         }
     }
 
@@ -322,7 +320,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     protected boolean isIntegralType(int dataType) {
         return (dataType == Types.BIGINT) || (dataType == Types.INTEGER)
         || (dataType == Types.NUMERIC) || (dataType == Types.SMALLINT)
-        || (dataType == Types.TINYINT);
+        || (dataType == Types.TINYINT) || (dataType == Types.DECIMAL);
     }
 
     protected boolean isTextType(int dataType) {
