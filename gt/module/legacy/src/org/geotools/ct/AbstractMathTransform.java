@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -213,25 +213,25 @@ public abstract class AbstractMathTransform implements MathTransform {
     }
     
     /**
-     * Transforme une forme gï¿½omï¿½trique. Cette mï¿½thode copie toujours les coordonnï¿½es
-     * transformï¿½es dans un nouvel objet. La plupart du temps, elle produira un objet
+     * Transforme une forme géométrique. Cette méthode copie toujours les coordonnées
+     * transformées dans un nouvel objet. La plupart du temps, elle produira un objet
      * {@link GeneralPath}. Elle peut aussi retourner des objets {@link Line2D} ou
      * {@link QuadCurve2D} si une telle simplification est possible.
      *
-     * @param  shape  Forme gï¿½omï¿½trique ï¿½ transformer.
-     * @param  preTr  Transformation affine ï¿½ appliquer <em>avant</em> de transformer la forme
+     * @param  shape  Forme géométrique à transformer.
+     * @param  preTr  Transformation affine à appliquer <em>avant</em> de transformer la forme
      *                <code>shape</code>, ou <code>null</code> pour ne pas en appliquer.
      *                Cet argument sera surtout utile lors des transformations inverses.
-     * @param  postTr Transformation affine ï¿½ appliquer <em>aprï¿½s</em> avoir transformï¿½e la
+     * @param  postTr Transformation affine à appliquer <em>après</em> avoir transformée la
      *                forme <code>shape</code>, ou <code>null</code> pour ne pas en appliquer.
      *                Cet argument sera surtout utile lors des transformations directes.
      * @param quadDir Direction des courbes quadratiques ({@link ShapeUtilities#HORIZONTAL}
      *                ou {@link ShapeUtilities#PARALLEL}).
      *
-     * @return La forme gï¿½omï¿½trique transformï¿½e.
+     * @return La forme géométrique transformée.
      * @throws MismatchedDimensionException if this transform
      *         doesn't map two-dimensional coordinate systems.
-     * @throws TransformException Si une transformation a ï¿½chouï¿½.
+     * @throws TransformException Si une transformation a échoué.
      */
     final Shape createTransformedShape(final Shape shape,
                                        final AffineTransform preTr,
@@ -247,9 +247,9 @@ public abstract class AbstractMathTransform implements MathTransform {
         final Point2D.Float ctrl = new Point2D.Float();
         final double[]    buffer = new double[6];
         
-        double ax=0, ay=0;  // Coordonnï¿½es du dernier point avant la projection.
-        double px=0, py=0;  // Coordonnï¿½es du dernier point aprï¿½s la projection.
-        int indexCtrlPt=0;  // Index du point de contrï¿½le dans 'buffer'.
+        double ax=0, ay=0;  // Coordonnées du dernier point avant la projection.
+        double px=0, py=0;  // Coordonnées du dernier point après la projection.
+        int indexCtrlPt=0;  // Index du point de contrôle dans 'buffer'.
         int indexLastPt=0;  // Index du dernier point dans 'buffer'.
         for (; !it.isDone(); it.next()) {
             switch (it.currentSegment(buffer)) {
@@ -258,8 +258,8 @@ public abstract class AbstractMathTransform implements MathTransform {
                 }
                 case PathIterator.SEG_CLOSE: {
                     /*
-                     * Ferme la forme gï¿½omï¿½trique, puis continue la boucle. On utilise une
-                     * instruction 'continue' plutï¿½t que 'break' car il ne faut pas exï¿½cuter
+                     * Ferme la forme géométrique, puis continue la boucle. On utilise une
+                     * instruction 'continue' plutôt que 'break' car il ne faut pas exécuter
                      * le code qui suit ce 'switch'.
                      */
                     path.closePath();
@@ -267,9 +267,9 @@ public abstract class AbstractMathTransform implements MathTransform {
                 }
                 case PathIterator.SEG_MOVETO: {
                     /*
-                     * Mï¿½morise les coordonnï¿½es spï¿½cifiï¿½es (avant et aprï¿½s les avoir
-                     * projetï¿½es), puis continue la boucle. On utilise une instruction
-                     * 'continue' plutï¿½t que 'break' car il ne faut pas exï¿½cuter le
+                     * Mémorise les coordonnées spécifiées (avant et après les avoir
+                     * projetées), puis continue la boucle. On utilise une instruction
+                     * 'continue' plutôt que 'break' car il ne faut pas exécuter le
                      * code qui suit ce 'switch'.
                      */
                     ax = buffer[0];
@@ -281,14 +281,14 @@ public abstract class AbstractMathTransform implements MathTransform {
                 }
                 case PathIterator.SEG_LINETO: {
                     /*
-                     * Place dans 'buffer[2,3]' les coordonnï¿½es
+                     * Place dans 'buffer[2,3]' les coordonnées
                      * d'un point qui se trouve sur la droite:
                      *
                      *  x = 0.5*(x1+x2)
                      *  y = 0.5*(y1+y2)
                      *
-                     * Ce point sera traitï¿½ aprï¿½s le 'switch', d'oï¿½
-                     * l'utilisation d'un 'break' plutï¿½t que 'continue'.
+                     * Ce point sera traité après le 'switch', d'où
+                     * l'utilisation d'un 'break' plutôt que 'continue'.
                      */
                     indexLastPt = 0;
                     indexCtrlPt = 2;
@@ -298,14 +298,14 @@ public abstract class AbstractMathTransform implements MathTransform {
                 }
                 case PathIterator.SEG_QUADTO: {
                     /*
-                     * Place dans 'buffer[0,1]' les coordonnï¿½es
+                     * Place dans 'buffer[0,1]' les coordonnées
                      * d'un point qui se trouve sur la courbe:
                      *
                      *  x = 0.5*(ctrlx + 0.5*(x1+x2))
                      *  y = 0.5*(ctrly + 0.5*(y1+y2))
                      *
-                     * Ce point sera traitï¿½ aprï¿½s le 'switch', d'oï¿½
-                     * l'utilisation d'un 'break' plutï¿½t que 'continue'.
+                     * Ce point sera traité après le 'switch', d'où
+                     * l'utilisation d'un 'break' plutôt que 'continue'.
                      */
                     indexLastPt = 2;
                     indexCtrlPt = 0;
@@ -315,25 +315,25 @@ public abstract class AbstractMathTransform implements MathTransform {
                 }
                 case PathIterator.SEG_CUBICTO: {
                     /*
-                     * Place dans 'buffer[0,1]' les coordonnï¿½es
+                     * Place dans 'buffer[0,1]' les coordonnées
                      * d'un point qui se trouve sur la courbe:
                      *
                      *  x = 0.25*(1.5*(ctrlx1+ctrlx2) + 0.5*(x1+x2));
                      *  y = 0.25*(1.5*(ctrly1+ctrly2) + 0.5*(y1+y2));
                      *
-                     * Ce point sera traitï¿½ aprï¿½s le 'switch', d'oï¿½
-                     * l'utilisation d'un 'break' plutï¿½t que 'continue'.
+                     * Ce point sera traité après le 'switch', d'où
+                     * l'utilisation d'un 'break' plutôt que 'continue'.
                      *
-                     * NOTE: Le point calculï¿½ est bien sur la courbe, mais n'est pas
-                     *       nï¿½cessairement reprï¿½sentatif. Cet algorithme remplace les
-                     *       deux points de contrï¿½les par un seul, ce qui se traduit par
-                     *       une perte de souplesse qui peut donner de mauvais rï¿½sultats
-                     *       si la courbe cubique ï¿½tait bien tordue. Projeter une courbe
-                     *       cubique ne me semble pas ï¿½tre un problï¿½me simple, mais ce
-                     *       cas devrait ï¿½tre assez rare. Il se produira le plus souvent
+                     * NOTE: Le point calculé est bien sur la courbe, mais n'est pas
+                     *       nécessairement représentatif. Cet algorithme remplace les
+                     *       deux points de contrôles par un seul, ce qui se traduit par
+                     *       une perte de souplesse qui peut donner de mauvais résultats
+                     *       si la courbe cubique était bien tordue. Projeter une courbe
+                     *       cubique ne me semble pas être un problème simple, mais ce
+                     *       cas devrait être assez rare. Il se produira le plus souvent
                      *       si on essaye de projeter un cercle ou une ellipse, auxquels
-                     *       cas l'algorithme actuel donnera quand mï¿½me des rï¿½sultats
-                     *       tolï¿½rables.
+                     *       cas l'algorithme actuel donnera quand même des résultats
+                     *       tolérables.
                      */
                     indexLastPt = 4;
                     indexCtrlPt = 0;
@@ -344,8 +344,8 @@ public abstract class AbstractMathTransform implements MathTransform {
             }
             /*
              * Applique la transformation sur les points qui se
-             * trouve dans le buffer, puis ajoute ces points ï¿½
-             * la forme gï¿½omï¿½trique projetï¿½e comme une courbe
+             * trouve dans le buffer, puis ajoute ces points à
+             * la forme géométrique projetée comme une courbe
              * quadratique.
              */
             transform(buffer, 0, buffer, 0, 2);
@@ -362,9 +362,9 @@ public abstract class AbstractMathTransform implements MathTransform {
             }
         }
         /*
-         * La projection de la forme gï¿½omï¿½trique est terminï¿½e. Applique
-         * une transformation affine si c'ï¿½tait demandï¿½e, puis retourne
-         * une version si possible simplifiï¿½e de la forme gï¿½omï¿½trique.
+         * La projection de la forme géométrique est terminée. Applique
+         * une transformation affine si c'était demandée, puis retourne
+         * une version si possible simplifiée de la forme géométrique.
          */
         if (postTr!=null) {
             path.transform(postTr);
@@ -512,7 +512,7 @@ public abstract class AbstractMathTransform implements MathTransform {
     }
     
     /**
-     * Returns a string reprï¿½sentation of this transform.
+     * Returns a string représentation of this transform.
      * Subclasses should override this method in order to
      * returns Well Know Text (WKT) instead.
      */

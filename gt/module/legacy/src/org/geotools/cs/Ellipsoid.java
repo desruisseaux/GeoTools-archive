@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -230,7 +230,7 @@ public class Ellipsoid extends Info {
     /**
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
-     * computed from the equation: <code>e=sqrt(2f-fï¿½)</code>.
+     * computed from the equation: <code>e=sqrt(2f-f²)</code>.
      *
      * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getEccentricity}.
      */

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -879,7 +879,7 @@ public class GridCoverage extends Coverage {
      * string with pixel coordinates and pixel values for all bands (with geophysics
      * values or category name in parenthesis). Example for a 1-banded image:
      *
-     * <blockquote><pre>(1171,1566)=[196 (29.6 ï¿½C)]</pre></blockquote>
+     * <blockquote><pre>(1171,1566)=[196 (29.6 °C)]</pre></blockquote>
      *
      * @param  coord The coordinate point where to evaluate.
      * @return A string with pixel coordinates and pixel values at the specified location,
@@ -1335,7 +1335,7 @@ testLinear: for (int i=0; i<numBands; i++) {
     }
 
     /**
-     * Returns a string reprï¿½sentation of this coverage. This string is
+     * Returns a string représentation of this coverage. This string is
      * for debugging purpose only and may change in future version.
      */
     public String toString() {

@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pï¿½ches et Ocï¿½ans Canada
- *               2000 Institut de Recherche pour le Dï¿½veloppement
+ *               1999 Pêches et Océans Canada
+ *               2000 Institut de Recherche pour le Développement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,12 +29,12 @@
  */
 package org.geotools.units;
 
-// Entrï¿½s/sorties
+// Entrés/sorties
 
 
 /**
- * Reprï¿½sente une transformation entre deux unitï¿½s
- * dont les valeurs n'ont qu'ï¿½ ï¿½tre inversï¿½es.
+ * Représente une transformation entre deux unités
+ * dont les valeurs n'ont qu'à être inversées.
  *
  * @version 1.0
  * @author Martin Desruisseaux
@@ -49,7 +49,7 @@ final class InverseTransform extends UnitTransform {
     
     /**
      * Construit un objet qui aura la charge de convertir
-     * des donnï¿½es exprimï¿½es selon les unitï¿½s spï¿½cifiï¿½es.
+     * des données exprimées selon les unités spécifiées.
      */
     private InverseTransform(final Unit fromUnit, final Unit toUnit) {
         super(fromUnit, toUnit);
@@ -57,26 +57,26 @@ final class InverseTransform extends UnitTransform {
     
     /**
      * Construit un objet qui aura la charge de convertir
-     * des donnï¿½es exprimï¿½es selon les unitï¿½s spï¿½cifiï¿½es.
+     * des données exprimées selon les unités spécifiées.
      */
     public static UnitTransform getInstance(final Unit fromUnit, final Unit toUnit) {
         return new InverseTransform(fromUnit, toUnit).intern();
     }
     
     /**
-     * Effectue la conversion d'unitï¿½s d'une valeur.
-     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
-     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
+     * Effectue la conversion d'unités d'une valeur.
+     * @param value Valeur exprimée selon les unités {@link #fromUnit}.
+     * @return Valeur exprimée selon les unités {@link #toUnit}.
      */
     public double convert(final double value) {
         return 1/value;
     }
     
     /**
-     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
-     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimï¿½es selon
-     *        les unitï¿½s {@link #toUnits}.
+     * Effectue la conversion d'unités d'un tableaux de valeurs.
+     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimées selon
+     *        les unités {@link #toUnits}.
      */
     public void convert(final double[] values) {
         for (int i=0; i<values.length; i++) {
@@ -85,10 +85,10 @@ final class InverseTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
-     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimï¿½es selon
-     *        les unitï¿½s {@link #toUnits}.
+     * Effectue la conversion d'unités d'un tableaux de valeurs.
+     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimées selon
+     *        les unités {@link #toUnits}.
      */
     public void convert(final float[] values) {
         for (int i=0; i<values.length; i++) {
@@ -97,19 +97,19 @@ final class InverseTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion inverse d'unitï¿½s d'une valeur.
-     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
-     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
+     * Effectue la conversion inverse d'unités d'une valeur.
+     * @param value Valeur exprimée selon les unités {@link #toUnit}.
+     * @return Valeur exprimée selon les unités {@link #fromUnit}.
      */
     public double inverseConvert(final double value) {
         return 1/value;
     }
     
     /**
-     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
-     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimï¿½es selon
-     *        les unitï¿½s {@link #fromUnits}.
+     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
+     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimées selon
+     *        les unités {@link #fromUnits}.
      */
     public void inverseConvert(final double[] values) {
         for (int i=0; i<values.length; i++) {
@@ -118,10 +118,10 @@ final class InverseTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
-     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimï¿½es selon
-     *        les unitï¿½s {@link #fromUnit}.
+     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
+     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimées selon
+     *        les unités {@link #fromUnit}.
      */
     public void inverseConvert(final float[] values) {
         for (int i=0; i<values.length; i++) {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -914,7 +914,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
     }
     
     /**
-     * Returns a string reprï¿½sentation of this coverage. This string is
+     * Returns a string représentation of this coverage. This string is
      * for debugging purpose only and may change in future version.
      */
     public String toString() {

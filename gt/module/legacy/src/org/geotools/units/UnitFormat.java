@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pï¿½ches et Ocï¿½ans Canada
- *               2000 Institut de Recherche pour le Dï¿½veloppement
+ *               1999 Pêches et Océans Canada
+ *               2000 Institut de Recherche pour le Développement
  *               2002 Centre for Computational Geography
  *
  *
@@ -45,9 +45,9 @@ import org.geotools.util.WeakHashSet;
 
 
 /**
- * Classe chargï¿½e du formattage ou de l'interprï¿½tation des symboles d'une unitï¿½.
+ * Classe chargée du formattage ou de l'interprétation des symboles d'une unité.
  * <strong>Cette classe n'est qu'un premier jet</strong>. Elle ne contient pas encore d'API qui
- * permettrait de contrï¿½ler la faï¿½on d'ï¿½crire les unitï¿½s. Plus important, le contrat gï¿½nï¿½ral voulant
+ * permettrait de contrôler la façon d'écrire les unités. Plus important, le contrat général voulant
  * que tout objet produit par {@link #format(Object)} soit lissible par {@link #parse(String)} <u>n'est
  * pas garanti</u> dans la version actuelle.
  *
@@ -58,28 +58,28 @@ import org.geotools.util.WeakHashSet;
  */
 final class UnitFormat {
     /**
-     * Format par dï¿½faut ï¿½ utiliser pour construire et interprï¿½ter les symboles des unitï¿½s.
-     * Ce format sera utilisï¿½ par les constructeurs des diffï¿½rentes classes {@link Unit}
-     * pour crï¿½er des symboles, ainsi que par la mï¿½thode {@link Unit#getUnit} pour interprï¿½ter
+     * Format par défaut à utiliser pour construire et interpréter les symboles des unités.
+     * Ce format sera utilisé par les constructeurs des différentes classes {@link Unit}
+     * pour créer des symboles, ainsi que par la méthode {@link Unit#getUnit} pour interpréter
      * un symbole.
      */
     static final UnitFormat DEFAULT=new UnitFormat();
     
     /**
-     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
-     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
+     * Banque des objets qui ont été précédemment créés et
+     * enregistrés par un appel à la méthode {@link #intern}.
      */
     private static final WeakHashSet pool=Prefix.pool;
     
     /**
-     * Inverse d'une petite valeur servant ï¿½ ï¿½viter des erreurs d'arrondissements.
-     * Cette valeur est dï¿½finie arbitrairement ï¿½ 2^24, soit environ 1.678E+7.
+     * Inverse d'une petite valeur servant à éviter des erreurs d'arrondissements.
+     * Cette valeur est définie arbitrairement à 2^24, soit environ 1.678E+7.
      */
     private static final double INV_EPS = 16777216;
     
     /**
-     * Ordre de prï¿½fï¿½rences des classes d'unitï¿½s. Cette ordre sera pris en
-     * compte si plusieurs unitï¿½s ont ï¿½tï¿½ trouvï¿½s pour un symbole donnï¿½.
+     * Ordre de préférences des classes d'unités. Cette ordre sera pris en
+     * compte si plusieurs unités ont été trouvés pour un symbole donné.
      */
     private static final Class[] PRIORITIES=new Class[] {
         BaseUnit.class,
@@ -89,45 +89,45 @@ final class UnitFormat {
     };
     
     /**
-     * Symbole reprï¿½sentant la multiplication d'une unitï¿½ par un facteur.
+     * Symbole représentant la multiplication d'une unité par un facteur.
      */
     private static final char SCALE_SYMBOL = '\u00D7';
     
     /**
-     * Symbole reprï¿½sentant la multiplication de deux unitï¿½s.
+     * Symbole représentant la multiplication de deux unités.
      */
     private static final char DOT_SYMBOL = '\u22C5'; // TODO: on devrait plutï¿½t utiliser '\u22C5', mais ce symbole n'est pas affichï¿½ correctement.
     
     /**
-     * Symbole reprï¿½sentant la division de deux unitï¿½s.
+     * Symbole représentant la division de deux unités.
      */
     private static final char SLASH_SYMBOL = '/';
     
     /**
-     * Symbole de l'opï¿½rateur exposant.
+     * Symbole de l'opérateur exposant.
      */
     private static final char EXPONENT_SYMBOL='^';
     
     /**
-     * Symbole reprï¿½sentant l'ouverture d'une parenthï¿½se.
+     * Symbole représentant l'ouverture d'une parenthèse.
      */
     private static final char OPEN_SYMBOL = '(';
     
     /**
-     * Symbole reprï¿½sentant la fermeture d'une parenthï¿½se.
+     * Symbole représentant la fermeture d'une parenthèse.
      */
     private static final char CLOSE_SYMBOL = ')';
     
     /**
-     * Construit un objet qui lira et ï¿½crira
-     * des unitï¿½s avec les paramï¿½tres par dï¿½faut.
+     * Construit un objet qui lira et écrira
+     * des unités avec les paramètres par défaut.
      */
     public UnitFormat()
     {}
     
     /**
-     * Construit un symbole ï¿½ partir du facteur spï¿½cifiï¿½. Ce sera le symbole
-     * de l'unitï¿½ de base avec son exposant. Par exemple "m", "mï¿½" ou "kg^-1".
+     * Construit un symbole à partir du facteur spécifié. Ce sera le symbole
+     * de l'unité de base avec son exposant. Par exemple "m", "m²" ou "kg^-1".
      */
     final StringBuffer format(final Factor factor, final StringBuffer buffer) {
         if (factor.power!=0) {
@@ -155,16 +155,16 @@ final class UnitFormat {
     }
     
     /**
-     * Construit un symbole ï¿½ partir du tableau de facteurs spï¿½cifiï¿½s. L'implï¿½mentation par dï¿½faut place
-     * au dï¿½but les unitï¿½s qui ont une puissance positive, puis ï¿½ la droite d'un signe "/" les unitï¿½s qui
-     * ont une puissance nï¿½gative. Le rï¿½sultat ressemblera par exemple ï¿½ "m/s". Si nï¿½cessaire, des parenthï¿½ses
-     * seront utilisï¿½es.
+     * Construit un symbole à partir du tableau de facteurs spécifiés. L'implémentation par défaut place
+     * au début les unités qui ont une puissance positive, puis à la droite d'un signe "/" les unités qui
+     * ont une puissance négative. Le résultat ressemblera par exemple à "m/s". Si nécessaire, des parenthèses
+     * seront utilisées.
      */
     final StringBuffer format(final Factor[] factors, StringBuffer buffer) {
         /*
-         * Ajoute au buffer tous les termes qui se trouvent comme numï¿½rateurs
+         * Ajoute au buffer tous les termes qui se trouvent comme numérateurs
          * (puissance positive).  Au passage, on comptera le nombre de termes
-         * qui se trouvent comme dï¿½nominateurs (puissance nï¿½gative).
+         * qui se trouvent comme dénominateurs (puissance négative).
          */
         int numeratorCount   = 0;
         int denominatorCount = 0;
@@ -179,8 +179,8 @@ final class UnitFormat {
             }
         }
         /*
-         * Ajoute au buffer tous les termes qui se trouvent comme dï¿½nominateurs
-         * (puissance nï¿½gative), s'il y en a.
+         * Ajoute au buffer tous les termes qui se trouvent comme dénominateurs
+         * (puissance négative), s'il y en a.
          */
         if (denominatorCount!=0) {
             if (numeratorCount==0)   buffer.append('1');
@@ -203,11 +203,11 @@ final class UnitFormat {
     }
     
     /**
-     * Renvoie une chaï¿½ne de caractï¿½res reprï¿½sentant la multiplication d'un symbole par un facteur.
-     * Par exemple cette reprï¿½sentation pourrait ï¿½tre de la forme <code>"\u00D70,9144\u00A0m"</code>
-     * pour reprï¿½senter un yard. Si le symbole <code>unit</code> autorise l'utilisation de prï¿½fix, un
-     * prï¿½fix pourra ï¿½tre placï¿½ devant le symbole plutï¿½t que d'ï¿½crire le facteur. C'est le cas par
-     * exemple des centimï¿½tres qui peuvent ï¿½tre ï¿½crits comme "cm".
+     * Renvoie une chaîne de caractères représentant la multiplication d'un symbole par un facteur.
+     * Par exemple cette représentation pourrait être de la forme <code>"\u00D70,9144\u00A0m"</code>
+     * pour représenter un yard. Si le symbole <code>unit</code> autorise l'utilisation de préfix, un
+     * préfix pourra être placé devant le symbole plutôt que d'écrire le facteur. C'est le cas par
+     * exemple des centimètres qui peuvent être écrits comme "cm".
      */
     final StringBuffer formatScaled(double amount, final SimpleUnit unit, StringBuffer buffer) {
         String          symbol = unit.symbol;
@@ -216,8 +216,8 @@ final class UnitFormat {
         final PrefixSet prefix = unit.prefix;
         if (prefix!=null) {
             /*
-             * Commence par vï¿½rifier si le symbole de <code>unit</code> commenï¿½ait
-             * dï¿½jï¿½ par un des prï¿½fix. Si oui, on supprimera cet ancien prï¿½fix.
+             * Commence par vérifier si le symbole de <code>unit</code> commençait
+             * déjà par un des préfix. Si oui, on supprimera cet ancien préfix.
              */
             final String unprefixedSymbol = unit.getUnprefixedSymbol();
             if (symbol.endsWith(unprefixedSymbol)) // Test only to make sure...
@@ -229,8 +229,8 @@ final class UnitFormat {
                 }
             }
             /*
-             * Essaie de placer un nouveau prï¿½fix devant
-             * le symbole, en fonction de l'ï¿½chelle.
+             * Essaie de placer un nouveau préfix devant
+             * le symbole, en fonction de l'échelle.
              */
             final Prefix p=prefix.getPrefix(amount);
             if (p!=null) {
@@ -240,14 +240,14 @@ final class UnitFormat {
         }
         /*
          * Si <code>amount</code> est presqu'une puissance de 10, arrondi
-         * ï¿½ la puissance de 10 la plus proche. Cette ï¿½tape vise ï¿½ rï¿½duire
+         * à la puissance de 10 la plus proche. Cette étape vise à réduire
          * certaines erreurs d'arrondissement.
          */
         final double power = Math.rint(XMath.log10(amount)*INV_EPS)/INV_EPS;
         if (power==Math.rint(power)) amount=XMath.pow10(power);
         /*
-         * Si on n'a pas pu placer un prï¿½fix devant les unitï¿½s,
-         * alors on ï¿½crira un symbole de multiplication.
+         * Si on n'a pas pu placer un préfix devant les unités,
+         * alors on écrira un symbole de multiplication.
          */
         if (amount!=1) {
             final NumberFormat format=NumberFormat.getNumberInstance();
@@ -262,8 +262,8 @@ final class UnitFormat {
     }
     
     /**
-     * Renvoie une chaï¿½ne de caractï¿½res reprï¿½sentant le dï¿½calage d'une unitï¿½. Par exemple cette reprï¿½sentation
-     * pourrait ï¿½tre de la forme <code>"+273.15\u00A0K</code> pour reprï¿½senter des degrï¿½s Celsius.
+     * Renvoie une chaîne de caractères représentant le décalage d'une unité. Par exemple cette représentation
+     * pourrait être de la forme <code>"+273.15\u00A0K</code> pour représenter des degrés Celsius.
      */
     final StringBuffer formatOffset(final double offset, final Unit unit, StringBuffer buffer) {
         final String       symbol = unit.toString();
@@ -284,14 +284,14 @@ final class UnitFormat {
     }
     
     /**
-     * Retourne les unitï¿½s qui correspondent au symbole spï¿½cifiï¿½. Si plus d'une
-     * unitï¿½ correspond au symbole spï¿½cifiï¿½, une unitï¿½ arbitraire sera choisie.
+     * Retourne les unités qui correspondent au symbole spécifié. Si plus d'une
+     * unité correspond au symbole spécifié, une unité arbitraire sera choisie.
      *
-     * @param  symbol Symbole des unitï¿½s recherchï¿½es. Cet argument ne doit pas ï¿½tre nul.
-     * @return Si les unitï¿½s ont ï¿½tï¿½ trouvï¿½s, l'objet {@link Unit} qui les reprï¿½sentent.
-     *         Sinon, un objet {@link String} contenant la portion de chaï¿½ne qui n'a pas
-     *         ï¿½tï¿½ reconnue.
-     * @throws IllegalArgumentException si les parenthï¿½ses ne sont pas ï¿½quilibrï¿½es.
+     * @param  symbol Symbole des unités recherchées. Cet argument ne doit pas être nul.
+     * @return Si les unités ont été trouvés, l'objet {@link Unit} qui les représentent.
+     *         Sinon, un objet {@link String} contenant la portion de chaîne qui n'a pas
+     *         été reconnue.
+     * @throws IllegalArgumentException si les parenthèses ne sont pas équilibrées.
      */
     final Object parse(final String symbol) throws IllegalArgumentException {
         final Set set=new HashSet(11);
@@ -305,24 +305,24 @@ final class UnitFormat {
     }
     
     /**
-     * Recherche des unitï¿½s qui correspondent au symbole spï¿½cifiï¿½. Les unitï¿½s trouvï¿½s seront ajoutï¿½s
-     * dans l'ensemble <code>set</code>. Si aucune unitï¿½ n'a ï¿½tï¿½ trouvï¿½e, la taille de <code>set</code>
-     * n'aura pas augmentï¿½e. Dans ce cas, cette mï¿½thode retourne les caractï¿½res qui n'ont pas ï¿½tï¿½ reconnus.
+     * Recherche des unités qui correspondent au symbole spécifié. Les unités trouvés seront ajoutés
+     * dans l'ensemble <code>set</code>. Si aucune unité n'a été trouvée, la taille de <code>set</code>
+     * n'aura pas augmentée. Dans ce cas, cette méthode retourne les caractères qui n'ont pas été reconnus.
      *
-     * @param  symbol Symbole des unitï¿½s recherchï¿½es.
-     * @param  set Ensemble dans lequel placer les unitï¿½s trouvï¿½es.
-     * @return <code>null</code> si des unitï¿½s ont ï¿½tï¿½ trouvï¿½es, ou sinon la portion
-     *         de la chaï¿½ne <code>symbol</code> qui n'a pas ï¿½tï¿½ reconnue.
-     * @throws IllegalArgumentException si les parenthï¿½ses ne sont pas ï¿½quilibrï¿½es.
+     * @param  symbol Symbole des unités recherchées.
+     * @param  set Ensemble dans lequel placer les unités trouvées.
+     * @return <code>null</code> si des unités ont été trouvées, ou sinon la portion
+     *         de la chaîne <code>symbol</code> qui n'a pas été reconnue.
+     * @throws IllegalArgumentException si les parenthèses ne sont pas équilibrées.
      */
     private String parse(String symbol, final Set set) throws IllegalArgumentException {
         symbol=symbol.trim();
         final int initialSize=set.size();
         /*
-         * Ignore les parenthï¿½ses qui se trouvent au dï¿½but ou ï¿½ la fin des unitï¿½s. Les ï¿½ventuelles
-         * parenthï¿½ses qui se trouverait au milieu ne sont pas pris en compte maintenant. Elles le
-         * seront plus tard.   On ignore toujours le mï¿½me nombre de parenthï¿½ses ouvrantes au dï¿½but
-         * que de parenthï¿½ses fermantes ï¿½ la fin.
+         * Ignore les parenthèses qui se trouvent au début ou à la fin des unités. Les éventuelles
+         * parenthèses qui se trouverait au milieu ne sont pas pris en compte maintenant. Elles le
+         * seront plus tard.   On ignore toujours le même nombre de parenthèses ouvrantes au début
+         * que de parenthèses fermantes à la fin.
          */
         if (true) {
             int lower=0;
@@ -356,9 +356,9 @@ final class UnitFormat {
             }
         }
         /*
-         * Recherche les symboles de divisions ou de multiplications. Si un tel symbole est trouvï¿½, on lira sï¿½parament
-         * les unitï¿½s qui prï¿½cï¿½dent et qui suivent ce symbole. On ne prend en compte que les symboles qui ne se trouvent
-         * pas dans une parenthï¿½se. Si un symbole se trouve dans une parenthï¿½se, il sera pris en compte plus tard.
+         * Recherche les symboles de divisions ou de multiplications. Si un tel symbole est trouvé, on lira séparament
+         * les unités qui précèdent et qui suivent ce symbole. On ne prend en compte que les symboles qui ne se trouvent
+         * pas dans une parenthèse. Si un symbole se trouve dans une parenthèse, il sera pris en compte plus tard.
          */
         if (true) {
             int level=0;
@@ -374,8 +374,8 @@ final class UnitFormat {
                 }
                 if (level!=0) continue;
                 /*
-                 * Un signe de multiplication ou d'addition a ï¿½tï¿½ trouvï¿½.
-                 * Lit d'abord les unitï¿½s avant ce signe, puis aprï¿½s ce signe.
+                 * Un signe de multiplication ou d'addition a été trouvé.
+                 * Lit d'abord les unités avant ce signe, puis après ce signe.
                  */
                 String tmp;
                 final Set unitsA=new HashSet(11);
@@ -408,17 +408,17 @@ final class UnitFormat {
             }
         }
         /*
-         * Parvenu ï¿½ ce stade, on n'a dï¿½tectï¿½ aucun symbole de multiplication ou de division
-         * et aucune parenthï¿½ses. Il ne devrait rester que le symbole de l'unitï¿½, ï¿½ventuellement
-         * avec son prï¿½fix et un exposant. On tente maintenant d'interprï¿½ter ce symbole.
+         * Parvenu à ce stade, on n'a détecté aucun symbole de multiplication ou de division
+         * et aucune parenthèses. Il ne devrait rester que le symbole de l'unité, éventuellement
+         * avec son préfix et un exposant. On tente maintenant d'interpréter ce symbole.
          */
         int           power = 1;
         boolean powerParsed = false;
         /*
-         * La boucle suivante sera exï¿½cutï¿½e deux fois. La premiï¿½re fois, on n'aura pas tentï¿½ de prendre en compte
-         * une ï¿½ventuelle puissance aprï¿½s le symbole (par exemple le '2' dans "mï¿½"), parce que le symbole avec sa
-         * puissance a peut-ï¿½tre ï¿½tï¿½ dï¿½jï¿½ explicitement dï¿½finie.   Si cette tentative a ï¿½chouï¿½, alors le deuxiï¿½me
-         * passage de la boucle prendra en compte un ï¿½ventuel exposant.
+         * La boucle suivante sera exécutée deux fois. La première fois, on n'aura pas tenté de prendre en compte
+         * une éventuelle puissance après le symbole (par exemple le '2' dans "m²"), parce que le symbole avec sa
+         * puissance a peut-être été déjà explicitement définie.   Si cette tentative a échoué, alors le deuxième
+         * passage de la boucle prendra en compte un éventuel exposant.
          */
         while (true) {
             final int length=symbol.length();
@@ -426,10 +426,10 @@ final class UnitFormat {
                 Unit unit=Unit.getCached(symbol.substring(lower));
                 if (unit!=null) {
                     /*
-                     * Parvenu ï¿½ ce stade, nous avons trouvï¿½ une unitï¿½ qui correspond au symbole <code>symbol</code>.
-                     * S'il a fallu sauter des caractï¿½res pour trouver cette unitï¿½, alors les caractï¿½res ignorï¿½s doivent
-                     * ï¿½tre un prï¿½fix. On tentera d'identifier le prï¿½fix en interrogeant la liste des prï¿½fix autorisï¿½s
-                     * pour cette unitï¿½.
+                     * Parvenu à ce stade, nous avons trouvé une unité qui correspond au symbole <code>symbol</code>.
+                     * S'il a fallu sauter des caractères pour trouver cette unité, alors les caractères ignorés doivent
+                     * être un préfix. On tentera d'identifier le préfix en interrogeant la liste des préfix autorisés
+                     * pour cette unité.
                      */
                     if (lower!=0) {
                         if (unit.prefix==null) continue;
@@ -438,7 +438,7 @@ final class UnitFormat {
                         unit=unit.scale(prefix.amount);
                     }
                     /*
-                     * Tente maintenant d'ï¿½lever les unitï¿½s ï¿½ une puissance,
+                     * Tente maintenant d'élever les unités à une puissance,
                      * s'ils sont suivit d'une puissance.
                      */
                     try {
@@ -449,23 +449,23 @@ final class UnitFormat {
                 }
             }
             /*
-             * Si c'est le second passage de la boucle, la puissance a dï¿½jï¿½ ï¿½tï¿½
-             * prise en compte. On terminera alors cette mï¿½thode maintenant.
+             * Si c'est le second passage de la boucle, la puissance a déjà été
+             * prise en compte. On terminera alors cette méthode maintenant.
              */
             if (powerParsed) {
                 return (set.size()==initialSize) ? symbol : null;
             }
             powerParsed=true;
             /*
-             * Si aucune unitï¿½ n'a ï¿½tï¿½ trouvï¿½e lors du premier passage de la boucle, tente maintenant de prendre en compte
-             * une ï¿½ventuelle puissance qui aurait ï¿½tï¿½ spï¿½cifiï¿½e aprï¿½s les unitï¿½s (comme par exemple le '2' dans "mï¿½"). On
-             * supposera que la puissance commence soit aprï¿½s le dernier caractï¿½re qui n'est pas un exposant, ou soit aprï¿½s
+             * Si aucune unité n'a été trouvée lors du premier passage de la boucle, tente maintenant de prendre en compte
+             * une éventuelle puissance qui aurait été spécifiée après les unités (comme par exemple le '2' dans "m²"). On
+             * supposera que la puissance commence soit après le dernier caractère qui n'est pas un exposant, ou soit après
              * le symbole '^'.
              */
             int expStart;
             int symbolEnd=symbol.lastIndexOf(EXPONENT_SYMBOL);
             if (symbolEnd>=0) {
-                // Positionne 'expStart' aprï¿½s le symbole '^'.
+                // Positionne 'expStart' après le symbole '^'.
                 expStart = symbolEnd+1;
             } else {
                 for (symbolEnd=length; --symbolEnd>=0;) {
@@ -474,12 +474,12 @@ final class UnitFormat {
                         break;
                     }
                 }
-                // Il n'y a pas de symbole '^' ï¿½ sauter pour 'expStart'.
+                // Il n'y a pas de symbole '^' à sauter pour 'expStart'.
                 expStart = symbolEnd;
             }
             /*
-             * Maintenant qu'on a sï¿½parï¿½ le symbole de l'exposant, tente d'interprï¿½ter l'exposant. Si l'interprï¿½tation
-             * ï¿½choue, ou s'il n'y a pas d'exposant ou de symbole, alors ce n'est pas la peine de faire le deuxiï¿½me
+             * Maintenant qu'on a séparé le symbole de l'exposant, tente d'interpréter l'exposant. Si l'interprétation
+             * échoue, ou s'il n'y a pas d'exposant ou de symbole, alors ce n'est pas la peine de faire le deuxième
              * passage de la boucle; on fera donc un "break".
              */
             if (symbolEnd>=1 && expStart<length) {
@@ -493,7 +493,7 @@ final class UnitFormat {
                     power=Integer.parseInt(powerText);
                 } catch (NumberFormatException exception) {
                     // TODO: le message d'erreur de 'Unit.getUnit(String)' n'est pas
-                    //       vraiment appropriï¿½ lorsqu'on retourne 'powerText'.
+                    //       vraiment approprié lorsqu'on retourne 'powerText'.
                     return (set.size()==initialSize) ? powerText : null;
                 }
             } else {
@@ -503,16 +503,16 @@ final class UnitFormat {
     }
     
     /**
-     * Sï¿½lectionne une unitï¿½. Cette mï¿½thode est appelï¿½e automatiquement par la mï¿½thode
-     * {@link #parse} si elle a trouvï¿½ plusieurs unitï¿½s qui utilisent le mï¿½me symbole.
-     * L'implï¿½mentation par dï¿½faut tentera de retourner de prï¿½fï¿½rence une unitï¿½ de la
+     * Sélectionne une unité. Cette méthode est appelée automatiquement par la méthode
+     * {@link #parse} si elle a trouvé plusieurs unités qui utilisent le même symbole.
+     * L'implémentation par défaut tentera de retourner de préférence une unité de la
      * classe {@link BaseUnit} ou {@link DerivedUnit}.
-     * Les classes dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode pour sï¿½lectionner une unitï¿½
-     * selon d'autres critï¿½res, par exemple en demandant ï¿½ l'utilisateur de choisir.
+     * Les classes dérivées peuvent redéfinir cette méthode pour sélectionner une unité
+     * selon d'autres critères, par exemple en demandant à l'utilisateur de choisir.
      *
-     * @param  units Liste d'unitï¿½s parmi lesquelles il faut faire un choix.
+     * @param  units Liste d'unités parmi lesquelles il faut faire un choix.
      *         La longueur de ce tableau sera d'au moins 2.
-     * @return Unitï¿½ choisie. Il n'est pas obligatoire que cette unitï¿½ fasse
+     * @return Unité choisie. Il n'est pas obligatoire que cette unité fasse
      *         partie du tableau <code>units</code> original.
      */
     protected Unit selectUnit(final Unit[] units) {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -341,7 +341,7 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * Returns this enum's name in the specified locale. If no name is available for
      * the specified locale, a default one will be used.  For example, the localized
      * name for {@link #SHORT} is "<cite>16 bits unsigned integer</cite>" in English
-     * and "<cite>Entier non-signï¿½ sur 16 bits</cite>" in French.
+     * and "<cite>Entier non-signé sur 16 bits</cite>" in French.
      *
      * @param  locale The locale, or <code>null</code> for the default locale.
      * @return Enum's name in the specified locale.

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -74,13 +74,13 @@ public abstract class MathTransformProvider {
     
     /**
      * Range of longitude values. Range goes
-     * from -180ï¿½ to +180ï¿½ inclusives.
+     * from -180° to +180° inclusives.
      */
     protected static final Range LONGITUDE_RANGE = new Range(Double.class, new Double(Longitude.MIN_VALUE), true, new Double(Longitude.MAX_VALUE), true);
     
     /**
      * Range of latitude values. Range goes
-     * from -90ï¿½ to +90ï¿½ inclusives.
+     * from -90° to +90° inclusives.
      */
     protected static final Range LATITUDE_RANGE = new Range(Double.class, new Double(Latitude.MIN_VALUE), true, new Double(Latitude.MAX_VALUE), true);
     

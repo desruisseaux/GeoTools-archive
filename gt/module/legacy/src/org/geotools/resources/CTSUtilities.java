@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -443,10 +443,10 @@ public final class CTSUtilities {
     }
     
     /**
-     * Retourne une chaï¿½ne de caractï¿½res reprï¿½sentant la rï¿½gion gï¿½ographique spï¿½cifiï¿½e. La
-     * chaï¿½ne retournï¿½e sera de la forme "45ï¿½00.00'N-50ï¿½00.00'N 30ï¿½00.00'E-40ï¿½00.00'E". Si
-     * une projection cartographique est nï¿½cessaire pour obtenir cette reprï¿½sentation, elle
-     * sera faite automatiquement. Cette chaï¿½ne sert surtout ï¿½ des fins de dï¿½boguage et sa
+     * Retourne une chaîne de caractères représentant la région géographique spécifiée. La
+     * chaîne retournée sera de la forme "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". Si
+     * une projection cartographique est nécessaire pour obtenir cette représentation, elle
+     * sera faite automatiquement. Cette chaîne sert surtout à des fins de déboguage et sa
      * forme peut varier.
      */
     public static String toWGS84String(CoordinateSystem cs, Rectangle2D bounds) {
@@ -458,7 +458,7 @@ public final class CTSUtilities {
                                createFromCoordinateSystems(cs, GeographicCoordinateSystem.WGS84);
                 bounds = transform((MathTransform2D) tr.getMathTransform(), bounds, null);
             }
-            final AngleFormat fmt = new AngleFormat("DDï¿½MM.m'");
+            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
             buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
             buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');

@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pï¿½ches et Ocï¿½ans Canada
- *               2000 Institut de Recherche pour le Dï¿½veloppement
+ *               1999 Pêches et Océans Canada
+ *               2000 Institut de Recherche pour le Développement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,26 +29,26 @@
  */
 package org.geotools.units;
 
-// Entrï¿½s/sorties
+// Entrés/sorties
 
 
 /**
- * Classe reprï¿½sentant les unitï¿½s fondamentales d'un systï¿½me d'unitï¿½s.
- * Le systï¿½me international (SI) n'a que quelques unitï¿½s fondamentales, ï¿½ partir desquelles
- * sont construites toutes les autres unitï¿½s. Les unitï¿½s fondamentales sont du systï¿½me SI sont:
+ * Classe représentant les unités fondamentales d'un système d'unités.
+ * Le système international (SI) n'a que quelques unités fondamentales, à partir desquelles
+ * sont construites toutes les autres unités. Les unités fondamentales sont du système SI sont:
  *
  * <ul>
- *     <li>Les Ampï¿½res pour le courant ï¿½lectrique</li>
- *     <li>Les Candelas pour l'intensitï¿½ lumineuse</li>
- *     <li>Les degrï¿½s Kelvin pour la tempï¿½rature</li>
+ *     <li>Les Ampères pour le courant électrique</li>
+ *     <li>Les Candelas pour l'intensité lumineuse</li>
+ *     <li>Les degrés Kelvin pour la température</li>
  *     <li>Les kilogrammes pour la masse</li>
- *     <li>Les mï¿½tres pour la longueur</li>
+ *     <li>Les mètres pour la longueur</li>
  *     <li>Les secondes pour le temps</li>
  * </ul>
  *
- * Il existe aussi d'autres mesures qui sont sans unitï¿½s, mais pour lesquelles
- * il est pratique de leur affecter des pseudo-unitï¿½s fondamentales. Les radians, les moles et
- * les mesures de salinitï¿½ en sont des exemples.
+ * Il existe aussi d'autres mesures qui sont sans unités, mais pour lesquelles
+ * il est pratique de leur affecter des pseudo-unités fondamentales. Les radians, les moles et
+ * les mesures de salinité en sont des exemples.
  *
  * @version 1.0
  * @author Steven R. Emmerson
@@ -65,34 +65,34 @@ final class BaseUnit extends SimpleUnit {
     private static final long serialVersionUID = -2736303035387288589L;
     
     /**
-     * Construit une unitï¿½ fondamentale.
+     * Construit une unité fondamentale.
      *
-     * @param quantityName Nom de la quantitï¿½ (exemple: "Mass").
-     * @param symbol Symbole de l'unitï¿½ (exemple: "kg").
+     * @param quantityName Nom de la quantité (exemple: "Mass").
+     * @param symbol Symbole de l'unité (exemple: "kg").
      */
     private BaseUnit(final String quantityName, final String symbol, final PrefixSet prefix) {
         super(quantityName, symbol, prefix);
     }
     
     /**
-     * Crï¿½e une nouvelle unitï¿½ de base. Les unitï¿½s de base n'existent
-     * normalement qu'en nombre restreint et servent de "briques" ï¿½
-     * toutes les autres unitï¿½s. Avant de crï¿½er une nouvelle unitï¿½
-     * avec cette mï¿½thode, vï¿½rifiez s'il ne s'agit pas en rï¿½alitï¿½
-     * d'une unitï¿½ dï¿½rivï¿½e.
+     * Crée une nouvelle unité de base. Les unités de base n'existent
+     * normalement qu'en nombre restreint et servent de "briques" à
+     * toutes les autres unités. Avant de créer une nouvelle unité
+     * avec cette méthode, vérifiez s'il ne s'agit pas en réalité
+     * d'une unité dérivée.
      *
-     * @param quantityName Le nom de la quantitï¿½ associï¿½e ï¿½ l'unitï¿½.
+     * @param quantityName Le nom de la quantité associée à l'unité.
      *        Des exemples de noms seraient "mass", "electric current",
      *        "temperature", etc.
      *
-     * @param symbol Le symbole des unitï¿½s (par exemple "kg" pour la masse).
-     *        Ce symbole est obligatoire et ne doit pas ï¿½tre <code>null</code>.
+     * @param symbol Le symbole des unités (par exemple "kg" pour la masse).
+     *        Ce symbole est obligatoire et ne doit pas être <code>null</code>.
      *
-     * @param prefix Liste des prï¿½fix pouvant ï¿½tre utilisï¿½s avec le symbole
+     * @param prefix Liste des préfix pouvant être utilisés avec le symbole
      *        <code>symbol</code>, ou <code>null</code> s'il n'y en a pas.
      *
-     * @return Une unitï¿½ de base associï¿½e ï¿½ la quantitï¿½ <code>quantityName</code>
-     *         avec le symbole <code>symbol</code> et les prï¿½fix <code>prefix</code>.
+     * @return Une unité de base associée à la quantité <code>quantityName</code>
+     *         avec le symbole <code>symbol</code> et les préfix <code>prefix</code>.
      *
      * @see DerivedUnit#getInstance
      * @see ScaledUnit#getInstance
@@ -103,23 +103,23 @@ final class BaseUnit extends SimpleUnit {
     }
     
     /**
-     * Retourne le symbole {@link #symbol} sans son prï¿½fix. Cette mï¿½thode retourne habituellement
-     * {@link #symbol}, ce qui est correct pour la presque totalitï¿½ des unitï¿½s <code>BaseUnit</code>.
-     * Dans le systï¿½me SI, la seule exception notable (qui justifie ï¿½ elle seule l'existence de cette
-     * mï¿½thode) est le kilogramme (symbole "kg").
+     * Retourne le symbole {@link #symbol} sans son préfix. Cette méthode retourne habituellement
+     * {@link #symbol}, ce qui est correct pour la presque totalité des unités <code>BaseUnit</code>.
+     * Dans le système SI, la seule exception notable (qui justifie à elle seule l'existence de cette
+     * méthode) est le kilogramme (symbole "kg").
      */
     String getUnprefixedSymbol() {
         return symbol.equals("kg") ? "g" : super.getUnprefixedSymbol();
     }
     
     /**
-     * Renvoie une unitï¿½ identique ï¿½ celle-ci, mais
-     * avec un nouveau symbole et de nouveaux prï¿½fix.
+     * Renvoie une unité identique à celle-ci, mais
+     * avec un nouveau symbole et de nouveaux préfix.
      *
-     * @param  symbol Nouveau symbole reprï¿½sentant cette unitï¿½. Si ce
-     *         paramï¿½tre est nul, un symbole par dï¿½faut sera crï¿½ï¿½.
-     * @param  prefix Liste des prï¿½fix autorisï¿½s pour le symbole.
-     * @return La mï¿½me unitï¿½, mais avec le nouveau symbole. Peut ï¿½tre
+     * @param  symbol Nouveau symbole représentant cette unité. Si ce
+     *         paramètre est nul, un symbole par défaut sera créé.
+     * @param  prefix Liste des préfix autorisés pour le symbole.
+     * @return La même unité, mais avec le nouveau symbole. Peut être
      *         <code>this</code>, mais ne sera jamais <code>null</code>.
      */
     public Unit rename(final String symbol, final PrefixSet prefix) { // CAST
@@ -127,11 +127,11 @@ final class BaseUnit extends SimpleUnit {
     }
     
     /**
-     * ï¿½lï¿½ve cette unitï¿½ ï¿½ une puissance entiï¿½re.
+     * Élève cette unité à une puissance entière.
      *
-     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
-     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
-     *         <code>this</code> ï¿½ la puissance <code>power</code>.
+     * @param power La puissance à laquelle élever cette unité.
+     * @return Les unités résultant de l'élévation des unités
+     *         <code>this</code> à la puissance <code>power</code>.
      *
      * @see #multiply
      * @see #divide
@@ -147,11 +147,11 @@ final class BaseUnit extends SimpleUnit {
     }
     
     /**
-     * Multiplie cette unitï¿½ par une autre unitï¿½.
+     * Multiplie cette unité par une autre unité.
      *
-     * @param  that L'unitï¿½ par laquelle multiplier cette unitï¿½.
+     * @param  that L'unité par laquelle multiplier cette unité.
      * @return Le produit de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
+     * @throws UnitException Si l'unité <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -191,11 +191,11 @@ final class BaseUnit extends SimpleUnit {
     }
     
     /**
-     * Divise cette unitï¿½ par une autre unitï¿½.
+     * Divise cette unité par une autre unité.
      *
-     * @param that L'unitï¿½ par laquelle diviser cette unitï¿½.
+     * @param that L'unité par laquelle diviser cette unité.
      * @return Le quotient de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
+     * @throws UnitException Si l'unité <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -231,13 +231,13 @@ final class BaseUnit extends SimpleUnit {
     }
     
     /**
-     * Indique si les unitï¿½s <code>this</code> et <code>that</code> sont compatibles.
-     * Si elles le sont, alors les mï¿½thodes <code>convert</code> ne lanceront jamais
-     * d'exception pour ces unitï¿½s.
+     * Indique si les unités <code>this</code> et <code>that</code> sont compatibles.
+     * Si elles le sont, alors les méthodes <code>convert</code> ne lanceront jamais
+     * d'exception pour ces unités.
      *
-     * @param that Autre unitï¿½s avec laquelle on veut
-     *        vï¿½rifier si ces unitï¿½s sont compatibles.
-     * @return <code>true</code> Si l'on garantie que les mï¿½thodes
+     * @param that Autre unités avec laquelle on veut
+     *        vérifier si ces unités sont compatibles.
+     * @return <code>true</code> Si l'on garantie que les méthodes
      *         <code>convert</code> ne lanceront pas d'exceptions.
      */
     public boolean canConvert(final Unit        that) {return that.canConvert(this);} // Do not move in superclass
@@ -245,141 +245,141 @@ final class BaseUnit extends SimpleUnit {
            boolean canConvert(final BaseUnit    that) {return equalsIgnoreSymbol(that);}
     
     /**
-     * Effectue la conversion d'une mesure exprimï¿½e selon d'autres unitï¿½s. Par
+     * Effectue la conversion d'une mesure exprimée selon d'autres unités. Par
      * exemple <code>METRE.convert(1,&nbsp;FOOT)</code> retournera <code>0.3048</code>.
      *
-     * @param value La valeur exprimï¿½e selon les autres unitï¿½s (<code>fromUnit</code>).
-     * @param fromUnit Les autres unitï¿½s.
-     * @return La valeur convertie selon ces unitï¿½s (<code>this</code>).
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
+     * @param value La valeur exprimée selon les autres unités (<code>fromUnit</code>).
+     * @param fromUnit Les autres unités.
+     * @return La valeur convertie selon ces unités (<code>this</code>).
+     * @throws UnitException Si les unités ne sont pas compatibles.
      */
     public double convert(final double value, final Unit        fromUnit) throws UnitException {return fromUnit.inverseConvert(value, this);} // Do not move in superclass
            double convert(final double value, final DerivedUnit fromUnit) throws UnitException {return fromUnit.inverseConvert(value, this);} // Do not move in superclass
            double convert(final double value, final BaseUnit    fromUnit) throws UnitException {if (!equalsIgnoreSymbol(fromUnit)) throw incompatibleUnitsException(fromUnit); return value;}
     
     /**
-     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
-     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimées selon d'autres
+     * unités. Les valeurs converties remplaceront les anciennes valeurs.
      *
-     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres unitï¿½s
-     *         (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es selon
-     *         ces unitï¿½s (<code>this</code>).
-     * @param  fromUnit Les autres unitï¿½s.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
-     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
+     * @param  values En entré, les valeurs exprimées selon les autres unités
+     *         (<code>fromUnit</code>). En sortie, les valeurs exprimées selon
+     *         ces unités (<code>this</code>).
+     * @param  fromUnit Les autres unités.
+     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
+     *         cas, aucun élément de <code>values</code> n'aura été modifié.
      */
     public void convert(final double[] values, final Unit        fromUnit) throws UnitException {fromUnit.inverseConvert(values, this);} // Do not move in superclass
            void convert(final double[] values, final DerivedUnit fromUnit) throws UnitException {fromUnit.inverseConvert(values, this);} // Do not move in superclass
            void convert(final double[] values, final BaseUnit    fromUnit) throws UnitException {if (!equalsIgnoreSymbol(fromUnit)) throw incompatibleUnitsException(fromUnit);}
     
     /**
-     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
-     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimées selon d'autres
+     * unités. Les valeurs converties remplaceront les anciennes valeurs.
      * Notez que d'importantes erreurs d'arrondissement peuvent survenir
      * si <code>fromUnit</code> est de la classe {@link OffsetUnit}.
      *
-     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres
-     *         unitï¿½s (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es
-     *         selon ces unitï¿½s (<code>this</code>).
-     * @param  fromUnit Les autres unitï¿½s.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
-     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
+     * @param  values En entré, les valeurs exprimées selon les autres
+     *         unités (<code>fromUnit</code>). En sortie, les valeurs exprimées
+     *         selon ces unités (<code>this</code>).
+     * @param  fromUnit Les autres unités.
+     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
+     *         cas, aucun élément de <code>values</code> n'aura été modifié.
      */
     public void convert(final float[] values, final Unit        fromUnit) throws UnitException {fromUnit.inverseConvert(values, this);} // Do not move in superclass
            void convert(final float[] values, final DerivedUnit fromUnit) throws UnitException {fromUnit.inverseConvert(values, this);} // Do not move in superclass
            void convert(final float[] values, final BaseUnit    fromUnit) throws UnitException {if (!equalsIgnoreSymbol(fromUnit)) throw incompatibleUnitsException(fromUnit);}
     
     /**
-     * Retourne un objet qui saura convertir selon ces unitï¿½s les valeurs exprimï¿½es
-     * selon d'autres unitï¿½s. Cette mï¿½thode est avantageuse si on prï¿½voie faï¿½re
-     * plusieurs conversions, car la transformation ï¿½ utiliser est dï¿½terminï¿½e une
+     * Retourne un objet qui saura convertir selon ces unités les valeurs exprimées
+     * selon d'autres unités. Cette méthode est avantageuse si on prévoie faîre
+     * plusieurs conversions, car la transformation à utiliser est déterminée une
      * fois pour toute.
      *
-     * @param  fromUnit Unitï¿½s ï¿½ partir de lesquel faire les conversions.
-     * @return Une transformation des unitï¿½s <code>fromUnit</code>
-     *         vers les unitï¿½s <code>this</code>. Cette mï¿½thode ne
+     * @param  fromUnit Unités à partir de lesquel faire les conversions.
+     * @return Une transformation des unités <code>fromUnit</code>
+     *         vers les unités <code>this</code>. Cette méthode ne
      *         retourne jamais <code>null</code>.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
+     * @throws UnitException Si les unités ne sont pas compatibles.
      */
     public UnitTransform getTransform(final Unit        fromUnit) throws UnitException {return fromUnit.getInverseTransform(this);} // Do not move in superclass
            UnitTransform getTransform(final DerivedUnit fromUnit) throws UnitException {return fromUnit.getInverseTransform(this);} // Do not move in superclass
            UnitTransform getTransform(final BaseUnit    fromUnit) throws UnitException {return IdentityTransform.getInstance(fromUnit, this);}
     
     /**
-     * Convertit une mesure vers d'autre unitï¿½s. Par exemple
+     * Convertit une mesure vers d'autre unités. Par exemple
      * <code>METRE.inverseConvert(1,&nbsp;FOOT)</code> retournera
-     * <code>3.2808</code>. Cette mï¿½thode est l'inverse de la mï¿½thode
+     * <code>3.2808</code>. Cette méthode est l'inverse de la méthode
      * {@link #convert(double,Unit)}.
      *
-     * @param value La valeur exprimï¿½e selon ces unitï¿½s (<code>this</code>).
-     * @param toUnit Les autres unitï¿½s.
-     * @return La valeur convertie selon les autres unitï¿½s (<code>toUnit</code>).
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
+     * @param value La valeur exprimée selon ces unités (<code>this</code>).
+     * @param toUnit Les autres unités.
+     * @return La valeur convertie selon les autres unités (<code>toUnit</code>).
+     * @throws UnitException Si les unités ne sont pas compatibles.
      */
     protected double inverseConvert(final double value, final Unit        toUnit) throws UnitException {return toUnit.convert(value, this);} // Do not move in superclass
               double inverseConvert(final double value, final DerivedUnit toUnit) throws UnitException {return toUnit.convert(value, this);} // Do not move in superclass
               double inverseConvert(final double value, final BaseUnit    toUnit) throws UnitException {if (!equalsIgnoreSymbol(toUnit)) throw toUnit.incompatibleUnitsException(this); return value;}
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
+     * Effectue sur-place la conversion de mesures vers d'autres unités.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(double[],Unit)}.
+     * méthode est l'inverse de la méthode {@link #convert(double[],Unit)}.
      *
-     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
-     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
-     *         selon les autres unitï¿½s (<code>toUnit</code>).
-     * @param  toUnit Les autres unitï¿½s.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
-     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
+     * @param  values En entré, les valeur exprimées selon ces unités
+     *         (<code>this</code>). En sortie, les valeurs exprimées
+     *         selon les autres unités (<code>toUnit</code>).
+     * @param  toUnit Les autres unités.
+     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
+     *         cas, aucun élément de <code>values</code> n'aura été modifié.
      */
     protected void inverseConvert(final double[] values, final Unit        toUnit) throws UnitException {toUnit.convert(values, this);} // Do not move in superclass
               void inverseConvert(final double[] values, final DerivedUnit toUnit) throws UnitException {toUnit.convert(values, this);} // Do not move in superclass
               void inverseConvert(final double[] values, final BaseUnit    toUnit) throws UnitException {if (!equalsIgnoreSymbol(toUnit)) throw toUnit.incompatibleUnitsException(this);}
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
+     * Effectue sur-place la conversion de mesures vers d'autres unités.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(float[],Unit)}.
+     * méthode est l'inverse de la méthode {@link #convert(float[],Unit)}.
      *
-     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
-     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
-     *         selon les autres unitï¿½s (<code>toUnit</code>).
-     * @param  toUnit Les autres unitï¿½s.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
-     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
+     * @param  values En entré, les valeur exprimées selon ces unités
+     *         (<code>this</code>). En sortie, les valeurs exprimées
+     *         selon les autres unités (<code>toUnit</code>).
+     * @param  toUnit Les autres unités.
+     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
+     *         cas, aucun élément de <code>values</code> n'aura été modifié.
      */
     protected void inverseConvert(final float[] values, final Unit        toUnit) throws UnitException {toUnit.convert(values, this);} // Do not move in superclass
               void inverseConvert(final float[] values, final DerivedUnit toUnit) throws UnitException {toUnit.convert(values, this);} // Do not move in superclass
               void inverseConvert(final float[] values, final BaseUnit    toUnit) throws UnitException {if (!equalsIgnoreSymbol(toUnit)) throw toUnit.incompatibleUnitsException(this);}
     
     /**
-     * Retourne un objet qui saura convertir selon d'autres unitï¿½s les
-     * valeurs exprimï¿½es selon ces unitï¿½s. Cette mï¿½thode est l'inverse
+     * Retourne un objet qui saura convertir selon d'autres unités les
+     * valeurs exprimées selon ces unités. Cette méthode est l'inverse
      * de {@link #getTransform}.
      *
-     * @param  toUnit Unitï¿½s vers lesquel faire les conversions.
-     * @return Une transformation des unitï¿½s <code>this</code>
-     *         vers les unitï¿½s <code>toUnit</code>. Cette mï¿½thode
+     * @param  toUnit Unités vers lesquel faire les conversions.
+     * @return Une transformation des unités <code>this</code>
+     *         vers les unités <code>toUnit</code>. Cette méthode
      *         ne retourne jamais <code>null</code>.
-     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
+     * @throws UnitException Si les unités ne sont pas compatibles.
      */
     protected UnitTransform getInverseTransform(final Unit        toUnit) throws UnitException {return toUnit.getTransform(this);} // Do not move in superclass
               UnitTransform getInverseTransform(final DerivedUnit toUnit) throws UnitException {return toUnit.getTransform(this);} // Do not move in superclass
               UnitTransform getInverseTransform(final BaseUnit    toUnit) throws UnitException {return IdentityTransform.getInstance(this, toUnit);}
     
     /**
-     * Vï¿½rifie si cette unitï¿½ est identique ï¿½ une autre. Deux unitï¿½s sont considï¿½rï¿½s
-     * identiques s'ils ont le mï¿½me champ {@link #quantityName}. Des symboles et prefix
-     * diffï¿½rents sont autorisï¿½s.
+     * Vérifie si cette unité est identique à une autre. Deux unités sont considérés
+     * identiques s'ils ont le même champ {@link #quantityName}. Des symboles et prefix
+     * différents sont autorisés.
      */
     final boolean equalsIgnoreSymbol(final BaseUnit unit) {
         return (unit==this) || quantityName.equals(unit.quantityName);
     }
     
     /**
-     * Indique si deux unitï¿½s sont ï¿½gales, en ignorant leurs symboles.
-     * La comparaison ne prend en compte que les quantitï¿½s telles que
-     * retournï¿½es par {@link #getQuantityName}.
+     * Indique si deux unités sont égales, en ignorant leurs symboles.
+     * La comparaison ne prend en compte que les quantités telles que
+     * retournées par {@link #getQuantityName}.
      */
     public boolean equalsIgnoreSymbol(final Unit unit) {
         return (unit instanceof BaseUnit) && equalsIgnoreSymbol((BaseUnit) unit);
@@ -387,7 +387,7 @@ final class BaseUnit extends SimpleUnit {
     
     /**
      * Retourne un code
-     * pour cette unitï¿½.
+     * pour cette unité.
      */
     public int hashCode() {
         return quantityName.hashCode();

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -762,7 +762,7 @@ public class CoordinateTransformationFactory {
                  * WEST). Compute the amount of angle to add to the source longitude in order to
                  * get the destination longitude. This amount is measured in units of the target
                  * axis.  The affine transform is then updated in order to take this rotation in
-                 * account. Note that the resulting longitude may be outside the usual [-180..180ï¿½]
+                 * account. Note that the resulting longitude may be outside the usual [-180..180°]
                  * range.
                  */
                 final Unit              unit = targetCS.getUnits(i);
@@ -942,7 +942,7 @@ public class CoordinateTransformationFactory {
      * @throws CannotCreateTransformException if no transformation path has been found.
      *
      * @task TODO: When rotating the prime meridian, we should ensure that
-     *             transformed longitudes stay in the range [-180..+180ï¿½].
+     *             transformed longitudes stay in the range [-180..+180°].
      */
     protected CoordinateTransformation createTransformationStep(
                                         final GeographicCoordinateSystem sourceCS,
@@ -960,7 +960,7 @@ public class CoordinateTransformationFactory {
              * different. Note: this special block is mandatory for avoiding never-ending loop,
              * since it is invoked by 'createTransformationStep(GeocentricCS...)'.
              *
-             * TODO: We should ensure that longitude is in range [-180..+180ï¿½].
+             * TODO: We should ensure that longitude is in range [-180..+180°].
              */
             final CoordinateTransformation horizontalStep;
             final Matrix matrix = swapAndScaleGeoAxis(sourceCS, targetCS);

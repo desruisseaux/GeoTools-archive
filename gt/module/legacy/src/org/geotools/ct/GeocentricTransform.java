@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -85,12 +85,12 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     private final double b;
     
     /**
-     * Square of semi-major axis (@link #a}ï¿½).
+     * Square of semi-major axis (@link #a}²).
      */
     private final double a2;
     
     /**
-     * Square of semi-minor axis ({@link #b}ï¿½).
+     * Square of semi-minor axis ({@link #b}²).
      */
     private final double b2;
     

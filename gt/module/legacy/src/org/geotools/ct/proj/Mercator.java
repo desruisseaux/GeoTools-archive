@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -77,7 +77,7 @@ import org.geotools.resources.cts.Resources;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
  * 
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *

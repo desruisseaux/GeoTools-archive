@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -253,8 +253,8 @@ public class OperationJAI extends Operation {
     }
     
     /**
-     * Vï¿½rifie que la classe spï¿½cifiï¿½e implï¿½mente l'interface {@link RenderedImage}.
-     * Cette mï¿½thode est utilisï¿½e pour vï¿½rifier les classes des images sources et
+     * Vérifie que la classe spécifiée implémente l'interface {@link RenderedImage}.
+     * Cette méthode est utilisée pour vérifier les classes des images sources et
      * destinations.
      */
     private static final void ensureValid(final Class classe) throws IllegalArgumentException {

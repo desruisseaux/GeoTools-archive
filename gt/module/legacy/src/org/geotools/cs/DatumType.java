@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -278,7 +278,7 @@ public abstract class DatumType extends EnumeratedParameter {
      * Returns the enum for the specified localized name.
      * Search is case-insensitive.
      *
-     * @param name The localized name (e.g. "Gï¿½ocentrique", "Ellipsoï¿½dal", etc.)
+     * @param name The localized name (e.g. "Géocentrique", "Ellipsoïdal", etc.)
      * @param locale The locale, or <code>null</code> for the default locale.
      * @return The enum for the specified localized name.
      * @throws NoSuchElementException if there is no enum for the specified name.

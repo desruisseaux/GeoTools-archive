@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -280,13 +280,13 @@ public abstract class GridCoverageReader {
     }
     
     /**
-     * Vï¿½rifie si l'index de l'image est dans la plage des valeurs
-     * autorisï¿½es. L'index maximal autorisï¿½ est obtenu en appelant
+     * Vérifie si l'index de l'image est dans la plage des valeurs
+     * autorisées. L'index maximal autorisé est obtenu en appelant
      * <code>{@link #getNumImages getNumImages}(false)</code>.
      *
-     * @param  imageIndex Index dont on veut vï¿½rifier la validitï¿½.
-     * @throws IndexOutOfBoundsException si l'index spï¿½cifiï¿½ n'est pas valide.
-     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e ï¿½ cause d'une erreur d'entrï¿½s/sorties.
+     * @param  imageIndex Index dont on veut vérifier la validité.
+     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
+     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
      */
     final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
         if (reader==null) {

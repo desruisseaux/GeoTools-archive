@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -110,9 +110,9 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  */
 public class RawBinaryImageReader extends SimpleImageReader {
     /**
-     * Valeurs minimales et maximales des donnï¿½es lues dans chaque
+     * Valeurs minimales et maximales des données lues dans chaque
      * bandes, ou <code>null</code> si ces valeurs n'ont pas encore
-     * ï¿½tï¿½ dï¿½terminï¿½es.
+     * été déterminées.
      */
     private Range[] ranges;
     
@@ -151,7 +151,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
     }
     
     /**
-     * Efface les information qui ï¿½taient conservï¿½es en mï¿½moire.
+     * Efface les information qui étaient conservées en mémoire.
      */
     private void clear() {
         ranges = null;
@@ -744,7 +744,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
      *     public CustomBinaryImageReaderSpi()
      *     {
      *         super("MyRAW", "image/raw-perso");
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Dï¿½veloppement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
      *         {@link #version    version}    = "1.0";
      *         {@link #dataType   dataType}   = {@link DataBuffer#TYPE_SHORT};
      *         {@link #imageSize  imageSize}  = new {@link Dimension}(400,600);
@@ -832,7 +832,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
             suffixes        = EXTENSIONS;
             inputTypes      = STANDARD_INPUT_TYPE;
             pluginClassName = "org.geotools.io.image.RawBinaryImageReader";
-            vendorName      = "Institut de Recherche pour le Dï¿½veloppement";
+            vendorName      = "Institut de Recherche pour le Développement";
             version         = "1.0";
         }
         

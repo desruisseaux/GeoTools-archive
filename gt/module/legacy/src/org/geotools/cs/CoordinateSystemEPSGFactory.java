@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -81,7 +81,7 @@ import org.opengis.referencing.FactoryException;
  * The EPSG database express many angles in some multi-radix units. For example, a lot of EPSG's
  * angles are coded in the following format: <cite>sign - degrees - decimal point - minutes (two
  * digits) - integer seconds (two digits) - fraction of seconds (any precision)</cite>. According
- * this convention, the angle <code>40ï¿½30'N</code> would be coded as <code>40.30</code>
+ * this convention, the angle <code>40°30'N</code> would be coded as <code>40.30</code>
  * (sexagesimal degree) instead of <code>40.5</code> (fractional degree). Unfortunatly,
  * sexagesimal degrees have the following inconvenients:
  *
@@ -101,7 +101,7 @@ import org.opengis.referencing.FactoryException;
  * the {@link #replaceAxisUnit} method.
  *
  * @version $Id$
- * @author Yann Cï¿½zard
+ * @author Yann Cézard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

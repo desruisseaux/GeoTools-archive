@@ -21,8 +21,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent

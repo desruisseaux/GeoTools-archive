@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2002, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -542,7 +542,7 @@ public class LocalizationGrid {
          * following identities instead:
          *
          *           1 + 2 + 3 ... + n    =    n*(n+1)/2              (arithmetic series)
-         *        1ï¿½ + 2ï¿½ + 3ï¿½ ... + nï¿½   =    n*(n+0.5)*(n+1)/3
+         *        1² + 2² + 3² ... + n²   =    n*(n+0.5)*(n+1)/3
          */
         double x,y,z, xx,yy, xy, zx,zy;
         z = zx = zy = 0; // To be computed in the loop.

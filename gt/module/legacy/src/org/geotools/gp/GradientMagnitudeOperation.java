@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -71,7 +71,7 @@ final class GradientMagnitudeOperation extends OperationJAI {
     /**
      * Set to <code>true</code> to enable automatic kernel normalization. Normalization modifies
      * kernel coefficients according the "grid to coordinate system" transform in order to get
-     * some meaningful engineering units (e.g. ï¿½C/km). The normalization factor is computed by
+     * some meaningful engineering units (e.g. °C/km). The normalization factor is computed by
      * testing the original kernels against synthetic horizontal and vertical gradients of
      * 1 sampleUnit/csUnit.
      */

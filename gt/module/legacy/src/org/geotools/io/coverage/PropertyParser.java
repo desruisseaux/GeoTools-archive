@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -151,7 +151,7 @@ public class PropertyParser {
      * @task TODO: Need a more general way to set unit symbols once the Unit API is completed.
      */
     private static final String[] DEGREES = {
-        "degree", "degrees", "deg", "ï¿½"
+        "degree", "degrees", "deg", "°"
     };
 
     /**
@@ -1998,7 +1998,7 @@ public class PropertyParser {
         }
         buffer.write(lineSeparator);
         try {
-            final String     pattern = "DDï¿½MM'SS\"";
+            final String     pattern = "DD°MM'SS\"";
             final Envelope  envelope = getGeographicEnvelope();
             final AngleFormat format = (userLocale!=null) ? new AngleFormat(pattern, userLocale) :
                                                             new AngleFormat(pattern);

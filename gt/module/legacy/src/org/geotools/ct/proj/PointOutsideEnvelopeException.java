@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import org.geotools.cs.CoordinateSystem;
 
 /**
  * Thrown by {@link MapProjection} when a map projection failed because the point is
- * outside the envelope of validity. Bounds are usually 90ï¿½S to 90ï¿½N and 180ï¿½W to 180ï¿½E.
+ * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
  *
  * @version $Id$
  * @author Martin Desruisseaux
