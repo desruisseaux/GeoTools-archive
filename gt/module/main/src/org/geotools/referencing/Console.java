@@ -42,6 +42,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
@@ -90,6 +91,12 @@ import org.geotools.geometry.GeneralDirectPosition;
  *   <tr><td nowrap valign="top"><P><code>target pt = </code> <var>coord</var></P></td><td>
  *   <P align="justify">Inverse transforms the specified coordinates from target CRS to source CRS
  *   and prints the result.</P>
+ *
+ *   <tr><td nowrap valign="top"><P><code>test tolerance = </code> <var>vector</var></P></td><td>
+ *   <P align="justify">Set the maximum difference between the transformed source point and the
+ *   target point. Once this value is set, every occurence of the <code>target pt</code> instruction
+ *   will trig this comparaison. If a greater difference is found, an exception is thrown or a
+ *   message is printed to the error stream.</P>
  *
  *   <tr><td nowrap valign="top"><P><code>print set</code></P></td><td>
  *   <P align="justify">Prints the set of shortcuts defined in previous calls to <code>SET</code>
@@ -158,7 +165,7 @@ public class Console extends AbstractConsole {
      * Used in order to print the stack trace on request.
      */
     private transient Exception lastError;
-    
+
     /**
      * Creates a new console instance using {@linkplain System#in standard input stream},
      * {@linkplain System#out standard output stream}, {@linkplain System#err error output stream}
@@ -353,6 +360,15 @@ public class Console extends AbstractConsole {
                         return;
                     }
                     // -------------------------------
+                    //   test tolerance = <vector>
+                    // -------------------------------
+                    if (key0.equalsIgnoreCase("test")) {
+                        if (key1.equalsIgnoreCase("tolerance")) {
+                            tolerance = parseVector(value);
+                            return;
+                        }
+                    }
+                    // -------------------------------
                     //   source|target crs = <wkt>
                     // -------------------------------
                     if (key1.equalsIgnoreCase("crs")) {
@@ -379,6 +395,12 @@ public class Console extends AbstractConsole {
                         }
                         if (key0.equalsIgnoreCase("target")) {
                             targetPosition = new GeneralDirectPosition(parseVector(value));
+                            if (tolerance!=null && sourcePosition!=null) {
+                                update();
+                                if (transform != null) {
+                                    test();
+                                }
+                            }
                             return;
                         }
                     }
@@ -553,6 +575,38 @@ public class Console extends AbstractConsole {
     ////////        H E L P E R   M E T H O D S        ////////
     ////////                                           ////////
     ///////////////////////////////////////////////////////////
+
+    /**
+     * Invoked automatically when the <code>target pt</code> instruction were executed and a
+     * <code>test tolerance</code> were previously set. The default implementation compares
+     * the transformed source point with the expected target point. If a mismatch greater than
+     * the tolerance error is found, an exception is thrown. Subclasses may overrides this
+     * method in order to performs more tests.
+     *
+     * @throws TransformException if the source point can't be transformed, or a mistmatch is found.
+     * @throws MismatchedDimensionException if the transformed source point doesn't have the
+     *         expected dimension.
+     */
+    protected void test() throws TransformException, MismatchedDimensionException {
+        final DirectPosition transformedSource = transform.transform(sourcePosition, null);
+        final int sourceDim = transformedSource.getDimension();
+        final int targetDim =    targetPosition.getDimension();
+        if (sourceDim != targetDim) {
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(sourceDim), new Integer(targetDim)));
+        }
+        for (int i=0; i<sourceDim; i++) {
+            // Use '!' for catching NaN.
+            if (!(Math.abs(transformedSource.getOrdinate(i) -
+                              targetPosition.getOrdinate(i))
+                  <= tolerance[Math.min(i, tolerance.length-1)]))
+            {
+                // TODO: Localize
+                throw new TransformException("Transformation doesn't produce the expected value.");
+            }
+        }
+    }
 
     /**
      * Check if the specified string start and end with the specified delimitors,

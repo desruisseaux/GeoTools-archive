@@ -64,6 +64,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform.GeocentricTransformTest .suite());
         suite.addTest(org.geotools.referencing.operation.transform.PassthroughTransformTest.suite());
         suite.addTest(org.geotools.referencing.operation.transform.LocalizationGridTest    .suite());
+        suite.addTest(org.geotools.referencing                    .ScriptTest              .suite());
         return suite;
     }
 }

@@ -20,7 +20,6 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies and extensions
-import java.util.Collections;
 import javax.vecmath.Point3d;
 
 // JUnit dependencies
@@ -115,9 +114,7 @@ public class GeocentricTransformTest extends TransformationTest {
          */
         final double radius = e.getSemiMajorAxis();
         final double circumference = (radius*1.00000001) * (2*Math.PI);
-        final Ellipsoid s = (Ellipsoid)
-            datumFactory.createEllipsoid(Collections.singletonMap("name", "Sphere"),
-                                         radius, radius, e.getAxisUnit());
+        final Ellipsoid s = Ellipsoid.createEllipsoid("Sphere", radius, radius, e.getAxisUnit());
         assertTrue("Spheroid class", !Ellipsoid.class.equals(s.getClass()));
         for (double i=0; i<=180; i+=1) {
             final double base = 360*random.nextDouble()-180;

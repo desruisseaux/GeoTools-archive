@@ -487,7 +487,7 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
      */
     protected String formatWKT(final Formatter formatter) {
         final double ivf = getInverseFlattening();
-        formatter.append(getSemiMajorAxis());
+        formatter.append(getAxisUnit().getConverterTo(SI.METER).convert(getSemiMajorAxis()));
         formatter.append(Double.isInfinite(ivf) ? 0 : ivf);
         return "SPHEROID";
     }
