@@ -18,6 +18,7 @@ package org.geotools.data.wms.gce;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -40,6 +41,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -130,8 +132,14 @@ public class WMSReader implements GridCoverageReader {
      */
     public GridCoverage read(ParameterValueGroup parameters)
         throws IllegalArgumentException, IOException {
-        GetMapRequest request = wms.createGetMapRequest();
-
+        GetMapRequest request;
+        try {
+            request = wms.createGetMapRequest();
+        } catch (SAXException e1) {
+            throw new IOException();
+        } catch (URISyntaxException e1) {
+            throw new IOException();
+        }
         String minx = "";
         String miny = "";
         String maxx = "";
@@ -249,8 +257,7 @@ public class WMSReader implements GridCoverageReader {
         String bbox = minx + "," + miny + "," + maxx + "," + maxy;
         request.setProperty("BBOX", bbox);
 
-        GetMapResponse response = (GetMapResponse) wms.issueRequest(request,
-                false);
+        GetMapResponse response = (GetMapResponse) wms.issueRequest(request);
 
         BufferedImage image = ImageIO.read(response.getInputStream());
 

@@ -16,18 +16,19 @@
  */
 package org.geotools.data.wms.gce;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.InvalidParameterException;
+
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WebMapServer;
-import org.jdom.JDOMException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.InvalidParameterException;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -45,8 +46,8 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     /** Web Map Server proxy */
     private WebMapServer wms;
 
-    public WMSGridCoverageExchange(Object source)
-        throws MalformedURLException, IOException, ParseCapabilitiesException {
+    public WMSGridCoverageExchange(Object source) throws MalformedURLException, SAXException, URISyntaxException
+{
         if (source instanceof String || source instanceof URL) {
             URL url = null;
 
@@ -56,23 +57,9 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
                 url = (URL) source;
             }
 
-            wms = new WebMapServer(url, true);
+            wms = new WebMapServer(url);
             capabilities = wms.getCapabilities();
 
-            if (capabilities == null) {
-                Exception e = wms.getProblem();
-
-                if (e instanceof JDOMException) {
-                    throw new RuntimeException("Data at the URL is not valid XML",
-                        e);
-                } else if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else if (e instanceof MalformedURLException) {
-                    throw (MalformedURLException) e;
-                } else if (e instanceof ParseCapabilitiesException) {
-                    throw (ParseCapabilitiesException) e;
-                }
-            }
         } else if (source instanceof WMSCapabilities) {
             capabilities = (WMSCapabilities) source;
         }
