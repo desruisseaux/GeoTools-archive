@@ -73,7 +73,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * This default implementation uses USGS equation (i.e. iteration) for computing
  * the {@linkplain #inverseTransformNormalized inverse transform}.
  *
- * @version $Id: PolarStereographic.java,v 1.6 2004/05/03 07:36:47 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -199,8 +199,8 @@ public class PolarStereographic extends Stereographic {
             final double phi = (Math.PI/2) - 
                                2.0*Math.atan(t*Math.pow((1-esinphi)/(1+esinphi), halfe));
             if (Math.abs(phi-phi0) < TOL) {
-                x = (Math.abs(rho)<TOL) ? 0 :
-                     Math.atan2(x, -y);
+                x = (Math.abs(rho)<EPS) ? 
+                    0.0 : Math.atan2(x, -y);
                 y = (southPole) ? -phi : phi;
                 break;
             }
@@ -249,7 +249,7 @@ public class PolarStereographic extends Stereographic {
      * Provides the transform equations for the spherical case of the polar
      * stereographic projection.
      *
-     * @version $Id: PolarStereographic.java,v 1.6 2004/05/03 07:36:47 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -294,7 +294,7 @@ public class PolarStereographic extends Stereographic {
             final double sinlon = Math.sin(x);
 
             if (southPole) {
-                if (!(Math.abs(1-sinlat) >= TOL)) {
+                if (Math.abs(1-sinlat) < EPS) {
                     throw new ProjectionException(Resources.format(
                         ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -303,7 +303,7 @@ public class PolarStereographic extends Stereographic {
                 x = f * sinlon; // (21-9)
                 y = f * coslon; // (21-10)
             } else {
-                if (!(Math.abs(1+sinlat) >= TOL)) {
+                if (Math.abs(1+sinlat) < EPS) {
                     throw new ProjectionException(Resources.format(
                         ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -338,8 +338,8 @@ public class PolarStereographic extends Stereographic {
                 y = -y;
             }
             // (20-17) call atan2(x,y) to properly deal with y==0
-            x = (Math.abs(x)<TOL && Math.abs(y)<TOL) ? 0.0 : Math.atan2(x, y);
-            if (Math.abs(rho) < TOL) {
+            x = (Math.abs(x)<EPS && Math.abs(y)<EPS) ? 0.0 : Math.atan2(x, y);
+            if (Math.abs(rho) < EPS) {
                 y = latitudeOfOrigin;
             } else {
                 final double c = 2.0 * Math.atan(rho/k0);
@@ -374,7 +374,7 @@ public class PolarStereographic extends Stereographic {
      * accuracy. The default {@link PolarStereographic} implementation implementation
      * is an derivated work of Proj4, and is therefor better tested.
      *
-     * @version $Id: PolarStereographic.java,v 1.6 2004/05/03 07:36:47 desruisseaux Exp $
+     * @version $Id$
      * @author Rueben Schulz
      */
     static final class Series extends PolarStereographic {
@@ -449,7 +449,7 @@ public class PolarStereographic extends Stereographic {
             final double t = (rho/k0) * Math.sqrt(Math.pow(1+e, 1+e)*Math.pow(1-e, 1-e)) / 2;
             final double chi = Math.PI/2 - 2*Math.atan(t);
 
-            x = (Math.abs(rho)<TOL) ? 0.0 : Math.atan2(x, -y);
+            x = (Math.abs(rho)<EPS) ? 0.0 : Math.atan2(x, -y);
 
             //See Snyde P. 19, "Computation of Series"
             final double sin2chi = Math.sin(2.0*chi);

@@ -74,7 +74,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @task REVISIT: this code is identical to the oblique except for 6 lines.
  *                It could be moved to the oblique with an isEquatorial flag.
  *
- * @version $Id: EquatorialOrthographic.java,v 1.2 2004/02/23 12:28:22 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  */
 public class EquatorialOrthographic extends ObliqueOrthographic {
@@ -104,7 +104,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
         double cosphi = Math.cos(y);
 	double coslam = Math.cos(x);
         
-        if (cosphi * coslam < -TOL) {
+        if (cosphi * coslam < -EPS) {
             throw new ProjectionException(Resources.format(
                 ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
         }
@@ -136,7 +136,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > TOL) {
+            if ((sinc - 1.0) > EPS) {
                 throw new ProjectionException(Resources.format(
                     ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
             }
@@ -144,7 +144,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
         }
         
         double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
-        if (Math.abs(rho) <= TOL) {
+        if (rho <= EPS) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {

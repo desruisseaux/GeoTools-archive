@@ -69,7 +69,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * The oblique case of the {@link Orthographic} projection. Only the spherical
  * form is given here.
  *
- * @version $Id: ObliqueOrthographic.java,v 1.2 2004/02/23 12:28:22 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  */
 public class ObliqueOrthographic extends Orthographic {    
@@ -107,7 +107,7 @@ public class ObliqueOrthographic extends Orthographic {
 	double coslam = Math.cos(x);
         double sinphi = Math.sin(y);
         
-        if (sinphi0*sinphi + cosphi0*cosphi*coslam < - TOL) {
+        if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPS) {
             throw new ProjectionException(Resources.format(
                 ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
         }
@@ -132,7 +132,7 @@ public class ObliqueOrthographic extends Orthographic {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > TOL) {
+            if ((sinc - 1.0) > EPS) {
                 throw new ProjectionException(Resources.format(
                     ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
             }
@@ -140,7 +140,7 @@ public class ObliqueOrthographic extends Orthographic {
         }
         
         double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
-        if (Math.abs(rho) <= TOL) {
+        if (rho <= EPS) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {

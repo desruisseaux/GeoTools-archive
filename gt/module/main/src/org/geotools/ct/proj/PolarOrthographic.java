@@ -70,7 +70,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * The polar case of the {@link Orthographic} projection. Only the spherical
  * form is given here.
  *
- * @version $Id: PolarOrthographic.java,v 1.2 2004/02/23 12:28:23 desruisseaux Exp $
+ * @version $Id$
  * @author  Rueben Schulz
  */
 public class PolarOrthographic extends Orthographic {
@@ -103,7 +103,7 @@ public class PolarOrthographic extends Orthographic {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        if (Math.abs(y - latitudeOfOrigin) - TOL > Math.PI/2.0) {
+        if (Math.abs(y - latitudeOfOrigin) - EPS > Math.PI/2.0) {
             throw new ProjectionException(Resources.format(
                 ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
 
@@ -135,14 +135,14 @@ public class PolarOrthographic extends Orthographic {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > TOL) {
+            if ((sinc - 1.0) > EPS) {
                 throw new ProjectionException(Resources.format(
                     ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }
         
-        if (Math.abs(rho) <= TOL) {
+        if (rho <= EPS) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {

@@ -73,7 +73,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * This is a special case of oblique stereographic projection for 
  * {@link #latitudeOfOrigin} == 0.0.
  *
- * @version $Id: EquatorialStereographic.java,v 1.4 2004/05/03 07:36:46 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -135,7 +135,7 @@ public class EquatorialStereographic extends ObliqueStereographic {
      * Provides the transform equations for the spherical case of the 
      * equatorial stereographic projection.
      *
-     * @version $Id: EquatorialStereographic.java,v 1.4 2004/05/03 07:36:46 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -163,11 +163,11 @@ public class EquatorialStereographic extends ObliqueStereographic {
 
             final double coslat = Math.cos(y);
             double f = 1.0 + coslat*Math.cos(x);
-            if (!(f >= TOL)) {
+            if (f < EPS) {
                 throw new ProjectionException(Resources.format(
                           ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
             }
-            f = k0/f;                    // (21-14)
+            f = k0/f;                     // (21-14)
             x = f * coslat * Math.sin(x); // (21-2)
             y = f * Math.sin(y);          // (21-13)
 
@@ -191,7 +191,7 @@ public class EquatorialStereographic extends ObliqueStereographic {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             final double rho = Math.sqrt(x*x + y*y);
-            if (Math.abs(rho) < TOL) {
+            if (Math.abs(rho) < EPS) {
                 y = 0.0;                     //latitudeOfOrigin
                 x = 0.0;
             } else {
@@ -201,7 +201,7 @@ public class EquatorialStereographic extends ObliqueStereographic {
                 y = Math.asin(y * sinc/rho); // (20-14)  with phi1=0
                 final double t  = x*sinc;
                 final double ct = rho*cosc;
-                x = (Math.abs(t)<TOL && Math.abs(ct)<TOL) ? 
+                x = (Math.abs(t)<EPS && Math.abs(ct)<EPS) ? 
                      0.0 : Math.atan2(t, ct);
             }
 

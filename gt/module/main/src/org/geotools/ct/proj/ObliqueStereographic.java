@@ -75,7 +75,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * The USGS oblique/equatorial case of the {@linkplain Stereographic stereographic} 
  * projection. This is similar but <strong>NOT</strong> equal to EPSG code 9809.
  *
- * @version $Id: ObliqueStereographic.java,v 1.5 2004/05/03 07:36:47 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -163,7 +163,8 @@ public class ObliqueStereographic extends Stereographic {
         final double ce = 2.0 * Math.atan2(rho*cosChi1, k0);
         final double cosce = Math.cos(ce);
         final double since = Math.sin(ce);
-        final double chi = (Math.abs(rho)>=TOL) ? Math.asin(cosce*sinChi1 + (y*since*cosChi1 / rho)) : chi1;
+        final double chi = (Math.abs(rho)>=EPS) ? 
+            Math.asin(cosce*sinChi1 + (y*since*cosChi1 / rho)) : chi1;
         final double tp = Math.tan(Math.PI/4.0 + chi/2.0);
         
         //parts of (21-36) used to calculate longitude
@@ -179,7 +180,8 @@ public class ObliqueStereographic extends Stereographic {
             final double esinphi = e*Math.sin(phi0);
             final double phi = 2*Math.atan(tp*Math.pow((1+esinphi)/(1-esinphi), halfe))-(Math.PI/2);
             if (Math.abs(phi-phi0) < TOL) {
-                x = (Math.abs(rho)<TOL) || (Math.abs(t)<TOL && Math.abs(ct)<TOL) ? 
+                // TODO: checking rho may be redundant
+                x = (Math.abs(rho)<EPS) || (Math.abs(t)<EPS && Math.abs(ct)<EPS) ? 
                      0.0 : Math.atan2(t, ct);
                 y = phi;
                 break;
@@ -241,7 +243,7 @@ public class ObliqueStereographic extends Stereographic {
      * Provides the transform equations for the spherical case of the 
      * Stereographic projection.
      *
-     * @version $Id: ObliqueStereographic.java,v 1.5 2004/05/03 07:36:47 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -279,7 +281,7 @@ public class ObliqueStereographic extends Stereographic {
             final double sinlat = Math.sin(y);
             final double coslon = Math.cos(x);
             double f = 1.0 + sinphi0*sinlat + cosphi0*coslat*coslon; // (21-4)
-            if (!(f >= TOL)) {
+            if (f < EPS) {
                 throw new ProjectionException(Resources.format(
                           ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
             }
@@ -307,7 +309,7 @@ public class ObliqueStereographic extends Stereographic {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             final double rho = Math.sqrt(x*x + y*y);
-            if (Math.abs(rho) < TOL) {
+            if (Math.abs(rho) < EPS) {
                 y = latitudeOfOrigin;
                 x = 0.0;
             } else {
@@ -317,7 +319,7 @@ public class ObliqueStereographic extends Stereographic {
                 final double ct = rho*cosphi0*cosc - y*sinphi0*sinc; // (20-15)
                 final double t  = x*sinc;                            // (20-15)
                 y = Math.asin(cosc*sinphi0 + y*sinc*cosphi0/rho);    // (20-14)
-                x = (Math.abs(ct)<TOL && Math.abs(t)<TOL) ? 
+                x = (Math.abs(ct)<EPS && Math.abs(t)<EPS) ? 
                      0.0 : Math.atan2(t, ct);
             }
 
@@ -361,7 +363,7 @@ public class ObliqueStereographic extends Stereographic {
      *       Surveying Engineering, University of New Brunswick. Technical Report No. 46.</li>
      * </ul>
      *
-     * @version $Id: ObliqueStereographic.java,v 1.5 2004/05/03 07:36:47 desruisseaux Exp $
+     * @version $Id$
      * @author Rueben Schulz
      */
     static final class EPSG extends ObliqueStereographic { 
@@ -440,7 +442,7 @@ public class ObliqueStereographic extends Stereographic {
         {
             final double rho = Math.sqrt(x*x + y*y);
             
-            if (Math.abs(rho) < TOL) {
+            if (Math.abs(rho) < EPS) {
                 x = 0.0;
                 y = phic0;
             } else {

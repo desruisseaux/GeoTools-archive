@@ -93,19 +93,10 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html"> "Albers_Conic_Equal_Area" on www.remotesensing.org</A>
  * @see <A HREF="http://srmwww.gov.bc.ca/gis/bceprojection.html">British Columbia Albers Standard Projection</A>
  *
- * @version $Id: AlbersEqualArea.java,v 1.4 2004/02/23 12:28:22 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  */
 public class AlbersEqualArea extends ConicProjection {
-    /**
-     * Maximum difference allowed when comparing real numbers.
-     */
-    private static final double EPS = 1E-7;
-    
-    /**
-     * Maximum number of itterations for the inverse calculation.
-     */
-    private static final int MAX_ITER = 15;
     
     /**
      * Constants used by the spherical and elliptical Albers projection. 
@@ -126,7 +117,7 @@ public class AlbersEqualArea extends ConicProjection {
     /**
      * Informations about a {@link AlbersEqualArea}.
      *
-     * @version $Id: AlbersEqualArea.java,v 1.4 2004/02/23 12:28:22 desruisseaux Exp $
+     * @version $Id$
      * @author Rueben Schulz
      */
     static final class Provider extends org.geotools.ct.proj.Provider {
@@ -162,7 +153,7 @@ public class AlbersEqualArea extends ConicProjection {
         phi2 = latitudeToRadians(parameters.getValue("standard_parallel_2", 58.5), true);
 
 	//Compute Constants
-        if (Math.abs(phi1 + phi2) < TOL) 
+        if (Math.abs(phi1 + phi2) < EPS) 
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_ANTIPODE_LATITUDES_$2,
                     new Latitude(Math.toDegrees(phi1)),
@@ -171,7 +162,7 @@ public class AlbersEqualArea extends ConicProjection {
         double  sinphi = Math.sin(phi1);
         double  cosphi = Math.cos(phi1);
         double  n      = sinphi;
-        boolean secant = (Math.abs(phi1 - phi2) >= TOL);
+        boolean secant = (Math.abs(phi1 - phi2) >= EPS);
         if (isSpherical) {
             if (secant) {
                 n = 0.5 * (n + Math.sin(phi2));
@@ -220,7 +211,8 @@ public class AlbersEqualArea extends ConicProjection {
 
         if (rho < 0.0) {
             // TODO: fix message (and check when this condition will occur)
-            // is this only checking for an impossible divide by 0 condition?
+            // this just checks for a tolerence error that may cause rho to be
+            // close to -0.0
             throw new ProjectionException("Tolerance condition error");
         }
         rho = Math.sqrt(rho) / n;
@@ -243,7 +235,7 @@ public class AlbersEqualArea extends ConicProjection {
     {
         y = rho0 - y;
         double rho = Math.sqrt(x*x + y*y);
-        if (rho  != 0.0) {
+        if (rho > EPS) {
             if (n < 0.0) {
                 rho = -rho;
                 x   = -x;
