@@ -28,6 +28,7 @@ import org.geotools.filter.Expression;
 import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
@@ -35,16 +36,21 @@ import org.geotools.styling.Halo;
 import org.geotools.styling.LabelPlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
+import org.geotools.styling.NamedLayer;
+import org.geotools.styling.NamedStyle;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.RemoteOWS;
 import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
+import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyledLayer;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.UserLayer;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -541,6 +547,10 @@ public class sldComplexTypes2 {
                         .getInstance(), null, 0, 1),
                 new sldElement("NamedStyle", _NamedStyle.getInstance(), null, 1, 1),
                 new sldElement("UserStyle", _UserStyle.getInstance(), null, 1, 1)};
+        private static int NAME = 0;
+        private static int LAYERFEATURECONSTRAINTS = 1;
+        private static int NAMEDSTYLE = 2;
+        private static int USERSTYLE = 3;
     
         private static ElementGrouping child = new SequenceGT(
                 null,
@@ -606,8 +616,30 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                NamedLayer sld = new NamedLayer();
+            
+                for (int i = 0; i < value.length; i++) {
+                    if ((value[i] == null) || value[i].getElement() == null) {
+                        continue;
+                    }
+    
+                    Element e = value[i].getElement();
+                    if(elems[NAME].getName().equals(e.getName()))
+                        sld.setName((String)value[i].getValue());
+    
+                    if(elems[LAYERFEATURECONSTRAINTS].getName().equals(e.getName())) {
+                        // ignore
+                        continue;
+                    }
+                    
+                    if(elems[NAMEDSTYLE].getName().equals(e.getName()))
+                        sld.addStyle((NamedStyle)value[i].getValue());
+                    
+                    if(elems[USERSTYLE].getName().equals(e.getName()))
+                        sld.addStyle((Style)value[i].getValue());
+                }
+                
+                return sld;
         }
     }
 
@@ -622,6 +654,8 @@ public class sldComplexTypes2 {
                 "Name",
                 org.geotools.xml.xsi.XSISimpleTypes.String.getInstance()/* simpleType name is string */,
                 null, 1, 1)};
+        
+        private static int NAME = 0;
     
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("Name",
@@ -685,8 +719,19 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                NamedStyle sld = new NamedStyle();
+            
+                for (int i = 0; i < value.length; i++) {
+                    if ((value[i] == null) || value[i].getElement() == null) {
+                        continue;
+                    }
+    
+                    Element e = value[i].getElement();
+                    if(elems[NAME].getName().equals(e.getName()))
+                        sld.setName((String)value[i].getValue());
+                }
+                
+                return sld;
         }
     }
 
@@ -2028,6 +2073,11 @@ public class sldComplexTypes2 {
                         .getInstance(), null, 1, 1),
                 new sldElement("UserStyle", _UserStyle.getInstance(), null, 1,
                         Element.UNBOUNDED)};
+        
+        private static int NAME = 0;
+        private static int REMOTEOWS = 1;
+        private static int LAYERFEATURECONSTRAINTS = 2;
+        private static int USERSTYLE = 3;
     
         private static ElementGrouping child = new SequenceGT(null,
                 elems, 1, 1);
@@ -2044,8 +2094,7 @@ public class sldComplexTypes2 {
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return UserLayer.class;
         }
         
         
@@ -2090,8 +2139,28 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                UserLayer sld = new UserLayer();
+            
+                for (int i = 0; i < value.length; i++) {
+                    if ((value[i] == null) || value[i].getElement() == null) {
+                        continue;
+                    }
+    
+                    Element e = value[i].getElement();
+                    if(elems[NAME].getName().equals(e.getName()))
+                        sld.setName((String)value[i].getValue());
+    
+                    if(elems[REMOTEOWS].getName().equals(e.getName()))
+                        sld.setRemoteOWS((RemoteOWS)value[i].getValue());
+                    
+                    if(elems[LAYERFEATURECONSTRAINTS].getName().equals(e.getName()))
+                        sld.setLayerFeatureConstraints((FeatureTypeConstraint[])value[i].getValue());
+                    
+                    if(elems[USERSTYLE].getName().equals(e.getName()))
+                        sld.addUserStyle((Style)value[i].getValue());
+                }
+                
+                return sld;
         }
     }
 
