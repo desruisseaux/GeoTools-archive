@@ -295,10 +295,12 @@ public class AlbersEqualArea extends MapProjection {
         }
 
         if (rho < 0.0) {
-            // TODO: fix message (and check when this condition will occur)
-            // this just checks for a tolerence error that may cause rho to be
-            // close to -0.0, may be better to just round up in these cases
-            throw new ProjectionException("Tolerance condition error");
+            if (Math.abs(rho) < EPS) {
+                rho = 0.0;
+            } else {
+                //TODO: can remove if someone can prove this condition will never happen
+                throw new ProjectionException("Tolerance condition error");
+            }
         }
         rho = Math.sqrt(rho) / n;
         y   = rho0 - rho * Math.cos(x);
