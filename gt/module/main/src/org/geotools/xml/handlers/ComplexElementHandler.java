@@ -206,7 +206,7 @@ public class ComplexElementHandler extends XMLElementHandler {
             	// done running
             	if (count < type.getChild().getMinOccurs()) {
             		throw new SAXException("Too few elements declared for "
-                        + type.getName());
+                        + type.getName() + "("+elem.getName()+")");
                 }
             }else{
             	i = i2[0];

@@ -218,13 +218,15 @@ public class ElementHandlerFactory {
         if (type == null) {
             throw new SAXException("Type not found for " + eth.getName() + " ");
         }
+        
+        // putting complextype first as it is less restrictive ... 
+        // see XSISimpleTypes.AnyType
+        if (type instanceof ComplexType) {
+            return new ComplexElementHandler(this, eth);
+        }
 
         if (type instanceof SimpleType) {
             return new SimpleElementHandler(eth);
-        }
-
-        if (type instanceof ComplexType) {
-            return new ComplexElementHandler(this, eth);
         }
 
         return new IgnoreHandler();

@@ -90,7 +90,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
      */
     public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",
             Integer.class,
-            "This allows the user to specify a timeout in milliseconds. This param has a default value of 1000ms.",
+            "This allows the user to specify a timeout in milliseconds. This param has a default value of 3000ms.",
             false);
 
     // buffer size -- optional
@@ -180,11 +180,15 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
         int buffer = 10;
 
         if (params.containsKey(TIMEOUT.key)) {
-            timeout = ((Integer) TIMEOUT.lookUp(params)).intValue();
+            Integer i = (Integer) TIMEOUT.lookUp(params);
+            if(i!=null)
+                timeout = i.intValue();
         }
 
         if (params.containsKey(BUFFER_SIZE.key)) {
-            buffer = ((Integer) BUFFER_SIZE.lookUp(params)).intValue();
+            Integer i = (Integer) BUFFER_SIZE.lookUp(params);
+            if(i!=null)
+                buffer = i.intValue();
         }
 
         if (params.containsKey(USERNAME.key)) {
