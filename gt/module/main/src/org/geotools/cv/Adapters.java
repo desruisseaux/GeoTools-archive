@@ -35,6 +35,9 @@ import org.opengis.cv.CV_SampleDimensionType;
 import org.opengis.cv.CV_ColorInterpretation;
 import org.opengis.cv.CV_PaletteInterpretation;
 
+// OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.pt.Envelope;

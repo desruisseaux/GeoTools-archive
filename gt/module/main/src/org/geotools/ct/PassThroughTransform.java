@@ -22,11 +22,11 @@ package org.geotools.ct;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.resources.Utilities;
 
 // J2SE dependencies
@@ -184,7 +184,9 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
         final int transDim = transform.getDimSource();
         final int pointDim = point.getDimension();
         if (pointDim != transDim+nSkipped) {
-            throw new MismatchedDimensionException(pointDim, transDim+nSkipped);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(pointDim), new Integer(transDim+nSkipped)));
         }
         final CoordinatePoint subPoint = new CoordinatePoint(transDim);
         System.arraycopy(point.ord, firstAffectedOrdinate, subPoint.ord, 0, transDim);

@@ -25,6 +25,7 @@ import org.geotools.cs.*;
 import org.geotools.ct.*;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 

@@ -43,8 +43,10 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
-import org.geotools.cs.FactoryException;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
 import org.geotools.ct.CoordinateTransformationFactory;

@@ -35,10 +35,11 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.util.CaselessStringKey;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
-import org.geotools.cs.FactoryException;
 import org.geotools.resources.WKTFormat;
 import org.geotools.resources.WKTElement;
 import org.geotools.resources.cts.Resources;

@@ -35,6 +35,10 @@ import javax.media.jai.ParameterList;
 import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+
 // Geotools dependencies and resources
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;

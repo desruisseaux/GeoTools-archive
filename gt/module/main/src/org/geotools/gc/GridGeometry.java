@@ -46,8 +46,11 @@ import org.opengis.gc.GC_GridGeometry;
 import org.opengis.ct.CT_MathTransform;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.coverage.CannotEvaluateException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
@@ -56,9 +59,6 @@ import org.geotools.pt.Dimensioned;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
-import org.geotools.pt.MismatchedDimensionException;
-import org.geotools.cv.CannotEvaluateException;
-import org.geotools.cs.FactoryException;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -151,10 +151,14 @@ public class GridGeometry implements Dimensioned, Serializable {
             final int dimSource = gridToCoordinateSystem.getDimSource();
             final int dimTarget = gridToCoordinateSystem.getDimTarget();
             if (dimRange != dimSource) {
-                throw new MismatchedDimensionException(dimRange, dimSource);
+                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                            new Integer(dimRange), new Integer(dimSource)));
             }
             if (dimRange != dimTarget) {
-                throw new MismatchedDimensionException(dimRange, dimTarget);
+                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                            new Integer(dimRange), new Integer(dimTarget)));
             }
         }
     }
@@ -185,10 +189,14 @@ public class GridGeometry implements Dimensioned, Serializable {
          */
         final int dimension = gridRange.getDimension();
         if (userRange.getDimension() != dimension) {
-            throw new MismatchedDimensionException(gridRange, userRange);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(gridRange.getDimension()), new Integer(userRange.getDimension())));
         }
         if (inverse!=null && inverse.length!=dimension) {
-            throw new MismatchedDimensionException(dimension, inverse.length);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dimension), new Integer(inverse.length)));
         }
         /*
          * Prepare elements for the 2D sub-transform. Those
@@ -446,7 +454,9 @@ public class GridGeometry implements Dimensioned, Serializable {
             try {
                 return gridFromCoordinateSystem2D.transform(point, null);
             } catch (TransformException exception) {
-                throw new CannotEvaluateException(point, exception);
+// TODO
+//                throw new CannotEvaluateException(point, exception);
+                throw new CannotEvaluateException(null, exception);
             }
         }
         throw new InvalidGridGeometryException(Resources.format(

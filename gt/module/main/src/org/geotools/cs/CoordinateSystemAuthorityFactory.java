@@ -57,6 +57,9 @@ import org.opengis.cs.CS_ProjectedCoordinateSystem;
 import org.opengis.cs.CS_CompoundCoordinateSystem;
 import org.opengis.cs.CS_CoordinateSystemAuthorityFactory;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 

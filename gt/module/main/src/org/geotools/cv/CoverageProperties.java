@@ -46,6 +46,9 @@ import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 
 // OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
+
+// OpenGIS dependencies
 import org.opengis.cv.CV_Coverage;
 
 

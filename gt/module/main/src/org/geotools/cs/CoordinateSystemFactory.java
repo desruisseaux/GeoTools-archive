@@ -71,6 +71,9 @@ import org.opengis.cs.CS_Projection;
 import org.opengis.cs.CS_ProjectionParameter;
 import org.opengis.cs.CS_WGS84ConversionInfo;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.util.WeakHashSet;

@@ -32,6 +32,7 @@ import org.geotools.resources.*;
 import org.geotools.resources.image.*;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // JUnit dependencies

@@ -42,10 +42,12 @@ import org.opengis.ct.CT_Parameter;
 import org.opengis.ct.CT_MathTransform;
 import org.opengis.ct.CT_MathTransformFactory;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.cs.Projection;
-import org.geotools.cs.FactoryException;
 import org.geotools.ct.proj.Provider;
 
 // Resources

@@ -35,9 +35,11 @@
  */
 package org.geotools.ct;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.cs.Projection; // For JavaDoc
-import org.geotools.cs.FactoryException;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 

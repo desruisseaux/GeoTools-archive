@@ -43,13 +43,13 @@ import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
-import org.geotools.pt.MismatchedDimensionException;
 
 // Resources
 import org.geotools.units.Unit;
@@ -856,7 +856,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private static void checkDimension(final CoordinatePoint point) {
         final int dim = point.getDimension();
         if (dim != 1) {
-            throw new MismatchedDimensionException(dim, 1);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dim), new Integer(1)));
         }
     }
     

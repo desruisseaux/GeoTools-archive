@@ -41,9 +41,10 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
+import org.opengis.referencing.FactoryException;
+
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.FactoryException;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.PrimeMeridian;

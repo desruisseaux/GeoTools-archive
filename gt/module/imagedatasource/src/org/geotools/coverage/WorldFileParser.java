@@ -91,7 +91,7 @@ public class WorldFileParser extends org.geotools.io.coverage.PropertyParser {
             this.addAlias(this.HEIGHT, "height-i");
             this.addAlias(this.WIDTH, "Width-i");
             
-        } catch (org.geotools.cs.FactoryException fe){
+        } catch (org.opengis.referencing.FactoryException fe){
             System.out.println("Factory Exception " + fe);
             LOGGER.severe("Factory Exception " + fe);
         }

@@ -26,6 +26,7 @@ import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
@@ -125,7 +126,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         throws MismatchedDimensionException
     {
         if (minCP.length != maxCP.length) {
-            throw new MismatchedDimensionException(minCP.length, maxCP.length);
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(minCP.length), new Integer(maxCP.length)));
         }
         ord = new double[minCP.length + maxCP.length];
         System.arraycopy(minCP, 0, ord, 0,            minCP.length);
@@ -169,7 +172,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
     void ensureDimensionMatch(final int expectedDimension) throws MismatchedDimensionException {
         final int dimension = getDimension();
         if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(dimension, expectedDimension);
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dimension), new Integer(expectedDimension)));
         }
     }
     

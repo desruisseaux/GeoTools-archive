@@ -25,6 +25,8 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.opengis.referencing.FactoryException;
+
 import jj2000.j2k.NotImplementedError;
 
 import org.geotools.measure.AngleFormat;

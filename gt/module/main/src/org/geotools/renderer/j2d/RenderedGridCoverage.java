@@ -52,6 +52,7 @@ import javax.media.jai.ImageLayout;
 import javax.media.jai.TileRequest;
 
 // OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
@@ -60,7 +61,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.cv.SampleDimension;
-import org.geotools.cv.CannotEvaluateException;
 import org.geotools.cv.PointOutsideCoverageException;
 import org.geotools.gc.GridRange;
 import org.geotools.gc.GridCoverage;

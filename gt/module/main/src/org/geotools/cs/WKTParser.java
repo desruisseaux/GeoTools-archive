@@ -33,6 +33,9 @@ import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.ParseException;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.resources.WKTFormat;

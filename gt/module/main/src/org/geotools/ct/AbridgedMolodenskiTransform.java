@@ -28,9 +28,6 @@ import java.io.Serializable;
 import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
 // Geotools dependencies
 import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.HorizontalDatum;

@@ -39,7 +39,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @deprecated Replaced by {@link org.opengis.referencing.NoSuchAuthorityCodeException} in the
  *             <code>org.opengis.referencing</code> package.
  */
-public class NoSuchAuthorityCodeException extends FactoryException {
+public class NoSuchAuthorityCodeException extends org.opengis.referencing.NoSuchIdentifierException {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -49,14 +49,14 @@ public class NoSuchAuthorityCodeException extends FactoryException {
      * Constructs an exception with no message.
      */
     public NoSuchAuthorityCodeException() {
-        super();
+        super(null, null);
     }
 
     /**
      * Constructs an exception with the specified detail message.
      */
     public NoSuchAuthorityCodeException(final String message) {
-        super(message);
+        super(message, null);
     }
 
     /**
@@ -66,6 +66,6 @@ public class NoSuchAuthorityCodeException extends FactoryException {
      * @param code The specified code.
      */
     NoSuchAuthorityCodeException(final String classname, final String code) {
-        super(Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2, classname, code));
+        super(Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2, classname, code), code);
     }
 }

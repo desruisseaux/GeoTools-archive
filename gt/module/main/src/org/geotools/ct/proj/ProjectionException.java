@@ -19,8 +19,8 @@
  */
 package org.geotools.ct.proj;
 
-// Geotools dependencies
-import org.geotools.ct.TransformException;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

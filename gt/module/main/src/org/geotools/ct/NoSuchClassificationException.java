@@ -38,9 +38,11 @@ package org.geotools.ct;
 // JAI dependencies
 import javax.media.jai.ParameterList; // For javadoc
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.cs.Projection; // For javadoc
-import org.geotools.cs.FactoryException;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 

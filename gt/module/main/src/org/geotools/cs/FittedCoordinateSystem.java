@@ -27,10 +27,12 @@ package org.geotools.cs;
 import org.opengis.cs.CS_CoordinateSystem;
 import org.opengis.cs.CS_FittedCoordinateSystem;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.ct.MathTransform;
-import org.geotools.pt.MismatchedDimensionException;
 
 // J2SE and Java3D dependencies
 import java.util.Arrays;
@@ -117,10 +119,14 @@ public class FittedCoordinateSystem extends CoordinateSystem {
         }
         int dim1, dim2;
         if ((dim1=toBase.getDimTarget()) != (dim2=base.getDimension())) {
-            throw new MismatchedDimensionException(dim1, dim2);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dim1), new Integer(dim2)));
         }
         if ((dim1=toBase.getDimSource()) != (dim2=axes.length)) {
-            throw new MismatchedDimensionException(dim1, dim2);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dim1), new Integer(dim2)));
         }
     }
 

@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.opengis.referencing.FactoryException;
+
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CSAUTOFactory;
 import org.geotools.cs.CSEPSGFactory;
@@ -34,7 +36,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.FactoryException;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.PrimeMeridian;

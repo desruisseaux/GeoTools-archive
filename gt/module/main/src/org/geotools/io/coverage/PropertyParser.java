@@ -60,6 +60,7 @@ import java.util.logging.LogRecord;
 import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies (CTS and GCS)
@@ -69,6 +70,9 @@ import org.geotools.ct.*;
 import org.geotools.gc.GridRange;
 import org.geotools.gc.GridCoverage;
 import org.geotools.cv.SampleDimension;
+import org.geotools.measure.AngleFormat;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.Latitude;
 
 // Resources
 import org.geotools.units.Unit;

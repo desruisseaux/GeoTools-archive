@@ -32,9 +32,11 @@ import org.opengis.ct.CT_MathTransformFactory;
 import org.opengis.ct.CT_CoordinateTransformation;
 import org.opengis.ct.CT_CoordinateTransformationFactory;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.cs.FactoryException;
 import org.geotools.cs.CoordinateSystem; // For javadoc
 import org.geotools.cs.CoordinateSystemFactory;
 

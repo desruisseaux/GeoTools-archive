@@ -56,6 +56,7 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.TestData;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 

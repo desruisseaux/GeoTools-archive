@@ -37,6 +37,8 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
+import org.opengis.referencing.FactoryException;
+
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;

@@ -85,12 +85,13 @@ import org.opengis.gc.GC_GridGeometry;
 import org.opengis.gc.GC_GridCoverage;
 
 // OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.pt.Envelope;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.AxisOrientation;
@@ -100,7 +101,6 @@ import org.geotools.cv.Coverage;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 import org.geotools.cv.SampleDimensionType;  // For Javadoc
-import org.geotools.cv.CannotEvaluateException;
 import org.geotools.cv.PointOutsideCoverageException;
 
 // Resources
@@ -621,7 +621,9 @@ public class GridCoverage extends Coverage {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ENVELOPE));
         }
         if (dimension != cs.getDimension()) {
-            throw new MismatchedDimensionException(cs, envelope);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(cs.getDimension()), new Integer(envelope.getDimension())));
         }
         this.envelope = (Envelope)pool.canonicalize(envelope);
         /*

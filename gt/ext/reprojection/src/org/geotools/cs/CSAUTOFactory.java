@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.media.jai.ParameterList;
+import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.units.Unit;

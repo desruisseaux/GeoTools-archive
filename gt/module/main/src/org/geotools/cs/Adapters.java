@@ -64,6 +64,9 @@ import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterListDescriptorImpl;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.resources.XArray;

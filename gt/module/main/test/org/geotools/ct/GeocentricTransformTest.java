@@ -32,6 +32,7 @@ import org.geotools.units.Unit;
 import org.geotools.resources.XMath;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // JUnit dependencies

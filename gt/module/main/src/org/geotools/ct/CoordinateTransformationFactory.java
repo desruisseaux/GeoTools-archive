@@ -42,6 +42,7 @@ import org.opengis.ct.CT_CoordinateTransformation;
 import org.opengis.ct.CT_CoordinateTransformationFactory;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
@@ -63,7 +64,6 @@ import org.geotools.cs.GeocentricCoordinateSystem;
 import org.geotools.cs.HorizontalCoordinateSystem;
 import org.geotools.cs.VerticalCoordinateSystem;
 import org.geotools.cs.TemporalCoordinateSystem;
-import org.geotools.cs.FactoryException;
 import org.geotools.pt.Dimensioned;
 
 // Resources

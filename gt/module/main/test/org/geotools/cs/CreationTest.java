@@ -35,6 +35,7 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.cs.CS_CoordinateSystem;
+import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.units.Unit;

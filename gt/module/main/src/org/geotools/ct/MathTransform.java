@@ -33,6 +33,7 @@ import javax.media.jai.PerspectiveTransform; // For JavaDoc
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // OpenGIS dependencies
 import org.opengis.pt.PT_Matrix;
@@ -43,7 +44,6 @@ import org.opengis.ct.CT_DomainFlags;
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 

@@ -27,6 +27,10 @@ package org.geotools.ct;
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+
 // Resources
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;

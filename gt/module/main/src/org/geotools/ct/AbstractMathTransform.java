@@ -43,11 +43,11 @@ import org.opengis.ct.CT_MathTransform;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -164,12 +164,16 @@ public abstract class AbstractMathTransform implements MathTransform {
         final int dimSource = getDimSource();
         final int dimTarget = getDimTarget();
         if (dimPoint != dimSource) {
-            throw new MismatchedDimensionException(dimPoint, dimSource);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dimPoint), new Integer(dimSource)));
         }
         if (ptDst==null) {
             ptDst = new CoordinatePoint(dimTarget);
         } else if (ptDst.getDimension() != dimTarget) {
-            throw new MismatchedDimensionException(ptDst.getDimension(), dimTarget);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(ptDst.getDimension()), new Integer(dimTarget)));
         }
         transform(ptSrc.ord, 0, ptDst.ord, 0, 1);
         return ptDst;
@@ -388,7 +392,9 @@ public abstract class AbstractMathTransform implements MathTransform {
     public Matrix derivative(final Point2D point) throws TransformException {
         final int dimSource = getDimSource();
         if (dimSource != 2) {
-            throw new MismatchedDimensionException(2, dimSource);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(2), new Integer(dimSource)));
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }
@@ -422,7 +428,9 @@ public abstract class AbstractMathTransform implements MathTransform {
         if (point != null) {
             final int dimPoint = point.getDimension();
             if (dimPoint != dimSource) {
-                throw new MismatchedDimensionException(dimPoint, dimSource);
+                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                            new Integer(dimPoint), new Integer(dimSource)));
             }
             if (dimSource == 2) {
                 return derivative(point.toPoint2D());

@@ -48,6 +48,7 @@ import javax.media.jai.InterpolationNearest;
 import javax.media.jai.IntegerSequence;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools (GCS) dependencies
@@ -61,7 +62,6 @@ import org.geotools.gc.InvalidGridGeometryException;
 import org.geotools.pt.Matrix;
 import org.geotools.pt.Envelope;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.FactoryException;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;

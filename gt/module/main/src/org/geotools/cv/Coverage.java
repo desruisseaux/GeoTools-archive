@@ -66,6 +66,9 @@ import javax.media.jai.util.CaselessStringKey; // For Javadoc
 import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
 
 // OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
+
+// OpenGIS dependencies
 import org.opengis.cv.CV_Coverage;
 import org.opengis.pt.PT_Envelope;
 import org.opengis.pt.PT_CoordinatePoint;

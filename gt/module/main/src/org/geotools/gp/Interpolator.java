@@ -43,13 +43,13 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
 
 // OpenGIS dependencies
+import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.gc.GridCoverage;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.cv.CannotEvaluateException;
 import org.geotools.cv.PointOutsideCoverageException;
 
 
@@ -297,7 +297,7 @@ final class Interpolator extends GridCoverage {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(coord, exception);
+            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
         }
         throw new PointOutsideCoverageException(coord);
     }
@@ -327,7 +327,7 @@ final class Interpolator extends GridCoverage {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(coord, exception);
+            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
         }
         throw new PointOutsideCoverageException(coord);
     }
@@ -357,7 +357,7 @@ final class Interpolator extends GridCoverage {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(coord, exception);
+            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
         }
         throw new PointOutsideCoverageException(coord);
     }

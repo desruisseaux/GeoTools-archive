@@ -68,6 +68,9 @@ import java.util.NoSuchElementException;
 import javax.media.jai.ParameterList;
 import javax.media.jai.util.CaselessStringKey;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+
 // Resources
 import org.geotools.units.Unit;
 import org.geotools.util.MonolineFormatter;

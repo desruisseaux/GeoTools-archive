@@ -38,6 +38,9 @@ package org.geotools.ct;
 // Geotools dependences
 import org.geotools.cs.CoordinateSystem;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Resources
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;

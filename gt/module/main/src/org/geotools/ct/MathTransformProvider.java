@@ -27,7 +27,9 @@ package org.geotools.ct;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.cs.Projection;
-import org.geotools.cs.FactoryException;
+
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 
 // Resources
 import org.geotools.resources.XArray;

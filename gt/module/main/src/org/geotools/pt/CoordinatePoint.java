@@ -27,6 +27,7 @@ import java.awt.geom.Point2D;
 // OpenGIS dependencies
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
@@ -195,7 +196,9 @@ public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, 
     {
         final int dimension = getDimension();
         if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(dimension, expectedDimension);
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dimension), new Integer(expectedDimension)));
         }
     }
     

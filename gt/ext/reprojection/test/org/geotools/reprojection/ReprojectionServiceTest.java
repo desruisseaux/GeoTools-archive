@@ -20,7 +20,8 @@ package org.geotools.reprojection;
 
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
-import org.geotools.cs.FactoryException;
+
+import org.opengis.referencing.FactoryException;
 
 import junit.framework.TestCase;
 

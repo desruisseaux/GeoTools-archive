@@ -23,6 +23,7 @@ package org.geotools.resources;
 import org.geotools.cs.*;
 import org.geotools.ct.*;
 import org.geotools.pt.*;
+import org.geotools.measure.*;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -34,6 +35,7 @@ import java.awt.geom.AffineTransform;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -293,7 +295,9 @@ public final class CTSUtilities {
     {
         final int sourceDim = transform.getDimSource();
         if (envelope.getDimension() != sourceDim) {
-            throw new MismatchedDimensionException(sourceDim, envelope.getDimension());
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
         int           coordinateNumber = 0;
         Envelope           transformed = null;

@@ -23,6 +23,9 @@ package org.geotools.pt;
 import javax.vecmath.GMatrix;
 import java.awt.geom.AffineTransform;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 // Geotools dependencies
 import org.geotools.cs.AxisOrientation;
 
@@ -127,7 +130,9 @@ public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
          */
         final int dimension = srcAxis.length;
         if (dstAxis.length != dimension) {
-            throw new MismatchedDimensionException(dimension, dstAxis.length);
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dimension), new Integer(dstAxis.length)));
         }
         if (validRegions) {
             srcRegion.ensureDimensionMatch(dimension);

@@ -27,13 +27,13 @@ import java.awt.event.MouseListener;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.renderer.DeformableViewer;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
@@ -215,7 +215,9 @@ public final class GeoMouseEvent extends MouseEvent {
             assert cs.getDimension() == 2;
             if (dest != null) {
                 if (dest.ord.length != 2) {
-                    throw new MismatchedDimensionException(cs, dest);
+                    throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                                org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                                new Integer(cs.getDimension()), new Integer(dest.getDimension())));
                 }
                 dest.ord[0] = px;
                 dest.ord[1] = py;
