@@ -20,6 +20,7 @@ package org.geotools.data.vpf;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
@@ -295,7 +296,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return featureType.getNamespace();
     }
 
@@ -358,7 +359,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#isDescendedFrom(java.lang.String, java.lang.String)
      */
-    public boolean isDescendedFrom(String nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName) {
         return featureType.isDescendedFrom(nsURI, typeName);
     }
 

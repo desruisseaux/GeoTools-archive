@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URI;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -304,7 +305,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *  (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return featureType.getNamespace();
     }
 
@@ -485,7 +486,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *  (non-Javadoc)
      * @see org.geotools.feature.FeatureType#isDescendedFrom(java.lang.String, java.lang.String)
      */
-    public boolean isDescendedFrom(String nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName) {
         return featureType.isDescendedFrom(nsURI, typeName);
     }
 

@@ -20,6 +20,7 @@
  */
 package org.geotools.data.vpf;
 
+import java.net.URI;
 import java.util.List;
 
 import org.geotools.feature.AttributeType;
@@ -210,7 +211,7 @@ public class VPFFeatureType implements FeatureType {
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return featureClass.getNamespace();
     }
 
@@ -245,7 +246,7 @@ public class VPFFeatureType implements FeatureType {
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#isDescendedFrom(java.lang.String, java.lang.String)
      */
-    public boolean isDescendedFrom(String nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName) {
         return featureClass.isDescendedFrom(nsURI, typeName);
     }
     /**
