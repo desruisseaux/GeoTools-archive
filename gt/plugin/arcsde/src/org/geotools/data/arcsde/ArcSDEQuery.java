@@ -1,13 +1,26 @@
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.*;
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.*;
-import org.geotools.filter.*;
-import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+import org.geotools.filter.GeometryEncoderException;
+
+import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeFilter;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeLog;
+import com.esri.sde.sdk.client.SeObjectId;
+import com.esri.sde.sdk.client.SeQuery;
+import com.esri.sde.sdk.client.SeQueryInfo;
+import com.esri.sde.sdk.client.SeRow;
+import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -249,7 +262,7 @@ public class ArcSDEQuery {
 
                 SeQueryInfo sdeQueryInfo = new SeQueryInfo();
                 sdeQueryInfo.setConstruct(sqlConstruct);
-                extent = query.calculateLayerExtent(sdeQueryInfo);
+                extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
             } catch (GeometryEncoderException ex) {
                 throw new DataSourceException(
                     "Can't create the spatial filter: " + ex.getMessage(), ex);
