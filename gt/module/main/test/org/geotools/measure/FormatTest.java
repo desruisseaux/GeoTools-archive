@@ -31,7 +31,7 @@ import org.geotools.referencing.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.cs.TemporalCS;
 import org.geotools.referencing.datum.TemporalDatum;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -119,7 +119,7 @@ public class FormatTest extends TestCase {
         final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-	DirectPosition position = new DirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
+	GeneralDirectPosition position = new GeneralDirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
         assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
      }
 }
