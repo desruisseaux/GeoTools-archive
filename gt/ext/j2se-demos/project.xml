@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-j2se-demos</name>
   <id>j2se-demos</id>
-  <currentVersion>2.0-B5-DEV</currentVersion>
+  <currentVersion>2.0-B6-DEV</currentVersion>
   <shortDescription>Demos for GeoTools2</shortDescription>
   <description>Demos of Geotools2 usable within the standard
   edition of java.</description>
@@ -55,34 +55,19 @@
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
-      <artifactId>cts-coordtrans</artifactId>
+      <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
-    <dependency>
-      <id>opengis+css</id>
+   <dependency>
+      <id>opengis+legacy</id>
       <version>0.1</version>
       <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <artifactId>resources</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>core</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>defaultcore</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>data</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
       <artifactId>junit</artifactId>
@@ -90,29 +75,9 @@
       <version>3.8.1</version>
     </dependency>
     <dependency>
-      <artifactId>renderer</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>gui</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>sldstyling</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>map</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
   </dependencies>
 </project>

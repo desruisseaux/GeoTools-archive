@@ -4,12 +4,12 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-graph</name>
   <id>graph</id>
-  <currentVersion>2.0-B5-DEV</currentVersion>
+  <currentVersion>2.0-B6-DEV</currentVersion>
   <versions>
     <version>
       <id>b1</id>
-      <name>2.0-b1</name>
-      <tag>GT_2_0_B1</tag>
+      <name>2.0-B6-DEV</name>
+      <tag>GT_2_0_B6_DEV</tag>
     </version>
   </versions>
   <package>org.geotools</package>
@@ -26,9 +26,7 @@
   of BMGS.
 
   This library has been ported to geotools2 as part of the VWFS project sponcered
-  by Geo Innovations. If all goes well this will be included in a future release
-  of geotools2. 
-  </description>
+  by Geo Innovations.</description>
   <developers>
     <developer>
       <name>Jody Garnett</name>
@@ -53,46 +51,29 @@
   </developers>
   <dependencies>
     <dependency>
-      <artifactId>core</artifactId>
+      <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
     <dependency>
       <id>JTS</id>
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
-    <dependency>
-      <artifactId>cts-coordtrans</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+   <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <id>opengis</id>
-      <version>2.0-B5-DEV</version>
-      <url>http://www.geotools.org</url>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
       <id>vecmath</id>
       <version>1.2.1</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
-    </dependency>
-    <dependency>
-      <artifactId>defaultcore</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-      <type>test</type>
-    </dependency>
-    <dependency>
-      <artifactId>data</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>resources</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-      <type>test</type>
     </dependency>
     <dependency>
       <id>junit</id>
@@ -114,7 +95,7 @@
       </includes>
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>testData/</include>
           </includes>
