@@ -19,22 +19,26 @@
  */
 package org.geotools.referencing;
 
+// J2SE and JUnit dependencies
 import java.io.*;
 import java.util.*;
 import javax.units.SI;
-import junit.framework.*;
 import java.awt.geom.AffineTransform;
+import junit.framework.*;
 
+// OpenGIS dependencies
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
 import org.geotools.parameter.*;
 import org.geotools.referencing.*;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
-import org.geotools.referencing.wkt.*;
 import org.geotools.referencing.datum.*;
-import org.geotools.referencing.operation.*;
-import org.geotools.referencing.operation.transform.*;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.MathTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 
 /**
@@ -225,7 +229,7 @@ public class BasicTest extends TestCase {
      * Test WKT formatting of transforms backed by matrix.
      */
     public void testMatrix() {
-        final org.geotools.referencing.wkt.Formatter  formatter = new  org.geotools.referencing.wkt.Formatter(null);
+        final Formatter  formatter = new Formatter(null);
         final GeneralMatrix matrix = new GeneralMatrix(4);
         matrix.setElement(0,2,  4);
         matrix.setElement(1,0, -2);
