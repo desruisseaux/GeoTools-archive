@@ -16,25 +16,23 @@
  */
 package org.geotools.gce.image;
 
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.*;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.spatialschema.geometry.Envelope;
-
-import java.io.File;
-
-import java.net.URL;
-
-import java.util.HashMap;
 
 /**
  * @author rgould
@@ -56,16 +54,22 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * PNG is default output format.
      *
      */
+
+
     public static final ParameterDescriptor FORMAT = new ParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
-    public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
+    public static final ParameterDescriptor CRS =new ParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
-            GeographicCRS.WGS84 //default value
+            WorldImageFormat.getDefaultCRS() //default value
         );
+
     public static final ParameterDescriptor ENVELOPE = new ParameterDescriptor("envelope",
             Envelope.class, null,
             new GeneralEnvelope(new double[] { 0, 0 }, new double[] { 1, 1 })); //default envelope to avoid exceptions in GridCoverage2D
+
+
+
 
     /**
      * WorldImageFormat
@@ -198,5 +202,18 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
         }
 
         return null;
+    }
+
+    /**
+     * getDefaultCRS
+     */
+    static CoordinateReferenceSystem getDefaultCRS() {
+        try{
+            return org.geotools.referencing.CRS.decode("EPSG:4326");
+        }
+        catch(org.opengis.referencing.NoSuchAuthorityCodeException e)
+        {
+            return GeographicCRS.WGS84;
+        }
     }
 }
