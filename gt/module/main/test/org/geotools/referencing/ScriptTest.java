@@ -188,9 +188,9 @@ public class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testOrthographic() throws Exception {
-//        runScript("scripts/Orthographic.txt");
-//    }
+    public void testOrthographic() throws Exception {
+        runScript("scripts/Orthographic.txt");
+    }
     
     /**
      * Run "OpenGIS.txt".
