@@ -48,7 +48,7 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
         super(pool);
     }
     
-    CoordinateReferenceSystem createCRS(int srid) throws FactoryException{
+    public CoordinateReferenceSystem createCRS(int srid) throws FactoryException, IOException{
         Connection dbConnection = null;
 
         try {
@@ -65,15 +65,13 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
                 return factory.createFromWKT(wkt);
             } else {
                 String mesg = "No wkt column row for srid in table: "+ TABLE_NAME;
-                throw new FactoryException(mesg);
+                throw new DataSourceException(mesg);
             }
         } catch (SQLException sqle) {
             String message = sqle.getMessage();
 
-            throw new FactoryException(message, sqle);
-        } catch (IOException e) {
-            throw new FactoryException(e.getMessage(), e);
-        } finally {
+            throw new DataSourceException(message, sqle);
+        }finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
     }
