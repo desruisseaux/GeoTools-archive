@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.io;
 
@@ -51,51 +38,46 @@ import org.geotools.resources.rsc.ResourceKeys;
 
 
 /**
- * Classe facilitant la lecture de lignes de données en format texte. Le plus
- * souvent, on utilise cette classe pour lire les lignes d'une matrice.
- * Certaines colonnes pourraient toutefois contenir autre chose que des
- * nombres. L'exemple ci-dessous créé un objet qui attendra des dates dans
- * la première colonne et des nombres dans les toutes autres.
+ * Parse a line of text data. This class is mostly used for parsing lines in a matrix or a table.
+ * Each column may contains numbers, dates, or other objects parseable by some {@link Format}
+ * implementations. The example below reads dates in the first column and numbers in all
+ * remaining columns.
  *
  * <blockquote><pre>
- * &nbsp;final LineParser parser=new LineFormat(new Format[]
- * &nbsp;{
- * &nbsp;    {@link java.text.DateFormat#getDateTimeInstance()},
- * &nbsp;    {@link java.text.NumberFormat#getNumberInstance()}
- * &nbsp;});
+ * final LineParser parser=new LineFormat(new Format[] {
+ *     {@link java.text.DateFormat#getDateTimeInstance()},
+ *     {@link java.text.NumberFormat#getNumberInstance()}
+ * });
  * </pre></blockquote>
  *
- * On peut utiliser <code>LineFormat</code> pour lire une matrice dont on ignore
- * le nombre de colonnes, tout en imposant (si désirée) la contrainte que toutes
- * les lignes aient le même nombre de colonnes. L'exemple ci-dessous obtient le
- * nombre de colonnes lors de la lecture de la première ligne. Si une des lignes
- * suivantes n'a pas le nombre requis de colonnes, une exception {@link ParseException}
- * sera lancée. La vérification du nombre de colonnes est faite par la méthode
- * <code>getValues(double[])</code> lorsque le tableau <code>data</code> n'est
- * plus nul.
+ * <code>LineFormat</code> may be used for reading a matrix with an unknow number of columns,
+ * while requiring that all lines have the same number of columns. The example below gets the
+ * number of columns while reading the first line, and ensure that all subsequent lines have
+ * the same number of columns. If one line violate this condition, then a {@link ParseException}
+ * will be thrown. The check if performed by the <code>getValues(double[])</code> method when
+ * the <code>data</code> array is non-nul.
  *
  * <blockquote><pre>
  * &nbsp;double[] data=null;
- * &nbsp;final {@link java.io.BufferedReader} in=new {@link java.io.BufferedReader}(new {@link java.io.FileReader}("MATRIX.TXT")),
- * &nbsp;for ({@link String} line; (line=in.readLine())!=null;)
- * &nbsp;{
+ * &nbsp;final {@link java.io.BufferedReader} in = new {@link java.io.BufferedReader}(new {@link java.io.FileReader}("MATRIX.TXT"));
+ * &nbsp;for ({@link String} line; (line=in.readLine())!=null;) {
  * &nbsp;    parser.setLine(line);
- * &nbsp;    data=parser.getValues(data);
+ * &nbsp;    data = parser.getValues(data);
  * &nbsp;    // ... process 'data' here ...
  * &nbsp;});
  * </pre></blockquote>
  *
- * Ce code fonctionnera même si la première colonne contenait des dates. Dans ce
- * cas, ce sera le nombre de millisecondes écoulés depuis le 1er janvier 1970 qui
- * sera mémorisé.
+ * This code can work as well with dates instead of numbers. In this case, the values returned
+ * will be microseconds ellapsed since January 1st, 1970.
  * <br><br>
- * Une exception {@link ParseException} peut être lancée parce qu'une chaîne de
- * caractère n'a pas pu être interprétée, parce qu'un objet n'a pas pu être
- * converti en nombre ou parce que le nombre de colonnes trouvées n'était pas
- * le nombre attendu. Dans tous les cas, il est possible d'obtenir l'index de
- * la partie fautive de la ligne avec {@link ParseException#getErrorOffset}.
+ * A {@link ParseException} may be thrown because a string can't be parsed, because an object
+ * can't be converted into a number or because a line don't have the expected number of columns.
+ * In all case, it is possible to gets the index of the first problem found using
+ * {@link ParseException#getErrorOffset}.
  *
- * @version 1.0
+ * @todo This class is intented to be a subclass of {@link Format}.
+ *
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LineFormat {
@@ -142,8 +124,7 @@ public class LineFormat {
     private String line;
 
     /**
-     * Construit un objet qui lira des nombres
-     * écrits selon les conventions locales.
+     * Constructs a new line parser for the default locale.
      */
     public LineFormat() {
         this(NumberFormat.getNumberInstance());
