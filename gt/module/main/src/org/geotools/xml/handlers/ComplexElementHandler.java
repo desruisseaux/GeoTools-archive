@@ -329,6 +329,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see valid(ElementGrouping)
      */
     private int valid(Element element, int index) {
+    	
         XMLElementHandler indexHandler = ((XMLElementHandler) elements.get(index));
 
         if ((indexHandler.getName() != null)

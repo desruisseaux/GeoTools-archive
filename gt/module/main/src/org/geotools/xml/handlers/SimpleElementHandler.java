@@ -85,7 +85,7 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getName()
      */
     public String getName() {
-        return type.getName();
+        return elem.getName();
     }
 
     /**
