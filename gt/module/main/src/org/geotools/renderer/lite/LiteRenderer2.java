@@ -483,7 +483,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                                                                .getDefaultGeometry()
                                                                .getCoordinateSystem();
 
-                if (!sourceCrs.equals(destinationCrs)) {
+                if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on 
                     // unprojected geometries
                     MathTransform2D transform = (MathTransform2D) CRSService.reproject(destinationCrs,
@@ -918,8 +918,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             }
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
-                renderRaster(graphics, feature,
-                    (RasterSymbolizer) symbolizers[m]);
+            	AffineTransform tempTransform = graphics.getTransform(); 
+                graphics.setTransform(shape.getTransform()); 
+                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]); 
+                graphics.setTransform(tempTransform); 
             } else {
                 Style2D style = styleFactory.createStyle(feature,
                         symbolizers[m], scaleRange);
@@ -983,7 +985,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         if ((sourceCrs == null) || (destinationCrs == null)) { // no transformation possible
 
-            return MathTransform2D.IDENTITY;
+            return null;
         }
 
         transform = (MathTransform2D) CRSService.reproject(sourceCrs, destinationCrs, true);
