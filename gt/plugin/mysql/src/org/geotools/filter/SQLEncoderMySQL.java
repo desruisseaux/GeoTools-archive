@@ -101,7 +101,7 @@ public class SQLEncoderMySQL extends SQLEncoder
         capabilities.addType((short) -12345);
         capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
         capabilities.addType(AbstractFilter.FID);
-		capabilities.addType(AbstractFilter.LIKE);
+        capabilities.addType(AbstractFilter.LIKE);
         return capabilities;
     }
 
@@ -151,16 +151,19 @@ public class SQLEncoderMySQL extends SQLEncoder
 
             // left and right have to be valid expressions
             try {
-                /*   if (left == null) {
-                   out.write(defaultGeom);
-                   } else {
-                       left.accept(this);
-                   }*/
+		    out.write("MBRIntersects(");
+                if (left == null) {
+                        out.write(defaultGeom);
+                      } else {
+                          left.accept(this);
+                     }
+                out.write(", ");
                 if (right == null) {
                     out.write(defaultGeom);
                 } else {
                     right.accept(this);
                 }
+                out.write(")");
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
             }
@@ -182,40 +185,33 @@ public class SQLEncoderMySQL extends SQLEncoder
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
-		System.out.println("MBRIntersects(GeometryFromText('" + geomText + "', " + srid
-            + "),geom);");
-        out.write("MBRIntersects(GeometryFromText('" + geomText + "', " + srid
-            + "),geom);");//TODO instead of hardcoding 'geom,' we need the name
-                          //     of the column (it could be 'the_geom' or anything
-                          //     else)
-        
+        out.write("GeometryFromText('" + geomText + "', " + srid + ")");        
     }
 
-		public void visit(LikeFilter filter) {
-		try {
-			String pattern = filter.getPattern();
+    public void visit(LikeFilter filter) {
+        try {
+            String pattern = filter.getPattern();
 
-			pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
-			pattern = pattern
-					.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
+            pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
+            pattern = pattern.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
 
-			//pattern = pattern.replace('\\', ''); //get rid of java escapes.
-			out.write("UPPER(");
-			((Expression) filter.getValue()).accept(this);
-			out.write(") LIKE ");
-			out.write("UPPER('" + pattern + "')");
+            //pattern = pattern.replace('\\', ''); //get rid of java escapes.
+            out.write("UPPER(");
+            ((Expression) filter.getValue()).accept(this);
+            out.write(") LIKE ");
+            out.write("UPPER('" + pattern + "')");
 
-			String esc = filter.getEscape();
+            String esc = filter.getEscape();
 
-			if (pattern.indexOf(esc) != -1) { //if it uses the escape char
-				out.write(" ESCAPE " + "'" + esc + "'"); //this needs testing
-			}
+            if (pattern.indexOf(esc) != -1) { //if it uses the escape char
+                out.write(" ESCAPE " + "'" + esc + "'"); //this needs testing
+            }
 
-			//TODO figure out when to add ESCAPE clause, probably just for the
-			// '_' char.
-		} catch (java.io.IOException ioe) {
-			LOGGER.warning("Unable to export filter" + ioe);
-		}
-	}
+            //TODO figure out when to add ESCAPE clause, probably just for the
+            // '_' char.
+         } catch (java.io.IOException ioe) {
+            LOGGER.warning("Unable to export filter" + ioe);
+        }
 
+    }
 }
