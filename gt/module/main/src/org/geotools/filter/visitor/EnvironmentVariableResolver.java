@@ -25,7 +25,10 @@ import org.geotools.filter.parser.ParseException;
 
 
 /**
+ * Finds instances of specific environment variable expressions within filters and
+ * composite expressins and replaces them with simple literals.
  *
+ * @author James Macgill, Penn State
  */
 public class EnvironmentVariableResolver extends AbstractFilterVisitor implements org.geotools.filter.FilterVisitor {
     
