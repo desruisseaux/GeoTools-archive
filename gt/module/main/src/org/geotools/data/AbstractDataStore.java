@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.QueryRequest;
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -276,8 +275,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    protected FeatureWriter getFeatureWriter(String typeName)
-        throws IOException {
+    protected FeatureWriter getFeatureWriter(String typeName){
         throw new UnsupportedOperationException("Writing not supported");
     }
 
@@ -289,14 +287,13 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(FeatureType featureType){
         throw new UnsupportedOperationException("Schema creation not supported");
     }
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String, org.geotools.feature.FeatureType)
      */
-    public void updateSchema(String typeName, FeatureType featureType)
-        throws IOException {
+    public void updateSchema(String typeName, FeatureType featureType){
         throw new UnsupportedOperationException("Schema modification not supported");
     }
 
@@ -320,7 +317,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         final FeatureType featureType = getSchema(typeName);
 
         if (isWriteable) {
-            if (lockingManager != null) {
+            if (lockingManager != null)
                 return new AbstractFeatureLocking() {
                     public DataStore getDataStore() {
                         return AbstractDataStore.this;
@@ -339,7 +336,6 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                         return featureType;
                     }
                 };
-            } else {
                 return new AbstractFeatureStore() {
                     public DataStore getDataStore() {
                         return AbstractDataStore.this;
@@ -358,8 +354,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                         return featureType;
                     }
                 };
-            }
-        } else {
+        }
             return new AbstractFeatureSource() {
                 public DataStore getDataStore() {
                     return AbstractDataStore.this;
@@ -377,7 +372,6 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                     return featureType;
                 }
             };
-        }
     }
 
 
@@ -387,7 +381,6 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         Filter filter = query.getFilter();
         String typeName = query.getTypeName();
         String propertyNames[] = query.getPropertyNames();
-        CoordinateSystem cs = null;
 
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
@@ -405,9 +398,9 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         }
         FeatureType featureType = getSchema( query.getTypeName() );
 
-        if( propertyNames != null || cs != null ){
+        if( propertyNames != null || query.getCoordinateSystem()!=null ){
             try {
-                featureType = DataUtilities.createSubType( featureType, propertyNames, cs );
+                featureType = DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
             } catch (SchemaException e) {
                 LOGGER.log( Level.FINEST, e.getMessage(), e);
                 throw new DataSourceException( "Could not create Feature Type for query", e );
@@ -635,7 +628,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @return the bounds, or null if too expensive
      * @throws IOException
      */
-    protected Envelope getBounds(Query query) throws IOException {
+    protected Envelope getBounds(Query query){
         return null; // too expensive
     }
 
@@ -654,7 +647,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @throws IOException if there are errors getting the count
      */
-    protected int getCount(Query query) throws IOException {
+    protected int getCount(Query query){
         return -1; // too expensive
     }
 }

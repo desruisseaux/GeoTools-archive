@@ -32,7 +32,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -220,8 +219,8 @@ public class DataUtilities {
     public static Set traverseDepth(Filter filter) {
         final Set set = new HashSet();
         FilterVisitor traverse = new Traversal() {
-                void traverse(Filter filter) {
-                    set.add(filter);
+                void traverse(Filter f) {
+                    set.add(f);
                 }
 
                 void traverse(Expression expression) {
@@ -294,7 +293,6 @@ public class DataUtilities {
 
         // may still be the same featureType
         // (Perhaps they differ on namespace?)
-        AttributeType b;
         int match = 0;
 
         for (int i = 0; i < countA; i++) {
@@ -578,7 +576,7 @@ public class DataUtilities {
                     return features[0].getFeatureType();
                 }
 
-                public Feature next() throws IOException {
+                public Feature next(){
                     if (!hasNext()) {
                         throw new NoSuchElementException("No more features");
                     }
@@ -586,11 +584,11 @@ public class DataUtilities {
                     return array[++offset];
                 }
 
-                public boolean hasNext() throws IOException {
+                public boolean hasNext(){
                     return (array != null) && (offset < (array.length - 1));
                 }
 
-                public void close() throws IOException {
+                public void close(){
                     array = null;
                     offset = -1;
                 }
@@ -661,8 +659,6 @@ public class DataUtilities {
             throw new NullPointerException();
         }
 
-        final FeatureType featureType;
-
         DataStore store = new CollectionDataStore(collection);
 
         try {
@@ -697,7 +693,7 @@ public class DataUtilities {
         }
 
         return new FeatureResults() {
-                public FeatureType getSchema() throws IOException {
+                public FeatureType getSchema(){
                     return collection.features().next().getFeatureType();
                 }
 
@@ -705,15 +701,15 @@ public class DataUtilities {
                     return DataUtilities.reader(collection);
                 }
 
-                public Envelope getBounds() throws IOException {
+                public Envelope getBounds(){
                     return collection.getBounds();
                 }
 
-                public int getCount() throws IOException {
+                public int getCount(){
                     return collection.size();
                 }
 
-                public FeatureCollection collection() throws IOException {
+                public FeatureCollection collection(){
                     return collection;
                 }
             };
@@ -1277,6 +1273,7 @@ public class DataUtilities {
          * @param betweenFilter DOCUMENT ME!
          */
         public void visit(BetweenFilter betweenFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1285,6 +1282,7 @@ public class DataUtilities {
          * @param comparefilter DOCUMENT ME!
          */
         public void visit(CompareFilter comparefilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1293,6 +1291,7 @@ public class DataUtilities {
          * @param geometryFilter DOCUMENT ME!
          */
         public void visit(GeometryFilter geometryFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1301,6 +1300,7 @@ public class DataUtilities {
          * @param likeFilter DOCUMENT ME!
          */
         public void visit(LikeFilter likeFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1309,6 +1309,7 @@ public class DataUtilities {
          * @param logicFilter DOCUMENT ME!
          */
         public void visit(LogicFilter logicFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1317,6 +1318,7 @@ public class DataUtilities {
          * @param nullFilter DOCUMENT ME!
          */
         public void visit(NullFilter nullFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1325,6 +1327,7 @@ public class DataUtilities {
          * @param fidFilter DOCUMENT ME!
          */
         public void visit(FidFilter fidFilter) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1333,6 +1336,7 @@ public class DataUtilities {
          * @param attributeExpression DOCUMENT ME!
          */
         public void visit(AttributeExpression attributeExpression) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1358,6 +1362,7 @@ public class DataUtilities {
          * @param literalExpression DOCUMENT ME!
          */
         public void visit(LiteralExpression literalExpression) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1366,6 +1371,7 @@ public class DataUtilities {
          * @param mathExpression DOCUMENT ME!
          */
         public void visit(MathExpression mathExpression) {
+            // DOCUMENT ME!
         }
 
         /**
@@ -1374,6 +1380,7 @@ public class DataUtilities {
          * @param functionExpression DOCUMENT ME!
          */
         public void visit(FunctionExpression functionExpression) {
+            // DOCUMENT ME!
         }
     }
 
