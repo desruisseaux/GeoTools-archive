@@ -152,7 +152,8 @@ public abstract class Geometry implements Shape, Cloneable, Serializable {
      * @param geometry The geometry to copy data from.
      */
     protected Geometry(final Geometry geometry) {
-        this.style = geometry.style;
+        this.style      = geometry.style;
+        this.userObject = geometry.userObject;
     }
 
     /**

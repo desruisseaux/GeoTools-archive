@@ -496,7 +496,8 @@ public class Polygon extends Polyline {
             return clipped;
         }
         final Polygon shell = new Polygon((Polyline)clipped);
-        shell.holes = holes;
+        assert shell.getUserObject() == getUserObject() : shell;
+        assert shell.holes           == holes           : shell;
         Polyline[] clip = new Polyline[holes.length];
         int count = 0;
         for (int i=0; i<holes.length; i++) {

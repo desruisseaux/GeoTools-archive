@@ -1,57 +1,67 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.renderer.style;
 
+// J2SE dependencies
 import java.awt.image.BufferedImage;
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderOutput;
 import org.w3c.dom.Document;
 
-
-/*
- * InternalTranscoder.java
- *
- * Created on March 31, 2004, 4:09 PM
- */
+// Apache dependencies
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 
 
 /**
  *
  * @author  jamesm 
  */
-public class InternalTranscoder extends org.apache.batik.transcoder.image.ImageTranscoder {
-
+final class InternalTranscoder extends ImageTranscoder {
 
     private BufferedImage result;
+
     private Document doc;
 
-    /** Creates a new instance of InternalTranscoder */
+    /**
+     * Creates a new instance of InternalTranscoder.
+     */
     public InternalTranscoder() {
     }
 
-     protected void transcode(Document document, String uri, TranscoderOutput output) throws TranscoderException{
-         super.transcode(document, uri, output);
-         this.doc = document;
-                                 
-                                 
-     }
-    public java.awt.image.BufferedImage createImage(int width, int height) {
+    protected void transcode(Document document, String uri, TranscoderOutput output) throws TranscoderException {
+        super.transcode(document, uri, output);
+        this.doc = document;
+    }
+
+    public BufferedImage createImage(int width, int height) {
         return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     }
 
-
-
-    //gets called by the end of the image transcoder with an actual image...
-    public void writeImage(java.awt.image.BufferedImage img, org.apache.batik.transcoder.TranscoderOutput output) {
+    /**
+     * Gets called by the end of the image transcoder with an actual image.
+     */
+    public void writeImage(BufferedImage img, TranscoderOutput output) {
         result = img;
     }
-
 
     public BufferedImage getImage(){
         return result;
     }
-    
+
     public Document getDocument(){
         return doc;
     }
-
-
 }

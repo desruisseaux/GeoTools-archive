@@ -73,6 +73,7 @@ import org.geotools.resources.renderer.ResourceKeys;
  *   <li>The coordinate systems in use and the transformations between them.</li>
  *   <li>The area rendered up to date. This information is updated by each
  *       {@link RenderedLayer} while they are painting.</li>
+ *   <li>The map scale.</li>
  * </ul>
  *
  * A rendering usually imply the following transformations (names are {@linkplain CoordinateSystem
@@ -91,7 +92,7 @@ import org.geotools.resources.renderer.ResourceKeys;
  * @see Renderer#paint
  * @see RenderedLayer#paint
  */
-public final class RenderingContext /*implements org.geotools.display.style.RenderingContext*/ {
+public final class RenderingContext implements org.geotools.renderer.event.RenderingContext {
     /**
      * The originating {@link Renderer}. This field is read by {@link GeoMouseEvent}.
      */

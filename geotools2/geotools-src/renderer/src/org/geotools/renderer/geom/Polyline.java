@@ -1614,7 +1614,8 @@ public class Polyline extends Geometry {
                 freeze();
                 return this;
             }
-            assert Utilities.equals(clipped.getStyle(), getStyle()) : clipped;
+            assert clipped.getStyle()      == getStyle()      : clipped;
+            assert clipped.getUserObject() == getUserObject() : clipped;
         }
         return clipped;
     }

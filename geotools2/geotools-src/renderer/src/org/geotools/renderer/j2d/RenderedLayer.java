@@ -641,6 +641,16 @@ public abstract class RenderedLayer {
                 }
             });
         }
+        if (Renderer.LOGGER.isLoggable(Level.FINEST)) {
+            final Locale locale = getLocale();
+            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINEST,
+                                     ResourceKeys.SEND_REPAINT_EVENT_$5, new Object[]{getName(locale),
+                                     new Integer(bounds.x), new Integer(bounds.x+bounds.width-1),
+                                     new Integer(bounds.y), new Integer(bounds.y+bounds.height-1)});
+            record.setSourceClassName("RenderedLayer");
+            record.setSourceMethodName("repaint");
+            Renderer.LOGGER.log(record);
+        }
     }
 
     /**

@@ -14,11 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * SLDStyleConverter.java
- *
- * Created on 2 giugno 2003, 18.37
- */
 package org.geotools.renderer.style;
 
 import com.vividsolutions.jts.geom.Coordinate;
