@@ -13,8 +13,8 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * 
- * 
+ *
+ *
  * @author jeichar
  */
 public class ArcGridReaderTest extends TestCaseSupport {
@@ -24,7 +24,7 @@ public class ArcGridReaderTest extends TestCaseSupport {
     String TESTFILE = "ArcGrid.asc";
 
     String GZIP_TESTFILE = "spearfish_dem.asc.gz";
-    
+
     Format format;
 
     URL url;
@@ -41,7 +41,7 @@ public class ArcGridReaderTest extends TestCaseSupport {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        url = TestData.getResource( this, TESTFILE );        
+        url = TestData.getResource( this, TESTFILE );
         format=(new ArcGridFormatFactory()).createFormat();
         reader = new ArcGridReader(url);
     }
@@ -72,17 +72,9 @@ public class ArcGridReaderTest extends TestCaseSupport {
     public void testGZIPReadStringParameterArray() throws Exception {
         URL gzipUrl = TestData.getResource( this, GZIP_TESTFILE );
         reader=new ArcGridReader( gzipUrl );
-        
-        ParameterValueGroup params = format.getReadParameters();        
-        
-        ParameterValue grass = params.parameter( "GRASS" );
-        grass.setValue( true );
-        
-        
-        ParameterValue compress = params.parameter( "Compressed" );
-        compress.setValue( true );
+
     }
-    
+
     public static final void main(String[] args) throws Exception {
         junit.textui.TestRunner.run(suite(ArcGridReaderTest.class));
     }

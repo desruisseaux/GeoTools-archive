@@ -72,8 +72,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         super(writer);
     }
 
-    
-    
+
+
     protected void parseHeader(StreamTokenizer st) throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();
@@ -95,7 +95,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         while (st.nextToken() != StreamTokenizer.TT_NUMBER) {
             if (st.ttype == StreamTokenizer.TT_WORD) {
                 String key = st.sval;
-                
+
 				if (NO_DATA_MARKER.equalsIgnoreCase(key))
 					break;
 
@@ -157,7 +157,10 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         st.parseNumbers();
         st.whitespaceChars(' ', ' ');
         st.whitespaceChars(' ', '\t');
-        st.whitespaceChars('\n', '\n');
+        st.whitespaceChars('\n','\n');
+        st.whitespaceChars('\r','\r');//linefeed (on windows only?)
+        st.whitespaceChars('\f','\f');//form feed (on printers????)
+
         st.eolIsSignificant(false);
         st.ordinaryChars('E', 'E');
         st.ordinaryChars('*', '*');
@@ -169,7 +172,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
         // Read values from grid and put into raster.
         // Values must be numbers, which may be simple <num>, or expressed
-        // in scientific notation <num>E<exp>. 
+        // in scientific notation <num>E<exp>.
         // The following loop can read both, even if mixed.
         // The loop expects a token to be read already
         st.nextToken();

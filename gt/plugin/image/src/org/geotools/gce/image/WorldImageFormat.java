@@ -24,6 +24,8 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
 
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+
 /**
  * @author rgould
  *
@@ -35,7 +37,9 @@ import org.opengis.parameter.ParameterValueGroup;
  * 
  * Designed to be used with GridCoverageExchange. 
  */
-public class WorldImageFormat implements Format {
+public class WorldImageFormat  extends AbstractGridFormat
+    implements Format {
+
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)

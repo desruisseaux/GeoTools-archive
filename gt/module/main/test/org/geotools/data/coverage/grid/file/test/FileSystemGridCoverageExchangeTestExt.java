@@ -9,11 +9,11 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.opengis.coverage.grid.Format;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.resources.TestData;
 import org.opengis.catalog.CatalogEntry;
+import org.opengis.coverage.grid.GridCoverageWriter;
 
 
 
@@ -29,9 +29,9 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 
 	File root;
 	FileSystemGridCoverageExchange exchange;
-	
-		
-	
+
+
+
 	private void init() throws Exception{
 		URL url=TestData.getResource(this,"ArcGrid.asc");
 		root=new File(new URI(URLDecoder.decode(url.toString(),"UTF-8"))).getParentFile();
@@ -39,19 +39,19 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		exchange.setRecursive(true);
 		exchange.setDataSource(root);
 	}
-	
+
 
 	public void testFileSystemGridCoverageExchange()throws Exception {
 		URL url=TestData.getResource(this,"ArcGrid.asc");
 		exchange= new FileSystemGridCoverageExchange();
 		assertNotNull(exchange);
-		
+
 		exchange.add(new File(new URI(URLDecoder.decode(url.toString(),"UTF-8"))));
 		Iterator iter=exchange.iterator();
 		assertTrue(iter.hasNext());
 		CatalogEntry f= (CatalogEntry)iter.next();
 		assertEquals( url.getFile(), f.getDataName() );
-		
+
 		init();
 		iter=exchange.iterator();
 		assertTrue(iter.hasNext());
@@ -77,10 +77,10 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 
 //	public void testQuery()throws Exception {
 //		init();
-//		
+//
 //		Expr expr=Exprs.meta("Name");
 //		QueryRequest query=new QueryRequest(expr);
-//		
+//
 //		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
 //		assertNotNull(result);
 //		assertEquals(2, result.getNumEntries());
@@ -91,9 +91,9 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 //
 //		Expr expr=Exprs.meta("Name");
 //		QueryRequest query=new QueryRequest(expr);
-//		
+//
 //		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
-//		
+//
 //		GridCoverageReader reader=exchange.getReader(result.getEntry(0));
 //		assertNotNull(reader);
 //	}

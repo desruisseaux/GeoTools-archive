@@ -39,170 +39,171 @@ import org.geotools.data.DataSourceException;
 import org.geotools.resources.NIOUtilities;
 
 
-/**
- * Class user for parsing an ArcGrid header (.arc, .asc) file
+/**Class user for parsing an ArcGrid header (.arc, .asc) file.
+ *
  *
  * @author <a href="mailto:ckl@dacelo.nl">Christiaan ten Klooster</a>
  * @author <a href="mailto:aaime@users.sf.net">Andrea Aime</a>
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class ArcGridRaster {
     /** Column number tag in the header file */
     public static final String NCOLS = "NCOLS";
-    
+
     /** Row number tag in the header file */
     public static final String NROWS = "NROWS";
-    
+
     /** x corner coordinate tag in the header file */
     public static final String XLLCORNER = "XLLCORNER";
-    
+
     /** y corner coordinate tag in the header file */
     public static final String YLLCORNER = "YLLCORNER";
-    
+
     /** cell size tag in the header file */
     public static final String CELLSIZE = "CELLSIZE";
-    
+
     /** no data tag in the header file */
     public static final String NODATA_VALUE = "NODATA_VALUE";
-    
+
     /** header or data file url */
     private URL srcURL;
-    
+
     /** max value found in the file */
     protected double maxValue = Float.MIN_VALUE;
-    
+
     /** min value found in the file */
     protected double minValue = Float.MAX_VALUE;
-    
-	protected double xllCorner = Double.NaN;
-    
-	protected double yllCorner = Double.NaN;
-    
-	protected double cellSize = Double.NaN;
-    
-	protected double noData = Double.NaN;
-    
-	protected int nCols = -1;
-    
-	protected int nRows = -1;
-	
-	private Reader reader=null;
-	
-	private PrintWriter writer=null;
+
+    protected double xllCorner = Double.NaN;
+
+    protected double yllCorner = Double.NaN;
+
+    protected double cellSize = Double.NaN;
+
+    protected double noData = Double.NaN;
+
+    protected int nCols = -1;
+
+    protected int nRows = -1;
+
+    private Reader reader=null;
+
+    private PrintWriter writer=null;
 
     private boolean compress;
-    
-    /**
-     * Creates a new instance of ArcGridRaster
+
+    /**Creates a new instance of ArcGridRaster.
      *
-     * @param srcURL URL of a ArcGridRaster
+     *
+     * @param srcURL URL of a ArcGridRaster.
      *
      */
 	public ArcGridRaster(URL srcURL) throws IOException {
-        this.srcURL = srcURL;        
-        if (srcURL.getFile().endsWith(".gz")) 
+        this.srcURL = srcURL;
+        if (srcURL.getFile().endsWith(".gz"))
             compress=true;
     }
-    
-    /**
-     * Creates a new instance of ArcGridRaster
+
+    /**Creates a new instance of ArcGridRaster.
      *
-     * Used Exclusively by ArcGridReader
-     * 
-     * @param Reader reader to be used for reading the Raster
+     *
+     * Used Exclusively by ArcGridReader.
+     *
+     * @param Reader reader to be used for reading the Raster.
      *
      */
 	public ArcGridRaster(Reader reader, boolean compress) throws IOException {
         this.reader=reader;
         this.compress=compress;
     }
-	
-    /**
-     * Creates a new instance of ArcGridRaster
+
+    /** Creates a new instance of ArcGridRaster.
      *
-     * Used Exclusively by ArcGridWriter
-     * 
-     * @param Writer writer to be used for writing the Raster
+     *
+     * Used Exclusively by ArcGridWriter.
+     *
+     * @param Writer writer to be used for writing the Raster.
      *
      */
 	public ArcGridRaster(PrintWriter writer) throws IOException {
         this.writer=writer;
     }
-    
-    /**
-     * Max value
+
+    /**Max value.
+     *
      *
      * @return the max value contained in the data file
      */
     public double getMaxValue() {
         return maxValue;
     }
-    
-    /**
-     * Min value
+
+    /**Min value.
+     *
      *
      * @return the min value contained in the data file
      */
     public double getMinValue() {
         return minValue;
     }
-    
-    /**
-     * Returns the number of rows contained in the file
+
+    /**Returns the number of rows contained in the file.
+     *
      *
      * @return number of rows
      */
     public int getNRows() {
         return nRows;
     }
-    
-    /**
-     * Returns the number of columns contained in the file
+
+    /**Returns the number of columns contained in the file.
+     *
      *
      * @return number of columns
      */
     public int getNCols() {
         return nCols;
     }
-    
-    /**
-     * Returns the x cordinate of the ... corner
+
+    /**Returns the x cordinate of the lower left corner.
      *
-     * @return x cordinate of the ... corner
+     *
+     * @return x cordinate of the lower left corner.
      */
     public double getXlCorner() {
         return xllCorner;
     }
-    
-    /**
-     * Returns the y cordinate of the ... corner
+
+    /**Returns the y cordinate of the lower left corner.
      *
-     * @return y cordinate of the ... corner
+     *
+     * @return y cordinate of the lower left corner.
      */
     public double getYlCorner() {
         return yllCorner;
     }
-    
-    /**
-     * Returns the cell size
+
+    /**Returns the cell size.
+     *
      *
      * @return cell size
      */
     public double getCellSize() {
         return cellSize;
     }
-    
-    /**
-     * Returns the no data (null) value
+
+    /**Returns the no data (null) value.
      *
-     * @return no data (null) value
+     *
+     * @return no data (null) value.
      */
     public double getNoData() {
         return noData;
     }
-    
-    
-    /**
-     * Parses the reader for the known properties
+
+
+    /**Parses the reader for the known properties.
+     *
      *
      * @param properties the map to be filled in
      * @param reader the source data
@@ -213,8 +214,8 @@ public class ArcGridRaster {
     public void parseHeader() throws IOException {
         parseHeader(new StreamTokenizer(openReader()));
     }
-    
-    
+
+
     protected void parseHeader(StreamTokenizer st) throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();
@@ -227,13 +228,13 @@ public class ArcGridRaster {
 
         // read lines while the next token is not a number
         while (st.nextToken() !=  StreamTokenizer.TT_NUMBER) {
-            
+
             if (st.ttype == StreamTokenizer.TT_WORD) {
                 String key = st.sval;
                 if (st.nextToken() != StreamTokenizer.TT_NUMBER)
                     throw new IOException("Expected number after " + key);
                 double val = st.nval;
-                
+
                 if (NCOLS.equalsIgnoreCase(key)) {
                     nCols = (int) val;
                 } else if (NROWS.equalsIgnoreCase(key)) {
@@ -250,19 +251,19 @@ public class ArcGridRaster {
                     // ignore extra fields for now
                     // are there ever any?
                 }
-                
+
                 if (st.nextToken() != StreamTokenizer.TT_EOL) {
                     throw new IOException("Expected new line, not " + st.sval);
                 }
             } else {
-                throw new IOException("Exected word token");
+                throw new IOException("Expected word token");
             }
-            
-            
+
+
         }
         st.pushBack();
     }
-    
+
     protected double readHeaderDouble(StreamTokenizer st) throws IOException {
         double val = st.nval;
         if (st.nextToken() == StreamTokenizer.TT_WORD && st.sval.startsWith("E")) {
@@ -272,13 +273,13 @@ public class ArcGridRaster {
         }
         return val;
     }
-    
-    
+
+
     /**
      * Obtain the best reader for the situation
      */
     protected Reader openReader() throws IOException {
-    	
+
     	if( reader != null )
     		return reader;
         // gzipped source, may be remote URL
@@ -287,17 +288,17 @@ public class ArcGridRaster {
                 srcURL.openStream()
             );
             return new InputStreamReader(new java.io.BufferedInputStream(in));
-        } 
-        
+        }
+
         // file based, non zipped - lets use memory-mapped reader
         if (srcURL.getProtocol().equals("file")) {
-            return new MemoryMappedReader(new File(java.net.URLDecoder.decode(srcURL.getPath(),"UTF-8"))); 
-        } 
-        
+            return new MemoryMappedReader(new File(java.net.URLDecoder.decode(srcURL.getPath(),"UTF-8")));
+        }
+
         // default URL
         return new InputStreamReader(srcURL.openStream());
     }
-    
+
     /**
      * Open the best writer for the situation.
      */
@@ -305,12 +306,12 @@ public class ArcGridRaster {
 
     	if (writer != null )
     		return writer;
-    	
+
     	java.io.OutputStream out;
         if (srcURL.getProtocol().equals("file")) {
             out = new java.io.BufferedOutputStream(
                 new java.io.FileOutputStream(new File(java.net.URLDecoder.decode(srcURL.getPath(),"UTF-8")))
-            ); 
+            );
         } else {
             out = srcURL.openConnection().getOutputStream();
         }
@@ -319,20 +320,20 @@ public class ArcGridRaster {
         return new PrintWriter(out);
     }
 
-    /**
-     * Returns the WritableRaster of the raster
+    /**Returns the WritableRaster of the raster.
      *
+     * The fucntion first parse the header then
      * @return RenderedImage
      */
     public WritableRaster readRaster() throws IOException {
-        
+
         // open reader and make tokenizer
         Reader reader = openReader();
         StreamTokenizer st = new StreamTokenizer(reader);
-        
+
         // parse header
         parseHeader(st);
-        
+
         // reconfigure tokenizer
         st.resetSyntax();
         st.parseNumbers();
@@ -341,9 +342,9 @@ public class ArcGridRaster {
         st.whitespaceChars('\n','\n');
         st.whitespaceChars('\r','\r');//linefeed (on windows only?)
         st.whitespaceChars('\f','\f');//form feed (on printers????)
-        st.eolIsSignificant(false);        
+        st.eolIsSignificant(false);
         st.ordinaryChars('E', 'E');
-        
+
         // allocate raster, for now this is done with floating point data,
         // though eventually it should be configurable
         WritableRaster raster = RasterFactory.createBandedRaster(
@@ -353,20 +354,20 @@ public class ArcGridRaster {
             1,
             null
         );
-        
+
         // Read values from grid and put into raster.
         // Values must be numbers, which may be simple <num>, or expressed
-        // in scientific notation <num>E<exp>. 
+        // in scientific notation <num>E<exp>.
         // The following loop can read both, even if mixed.
-        
+
         // The loop expects a token to be read already
         st.nextToken();
         for (int y = 0; y < getNRows(); y++) {
             for (int x = 0; x < getNCols(); x++) {
-                
+
                 // this call always reads the next token
                 double d = readCell(st,x,y);
-                
+
                 // mask no data values with NaN
                 if (d == getNoData()) {
                     d = Double.NaN;
@@ -374,24 +375,24 @@ public class ArcGridRaster {
                     minValue = Math.min(minValue,d);
                     maxValue = Math.max(maxValue,d);
                 }
-                
+
                 // set the value at x,y in band 0 to the parsed value
                 raster.setSample(x,y,0,d);
-                
+
             }
         }
-        
+
         reader.close();
 
         return raster;
     }
-    
-    /**
-     * Parse a number.
+
+    /**Parse a number.
+     *
      */
     private double readCell(StreamTokenizer st,int x,int y) throws IOException {
         double d = 0;
-        
+
         // read a token, expected: a number
         switch (st.ttype) {
             case StreamTokenizer.TT_NUMBER:
@@ -402,7 +403,7 @@ public class ArcGridRaster {
             default:
                 throw new IOException("Unknown token " + st.ttype);
         }
-        
+
         // read another. May be an exponent of this number.
         // If its not an exponent, its the next number. Fall through
         // and token is prefetched for next loop...
@@ -414,20 +415,20 @@ public class ArcGridRaster {
                     throw new IOException("Expected exponent at " + x + "," + y);
                 // calculate
                 d = d * Math.pow(10.0,st.nval);
-                
+
                 // prefetch for next loop
                 st.nextToken();
-                
+
                 break;
             case StreamTokenizer.TT_NUMBER: case StreamTokenizer.TT_EOF:
                 break;
             default:
                 throw new IOException("Expected Number or EOF");
         }
-        
+
         return d;
     }
-    
+
     /**
      * Print n spaces to the PrintWriter
      */
@@ -436,16 +437,16 @@ public class ArcGridRaster {
             p.print(' ');
         }
     }
-    
-    /**
-     * Write out the given raster.
+
+    /**Write out the given raster..
+     *
      */
     public void writeRaster(Raster raster,
                             double xl,double yl,double cellsize,
                             boolean compress) throws IOException {
         // open writer
         PrintWriter out = openWriter(compress);
-        
+
         // output header and assign header fields
         out.print(NCOLS); spaces(out,9); out.println(nCols = raster.getWidth());
         out.print(NROWS); spaces(out,9); out.println(nRows = raster.getHeight());
@@ -453,11 +454,11 @@ public class ArcGridRaster {
         out.print(YLLCORNER); spaces(out,5); out.println(yllCorner = yl);
         out.print(CELLSIZE); spaces(out,6); out.println(cellSize = cellsize);
         out.print(NODATA_VALUE); spaces(out, 2); out.println(noData = -9999);
-        
+
         // reset min and max
         minValue = Double.MAX_VALUE;
         maxValue = Double.MIN_VALUE;
-        
+
         // a buffer to flush each line to
         // this technique makes things a bit quicker because buffer.append()
         // internally calls new FloatingDecimal(double).appendTo(StringBuffer)
@@ -469,19 +470,19 @@ public class ArcGridRaster {
             buffer.delete(0, buffer.length());
             // write row to buffer
             for (int j = 0, jj = raster.getWidth(); j < jj; j++) {
-                
+
                 double v = raster.getSampleDouble(j,i,0);
-                
+
                 // no data masking
                 if (Double.isNaN(v)) {
                     v = -9999;
-                } 
-                
+                }
+
                 // append value and possible spacer
                 buffer.append(v);
                 if (j + 1 < jj) buffer.append(' ');
             }
-            
+
             // flush out row
             out.write(buffer.toString());
             out.println();
@@ -489,9 +490,9 @@ public class ArcGridRaster {
         out.flush();
         out.close();
     }
-    
-    /**
-     * This is a slight optimization over using a BufferedReader. 
+
+    /**This is a slight optimization over using a BufferedReader.
+     *
      * StreamTokenizer makes single character read calls.
      */
     static class MemoryMappedReader extends java.io.Reader {
@@ -505,7 +506,7 @@ public class ArcGridRaster {
             chars = CharBuffer.allocate(16 * 1028);
             fill();
         }
-        
+
         public void close() throws IOException {
             if(channel != null)
                 channel.close();
@@ -513,12 +514,12 @@ public class ArcGridRaster {
             channel = null;
             map = null;
         }
-        
+
         void fill() throws IOException {
             decoder.decode(map,chars, false);
             chars.flip();
         }
-        
+
         public int read() throws IOException {
             if (chars.remaining() == 0) {
                 chars.flip();
@@ -528,13 +529,13 @@ public class ArcGridRaster {
             }
             return chars.get();
         }
-        
+
         public int read(char[] cbuf, int off, int len) throws IOException {
             throw new RuntimeException("Expected single character read");
         }
-        
+
     }
-    
+
     public String toString() {
         java.lang.reflect.Field[] f = getClass().getDeclaredFields();
         String s = "";

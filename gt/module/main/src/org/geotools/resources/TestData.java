@@ -32,7 +32,7 @@ import java.net.URLDecoder;
  * Provides access to test-data directories associated
  * with junit tests.
  * <p>
- * We have chosen test-data to follow the javadoc "doc-files" convention 
+ * We have chosen test-data to follow the javadoc "doc-files" convention
  * of ensuring that data directories don't look anything like normal
  * java packages.
  * </p>
@@ -66,7 +66,7 @@ public class TestData {
     /**
      * Provided a {@link BufferedReader} for named test data.
      * It is the caller responsability to close this reader after usage.
-     * 
+     *
      * @param caller The class of the object associated with named data.
      * @param name of test data to load.
      * @return The reader, or <code>null</code> if the named test data are not found.
@@ -77,15 +77,15 @@ public class TestData {
     {
         final URL url = getResource(caller, name);
         if (url == null) {
-            return null; // echo handling of getResource( ... )    		
+            return null; // echo handling of getResource( ... )
         }
         return new BufferedReader(new InputStreamReader(url.openStream()));
-    }	
+    }
 
     /**
      * Provided a {@link BufferedReader} for named test data.
      * It is the caller responsability to close this reader after usage.
-     * 
+     *
      * @param host Object associated with named data
      * @param name of test data to load
      * @return The reader, or <code>null</code> if the named test data are not found.
@@ -116,12 +116,12 @@ public class TestData {
         return caller.getResource(name);
     }
 
-    /** 
+    /**
      * Locate named test-data resource for caller.
      *
      * @param caller Object used to locate test-data
      * @param name name of test-data
-     * @return URL or null of named test-data could not be found 
+     * @return URL or null of named test-data could not be found
      *
      * @todo Should this be getURL() - or simply url?
      *       I tend to save getX method for accessors.

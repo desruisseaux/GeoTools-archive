@@ -19,15 +19,18 @@ package org.geotools.data.coverage.grid.file;
 import java.io.File;
 import java.util.Iterator;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.UnknownFormat;
+import org.opengis.coverage.grid.Format;
+
+
 import org.opengis.catalog.CatalogEntry;
 import org.opengis.catalog.MetadataEntity;
 
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.data.coverage.grid.UnknownFormat;
 
 /**
  * A CatalogEntry that refers to a file and a metadata that describes the file
- * 
+ *
  * The files should be a GridCoverage file
  *
  * @author $author$
@@ -42,14 +45,13 @@ public class FSCatalogEntry implements CatalogEntry {
      *
      * @param f a GridCoverage file
      */
-    public FSCatalogEntry(File f, Format[] formats) {
+    public FSCatalogEntry(File f, org.opengis.coverage.grid.Format[] formats) {
         resource = f;
 
-        String ext = f.getName();
-        ext = ext.substring(ext.lastIndexOf('.') + 1);
+
         for (int i = 0; i < formats.length; i++) {
             Format format = formats[i];
-            if( format.accepts(f) )
+            if( ((AbstractGridFormat)format).accepts(f) )
                 metadata = new FileMetadataImpl(f, format);
         }
         if( metadata==null )

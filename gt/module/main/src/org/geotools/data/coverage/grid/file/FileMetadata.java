@@ -16,7 +16,8 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.geotools.data.coverage.grid.Format;
+import org.opengis.coverage.grid.Format;
+
 import org.opengis.catalog.MetadataEntity;
 
 
@@ -48,14 +49,14 @@ public interface FileMetadata extends MetadataEntity {
 
     /**
      * Returns the date the file was last modified.
-     * 
+     *
      * @return Returns the date the file was last modified.
      */
     public long getLastModified();
 
     /**
      * Returns the path of the file.
-     * 
+     *
      * @return Returns the path of the file.
      */
     public String getPath();

@@ -26,18 +26,23 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.geotools.catalog.AbstractCatalog;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
+
+
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageExchange;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+
+
 import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.opengis.catalog.CatalogEntry;
 
 
 /**
  * A GridCoverageExchange that searches a directory (or a branch if recursive is set to true)
  * and creates a set of catalog entries with a FileMetadata for each entry.
- * 
+ *
  * Is both a GridCoverageExchange and a Catalog
  *
  * @author $author$
@@ -58,40 +63,42 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
     }
 
     /**
-     * Creates a FileSystemGridCoverageExchange that 
+     * Creates a FileSystemGridCoverageExchange that
      */
     public FileSystemGridCoverageExchange( File root ) {
+        this.root=root;
         formats=GridFormatFinder.getFormatArray();
     }
 
     /**
      * Examines the associated directories again to see if any changes have been made
-     * 
+     *
      * Not very efficient at the moment.  Should be updated in the future.
      * Each time it is called all the current are discarded and new ones are built
-     * 
+     *
      */
     public void refresh() {
         if (root != null) {
-            refresh(root, recursive);
+        	entries=new ArrayList();
+            refresh(root);
         }
     }
 
-    private void refresh(File file, boolean recursive) {
-        entries=new ArrayList();
-        File[] files = file.listFiles(new FormatFileFilter(formats));
+    private void refresh(File file) {
+      File[] files = file.listFiles(new FormatFileFilter(formats,recursive));
 
-        for (int j = 0; j < files.length; j++) {
-            if (files[j].isFile()) {
-                entries.add(new FSCatalogEntry(files[j],formats));
-            }
+      for (int j = 0; j < files.length; j++) {
+          if (files[j].isFile()) {
+              entries.add(new FSCatalogEntry(files[j],formats));
+          }
 
-            if (files[j].isDirectory()) {
-                if (recursive) {
-                    refresh(files[j], recursive);
-                }
-            }
-        }
+          if (files[j].isDirectory()) {
+              if (recursive) {
+                  refresh(files[j]);
+              }
+          }
+      }
+
     }
 
     /**
@@ -124,7 +131,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
         CatalogEntry entry = (CatalogEntry) source;
         Format format = ((FileMetadata) entry.getMetadata(0)).getFormat();
 
-        return format.getReader(source);
+        return ((AbstractGridFormat)format).getReader(source);
     }
 
     /**
@@ -137,7 +144,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
         || (destination instanceof FileOutputStream)
         || (destination instanceof FileWriter);
 
-        return format.getWriter(destination);
+        return ((AbstractGridFormat)format).getWriter(destination);
     }
 
     /**
@@ -186,12 +193,12 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
             url = (URL) datasource;
         } else if (datasource instanceof File) {
             root = (File) datasource;
-            refresh(root, recursive);
+            refresh(root);
         }
 
         if ((url != null) && (url.getFile().length() > 0)) {
             root = new File(url.getFile());
-            refresh(root, recursive);
+            refresh(root);
 
             return true;
         }
@@ -201,7 +208,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
 
     /**
      * Return true if the root and all subdirectories are searched for files
-     * 
+     *
      * @return true if the root and all subdirectories are searched for files
      * 		false otherwise
      */
@@ -212,7 +219,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
     /**
      * Sets whether the entire branch starting at root is part of the catalog or just
      * a single directory
-     * 
+     *
      * @param recursive True means that root and all subdirectories are searched files
      *                 false means just the root is searched
      */
@@ -220,7 +227,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
         this.recursive = recursive;
 
         if (root != null) {
-            refresh(root, recursive);
+            refresh(root);
         }
     }
 }

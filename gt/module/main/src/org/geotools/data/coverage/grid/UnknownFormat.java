@@ -17,8 +17,12 @@
 package org.geotools.data.coverage.grid;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
-
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import java.util.HashMap;
 /**
  * DOCUMENT ME!
  *
@@ -26,82 +30,44 @@ import org.opengis.parameter.ParameterDescriptorGroup;
  * @author $author$ (Last Modified)
  * @version $Revision: 1.9 $
  */
-public class UnknownFormat implements Format {
+public class UnknownFormat extends AbstractGridFormat implements Format {
     /**
      * Creates a new UnknownFormat object.
      */
     public UnknownFormat() {
+            mInfo= new HashMap();
+            mInfo.put("name", "Unkown Format");
+            mInfo.put("description", "This format describes all unknown formats");
+            mInfo.put("vendor", null);
+            mInfo.put("docURL", null);
+            mInfo.put("version",null);
+            readParameters = null;
+            writeParameters = null;
+
     }
 
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getName()
-     */
-    public String getName() {
-        return "Unkown Format";
-    }
+
 
     /**
-     * @see org.geotools.data.coverage.grid.Format#getDescription()
+     * @see org.geotools.data.coverage.grid.Format#getReader()
      */
-    public String getDescription() {
-        return "This format describes all unknown formats";
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getVendor()
-     */
-    public String getVendor() {
-        // TODO Auto-generated method stub
+    public GridCoverageReader getReader(java.lang.Object source) {
         return null;
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.Format#getDocURL()
-     */
-    public String getDocURL() {
-        return null;
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getVersion()
-     */
-    public String getVersion() {
-        return null;
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getReadParameters()
-     */
-    public ParameterDescriptorGroup getReadParameters() {
-        return null;
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getWriteParameters()
-     */
-    public ParameterDescriptorGroup getWriteParameters() {
-        return null;
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
-     */
-    public GridCoverageReader getReader(Object source) {
-        return null;
-    }
-
-    /**
-     * @see org.geotools.data.coverage.grid.Format#getWriter(java.lang.Object)
+     * @see org.geotools.data.coverage.grid.Format#getWriter()
      */
     public GridCoverageWriter getWriter(Object destination) {
         return null;
     }
 
+
     /**
      * @see org.geotools.data.coverage.grid.Format#accepts(java.lang.Object)
      */
     public boolean accepts(Object input) {
-        return true;
+        return false;
     }
 
     /**
@@ -112,6 +78,6 @@ public class UnknownFormat implements Format {
             return true;
         return false;
     }
-    
-    
+
+
 }

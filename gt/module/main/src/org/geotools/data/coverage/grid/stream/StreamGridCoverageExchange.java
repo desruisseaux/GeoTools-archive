@@ -29,12 +29,16 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
+
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageExchange;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+
+
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
 
 
 /**
@@ -95,19 +99,19 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
      */
     public GridCoverageWriter getWriter(Object destination, Format format)
         throws IOException {
-            
-        return format.getWriter(destination);
+
+        return ((AbstractGridFormat)format).getWriter(destination);
     }
 
     /**
      * Checks the source Object and ensures that it is legal for this type of
      * GridCoverageExchange
-     * 
+     *
      * This method is basic and can easily be fooled at this point
-     * 
+     *
      * @param destination the source object to check
      *
-     * @return 
+     * @return
      *      true if destination is an object understood by StreamGridCoverageExchange
      *
      * @see org.opengis.coverage.grid.GridCoverageExchange#getReader(java.lang.Object,
@@ -152,8 +156,8 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
     public GridCoverageReader getReader(Object arg0) throws IOException {
         for (Iterator iter = formats.iterator(); iter.hasNext();) {
             Format f = (Format) iter.next();
-            if( f.accepts(arg0))
-                return f.getReader(arg0);
+            if( ((AbstractGridFormat)f).accepts(arg0))
+                return ((AbstractGridFormat)f).getReader(arg0);
         }
         return null;
     }

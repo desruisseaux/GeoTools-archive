@@ -19,7 +19,8 @@ package org.geotools.data.coverage.grid.file;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.geotools.data.coverage.grid.Format;
+import org.opengis.coverage.grid.Format;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
 
 
 /**
@@ -31,14 +32,16 @@ import org.geotools.data.coverage.grid.Format;
  */
 public class FormatFileFilter implements FileFilter {
     Format[] formats;
+    boolean recursive=false;
 
     /**
      * Creates a new FormatFileFilter object.
      *
      * @param f DOCUMENT ME!
      */
-    public FormatFileFilter(Format[] f) {
+    public FormatFileFilter(Format[] f, boolean recursive) {
         formats = f;
+        this.recursive= recursive;
     }
 
     /**
@@ -48,8 +51,9 @@ public class FormatFileFilter implements FileFilter {
         for (int i = 0; i < formats.length; i++) {
             Format format = formats[i];
 
-            if (format.accepts(pathname)) {
+            if (((AbstractGridFormat)format).accepts(pathname)||(pathname.isDirectory() && this.recursive)) {
                 return true;
+
             }
         }
 

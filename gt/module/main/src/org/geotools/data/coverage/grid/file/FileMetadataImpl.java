@@ -19,7 +19,9 @@ package org.geotools.data.coverage.grid.file;
 import java.io.File;
 
 import org.geotools.catalog.AbstractMetadataEntity;
-import org.geotools.data.coverage.grid.Format;
+
+import org.opengis.coverage.grid.Format;
+
 
 
 /**
@@ -47,7 +49,7 @@ public class FileMetadataImpl extends AbstractMetadataEntity implements FileMeta
         assert file.exists();
         path = file.getPath();
         name = file.getName();
-        extension = name.substring((name.lastIndexOf('.') + 1));
+        extension =name.lastIndexOf('.')>0? name.substring((name.lastIndexOf('.') + 1)):"";
         lastModified = file.lastModified();
         this.format = format;
         this.file = file;
