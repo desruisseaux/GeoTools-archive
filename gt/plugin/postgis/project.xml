@@ -72,6 +72,14 @@ freely available.</description>
       </properties>
     </dependency>
     <dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+      <url>http://logging.apache.org/log4j/docs/</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <id>JTS</id>
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
