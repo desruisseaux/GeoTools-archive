@@ -545,16 +545,9 @@ class SdeTypeDef {
  * @version $Revision: 1.9 $
  */
 class FilterSet {
-    /** DOCUMENT ME!  */
     private Filter sourceFilter;
-
-    /** DOCUMENT ME!  */
     private Filter sqlFilter;
-
-    /** DOCUMENT ME!  */
     private Filter geometryFilter;
-
-    /** DOCUMENT ME!  */
     private Filter unsupportedFilter;
 
     /** DOCUMENT ME!  */

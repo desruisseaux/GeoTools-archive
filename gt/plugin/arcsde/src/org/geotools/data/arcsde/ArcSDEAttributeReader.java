@@ -16,50 +16,47 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.data.AttributeReader;
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeRow;
+import com.esri.sde.sdk.client.SeShape;
 
 
 /**
- * DOCUMENT ME!
+ * Implements an attribute reader that is aware of the particulars of ArcSDE.
+ * This class sends its logging to the log named "org.geotools.data".
  *
  * @author Gabriel Roldán
  * @version $Id$
  */
 public class ArcSDEAttributeReader implements AttributeReader {
-    /** DOCUMENT ME!  */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
     private ArcSDEQuery query;
-
-    /** DOCUMENT ME!  */
     private FeatureType schema;
-
-    /** DOCUMENT ME!  */
     private SeRow currentRow;
-
-    /** DOCUMENT ME!  */
     private SeShape currentShape;
-
-    /** DOCUMENT ME!  */
     private GeometryBuilder geometryBuilder;
-
-    /** DOCUMENT ME!  */
     private int geometryTypeIndex = -1;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     StringBuffer fidPrefix;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     int fidPrefixLen;
-
-    /** DOCUMENT ME!  */
     private boolean hasNextAlreadyCalled = false;
 
     /**
-     * Creates a new ArcSDEAttributeReader object.
+     * The query that defines this readers interaction with an ArcSDE instance.
      *
-     * @param query DOCUMENT ME!
+     * @param query
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -76,31 +73,24 @@ public class ArcSDEAttributeReader implements AttributeReader {
         String geometryTypeName = schema.getDefaultGeometry().getName();
         AttributeType[] types = schema.getAttributeTypes();
 
-        for (int i = 0; i < types.length; i++)
+        for (int i = 0; i < types.length; i++) {
             if (types[i].getName().equals(geometryTypeName)) {
                 geometryTypeIndex = i;
 
                 break;
             }
+        }
     }
 
     /**
-     * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
      */
     public int getAttributeCount() {
         return schema.getAttributeCount();
     }
 
     /**
-     * DOCUMENT ME!
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws ArrayIndexOutOfBoundsException DOCUMENT ME!
      */
     public AttributeType getAttributeType(int index)
         throws ArrayIndexOutOfBoundsException {
@@ -108,7 +98,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * DOCUMENT ME!
+     * Closes the associated query object.
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -117,12 +107,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
      */
     public boolean hasNext() throws IOException {
         if (!hasNextAlreadyCalled) {
@@ -139,6 +124,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
                 }
             } catch (SeException ex) {
                 query.close();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new DataSourceException("Fetching row:" + ex.getMessage(),
                     ex);
             }
@@ -148,7 +134,8 @@ public class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the next row, or throws a DataSourceException if not more rows
+     * are available.
      *
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
@@ -162,15 +149,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * DOCUMENT ME!
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws ArrayIndexOutOfBoundsException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
      */
     public Object read(int index)
         throws IOException, ArrayIndexOutOfBoundsException {
@@ -181,18 +160,14 @@ public class ArcSDEAttributeReader implements AttributeReader {
                 return currentRow.getObject(index);
             }
         } catch (SeException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Error retrieveing column " + index
                 + ": " + ex.getMessage(), ex);
         }
     }
 
     /**
-     * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
      */
     public String readFID() throws IOException {
         fidPrefix.setLength(fidPrefixLen);
@@ -200,6 +175,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
         try {
             fidPrefix.append(currentShape.getFeatureId().longValue());
         } catch (SeException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Can't read FID value: "
                 + ex.getMessage(), ex);
         }

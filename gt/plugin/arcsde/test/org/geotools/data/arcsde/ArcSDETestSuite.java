@@ -27,15 +27,13 @@ import junit.framework.TestSuite;
  * @author Gabriel Roldán
  * @version $Id: ArcSDETestSuite.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
-public class ArcSDETestSuite extends TestCase
-{
+public class ArcSDETestSuite extends TestCase {
     /**
      * Creates a new SdeTestSuite object.
      *
      * @param s suite's name
      */
-    public ArcSDETestSuite(String s)
-    {
+    public ArcSDETestSuite(String s) {
         super(s);
     }
 
@@ -44,8 +42,7 @@ public class ArcSDETestSuite extends TestCase
      *
      * @return test suite for sde datasource
      */
-    public static Test suite()
-    {
+    public static Test suite() {
         TestSuite suite = new TestSuite();
 
         suite.addTestSuite(org.geotools.data.arcsde.GeometryBuilderTest.class);

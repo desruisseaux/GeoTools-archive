@@ -158,7 +158,7 @@ public class SQLEncoderSDE extends SQLEncoder
                 LOGGER.finer("added fid filter: " + sb.toString());
             }
 
-            System.err.println("QUERY: " + sb.toString());
+            //System.err.println("QUERY: " + sb.toString());
             out.write(sb.toString());
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);

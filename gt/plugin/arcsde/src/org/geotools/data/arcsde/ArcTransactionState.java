@@ -31,7 +31,7 @@ import com.esri.sde.sdk.client.SeException;
  * instances.
  *
  * @author Jake Fear
- * @version $Id$
+ * @version
  */
 public class ArcTransactionState implements Transaction.State {
     private static final Logger LOGGER = Logger.getLogger(ArcTransactionState.class.getPackage()

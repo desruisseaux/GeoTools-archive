@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
- * Encodes the geometry related parts of a filter into a set of
+ * Encodes the geometry and FID related parts of a filter into a set of
  * <code>SeFilter</code> objects and provides a method to get the resulting
  * filters suitable to set up an SeQuery's spatial constraints.
  * 

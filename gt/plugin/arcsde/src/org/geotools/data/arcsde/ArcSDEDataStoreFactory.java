@@ -36,8 +36,6 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x";
-
-    /** DOCUMENT ME!  */
     private static Param[] paramMetadata = new Param[11];
 
     static {

@@ -78,8 +78,6 @@ public class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getPackage()
                                                                                .getName());
-
-    /** DOCUMENT ME!  */
     private ArcSDEConnectionPool connectionPool;
 
     /** <code>Map&lt;typeName/FeatureType&gt;</code> of feature type schemas */

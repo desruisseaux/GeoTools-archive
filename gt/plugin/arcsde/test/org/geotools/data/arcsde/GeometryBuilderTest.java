@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
+
 /**
  * DOCUMENT ME!
  *
@@ -48,8 +49,11 @@ import com.vividsolutions.jts.io.WKTReader;
  * @version $Id: GeometryBuilderTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class GeometryBuilderTest extends TestCase {
-    static Logger LOGGER = Logger.getLogger(
-      GeometryBuilderTest.class.getPackage().getName());
+    /** DOCUMENT ME!  */
+    static Logger LOGGER = Logger.getLogger(GeometryBuilderTest.class.getPackage()
+                                                                     .getName());
+
+    /** DOCUMENT ME!  */
     static final String COORD_SYS = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]";
 
     /** DOCUMENT ME! */
@@ -134,135 +138,136 @@ public class GeometryBuilderTest extends TestCase {
     public void testMultiPolygonBuilder() {
         testBuildGeometries(MultiPolygon.class, "multipolygontest.wkt");
     }
-/*
-    public void testConstructShapePoint() {
-      Geometry[] testPoints = null;
-      try {
-        testPoints = loadTestData("pointtest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testPoints);
-    }
 
-    public void testConstructShapeMultiPoint() {
-      Geometry[] testMultiPoints = null;
-      try {
-        testMultiPoints = loadTestData("multipointtest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testMultiPoints);
-    }
-
-    public void testConstructShapeLineString() {
-      Geometry[] testLineStrings = null;
-      try {
-        testLineStrings = loadTestData("linestringtest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testLineStrings);
-    }
-
-    public void testConstructShapeMultiLineString() {
-      Geometry[] testMultiLineStrings = null;
-      try {
-        testMultiLineStrings = loadTestData("multilinestringtest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testMultiLineStrings);
-    }
-
-    public void testConstructShapePolygon() {
-      Geometry[] testPolygons = null;
-      try {
-        testPolygons = loadTestData("multipolygontest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testPolygons);
-    }
-
-    public void testConstructShapeMultiPolygon() {
-      Geometry[] testMultiPolygons = null;
-      try {
-        testMultiPolygons = loadTestData("multipolygontest.wkt");
-      }
-      catch (Exception ex) {
-        fail(ex.getMessage());
-      }
-      testConstructShape(testMultiPolygons);
-    }
-*/
+    /*
+       public void testConstructShapePoint() {
+         Geometry[] testPoints = null;
+         try {
+           testPoints = loadTestData("pointtest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testPoints);
+       }
+       public void testConstructShapeMultiPoint() {
+         Geometry[] testMultiPoints = null;
+         try {
+           testMultiPoints = loadTestData("multipointtest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testMultiPoints);
+       }
+       public void testConstructShapeLineString() {
+         Geometry[] testLineStrings = null;
+         try {
+           testLineStrings = loadTestData("linestringtest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testLineStrings);
+       }
+       public void testConstructShapeMultiLineString() {
+         Geometry[] testMultiLineStrings = null;
+         try {
+           testMultiLineStrings = loadTestData("multilinestringtest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testMultiLineStrings);
+       }
+       public void testConstructShapePolygon() {
+         Geometry[] testPolygons = null;
+         try {
+           testPolygons = loadTestData("multipolygontest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testPolygons);
+       }
+       public void testConstructShapeMultiPolygon() {
+         Geometry[] testMultiPolygons = null;
+         try {
+           testMultiPolygons = loadTestData("multipolygontest.wkt");
+         }
+         catch (Exception ex) {
+           fail(ex.getMessage());
+         }
+         testConstructShape(testMultiPolygons);
+       }
+     */
     public void testConstructShapeEmpty() {
-      Geometry[] testEmptys = new Geometry[6];
-      testEmptys[0] = GeometryBuilder.builderFor(Point.class).getEmpty();
-      testEmptys[1] = GeometryBuilder.builderFor(MultiPoint.class).getEmpty();
-      testEmptys[2] = GeometryBuilder.builderFor(LineString.class).getEmpty();
-      testEmptys[3] = GeometryBuilder.builderFor(MultiLineString.class).getEmpty();
-      testEmptys[4] = GeometryBuilder.builderFor(Polygon.class).getEmpty();
-      testEmptys[5] = GeometryBuilder.builderFor(MultiPolygon.class).getEmpty();
-      testConstructShape(testEmptys);
+        Geometry[] testEmptys = new Geometry[6];
+        testEmptys[0] = GeometryBuilder.builderFor(Point.class).getEmpty();
+        testEmptys[1] = GeometryBuilder.builderFor(MultiPoint.class).getEmpty();
+        testEmptys[2] = GeometryBuilder.builderFor(LineString.class).getEmpty();
+        testEmptys[3] = GeometryBuilder.builderFor(MultiLineString.class)
+                                       .getEmpty();
+        testEmptys[4] = GeometryBuilder.builderFor(Polygon.class).getEmpty();
+        testEmptys[5] = GeometryBuilder.builderFor(MultiPolygon.class).getEmpty();
+        testConstructShape(testEmptys);
     }
 
     /**
      * tests each geometry in <code>geometries</code> using
      * <code>testConstructShape(Geometry)</code>
+     *
+     * @param geometries DOCUMENT ME!
      */
-    public void testConstructShape(Geometry []geometries)
-    {
-      for(int i = 0; i < geometries.length; i++)
-      {
-        testConstructShape(geometries[i]);
-      }
+    public void testConstructShape(Geometry[] geometries) {
+        for (int i = 0; i < geometries.length; i++) {
+            testConstructShape(geometries[i]);
+        }
     }
+
     /**
-     * tests the building of SeShape objects from JTS Geometries.
-     * To do that, recieves a Geometry object, then creates a GeometryBuilder
-     * for it's geometry type and ask it to construct an equivalent SeShape.
-     * With this SeShape, checks that it's number of points is equal to the
-     * number of points in <code>geometry</code>, and then creates an equivalent
+     * tests the building of SeShape objects from JTS Geometries. To do that,
+     * recieves a Geometry object, then creates a GeometryBuilder for it's
+     * geometry type and ask it to construct an equivalent SeShape. With this
+     * SeShape, checks that it's number of points is equal to the number of
+     * points in <code>geometry</code>, and then creates an equivalent
      * Geometry object, wich in turn is checked for equality against
      * <code>geometry</code>.
      *
      * @param geometry DOCUMENT ME!
      */
     public void testConstructShape(Geometry geometry) {
-
         LOGGER.fine("testConstructShape: testing " + geometry);
 
         Class geometryClass = geometry.getClass();
         GeometryBuilder builder = GeometryBuilder.builderFor(geometryClass);
         SeCoordinateReference cr = new SeCoordinateReference();
         cr.setCoordSysByDescription(COORD_SYS);
+
         Geometry equivalentGeometry = null;
+
         try {
-          SeShape equivalentShape = builder.constructShape(geometry, cr);
-          assertEquals(geometry.getNumPoints(), equivalentShape.getNumOfPoints());
-          LOGGER.info("geometry and SeShape contains the same number of points: "
-                      + equivalentShape.getNumOfPoints());
-          LOGGER.fine("generating an SeShape's equivalent Geometry");
-          equivalentGeometry = builder.construct(equivalentShape);
-        }catch(Exception ex) {
-          ex.printStackTrace();
-          fail(ex.getMessage());
+            SeShape equivalentShape = builder.constructShape(geometry, cr);
+            assertEquals(geometry.getNumPoints(),
+                equivalentShape.getNumOfPoints());
+            LOGGER.info(
+                "geometry and SeShape contains the same number of points: "
+                + equivalentShape.getNumOfPoints());
+            LOGGER.fine("generating an SeShape's equivalent Geometry");
+            equivalentGeometry = builder.construct(equivalentShape);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            fail(ex.getMessage());
         }
 
-        LOGGER.info("now testing both geometries for equivalence: " +
-                    geometry + " -- " + equivalentGeometry);
-
+        LOGGER.info("now testing both geometries for equivalence: " + geometry
+            + " -- " + equivalentGeometry);
 
         assertEquals(geometry.getDimension(), equivalentGeometry.getDimension());
         LOGGER.info("dimension test passed");
 
-        assertEquals(geometry.getGeometryType(), equivalentGeometry.getGeometryType());
+        assertEquals(geometry.getGeometryType(),
+            equivalentGeometry.getGeometryType());
         LOGGER.info("geometry type test passed");
 
         assertEquals(geometry.getSRID(), equivalentGeometry.getSRID());
@@ -271,17 +276,17 @@ public class GeometryBuilderTest extends TestCase {
         assertEquals(geometry.getNumPoints(), equivalentGeometry.getNumPoints());
         LOGGER.info("numPoints test passed");
 
-        LOGGER.info(geometry.getEnvelopeInternal() + " == " + equivalentGeometry
-                .getEnvelopeInternal());
+        LOGGER.info(geometry.getEnvelopeInternal() + " == "
+            + equivalentGeometry.getEnvelopeInternal());
 
-        assertEquals(geometry.getEnvelopeInternal(), equivalentGeometry.getEnvelopeInternal());
+        assertEquals(geometry.getEnvelopeInternal(),
+            equivalentGeometry.getEnvelopeInternal());
 
         assertEquals(geometry.getArea(), equivalentGeometry.getArea(), 0.001);
         LOGGER.info("area test passed");
 
         assertEquals(geometry, equivalentGeometry);
         LOGGER.info("equals test passed!!!");
-
     }
 
     /**
