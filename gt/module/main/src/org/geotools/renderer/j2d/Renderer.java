@@ -77,6 +77,7 @@ import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.gp.GridCoverageProcessor;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.GraphicsUtilities;
@@ -509,7 +510,7 @@ public class Renderer implements Renderer2D {
      *
      * @return The two dimensional coordinate system used for display.
      */
-    public CoordinateSystem getCoordinateSystem() {
+    public CoordinateReferenceSystem getCoordinateSystem() {
         return context.mapCS;
     }
 
@@ -524,7 +525,7 @@ public class Renderer implements Renderer2D {
      * @throws TransformException If <code>cs</code> can't be reduced to a two-dimensional
      *         coordinate system, or if data can't be transformed for some other reason.
      */
-    public void setCoordinateSystem(CoordinateSystem cs) throws TransformException {
+    public void setCoordinateSystem(CoordinateReferenceSystem cs) throws TransformException {
         cs = CTSUtilities.getCoordinateSystem2D(cs);
         final CoordinateSystem oldCS;
         synchronized (this) {

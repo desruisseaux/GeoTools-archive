@@ -41,8 +41,7 @@ import javax.swing.Action;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.renderer.j2d.GeoMouseEvent;
 import org.geotools.renderer.j2d.Hints;
 import org.geotools.renderer.j2d.RenderedLayer;
@@ -152,7 +151,7 @@ public class MapPane extends ZoomPane {
      *
      * @param cs The rendering coordinate system.
      */
-    public MapPane(final CoordinateSystem cs) {
+    public MapPane(final CoordinateReferenceSystem cs) {
         this();
         try {
             setCoordinateSystem(cs);
@@ -183,7 +182,7 @@ public class MapPane extends ZoomPane {
      * @return The two dimensional coordinate system used for display.
      *         Default to {@linkplain GeographicCoordinateSystem#WGS84 WGS 1984}.
      */
-    public CoordinateSystem getCoordinateSystem() {
+    public CoordinateReferenceSystem getCoordinateSystem() {
         return renderer.getCoordinateSystem();
     }
 
@@ -198,7 +197,7 @@ public class MapPane extends ZoomPane {
      * @throws TransformException If <code>cs</code> can't be reduced to a two-dimensional
      *         coordinate system., or if data can't be transformed for some other reason.
      */
-    public void setCoordinateSystem(CoordinateSystem cs) throws TransformException {
+    public void setCoordinateSystem(CoordinateReferenceSystem cs) throws TransformException {
         renderer.setCoordinateSystem(cs);
     }
 

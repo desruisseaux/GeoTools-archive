@@ -37,29 +37,25 @@ import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 
-import org.geotools.axis.AbstractGraduation;
-import org.geotools.axis.Graduation;
-import org.geotools.axis.LogarithmicNumberGraduation;
-import org.geotools.axis.NumberGraduation;
-import org.geotools.axis.TickIterator;
-import org.geotools.ct.MathTransform1D;
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridCoverage;
-import org.geotools.resources.LegacyGCSUtilities;
+//import org.geotools.axis.AbstractGraduation;
+//import org.geotools.axis.Graduation;
+//import org.geotools.axis.LogarithmicNumberGraduation;
+//import org.geotools.axis.NumberGraduation;
+//import org.geotools.axis.TickIterator;
+//import org.geotools.ct.MathTransform1D;
+//import org.geotools.cv.Category;
+//import org.geotools.cv.SampleDimension;
+//import org.geotools.gc.GridCoverage;
+//import org.geotools.resources.LegacyGCSUtilities;
+import org.geotools.coverage.grid.GridCoverage;
+import org.geotools.referencing.cs.CoordinateSystemAxis;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.units.Unit;
-import org.geotools.util.NumberRange;
-import org.opengis.referencing.operation.TransformException;
+import org.opengis.metadata.Identifier;
 
 
 /**
@@ -90,7 +86,7 @@ public class ColorBar extends JComponent {
     /**
      * The graduation to write over the color ramp.
      */
-    private Graduation graduation;
+//    private Graduation graduation;
 
     /**
      * Graduation units. This is constructed from {@link Graduation#getUnit} and cached
@@ -132,7 +128,7 @@ public class ColorBar extends JComponent {
      * This iterator will be reused as mush as possible
      * in order to reduce garbage-collections.
      */
-    private transient TickIterator reuse;
+//    private transient TickIterator reuse;
 
     /**
      * A temporary buffer for conversions from RGB to HSB
@@ -169,9 +165,9 @@ public class ColorBar extends JComponent {
      * Returns the graduation to paint over colors. If the graduation is
      * not yet defined, then this method returns <code>null</code>.
      */
-    public Graduation getGraduation() {
-        return graduation;
-    }
+//    public Graduation getGraduation() {
+//        return graduation;
+//    }
 
     /**
      * Set the graduation to paint on top of the color bar. The graduation can be set also
@@ -181,31 +177,31 @@ public class ColorBar extends JComponent {
      * @param  graduation The new graduation, or <code>null</code> if none.
      * @return <code>true</code> if this object changed as a result of this call.
      */
-    public boolean setGraduation(final Graduation graduation) {
-        final Graduation oldGraduation = this.graduation;
-        if (graduation != oldGraduation) {
-            if (oldGraduation != null) {
-                oldGraduation.removePropertyChangeListener(ui);
-            }
-            if (graduation != null) {
-                graduation.addPropertyChangeListener(ui);
-            }
-            this.graduation = graduation;
-            units = null;
-            if (graduation != null) {
-                final Unit unit = graduation.getUnit();
-                if (unit != null) {
-                    units = unit.toString();
-                }
-            }
-        }
-        final boolean changed = !Utilities.equals(graduation, oldGraduation);
-        if (changed) {
-            repaint();
-        }
-        firePropertyChange("graduation", oldGraduation, graduation);
-        return changed;
-    }
+//    public boolean setGraduation(final Graduation graduation) {
+//        final Graduation oldGraduation = this.graduation;
+//        if (graduation != oldGraduation) {
+//            if (oldGraduation != null) {
+//                oldGraduation.removePropertyChangeListener(ui);
+//            }
+//            if (graduation != null) {
+//                graduation.addPropertyChangeListener(ui);
+//            }
+//            this.graduation = graduation;
+//            units = null;
+//            if (graduation != null) {
+//                final Unit unit = graduation.getUnit();
+//                if (unit != null) {
+//                    units = unit.toString();
+//                }
+//            }
+//        }
+//        final boolean changed = !Utilities.equals(graduation, oldGraduation);
+//        if (changed) {
+//            repaint();
+//        }
+//        firePropertyChange("graduation", oldGraduation, graduation);
+//        return changed;
+//    }
 
     /**
      * Returns the colors painted by this <code>ColorBar</code>.
@@ -305,16 +301,16 @@ public class ColorBar extends JComponent {
      * @see #getColors()
      * @see #getGraduation()
      */
-    private boolean setColors(final SampleDimension band, final IndexColorModel colors) {
+    private boolean setColors(final CoordinateSystemAxis band, final IndexColorModel colors) {
         /*
          * Looks for what seems to be the "main" category. We look for the
          * quantitative category (if there is one) with the widest sample range.
          */
         double maxRange = 0;
-        Category category = null;
-        final List categories = band.getCategories();
-        for (int i=categories.size(); --i>=0;) {
-            final Category candidate = ((Category) categories.get(i)).geophysics(false);
+        Identifier identifier = null;
+        final Identifier[] identifiers = band.getIdentifiers();
+        for (int i=identifiers.length; --i>=0;) {
+            final Identifier candidate = ((Identifier) identifiers[i]).geophysics(false);
             if (candidate!=null && candidate.isQuantitative()) {
                 final NumberRange range = candidate.getRange();
                 final double rangeValue = range.getMaximum() - range.getMinimum();
