@@ -233,7 +233,7 @@ public class Rendering2DTest extends TestCase {
         return data.getFeatureSource(typeName).getFeatures().collection();
     }
 
-    public void ztestSimpleRender() throws Exception {
+    public void testSimpleRender() throws Exception {
 
             // same as the datasource test, load in some features into a table
             System.err.println("starting rendering2DTest");
@@ -291,6 +291,8 @@ public class Rendering2DTest extends TestCase {
 
                 env=new Envelope( bounds.getMinX()-2000000, bounds.getMaxX()+2000000, bounds.getMinY()-2000000, bounds.getMaxY()+2000000);
                 showRender("testReprojection", renderer, 1000, env);
+                
+//                System.in.read();
 
         }
 
@@ -302,7 +304,7 @@ public class Rendering2DTest extends TestCase {
      * 
      * @throws Exception
      */
-    public void ztestDefinitionQuery() throws Exception {
+    public void testDefinitionQuery() throws Exception {
 
             System.err.println("starting definition query test");
             final FeatureCollection ft = createTestDefQueryFeatureCollection();
