@@ -317,15 +317,15 @@ public class FilterFactoryImpl extends FilterFactory {
             while ((funName != "found") && (it.hasNext())){
                 FunctionExpression fe = (FunctionExpression) it.next();
                 funName = fe.getName();
-                if (funName == name){
+                if (funName.equalsIgnoreCase(name)){
                     exp = fe;
                     funName = "found";
                 }
             }
             return exp;
             
-//            return (FunctionExpression) Class.forName("org.geotools.filter."
-//                + name + "Function").newInstance();
+      //return (FunctionExpression) Class.forName("org.geotools.filter."
+      //          + name + "Function").newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Unable to create class " + name
                 + "Function", e);  //changed the word "Filter" to "Function".

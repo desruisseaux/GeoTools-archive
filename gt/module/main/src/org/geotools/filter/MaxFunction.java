@@ -44,7 +44,7 @@ public class MaxFunction extends FunctionExpressionImpl
     /**
      * Creates a new instance of MinFunction
      */
-    protected MaxFunction() {
+    public MaxFunction() {
     }
 
     /**

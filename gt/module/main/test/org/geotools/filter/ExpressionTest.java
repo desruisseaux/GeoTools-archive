@@ -250,7 +250,7 @@ public class ExpressionTest extends TestCase {
     public void testNonExistentFunction(){
         try{
             Expression nochance = filterFactory.createFunctionExpression("%$#%$%#%#$@#%@");
-            fail();
+            assertNull(nochance);
         }
         catch(RuntimeException re){
         }

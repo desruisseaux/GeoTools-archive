@@ -44,7 +44,7 @@ public class MinFunction extends FunctionExpressionImpl
     /**
      * Creates a new instance of MinFunction
      */
-    protected MinFunction() {
+    public MinFunction() {
     }
 
     /**
