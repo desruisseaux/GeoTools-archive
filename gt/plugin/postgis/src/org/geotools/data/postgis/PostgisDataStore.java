@@ -61,6 +61,7 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.postgis.attributeio.PgWKBAttributeIO;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.referencing.PostgisAuthorityFactory;
@@ -620,6 +621,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
+    /**
+     * @see org.geotools.data.jdbc.JDBCDataStore#buildFIDMapperFactory(org.geotools.data.jdbc.JDBCDataStoreConfig)
+     */
+    protected FIDMapperFactory buildFIDMapperFactory( JDBCDataStoreConfig config ) {
+        return new PostgisFIDMapperFactory();
+    }
+    
     /**
      * Returns an attribute type for a geometry column in a feature table.
      *

@@ -80,7 +80,6 @@ public class StyledShapePainter {
         // Is the current scale within the style scale range? 
         if (!style.isScaleInRange(scale)) {
             LOGGER.fine("Out of scale");
-
             return;
         }
         
@@ -234,8 +233,10 @@ public class StyledShapePainter {
                             paint = new TexturePaint(image, scaledRect);
                         }
 
+//                        debugShape(shape);
+                        
                         graphics.setPaint(paint);
-                        graphics.setStroke(processStroke(ls2d.getStroke()));
+                        graphics.setStroke(ls2d.getStroke());
                         graphics.setComposite(ls2d.getContourComposite());
                         graphics.draw(shape);
                     }
@@ -244,12 +245,18 @@ public class StyledShapePainter {
         }
     }
 
-    /**
-     * Scales the stroke
-     */
-    private Stroke processStroke( Stroke stroke ) {
-        return stroke;
+    private void debugShape( Shape shape ) {
+        //HACK
+        PathIterator iter=shape.getPathIterator(null);
+//        for( int i=0; i<5; i++){
+//            double[] coords=new double[2];
+//            iter.currentSegment(coords);
+////            System.out.print(coords[0]+" "+coords[1]+",");
+//            iter.next();
+//        }
+//        System.out.println();
     }
+
 
     // draws the image along the path
     private void drawWithGraphicsStroke(Graphics2D graphics, Shape shape,

@@ -136,6 +136,9 @@ public class JTS {
      * @throws TransformException 
      */     
     public static Coordinate transform( Coordinate source, Coordinate dest, MathTransform transform ) throws TransformException{
+        if( dest==null)
+            dest=new Coordinate();
+        
         double[] array=null;
         if ( transform.getSourceDimensions()==2 )
             array=new double[]{ source.x, source.y };

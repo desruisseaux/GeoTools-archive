@@ -1,18 +1,10 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
+ * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2002, Geotools Project Managment
+ * Committee (PMC) This library is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * version 2.1 of the License. This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.geotools.data.postgis.referencing;
 
@@ -27,6 +19,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.referencing.JDBCAuthorityFactory;
+import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -35,47 +28,84 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
 
-    private String TABLE_NAME="SPATIAL_REF_SYS";
-    private String WKT_COLUMN="SRTEXT";
-    private String SRID_COLUMN="SRID";
+    private String TABLE_NAME = "SPATIAL_REF_SYS";
+    private String WKT_COLUMN = "SRTEXT";
+    private String SRID_COLUMN = "SRID";
+    private String AUTH_NAME = "AUTH_NAME";
+    private String AUTH_SRID = "AUTH_SRID";
 
     /**
      * Construct <code>PostgisAuthorityFactory</code>.
-     *
+     * 
      * @param pool
      */
     public PostgisAuthorityFactory( ConnectionPool pool ) {
         super(pool);
     }
-    
-    public CoordinateReferenceSystem createCRS(int srid) throws FactoryException, IOException{
+
+    public CoordinateReferenceSystem createCRS( int srid ) throws FactoryException, IOException {
         Connection dbConnection = null;
 
         try {
-            String sqlStatement = "SELECT "+WKT_COLUMN+" FROM "+TABLE_NAME+" WHERE "+SRID_COLUMN+" = "+srid;
-            dbConnection = getConnection(Transaction.AUTO_COMMIT);
+            String sqlStatement = "SELECT * FROM " + TABLE_NAME + " WHERE " + SRID_COLUMN + " = "
+                    + srid;
+            dbConnection = connectionPool.getConnection();
 
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);
 
             if (result.next()) {
-                String wkt = result.getString("srid");
+                CoordinateReferenceSystem crs = null;
+                try {
+                    crs = createFromAuthority(result);
+                } catch (Exception e) {
+                    // do nothing
+                }
+                if (crs == null) {
+                    crs=createFromWKT(result);
+                }
                 JDBCUtils.close(statement);
 
-                return factory.createFromWKT(wkt);
+                return crs;
             } else {
-                String mesg = "No wkt column row for srid in table: "+ TABLE_NAME;
+                String mesg = "No row found for srid in table: " + TABLE_NAME;
                 throw new DataSourceException(mesg);
             }
         } catch (SQLException sqle) {
             String message = sqle.getMessage();
 
             throw new DataSourceException(message, sqle);
-        }finally {
+        } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
     }
-    
 
+    protected CoordinateReferenceSystem createFromWKT( ResultSet result )
+            throws DataSourceException, FactoryException {
+        try {
+            String wkt = result.getString(WKT_COLUMN);
+
+            return factory.createFromWKT(wkt);
+
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+
+            throw new DataSourceException(message, sqle);
+        }
+    }
+
+    protected CoordinateReferenceSystem createFromAuthority( ResultSet result )
+            throws DataSourceException, FactoryException {
+        try {
+            String name = result.getString(AUTH_NAME);
+            int id = result.getInt(AUTH_SRID);
+
+            return CRS.decode(name + ":" + id);
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+
+            throw new DataSourceException(message, sqle);
+        }
+    }
 
 }

@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
@@ -72,6 +73,7 @@ class GeomCollectionIterator extends AbstractLiteIterator {
 	 */
 	public void init(GeometryCollection gc, AffineTransform at, boolean generalize, double maxDistance) {
 		int numGeometries = gc.getNumGeometries();
+        
         
         this.gc = gc;
 

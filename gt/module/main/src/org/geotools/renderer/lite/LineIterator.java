@@ -344,7 +344,6 @@ class LineIterator extends AbstractLiteIterator {
             coords[0] = (double) coordinates.getX(0);
             coords[1] = (double) coordinates.getY(0);
             at.transform(coords, 0, coords, 0, 1);
-
             return SEG_MOVETO;
         } else if ((currentCoord == coordinateCount) && isClosed) {
             return SEG_CLOSE;
@@ -352,7 +351,7 @@ class LineIterator extends AbstractLiteIterator {
             coords[0] = coordinates.getX(currentCoord);
             coords[1] = coordinates.getY(currentCoord);
             at.transform(coords, 0, coords, 0, 1);
-
+            
             return SEG_LINETO;
         }
 	}

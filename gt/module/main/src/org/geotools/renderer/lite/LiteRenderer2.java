@@ -435,7 +435,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     // unprojected geometries
                     MathTransform transform = operationFactory.createOperation(destinationCrs,
                             sourceCrs).getMathTransform();
-                    if (transform != null)
+                    if (transform != null && !transform.isIdentity())
                         envelope = JTS.transform(envelope, transform);
                 }
 
@@ -766,7 +766,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             // get style caching also between multiple rendering runs
             NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
             FeatureReader reader = features.reader();
-
             while( true ) {
                 try {
                     if (!reader.hasNext()) {
@@ -842,6 +841,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     private void processSymbolizers( final Graphics2D graphics, final Feature feature,
             final Symbolizer[] symbolizers, Range scaleRange, LiteShape shape,
             CoordinateReferenceSystem destinationCrs ) throws TransformException {
+
         for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("applying symbolizer " + symbolizers[m]);
