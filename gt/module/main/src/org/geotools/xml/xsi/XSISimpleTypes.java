@@ -2784,7 +2784,9 @@ public class XSISimpleTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            if(element == null || element.getType() == null)
+                throw new OperationNotSupportedException();
+            return element.getType().getValue(element,value,attrs,hints);
         }
 
         /**
