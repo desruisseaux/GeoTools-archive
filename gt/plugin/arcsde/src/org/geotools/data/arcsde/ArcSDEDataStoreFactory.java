@@ -16,15 +16,18 @@
  */
 package org.geotools.data.arcsde;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
+import com.esri.sde.sdk.client.SDEPoint;
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.pe.PeCoordinateSystem;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Factory to create DataStores over a live ArcSDE instance.
  *
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
@@ -36,6 +39,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x";
+
+    /** DOCUMENT ME! */
     private static Param[] paramMetadata = new Param[11];
 
     static {
@@ -49,7 +54,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 "port number in wich the ArcSDE server is listening for connections.Generally it's 5151",
                 true, new Integer(5151));
         paramMetadata[4] = new Param("instance", String.class,
-                "the specific database to connect to. Only applicable to certain databases. Value ignored if not applicable.", false);
+                "the specific database to connect to. Only applicable to certain databases. Value ignored if not applicable.",
+                false);
         paramMetadata[5] = new Param("user", String.class,
                 "name of a valid database user account.", true);
         paramMetadata[6] = new Param("password", String.class,
@@ -60,8 +66,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 "Minimun number of open connections", false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_CONNECTIONS));
         paramMetadata[8] = new Param("pool.maxConnections", Integer.class,
-                "Maximun number of open connections (will not work if < 2)", false,
-                new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
+                "Maximun number of open connections (will not work if < 2)",
+                false, new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
         paramMetadata[9] = new Param("pool.increment", Integer.class,
                 "Number of connections created on each pool size increment",
                 false, new Integer(ArcSDEConnectionPool.DEFAULT_INCREMENT));
@@ -140,27 +146,33 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
         return sdeDStore;
     }
-    
-    /** Display name for this DataStore Factory */
+
+    /**
+     * Display name for this DataStore Factory
+     *
+     * @return DOCUMENT ME!
+     */
     public String getDisplayName() {
-    	return "ArcSDE";
-	}
-//    /** Interpret connection params as a metadata entity */
-//    public DataSourceMetadataEnity createMetadata( Map params )
-//            throws IOException {
-//        
-//        ConnectionConfig config;
-//        try {
-//            config = new ConnectionConfig(params);
-//        } catch (NullPointerException ex) {
-//            throw new IOException( "Cannot use provided params to connect" );
-//        } catch (IllegalArgumentException ex) {
-//            throw new DataSourceException( "Cannot use provided params to connect:"+ex.getMessage(), ex );
-//        }        
-//        String description =
-//            "Connection to "+config.getDatabaseName()+ " at "+config.getServerName()+":"+config.getPortNumber()+ " as "+ config.getUserName();
-//        return new DataSourceMetadataEnity( config.getServerName(), config.getDatabaseName(), description );
-//    }
+        return "ArcSDE";
+    }
+
+    //    /** Interpret connection params as a metadata entity */
+    //    public DataSourceMetadataEnity createMetadata( Map params )
+    //            throws IOException {
+    //        
+    //        ConnectionConfig config;
+    //        try {
+    //            config = new ConnectionConfig(params);
+    //        } catch (NullPointerException ex) {
+    //            throw new IOException( "Cannot use provided params to connect" );
+    //        } catch (IllegalArgumentException ex) {
+    //            throw new DataSourceException( "Cannot use provided params to connect:"+ex.getMessage(), ex );
+    //        }        
+    //        String description =
+    //            "Connection to "+config.getDatabaseName()+ " at "+config.getServerName()+":"+config.getPortNumber()+ " as "+ config.getUserName();
+    //        return new DataSourceMetadataEnity( config.getServerName(), config.getDatabaseName(), description );
+    //    }
+
     /**
      * A human friendly name for this data source factory
      *
@@ -193,18 +205,23 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     /**
      * Test to see if this datastore is available, if it has all the
-     * appropriate libraries to construct a datastore.  This datastore just
-     * returns true for now.  This method is used for gui apps, so as to not
-     * advertise data store capabilities they don't actually have.
+     * appropriate libraries to construct a datastore.
      *
      * @return <tt>true</tt> if and only if this factory is available to create
      *         DataStores.
-     *
-     * @task REVISIT: I'm just adding this method to compile, maintainer should
-     *       revisit to check for any libraries that may be necessary for
-     *       datastore creations. ch.
      */
     public boolean isAvailable() {
+        try {
+            LOGGER.fine(SeConnection.class.getName() + " is in place.");
+            LOGGER.fine(PeCoordinateSystem.class.getName() + " is in place.");
+        } catch (Throwable t) {
+            LOGGER.log(Level.WARNING,
+                "ArcSDE Java API seems not to be in your classpath."
+                + "Please verify that all needed jars are. ArcSDE data stores will not be available.",
+                t);
+            return false;
+        }
+
         return true;
     }
 
