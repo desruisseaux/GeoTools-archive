@@ -18,7 +18,10 @@ package org.geotools.metadata;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.geotools.metadata.Metadata.Entity;
 
 import junit.framework.TestCase;
 
@@ -161,22 +164,56 @@ public class TestFileMetadataImpl extends TestCase {
         
    }
 
-    /*
-     * Class under test for Object getElement(String)
-     */
-    public void testGetElementString() {
-        //TODO Implement getElement().
+    public void testGetEntity() {
+        File f=new File(resource.getFile());
+        assertNotNull(f);
+        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
+        assertNotNull(metadata);
+
+        // test begins
+        assertNotNull(metadata.getEntity());
     }
 
     /*
      * Class under test for Object getElement(ElementType)
      */
     public void testGetElementElementType() {
-        //TODO Implement getElement().
+        File f=new File(resource.getFile());
+        assertNotNull(f);
+        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
+        assertNotNull(metadata);
+
+        // test begins
+        Entity entity=metadata.getEntity();
+        List elements=entity.getElements();
+        List values=metadata.getElements(null);
+        int i=0;
+        for (Iterator iter = elements.iterator(); iter.hasNext();i++) {
+            Metadata.Element element = (Metadata.Element) iter.next();
+            assertEquals(metadata.getElement(element), values.get(i));
+        }
     }
 
-    public void testGetEntity() {
-        //TODO Implement getEntity().
+    /*
+     * Class under test for Object getElement(String)
+     */
+    public void testGetElementString() {
+        File f=new File(resource.getFile());
+        assertNotNull(f);
+        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
+        assertNotNull(metadata);
+
+        // test begins
+        Entity entity=metadata.getEntity();
+        List elements=entity.getElements();
+        List values=metadata.getElements(null);
+        int i=0;
+        for (Iterator iter = elements.iterator(); iter.hasNext();i++) {
+            Metadata.Element element = (Metadata.Element) iter.next();
+            String name=element.getName();
+            Object value=metadata.getElement(name);
+            assertEquals(value, values.get(i));
+        }
     }
 
-}
+ }
