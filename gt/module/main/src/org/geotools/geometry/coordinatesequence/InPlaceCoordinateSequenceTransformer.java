@@ -60,17 +60,14 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
     }
 
     FlyWeightDirectPosition start=new FlyWeightDirectPosition(2);
-    FlyWeightDirectPosition dest=new FlyWeightDirectPosition(2);
     private CoordinateSequence transformInternal( PackedCoordinateSequence sequence, MathTransform transform ) 
     throws TransformException{
         
-        start.setSequence(sequence);        
-        dest.setSequence(sequence);
-        for(int i=0; i<sequence.size()*sequence.getDimension();i++ ){
+        start.setSequence(sequence);   
+        for(int i=0; i<sequence.size();i++ ){
             start.setOffset(i);
-            dest.setOffset(i);
             try {
-                transform.transform(start, dest);
+                transform.transform(start, start);
             } catch (MismatchedDimensionException e) {
                 throw new TransformException( "", e);
             } 
@@ -116,7 +113,7 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
          * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinates()
          */
         public double[] getCoordinates() {
-            return new double[]{ sequence.getX(offset), sequence.getY(offset)};
+            return new double[]{ sequence.getX(offset), sequence.getY(offset), sequence.getOrdinate(offset, CoordinateSequence.Z)};
         }
 
         /**

@@ -50,7 +50,7 @@ import org.opengis.referencing.operation.CoordinateOperation;
  * @since 2.1.0
  */
 public class CRS {
-    public interface OpperationVisitor {
+    public interface OperationVisitor {
         /**
          * Implement this method to visit each available CoordinateOperationFactory
          * known to FactoryFinder.
@@ -77,7 +77,7 @@ public class CRS {
      * @throws FactoryException only if MathTransform is unavailable due to error
      */
     public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to ) throws FactoryException {
-        List list = visit( new OpperationVisitor() {
+        List list = visit( new OperationVisitor() {
             public Object factory( CoordinateOperationFactory factory ) throws FactoryException{
                 CoordinateOperation opperation = factory.createOperation( from, to );                
                 return opperation.getMathTransform();                
@@ -91,7 +91,7 @@ public class CRS {
      * 
      * TODO: Martin can you say aye or nay to this idea?
      */
-    private static List visit(OpperationVisitor visitor ) throws FactoryException {
+    private static List visit(OperationVisitor visitor ) throws FactoryException {
         Throwable trouble = null;
         List list = new ArrayList();
         for( Iterator i = FactoryFinder.getCoordinateOperationFactories().iterator(); i.hasNext(); ){

@@ -988,9 +988,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     private Shape getTransformedShape(Geometry g, MathTransform2D transform)
         throws TransformException {
         LiteShape shape=new LiteShape(g, null, false);
-//        shape.setMathTransform(transform);
-//        return shape;
-        return transform.createTransformedShape(shape);
+        shape.setMathTransform(transform);
+        return shape;
+//        return transform.createTransformedShape(shape);
     }
 
     /**
