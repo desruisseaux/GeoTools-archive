@@ -20,10 +20,14 @@
  */
 package org.geotools.data.vpf.file;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
@@ -81,7 +85,7 @@ public class VPFFileStore extends AbstractDataStore {
             result = (FeatureType) files.get(pathName);
         } else {
             try {
-                result = new VPFFile(pathName);
+                result = findFile(pathName);
             } catch (SchemaException exc) {
                 throw new IOException("Schema error in path: " + pathName
                     + "\n" + exc.getMessage());
@@ -119,5 +123,58 @@ public class VPFFileStore extends AbstractDataStore {
             }
         }
         files.clear();
+    }
+
+    /**
+     * This does basically a case independent file search
+     * through the pathName to try to find the file.
+     * This is necessary due to many problems seen with VPF
+     * data disks where the file names specified in the VPF files
+     * do not match the case of the files on disk.  
+     **/
+    private VPFFile findFile(String pathName)
+        throws IOException, SchemaException {
+
+        if (new File(pathName).exists())
+            return new VPFFile(pathName);
+
+        ArrayList matches = new ArrayList();
+        matches.add("");  // Need to start with something in the list
+        StringTokenizer st = new StringTokenizer(pathName, File.separator);
+        while (st.hasMoreTokens()) {
+            String curr = st.nextToken();
+            String currUpper = curr.toUpperCase();
+            String currLower = curr.toLowerCase();
+            boolean useUpper = !curr.equals(currUpper);
+            boolean useLower = !curr.equals(currLower);
+            ArrayList newMatches = new ArrayList();
+            
+            for(Iterator it = matches.iterator(); it.hasNext(); ) {
+                String match = (String)it.next();
+                String tmp = match + File.separator + curr;
+                
+                if (new File(tmp).exists())
+                    newMatches.add(tmp);
+                
+                if (useUpper) {
+                    tmp = match + File.separator + currUpper;
+                    if (new File(tmp).exists())
+                        newMatches.add(tmp);
+                }
+                
+                if (useLower) {
+                    tmp = match + File.separator + currLower;
+                    if (new File(tmp).exists())
+                        newMatches.add(tmp);
+                }
+            }
+            matches = newMatches;
+        }
+
+        if (matches.isEmpty()) {
+            throw new FileNotFoundException("Could not find file: " + pathName);
+        }
+        
+        return new VPFFile((String)matches.get(0));
     }
 }
