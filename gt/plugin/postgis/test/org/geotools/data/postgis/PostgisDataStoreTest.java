@@ -129,6 +129,9 @@ public class PostgisDataStoreTest extends TestCase {
 
             //catch the proper exception
         }
+        
+        // make sure the CRS is specified
+        assertNotNull(schema1.getDefaultGeometry().getCoordinateSystem());
     }
 
     //tests todo: bad retyping. post filters. 
