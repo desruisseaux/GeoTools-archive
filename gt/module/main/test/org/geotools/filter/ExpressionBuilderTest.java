@@ -72,6 +72,29 @@ public class ExpressionBuilderTest extends FilterTestSupport {
         }
     }
     
+     /**
+     * Test of parse method, of class org.geotools.filter.ExpressionBuilder.
+     */
+    public void testParseAttributeAndValidateExpressions() {
+        System.out.println("testAttributeExpressions");
+        try{
+            Expression exp = (Expression)ExpressionBuilder.parse(testFeature.getFeatureType(),"10 + testInteger");
+            assertEquals(1012, ((Number)exp.getValue(testFeature)).intValue());
+            
+            
+        } catch(ParseException pe){
+            fail(pe.getMessage());
+        }
+        
+        try{
+            Expression exp = (Expression)ExpressionBuilder.parse(testFeature.getFeatureType(),"10 + notAnAttribute");
+            fail("Exception should have been thrown");
+        }
+        catch(Exception ife){
+   
+        }
+    }
+    
     public void testParseComparisonFilters() {
         System.out.println("testComparisonFilters");
         try{

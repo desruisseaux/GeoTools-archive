@@ -23,6 +23,7 @@ import com.vividsolutions.jts.io.WKTReader;
 import java.io.*;
 import java.util.EmptyStackException;
 import java.util.Stack;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.parser.*;
 import org.geotools.filter.FilterTransformer;
 
@@ -39,8 +40,8 @@ public class ExpressionBuilder {
     /**
      * Parse the input string into either a Filter or an Expression.
      */
-    public static Object parse(String input) throws ParseException {
-        ExpressionCompiler c = new ExpressionCompiler(input);
+    public static Object parse(FeatureType schema, String input) throws ParseException {
+        ExpressionCompiler c = new ExpressionCompiler(schema,input);
         try {
             c.CompilationUnit();
         } catch (TokenMgrError tme) {
@@ -51,6 +52,14 @@ public class ExpressionBuilder {
         
         StackItem item = (StackItem) c.stack.peek();
         return item.built;
+        
+    }
+    
+    /**
+     * Parse the input string into either a Filter or an Expression.
+     */
+    public static Object parse(String input) throws ParseException {
+        return parse(null,input);
         
     }
     
@@ -78,10 +87,12 @@ public class ExpressionBuilder {
         FilterFactory factory = FilterFactory.createFilterFactory();
         ExpressionException exception = null;
         String input;
+        FeatureType schema;
         WKTReader reader;
-        ExpressionCompiler(String input) {
+        ExpressionCompiler(FeatureType schema, String input) {
             super(new StringReader(input));
             this.input = input;
+            this.schema = schema;
         }
         
         StackItem popStack() {
@@ -215,7 +226,7 @@ public class ExpressionBuilder {
                     return factory.createLiteralExpression(n.getToken().image);
                 case JJTATTNODE:
                     try {
-                        return factory.createAttributeExpression(null,token());
+                        return factory.createAttributeExpression(schema,token());
                     } catch (IllegalFilterException ife) {
                         throw new ExpressionException("Exception building AttributeExpression",getToken(0),ife);
                     }
@@ -352,7 +363,7 @@ public class ExpressionBuilder {
                 
                 try {
                     if (e instanceof LiteralExpression) {
-                        e = factory.createAttributeExpression(null, ((LiteralExpression)e).getValue(null).toString() );
+                        e = factory.createAttributeExpression(schema, ((LiteralExpression)e).getValue(null).toString() );
                     }
                     nf.nullCheckValue(e);
                 } catch (IllegalFilterException ife) {
