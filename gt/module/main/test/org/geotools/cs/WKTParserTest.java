@@ -41,6 +41,7 @@ import java.text.*;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -84,9 +85,14 @@ public class WKTParserTest extends TestCase {
      * stream once finished is the user's responsability.
      */
     private BufferedReader open(final String path) throws IOException {
+        System.out.println(getClass().getResource(path).openStream());
+        
         return new BufferedReader(
                new InputStreamReader(
-               getClass().getClassLoader().getResourceAsStream(path)));
+               getClass().getResource(path).openStream()));
+//        return new BufferedReader(
+//               new InputStreamReader(
+//               getClass().getClassLoader().getResourceAsStream(path)));
     }
 
     /**
@@ -96,7 +102,7 @@ public class WKTParserTest extends TestCase {
      * coordinate system objects.
      */
     public void testParsing() throws IOException, ParseException, FactoryException {
-        final BufferedReader reader = open("test-data/test-cs.txt");
+        final BufferedReader reader = TestData.getReader(this, "test-cs.txt");
         final Collection       pool = new HashSet();
         String line;
         while ((line=reader.readLine()) != null) {
