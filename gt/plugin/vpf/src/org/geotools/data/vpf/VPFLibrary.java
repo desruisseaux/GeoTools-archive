@@ -35,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /*
@@ -75,10 +76,6 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      */
     private final List coverages = new Vector();
     /**
-     * The database containing the library
-     */
-    private final VPFDataBase base;
-    /**
      * The coordinate reference system used through this library
      */
     private CoordinateReferenceSystem crs;
@@ -96,8 +93,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      * @throws IOException
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
-    public VPFLibrary(Feature libraryFeature, File dir, VPFDataBase base) throws IOException, SchemaException {
-        this.base = base;
+    public VPFLibrary(Feature libraryFeature, File dir) throws IOException, SchemaException {
         xmin = ((Number)libraryFeature.getAttribute(FIELD_XMIN)).doubleValue();
         ymin = ((Number)libraryFeature.getAttribute(FIELD_YMIN)).doubleValue();
         xmax = ((Number)libraryFeature.getAttribute(FIELD_XMAX)).doubleValue();
@@ -119,10 +115,8 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
         String vpfTableName = new File(dir, LIBRARY_HEADER_TABLE).toString();
         VPFFile lhtFile = VPFFileFactory.getInstance().getFile(vpfTableName);
         lhtFile.reset();
-        Feature libraryFeature = null;
-        base = null;
         try {
-            libraryFeature = lhtFile.readFeature();
+            lhtFile.readFeature(); // check for errors
         } catch (IllegalAttributeException exc) {
             exc.printStackTrace();
             throw new IOException("Illegal values in library attribute table");
@@ -313,7 +307,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public FeatureType getSchema(String typeName){
         // Look through all of the coverages to find a matching feature type
         FeatureType result = null;
         Iterator coverageIter = coverages.iterator();
@@ -337,7 +331,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
      */
-    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+    protected FeatureReader getFeatureReader(String typeName){
         // Find the appropriate feature type, make a reader for it, and reset its stream
         FeatureReader result = null;
         VPFFeatureType featureType = (VPFFeatureType)getSchema(typeName);
@@ -365,8 +359,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
                 if("GEO".equalsIgnoreCase(dataType)){
                     String geoDatumCode = String.valueOf(grt.getAttribute("geo_datum_code"));
                     if ("WGE".equalsIgnoreCase(geoDatumCode)){
-                        CRSService crsService = new CRSService();
-                        crs = crsService.createCRS("EPSG:4326");
+                        crs = GeographicCRS.WGS84;
                     }
                 }
             } catch(Exception ex){

@@ -65,7 +65,7 @@ public class VPFDataBase implements FileConstants {
             feature = (Feature) iter.next();
 
             try {
-              library = new VPFLibrary(feature, directory, this);
+              library = new VPFLibrary(feature, directory);
               libraries.add(library);
             }
             catch ( java.io.FileNotFoundException ex ) {

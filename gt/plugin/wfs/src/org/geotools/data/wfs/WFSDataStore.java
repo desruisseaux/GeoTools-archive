@@ -40,7 +40,6 @@ import java.util.logging.Level;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.MathTransform;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -73,7 +72,6 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -315,6 +313,8 @@ public class WFSDataStore extends AbstractDataStore {
             	t = FactoryFinder.transform(t,crs);
             }
         } catch (FactoryException e) {
+            WFSDataStoreFactory.logger.warning(e.getMessage());
+        } catch (SchemaException e) {
             WFSDataStoreFactory.logger.warning(e.getMessage());
         }
         
@@ -741,9 +741,8 @@ System.out.println(url);
         if(fsd.getSRS()!=null){
             // reproject this
             try {
-                crs = WFSDataStoreFactory.getCRSService().createCRS(fsd.getSRS());
-                MathTransform mt = CRSService.reproject(CRSService.GEOGRAPHIC,crs,false);
-                maxbbox = CRSService.transform(maxbbox,mt);
+                crs = FactoryFinder.decode(fsd.getSRS());
+                maxbbox = FactoryFinder.toGeographic(maxbbox,crs);
             } catch (FactoryException e) {
                 e.printStackTrace();maxbbox = null;
             } catch (CannotCreateTransformException e) {
