@@ -103,7 +103,6 @@ public final class ExpressionDOMParser {
 
         Node child = root;
        
-        System.out.println("ExpressionParser: NodeValue=" + child.getNodeValue() +" NodeName=" + child.getNodeName() + ": LocalName=" + child.getLocalName() + ": NameSpaceURI=" + child.getNamespaceURI());
         String childName = (child.getLocalName()!=null)?child.getLocalName():child.getNodeName(); 
         if (childName.equalsIgnoreCase("Literal")) {
             LOGGER.finer("processing literal " + child);
