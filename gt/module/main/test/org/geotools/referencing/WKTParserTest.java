@@ -105,11 +105,12 @@ public class WKTParserTest extends TestCase {
             try {
                 parsed = parser.parseObject(line);
             } catch (ParseException exception) {
+                System.err.println();
                 System.err.println("-----------------------------");
                 System.err.println("Parse failed. Dump WKT below.");
                 System.err.println("-----------------------------");
                 System.err.println(line);
-                Throwable cause = exception.getCause();
+                System.err.println();
                 throw exception;
             }
             assertNotNull("Parsing returns null.",                 parsed);
@@ -121,7 +122,23 @@ public class WKTParserTest extends TestCase {
              * Format the object and parse it again.
              * Ensure that the result is consistent.
              */
-            final Object again = parser.parseObject(parser.format(parsed));
+            final String formatted = parser.format(parsed);
+            final Object again;
+            try {
+                again = parser.parseObject(formatted);
+            } catch (ParseException exception) {
+                System.err.println();
+                System.err.println("------------------------------------");
+                System.err.println("Second parse failed. Dump WKT below.");
+                System.err.println("------------------------------------");
+                System.err.println(line);
+                System.err.println();
+                System.err.println("------ Reformatted WKT below -------");
+                System.err.println();
+                System.err.println(formatted);
+                System.err.println();
+                throw exception;
+            }
             assertEquals("Second parsing produced different objects", parsed, again);
             assertTrue("Inconsistent hashCode or equals method.",  pool.contains(again));
         }

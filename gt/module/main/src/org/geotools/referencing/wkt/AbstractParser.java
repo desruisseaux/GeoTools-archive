@@ -27,11 +27,21 @@ import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.ParseException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 
 // OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.GeneralParameterValue;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -156,4 +166,70 @@ public abstract class AbstractParser extends Format {
             formatter.clear();
         }
     }     
+
+    /**
+     * Read WKT strings from an input stream and reformat them to the specified
+     * output stream. WKT strings are read until the the end-of-stream, or until
+     * an unparsable WKT has been hit. In this later case, an error message is
+     * formatted to the specified error stream.
+     *
+     * @param  in  The input stream.
+     * @param  out The output stream.
+     * @param  err The error stream.
+     * @throws IOException if an error occured while reading from the input stream
+     *         or writting to the output stream.
+     */
+    public void reformat(final BufferedReader in, final Writer out, final PrintWriter err)
+            throws IOException
+    {
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        String line = null;
+        try {
+            while ((line=in.readLine()) != null) {
+                out.write(lineSeparator);
+                out.write(format(parseObject(line)));
+                out.write(lineSeparator);
+                out.write(lineSeparator);
+                out.flush();
+            }
+        } catch (ParseException exception) {
+            err.println(exception.getLocalizedMessage());
+            if (line != null) {
+                line = line.replace('\r', ' ').replace('\n', ' ');
+                final int WINDOW_WIDTH    = 80; // Arbitrary value.
+                int           stop        = line.length();
+                int           errorOffset = exception.getErrorOffset();
+                int           base        = errorOffset-WINDOW_WIDTH/2;
+                final int     baseMax     = stop-WINDOW_WIDTH;
+                final boolean hasTrailing = (Math.max(base,0) < baseMax);
+                if (!hasTrailing) {
+                    base = baseMax;
+                }
+                if (base < 0) {
+                    base = 0;
+                }
+                stop = Math.min(stop, base+WINDOW_WIDTH);
+                if (hasTrailing) {
+                    stop -= 3;
+                }
+                if (base != 0) {
+                    err.print("...");
+                    errorOffset += 3;
+                    base += 3;
+                }
+                err.print(line.substring(base, stop));
+                if (hasTrailing) {
+                    err.println("...");
+                } else {
+                    err.println();
+                }
+                err.print(Utilities.spaces(errorOffset-base));
+                err.println('^');
+            }
+        } catch (InvalidParameterValueException exception) {
+            err.print(Resources.format(ResourceKeys.ERROR_IN_$1, exception.getParameterName()));
+            err.print(' ');
+            err.println(exception.getLocalizedMessage());
+        }
+    }
 }

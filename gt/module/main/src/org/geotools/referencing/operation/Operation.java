@@ -25,9 +25,10 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Map;
-import java.util.Arrays;
+import java.util.Collection;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
@@ -35,13 +36,19 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
  * A parameterized mathematical operation on coordinates that transforms or converts
  * coordinates to another coordinate reference system. This coordinate operation thus
  * uses an operation method, usually with associated parameter values.
- *  
+ *
+ * <P>In the Geotools implementation, the {@linkplain #getParameterValues parameter values}
+ * are inferred from the {@linkplain #transform transform}. Other implementations may have
+ * to overrides the {@link #getParameterValues} method.</P>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -56,19 +63,9 @@ public class Operation extends SingleOperation
     private static final long serialVersionUID = -8923365753849532179L;
 
     /**
-     * An empty array of parameters.
-     */
-    private static final GeneralParameterValue[] EMPTY_PARAMETER = new GeneralParameterValue[0];
-
-    /**
      * The operation method.
      */
     protected final OperationMethod method;
-
-    /**
-     * The parameter values, or <code>null</code> if none.
-     */
-    private final GeneralParameterValue[] values;
 
     /**
      * Construct an operation from a set of properties. The properties given in argument
@@ -81,28 +78,16 @@ public class Operation extends SingleOperation
      *                  reference system} to positions in the {@linkplain #getTargetCRS target
      *                  coordinate reference system}.
      * @param method    The operation method.
-     * @param values    The parameter values, or <code>null</code> or an empty array if none.
      */
     public Operation(final Map                      properties,
                      final CoordinateReferenceSystem sourceCRS,
                      final CoordinateReferenceSystem targetCRS,
                      final MathTransform             transform,
-                     final OperationMethod           method,
-                           GeneralParameterValue[]   values)
+                     final OperationMethod           method)
     {
         super(properties, sourceCRS, targetCRS, transform);
         ensureNonNull("method", method);
         org.geotools.referencing.operation.OperationMethod.checkDimensions(method, transform);
-        if (values==null || values.length==0) {
-            values = null;
-        } else {
-            values = (GeneralParameterValue[]) values.clone();
-            for (int i=0; i<values.length; i++) {
-                ensureNonNull("values", values, i);
-                values[i] = (GeneralParameterValue) values[i].clone();
-            }
-        }
-        this.values = values;
         this.method = method;
     }
 
@@ -115,12 +100,23 @@ public class Operation extends SingleOperation
 
     /**
      * Returns the parameter values, or an empty array if none.
+     * The default implementation infer the parameter values from the
+     * {@link #transform transform}, if possible.
      *
      * @see MathTransformFactory#createParameterizedTransform
      * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
     public GeneralParameterValue[] getParameterValues() {
-        return (values!=null) ? (GeneralParameterValue[]) values.clone() : EMPTY_PARAMETER;
+        if (transform instanceof AbstractMathTransform) {
+            final ParameterValueGroup group =
+                ((AbstractMathTransform) transform).getParameterValues();
+            if (group != null) {
+                final Collection params = group.values();
+                return (GeneralParameterValue[]) params.toArray(
+                        new GeneralParameterValue[params.size()]);
+            }
+        }
+        throw new UnsupportedImplementationException(transform.getClass());
     }
 
     /**
@@ -137,8 +133,7 @@ public class Operation extends SingleOperation
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final Operation that = (Operation) object;
-            return equals(this.method, that.method, compareMetadata) &&
-                   Arrays.equals(this.values, that.values);
+            return equals(this.method, that.method, compareMetadata);
         }
         return false;
     }
@@ -147,12 +142,6 @@ public class Operation extends SingleOperation
      * Returns a hash code value for this operation method.
      */
     public int hashCode() {
-        int code = super.hashCode() + method.hashCode();
-        if (values != null) {
-            for (int i=values.length; --i>=0;) {
-                code = code*37 + values[i].hashCode();
-            }
-        }
-        return code;
+        return super.hashCode() ^ method.hashCode();
     }
 }

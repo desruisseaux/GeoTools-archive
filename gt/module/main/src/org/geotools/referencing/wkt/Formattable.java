@@ -182,7 +182,7 @@ public class Formattable {
      * &nbsp;           (insertion point)
      * </pre>
      *
-     * The default implementation does nothing.
+     * The default implementation declare that this object produces an invalid WKT.
      * Subclasses must override this method for proper WKT formatting.
      *
      * @param  formatter The formatter to use.

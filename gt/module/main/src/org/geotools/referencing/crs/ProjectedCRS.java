@@ -113,35 +113,6 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     }
 
     /**
-     * Constructs a projected coordinate reference system from a projection name.
-     * The properties are given unchanged to the
-     * {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map,CoordinateReferenceSystem,MathTransform,CoordinateSystem)
-     * super-class constructor}.
-     * 
-     * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
-     * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  projectionName The classification name for the projection to be created
-     *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
-     * @param  parameterValues The parameter value to give to the projection. Should includes
-     *         "central_meridian", "latitude_of_origin", "scale_factor", "false_easting",
-     *         "false_northing" and any other parameters specific to the projection.
-     * @param  cs The coordinate system for the projected CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @todo Not yet implemented.
-     */
-    public ProjectedCRS(final Map                          properties,
-                        final GeographicCRS                    geoCRS,
-                        final String                   projectionName,
-                        final GeneralParameterValue[] parameterValues,
-                        final CartesianCS                          cs)
-    {
-        super(properties, geoCRS, null, cs);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * Wraps the specified arguments in a {@link Projection} object. This method is invoked
      * by {@link GeneralDerivedCRS} constructor in order to construct a {@link Conversion}
      * object of the right kind.
@@ -152,11 +123,10 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
                                 final CoordinateReferenceSystem sourceCRS,
                                 final CoordinateReferenceSystem targetCRS,
                                 final MathTransform             transform,
-                                final OperationMethod           method,
-                                final GeneralParameterValue[]   values)
+                                final OperationMethod           method)
     {
         return new org.geotools.referencing.operation.Projection(properties,
-                    sourceCRS, targetCRS, transform, method, values);
+                    sourceCRS, targetCRS, transform, method);
     }
     
     /**
@@ -183,8 +153,12 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
         formatter.append(baseCRS);
         formatter.append(conversionFromBase.getMethod());
         formatter.setContextualUnit(unit);
-        formatter.append(conversionFromBase);
+        final GeneralParameterValue[] parameters = conversionFromBase.getParameterValues();
+        for (int i=0; i<parameters.length; i++) {
+            formatter.append(parameters[i]);
+        }
         formatter.setContextualUnit(oldUnit);
+        formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));

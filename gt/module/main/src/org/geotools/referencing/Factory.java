@@ -822,21 +822,17 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      *         "false_northing" and any other parameters specific to the projection.
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @todo Not yet implemented.
      */
     public ProjectedCRS createProjectedCRS(Map                          properties,
                                            GeographicCRS                    geoCRS,
                                            String                   projectionName,
                                            GeneralParameterValue[] parameterValues,
-                                           CartesianCS                          cs) throws FactoryException
+                                           CartesianCS                          cs)
+            throws FactoryException
     {
-        ProjectedCRS crs;
-        try {
-            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, geoCRS, projectionName, parameterValues, cs);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        crs = (ProjectedCRS) canonicalize(crs);
-        return crs;
+        throw new UnsupportedOperationException();
     }
 
     /**

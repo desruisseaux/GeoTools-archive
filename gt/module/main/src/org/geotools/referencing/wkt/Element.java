@@ -98,7 +98,7 @@ public final class Element {
          */
         int lower = position.getIndex();
         final int length = text.length();
-        while (lower<length && Character.isSpaceChar(text.charAt(lower))) {
+        while (lower<length && Character.isWhitespace(text.charAt(lower))) {
             lower++;
         }
         offset = lower;
@@ -197,7 +197,7 @@ public final class Element {
         int index = position.getIndex();
         while (index < length) {
             final char c = text.charAt(index);
-            if (Character.isSpaceChar(c)) {
+            if (Character.isWhitespace(c)) {
                 index++;
                 continue;
             }
@@ -283,9 +283,15 @@ public final class Element {
                 }
             }
         }
-        return trim("unparsableString", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_UNPARSABLE_STRING_$2,
-                    text.substring(position.getIndex()), text.substring(lower, upper))), lower));
+        final String message;
+        if (lower == length) {
+            message = Resources.format(ResourceKeys.ERROR_UNEXPECTED_END_OF_STRING);
+        } else {
+            message = Resources.format(ResourceKeys.ERROR_UNPARSABLE_STRING_$2,
+                      text.substring(position.getIndex()),
+                      text.substring(lower, upper));
+        }
+        return trim("unparsableString", new ParseException(complete(message), lower));
     }
 
     /**

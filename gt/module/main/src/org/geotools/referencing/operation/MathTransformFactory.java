@@ -465,46 +465,39 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         final Arguments arguments = new Arguments(args);
         final boolean printAll = arguments.getFlag("-all");
         args = arguments.getRemainingArguments(1);
-        final MathTransformFactory factory = new MathTransformFactory();
-        final ParameterWriter writer = new ParameterWriter(arguments.out);
-        writer.setLocale(arguments.locale);
-        Set transforms = Collections.EMPTY_SET;
-        if (printAll || args.length==0) {
-            transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
-            transforms.addAll(factory.getAvailableTransforms());
-            try {
-                writer.summary(transforms);
-            } catch (IOException exception) {
-                // Should not happen, since we are writting to System.out.
-                exception.printStackTrace(arguments.out);
-                arguments.out.flush();
-                return;
-            }
-        }
-        if (!printAll) {
-            if (args.length == 0) {
-                transforms = Collections.EMPTY_SET;
-            } else try {
-                transforms = Collections.singleton(factory.getProvider(args[0]));
-            } catch (NoSuchIdentifierException exception) {
-                arguments.out.println(exception.getLocalizedMessage());
-                return;
-            }
-        }
-        /*
-         * Iterates through all math transform to print. It may be a singleton
-         * if the user ask for a specific math transform.
-         */
-        final Iterator it = transforms.iterator();
-        final String lineSeparator = System.getProperty("line.separator", "\n");
         try {
+            final MathTransformFactory factory = new MathTransformFactory();
+            final ParameterWriter writer = new ParameterWriter(arguments.out);
+            writer.setLocale(arguments.locale);
+            Set transforms = Collections.EMPTY_SET;
+            if (printAll || args.length==0) {
+                transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
+                transforms.addAll(factory.getAvailableTransforms());
+                writer.summary(transforms);
+            }
+            if (!printAll) {
+                if (args.length == 0) {
+                    transforms = Collections.EMPTY_SET;
+                } else {
+                    transforms = Collections.singleton(factory.getProvider(args[0]));
+                }
+            }
+            /*
+             * Iterates through all math transform to print. It may be a singleton
+             * if the user ask for a specific math transform.
+             */
+            final Iterator it = transforms.iterator();
+            final String lineSeparator = System.getProperty("line.separator", "\n");
             while (it.hasNext()) {
                 arguments.out.write(lineSeparator);
                 writer.format((OperationMethod) it.next());
             }
-        } catch (IOException exception) {
-            // Should not happen, since we are writting to System.out.
-            exception.printStackTrace(arguments.out);
+        } catch (NoSuchIdentifierException exception) {
+            arguments.err.println(exception.getLocalizedMessage());
+            return;
+        } catch (Exception exception) {
+            exception.printStackTrace(arguments.err);
+            return;
         }
         arguments.out.flush();
     }

@@ -522,7 +522,8 @@ public class Parameter extends AbstractParameter
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new InvalidParameterValueException(Resources.format(expectedID, unit),
+                      descriptor.getName().getCode(), value);
         }
         final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
         ensureValidValue((ParameterDescriptor) descriptor, converted);

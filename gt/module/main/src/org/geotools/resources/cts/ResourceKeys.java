@@ -148,6 +148,7 @@ public interface ResourceKeys
     public static final int ERROR_POINT_OUTSIDE_HEMISPHERE              =   118;
     public static final int ERROR_POLE_PROJECTION_$1                    =   119;
     public static final int ERROR_TOO_MANY_OCCURENCES_$2                =   130;
+    public static final int ERROR_UNEXPECTED_END_OF_STRING              =   133;
     public static final int ERROR_UNEXPECTED_PARAMETER_$1               =   120;
     public static final int ERROR_UNITLESS_PARAMETER_$1                 =   121;
     public static final int ERROR_UNKNOW_TYPE_$1                        =   122;

@@ -20,12 +20,15 @@
 package org.geotools.resources;
 
 // Input/output
+import java.io.Reader;
 import java.io.Writer;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -79,6 +82,14 @@ public class Arguments {
      * preference.
      */
     public final PrintWriter out;
+
+    /**
+     * Error stream to the console. This output stream will use
+     * encoding specified in the <code>"-encoding" argument, if
+     * present. Otherwise, encoding will be fetch from user's
+     * preference.
+     */
+    public final PrintWriter err;
 
     /**
      * The locale. Locale will be fetch from the <code>"-locale"</code>
@@ -138,6 +149,7 @@ public class Arguments {
             out = new PrintWriter(System.out, true);
         }
         this.out = out;
+        this.err = new PrintWriter(getWriter(System.err), true);
         if (error != null) {
             illegalArgument(error);
         }
@@ -373,23 +385,43 @@ public class Arguments {
     }
 
     /**
+     * Gets a reader for the specified input stream. If the user specified an encoding
+     * in some previous run of {@link Arguments}, then this encoding will be used.
+     *
+     * @param  in The input stream to wrap.
+     * @return A {@link Reader} wrapping the specified input stream with the user's
+     *         prefered encoding.
+     */
+    public static Reader getReader(final InputStream in) {
+        final String encoding;
+        encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
+        if (encoding != null) try {
+            return new InputStreamReader(in, encoding);
+        } catch (UnsupportedEncodingException exception) {
+            // Should not occurs, since the character encoding was supported in some previous run...
+            Utilities.unexpectedException("org.geotools.resources", "Arguments",
+                                          "getReader", exception);
+        }
+        return new InputStreamReader(in);
+    }
+
+    /**
      * Gets a writer for the specified output stream. If the user specified an encoding
      * in some previous run of {@link Arguments}, then this encoding will be used.
      *
      * @param  out The output stream to wrap.
-     * @return A {@link PrintWriter} wrapping the specified output stream with the user's
+     * @return A {@link Writer} wrapping the specified output stream with the user's
      *         prefered encoding.
      */
     public static Writer getWriter(final OutputStream out) {
-        try {
-            final String encoding;
-            encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
-            if (encoding != null) {
-                return new OutputStreamWriter(out, encoding);
-            }
+        final String encoding;
+        encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
+        if (encoding != null) try {
+            return new OutputStreamWriter(out, encoding);
         } catch (UnsupportedEncodingException exception) {
             // Should not occurs, since the character encoding was supported in some previous run...
-            Utilities.unexpectedException("org.geotools.resources", "Arguments", "getWriter", exception);
+            Utilities.unexpectedException("org.geotools.resources", "Arguments",
+                                          "getWriter", exception);
         }
         return new OutputStreamWriter(out);
     }
@@ -430,11 +462,10 @@ public class Arguments {
      * @param exception An exception with a message describing the user's error.
      */
     protected void illegalArgument(final Exception exception) {
-        out.print(Utilities.getShortClassName(exception));
-        out.print(": ");
-        out.println(exception.getLocalizedMessage());
-        out.flush();
-        out.close();
+        err.print(Utilities.getShortClassName(exception));
+        err.print(": ");
+        err.println(exception.getLocalizedMessage());
+        err.flush();
         System.exit(1);
         // We should not get there. But just in case,
         // throw the exception...

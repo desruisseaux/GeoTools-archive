@@ -354,9 +354,8 @@ public final class FactoryFinder {
         args = arguments.getRemainingArguments(0);
         try {
             listProviders(arguments.out, arguments.locale);
-        } catch (IOException exception) {
-            // Should not happen
-            exception.printStackTrace(arguments.out);
+        } catch (Exception exception) {
+            exception.printStackTrace(arguments.err);
         }
     }
 }

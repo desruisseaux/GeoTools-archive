@@ -27,7 +27,6 @@ package org.geotools.referencing.operation;
 import java.util.Map;
 
 // OpenGIS dependencies
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -61,16 +60,14 @@ public class Conversion extends Operation implements org.opengis.referencing.ope
      *                  reference system} to positions in the {@linkplain #getTargetCRS target
      *                  coordinate reference system}.
      * @param method    The operation method.
-     * @param values    The parameter values, or <code>null</code> or an empty array if none.
      */
     public Conversion(final Map                       properties,
                       final CoordinateReferenceSystem sourceCRS,
                       final CoordinateReferenceSystem targetCRS,
                       final MathTransform             transform,
-                      final OperationMethod           method,
-                      final GeneralParameterValue[]   values)
+                      final OperationMethod           method)
     {
-        super(properties, sourceCRS, targetCRS, transform, method, values);
+        super(properties, sourceCRS, targetCRS, transform, method);
     }
 
     /**

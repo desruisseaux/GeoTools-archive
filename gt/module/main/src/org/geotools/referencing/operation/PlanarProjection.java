@@ -61,15 +61,13 @@ public class PlanarProjection extends Projection
      *                  reference system} to positions in the {@linkplain #getTargetCRS target
      *                  coordinate reference system}.
      * @param method    The operation method.
-     * @param values    The parameter values, or <code>null</code> or an empty array if none.
      */
     public PlanarProjection(final Map                       properties,
                             final CoordinateReferenceSystem sourceCRS,
                             final CoordinateReferenceSystem targetCRS,
                             final MathTransform             transform,
-                            final OperationMethod           method,
-                            final GeneralParameterValue[]   values)
+                            final OperationMethod           method)
     {
-        super(properties, sourceCRS, targetCRS, transform, method, values);
+        super(properties, sourceCRS, targetCRS, transform, method);
     }
 }

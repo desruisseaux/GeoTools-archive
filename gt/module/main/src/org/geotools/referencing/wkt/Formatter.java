@@ -250,14 +250,30 @@ public class Formatter {
         if (identifier != null) {
             final Citation authority = identifier.getAuthority();
             if (authority != null) {
-                final InternationalString title = authority.getTitle();
+                /*
+                 * Format the authority code. Since WKT often use abbreviations,
+                 * we will search for the shortest title or alternate title.
+                 */
+                InternationalString inter = authority.getTitle();
+                String title = (inter!=null) ? inter.toString(symbols.locale) : null;
+                for (final Iterator it=authority.getAlternateTitles().iterator(); it.hasNext();) {
+                    inter = (InternationalString) it.next();
+                    if (inter != null) {
+                        final String candidate = inter.toString(symbols.locale);
+                        if (candidate != null) {
+                            if (title==null || candidate.length()<title.length()) {
+                                title = candidate;
+                            }
+                        }
+                    }
+                }
                 if (title != null) {
                     buffer.append(symbols.separator);
                     buffer.append(symbols.space);
                     buffer.append("AUTHORITY");
                     buffer.append(symbols.open);
                     buffer.append(symbols.quote);
-                    buffer.append(title.toString(symbols.locale));
+                    buffer.append(title);
                     final String code = identifier.getCode();
                     if (code != null) {
                         buffer.append(symbols.quote);

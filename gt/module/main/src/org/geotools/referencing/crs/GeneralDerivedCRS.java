@@ -37,12 +37,13 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -107,11 +108,6 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"parameters"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;<code>{@linkplain GeneralParameterValue}[]</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Conversion#getParameterValues}</td>
-     *   </tr>
-     *   <tr>
      *     <td nowrap>&nbsp;<code>"method.name"</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;<code>{@linkplain Conversion#getMethod}.getName()</code></td>
@@ -158,38 +154,37 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                         new Integer(dim1), new Integer(dim2)));
         }
-        /*
-         * Gets the parameters, which may be null. If no OperationMethod was explicitly specified,
-         * a new one will be inferred from the parameters. The operation method will inherit the
-         * name from this GeneralDerivedCRS, unless a "method.name" property were explicitly
-         * specified.
-         */
-        final GeneralParameterValue[] parameters;
-        parameters = (GeneralParameterValue[]) properties.get("parameters");
         OperationMethod method = (OperationMethod) properties.get("method");
-        if (method == null) {
-            final GeneralParameterDescriptor[] descriptors;
-            if (parameters != null) {
-                descriptors = new GeneralParameterDescriptor[parameters.length];
-                for (int i=0; i<descriptors.length; i++) {
-                    descriptors[i] = parameters[i].getDescriptor();
+        if (method != null) {
+            /*
+             * A method was explicitly specified. Make sure that the source and target
+             * dimensions match. We do not check parameters in current version of this
+             * implementation (we may add this check in a future version), since the
+             * descriptors provided in this user-supplied OperationMethod may be more
+             * accurate than the one inferred from the MathTransform.
+             */
+            org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
+        } else {
+            /*
+             * No OperationMethod were explicitly set (which is the default, documented
+             * behavior). Constructs a default OperationMethod using the descriptors
+             * inferred from the MathTransform. This work for Geotools implementation,
+             * but is likely to fails to infer parameters for other implementations.
+             */
+            ParameterDescriptorGroup descriptors = null;
+            if (baseToDerived instanceof AbstractMathTransform) {
+                final ParameterValueGroup values =
+                        ((AbstractMathTransform) baseToDerived).getParameterValues();
+                if (values != null) {
+                    // TODO: remove cast once we will be allowed to use J2SE 1.5.
+                    descriptors = (ParameterDescriptorGroup) values.getDescriptor();
                 }
-            } else {
-                descriptors = null;
             }
             method = new org.geotools.referencing.operation.OperationMethod(
                          /* properties       */ new UnprefixedMap(properties, "method."),
                          /* sourceDimensions */ dimSource,
                          /* targetDimensions */ dimTarget,
                          /* parameters       */ descriptors);
-        } else {
-            /*
-             * A method was explicitly specified. Make sure that the source and target dimensions
-             * match. We do not check parameters in current version of this implementation (we may
-             * add this check in a future version), since the provided parameter descriptors may be
-             * more accurate than the one inferred from the parameter values.
-             */
-            org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
         }
         /*
          * Constructs the conversion from all the information above. The ProjectedCRS subclass
@@ -200,8 +195,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                                   /* sourceCRS  */ base,
                                   /* targetCRS  */ this,
                                   /* transform  */ baseToDerived,
-                                  /* method     */ method,
-                                  /* parameters */ parameters);
+                                  /* method     */ method);
     }
 
     /**
@@ -213,11 +207,10 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                                 final CoordinateReferenceSystem sourceCRS,
                                 final CoordinateReferenceSystem targetCRS,
                                 final MathTransform             transform,
-                                final OperationMethod           method,
-                                final GeneralParameterValue[]   values)
+                                final OperationMethod           method)
     {
         return new org.geotools.referencing.operation.Conversion(properties,
-                    sourceCRS, targetCRS, transform, method, values);
+                    sourceCRS, targetCRS, transform, method);
     }
 
     /**
@@ -263,8 +256,17 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
         }
         if (super.equals(object, compareMetadata)) {
             final GeneralDerivedCRS that = (GeneralDerivedCRS) object;
-            return equals(this.baseCRS,            that.baseCRS,            compareMetadata) &&
-                   equals(this.conversionFromBase, that.conversionFromBase, compareMetadata);
+            if (equals(this.baseCRS, that.baseCRS, compareMetadata)) {
+                /*
+                 * Avoid never-ending loop: Conversion has a 'sourceCRS' field (in the
+                 * CoordinateOperation super-class) that is set to this GeneralDerivedCRS.
+                 *
+                 * TODO
+                 */
+                return equals(this.conversionFromBase,
+                              that.conversionFromBase,
+                              compareMetadata);
+            }
         }
         return false;
     }
@@ -276,7 +278,12 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *         in past or future versions of this class.
      */
     public int hashCode() {
-        return (int)serialVersionUID ^ baseCRS.hashCode() ^ conversionFromBase.hashCode();
+        /*
+         * Do not invoke 'conversionFromBase.hashCode()' in order to avoid a never-ending loop.
+         * This is because Conversion has a 'sourceCRS' field (in the CoordinateOperation super-
+         * class), which is set to this GeneralDerivedCRS. Checking the identifier should be enough.
+         */
+        return (int)serialVersionUID ^ baseCRS.hashCode() ^ conversionFromBase.getName().hashCode();
     }
     
     /**

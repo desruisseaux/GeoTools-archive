@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.io.BufferedReader;
 
 // Parsing
 import java.util.Locale;
@@ -46,6 +47,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
 
@@ -55,8 +57,9 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.metadata.citation.Citation;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -223,22 +226,22 @@ public class Parser extends MathTransformParser {
      * </code></blockquote>
      *
      * @param  parent The parent element.
-     * @param  parentName The name of the parent object being parsed.
+     * @param  name The name of the parent object being parsed.
      * @return A properties map with the parent name and the optional autority code.
      * @throws ParseException if the "AUTHORITY" can't be parsed.
      */
-    private static Map parseAuthority(final Element parent, final String parentName)
+    private static Map parseAuthority(final Element parent, final String name)
             throws ParseException
     {
         final Element element = parent.pullOptionalElement("AUTHORITY");
         if (element == null) {
-            return Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, parentName);
+            return Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, name);
         }
-        final String name = element.pullString("name");
+        final String auth = element.pullString("name");
         final String code = element.pullString("code");
         element.close();
         final Map     properties = new HashMap(4);
-        final Citation authority = Citation.createCitation(name);
+        final Citation authority = Citation.createCitation(auth);
         properties.put(IdentifiedObject.       NAME_PROPERTY, new Identifier(authority, name));
         properties.put(IdentifiedObject.IDENTIFIERS_PROPERTY, new Identifier(authority, code));
         return properties;
@@ -458,10 +461,18 @@ public class Parser extends MathTransformParser {
             final double         paramValue = param.pullDouble("value");
             final ParameterValue parameter  = parameters.parameter(paramName);
             if (unit != null) {
-                parameter.setValue(paramValue, unit);
-            } else {
-                parameter.setValue(paramValue);
+                final Unit expected = ((ParameterDescriptor)parameter.getDescriptor()).getUnit();
+                if (SI.METER.isCompatible(expected)) {
+                    /*
+                     * Parameters block contains a mix of linear and angular unit.
+                     * But the unit specified with a PROJECTION statement applies
+                     * to linear unit only.
+                     */
+                    parameter.setValue(paramValue, unit);
+                    continue;
+                }
             }
+            parameter.setValue(paramValue);
         }
         return parameters;
     }
@@ -820,6 +831,23 @@ public class Parser extends MathTransformParser {
             throw element.parseFailed(exception, null);
         } catch (NoninvertibleTransformException exception) {
             throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Read WKT strings from the {@linkplain System#in standard input stream} and
+     * reformat them to the {@linkplain System#out standard output stream}. The
+     * input is read until it reach the end-of-file (<code>[Ctrl-Z]</code> if
+     * reading from the keyboard), or until an unparsable WKT has been hit.
+     */
+    public static void main(String[] args) {
+        final Arguments arguments = new Arguments(args);
+        args = arguments.getRemainingArguments(0);
+        final BufferedReader in = new BufferedReader(Arguments.getReader(System.in));
+        try {
+            new Parser().reformat(in, arguments.out, arguments.err);
+        } catch (Exception exception) {
+            exception.printStackTrace(arguments.err);
         }
     }
 }

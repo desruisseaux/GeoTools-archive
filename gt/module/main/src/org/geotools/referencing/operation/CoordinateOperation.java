@@ -33,7 +33,6 @@ import java.util.HashMap;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.PositionalAccuracy;
-import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -225,22 +224,14 @@ public class CoordinateOperation extends IdentifiedObject
     }
 
     /**
-     * Returns the source CRS. The source CRS is mandatory for {@linkplain Transformation
-     * transformations}. {@linkplain Conversion Conversions} may have a source CRS that
-     * is not specified here, but through {@link GeneralDerivedCRS#getBaseCRS} instead.
-     *
-     * @return The source CRS, or <code>null</code> if not available.
+     * Returns the source CRS.
      */
     public CoordinateReferenceSystem getSourceCRS() {
         return sourceCRS;
     }
 
     /**
-     * Returns the target CRS. The target CRS is mandatory for {@linkplain Transformation
-     * transformations} only. {@linkplain Conversion Conversions} may have a target CRS
-     * that is not specified here, but through {@link GeneralDerivedCRS} instead.
-     *
-     * @return The target CRS, or <code>null</code> if not available.
+     * Returns the target CRS.
      */
     public CoordinateReferenceSystem getTargetCRS() {
         return targetCRS;
@@ -310,17 +301,20 @@ public class CoordinateOperation extends IdentifiedObject
         }
         if (super.equals(object, compareMetadata)) {
             final CoordinateOperation that = (CoordinateOperation) object;
-            if (          equals(this.sourceCRS, that.sourceCRS, compareMetadata) &&
-                          equals(this.targetCRS, that.targetCRS, compareMetadata) &&
+            if (equals(this.targetCRS, that.targetCRS, compareMetadata) &&
                 Utilities.equals(this.transform, that.transform))
             {
-                if (!compareMetadata) {
-                    return true;
+                if (compareMetadata) {
+                    if (!Utilities.equals(this.validArea,          that.validArea) ||
+                        !Utilities.equals(this.scope,              that.scope    ) ||
+                        !Arrays   .equals(this.positionalAccuracy, that.positionalAccuracy))
+                        // TODO: Uses Arrays.deepEquals(...) when J2SE 1.5 will be available.
+                    {
+                        return false;
+                    }
                 }
-                return Utilities.equals(this.validArea,          that.validArea) &&
-                       Utilities.equals(this.scope,              that.scope    ) &&
-                       Arrays   .equals(this.positionalAccuracy, that.positionalAccuracy);
-                       // TODO: Uses Arrays.deepEquals(...) when J2SE 1.5 will be available.
+                // TODO: the following may cause a never-ending loop.
+                return equals(this.sourceCRS, that.sourceCRS, compareMetadata);
             }
         }
         return false;

@@ -68,7 +68,7 @@ final class UnprefixedMap extends DerivedMap {
      * Remove the prefix from the specified key. If the key doesn't begins with
      * the prefix, then this method returns <code>null</code>.
      *
-     * @param  key A ley from the {@linkplain #base} map.
+     * @param  key A key from the {@linkplain #base} map.
      * @return The key that this view should contains instead of <code>key</code>,
      *         or <code>null</code>.
      */

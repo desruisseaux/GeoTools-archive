@@ -242,7 +242,9 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
         }
 
         protected Object baseToDerived(final Object element) {
-            return new Entry((Map.Entry) element);
+            final Map.Entry entry = (Map.Entry) element;
+            final Object derived = DerivedMap.this.baseToDerived(entry.getKey());
+            return derived!=null ? new Entry(entry, derived) : null;
         }
         
         protected Object derivedToBase(final Object element) {
@@ -253,15 +255,17 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
     /**
      * The entry element.
      */
-    private final class Entry implements Map.Entry {
+    private static final class Entry implements Map.Entry {
         public final Map.Entry entry;
+        private final Object derived;
 
-        public Entry(final Map.Entry entry) {
-            this.entry = entry;
+        public Entry(final Map.Entry entry, final Object derived) {
+            this.entry   = entry;
+            this.derived = derived;
         }
 
         public Object getKey() {
-            return baseToDerived(entry.getValue());
+            return derived;
         }
         
         public Object getValue() {
