@@ -402,8 +402,13 @@ public class WebMapServer implements Discovery {
                         "Unable to create a GetMapRequest when the GetCapabilities document is null.");
             }
         }
+        
+        URL onlineResource = onlineResource = getCapabilities().getRequest().getGetMap().getGet();
+        if (onlineResource == null) { 
+            onlineResource = serverURL;
+        }
 
-        GetMapRequest request = specification.createGetMapRequest(getCapabilities().getRequest().getGetMap().getGet(),
+        GetMapRequest request = specification.createGetMapRequest(onlineResource,
                 Utils.findDrawableLayers(getCapabilities().getLayers()), getSRSs(), getCapabilities().getRequest()
                         .getGetMap().getFormatStrings(), getExceptions());
 
@@ -429,8 +434,13 @@ public class WebMapServer implements Discovery {
             throw new UnsupportedOperationException("This Web Map Server does not support GetFeatureInfo requests");
         }
 
-        GetFeatureInfoRequest request = specification.createGetFeatureInfoRequest(getCapabilities().getRequest()
-                .getGetFeatureInfo().getGet(), getMapRequest, getQueryableLayers(), getCapabilities().getRequest()
+        URL onlineResource = getCapabilities().getRequest().getGetFeatureInfo().getGet();
+        if (onlineResource == null) {
+            onlineResource = serverURL;
+        }
+        
+        GetFeatureInfoRequest request = specification.createGetFeatureInfoRequest(onlineResource,
+                getMapRequest, getQueryableLayers(), getCapabilities().getRequest()
                 .getGetFeatureInfo().getFormatStrings());
 
         return request;
@@ -442,6 +452,9 @@ public class WebMapServer implements Discovery {
         }
         
         URL onlineResource = getCapabilities().getRequest().getDescribeLayer().getGet();
+        if (onlineResource == null) {
+            onlineResource = serverURL;
+        }
         
         DescribeLayerRequest request = specification.createDescribeLayerRequest(onlineResource);
         
@@ -454,6 +467,9 @@ public class WebMapServer implements Discovery {
         }
         
         URL onlineResource = getCapabilities().getRequest().getGetLegendGraphic().getGet();
+        if (onlineResource == null) {
+            onlineResource = serverURL;
+        }
         
         GetLegendGraphicRequest request = specification.createGetLegendGraphicRequest(onlineResource, 
                 Utils.findDrawableLayers(getCapabilities().getLayers()),
@@ -469,6 +485,9 @@ public class WebMapServer implements Discovery {
         }
         
         URL onlineResource = getCapabilities().getRequest().getGetStyles().getGet();
+        if (onlineResource == null) {
+            onlineResource = serverURL;
+        }
         
         GetStylesRequest request = specification.createGetStylesRequest(onlineResource,
                 getNamedLayers());
@@ -482,6 +501,9 @@ public class WebMapServer implements Discovery {
         }
         
         URL onlineResource = getCapabilities().getRequest().getPutStyles().getGet();
+        if (onlineResource == null) {
+            onlineResource = serverURL;
+        }
         
         PutStylesRequest request = specification.createPutStylesRequest(onlineResource);
         return request;
