@@ -73,15 +73,6 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         implements org.opengis.referencing.operation.CoordinateOperationFactory
 {
     /**
-     * The identifier for temporary objects created.
-     *
-     * @todo localize
-     * @todo Provides a more elaborated name, e.g. "NAD27 (temporary-1)".
-     */
-    private static final Identifier TEMPORARY_NAME =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Temporary");
-
-    /**
      * The identifier for an identity operation.
      *
      * @todo localize
@@ -366,7 +357,9 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
-     * Concatenate two operation steps.
+     * Concatenate two operation steps. If an operation is n {@link #AXIS_CHANGE},
+     * it will be included as part of the second operation instead of creating an
+     * {@link ConcatenatedOperation}.
      *
      * @param  step1 The first  step, or <code>null</code> for the identity operation.
      * @param  step2 The second step, or <code>null</code> for the identity operation.
@@ -391,8 +384,17 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         final MathTransform mt2 = step2.getMathTransform(); if (mt2.isIdentity()) return step1;
         final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
         final CoordinateReferenceSystem targetCRS = step2.getTargetCRS();
-        return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
-                                           new CoordinateOperation[] {step1, step2});
+        final CoordinateOperation step;
+             if (step2.getName() == AXIS_CHANGES) step = step1;
+        else if (step1.getName() == AXIS_CHANGES) step = step2;
+        else {
+            return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
+                                               new CoordinateOperation[] {step1, step2});
+        }
+        return createFromMathTransform(getProperties(step), sourceCRS, targetCRS,
+               mtFactory.createConcatenatedTransform(mt1, mt2),
+               (step instanceof Operation) ? ((Operation) step).getMethod() : null,
+               CoordinateOperation.class);
     }
 
     /**
@@ -421,6 +423,8 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         if (mt2.isIdentity()) return concatenate(step1, step3);
         final MathTransform mt3 = step3.getMathTransform();
         if (mt3.isIdentity()) return concatenate(step1, step2);
+        if (step1.getName() == AXIS_CHANGES) return concatenate(concatenate(step1, step2), step3);
+        if (step3.getName() == AXIS_CHANGES) return concatenate(step1, concatenate(step2, step3));
         final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
         final CoordinateReferenceSystem targetCRS = step3.getTargetCRS();
         return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
@@ -447,15 +451,60 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
+     * Returns the properties of the given object.
+     *
+     * @todo Delete and replace by a static import when we will be allowed to compile against
+     *       J2SE 1.5. Nnote: there is a bunch of constants in this class that we could
+     *       simplified as well.
+     */
+    static Map getProperties(final IdentifiedObject object) {
+        return org.geotools.referencing.IdentifiedObject.getProperties(object);
+    }
+
+    /**
+     * An identifier for temporary objects. This identifier manage a count of temporary
+     * identifier. The count is appended to the identifier name (e.g. "WGS84 (step 1)").
+     */
+    private static final class TemporaryIdentifier extends org.geotools.referencing.Identifier {
+        /** The parent identifier. */
+        private final Identifier parent;
+
+        /** The temporary object count. */
+        private final int count;
+
+        /** Constructs an identifier derived from the specified one. */
+        public TemporaryIdentifier(final Identifier parent) {
+            this(parent, ((parent instanceof TemporaryIdentifier) ?
+                         ((TemporaryIdentifier) parent).count : 0) + 1);
+        }
+
+        /** Work around for RFE #4093999 in Sun's bug database */
+        private TemporaryIdentifier(final Identifier parent, final int count) {
+            super(Citation.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
+            this.parent = parent;
+            this.count  = count;
+        }
+
+        /** Returns the parent identifier for the specified identifier, if any. */
+        public static Identifier unwrap(Identifier identifier) {
+            while (identifier instanceof TemporaryIdentifier) {
+                identifier = ((TemporaryIdentifier) identifier).parent;
+            }
+            return identifier;
+        }
+    }
+
+    /**
      * Returns the name of the specified object.
      */
-    static String getName(final IdentifiedObject object) {
+    private static String getClassName(final IdentifiedObject object) {
         if (object != null) {
+            String name = Utilities.getShortClassName(object);
             final Identifier id = object.getName();
             if (id != null) {
-                return Utilities.getShortClassName(object) + '(' + id.getCode() + ')';
+                name = name + '[' + id.getCode() + ']';
             }
-            return Utilities.getShortClassName(object);
+            return name;
         }
         return null;
     }
@@ -469,17 +518,9 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
      */
     static Map getTemporaryName(final IdentifiedObject source) {
         final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY, TEMPORARY_NAME);
-        final StringBuffer remarks = new StringBuffer("Derived from \"");
-        remarks.append(getName(source));
-        remarks.append('"');
-        final InternationalString previous = source.getRemarks();
-        if (previous != null) {
-            remarks.append(System.getProperty("line.separator", "\n"));
-            remarks.append(previous);
-        }
+        properties.put(NAME_PROPERTY, new TemporaryIdentifier(source.getName()));
         properties.put(org.geotools.referencing.IdentifiedObject.REMARKS_PROPERTY,
-                       remarks.toString());
+                       "Derived from " + getClassName(source));
         return properties;
     }
 
@@ -491,7 +532,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     static Map getTemporaryName(final CoordinateReferenceSystem source,
                                 final CoordinateReferenceSystem target)
     {
-        final String name = getName(source) + " \u21E8 " + getName(target);
+        final String name = getClassName(source) + " \u21E8 " + getClassName(target);
         return Collections.singletonMap(NAME_PROPERTY, name);
     }
 
@@ -541,6 +582,6 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
                                             final IdentifiedObject target)
     {
         return Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
-                                getName(source), getName(target));
+                                getClassName(source), getClassName(target));
     }
 }

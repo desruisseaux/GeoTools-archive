@@ -124,9 +124,11 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                final CoordinateReferenceSystem targetCRS)
             throws OperationNotFoundException, FactoryException
     {
+        ensureNonNull("sourceCRS", sourceCRS);
+        ensureNonNull("targetCRS", targetCRS);
         if (equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-            final int dim = sourceCRS.getCoordinateSystem().getDimension();
-            assert   dim == targetCRS.getCoordinateSystem().getDimension() : dim;
+            final int dim  = getDimension(sourceCRS);
+            assert    dim == getDimension(targetCRS) : dim;
             return createFromAffineTransform(IDENTITY, sourceCRS, targetCRS,
                                              new GeneralMatrix(dim+1));
         }
@@ -277,8 +279,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             sourceCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_3D ||
             targetCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_3D)
         {
-            final int dimSource = sourceCRS.getCoordinateSystem().getDimension();
-            final int dimTarget = targetCRS.getCoordinateSystem().getDimension();
+            final int dimSource = getDimension(sourceCRS);
+            final int dimTarget = getDimension(targetCRS);
             if (dimTarget == dimSource) {
                 final Matrix  matrix    = new GeneralMatrix(dimTarget+1, dimSource+1);
                 return createFromAffineTransform(IDENTITY, sourceCRS, targetCRS, matrix);
@@ -689,10 +691,15 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          *     geocentric CRS with a preference for datum using Greenwich meridian -->
          *     target geographic CRS
          */
-        final GeodeticDatum   datum = getGreenwichLongitude(targetPM)==0 ? targetDatum : sourceDatum;
-        final CartesianCS  STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
-        final GeocentricCRS stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
-                                      getTemporaryName(targetCRS), datum, STANDARD);
+        final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+        final GeocentricCRS stepCRS;
+        if (getGreenwichLongitude(targetPM) == 0) {
+            stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
+                          getTemporaryName(targetCRS), targetDatum, STANDARD);
+        } else {
+            stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
+                          getTemporaryName(sourceCRS), sourceDatum, STANDARD);
+        }
         final CoordinateOperation step1 = createOperationStep(sourceCRS, stepCRS);
         final CoordinateOperation step2 = createOperationStep(stepCRS, targetCRS);
         return concatenate(step1, step2);
@@ -936,12 +943,11 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         final MathTransform     transform;
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
-        param.parameter("dim").setValue(normSourceCRS.getCoordinateSystem().getDimension());
+        param.parameter("dim")       .setValue(getDimension(normSourceCRS));
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep (sourceCRS, normSourceCRS);
-        step2 = createFromParameters(GEOCENTRIC_CONVERSION,
-                                     normSourceCRS, normTargetCRS, param);
+        step2 = createFromParameters(GEOCENTRIC_CONVERSION, normSourceCRS, normTargetCRS, param);
         step3 = createOperationStep (normTargetCRS, targetCRS);
         return concatenate(step1, step2, step3);
     }
@@ -970,12 +976,11 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         final MathTransform     transform;
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
-        param.parameter("dim").setValue(normTargetCRS.getCoordinateSystem().getDimension());
+        param.parameter("dim")       .setValue(getDimension(normTargetCRS));
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep (sourceCRS, normSourceCRS);
-        step2 = createFromParameters(GEOCENTRIC_CONVERSION,
-                                     normSourceCRS, normTargetCRS, param);
+        step2 = createFromParameters(GEOCENTRIC_CONVERSION, normSourceCRS, normTargetCRS, param);
         step3 = createOperationStep (normTargetCRS, targetCRS);
         return concatenate(step1, step2, step3);
     }
@@ -1220,16 +1225,5 @@ search: for (int j=0; j<targets.length; j++) {
      */
     private static boolean nameMatches(final IdentifiedObject object, final String name) {
         return org.geotools.referencing.IdentifiedObject.nameMatches(object, name);
-    }
-
-    /**
-     * Returns the properties of the given object.
-     *
-     * @todo Delete and replace by a static import when we will be allowed to compile against
-     *       J2SE 1.5. Nnote: there is a bunch of constants in this class that we could
-     *       simplified as well.
-     */
-    private static Map getProperties(final IdentifiedObject object) {
-        return org.geotools.referencing.IdentifiedObject.getProperties(object);
     }
 }
