@@ -283,6 +283,7 @@
           <include>**/*.txt</include>
           <include>**/*.utf</include>
           <include>**/*.properties</include>
+          <include>**/META-INF/*.jai</include>
           <include>**/services/**</include>
         </includes>
       </resource>

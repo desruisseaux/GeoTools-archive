@@ -196,6 +196,8 @@
             <include>**/*.wkt</include>
             <include>**/*.txt</include>
             <include>**/*.csv</include>
+            <include>**/*.png</include>
+            <include>**/*.gml</include>
           </includes>
         </resource>
       </resources>

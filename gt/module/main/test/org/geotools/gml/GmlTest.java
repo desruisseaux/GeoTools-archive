@@ -38,6 +38,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.logging.Logger;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -69,15 +70,8 @@ public class GmlTest extends TestCase {
     }
 
     public void testParsingHoles() throws Exception {
-        String dataFolder = System.getProperty("dataFolder");
-
-        if (dataFolder == null) {
-            //then we are being run by maven
-            dataFolder = System.getProperty("basedir");
-            dataFolder += "/tests/unit/testData";
-        }
-
-        URL url = new URL("file:///" + dataFolder + "/testGML11Hole.gml");
+       
+        URL url = TestData.getResource(this, "testGML11Hole.gml");
         LOGGER.fine("Testing ability to load " + url + " as Feature datasource");
 
         DataSource ds = new GMLDataSource(url);
@@ -103,15 +97,8 @@ public class GmlTest extends TestCase {
     public void testGMLDataSource() throws Exception {
         // no try block, a thrown exception will cause it a fail and should
         //print the trace to the output.
-        String dataFolder = System.getProperty("dataFolder");
-
-        if (dataFolder == null) {
-            //then we are being run by maven
-            dataFolder = System.getProperty("basedir");
-            dataFolder += "/tests/unit/testData";
-        }
-
-        URL url = new URL("file:///" + dataFolder + "/testGML7Features.gml");
+       
+        URL url = TestData.getResource(this, "testGML7Features.gml");
         System.out.println("Testing ability to load " + url
             + " as Feature datasource");
 

@@ -23,8 +23,13 @@ public class TestData {
         host.getClass().getResource("test-data/"+name).openStream()));
     }
     
-    public static final URL getResource(final Object host, final String name) throws IOException {
-       URL base = host.getClass().getResource("test-data/");
+    public static final URL getResource(final Class caller, final String name) throws IOException {
+       URL base = caller.getResource("test-data/");
+       return new URL(base + name);
+    }
+    
+    public static final URL getResource(final Object caller, final String name) throws IOException {
+       URL base = caller.getClass().getResource("test-data/");
        return new URL(base + name);
     }
     

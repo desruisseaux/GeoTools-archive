@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 import java.net.URL;
 import java.lang.reflect.*;
+import java.net.URLDecoder;
 import java.util.logging.Logger;
 import junit.framework.*;
 
@@ -45,21 +46,21 @@ public class CodeListTest extends TestCase implements FileFilter {
     public CodeListTest(String testName) {
         super(testName);
     }
-
+    
     /**
      * Returns the test suite.
      */
     public static Test suite() {
         return new TestSuite(CodeListTest.class);
     }
-
+    
     /**
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-
+    
     /**
      * Test {@link AxisDirection} operations.
      */
@@ -77,7 +78,7 @@ public class CodeListTest extends TestCase implements FileFilter {
         assertSame("PAST",   AxisDirection.FUTURE, AxisDirection.PAST  .inverse());
         assertSame("FUTURE", AxisDirection.PAST,   AxisDirection.FUTURE.inverse());
         assertSame("OTHER",  AxisDirection.OTHER,  AxisDirection.OTHER .inverse());
-
+        
         assertSame("SOUTH",  AxisDirection.NORTH,  AxisDirection.SOUTH .absolute());
         assertSame("NORTH",  AxisDirection.NORTH,  AxisDirection.NORTH .absolute());
         assertSame("WEST",   AxisDirection.EAST,   AxisDirection.WEST  .absolute());
@@ -92,7 +93,7 @@ public class CodeListTest extends TestCase implements FileFilter {
         assertSame("FUTURE", AxisDirection.FUTURE, AxisDirection.FUTURE.absolute());
         assertSame("OTHER",  AxisDirection.OTHER,  AxisDirection.OTHER .absolute());
     }
-
+    
     /**
      * Test the extensibility of some enums.
      */
@@ -108,7 +109,7 @@ public class CodeListTest extends TestCase implements FileFilter {
         }
         assertTrue(toIgnore.add(DUMMY));
     }
-
+    
     /**
      * Test all code list found in the system.
      */
@@ -116,7 +117,7 @@ public class CodeListTest extends TestCase implements FileFilter {
         final File base = defaultRootDirectory();
         scan(base, base);
     }
-
+    
     /**
      * Filter the files to includes on the processing. Only the files with the ".class" extensions
      * will be loaded. Directory must be included too if recursive scanning is wanted.
@@ -137,7 +138,7 @@ public class CodeListTest extends TestCase implements FileFilter {
         }
         return name.trim().endsWith(".class");
     }
-
+    
     /**
      * Returns the default root directory, or <code>null</code> if not found.
      * The default root directory is the one where the implementation of this
@@ -147,20 +148,25 @@ public class CodeListTest extends TestCase implements FileFilter {
         final Class c = getClass();
         final URL url = c.getClassLoader().getResource(c.getName().replace('.','/')+".class");
         if (url!=null && url.getProtocol().trim().equalsIgnoreCase("file")) {
-            File file = new File(url.getFile());
-            final String[] packages = c.getPackage().getName().split("\\.");
-            for (int i=packages.length; --i>=0;) {
-                file = file.getParentFile();
-                if (file==null || !file.getName().equals(packages[i])) {
-                    fail("Wrong directory name: "+file);
-                    return null;
+            try{
+                File file = new File(URLDecoder.decode(url.toExternalForm(),"UTF-8"));
+                final String[] packages = c.getPackage().getName().split("\\.");
+                for (int i=packages.length; --i>=0;) {
+                    file = file.getParentFile();
+                    if (file==null || !file.getName().equals(packages[i])) {
+                        fail("Wrong directory name: "+file);
+                        return null;
+                    }
                 }
+                return file.getParentFile();
             }
-            return file.getParentFile();
+            catch(UnsupportedEncodingException uee){
+                return null;
+            }
         }
         return null;
     }
-
+    
     /**
      * Scan the directory and all subdirectory for classes implementing {@link CodeList}.
      */
@@ -199,7 +205,7 @@ public class CodeListTest extends TestCase implements FileFilter {
             }
         }
     }
-
+    
     /**
      * Process a class. Only code list will be procceded.
      */
@@ -255,7 +261,7 @@ public class CodeListTest extends TestCase implements FileFilter {
             }
         }
     }
-
+    
     /**
      * List of enums to ignore in the {@link #process} operation.
      * Must be static because JUnit seems to recreate this object

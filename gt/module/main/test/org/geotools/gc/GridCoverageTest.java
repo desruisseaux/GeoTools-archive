@@ -57,6 +57,7 @@ import org.geotools.util.NumberRange;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -273,7 +274,7 @@ public class GridCoverageTest extends TestCase {
             }
             case 0: {
                 unit = "°C";
-                path = "test-data/QL95209.png";
+                path = "QL95209.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
                     new Category("Coast line", Color.decode("#000000"), new NumberRange(  0,   0)),
@@ -290,7 +291,7 @@ public class GridCoverageTest extends TestCase {
             }
             case 1: {
                 unit = "mg/m³";
-                path = "test-data/CHL01195.png";
+                path = "CHL01195.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
                     new Category("Land",       Color.decode("#000000"), new NumberRange(255, 255)),
@@ -306,8 +307,8 @@ public class GridCoverageTest extends TestCase {
             new SampleDimension(categories, (unit!=null) ? Unit.get(unit).rename(unit, null) : null)
         };
         final Envelope   envelope = new Envelope(bounds);
+        final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
         final String     filename = new File(path).getName();
-        final RenderedImage image = ImageIO.read(GridCoverageTest.class.getClassLoader().getResource(path));
         return new GridCoverage(filename, image, cs, envelope, bands, null, null);
     }
 }

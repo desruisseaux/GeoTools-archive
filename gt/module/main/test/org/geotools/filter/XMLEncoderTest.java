@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.xml.parsers.*;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -58,7 +59,7 @@ public class XMLEncoderTest extends FilterTestSupport {
         if (dataFolder == null) {
             //then we are being run by maven
             dataFolder = System.getProperty("basedir");
-            dataFolder = "file:////" + dataFolder + "/tests/unit/testData"; //url.toString();
+            dataFolder = "file:////" + "tests/unit/testData"; //url.toString();
             LOGGER.finer("data folder is " + dataFolder);
         }
     }
@@ -84,85 +85,85 @@ public class XMLEncoderTest extends FilterTestSupport {
     }
 
     public void test1() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test1.xml");
+        Filter test = parseDocument("test1.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test2() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test2.xml");
+        Filter test = parseDocument("test2.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test3a() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test3a.xml");
+        Filter test = parseDocument("test3a.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test3b() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test3b.xml");
+        Filter test = parseDocument("test3b.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test4() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test4.xml");
+        Filter test = parseDocument("test4.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test5() throws Exception {
-	Filter test = parseDocument(dataFolder + "/test5.xml");
+	Filter test = parseDocument("test5.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
       public void test7() throws Exception {
-	Filter test = parseDocument(dataFolder + "/test7.xml");
+	Filter test = parseDocument("test7.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test8() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test8.xml");
+        Filter test = parseDocument("test8.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test9() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test9.xml");
+        Filter test = parseDocument("test9.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test11() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test11.xml");
+        Filter test = parseDocument("test11.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test12() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test12.xml");
+        Filter test = parseDocument("test12.xml");
 
         // LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test13() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test13.xml");
+        Filter test = parseDocument("test13.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test14() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test14.xml");
+        Filter test = parseDocument("test14.xml");
 
         //LOGGER.fine("parsed filter is: " + test);
     }
 
     public void test28() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test28.xml");
+        Filter test = parseDocument("test28.xml");
 
         //LOGGER.fine("parsedfilter is: " + test);
     }
@@ -171,7 +172,7 @@ public class XMLEncoderTest extends FilterTestSupport {
         Filter filter = null;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document dom = db.parse(uri);
+        Document dom = db.parse(TestData.getResource(this, uri).toExternalForm());
         LOGGER.fine("exporting " + uri);
 
         // first grab a filter node
