@@ -20,18 +20,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here.
  */
@@ -257,14 +245,14 @@ public class TransverseMercator extends MapProjection {
         esp = excentricitySquared / (1.0 - excentricitySquared);
           
         double t;
-        en0 = C00 - excentricitySquared * (C02 + excentricitySquared * 
-              (C04 + excentricitySquared * (C06 + excentricitySquared * C08)));
-        en1 = excentricitySquared * (C22 - excentricitySquared * 
-              (C04 + excentricitySquared * (C06 + excentricitySquared * C08)));
-        en2 = (t = excentricitySquared * excentricitySquared) * 
-              (C44 - excentricitySquared * (C46 + excentricitySquared * C48));
-        en3 = (t *= excentricitySquared) * (C66 - excentricitySquared * C68);
-        en4 = t * excentricitySquared * C88;
+        en0 = C00 - excentricitySquared  *  (C02 + excentricitySquared  * 
+             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
+        en1 =       excentricitySquared  *  (C22 - excentricitySquared  *
+             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
+        en2 =  (t = excentricitySquared  *         excentricitySquared) * 
+             (C44 - excentricitySquared  *  (C46 + excentricitySquared  * C48));
+        en3 = (t *= excentricitySquared) *  (C66 - excentricitySquared  * C68);
+        en4 =   t * excentricitySquared  *  C88;
         ml0 = mlfn(latitudeOfOrigin, Math.sin(latitudeOfOrigin), Math.cos(latitudeOfOrigin));
     }
     
@@ -496,27 +484,6 @@ public class TransverseMercator extends MapProjection {
     }
     
     /**
-     * Returns a hash value for this projection.
-     */
-    public int hashCode() { 
-        final long code = Double.doubleToLongBits(ml0);
-        return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
-    }
-    
-    /**
-     * Compares the specified object with
-     * this map projection for equality.
-     */
-    public boolean equals(final Object object) {
-        if (object == this) {
-            // Slight optimization
-            return true;
-        }
-        // Relevant parameters are already compared in MapProjection
-        return super.equals(object);
-    }
-    
-    /**
      * Convenience method computing the zone code from the central meridian.
      * Information about zones convention must be specified in argument. Two
      * widely set of arguments are of Universal Transverse Mercator (UTM) and
@@ -588,8 +555,8 @@ public class TransverseMercator extends MapProjection {
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
             return(getZone(-52.5, -3));
         }
-        //unknown
-        throw new IllegalStateException();
+        //unknown (TODO: localize the error message)
+        throw new IllegalStateException("Unknow projection type.");
     }
     
     /**
@@ -611,7 +578,28 @@ public class TransverseMercator extends MapProjection {
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
             return(getCentralMedirian(-52.5, -3));
         }
-        //unknown
-        throw new IllegalStateException();
+        //unknown (TODO: localize the error message)
+        throw new IllegalStateException("Unknow projection type.");
     } 
+    
+    /**
+     * Returns a hash value for this projection.
+     */
+    public int hashCode() { 
+        final long code = Double.doubleToLongBits(ml0);
+        return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
+    }
+    
+    /**
+     * Compares the specified object with
+     * this map projection for equality.
+     */
+    public boolean equals(final Object object) {
+        if (object == this) {
+            // Slight optimization
+            return true;
+        }
+        // Relevant parameters are already compared in MapProjection
+        return super.equals(object);
+    }
 }
