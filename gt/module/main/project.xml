@@ -102,6 +102,15 @@
       </roles>
     </developer>
     <developer>
+      <name>Jesse Eichar</name>
+      <id>jeichar</id>
+      <email>jeichar@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Rueben Schulz</name>
       <organization>University of British Columbia</organization>
       <roles>
