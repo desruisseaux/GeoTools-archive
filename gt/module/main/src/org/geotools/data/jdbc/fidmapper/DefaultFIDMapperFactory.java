@@ -83,7 +83,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     }
 
     /**
-     * DOCUMENT ME!
+     * Builds a FID mapper for multi column public columns
      *
      * @param colInfos
      *
