@@ -377,8 +377,7 @@ public class WMSSchema implements Schema {
          * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
          */
         public Element findChildElement( String name ) {
-            // TODO Auto-generated method stub
-            return null;
+            return (this.name!=null && this.name.equals(name))?this:null;
         }
     }
     

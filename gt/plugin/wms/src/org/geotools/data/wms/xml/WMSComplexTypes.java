@@ -101,7 +101,7 @@ public class WMSComplexTypes {
             
             List formatStrings = new ArrayList();
             
-            for (int i = 0; i < elems.length; i++) {
+            for (int i = 0; i < value.length; i++) {
                 if (sameName(elems[0], value[i])) {
                     formatStrings.add(value[i].getValue());
                 }
@@ -111,7 +111,12 @@ public class WMSComplexTypes {
                 }
             }
             
-            operationType.setFormatStrings((String[]) formatStrings.toArray());
+            String[] strings = new String[formatStrings.size()];
+            for (int i = 0; i < formatStrings.size(); i++) {
+                strings[i] = (String) formatStrings.get(i);
+            }
+            
+            operationType.setFormatStrings(strings);
             
             return operationType;
         }
@@ -181,7 +186,7 @@ public class WMSComplexTypes {
             WMSCapabilities capabilities = null;
             Service service = null;
             
-            for (int i = 0; i < elems.length; i++) {
+            for (int i = 0; i < value.length; i++) {
                 if (sameName(elems[0], value[i])) {
                     service = ((Service) value[i].getValue());
                 }
@@ -233,6 +238,7 @@ public class WMSComplexTypes {
         private static final WMSComplexType instance = new _ServiceType();
         
         private static Element[] elems = new Element[] {
+            new WMSElement("Name", XSISimpleTypes.String.getInstance()),
             new WMSElement("Title", XSISimpleTypes.String.getInstance()),
             new WMSElement("Abstract", XSISimpleTypes.String.getInstance(), 0, 1),
             new WMSElement("KeywordList", _KeywordListType.getInstance(), 0, 1),
@@ -282,42 +288,46 @@ public class WMSComplexTypes {
             for (int i = 0; i < value.length; i++) {
                 
                 if (sameName(elems[0], value[i])) {
-                    service.setTitle((String) value[i].getValue());
+                    service.setName((String) value[i].getValue());
                 }
                 
                 if (sameName(elems[1], value[i])) {
-                    service.set_abstract((String) value[i].getValue());
+                    service.setTitle((String) value[i].getValue());
                 }
                 
                 if (sameName(elems[2], value[i])) {
-                    service.setKeywordList((String[]) value[i].getValue());
+                    service.set_abstract((String) value[i].getValue());
                 }
                 
                 if (sameName(elems[3], value[i])) {
+                    service.setKeywordList((String[]) value[i].getValue());
+                }
+                
+                if (sameName(elems[4], value[i])) {
                     service.setOnlineResource((URL) value[i].getValue());
                 }
                 
-//                if (sameName(elems[4], value[i])) {
+//                if (sameName(elems[5], value[i])) {
 //                    //TODO contact info not implemented, ignoring
 //                }
                 
-//                if (sameName(elems[5], value[i])) {
+//                if (sameName(elems[6], value[i])) {
 //                    //TODO fees not implemented, ignoring
 //                }
                 
-//                if (sameName(elems[6], value[i])) {
+//                if (sameName(elems[7], value[i])) {
 //                    //TODO access constraints not implemented, ignoring
 //                }
                 
-                if (sameName(elems[7], value[i])) {
+                if (sameName(elems[8], value[i])) {
                     service.setLayerLimit(((Integer) value[i].getValue()).intValue());
                 }
                 
-                if (sameName(elems[8], value[i])) {
+                if (sameName(elems[9], value[i])) {
                     service.setMaxWidth(((Integer) value[i].getValue()).intValue());
                 }
                 
-                if (sameName(elems[9], value[i])) {
+                if (sameName(elems[10], value[i])) {
                     service.setMaxHeight(((Integer) value[i].getValue()).intValue());
                 }
             }
@@ -521,7 +531,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getName()
@@ -582,7 +593,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getName()
@@ -644,7 +656,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getName()
@@ -724,7 +737,15 @@ public class WMSComplexTypes {
 //                }
                 
                 if (sameName(elems[3], value[i])) {
-                    capabilities.setLayers((Layer[]) value[i].getValue());
+                    
+                    List layerList = (List) value[i].getValue();
+                    
+                    Layer[] layers = new Layer[layerList.size()];
+                    for(int ii = 0; ii < layerList.size(); ii++) {
+                        layers[ii] = (Layer) layerList.get(ii);
+                    }
+                    
+                    capabilities.setLayers(layers);
                 }
             }
             
@@ -791,7 +812,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -1279,7 +1301,7 @@ public class WMSComplexTypes {
         
         private static Sequence seq = new SequenceGT(elems);
         
-        private static Attribute[] attrs = new Attribute[] {
+        private static Attribute[] attributes = new Attribute[] {
             new WMSAttribute(null, "queryable", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.REQUIRED, "0", null, false),
             new WMSAttribute("cascaded", XSISimpleTypes.NonNegativeInteger.getInstance()),
             new WMSAttribute(null, "opaque", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(), Attribute.REQUIRED, "0", null, false),
@@ -1293,7 +1315,7 @@ public class WMSComplexTypes {
         }
 
 		public Attribute[] getAttributes() {
-			return attrs;
+			return attributes;
 		}
 
 		public ElementGrouping getChild() {
@@ -1316,7 +1338,7 @@ public class WMSComplexTypes {
             layers.add(0, layer);
             
             Set crs = new TreeSet();
-            Map boundingBoxes = new HashMap();
+            HashMap boundingBoxes = new HashMap();
             List styles = new ArrayList();
             
             for (int i = 0; i < value.length; i++) {
@@ -1390,11 +1412,16 @@ public class WMSComplexTypes {
             }
             
             layer.setSrs(crs);
+            layer.setBoundingBoxes(boundingBoxes);
             
             //Attributes -- only do queryable for now
             
             String queryable = attrs.getValue("queryable");
-            layer.setQueryable(new Boolean(queryable).booleanValue());
+            if ("1".equals(queryable)) {
+                layer.setQueryable(true);
+            } else {
+                layer.setQueryable(new Boolean(queryable).booleanValue());
+            }
             
             return layers;
         }
@@ -1642,7 +1669,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -1714,7 +1742,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -1790,7 +1819,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -1865,7 +1895,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -1939,7 +1970,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2007,7 +2039,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2078,7 +2111,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2149,7 +2183,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2301,7 +2336,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2372,7 +2408,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2443,7 +2480,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            return null;
+            //throw new OperationNotSupportedException();
         }
 
         /* (non-Javadoc)
@@ -2570,7 +2608,7 @@ public class WMSComplexTypes {
         }
 
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            return value[0].getValue();
+            return new Double((String) value[0].getValue());
         }
 
         public String getName() {
@@ -2628,7 +2666,7 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            return value[0].getValue();
+            return new Double((String) value[0].getValue());
         }
 
         /* (non-Javadoc)
