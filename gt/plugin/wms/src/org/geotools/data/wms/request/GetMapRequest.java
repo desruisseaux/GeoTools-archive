@@ -20,6 +20,7 @@ import org.geotools.data.wms.SimpleLayer;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 
@@ -72,7 +73,7 @@ import java.util.Set;
  *
  * @author Richard Gould, Refractions Research
  */
-public abstract class GetMapRequest extends AbstractRequest {
+public interface GetMapRequest extends Request{
     public static final String VERSION = "VERSION";
     public static final String ELEVATION = "ELEVATION";
     public static final String TIME = "TIME";
@@ -87,41 +88,7 @@ public abstract class GetMapRequest extends AbstractRequest {
     public static final String REQUEST = "REQUEST";
     public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
     public static final String EXCEPTION_BLANK = "application/vnd.ogc.se_blank";
-    private List availableLayers;
-    private Set availableSRSs;
-    private List availableFormats;
-    private List availableExceptions;
 
-    /**
-     * Initialize properties and set the request propertie to "GetMap"
-     *
-     * @param onlineResource
-     * @param version
-     * @param availableLayers
-     * @param availableSRSs
-     * @param availableFormats
-     * @param availableExceptions DOCUMENT ME!
-     */
-    public GetMapRequest(URL onlineResource,
-        SimpleLayer[] availableLayers, Set availableSRSs,
-        String[] availableFormats, List availableExceptions) {
-        super(onlineResource);
-
-        this.availableLayers = Arrays.asList(availableLayers);
-
-        this.availableSRSs = availableSRSs;
-        this.availableFormats = Arrays.asList(availableFormats);
-        this.availableExceptions = availableExceptions;
-
-        initRequest();
-        initVersion();
-    }
-
-    protected abstract void initVersion();
-    
-    protected void initRequest() {
-        setProperty(REQUEST, "GetMap");
-    }
 
     /**
      * Sets the version number of the request.
@@ -129,29 +96,9 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param version A String indicting a WMS Version ("1.0.0", "1.1.0",
      *        "1.1.1", or "1.3.0")
      */
-    public void setVersion(String version) {
-        //TODO Version stuff here
-        properties.setProperty("VERSION", version);
-    }
+    public void setVersion(String version);
 
-    public void setLayers(List layers) {
-        String layerString = "";
-        String styleString = "";
-
-        for (int i = 0; i < layers.size(); i++) {
-            SimpleLayer simpleLayer = (SimpleLayer) layers.get(i);
-            layerString = layerString + simpleLayer.getName();
-            styleString = styleString + simpleLayer.getStyle();
-
-            if (i != (layers.size() - 1)) {
-                layerString = layerString + ",";
-                styleString = styleString + ",";
-            }
-        }
-
-        setProperty("LAYERS", layerString);
-        setProperty("STYLES", styleString);
-    }
+    public void setLayers(List layers);
 
     /**
      * From the Web Map Service Implementation Specification: "The required SRS
@@ -168,9 +115,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param srs A String indicating the Spatial Reference System to render
      *        the layers in.
      */
-    public void setSRS(String srs) {
-        properties.setProperty(SRS, srs);
-    }
+    public void setSRS(String srs);
 
     /**
      * From the Web Map Service Implementation Specification: "The required
@@ -184,10 +129,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param bbox A string representing a bounding box in the format
      *        "minx,miny,maxx,maxy"
      */
-    public void setBBox(String bbox) {
-        //TODO enforce non-subsettable layers
-        properties.setProperty(BBOX, bbox);
-    }
+    public void setBBox(String bbox);
 
     /**
      * From the Web Map Service Implementation Specification: "The required
@@ -200,9 +142,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      *
      * @param format The desired format for the GetMap response
      */
-    public void setFormat(String format) {
-        properties.setProperty(FORMAT, format);
-    }
+    public void setFormat(String format);
 
     /**
      * From the Web Map Service Implementation Specification: "The required
@@ -218,10 +158,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param width
      * @param height
      */
-    public void setDimensions(String width, String height) {
-        properties.setProperty(HEIGHT, height);
-        properties.setProperty(WIDTH, width);
-    }
+    public void setDimensions(String width, String height);
 
     // End required parameters, being optional ones.
     //TODO Implement optional parameters.
@@ -234,15 +171,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      *
      * @param transparent true for transparency, false otherwise
      */
-    public void setTransparent(boolean transparent) {
-        String value = "FALSE";
-
-        if (transparent) {
-            value = "TRUE";
-        }
-
-        properties.setProperty(TRANSPARENT, value);
-    }
+    public void setTransparent(boolean transparent);
 
     /**
      * Specifies the colour, in hexidecimal format, to be used as the
@@ -252,9 +181,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      *
      * @param bgColour the background colour of the map, in the format 0xRRGGBB
      */
-    public void setBGColour(String bgColour) {
-        properties.setProperty(BGCOLOR, bgColour);
-    }
+    public void setBGColour(String bgColour);
 
     /**
      * The exceptions type specifies what format the server should return
@@ -278,9 +205,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      *
      * @param exceptions
      */
-    public void setExceptions(String exceptions) {
-        properties.setProperty(EXCEPTIONS, exceptions);
-    }
+    public void setExceptions(String exceptions);
 
     /**
      * See the Web Map Server Implementation Specification 1.1.1, Annexes B and
@@ -289,9 +214,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param time See the Web Map Server Implementation Specification 1.1.1,
      *        Annexes B and C
      */
-    public void setTime(String time) {
-        properties.setProperty(TIME, time);
-    }
+    public void setTime(String time);
 
     /**
      * See the Web Map Server Implementation Specification 1.1.1, Annex C, in
@@ -300,9 +223,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param elevation See the Web Map Server Implementation Specification
      *        1.1.1, Annex C
      */
-    public void setElevation(String elevation) {
-        properties.setProperty(ELEVATION, elevation);
-    }
+    public void setElevation(String elevation);
 
     /**
      * See the Web Map Server Implementation Specification 1.1.1, Annex C, in
@@ -318,9 +239,7 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param value the value of the request parameter (value, interval or
      *        comma-separated list)
      */
-    public void setSampleDimensionValue(String name, String value) {
-        properties.setProperty(name, value);
-    }
+    public void setSampleDimensionValue(String name, String value);
 
     /**
      * Used to implement vendor specific parameters. Entirely optional.
@@ -328,23 +247,13 @@ public abstract class GetMapRequest extends AbstractRequest {
      * @param name a request parameter name
      * @param value a value to accompany the name
      */
-    public void setVendorSpecificParameter(String name, String value) {
-        properties.setProperty(name, value);
-    }
+    public void setVendorSpecificParameter(String name, String value);
 
-    public List getAvailableExceptions() {
-        return availableExceptions;
-    }
+    public List getAvailableExceptions();
 
-    public List getAvailableFormats() {
-        return availableFormats;
-    }
+    public List getAvailableFormats();
 
-    public List getAvailableLayers() {
-        return availableLayers;
-    }
+    public List getAvailableLayers();
 
-    public Set getAvailableSRSs() {
-        return availableSRSs;
-    }
+    public Set getAvailableSRSs();
 }

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.data.wms.WMS1_1_1.GetFeatureInfoRequest;
 import org.geotools.data.wms.WMS1_1_1.GetMapRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.jdom.Element;
@@ -69,4 +70,28 @@ public class WMS1_3_0 extends WMS1_1_1 {
             setVersion("1.3.0");
         }
 	}
+	
+	public static class GetFeatureInfoRequest extends WMS1_1_1.GetFeatureInfoRequest {
+	    
+        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request, Set queryableLayers, String[] infoFormats ) {
+            super(onlineResource, request, queryableLayers, infoFormats);
+        }
+        
+        protected void initVersion() {
+            setProperty("VERSION", "1.3.0");
+        }
+        
+        protected String getQueryX() {
+            return "I";
+        }
+        
+        protected String getQueryY() {
+            return "J";
+        }
+	}
+	
+    public GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
+            Set queryableLayers, String[] infoFormats ) {
+        return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
+    }
 }

@@ -31,6 +31,7 @@ import org.geotools.data.wms.xml.WMSSchema.WMSComplexType;
 import org.geotools.data.wms.xml.WMSSchema.WMSElement;
 import org.geotools.data.wms.xml.WMSSchema.WMSSimpleType;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -39,6 +40,7 @@ import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.AllGT;
 import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SequenceGT;
@@ -399,7 +401,10 @@ public class WMSComplexTypes {
                 new WMSElement("INIMAGE", _INIMAGEType.getInstance(), 0, 1),
                 new WMSElement("BLANK", _BLANKType.getInstance(), 0, 1),};
 
-        private static Sequence seq = new SequenceGT(elems);
+//        	private static Sequence seq = new SequenceGT(elems);
+        private static Sequence seq = new SequenceGT(new ElementGrouping[] {
+                new ChoiceGT(null, 0, Integer.MAX_VALUE, elems)});
+//        private static All seq = new AllGT(elems);
 
         /*
          * (non-Javadoc)
@@ -1868,16 +1873,12 @@ public class WMSComplexTypes {
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints )
                 throws SAXException, OperationNotSupportedException {
             
-            if (value != null && value.length >= 1) {
-                return value[0].getValue();
-            }
-            
             try {
                 return new URL(attrs.getValue("onlineResource"));
             } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
             }
+            
+            return (URL) value[0].getValue();
         }
 
         /*
@@ -1969,10 +1970,14 @@ public class WMSComplexTypes {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints )
                 throws SAXException, OperationNotSupportedException {
-            if (value != null && value.length >= 1) {
-                return value[0].getValue();
+            
+            try {
+                return new URL(attrs.getValue("onlineResource"));
+            } catch (MalformedURLException e) {
             }
-            return attrs.getValue("onlineResource");
+            
+            return (URL) value[0].getValue();
+
         }
 
         /*

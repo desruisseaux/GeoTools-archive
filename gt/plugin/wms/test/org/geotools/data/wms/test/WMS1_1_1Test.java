@@ -6,13 +6,18 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_1;
+import org.geotools.data.wms.WebMapServer;
+import org.xml.sax.SAXException;
 
 /**
  * @author Kefka
@@ -123,4 +128,28 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         assertEquals(properties.get("REQUEST"), "GetCapabilities");
         assertEquals(properties.get("SERVICE"), "WMS");
 	}
+	
+    protected WebMapServer getCustomWMS( URL featureURL ) throws SAXException, URISyntaxException, IOException {
+        return new CustomWMS(featureURL);
+    }
+    //forces use of 1.1.1 spec
+    private class CustomWMS extends WebMapServer {
+
+        /**
+         * @param serverURL
+         * @param wait
+         * @throws SAXException
+         * @throws URISyntaxException
+         * @throws IOException
+         */
+        public CustomWMS( URL serverURL) throws SAXException, URISyntaxException, IOException {
+            super(serverURL);
+            // TODO Auto-generated constructor stub
+        }
+        
+        protected void setupSpecifications() {
+            specs = new Specification[1];
+            specs[0] = new WMS1_1_1();
+        }
+    }
 }

@@ -39,10 +39,15 @@ public class AbstractRequest {
      * DOCUMENT ME!
      *
      * @param onlineResource
+     * @param properties2
      */
-    public AbstractRequest(URL onlineResource) {
+    public AbstractRequest(URL onlineResource, Properties properties) {
     	
-    	properties = new Properties();
+        if (properties == null) {
+            this.properties = new Properties();
+        } else {
+            this.properties = properties;
+        }
     	
         // Need to strip off the query, as getFinalURL will add it back
         // on, with all the other properties. If we don't, elements will
@@ -109,5 +114,9 @@ public class AbstractRequest {
 
     public void setProperty(String name, String value) {
         properties.setProperty(name, value);
+    }
+    
+    public Properties getProperties() {
+        return (Properties) properties.clone();
     }
 }

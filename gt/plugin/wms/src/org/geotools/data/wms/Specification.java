@@ -17,6 +17,7 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.util.InternationalString;
 import org.jdom.Document;
@@ -100,4 +101,13 @@ public abstract class Specification {
         URL server);
 
     public abstract GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings, List exceptions );
+
+    /**
+     * @param get
+     * @param getMapRequest
+     * @param queryableLayers
+     * @param formatStrings
+     * @return
+     */
+    public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL get, GetMapRequest getMapRequest, Set queryableLayers, String[] formatStrings );
 }

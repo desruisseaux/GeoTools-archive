@@ -6,17 +6,13 @@
  */
 package org.geotools.data.wms;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.data.wms.WMS1_0_0.GetMapRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 
 /**
  * @author Kefka
@@ -49,6 +45,11 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		return new GetCapsRequest(server);
 	}
 	
+    public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
+            Set queryableLayers, String[] infoFormats ) {
+        return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
+    }
+    
 	public static class GetCapsRequest extends WMS1_0_0.GetCapsRequest {
 
 		public GetCapsRequest(URL urlGetCapabilities) {
@@ -94,4 +95,24 @@ public class WMS1_1_0 extends WMS1_0_0 {
             return format;
         }
   	}
+	
+	public static class GetFeatureInfoRequest extends WMS1_0_0.GetFeatureInfoRequest {
+
+        /**
+         * @param onlineResource
+         * @param request
+         * @param queryableLayers
+         * @param infoFormats
+         */
+        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request, Set queryableLayers, String[] infoFormats ) {
+            super(onlineResource, request, queryableLayers, infoFormats);
+        }        
+	    
+        protected void initRequest() {
+            setProperty("REQUEST", "GetFeatureInfo");
+        }
+        protected void initVersion() {
+            setProperty("VERSION", "1.1.0");
+        }
+	}
 }

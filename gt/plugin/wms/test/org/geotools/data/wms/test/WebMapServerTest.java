@@ -17,7 +17,9 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -36,7 +38,9 @@ import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSLayerCatalogEntry;
 import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.filter.CapabilitiesTest;
 import org.xml.sax.SAXException;
@@ -58,9 +62,9 @@ public class WebMapServerTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        serverURL = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&?VERSION=1.3.0&REQUEST=GetCapabilities");
-        //serverURL = new URL(
-         //       "http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
+//        serverURL = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&?VERSION=1.3.0&REQUEST=GetCapabilities");
+        serverURL = new URL(
+                "http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
         featureURL = new URL(
                 "http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
         brokenURL = new URL("http://afjklda.com");
@@ -143,56 +147,58 @@ public class WebMapServerTest extends TestCase {
     }
 
     public void testIssueGetFeatureInfoRequest() throws Exception {
+//        http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?LAYERS=DEMO&FORMAT=image/png&TRANSPARENT=TRUE&HEIGHT=213&REQUEST=GetMap&BBOX=-172.367,35.667300000000004,-11.562400000000014,83.8293&WIDTH=710&STYLES=&SRS=EPSG:4326&VERSION=1.1.1
         
         WebMapServer wms = new WebMapServer(featureURL);
         WMSCapabilities capabilities = wms.getCapabilities();
         
         assertNotNull(capabilities);
         
+        GetMapRequest getMapRequest = wms.createGetMapRequest();
+
+        List simpleLayers = getMapRequest.getAvailableLayers();
+        Iterator iter = simpleLayers.iterator();
+        while (iter.hasNext()) {
+                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+                Object[] styles = simpleLayer.getValidStyles().toArray();
+                if (styles.length == 0) {
+                        simpleLayer.setStyle("");
+                        continue;
+                }
+                Random random = new Random();
+                int randomInt = random.nextInt(styles.length);
+                simpleLayer.setStyle((String) styles[randomInt]);
+        }
+        getMapRequest.setLayers(simpleLayers);
+
+        getMapRequest.setSRS("EPSG:4326");
+        getMapRequest.setDimensions("400", "400");
+        getMapRequest.setFormat("image/png");
+
+        getMapRequest.setBBox("-114.01268,59.4596930,-113.26043,60.0835794");
+        URL url2 = getMapRequest.getFinalURL();
+
+        GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
+        request.setQueryLayers(request.getQueryableLayers());
+        request.setQueryPoint(200, 200);
+        request.setInfoFormat("text/html");
         
-        
-        
-        
-//            WebMapServer wms = new WebMapServer(featureURL, true);
-//            wms.getCapabilities();
-//            GetMapRequest getMapRequest = wms.createGetMapRequest();
-//
-//            List simpleLayers = getMapRequest.getAvailableLayers();
-//        Iterator iter = simpleLayers.iterator();
-//        while (iter.hasNext()) {
-//                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-//                Object[] styles = simpleLayer.getValidStyles().toArray();
-//                if (styles.length == 0) {
-//                        simpleLayer.setStyle("");
-//                        continue;
-//                }
-//                Random random = new Random();
-//                int randomInt = random.nextInt(styles.length);
-//                simpleLayer.setStyle((String) styles[randomInt]);
-//        }
-//        getMapRequest.setLayers(simpleLayers);
-//
-//        getMapRequest.setSRS("EPSG:42304");
-//        getMapRequest.setDimensions("400", "400");
-//        getMapRequest.setFormat("image/jpeg");
-//
-//        getMapRequest.setBBox("-2.2e+06,-712631,3.0728e+06,3.84e+06");
-//        URL url2 = getMapRequest.getFinalURL();
-//
-//            GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-//            request.setQueryLayers(request.getQueryableLayers());
-//            request.setQueryPoint(200, 200);
-//            request.setInfoFormat("application/vnd.ogc.gml");
-//            URL url = request.getFinalURL();
-//
-//            GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request, false);
-//            assertEquals("application/vnd.ogc.gml", response.getContentType());
-//            BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
-//    String line;
-//
-//            while ((line = in.readLine()) != null) {
-//        System.out.println(line);
-//    }
+        System.out.println(request.getFinalURL());
+
+        GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request);
+        System.out.println(response.getContentType());
+        assertTrue( response.getContentType().indexOf("text/html") != -1 );
+        BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+        String line;
+
+        boolean textFound = false;
+        while ((line = in.readLine()) != null) {
+            System.out.println(line);
+            if (line.indexOf("Wood Buffalo National Park") != -1) {
+                textFound = true;
+            }
+        }
+        assertTrue(textFound);
 
     }
     

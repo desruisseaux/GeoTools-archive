@@ -22,13 +22,18 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
@@ -37,11 +42,14 @@ import junit.framework.TestCase;
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentFactory;
@@ -143,7 +151,74 @@ public class WMS1_0_0Test extends TestCase {
         assertTrue(request.getFinalURL().toExternalForm().indexOf("JPEG") >= 0);
     }
 
+    public void testCreateGetFeatureInfoRequest() throws Exception {
+        URL featureURL = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
+        WebMapServer wms = getCustomWMS(featureURL);
+        WMSCapabilities caps = wms.getCapabilities();
+        assertNotNull(caps);
+        assertNotNull(caps.getRequest().getGetFeatureInfo());
+        
+        GetMapRequest getMapRequest = wms.createGetMapRequest();
+
+        List simpleLayers = getMapRequest.getAvailableLayers();
+        Iterator iter = simpleLayers.iterator();
+        while (iter.hasNext()) {
+                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+                Object[] styles = simpleLayer.getValidStyles().toArray();
+                if (styles.length == 0) {
+                        simpleLayer.setStyle("");
+                        continue;
+                }
+                Random random = new Random();
+                int randomInt = random.nextInt(styles.length);
+                simpleLayer.setStyle((String) styles[randomInt]);
+        }
+        getMapRequest.setLayers(simpleLayers);
+
+        getMapRequest.setSRS("EPSG:4326");
+        getMapRequest.setDimensions("400", "400");
+        getMapRequest.setFormat("image/png");
+
+        getMapRequest.setBBox("-114.01268,59.4596930,-113.26043,60.0835794");
+        URL url2 = getMapRequest.getFinalURL();
+
+        GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
+        request.setQueryLayers(request.getQueryableLayers());
+        request.setQueryPoint(200, 200);
+        request.setInfoFormat(caps.getRequest().getGetFeatureInfo().getFormatStrings()[0]);
+        
+        System.out.println(request.getFinalURL());
+
+        GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request);
+        System.out.println(response.getContentType());
+        assertTrue( response.getContentType().indexOf("text/plain") != -1 );
+        BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+        String line;
+
+        boolean textFound = false;
+        while ((line = in.readLine()) != null) {
+            System.out.println(line);
+            if (line.indexOf("Wood Buffalo National Park") != -1) {
+                textFound = true;
+            }
+        }
+        assertTrue(textFound);
+
+        
+    }
     
+    
+    /**
+     * @param featureURL
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws SAXException
+     */
+    protected WebMapServer getCustomWMS( URL featureURL ) throws SAXException, URISyntaxException, IOException {
+        return new CustomWMS(featureURL);
+    }
+
     protected WMSCapabilities createCapabilities( String capFile ) throws Exception {	
         File getCaps = TestData.file(this, capFile);
         URL getCapsURL = getCaps.toURL();
@@ -161,6 +236,7 @@ public class WMS1_0_0Test extends TestCase {
     }
 
 
+    //forces use of 1.0.0 spec
     private class CustomWMS extends WebMapServer {
 
         /**

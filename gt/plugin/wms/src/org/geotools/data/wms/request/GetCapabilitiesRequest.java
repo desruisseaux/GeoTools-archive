@@ -35,7 +35,7 @@ public abstract class GetCapabilitiesRequest extends AbstractRequest {
      * @throws RuntimeException DOCUMENT ME!
      */
     public GetCapabilitiesRequest(URL serverURL) {
-        super(serverURL);
+        super(serverURL, null);
 
         initRequest();
         initService();
