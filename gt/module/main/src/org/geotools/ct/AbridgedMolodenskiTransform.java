@@ -42,12 +42,33 @@ import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * Transforms a three dimensional geographic points using
- * abridged versions of formulas derived by Molodenski.
+ * The Abridged Molodensky transformation is a simplified version of the
+ * Molodensky transformation method. This transforms three dimensional 
+ * geographic points from one geographic coordinate reference system to another
+ * (a datum shift), using three shift parameters (delta X, delta Y, delta Z) and
+ * the difference between the semi-major axis and flattenings of the two ellipsoids.
+ * <br><br>
+ *
+ * Unlike the Bursa-Wolf 3 parameter method (which acts on geocentric coordinates),
+ * this transformation can be performed directly on geographic coordinates.
+ * <br><br>
+ *
+ * <strong>References:</strong><ul>
+ *   <li> Defense Mapping Agency (DMA), Datums, Ellipsoids, Grids and Grid Reference Systems,
+ *        Technical Manual 8358.1. 
+ *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
+ *   <li> Defense Mapping Agency (DMA), The Universal Grids: Universal Transverse 
+ *        Mercator (UTM) and Universal Polar Stereographic (UPS), Fairfax VA, Technical Manual 8358.2. 
+ *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
+ *   <li> National Imagry and Mapping Agency (NIMA), Department of Defense World 
+ *        Geodetic System 1984, Technical Report 8350.2. 
+ *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
+ * </ul>
  *
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
+ * @author Rueben Schulz
  */
 class AbridgedMolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -62,23 +83,25 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     private final boolean source3D, target3D;
     
     /**
-     * X,Y,Z shift in meters
+     * X,Y,Z shift in meters.
      */
     private final double dx, dy, dz;
     
     /**
-     * Source equatorial (<var>a</var>) and polar (<var>b/<var>) radius in meters.
+     * Semi-major (<var>a</var>) semi-minor (<var>b/<var>) radius in meters.
      */
     private final double a, b;
     
     /**
-     * Difference in the semi-major (<code>da=a1-a2</code>) and semi-minor
-     * (<code>db=b1-b2</code>) axes of the first and second ellipsoids.
+     * Difference in the semi-major (<code>da=target a - source a</code>) and semi-minor
+     * (<code>db=target b - source b</code>) axes of the target and source ellipsoids.
      */
     private final double da, db;
     
     /**
-     * Square of the eccentricity of the ellipsoid.
+     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
+     * <var>a</var> is the semi-major axis length and
+     * <var>b</var> is the semi-minor axis length.
      */
     private final double e2;
     
@@ -88,7 +111,12 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     private final double adf;
     
     /**
-     * Construct a transform from the specified datum.
+     * Construct an AbridgedMolodenskiTransform from the specified datums.
+     *
+     * @param source source horizontal datum you are transforming from.
+     * @param target target horizontal datum you are transforming to.
+     * @param source3D <code>true</code> if the source geographic CRS has a Z-axis (3 dimentional)
+     * @param target3D <code>true</code> if the target geographic CRS has a Z-axis (3 dimentional)
      */
     protected AbridgedMolodenskiTransform(final HorizontalDatum source,
                                           final HorizontalDatum target,
@@ -105,9 +133,9 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
         a  =     srcEllipsoid.getSemiMajorAxis();
         b  =     srcEllipsoid.getSemiMinorAxis();
         f  = 1 / srcEllipsoid.getInverseFlattening();
-        da = a - tgtEllipsoid.getSemiMajorAxis();
-        db = b - tgtEllipsoid.getSemiMinorAxis();
-        df = f - 1/tgtEllipsoid.getInverseFlattening();
+        da = tgtEllipsoid.getSemiMajorAxis() - a;
+        db = tgtEllipsoid.getSemiMinorAxis() - b;
+        df = 1/tgtEllipsoid.getInverseFlattening() - f;
         e2  = 1 - (b*b)/(a*a);
         adf = (a*df) + (f*da);
         this.source3D = source3D;
@@ -115,7 +143,9 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     }
     
     /**
-     * Construct a transform from the specified parameters.
+     * Construct an AbridgedMolodenskiTransform from the specified parameters.
+     * 
+     * @param  parameters The parameter values in standard units.
      */
     protected AbridgedMolodenskiTransform(final ParameterList parameters) {
         final int dim = parameters.getIntParameter("dim");
@@ -133,16 +163,34 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
         b  = parameters.getDoubleParameter("src_semi_minor");
         ta = parameters.getDoubleParameter("tgt_semi_major");
         tb = parameters.getDoubleParameter("tgt_semi_minor");
-        da = a - ta;
-        db = b - tb;
+        da = ta - a;
+        db = tb - b;
         f  = (a-b)/a;
-        df = f - (ta-tb)/ta;
+        df = (ta-tb)/ta - f;
         e2  = 1 - (b*b)/(a*a);
         adf = (a*df) + (f*da);
     }
     
     /**
      * Transforms a list of coordinate point ordinal values.
+     * This method is provided for efficiently transforming many points.
+     * The supplied array of ordinal values will contain packed ordinal
+     * values.  For example, if the source dimension is 3, then the ordinals
+     * will be packed in this order:
+     *
+     * (<var>x<sub>0</sub></var>,<var>y<sub>0</sub></var>,<var>z<sub>0</sub></var>,
+     *  <var>x<sub>1</sub></var>,<var>y<sub>1</sub></var>,<var>z<sub>1</sub></var> ...).
+     *
+     * @param srcPts the array containing the source point coordinates.
+     * @param srcOff the offset to the first point to be transformed
+     *               in the source array.
+     * @param dstPts the array into which the transformed point
+     *               coordinates are returned. May be the same
+     *               than <code>srcPts</code>.
+     * @param dstOff the offset to the location of the first
+     *               transformed point that is stored in the
+     *               destination array.
+     * @param numPts the number of point objects to be transformed.
      */
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
@@ -180,8 +228,14 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
             y += (dz*cosY - sinY*(dy*sinX + dx*cosX) + adf*Math.sin(2*y)) / rho;
             x += (dy*cosX - dx*sinX) / (nu*cosY);
             
-            dstPts[dstOff++] = Math.toDegrees(x);
-            dstPts[dstOff++] = Math.toDegrees(y);
+            //stay within latitude +-90 deg. and longitude +-180 deg.
+            if (Math.abs(y) > Math.PI/2.0) {
+                dstPts[dstOff++] = 0.0;
+                dstPts[dstOff++] = (y > 0.0) ? 90.0 : -90.0;
+            } else {
+                dstPts[dstOff++] = Math.toDegrees(ensureInRange(x));
+                dstPts[dstOff++] = Math.toDegrees(y);
+            }
             if (target3D) {
                 z += dx*cosY*cosX + dy*cosY*sinX + dz*sinY + adf*sin2Y - da;
                 dstPts[dstOff++] = z;
@@ -193,6 +247,7 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     
     /**
      * Transforms a list of coordinate point ordinal values.
+     * @task REVISIT: this functionality already exists in AbstractMathTransform
      */
     public void transform(final float[] srcPts, final int srcOff,
                           final float[] dstPts, final int dstOff, int numPts)
@@ -218,6 +273,24 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
      */
     public final int getDimTarget() {
         return target3D ? 3 : 2;
+    }
+    
+    /**
+     * Makes sure that the specified longitude stay within ±180 degrees. This methpod should be
+     * invoked after coordinates are transformed. This
+     * method may add or substract an amount of 360° to <var>x</var>.
+     *
+     * @param  x The longitude.
+     * @return The longitude in the range +/- 180°.
+     * @task REVISIT: could be moved to AbstractMathTransform
+     */
+    final double ensureInRange(double x) {
+        if (x > Math.PI) {
+            x -= 2*Math.PI;
+        } else if (x < -Math.PI) {
+            x += 2*Math.PI;
+        }
+        return x;
     }
     
     /**
@@ -269,8 +342,8 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
         addParameter(buffer, "dz",              dz);
         addParameter(buffer, "src_semi_major",   a);
         addParameter(buffer, "src_semi_minor",   b);
-        addParameter(buffer, "tgt_semi_major",   a-da);
-        addParameter(buffer, "tgt_semi_minor",   b-db);
+        addParameter(buffer, "tgt_semi_major",   a+da);
+        addParameter(buffer, "tgt_semi_minor",   b+db);
         buffer.append(']');
         return buffer.toString();
     }
