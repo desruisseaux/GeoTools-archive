@@ -1,3 +1,19 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 /* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
  * This code is licensed under the GPL 2.0 license, availible at the root
  * application directory.
@@ -19,10 +35,13 @@
  */
 package org.geotools.data.crs;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.MathTransform;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.crs.geometry.GeometryCoordinateSequenceTransformer;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -33,8 +52,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
@@ -43,58 +60,68 @@ import java.util.NoSuchElementException;
  * ReprojectFeatureReader provides a reprojection for FeatureTypes.
  * 
  * <p>
- * ReprojectFeatureReader  is a wrapper used to reproject 
- * GeometryAttributes to a user supplied CoordinateReferenceSystem from
- * the Origional CoordinateReferenceSystem supplied by the origional
- * FeatureReader.
+ * ReprojectFeatureReader  is a wrapper used to reproject  GeometryAttributes
+ * to a user supplied CoordinateReferenceSystem from the original
+ * CoordinateReferenceSystem supplied by the original FeatureReader.
  * </p>
  * 
  * <p>
  * Example Use:
  * <pre><code>
  * ReprojectFeatureReader reader =
- *     new ReprojectFeatureReader( origionalReader, newCS );
+ *     new ReprojectFeatureReader( originalReader, reprojectCS );
  * 
- * CoordinateReferenceSystem orgionalCS =
- *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+ * CoordinateReferenceSystem originalCS =
+ *     originalReader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
  * 
  * CoordinateReferenceSystem newCS =
- *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+ *     reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
  * 
- * assertEquals( forceCS, newCS );
+ * assertEquals( reprojectCS, newCS );
  * </code></pre>
  * </p>
+ * TODO: handle the case where there is more than one geometry and the other
+ * geometries have a different CS than the default geometry
  *
  * @author jgarnett, Refractions Research, Inc.
+ * @author aaime
  * @author $Author: jive $ (last modification)
  * @version $Id: ReprojectFeatureReader.java,v 1.1 2003/12/19 01:08:58 jive Exp $
  */
 public class ReprojectFeatureReader implements FeatureReader {
-    private FeatureReader reader;
-    private FeatureType schema;
-    private CoordinateReferenceSystem cs;
-    private MathTransform transform;
-    
+    FeatureReader reader;
+    FeatureType schema;
+    MathTransform transform;
+    GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
+
+    ReprojectFeatureReader(FeatureReader reader, FeatureType schema,
+        MathTransform transform) {
+        this.reader = reader;
+        this.schema = schema;
+        this.transform = transform;
+        transformer.setMathTransform((MathTransform2D) transform);
+    }
+
     public ReprojectFeatureReader(FeatureReader reader,
-        CoordinateReferenceSystem crs) throws SchemaException, CannotCreateTransformException 
-    {        
-        if (crs == null) {
+        CoordinateReferenceSystem cs)
+        throws SchemaException, CannotCreateTransformException {
+        if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
 
         FeatureType type = reader.getFeatureType();
-        CoordinateReferenceSystem origional = type.getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem original = type.getDefaultGeometry()
+                                                 .getCoordinateSystem();
 
-        if (crs.equals(origional)) {
+        if (cs.equals(original)) {
             throw new IllegalArgumentException("CoordinateSystem " + cs
                 + " already used (check before using wrapper)");
         }
-        cs = crs;
-        
-        transform = CRSService.reproject( origional, cs );
-        
-        schema = CRSService.transform( type, crs );        
+
+        this.transform = CRSService.reproject(original, cs, true);
+        this.schema = CRSService.transform(type, cs);
         this.reader = reader;
+        transformer.setMathTransform((MathTransform2D) transform);
     }
 
     /**
@@ -106,12 +133,15 @@ public class ReprojectFeatureReader implements FeatureReader {
      *
      * @return
      *
+     * @throws IllegalStateException DOCUMENT ME!
+     *
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        if( schema == null ){
+        if (schema == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
+
         return schema;
     }
 
@@ -119,7 +149,7 @@ public class ReprojectFeatureReader implements FeatureReader {
      * Implement next.
      * 
      * <p>
-     * Uses CRSService.transform( next, transform ) for very simple reprojection.
+     * Description ...
      * </p>
      *
      * @return
@@ -127,22 +157,32 @@ public class ReprojectFeatureReader implements FeatureReader {
      * @throws IOException
      * @throws IllegalAttributeException
      * @throws NoSuchElementException
+     * @throws IllegalStateException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      *
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
-        }                    
-        Feature next = reader.next();
-        try {
-            return CRSService.transform( next, schema, transform );
-        } catch (MismatchedDimensionException dimensionException ) {
-            throw new DataSourceException( dimensionException );
-        } catch (TransformException transformException) {
-            throw new DataSourceException( transformException );
         }
+
+        Feature next = reader.next();
+        Object[] attributes = next.getAttributes(null);
+
+        try {
+            for (int i = 0; i < attributes.length; i++) {
+                if (attributes[i] instanceof Geometry) {
+                    attributes[i] = transformer.transform((Geometry) attributes[i]);
+                }
+            }
+        } catch (TransformException e) {
+            throw new DataSourceException("A transformation exception occurred while reprojecting data on the fly",
+                e);
+        }
+
+        return schema.create(attributes, next.getID());
     }
 
     /**
@@ -155,13 +195,15 @@ public class ReprojectFeatureReader implements FeatureReader {
      * @return
      *
      * @throws IOException
+     * @throws IllegalStateException DOCUMENT ME!
      *
      * @see org.geotools.data.FeatureReader#hasNext()
      */
     public boolean hasNext() throws IOException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
-        }        
+        }
+
         return reader.hasNext();
     }
 
@@ -173,13 +215,15 @@ public class ReprojectFeatureReader implements FeatureReader {
      * </p>
      *
      * @throws IOException
+     * @throws IllegalStateException DOCUMENT ME!
      *
      * @see org.geotools.data.FeatureReader#close()
      */
     public void close() throws IOException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
+
         reader.close();
         reader = null;
         schema = null;

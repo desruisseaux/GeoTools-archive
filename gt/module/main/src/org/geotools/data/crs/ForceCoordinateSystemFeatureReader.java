@@ -1,11 +1,7 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,16 +12,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.crs;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -47,10 +40,10 @@ import java.util.NoSuchElementException;
  * Example Use:
  * <pre><code>
  * ForceCoordinateSystemFeatureReader reader =
- *     new ForceCoordinateSystemFeatureReader( origionalReader, forceCS );
+ *     new ForceCoordinateSystemFeatureReader( originalReader, forceCS );
  * 
- * CoordinateReferenceSystem orgionalCS =
- *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+ * CoordinateReferenceSystem originalCS =
+ *     originalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
  * 
  * CoordinateReferenceSystem newCS =
  *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
@@ -60,14 +53,34 @@ import java.util.NoSuchElementException;
  * </p>
  *
  * @author jgarnett, Refractions Research, Inc.
+ * @author aaime
  * @author $Author: jive $ (last modification)
  * @version $Id: ForceCoordinateSystemFeatureReader.java,v 1.1 2003/12/19 01:05:08 jive Exp $
  */
 public class ForceCoordinateSystemFeatureReader implements FeatureReader {
-    private FeatureReader reader;
-    private FeatureType schema;
-    private CoordinateReferenceSystem coordianteSystem;
+    protected FeatureReader reader;
+    protected FeatureType schema;
 
+    /**
+     * Shortcut constructor that can be used if the new schema has already been computed
+     * @param reader
+     * @param schema
+     */
+    ForceCoordinateSystemFeatureReader(FeatureReader reader, FeatureType schema) {
+        this.reader = reader;
+        this.schema = schema;
+    }
+
+    /**
+     * Builds a new ForceCoordinateSystemFeatureReader
+     *
+     * @param reader
+     * @param cs
+     *
+     * @throws SchemaException
+     * @throws NullPointerException DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
     public ForceCoordinateSystemFeatureReader(FeatureReader reader,
         CoordinateReferenceSystem cs) throws SchemaException {
         if (cs == null) {
@@ -75,96 +88,62 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         }
 
         FeatureType type = reader.getFeatureType();
-        CoordinateReferenceSystem origional = type.getDefaultGeometry()
-                                                  .getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
+                                                   .getCoordinateSystem();
 
-        if (cs.equals(origional)) {
+        if (cs.equals(originalCs)) {
             throw new IllegalArgumentException("CoordinateSystem " + cs
                 + " already used (check before using wrapper)");
         }
 
-        coordianteSystem = cs;
-        schema = CRSService.transform( type, cs );        
+        schema = CRSService.transform(type, cs);
         this.reader = reader;
     }
 
     /**
-     * Implement getFeatureType.
-     * 
-     * <p>
-     * Description ...
-     * </p>
-     *
-     * @return
-     *
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        if( schema == null ){
+        if (schema == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
+
         return schema;
     }
 
     /**
-     * Implement next.
-     * 
-     * <p>
-     * Description ...
-     * </p>
-     *
-     * @return
-     *
-     * @throws IOException
-     * @throws IllegalAttributeException
-     * @throws NoSuchElementException
-     *
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
-        }            
-        Feature next = reader.next();            
-        return schema.create( next.getAttributes( null ), next.getID() );
+        }
+
+        Feature next = reader.next();
+
+        return schema.create(next.getAttributes(null), next.getID());
     }
 
     /**
-     * Implement hasNext.
-     * 
-     * <p>
-     * Description ...
-     * </p>
-     *
-     * @return
-     *
-     * @throws IOException
-     *
      * @see org.geotools.data.FeatureReader#hasNext()
      */
     public boolean hasNext() throws IOException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
-        }        
+        }
+
         return reader.hasNext();
     }
 
     /**
-     * Implement close.
-     * 
-     * <p>
-     * Description ...
-     * </p>
-     *
-     * @throws IOException
-     *
      * @see org.geotools.data.FeatureReader#close()
      */
     public void close() throws IOException {
-        if( reader == null ){
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
+
         reader.close();
         reader = null;
         schema = null;
