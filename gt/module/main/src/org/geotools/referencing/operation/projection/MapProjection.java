@@ -156,8 +156,11 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Central longitude in <u>radians</u>. Default value is 0, the Greenwich meridian.
      * This is called '<var>lambda0</var>' in Snyder.
+     *
+     * <strong>Consider this field as final</strong>. It is not final only
+     * because some classes need to modify it at construction time.
      */
-    protected final double centralMeridian;
+    protected double centralMeridian;
     
     /**
      * Latitude of origin in <u>radians</u>. Default value is 0, the equator.
@@ -995,7 +998,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compute function (15-9) from Snyder equivalent to negative of function (7-7).
+     * Compute function (15-9) and (9-13) from Snyder.
+     * Equivalent to negative of function (7-7).
      */
     final double tsfn(final double phi, double sinphi) {
         sinphi *= excentricity;
@@ -1062,8 +1066,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                     new Identifier(Citation.OPEN_GIS, "central_meridian"),
                     new Identifier(Citation.EPSG,     "Longitude of natural origin"),
                     new Identifier(Citation.EPSG,     "Longitude of false origin"),
-                    new Identifier(Citation.ESRI,     "Longitude_Of_Center"),
                     new Identifier(Citation.ESRI,     "Longitude_Of_Origin"),
+                    new Identifier(Citation.ESRI,     "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
                     new Identifier(Citation.GEOTIFF,  "NatOriginLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
@@ -1077,7 +1081,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                     new Identifier(Citation.OPEN_GIS, "latitude_of_origin"),
                     new Identifier(Citation.EPSG,     "Latitude of false origin"),
                     new Identifier(Citation.EPSG,     "Latitude of natural origin"),
-                    new Identifier(Citation.ESRI,     "Latitude_Of_Center"),
+                    new Identifier(Citation.ESRI,     "Latitude_Of_Center"),  //ESRI uses this in orthographic 
                     new Identifier(Citation.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
@@ -1092,7 +1096,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "scale_factor"),
                     new Identifier(Citation.EPSG,     "Scale factor at natural origin"),
-                    new Identifier(Citation.GEOTIFF,  "ScaleAtNatOrigin")
+                    new Identifier(Citation.GEOTIFF,  "ScaleAtNatOrigin"),
+                    new Identifier(Citation.GEOTIFF,  "ScaleAtCenter")
                 },
                 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
