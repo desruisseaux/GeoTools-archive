@@ -16,12 +16,8 @@
  */
 package org.geotools.data.wms;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.geotools.data.wms.getCapabilities.Layer;
 
@@ -31,53 +27,21 @@ import org.geotools.data.wms.getCapabilities.Layer;
  *
  * Construct a WMS getMap request. 
  */
-public class GetMapRequest {
+public class GetMapRequest extends AbstractRequest {
 	
-	/** Represents OGC Exception MIME types */
-	public static final String EXCEPTION_XML     = "application/vnd.ogc.se_xml";
 	public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
 	public static final String EXCEPTION_BLANK   = "application/vnd.ogc.se_blank";
 	
-    private URL onlineResource;
-    private Properties properties;
-    
     /**
      * Initialize properties and set the request propertie to "GetMap"
      */
     public GetMapRequest(URL onlineResource) {
-        this.onlineResource = onlineResource;
+    	super(onlineResource);
+
+    	setProperty("REQUEST", "GetMap");
         
-        properties = new Properties();
-        properties.setProperty("REQUEST", "GetMap");
-        //TODO remove this when more version support comes along
-        properties.setProperty("VERSION", "1.1.1");
     }
     
-    public URL getFinalURL() {
-        String url = onlineResource.toExternalForm();
-        if (!url.endsWith("?")) {
-            url = url.concat("?");
-        }
-        
-        Iterator iter = properties.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            String param = entry.getKey() +"="+entry.getValue();
-            if (iter.hasNext()) {
-                param = param.concat("&");
-            }
-            url = url.concat(param);
-        }
-        
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            //If something is wrong here, this is something wrong with the code above.
-        }
-        
-        return null;
-    }
-
     /**
      * Sets the version number of the request.
      * @param version A String indicting a WMS Version ("1.0.0", "1.1.0", or "1.1.1")
@@ -97,6 +61,14 @@ public class GetMapRequest {
      * @param layers A list of Layers, each containing a name.
      */
     public void setLayers(List layers) {
+        setLayers(toCommaDelimitedString(layers));
+    }
+    
+    /**
+	 * @param layers
+	 * @return
+	 */
+	protected String toCommaDelimitedString(List layers) {
         String layerList = "";
         
         for (int i = 0; i < layers.size(); i++) {
@@ -107,10 +79,10 @@ public class GetMapRequest {
                 layerList.concat(",");
             }
         }
-        setLayers(layerList);
-    }
-    
-    /**
+        return layerList;
+	}
+
+	/**
      * From the Web Map Service Implementation Specification:
      * "The required LAYERS parameter lists the map layer(s) to be returned by this GetMap
      * request. The value of the LAYERS parameter is a comma-separated list of one or more
@@ -295,10 +267,6 @@ public class GetMapRequest {
      * @param value a value to accompany the name
      */
     public void setVendorSpecificParameter(String name, String value) {
-    	properties.setProperty(name, value);
-    }
-    
-    public void setProperty(String name, String value) {
     	properties.setProperty(name, value);
     }
 }

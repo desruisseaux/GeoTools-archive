@@ -18,6 +18,7 @@ package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -95,6 +96,10 @@ public class WebMapServerTest extends TestCase {
 	    WebMapServer wms = new WebMapServer(serverURL);
 	    
 	    WMT_MS_Capabilities capabilities = wms.getCapabilities();
+	    
+	    List namedLayers = wms.getNamedLayers();
+	    
+	    GetMapRequest request2 = wms.createGetMapRequest(namedLayers);
 	    
 	    DCPType dcpType = (DCPType) capabilities.getCapability().getRequest().getGetMap().getDcpTypes().get(0);
 	    Get get = (Get) dcpType.getHttp().getGets().get(0);

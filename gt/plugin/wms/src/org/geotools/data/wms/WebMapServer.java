@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.geotools.data.wms.getCapabilities.DCPType;
+import org.geotools.data.wms.getCapabilities.Get;
 import org.geotools.data.wms.getCapabilities.Layer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.jdom.Document;
@@ -241,28 +243,58 @@ public class WebMapServer {
 	}
 	
     /**
-     * Iterate through the layers and extract and return all layers containing a <name>.
-     * @param layers The list of Layers to iterate through.
-     * @return A list of Layers each containing a <name>
+     * Utility method to return each layer that has a name.
+	 * This method maintains no hierarchy at all.
+	 * @return A list of type Layer, each value has a it's name property set
      */
-    public static List getNamedLayers(List layers) {
+    public List getNamedLayers() {
         List namedLayers = new ArrayList();
         
-        Iterator iter = layers.iterator();
-        while (iter.hasNext()) {
-            Layer layer = (Layer) iter.next();
-            if (layer.getName() != null && !layer.getName().equals("")) {
-                namedLayers.add(layer);
-            }
-            if (layer.getSubLayers() != null) {
-                namedLayers.add(getNamedLayers(layer.getSubLayers()));
-            }
-        }
-        
+        Layer root = capabilities.getCapability().getLayer();
+        getNamedLayers(root, namedLayers);
+                
         return namedLayers;
     }
 
+	/**
+	 * @param root
+	 * @param namedLayers
+	 */
+	private void getNamedLayers(Layer root, List namedLayers) {
+		
+		if (root.getName() != null && root.getName().length() != 0) {
+			namedLayers.add(root);
+		}
+		
+		if (root.getSubLayers() == null) {
+			return;
+		}
+		
+		Iterator iter = root.getSubLayers().iterator();
+        while (iter.hasNext()) {
+            Layer layer = (Layer) iter.next();
+
+            getNamedLayers(layer, namedLayers);
+        }
+	}
+
 	public Exception getProblem() {
 		return problem;
+	}
+
+	/**
+	 * @param namedLayers
+	 * @return
+	 */
+	public GetMapRequest createGetMapRequest(List namedLayers) {
+		
+		DCPType dcpType = (DCPType) getCapabilities().getCapability().getRequest().getGetMap().getDcpTypes().get(0);
+	    Get get = (Get) dcpType.getHttp().getGets().get(0);
+		
+		GetMapRequest request = new GetMapRequest(get.getOnlineResource());
+		
+		
+		
+		return request;
 	}
 }
