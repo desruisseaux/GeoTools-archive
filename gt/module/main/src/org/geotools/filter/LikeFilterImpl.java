@@ -17,8 +17,6 @@
 package org.geotools.filter;
 
 
-// Geotools dependencies
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,8 +30,6 @@ import org.geotools.feature.Feature;
  * @version $Id: LikeFilterImpl.java,v 1.8 2003/08/11 18:48:25 cholmesny Exp $
  */
 public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
-    /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
 
     /** The attribute value, which must be an attribute expression. */
     private Expression attribute = null;
@@ -44,14 +40,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     /** The single wildcard for the REGEXP pattern. */
     private String wildcardSingle = ".?";
 
-    /** The escaped version of the single wildcard for the REGEXP pattern. */
-    private String escapedWildcardSingle = "\\.\\?";
-
     /** The multiple wildcard for the REGEXP pattern. */
     private String wildcardMulti = ".*";
-
-    /** The escaped version of the multiple wildcard for the REGEXP pattern. */
-    private String escapedWildcardMulti = "\\.\\*";
 
     /** The escape sequence for the REGEXP pattern. */
     private String escape = "\\";
@@ -60,7 +50,100 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     private Pattern compPattern = null;
 
     /** The matcher to match patterns with. */
-    private Matcher matcher = null;
+    private Matcher match = null;
+    private Matcher getMatcher(){
+        if(match == null){
+            // protect the vars as this is moved code
+
+            String pattern1 = new String(this.pattern);
+            String wildcardMulti1 = new String(this.wildcardMulti);
+            String wildcardSingle1 = new String(this.wildcardSingle);
+            String escape1 = new String(this.escape);
+            
+//          The following things happen for both wildcards:
+            //  (1) If a user-defined wildcard exists, replace with Java wildcard
+            //  (2) If a user-defined escape exists, Java wildcard + user-escape
+            //  Then, test for matching pattern and return result.
+            char esc = escape1.charAt(0);
+            LOGGER.finer("wildcard " + wildcardMulti1 + " single " + wildcardSingle1);
+            LOGGER.finer("escape " + escape1 + " esc " + esc + " esc == \\ "
+                + (esc == '\\'));
+
+            String escapedWildcardMulti = fixSpecials(wildcardMulti1);
+            String escapedWildcardSingle = fixSpecials(wildcardSingle1);
+
+            // escape any special chars which are not our wildcards
+            StringBuffer tmp = new StringBuffer("");
+
+            boolean escapedMode = false;
+
+            for (int i = 0; i < pattern1.length(); i++) {
+                char chr = pattern1.charAt(i);
+                LOGGER.finer("tmp = " + tmp + " looking at " + chr);
+
+                if (pattern1.regionMatches(false, i, escape1, 0, escape1.length())) {
+                    // skip the escape string
+                    LOGGER.finer("escape ");
+                    escapedMode = true;
+
+                    i += escape1.length();
+                    chr = pattern1.charAt(i);
+                }
+
+                if (pattern1.regionMatches(false, i, wildcardMulti1, 0,
+                            wildcardMulti1.length())) { // replace with java wildcard
+                    LOGGER.finer("multi wildcard");
+
+                    if (escapedMode) {
+                        LOGGER.finer("escaped ");
+                        tmp.append(escapedWildcardMulti);
+                    } else {
+                        tmp.append(".*");
+                    }
+
+                    i += (wildcardMulti1.length() - 1);
+                    escapedMode = false;
+
+                    continue;
+                }
+
+                if (pattern1.regionMatches(false, i, wildcardSingle1, 0,
+                            wildcardSingle1.length())) {
+                    // replace with java single wild card
+                    LOGGER.finer("single wildcard");
+
+                    if (escapedMode) {
+                        LOGGER.finer("escaped ");
+                        tmp.append(escapedWildcardSingle);
+                    } else {
+                        tmp.append(".?");
+                    }
+
+                    i += (wildcardSingle1.length() - 1);
+                    escapedMode = false;
+
+                    continue;
+                }
+
+                if (isSpecial(chr)) {
+                    LOGGER.finer("special");
+                    tmp.append(this.escape + chr);
+                    escapedMode = false;
+
+                    continue;
+                }
+
+                tmp.append(chr);
+                escapedMode = false;
+            }
+
+            pattern1 = tmp.toString();
+            LOGGER.finer("final pattern " + pattern1);
+            compPattern = java.util.regex.Pattern.compile(pattern1);
+            match = compPattern.matcher("");
+        }
+        return match;
+    }
 
     /**
      * Constructor which flags the operator as like.
@@ -77,7 +160,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * @throws IllegalFilterException Filter is illegal.
      */
     public void setValue(Expression attribute) throws IllegalFilterException {
-        if ((attribute.getType() != DefaultExpression.ATTRIBUTE_STRING)
+        if ((attribute.getType() != ExpressionType.ATTRIBUTE_STRING)
                 || permissiveConstruction) {
             this.attribute = attribute;
         } else {
@@ -109,8 +192,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      */
     public void setPattern(Expression p, String wildcardMulti,
         String wildcardSingle, String escape) {
-        String pattern = p.toString();
-        setPattern(pattern, wildcardMulti, wildcardSingle, escape);
+        setPattern(p.toString(), wildcardMulti, wildcardSingle, escape);
     }
 
     /**
@@ -126,91 +208,11 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      */
     public void setPattern(String pattern, String wildcardMulti,
         String wildcardSingle, String escape) {
-        // The following things happen for both wildcards:
-        //  (1) If a user-defined wildcard exists, replace with Java wildcard
-        //  (2) If a user-defined escape exists, Java wildcard + user-escape
-        //  Then, test for matching pattern and return result.
-        char esc = escape.charAt(0);
-        LOGGER.finer("wildcard " + wildcardMulti + " single " + wildcardSingle);
-        LOGGER.finer("escape " + escape + " esc " + esc + " esc == \\ "
-            + (esc == '\\'));
-
-        escapedWildcardMulti = fixSpecials(wildcardMulti);
-        escapedWildcardSingle = fixSpecials(wildcardSingle);
-
-        LOGGER.finer("after fixing: wildcard " + wildcardMulti + " single "
-            + wildcardSingle + " escape " + escape);
-        LOGGER.finer("start pattern = " + pattern);
-
-        // escape any special chars which are not our wildcards
-        StringBuffer tmp = new StringBuffer("");
-
-        boolean escapedMode = false;
-
-        for (int i = 0; i < pattern.length(); i++) {
-            char chr = pattern.charAt(i);
-            LOGGER.finer("tmp = " + tmp + " looking at " + chr);
-
-            if (pattern.regionMatches(false, i, escape, 0, escape.length())) {
-                // skip the escape string
-                LOGGER.finer("escape ");
-                escapedMode = true;
-
-                i += escape.length();
-                chr = pattern.charAt(i);
-            }
-
-            if (pattern.regionMatches(false, i, wildcardMulti, 0,
-                        wildcardMulti.length())) { // replace with java wildcard
-                LOGGER.finer("multi wildcard");
-
-                if (escapedMode) {
-                    LOGGER.finer("escaped ");
-                    tmp.append(escapedWildcardMulti);
-                } else {
-                    tmp.append(this.wildcardMulti);
-                }
-
-                i += (wildcardMulti.length() - 1);
-                escapedMode = false;
-
-                continue;
-            }
-
-            if (pattern.regionMatches(false, i, wildcardSingle, 0,
-                        wildcardSingle.length())) {
-                // replace with java single wild card
-                LOGGER.finer("single wildcard");
-
-                if (escapedMode) {
-                    LOGGER.finer("escaped ");
-                    tmp.append(escapedWildcardSingle);
-                } else {
-                    tmp.append(this.wildcardSingle);
-                }
-
-                i += (wildcardSingle.length() - 1);
-                escapedMode = false;
-
-                continue;
-            }
-
-            if (isSpecial(chr)) {
-                LOGGER.finer("special");
-                tmp.append(this.escape + chr);
-                escapedMode = false;
-
-                continue;
-            }
-
-            tmp.append(chr);
-            escapedMode = false;
-        }
-
-        this.pattern = tmp.toString();
-        LOGGER.finer("final pattern " + this.pattern);
-        compPattern = java.util.regex.Pattern.compile(this.pattern);
-        matcher = compPattern.matcher("");
+        match = null; // empty cache
+        this.pattern = pattern;
+        this.wildcardMulti = wildcardMulti;
+        this.wildcardSingle = wildcardSingle;
+        this.escape = escape;
     }
 
     /**
@@ -236,7 +238,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
         // Checks to ensure that the attribute has been set
         if (attribute == null) {
             return false;
-        } else {
+        }
             // Note that this converts the attribute to a string
             //  for comparison.  Unlike the math or geometry filters, which
             //  require specific types to function correctly, this filter
@@ -252,10 +254,10 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
                 return false;
             }
 
+            Matcher matcher = getMatcher();
             matcher.reset(attribute.getValue(feature).toString());
 
             return matcher.matches();
-        }
     }
 
     /**
@@ -351,9 +353,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             return ((lFilter.getFilterType() == this.filterType)
             && lFilter.getValue().equals(this.attribute)
             && lFilter.getPattern().equals(this.pattern));
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
