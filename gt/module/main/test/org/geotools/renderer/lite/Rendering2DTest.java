@@ -27,8 +27,8 @@ import junit.textui.TestRunner;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
-import org.geotools.data.MemoryDataSource;
 import org.geotools.data.Query;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -196,15 +196,16 @@ public class Rendering2DTest extends TestCase {
         FeatureType collType = FeatureTypeFactory.newFeatureType(types, "collfeature");
         Feature collFeature = collType.create(new Object[]{coll, "collection"});
                 
-        MemoryDataSource datasource = new MemoryDataSource();
-        datasource.addFeature(lineFeature);
-        datasource.addFeature(polygonFeature);
-        datasource.addFeature(pointFeature);
-        datasource.addFeature(ringFeature);
-        datasource.addFeature(collFeature);
+        MemoryDataStore data = new MemoryDataStore();
+        data.addFeature(lineFeature);
+        data.addFeature(polygonFeature);
+        data.addFeature(pointFeature);
+        data.addFeature(ringFeature);
+        data.addFeature(collFeature);
         
-        FeatureCollection ft = datasource.getFeatures(Query.ALL);
-        return ft;
+        String typeName = data.getTypeNames()[0];
+        
+        return data.getFeatureSource( typeName ).getFeatures().collection();
     }
     
     public void testSimpleRender()throws Exception {
@@ -370,7 +371,7 @@ public class Rendering2DTest extends TestCase {
     private FeatureCollection createTestDefQueryFeatureCollection()
     throws Exception
     {
-        MemoryDataSource datasource = new MemoryDataSource();
+        MemoryDataStore data = new MemoryDataStore();
     	AttributeType []types = new AttributeType[4];
     	
     	types[0] = AttributeTypeFactory.newAttributeType("id", String.class);
@@ -388,21 +389,20 @@ public class Rendering2DTest extends TestCase {
     	l = line(gf, new int[] { 20, 20, 100, 20, 100, 100 });
     	p = (Polygon)l.convexHull();
         f = type.create(new Object[] {"ft1", point(gf, 20, 20), l, p},"test.1");
-        datasource.addFeature(f);
+        data.addFeature(f);
         
         l = line(gf, new int[] { 130, 130, 110, 110, 110, 130, 30, 130 });
     	p = (Polygon)l.convexHull();
         f = type.create(new Object[] {"ft2", point(gf, 130, 130), l, p},"test.2");
-        datasource.addFeature(f);
+        data.addFeature(f);
 
         l = line(gf, new int[] { 150, 150, 190, 140, 190, 190 });
     	p = (Polygon)l.convexHull();
         f = type.create(new Object[] {"ft3", point(gf, 150, 150), l, p},"test.3");
-        datasource.addFeature(f);
+        data.addFeature(f);
 
-
-        FeatureCollection col = datasource.getFeatures();
-    	return col;
+        String typeName = type.getTypeName();
+        return data.getFeatureSource( typeName ).getFeatures().collection();        
     }
     
     private Style createDefQueryTestStyle() throws IllegalFilterException
