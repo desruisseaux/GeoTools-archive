@@ -54,8 +54,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import com.thaiopensource.datatype.xsd.regex.test.CategoryTest;
-
 
 /**
  * An immutable list of categories. Categories are sorted by their sample values.
