@@ -49,6 +49,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.geotools.units.Unit;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
@@ -111,7 +112,9 @@ public class ArcGridRenderTest extends TestCaseSupport {
         StyleFactory sFac = StyleFactory.createStyleFactory();
         
         Format format = reader.getFormat();
-        ParameterValueGroup params = format.getReadParameters();        
+        ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+        
         GridCoverage gc = reader.read( params );
         Raster raster = gc.getRenderedImage().getData();
         

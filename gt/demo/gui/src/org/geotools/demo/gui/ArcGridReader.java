@@ -43,9 +43,9 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.PrameterGroupDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -89,10 +89,10 @@ public class ArcGridReader {
         GridCoverageReader reader = f.getReader(url);
         
         //get the parameters and set them
-        PrameterGroupDescriptor paramDescriptor = f.getReadParameters();
-        ParameterGroup params = (ParameterGroup) paramDescriptor.createValue();
-        params.getValue( "Compressed" ).setValue( true );
-        params.getValue( "GRASS" ).setValue( true );
+        ParameterDescriptorGroup paramDescriptor = f.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+        params.parameter( "Compressed" ).setValue( true );
+        params.parameter( "GRASS" ).setValue( true );
         
         //read the grid
         if (reader.hasMoreGridCoverages()) {                 //not yet implemented

@@ -9,6 +9,7 @@ import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.resources.TestData;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -72,7 +73,9 @@ public class ArcGridReaderTest extends TestCaseSupport {
     public void testGZIPReadStringParameterArray() throws Exception {
         URL gzipUrl = TestData.getResource( this, GZIP_TESTFILE );
         reader=format.getReader( gzipUrl );
-        ParameterValueGroup params = format.getReadParameters();
+        
+        ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();        
         
         ParameterValue grass = params.parameter( "GRASS" );
         grass.setValue( true );

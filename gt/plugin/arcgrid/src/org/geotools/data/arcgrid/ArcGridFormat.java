@@ -16,17 +16,16 @@
  */
 package org.geotools.data.arcgrid;
 
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterGroup;
-import org.opengis.parameter.GeneralParameterValue;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.ParameterGroupDescriptor;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * A simple implementation of the Arc Grid Format Metadata
@@ -54,31 +53,17 @@ public class ArcGridFormat extends AbstractGridFormat {
         info.put("version", "1.0");
         mInfo = info;
         
-        readParameters = new ParameterGroup( mInfo,
-                new GeneralParameterValue[]{ getGRASSParam(), getCompressParam()} );
         
-        writeParameters = new ParameterGroup( mInfo,
-                new GeneralParameterValue[]{ getGRASSParam(), getCompressParam()} );        
+        readParameters = new ParameterGroupDescriptor( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS } );        
+        writeParameters = new ParameterGroupDescriptor( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS} );        
     }
-    /**
-     * Creates a "Compress" Parameter.  Indicates whether the arcgrid data is
-     * compressed with GZIP
-     *
-     * @return a "Compress" Parameter.
-     */
-    public static Parameter getCompressParam() {
-        return new Parameter(new ParameterDescriptor( "Compressed", "Indicates whether the arcgrid data is compressed with GZIP", Boolean.FALSE, true ));        
-    }
-    /**
-     * Creates a "GRASS" Parameter.  Indicates whether the arcgrid is in GRASS
-     * format
-     *
-     * @return a "GRASS" Parameter.
-     */
-    public static Parameter getGRASSParam() {
-        return new Parameter(new ParameterDescriptor( "GRASS", "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true ));
-    }
-
+    
+    /** Indicates whether the arcgrid data is compressed with GZIP */
+    public static final ParameterDescriptor COMPRESS = new ParameterDescriptor( "Compressed", "Indicates whether the arcgrid data is compressed with GZIP", Boolean.FALSE, true );
+    
+    /** Indicates whether the arcgrid is in GRASS format */
+    public static final ParameterDescriptor GRASS = new ParameterDescriptor( "GRASS", "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true );
+    
     /**
      * @see org.geotools.data.GridFormatFactorySpi#createReader(java.lang.Object)
      */

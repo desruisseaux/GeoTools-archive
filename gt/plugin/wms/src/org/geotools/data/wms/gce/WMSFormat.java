@@ -22,7 +22,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -132,7 +132,7 @@ public class WMSFormat extends AbstractGridFormat {
      * user interface.
      * </p>
      */
-    public ParameterValueGroup getReadParameters() {
+    public ParameterDescriptorGroup getReadParameters() {
         Parameter params[] = new Parameter[16];
 
         WMSParameterMaker maker = new WMSParameterMaker(capabilities);

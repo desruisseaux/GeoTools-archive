@@ -16,6 +16,7 @@ import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.resources.TestData;
 
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -63,10 +64,12 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         File tmpFile = TestData.temp(this,"temp.asc");
         
         //read in the grid coverage
-        GridCoverageReader reader = f.getReader(TestData.getResource( this, testParam.fileName ));
-        ParameterValueGroup paramDescriptor = f.getReadParameters();
-//        params.getValue( "Compressed" ).setValue( testParam.compressed );
-//        params.getValue( "GRASS" ).setValue( testParam.grass );
+        GridCoverageReader reader = f.getReader(TestData.getResource( this, testParam.fileName ));        
+        ParameterDescriptorGroup paramDescriptor = f.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();        
+        
+//        params.parameter( "Compressed" ).setValue( testParam.compressed );
+//        params.parameter( "GRASS" ).setValue( testParam.grass );
 //        GridCoverage gc1 = reader.read( params );
 //
 //        //write grid coverage out to temp file

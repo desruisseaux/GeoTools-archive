@@ -111,14 +111,13 @@ public class ArcGridWriter implements GridCoverageWriter {
         return destination;
     }
 
-	boolean parseBoolean( ParameterValueGroup params, String name ){
-	    ParameterValueGroup info = getFormat().getReadParameters();        
+	boolean parseBoolean( ParameterValueGroup params, String name ){	           
 		if( params == null ){
 		    throw new InvalidParameterValueException(
 		            "A Parameter group was expected",
 		            null, null );            
-		}
-		ParameterValue targetInfo = info.parameter( name );
+		}		 		
+		ParameterValue targetInfo = params.parameter( name );
 		if( targetInfo == null ){
 		    throw new InvalidParameterNameException( name, "Not a ArcGrid paramerter" );
 		}

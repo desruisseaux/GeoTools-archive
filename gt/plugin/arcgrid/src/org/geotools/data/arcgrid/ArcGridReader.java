@@ -182,17 +182,17 @@ public class ArcGridReader implements GridCoverageReader {
      * @throws IOException
      *             Thrown for any other unexpected exception
      */
-    private void setEnvironment(String name, ParameterValueGroup parameters)
+    private void setEnvironment(String name, ParameterValueGroup params)
             throws InvalidParameterNameException,
             InvalidParameterValueException, IOException {
         this.name = name;
-        if (parameters == null ){
+        if (params == null ){
             compress = false;
             GRASS = false;
         }
         else {
-            compress = parameters.parameter( "Compressed" ).booleanValue();
-            GRASS = parameters.parameter( "GRASS" ).booleanValue();
+            compress = params.parameter( "Compressed" ).booleanValue();
+            GRASS = params.parameter( "GRASS" ).booleanValue();
         }              
         if ( compress )
             mReader= mExchange.getGZIPReader(mSource);
@@ -201,13 +201,12 @@ public class ArcGridReader implements GridCoverageReader {
 
     }
     boolean parseBoolean( ParameterValueGroup params, String name ){
-        ParameterValueGroup info = getFormat().getReadParameters();        
         if( params == null ){
             throw new InvalidParameterValueException(
                     "A Parameter group was expected",
                     null, null );            
         }
-        ParameterValue targetInfo = info.parameter( name );
+        ParameterValue targetInfo = params.parameter( name );
         if( targetInfo == null ){
             throw new InvalidParameterNameException( name, "Not a ArcGrid paramerter" );
         }
