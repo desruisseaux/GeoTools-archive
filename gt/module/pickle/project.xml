@@ -28,6 +28,11 @@
       <version>2.0-B6-DEV</version>
     </dependency>
     <dependency>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
       <id>JTS</id>
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>

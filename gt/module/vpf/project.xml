@@ -35,4 +35,22 @@
     </dependency>
   </dependencies>
   <contributors />
+<build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/test-data/</include>
+            <include>**/*.svg</include>
+            <include>**/*.sld</include>
+            <include>**/*.gml</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
 </project>
