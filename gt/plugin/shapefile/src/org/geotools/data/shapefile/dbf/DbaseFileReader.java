@@ -224,8 +224,6 @@ public class DbaseFileReader {
   public void skip() throws IOException {
     boolean foundRecord = false;
     while (!foundRecord) {
-      // retrieve the record length
-      int tempRecordLength = header.getRecordLength();
       
       bufferCheck();
       
@@ -233,7 +231,7 @@ public class DbaseFileReader {
       char tempDeleted = (char) buffer.get();
       
       // skip the next bytes
-      buffer.position(buffer.position() + tempRecordLength - 1); //the 1 is for the deleted flag just read.
+      buffer.position(buffer.position() + header.getRecordLength() - 1); //the 1 is for the deleted flag just read.
       
       // add the row if it is not deleted.
       if (tempDeleted != '*') {
@@ -272,7 +270,6 @@ public class DbaseFileReader {
    */
   public void transferTo(DbaseFileWriter writer) throws IOException {
       bufferCheck();
-      
       buffer.limit(buffer.position() + header.getRecordLength());
       writer.channel.write(buffer);
       buffer.limit(buffer.capacity());
@@ -289,7 +286,7 @@ public class DbaseFileReader {
       // read the deleted flag
       char deleted = (char) buffer.get();
       if (deleted == '*') {
-        continue;
+          continue;
       }
       
       charBuffer.position(0);

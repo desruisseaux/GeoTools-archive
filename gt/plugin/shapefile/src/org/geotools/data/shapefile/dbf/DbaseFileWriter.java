@@ -174,9 +174,14 @@ public class DbaseFileWriter  {
    * @throws IOException If errors occur.
    */
   public void close() throws IOException {
-    buffer.position(0);
-    buffer.put((byte) 0).position(0).limit(1);
-    write();
+      // IANS - GEOT 193, bogus 0x00 written. According to dbf spec, optional
+      // eof 0x1a marker is, well, optional. Since the original code wrote a
+      // 0x00 (which is wrong anyway) lets just do away with this :)
+      // - produced dbf works in OpenOffice and ArcExplorer java, so it must
+      // be okay. 
+//    buffer.position(0);
+//    buffer.put((byte) 0).position(0).limit(1);
+//    write();
     channel.close();
     if (buffer instanceof MappedByteBuffer) {
       NIOUtilities.clean(buffer);
