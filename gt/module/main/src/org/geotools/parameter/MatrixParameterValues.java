@@ -26,6 +26,7 @@ import java.util.Locale;
 import org.opengis.referencing.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.GeneralOperationParameter;
@@ -138,7 +139,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public GeneralOperationParameter getParameter(final String name)
+    public OperationParameter getParameter(final String name)
             throws ParameterNotFoundException
     {
         return ((MatrixParameters) descriptor).getParameter(name, numRow.intValue(),
@@ -157,7 +158,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      * @return The parameter value for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public GeneralParameterValue getValue(String name) throws ParameterNotFoundException {
+    public ParameterValue getValue(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         final MatrixParameters descriptor = ((MatrixParameters) this.descriptor);

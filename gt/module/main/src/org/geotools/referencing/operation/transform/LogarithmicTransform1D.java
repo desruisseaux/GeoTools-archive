@@ -20,23 +20,24 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.util.Locale;
 import javax.units.Unit;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
+import org.geotools.metadata.citation.Citation;
 import org.geotools.parameter.ParameterValue;
+import org.geotools.referencing.Identifier;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -289,6 +290,11 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      */
     public static class Provider extends MathTransformProvider {
         /**
+         * Serial number for interoperability with different versions.
+         */
+        private static final long serialVersionUID = -7235097164208708484L;
+
+        /**
          * The operation parameter descriptor for the {@link #base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
@@ -306,34 +312,30 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * Create a provider for logarithmic transforms.
          */
         public Provider() {
-            super("Logarithmic", 1, 1, new OperationParameter[] {BASE, OFFSET});
-        }
-
-        /**
-         * Returns the name by which this object is identified. If <code>locale</code> is
-         * <code>null</code>, then this method returns <code>"Logarithmic"</code>. Otherwise,
-         * it try to returns a localized string.
-         *
-         * @param  locale The desired locale for the name to be returned,
-         *         or <code>null</code> for a non-localized string.
-         * @return The name, or <code>null</code> if not available.
-         */
-        public String getName(final Locale locale) {
-            if (locale == null) {
-                return super.getName(locale);
-            }
-            return Resources.getResources(locale).getString(ResourceKeys.LOGARITHM);
+            super(new Identifier[] {new Identifier(Citation.GEOTOOLS, null, "Logarithmic")},
+                  1, 1, new OperationParameter[] {BASE, OFFSET});
         }
         
         /**
-         * Returns a transform for the specified parameters.
+         * Creates a logarithmic transform from the specified group of parameter values.
          *
-         * @param  parameters The parameter values.
-         * @return A {@link MathTransform} object of this classification.
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters) {
-            final double base = 0;//TODO parameters.getValue("base").doubleValue();
-            return create(base, 0);
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            return create(values.getValue("base"  ).doubleValue(),
+                          values.getValue("offset").doubleValue());
+        }
+
+        /**
+         * Returns the resources key for {@linkplain #getName localized name}.
+         * This method is for internal purpose by Geotools implementation only.
+         */
+        protected int getLocalizationKey() {
+            return ResourceKeys.LOGARITHM;
         }
     }
 }

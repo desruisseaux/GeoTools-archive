@@ -35,6 +35,7 @@ import javax.units.Converter;
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
 import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
@@ -188,17 +189,25 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     }
 
     /**
-     * Check the parameter value validity.
+     * Ensures that the given value is valid according the specified parameter descriptor.
+     * This convenience method ensures that <code>value</code> is assignable to the
+     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass expected class}, is between the
+     * {@linkplain org.geotools.parameter.OperationParameter#getMinimumValue minimum} and
+     * {@linkplain org.geotools.parameter.OperationParameter#getMaximumValue maximum} values and is one of the
+     * {@linkplain org.geotools.parameter.OperationParameter#getValidValues set of valid values}.
+     * If the value fails any of those tests, then an exception is thrown.
      *
+     * @param  descriptor The parameter descriptor to check against.
      * @param  value The value to check, or <code>null</code>.
-     * @throws InvalidParameterValueException if the parameter value is illegal.
+     * @throws InvalidParameterValueException if the parameter value is invalid.
      */
-    private void ensureValidValue(final Object value) throws InvalidParameterValueException {
+    public static void ensureValidValue(final OperationParameter descriptor, final Object value)
+            throws InvalidParameterValueException
+    {
         if (value == null) {
             return;
         }
         final String error;
-        final OperationParameter descriptor = (OperationParameter) this.descriptor;
         if (!descriptor.getValueClass().isAssignableFrom(value.getClass())) {
             error = Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
                     Utilities.getShortClassName(value));
@@ -214,13 +223,13 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
                 final Set validValues = descriptor.getValidValues();
                 if (validValues!=null && !validValues.contains(value)) {
                     error = Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                                             getName(), value);
+                                             getName(descriptor), value);
                 } else {
                     return;
                 }
             }
         }
-        throw new InvalidParameterValueException(error, getName(), value);
+        throw new InvalidParameterValueException(error, getName(descriptor), value);
     }
 
     /**
@@ -234,7 +243,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     /**
      * Returns the parameter name in the default locale.
      */
-    private String getName() {
+    private static String getName(final GeneralOperationParameter descriptor) {
         return descriptor.getName(Locale.getDefault());
     }
 
@@ -282,7 +291,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     public double doubleValue(final Unit unit) throws InvalidParameterTypeException {
         if (this.unit == null) {
             throw new IllegalStateException(Resources.format(
-                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
         }
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
@@ -307,7 +316,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -325,7 +334,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof Number) {
             return ((Number) value).intValue();
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -342,7 +351,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof Boolean) {
             return ((Boolean) value).booleanValue();
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -360,7 +369,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof CharSequence) {
             return value.toString();
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -381,7 +390,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     public double[] doubleValueList(final Unit unit) throws InvalidParameterTypeException {
         if (this.unit == null) {
             throw new IllegalStateException(Resources.format(
-                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
         }
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
@@ -411,7 +420,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof double[]) {
             return (double[]) value;
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -429,7 +438,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof int[]) {
             return (int[]) value;
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -449,7 +458,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (value instanceof URL) {
             return (URL) value;
         } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
     }
 
@@ -483,14 +492,14 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
         if (targetUnit == null) {
             throw new IllegalStateException(Resources.format(
-                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
         final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
-        ensureValidValue(converted);
+        ensureValidValue((OperationParameter) descriptor, converted);
         this.value = wrap(value);
         this.unit  = unit;
     }
@@ -509,7 +518,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      */
     public void setValue(final double value) throws InvalidParameterValueException {
         final Double check = wrap(value);
-        ensureValidValue(check);
+        ensureValidValue((OperationParameter) descriptor, check);
         this.value = check;
     }
 
@@ -524,7 +533,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      */
     public void setValue(final int value) throws InvalidParameterValueException {
         final Integer check = wrap(value);
-        ensureValidValue(check);
+        ensureValidValue((OperationParameter) descriptor, check);
         this.value = check;
     }
 
@@ -538,7 +547,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      */
     public void setValue(final boolean value) throws InvalidParameterValueException {
         final Boolean check = Boolean.valueOf(value);
-        ensureValidValue(check);
+        ensureValidValue((OperationParameter) descriptor, check);
         this.value = check;
     }
 
@@ -555,7 +564,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      * @see #getValue
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        ensureValidValue(value);
+        ensureValidValue((OperationParameter) descriptor, value);
         this.value = value;
     }
 
@@ -573,7 +582,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
         if (targetUnit == null) {
             throw new IllegalStateException(Resources.format(
-                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
@@ -584,7 +593,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         for (int i=0; i<converted.length; i++) {
             converted[i] = converter.convert(converted[i]);
         }
-        ensureValidValue(converted);
+        ensureValidValue((OperationParameter) descriptor, converted);
         this.value = values;
         this.unit  = unit;
     }

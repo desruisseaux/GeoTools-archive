@@ -26,6 +26,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -182,7 +183,7 @@ public class MatrixParameters extends OperationParameterGroup {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public final GeneralOperationParameter getParameter(final String name)
+    public final OperationParameter getParameter(final String name)
             throws ParameterNotFoundException
     {
         return getParameter(name,
@@ -199,7 +200,7 @@ public class MatrixParameters extends OperationParameterGroup {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    final GeneralOperationParameter getParameter(String name, final int numRow, final int numCol)
+    final OperationParameter getParameter(String name, final int numRow, final int numCol)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
@@ -352,10 +353,10 @@ public class MatrixParameters extends OperationParameterGroup {
             return ((MatrixParameterValues) parameters).getMatrix();
         }
         // Fallback on the general case (others implementations)
-        final GeneralParameterValue numRowParam = parameters.getValue(numRow.getName(null));
-        final GeneralParameterValue numColParam = parameters.getValue(numCol.getName(null));
-        final int numRow = ((ParameterValue) numRowParam).intValue();
-        final int numCol = ((ParameterValue) numColParam).intValue();
+        final ParameterValue numRowParam = parameters.getValue(numRow.getName(null));
+        final ParameterValue numColParam = parameters.getValue(numCol.getName(null));
+        final int numRow = numRowParam.intValue();
+        final int numCol = numColParam.intValue();
         final GeneralMatrix matrix = new GeneralMatrix(numRow, numCol);
         final GeneralParameterValue[] params = parameters.getValues();
         if (params != null) {

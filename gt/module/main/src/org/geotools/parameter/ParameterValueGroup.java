@@ -24,14 +24,19 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
+import org.geotools.referencing.Info;
+import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -130,34 +135,56 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
     }
 
     /**
-     * Returns the first value in this group for the specified name. If no
-     * {@linkplain org.geotools.parameter.ParameterValue parameter value} or
-     * group is found for the given name, then this method search recursively
-     * in subgroups (if any).
+     * Returns the first value in this group for the specified {@linkplain Identifier#getCode
+     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterValue parameter value}
+     * is found for the given code, then this method search recursively in subgroups (if any).
+     * This convenience method provides a way to get and set parameter values by name. For example
+     * the following idiom fetches a floating point value for the <code>"false_easting"</code>
+     * parameter:
+     * <br><br>
+     * <blockquote><code>
+     * double value = getValue("false_easting").{@linkplain
+     * org.geotools.parameter.ParameterValue#doubleValue() doubleValue()};
+     * </code></blockquote>
      *
-     * @param  name The case insensitive name of the parameter to search for.
-     * @return The parameter value for the given name.
-     * @throws ParameterNotFoundException if there is no parameter for the given name.
+     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
+     *              parameter to search for. If this string contains the <code>':'</code> character,
+     *              then the part before <code>':'</code> is the {@linkplain Identifier#getCodeSpace
+     *              code space}.
+     * @return The parameter value for the given identifier code.
+     * @throws ParameterNotFoundException if there is no parameter value for the given identifier code.
      */
-    public GeneralParameterValue getValue(String name) throws ParameterNotFoundException {
+    public ParameterValue getValue(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        for (int i=0; i<values.length; i++) {
-            final GeneralParameterValue value = values[i];
-            if (name.equals(value.getDescriptor().getName(null))) {
-                return value;
+        List subgroups = null;
+        GeneralParameterValue[] values = this.values;
+        while (values != null) {
+            for (int i=0; i<values.length; i++) {
+                final GeneralParameterValue value = values[i];
+                if (value instanceof ParameterValue) {
+                    if (Info.identifierMatches(value.getDescriptor(), name)) {
+                        return (ParameterValue) value;
+                    }
+                } else if (value instanceof org.opengis.parameter.ParameterValueGroup) {
+                    if (subgroups == null) {
+                        subgroups = new LinkedList();
+                    }
+                    assert !subgroups.contains(value) : value;
+                    subgroups.add(value);
+                }
             }
-        }
-        for (int i=0; i<values.length; i++) {
-            final GeneralParameterValue value = values[i];
-            if (value instanceof ParameterValueGroup) try {
-                return ((ParameterValueGroup) value).getValue(name);
-            } catch (ParameterNotFoundException exception) {
-                // Parameter not found. Ignore for now (search in others subgroups).
+            /*
+             * Looks in subgroups only after all parameters in the current group have been verified.
+             * Search in a "first in, first out" basis.
+             */
+            if (subgroups==null || subgroups.isEmpty()) {
+                break;
             }
+            values = ((org.opengis.parameter.ParameterValueGroup) subgroups.remove(0)).getValues();
         }
         throw new ParameterNotFoundException(Resources.format(
-                    ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
     }
     
     /**

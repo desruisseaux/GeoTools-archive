@@ -196,14 +196,12 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
      *        or {@link org.geotools.metadata.citation.Citation#EPSG}).
      * @param codespace The code space, or <code>null</code> if none.
      * @param code      The code. This parameter is mandatory.
-     * @param version   The version, or <code>null</code> if none.
      */
     public Identifier(final Citation authority,
                       final String   codespace,
-                      final String   code,
-                      final String   version)
+                      final String   code)
     {
-        this(toMap(authority, codespace, code, version));
+        this(toMap(authority, codespace, code));
     }
 
     /**
@@ -212,14 +210,12 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
      */
     private static final Map toMap(final Citation authority,
                                    final String   codespace,
-                                   final String   code,
-                                   final String   version)
+                                   final String   code)
     {
-        final Map properties = new HashMap();
+        final Map properties = new HashMap(8);
         properties.put("authority", authority);
         properties.put("codespace", codespace);
         properties.put("code",      code     );
-        properties.put("version",   version  );
         return properties;
     }
 

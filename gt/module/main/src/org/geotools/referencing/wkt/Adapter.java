@@ -19,9 +19,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
-import java.lang.reflect.Method;
-
 // Geotools dependencies
 import org.geotools.util.UnsupportedImplementationException;
 
@@ -29,19 +26,12 @@ import org.geotools.util.UnsupportedImplementationException;
 /**
  * Adapter for implementations which doesn't extends {@link Formattable}. This includes
  * especially {@link org.geotools.referencing.operation.transform.AffineTransform2D}.
- * This method looks for an appropriate method using reflection.
+ * This method looks for a <code>toWKT()</code> method using reflection.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class Adapter extends Formattable {
-    /**
-     * The argument types for the <code>formatWKT</code> method to search for.
-     */
-    private static final Class[] ARGUMENTS = {
-        Formatter.class
-    };
-
     /**
      * The object to format as WKT.
      */
@@ -59,22 +49,21 @@ final class Adapter extends Formattable {
      * the object as WKT, then an {@link UnsupportedImplementationException} is thrown.
      */
     protected String formatWKT(final Formatter formatter) {
+        if (object instanceof org.geotools.resources.Formattable) {
+            return ((org.geotools.resources.Formattable) object).formatWKT(formatter);
+        }
         final Class classe = object.getClass();
+        final String wkt;
         try {
-            final Method method = classe.getMethod("formatWKT", ARGUMENTS);
-            try {
-                // Gets access even if package-private class.
-                method.setAccessible(true);
-            } catch (SecurityException exception) {
-                // Not allowed to make the method accessible.
-                // Continue; maybe the class was already public.
-            }
-            return (String) method.invoke(object, new Object[] {formatter});
+            wkt = (String) classe.getMethod("toWKT", null).invoke(object, null);
         } catch (Exception cause) {
             final UnsupportedImplementationException exception;
             exception = new UnsupportedImplementationException(classe);
             exception.initCause(cause);
             throw exception;
         }
+        // TODO: Not yet implemented. We should insert the WKT in the formatter
+        //       as pre-formatted text, and returns <code>null</code>.
+        throw new UnsupportedImplementationException(classe);
     }
 }

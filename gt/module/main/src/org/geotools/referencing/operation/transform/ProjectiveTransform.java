@@ -24,7 +24,6 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.util.Locale;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.Serializable;
@@ -38,16 +37,19 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies and resources
 import org.geotools.parameter.ParameterValue;
 import org.geotools.parameter.MatrixParameters;
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -427,17 +429,27 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     /**
      * The provider for {@link ProjectiveTransform}. This transform is registered
      * under the name "Affine", which is a special case of projective transform.
+     * The default matrix size is
+     * {@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}&times;{@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static final class Provider extends MathTransformProvider {
         /**
-         * Create a provider for affine transform with a default matrix size of
-         * {@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}&times;{@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}.
+         * Serial number for interoperability with different versions.
+         */
+        private static final long serialVersionUID = 649555815622129472L;
+
+        /**
+         * Create a provider for affine transform with a default matrix size.
+         *
+         * @todo We should register EPSG parameter identifiers (A0, A1, A2, B0, B1, B2) as well.
          */
         public Provider() {
-            super("Affine",
+            super(new Identifier[] {
+                      new Identifier(Citation.OPEN_GIS, null,  "Affine"),
+                      new Identifier(Citation.EPSG,    "EPSG", "9624")},
                   MatrixParameters.DEFAULT_MATRIX_SIZE-1,
                   MatrixParameters.DEFAULT_MATRIX_SIZE-1,
                   new GeneralOperationParameter[] {
@@ -445,30 +457,24 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         }
 
         /**
-         * Returns the name by which this object is identified. If <code>locale</code> is
-         * <code>null</code>, then this method returns <code>"Affine"</code>. Otherwise,
-         * it try to returns a localized string.
+         * Creates a projective transform from the specified group of parameter values.
          *
-         * @param  locale The desired locale for the name to be returned,
-         *         or <code>null</code> for a non-localized string.
-         * @return The name, or <code>null</code> if not available.
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public String getName(final Locale locale) {
-            if (locale == null) {
-                return super.getName(locale);
-            }
-            return Resources.getResources(locale).getString(ResourceKeys.AFFINE_TRANSFORM);
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            return create(((MatrixParameters) parameters).getMatrix(values));
         }
 
         /**
-         * Returns a transform for the specified parameters.
-         *
-         * @param  parameters The parameter values in standard units.
-         * @return A {@link MathTransform} object of this classification.
+         * Returns the resources key for {@linkplain #getName localized name}.
+         * This method is for internal purpose by Geotools implementation only.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters) {
-            final Matrix matrix = null;//MatrixParameters.getMatrix(parameters); (TODO)
-            return create(matrix);
+        protected int getLocalizationKey() {
+            return ResourceKeys.AFFINE_TRANSFORM;
         }
     }
 }

@@ -1,24 +1,32 @@
 
-Name: org/geotools/cv/
-Specification-Title: Grid Coverages Services
-Specification-Version: 1.0
+Name: org/geotools/parameter/
+Specification-Title: GeoAPI for ISO 19111
+Specification-Version: 1.0.0
 Specification-Vendor: OpenGIS Consortium, Inc.
-Implementation-Title: Grid Coverages Services
-Implementation-Version: 0.6.1
+Implementation-Title: Referencing by coordinates Services
+Implementation-Version: 2.0
 Implementation-Vendor: Geotools OpenSource project
 
-Name: org/geotools/gc/
-Specification-Title: Grid Coverages Services
-Specification-Version: 1.0
+Name: org/geotools/referencing/
+Specification-Title: GeoAPI for ISO 19111
+Specification-Version: 1.0.0
 Specification-Vendor: OpenGIS Consortium, Inc.
-Implementation-Title: Grid Coverages Services
-Implementation-Version: 0.6.1
+Implementation-Title: Referencing by coordinates Services
+Implementation-Version: 2.0
 Implementation-Vendor: Geotools OpenSource project
 
-Name: org/geotools/gp/
-Specification-Title: Grid Coverages Services
-Specification-Version: 1.0
+Name: org/geotools/geometry/
+Specification-Title: GeoAPI for ISO 19107
+Specification-Version: 1.0.0
+Specification-Vendor: OpenGIS Consortium, Inc.
+Implementation-Title: Spatial schema
+Implementation-Version: 2.0
+Implementation-Vendor: Geotools OpenSource project
+
+Name: org/geotools/coverage/
+Specification-Title: GeoAPI for Grid Coverage
+Specification-Version: 1.0.0
 Specification-Vendor: OpenGIS Consortium, Inc.
 Implementation-Title: Grid Coverages Services
-Implementation-Version: 0.6.1
+Implementation-Version: 2.0
 Implementation-Vendor: Geotools OpenSource project

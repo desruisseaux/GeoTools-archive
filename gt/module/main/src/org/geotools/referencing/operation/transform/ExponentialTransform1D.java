@@ -20,16 +20,23 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import javax.units.Unit;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
+import org.geotools.metadata.citation.Citation;
 import org.geotools.parameter.ParameterValue;
+import org.geotools.referencing.Identifier;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -309,63 +316,58 @@ public class ExponentialTransform1D extends AbstractMathTransform
     }
     
     /**
-     * The provider for {@link ExponentialTransform1D} and {@link LogarithmicTransform1D}.
+     * The provider for the {@link ExponentialTransform1D}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
-//    static final class Provider extends MathTransformProvider {
-//        /**
-//         * The range of allowed value for the "Dimension" parameter.
-//         * Current implementation support only one-dimensional transform.
-//         */
-//        private static final Range DIMENSION_RANGE;
-//        static
-//        {
-//            final Integer ONE = new Integer(1);
-//            DIMENSION_RANGE = new Range(Integer.class, ONE, true, ONE, true);
-//        }
-//
-//        /**
-//         * <code>false</code> to create a provider for {@link ExponentialTransform1D}, or
-//         * <code>true</code> to create a provider for {@link LogarithmicTransform1D}.
-//         */
-//        private final boolean logarithm;
-//
-//        /**
-//         * Create a provider for exponentional or logarithmic transforms.
-//         *
-//         * @param logarithm <code>false</code> to create a provider for
-//         *        {@link ExponentialTransform1D}, or <code>true</code> to create
-//         *        a provider for {@link LogarithmicTransform1D}.
-//         */
-//        public Provider(final boolean logarithm) {
-//            super(logarithm ? "Logarithmic" : "Exponential",
-//                  logarithm ? ResourceKeys.LOGARITHM : ResourceKeys.EXPONENTIAL,
-//                  null);
-//            this.logarithm = logarithm;
-//            put("base", 10, POSITIVE_RANGE);
-//            putInt("dimension", 1, DIMENSION_RANGE);
-//        }
-//        
-//        /**
-//         * Returns a transform for the specified parameters.
-//         *
-//         * @param  parameters The parameter values.
-//         * @return A {@link MathTransform} object of this classification.
-//         */
-//        public MathTransform create(final ParameterList parameters) {
-//            final double   base = parameters.getDoubleParameter("base");
-//            final int dimension = parameters.getIntParameter("dimension");
-//            if (dimension == 1) {
-//                if (logarithm) {
-//                    return new LogarithmicTransform1D(base, 0);
-//                } else {
-//                    return ExponentialTransform1D.create(base, 1);
-//                }
-//            }
-//            // TODO: make it more general.
-//            throw new UnsupportedOperationException("Only 1D transforms are currently supported.");
-//        }
-//    }
+    public static class Provider extends MathTransformProvider {
+        /**
+         * Serial number for interoperability with different versions.
+         */
+        private static final long serialVersionUID = -5838840021166379987L;;
+
+        /**
+         * The operation parameter descriptor for the {@link #base} parameter value.
+         * Valid values range from 0 to infinity. The default value is 10.
+         */
+        public static final OperationParameter BASE = LogarithmicTransform1D.Provider.BASE;
+
+        /**
+         * The operation parameter descriptor for the {@link #scale} parameter value.
+         * Valid values range is unrestricted. The default value is 0.
+         */
+        public static final OperationParameter SCALE = new org.geotools.parameter.OperationParameter(
+                "scale", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
+
+        /**
+         * Create a provider for logarithmic transforms.
+         */
+        public Provider() {
+            super(new Identifier[] {new Identifier(Citation.GEOTOOLS, null, "Exponential")},
+                  1, 1, new OperationParameter[] {BASE, SCALE});
+        }
+        
+        /**
+         * Creates a logarithmic transform from the specified group of parameter values.
+         *
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            return create(values.getValue("base" ).doubleValue(),
+                          values.getValue("scale").doubleValue());
+        }
+
+        /**
+         * Returns the resources key for {@linkplain #getName localized name}.
+         * This method is for internal purpose by Geotools implementation only.
+         */
+        protected int getLocalizationKey() {
+            return ResourceKeys.EXPONENTIAL;
+        }
+    }
 }

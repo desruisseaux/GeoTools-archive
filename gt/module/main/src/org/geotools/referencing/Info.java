@@ -285,6 +285,87 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
         // Subclasses need to overrides this!!!!
         return (int)serialVersionUID ^ getClass().hashCode();
     }
+
+    /**
+     * Returns <code>true</code> if at least one {@linkplain #getIdentifiers identifier} matches
+     * the specified string. The comparaison is case-insensitive. If the <code>identifier</code>
+     * to compare contains the ':' character, then the part before ':' will be compared to the
+     * {@linkplain org.geotools.referencing.Identifier#getCodeSpace code space} and the part after
+     * ':' will be compared to the {@linkplain org.geotools.referencing.Identifier#getCode code}.
+     * If this info contains no identifier, then this method compares its unlocalized
+     * {@linkplain #getName name}.
+     *
+     * @param  identifier The identifier.
+     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
+     *         matches the specified <code>identifier</code>.
+     */
+    public boolean identifierMatches(final String identifier) {
+        return identifierMatches(this, identifiers, identifier);
+    }
+
+    /**
+     * Returns <code>true</code> if at least one identifier matches the specified string.
+     * This method performs the same check than the {@linkplain #identifierMatches(String)
+     * non-static method} on arbitrary object implementing the OpenGIS interface.
+     *
+     * @param  info The object to check.
+     * @param  identifier The identifier.
+     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
+     *         matches the specified <code>identifier</code>.
+     */
+    public static boolean identifierMatches(final org.opengis.referencing.Info info,
+                                            final String identifier)
+    {
+        if (info instanceof Info) {
+            return ((Info) info).identifierMatches(identifier);
+        } else {
+            return identifierMatches(info, info.getIdentifiers(), identifier);
+        }
+    }
+
+    /**
+     * Implementation of <code>identifierMatches</code> method.
+     *
+     * @param  info The object to check.
+     * @param  identifiers The list of identifiers in <code>info</code>.
+     * @param  identifier The identifier.
+     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
+     *         matches the specified <code>identifier</code>.
+     */
+    private static boolean identifierMatches(final org.opengis.referencing.Info info,
+                                             final Identifier[] identifiers,
+                                             String identifier)
+    {
+        identifier = identifier.trim();
+        if (identifiers==null || identifiers.length==0) {
+            return identifier.equalsIgnoreCase(info.getName(null).trim());
+        }
+        final String code, codespace;
+        final int separator = identifier.indexOf(':');
+        if (separator >= 0) {
+            code = identifier.substring(separator+1).trim();
+            codespace = identifier.substring(0, separator).trim();
+        } else {
+            code = identifier;
+            codespace = null;
+        }
+        for (int i=0; i<identifiers.length; i++) {
+            final Identifier candidate = identifiers[i];
+            if (code.equalsIgnoreCase(candidate.getCode().trim())) {
+                if (codespace == null) {
+                    return true;
+                }
+                String check = candidate.getCodeSpace();
+                if (check != null) {
+                    check = check.trim();
+                } else {
+                    check = "";
+                }
+                return codespace.equalsIgnoreCase(check);
+            }
+        }
+        return false;
+    }
     
     /**
      * Compares the specified object with this info for equality.

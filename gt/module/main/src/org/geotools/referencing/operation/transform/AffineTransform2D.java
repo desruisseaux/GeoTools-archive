@@ -32,6 +32,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Formattable;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XAffineTransform;
@@ -46,7 +47,8 @@ import org.geotools.geometry.GeneralDirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class AffineTransform2D extends XAffineTransform implements MathTransform2D, LinearTransform {
+final class AffineTransform2D extends XAffineTransform
+                           implements MathTransform2D, LinearTransform, Formattable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -155,10 +157,6 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element.
-     *
-     * @todo This method can't be invoked directly since this class do not inherit from
-     *       {@link org.geotools.referencing.wkt.Formattable}. The current hack is to
-     *       invokes this method through the reflection API, which is why it is declared public.
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
