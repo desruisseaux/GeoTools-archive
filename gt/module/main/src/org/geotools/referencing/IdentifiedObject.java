@@ -23,6 +23,7 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Iterator;
@@ -36,7 +37,7 @@ import org.opengis.metadata.Identifier;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.InternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -58,7 +59,14 @@ import org.geotools.referencing.wkt.Formattable;
 public class IdentifiedObject extends Formattable
                            implements org.opengis.referencing.IdentifiedObject, Serializable
 {
-    /**
+        
+    /** "name" Key used to provide String for getName() */
+    public static final String NAME_PROPERTY = "name";
+    
+    /** "remarks" Key used to provide String for getRemarks() */
+    public static final String REMARKS_PROPERTY = "remarks";
+    
+        /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5543338998051359448L;
@@ -72,8 +80,8 @@ public class IdentifiedObject extends Formattable
      * The name for this object or code. Should never be <code>null</code>.
      * Keys are {@link Locale} objects and values are {@link String}.
      */
-    private final Map name;
-
+    //private final Map name;
+    private final InternationalString name;
     /**
      * Set of alternative identifications of this object. The first identifier, if
      * any, is normally the primary identification code, and any others are aliases.
@@ -84,8 +92,18 @@ public class IdentifiedObject extends Formattable
      * Comments on or information about this object, or <code>null</code> if none.
      * Keys are {@link Locale} objects and values are {@link String}.
      */
-    private final Map remarks;
+    // private final Map remarks;
+    private final InternationalString remarks;
     
+    static private final Map defaultMap( String objectName, String objectDescription ){
+        Map map = new HashMap();
+        map.put( NAME_PROPERTY, objectName );
+        map.put( REMARKS_PROPERTY, objectDescription );
+        return map;        
+    }
+    public IdentifiedObject( String objectName, String objectDescription ) throws IllegalArgumentException {
+        this( defaultMap( objectName, objectDescription ));
+    }
     /**
      * Constructs an object from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
@@ -173,9 +191,10 @@ public class IdentifiedObject extends Formattable
             throws IllegalArgumentException
     {
         ensureNonNull("properties", properties);
-        Map          name        = null;
-        Map          remarks     = null;
-        Identifier[] identifiers = null;
+        
+        InternationalString name        = new InternationalString();
+        InternationalString remarks     = new InternationalString();
+        Identifier[] identifiers        = null;
         /*
          * Iterate through each map entry. This have two purposes:
          *
@@ -185,7 +204,7 @@ public class IdentifiedObject extends Formattable
          * This algorithm is sub-optimal if the map contains a lot of entries of no interest to
          * this identifier. Hopefully, most users will fill a map only with usefull entries.
          */
-check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
+CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
             String    key   = ((String) entry.getKey()).trim().toLowerCase();
             Object    value = entry.getValue();
@@ -195,12 +214,12 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
              */
             switch (key.hashCode()) {
                 case 1368189162: {
-                    if (key.equals("identifiers")) {
-                        identifiers = (Identifier[]) value;
-                        if (identifiers != null) {
-                            identifiers = (Identifier[]) identifiers.clone();
-                        }
-                        continue check;
+                    if (key.equals("identifiers")) {                                                
+                        if (value != null) {
+                            Identifier origional[] = (Identifier[]) value;
+                            identifiers = (Identifier[]) (origional.clone());                            
+                        }                        
+                        continue CHECK;
                     }
                 }
                 // Fix case for common keywords.
@@ -208,15 +227,15 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
                 case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
                 case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
             }
-            Locale locale = getLocale(key, "name");
+            Locale locale = getLocale(key, NAME_PROPERTY );
             if (locale != null) {
-                name = addLocalizedString(name, locale, value);
-                continue check;
+                name.addLocalizedString( locale, (String) value);
+                continue CHECK;
             }
-            locale = getLocale(key, "remarks");
-            if (locale != null) {
-                remarks = addLocalizedString(remarks, locale, value);
-                continue check;
+            locale = getLocale(key, REMARKS_PROPERTY );
+            if (locale != null) {                
+                remarks.addLocalizedString( locale, (String) value);
+                continue CHECK;
             }
             if (localizables != null) {
                 for (int i=0; i<localizables.length; i++) {
@@ -226,19 +245,21 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
                         Map map = (Map)subProperties.get(prefix);
                         map = addLocalizedString(map, locale, value);
                         subProperties.put(prefix, map);
-                        continue check;
+                        continue CHECK;
                     }
                 }
             }
-            subProperties.put(key, value);
+            if( subProperties != null ){
+                subProperties.put(key, value);
+            }
         }
         this.name        = name;
         this.identifiers = identifiers;
         this.remarks     = remarks;
         ensureNonNull("name", name);
-        ensureNonNull("name", name.get(null));
-        org.geotools.referencing.Identifier.canonicalizeKeys(name);
-        org.geotools.referencing.Identifier.canonicalizeKeys(remarks);
+        ensureNonNull("name", name.toString());         
+        //org.geotools.referencing.Identifier.canonicalizeKeys(name);
+        //org.geotools.referencing.Identifier.canonicalizeKeys(remarks);
     }
 
     /**
@@ -249,9 +270,14 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * @return The name, or <code>null</code> if not available.
      */
     public String getName(final Locale locale) {
-        return getLocalized(name, locale);
+        if( locale == null ){
+            return name.toString();
+        }
+        return name.toString( locale );        
     }
-
+    public InternationalString getName(){
+        return name;
+    }
     /**
      * Set of alternative identifications of this object. The first identifier, if
      * any, is normally the primary identification code, and any others are aliases.
@@ -273,7 +299,13 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * @return The remarks, or <code>null</code> if not available.
      */
     public String getRemarks(final Locale locale) {
-        return getLocalized(remarks, locale);
+        if( locale == null ){
+            return remarks.toString();
+        }         
+        return remarks.toString( locale);
+    }
+    public InternationalString getRemarks(){       
+        return remarks;
     }
     
     /**

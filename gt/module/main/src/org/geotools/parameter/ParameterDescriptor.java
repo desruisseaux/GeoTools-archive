@@ -23,6 +23,7 @@
 package org.geotools.parameter;
 
 // J2SE direct dependencies
+import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
@@ -107,6 +108,34 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
      * The unit for default, minimum and maximum values, or <code>null</code>.
      */
     private final Unit unit;
+
+    private static final Map properties( String name, String remarks ){
+        if (remarks == null ){
+            return Collections.singletonMap("name", name);
+        }
+        Map properties = new HashMap(2);
+        properties.put("name", name );
+        properties.put("remarks", name );
+        return properties;        
+    }
+    /**
+     * Similar to DataStore PARAM constuctor.
+     * 
+     * @param name The parameter name.
+     * @param true1
+     */
+    public ParameterDescriptor(String name, String description, Object defaultValue, boolean required ) {
+        this( properties( name, description ),
+              required ? 1 : 0,
+              1,
+              defaultValue.getClass(),
+              null,
+              defaultValue,
+              null,
+              null,
+              null );              
+              
+    }
 
     /**
      * Construct a parameter for a range of integer values.

@@ -311,8 +311,9 @@ public class InternationalString implements org.opengis.util.InternationalString
      * @return The string in the specified locale, or in a default locale.
      */
     public String toString(Locale locale) {
+        String text = null;
         while (locale != null) {
-            final String text = (String) localMap.get(locale);
+            text = (String) localMap.get(locale);
             if (text != null) {
                 return text;
             }
@@ -329,8 +330,16 @@ public class InternationalString implements org.opengis.util.InternationalString
             }
             break;
         }
+        
+        // Try an Empty Locale
+        locale = new Locale( "", "", "" ); // IdentifiedObject does this to us
+        text = (String) localMap.get(locale);
+        if (text != null) {
+            return text;
+        }
+        
         // Try the string in the 'null' locale.
-        final String text = (String) localMap.get(null);
+        text = (String) localMap.get(null);
         if (text == null) {
             // No 'null' locale neither. Returns the first string in whatever locale.
             final Iterator it = localMap.values().iterator();
@@ -388,11 +397,11 @@ public class InternationalString implements org.opengis.util.InternationalString
             // For now, we do not apply this operation on singleton map since they are immutable.
             final Map.Entry[] entries;
             entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[localMap.size()]);
-            localMap.clear();
+            localMap = new HashMap(); //TODO: Used to be localMap.clear() to recover space     
             for (int i=0; i<entries.length; i++) {
                 final Map.Entry entry = entries[i];
                 localMap.put(canonicalize((Locale)entry.getKey()), entry.getValue());
             }
         }
-    }
+    }    
 }

@@ -29,8 +29,8 @@ import java.util.LinkedList;
 import java.util.Collections;
 
 // OpenGIS dependencies
-import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
 
@@ -127,7 +127,7 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
      * for the created group will be <code>this</code> object.
      */
     public GeneralParameterValue createValue() {
-        return new org.geotools.parameter.ParameterValueGroup(this);
+        return new ParameterValueGroup(this);
     }
 
     /**
