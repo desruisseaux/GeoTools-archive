@@ -1,6 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Managment Committee (PMC)
+ * (C) 2003, 2004 Geotools Project Managment Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -583,7 +583,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
     
     /**
-     * Makes sure that the specified longitude stay within &plusmn;&pi; radians. This method
+     * Ensures that the specified longitude stay within &plusmn;&pi; radians. This method
      * is typically invoked after geographic coordinates are transformed. This method may add
      * or substract some amount of 2&pi; radians to <var>x</var>.
      *
@@ -591,7 +591,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @return The longitude in the range &plusmn;&pi; radians.
      */
     protected static double rollLongitude(final double x) {
-        return x + (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
+        return x - (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
     }
     
     /**
