@@ -195,12 +195,12 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *
      * @return The values.
      */
-    public synchronized List values() {
+    public List values() {
         // don't need a clone because we will copy
         // still need synchronized incase we interupt add updating the values pointer
         // (usually only a problem on 64 bit multiprocessor machines, but with a 
         /// JIT all bets are off).
-        GeneralParameterValue params[] = values; 
+        GeneralParameterValue params[] = values;
         if( params == null ){
             return Collections.EMPTY_LIST;
         }
@@ -246,10 +246,10 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
         ensureNonNull("name", name);
         name = name.trim();
         List subgroups = null;
-        GeneralParameterValue[] values = this.values;
-        while (values != null) {
-            for (int i=0; i<values.length; i++) {
-                final GeneralParameterValue value = values[i];
+        GeneralParameterValue[] params = this.values;
+        while (params != null) {
+            for (int i=0; i<params.length; i++) {
+                final GeneralParameterValue value = params[i];
                 if (value instanceof ParameterValue) {
                     if (IdentifiedObject.identifierMatches(value.getDescriptor(), name)) {
                         return (ParameterValue) value;
@@ -269,7 +269,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
             if (subgroups==null || subgroups.isEmpty()) {
                 break;
             }
-            values = Parameters.array( (org.opengis.parameter.ParameterValueGroup) subgroups.remove(0));
+            params = Parameters.array( (org.opengis.parameter.ParameterValueGroup) subgroups.remove(0));
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);

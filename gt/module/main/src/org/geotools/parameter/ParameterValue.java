@@ -29,7 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Set;
 import java.util.Arrays;
-import java.util.Locale;
 import javax.units.Unit;
 import javax.units.SI;
 import javax.units.NonSI;
