@@ -22,7 +22,6 @@ import org.geotools.data.*;
 import org.geotools.feature.*;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterDOMParser;
-import org.geotools.filter.FilterTestSupport;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.w3c.dom.*;
@@ -159,7 +158,7 @@ public class XMLEncoderTest extends FilterTestSupport {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document dom = db.parse(TestData.getResource(this, uri).toExternalForm());
-        LOGGER.fine("exporting " + uri);
+//        LOGGER.fine("exporting " + uri);
 
         // first grab a filter node
         NodeList nodes = dom.getElementsByTagName("Filter");
@@ -181,13 +180,13 @@ public class XMLEncoderTest extends FilterTestSupport {
                 filter = FilterDOMParser.parseFilter(child);
 
                 //_log.getLoggerRepository().setThreshold(Level.DEBUG);
-                LOGGER.fine("filter: " + filter);
+//                LOGGER.fine("filter: " + filter);
 
                 StringWriter output = new StringWriter();
                 DocumentWriter.writeFragment(filter,FilterSchema.getInstance(),output,null);
 
-                LOGGER.fine("Resulting filter XML is \n"
-                    + output.getBuffer().toString());
+//                LOGGER.fine("Resulting filter XML is \n"
+//                    + output.getBuffer().toString());
             }
         }
 
