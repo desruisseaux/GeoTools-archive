@@ -817,7 +817,7 @@ public class DataUtilities {
 
         boolean same = featureType.getAttributeCount() == properties.length &&
             featureType.getTypeName().equals( typeName ) &&
-            featureType.getNamespace().equals( namespace );
+            featureType.getNamespaceURI().equals( namespace );
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
             AttributeType type = featureType.getAttributeType(i);
