@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.data.vpf.io;
 
 import org.geotools.data.vpf.ifc.Coordinate;
@@ -61,10 +60,13 @@ public class CoordinateFloat implements Coordinate {
                 if (j > 0) {
                     sb.append(", ");
                 }
+
                 sb.append(coordinates[i][j]);
             }
+
             sb.append(")");
         }
+
         return sb.toString();
     }
 }

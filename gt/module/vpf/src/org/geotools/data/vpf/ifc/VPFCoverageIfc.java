@@ -14,45 +14,33 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.vpf.ifc;
 
-/**
- * VPFLibraryIfc.java
+package org.geotools.data.vpf.ifc;
+/*
+ * VPFCoverageIfc.java
  *
+ * Created on 20. april 2004, 15:04
  *
- * Created: Fri Apr 04 14:06:29 2003
- *
- * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFLibraryIfc.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
-public interface VPFLibraryIfc {
+public interface VPFCoverageIfc {
     /**
      * Describe constant <code>FIELD_XMIN</code> here.
      *
      */
-    public static final String FIELD_XMIN = "xmin";
+    public static final String FIELD_COVERAGE_NAME = "coverage_name";
 
     /**
      * Describe constant <code>FIELD_YMIN</code> here.
      *
      */
-    public static final String FIELD_YMIN = "ymin";
+    public static final String FIELD_DESCRIPTION = "description";
 
     /**
      * Describe constant <code>FIELD_XMAX</code> here.
      *
      */
-    public static final String FIELD_XMAX = "xmax";
-
-    /**
-     * Describe constant <code>FIELD_YMAX</code> here.
-     *
-     */
-    public static final String FIELD_YMAX = "ymax";
-
-    /**
-     * Describe constant <code>FIELD_LIB_NAME</code> here.
-     *
-     */
-    public static final String FIELD_LIB_NAME = "library_name";
-} // VPFLibraryIfc
+    public static final String FIELD_LEVEL = "level";
+    public static final String FIELD_TILE_NAME = "tile_name";
+    public static final String FIELD_TILE_ID = "id";
+}

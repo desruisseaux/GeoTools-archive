@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,8 +16,10 @@
  */
 package org.geotools.data.vpf.io;
 
-import org.geotools.data.vpf.ifc.VPFRow;
 import java.util.Map;
+
+import org.geotools.data.vpf.ifc.VPFRow;
+
 
 /**
  * TableRow.java Created: Thu Jan 02 23:58:39 2003
@@ -31,6 +33,7 @@ public class TableRow implements VPFRow {
      *
      */
     private RowField[] fieldsArr = null;
+
     /**
      * Describe variable <code>fieldsMap</code> here.
      *
@@ -83,8 +86,10 @@ public class TableRow implements VPFRow {
             for (int i = 0; i < fieldsArr.length; i++) {
                 buff.append(fieldsArr[i].toString() + ":");
             }
+
             buff.append(";");
         }
+
         return buff.toString();
     }
 
@@ -127,35 +132,41 @@ public class TableRow implements VPFRow {
         if ((obj == null) || !(obj instanceof TableRow)) {
             return false;
         }
+
         TableRow row = (TableRow) obj;
 
         if ((fieldsArr == null) && (row.fieldsArr == null)) {
             return true;
         }
+
         if ((fieldsArr == null) || (row.fieldsArr == null)) {
             return false;
         }
+
         if (fieldsArr.length != row.fieldsArr.length) {
             return false;
         }
+
         for (int i = 0; i < fieldsArr.length; i++) {
             if (!fieldsArr[i].equals(row.fieldsArr[i])) {
                 return false;
             }
         }
+
         return true;
     }
 
     public int hashCode() {
         int code = 0;
-        if (fieldsArr == null || fieldsArr.length == 0) {
+
+        if ((fieldsArr == null) || (fieldsArr.length == 0)) {
             code = super.hashCode();
         } else {
             for (int i = 0; i < fieldsArr.length; i++) {
                 code += fieldsArr[i].hashCode();
             }
         }
+
         return code;
     }
-
 }

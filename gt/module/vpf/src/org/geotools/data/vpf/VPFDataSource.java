@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,19 +14,23 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.vpf;
 
+package org.geotools.data.vpf;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.logging.Logger;
+
 import org.geotools.data.AbstractDataSource;
 import org.geotools.data.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
+
 import org.geotools.filter.Filter;
 
 
@@ -41,17 +45,21 @@ public class VPFDataSource extends AbstractDataSource implements DataSource {
      * Describe variable <code>log</code> here.
      *
      */
+
     //    private Logger log = Logger.getLogger("org.geotools.vpf");
+
     /**
      * Describe variable <code>file</code> here.
      *
      */
     private File file = null;
+
     /**
      * Describe variable <code>dataBase</code> here.
      *
      */
     private VPFDataBase dataBase = null;
+
     /**
      * Describe variable <code>schema</code> here.
      *
@@ -67,7 +75,8 @@ public class VPFDataSource extends AbstractDataSource implements DataSource {
      */
     public VPFDataSource(File file) throws IOException {
         this.file = file;
-        dataBase = new VPFDataBase(file);
+
+        //dataBase = new VPFDataBase(file);
     }
 
     // Implementation of org.geotools.data.DataSource
@@ -83,7 +92,7 @@ public class VPFDataSource extends AbstractDataSource implements DataSource {
      * @throws DataSourceException For all data source errors.
      */
     public FeatureCollection getFeatures(Filter filter)
-        throws DataSourceException {
+                                  throws DataSourceException {
         FeatureCollection fc = FeatureCollections.newCollection();
         getFeatures(fc, filter);
 
@@ -103,7 +112,7 @@ public class VPFDataSource extends AbstractDataSource implements DataSource {
      * @throws DataSourceException For all data source errors.
      */
     public void getFeatures(FeatureCollection featureCollection, Query query)
-        throws DataSourceException {
+                     throws DataSourceException {
     }
 
     /**
@@ -120,5 +129,4 @@ public class VPFDataSource extends AbstractDataSource implements DataSource {
     public FeatureType getSchema() {
         return schema;
     }
-
 }

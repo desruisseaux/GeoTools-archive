@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,12 +14,13 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.data.vpf.io;
+
+import java.io.IOException;
 
 import org.geotools.data.vpf.ifc.VPFHeader;
 import org.geotools.data.vpf.ifc.VPFRow;
-import java.io.IOException;
+
 
 /**
  * VariableIndexInputStream.java Created: Mon Feb 24 22:23:58 2003
@@ -28,7 +29,6 @@ import java.io.IOException;
  * @version $Id: VariableIndexInputStream.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
  */
 public class VariableIndexInputStream extends VPFInputStream {
-
     /**
      * Creates a new <code>VariableIndexInputStream</code> instance.
      *
@@ -37,7 +37,7 @@ public class VariableIndexInputStream extends VPFInputStream {
      * @exception IOException if an error occurs
      */
     public VariableIndexInputStream(String file, char byteOrder)
-        throws IOException {
+                             throws IOException {
         super(file, byteOrder);
     }
 
@@ -57,10 +57,7 @@ public class VariableIndexInputStream extends VPFInputStream {
      * @exception IOException if an error occurs
      */
     public VPFHeader readHeader() throws IOException {
-        return new VariableIndexHeader(
-            readInteger(),
-            readInteger()
-        );
+        return new VariableIndexHeader(readInteger(), readInteger());
     }
 
     /**
@@ -70,12 +67,8 @@ public class VariableIndexInputStream extends VPFInputStream {
      * @exception IOException if an error occurs
      */
     public VPFRow readRow() throws IOException {
-        return new VariableIndexRow(
-            readInteger(),
-            readInteger()
-        );
+        return new VariableIndexRow(readInteger(), readInteger());
     }
 }
-
 
 // VariableIndexInputStream

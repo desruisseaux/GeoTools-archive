@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,31 +31,37 @@ public class SpatialIndexHeader implements VPFHeader {
      * of
      */
     public static final int SPATIAL_INDEX_HEADER_LENGTH = 24;
+
     /**
      * Describe variable <code>numPrims</code> here.
      *
      */
     private int numPrims = 0;
+
     /**
      * Describe variable <code>xmin</code> here.
      *
      */
     private float xmin = 0;
+
     /**
      * Describe variable <code>ymin</code> here.
      *
      */
     private float ymin = 0;
+
     /**
      * Describe variable <code>xmax</code> here.
      *
      */
     private float xmax = 0;
+
     /**
      * Describe variable <code>ymax</code> here.
      *
      */
     private float ymax = 0;
+
     /**
      * Describe variable <code>numNodes</code> here.
      *
@@ -72,8 +78,8 @@ public class SpatialIndexHeader implements VPFHeader {
      * @param ymax a <code>float</code> value
      * @param numNodes an <code>int</code> value
      */
-    public SpatialIndexHeader(int numPrims, float xmin, float ymin, float xmax,
-        float ymax, int numNodes) {
+    public SpatialIndexHeader(int numPrims, float xmin, float ymin, float xmax, 
+                              float ymax, int numNodes) {
         this.numPrims = numPrims;
         this.xmin = xmin;
         this.ymin = ymin;

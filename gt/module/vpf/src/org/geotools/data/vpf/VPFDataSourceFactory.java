@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,14 +16,17 @@
  */
 package org.geotools.data.vpf;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.util.Map;
+
 import org.geotools.data.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataSourceFactorySpi;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 
 /**
@@ -65,8 +68,8 @@ public class VPFDataSourceFactory implements DataSourceFactorySpi {
             try {
                 return new VPFDataSource(file);
             } catch (IOException e) {
-                throw new DataSourceException("Unable to open VPF data base "
-                    + file, e);
+                throw new DataSourceException("Unable to open VPF data base " + 
+                                              file, e);
             }
         } catch (URISyntaxException e) {
             return null;

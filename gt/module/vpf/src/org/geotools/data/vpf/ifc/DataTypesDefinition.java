@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.data.vpf.ifc;
 
 /**
@@ -137,6 +136,5 @@ public interface DataTypesDefinition {
     /** Variable constant <code>CHAR_NULL_VALUE</code> keeps value of */
     public static final char CHAR_NULL_VALUE = '-';
 }
-
 
 // DataTypesDefinition

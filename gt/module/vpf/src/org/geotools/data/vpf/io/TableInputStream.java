@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,19 @@
  */
 package org.geotools.data.vpf.io;
 
+import java.io.EOFException;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.geotools.data.vpf.exc.VPFHeaderFormatException;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFHeader;
 import org.geotools.data.vpf.ifc.VPFRow;
 import org.geotools.data.vpf.util.DataUtils;
-import java.io.EOFException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -35,10 +37,9 @@ import java.util.List;
  * @author <a href="mailto:kobit@users.sf.net">Artur Hefczyc</a>
  * @version $Id: TableInputStream.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
  */
-public class TableInputStream extends VPFInputStream implements FileConstants,
-    DataTypesDefinition {
-
+public class TableInputStream extends VPFInputStream implements FileConstants, DataTypesDefinition {
     private static final String EMPTY_STRING = "";
+
     /**
      * Variable constant <code>AHEAD_BUFFER_SIZE</code> keeps value of  number
      * of records to read ahead and keep in cache to improve further access to
@@ -66,7 +67,7 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
      * @exception IOException if an error occurs
      */
     public TableInputStream(String file, char byteOrder)
-        throws IOException {
+                     throws IOException {
         super(file, byteOrder);
     }
 
@@ -78,10 +79,10 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
      * @exception VPFHeaderFormatException if an error occurs
      * @exception IOException if an error occurs
      */
-    public VPFHeader readHeader()
-        throws VPFHeaderFormatException, IOException {
+    public VPFHeader readHeader() throws VPFHeaderFormatException, IOException {
         byte[] fourBytes = new byte[4];
         input.read(fourBytes);
+
         char order = readChar();
         char ctrl = order;
 
@@ -99,11 +100,12 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
 
         if (ctrl != VPF_RECORD_SEPARATOR) {
             throw new VPFHeaderFormatException(
-                "Header format does not fit VPF file definition.");
+                    "Header format does not fit VPF file definition.");
         }
 
         String description = readString(EMPTY_STRING + VPF_RECORD_SEPARATOR);
-        String narrativeTable = readString(EMPTY_STRING + VPF_RECORD_SEPARATOR);
+        String narrativeTable = readString(EMPTY_STRING + 
+                                           VPF_RECORD_SEPARATOR);
         ArrayList colDefs = new ArrayList();
         TableColumnDef colDef = readColumnDef();
 
@@ -114,7 +116,7 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
 
             if (ctrl != VPF_FIELD_SEPARATOR) {
                 throw new VPFHeaderFormatException(
-                    "Header format does not fit VPF file definition.");
+                        "Header format does not fit VPF file definition.");
             }
 
             colDef = readColumnDef();
@@ -124,8 +126,8 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
             colDefs = null;
         }
 
-        return new TableHeader(length, order, description, narrativeTable,
-            colDefs);
+        return new TableHeader(length, order, description, narrativeTable, 
+                               colDefs);
     }
 
     /**
@@ -137,8 +139,9 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
      * @exception IOException if an error occurs
      * @exception NumberFormatException if an error occurs
      */
-    private TableColumnDef readColumnDef()
-        throws VPFHeaderFormatException, IOException, NumberFormatException {
+    private TableColumnDef readColumnDef() throws VPFHeaderFormatException, 
+                                                  IOException, 
+                                                  NumberFormatException {
         char ctrl = readChar();
 
         if (ctrl == VPF_RECORD_SEPARATOR) {
@@ -151,10 +154,11 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
 
         if (ctrl != VPF_ELEMENT_SEPARATOR) {
             throw new VPFHeaderFormatException(
-                "Header format does not fit VPF file definition.");
+                    "Header format does not fit VPF file definition.");
         }
 
-        String elemStr = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR).trim();
+        String elemStr = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR)
+                             .trim();
 
         if (elemStr.equals("*")) {
             elemStr = "-1";
@@ -166,20 +170,21 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
 
         if (ctrl != VPF_ELEMENT_SEPARATOR) {
             throw new VPFHeaderFormatException(
-                "Header format does not fit VPF file definition.");
+                    "Header format does not fit VPF file definition.");
         }
 
-        String colDesc = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR
-            + VPF_FIELD_SEPARATOR);
-        String descTableName = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR
-            + VPF_FIELD_SEPARATOR);
-        String indexFile = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR
-            + VPF_FIELD_SEPARATOR);
-        String narrTable = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR
-            + VPF_FIELD_SEPARATOR);
+        String colDesc = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR + 
+                                    VPF_FIELD_SEPARATOR);
+        String descTableName = readString(EMPTY_STRING + 
+                                          VPF_ELEMENT_SEPARATOR + 
+                                          VPF_FIELD_SEPARATOR);
+        String indexFile = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR + 
+                                      VPF_FIELD_SEPARATOR);
+        String narrTable = readString(EMPTY_STRING + VPF_ELEMENT_SEPARATOR + 
+                                      VPF_FIELD_SEPARATOR);
 
-        return new TableColumnDef(name, type, elements, key, colDesc,
-            descTableName, indexFile, narrTable);
+        return new TableColumnDef(name, type, elements, key, colDesc, 
+                                  descTableName, indexFile, narrTable);
     }
 
     /**
@@ -206,8 +211,8 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
                 if (tcd.getColumnSize() < 0) {
                     value = readVariableSizeData(tcd.getType());
                 } else {
-                    value = readFixedSizeData(tcd.getType(),
-                            tcd.getElementsNumber());
+                    value = readFixedSizeData(tcd.getType(), 
+                                              tcd.getElementsNumber());
                 }
             } catch (EOFException e) {
                 return null;
@@ -253,7 +258,8 @@ public class TableInputStream extends VPFInputStream implements FileConstants,
         while (row != null) {
             for (int i = 0; i < fieldDefs.size(); i++) {
                 TableColumnDef tcd = (TableColumnDef) fieldDefs.get(i);
-                System.out.println(tcd.getName() + "=" + row.get(i).toString());
+                System.out.println(tcd.getName() + "=" + 
+                                   row.get(i).toString());
             }
 
             row = (TableRow) testInput.readRow();

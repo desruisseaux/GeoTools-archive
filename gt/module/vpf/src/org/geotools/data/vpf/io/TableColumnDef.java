@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -66,9 +66,9 @@ public class TableColumnDef implements DataTypesDefinition {
      * @param thematicIdx a <code>String</code> value
      * @param narrTable a <code>String</code> value
      */
-    public TableColumnDef(String name, char type, int elementsNumber,
-        char keyType, String colDesc, String valDescTableName,
-        String thematicIdx, String narrTable) {
+    public TableColumnDef(String name, char type, int elementsNumber, 
+                          char keyType, String colDesc, String valDescTableName, 
+                          String thematicIdx, String narrTable) {
         this.name = name;
         this.type = type;
         this.elementsNumber = elementsNumber;
@@ -206,6 +206,5 @@ public class TableColumnDef implements DataTypesDefinition {
         return DataUtils.isNumeric(type);
     }
 }
-
 
 // TableColumnDef

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,10 @@
  */
 package org.geotools.data.vpf.io;
 
+import java.io.IOException;
+
 import org.geotools.data.vpf.ifc.VPFHeader;
 import org.geotools.data.vpf.ifc.VPFRow;
-import java.io.IOException;
 
 
 /**
@@ -40,7 +41,7 @@ public class SpatialIndexInputStream extends VPFInputStream {
      * @exception IOException if an error occurs
      */
     public SpatialIndexInputStream(String file, char byteOrder)
-        throws IOException {
+                            throws IOException {
         super(file, byteOrder);
     }
 
@@ -61,8 +62,8 @@ public class SpatialIndexInputStream extends VPFInputStream {
      * @exception IOException if an error occurs
      */
     public VPFHeader readHeader() throws IOException {
-        return new SpatialIndexHeader(readInteger(), readFloat(), readFloat(),
-            readFloat(), readFloat(), readInteger());
+        return new SpatialIndexHeader(readInteger(), readFloat(), readFloat(), 
+                                      readFloat(), readFloat(), readInteger());
     }
 
     /**

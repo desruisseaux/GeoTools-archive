@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,165 +17,171 @@
 
 package org.geotools.data.vpf;
 
-import org.geotools.data.vpf.io.TableRow;
-import org.geotools.data.vpf.io.TableInputStream;
-import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.data.vpf.ifc.VPFLibraryIfc;
 import java.io.File;
 import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.data.vpf.ifc.VPFLibraryIfc;
+import org.geotools.data.vpf.io.TableInputStream;
+import org.geotools.data.vpf.io.TableRow;
 
 
 /**
  * Class <code>VPFDataBase</code> is responsible for 
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFDataBase.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @version $Id: VPFDataBase.java,v 1.1 2004/05/03 11:48:20 knutejoh Exp $
  */
 public class VPFDataBase implements FileConstants {
-
-    /**
-     * Describe variable <code>directory</code> here.
-     *
-     */
-    private File directory = null;
-    /**
-     * Describe variable <code>dataBaseInfo</code> here.
-     *
-     */
-    private TableRow dataBaseInfo = null;
-    /**
-     * Describe variable <code>libraries</code> here.
-     *
-     */
-    private TableRow[] libraries = null;
-    /**
-     * Describe variable <code>coverages</code> here.
-     *
-     */
+    private VPFLibrary[] libraries = null;
     private TableRow[][] coverages = null;
+    private HashMap tilingSchema = null;
 
-    /**
-     * Creates a new <code><code>VPFDataBase</code></code> instance.
-     *
-     * @param directory a <code><code>File</code></code> value
-     * @exception IOException if an error occurs
-     */
-    public VPFDataBase(File directory) throws IOException {
+    public VPFDataBase(File directory) throws IOException, Exception {
         // read data base header info
-        this.directory = directory;
-        String vpfTableName =
-            new File(directory, DATABASE_HEADER_TABLE).toString();
+        //this.directory = directory;
+        String vpfTableName = new File(directory, DATABASE_HEADER_TABLE).toString();
         TableInputStream vpfTable = new TableInputStream(vpfTableName);
-        dataBaseInfo = (TableRow) vpfTable.readRow();
+        TableRow dataBaseInfo = (TableRow) vpfTable.readRow();
         vpfTable.close();
+
 
         // read libraries info
         vpfTableName = new File(directory, LIBRARY_ATTTIBUTE_TABLE).toString();
         vpfTable = new TableInputStream(vpfTableName);
+
         List list = vpfTable.readAllRows();
         vpfTable.close();
-        libraries = (TableRow[]) list.toArray(new TableRow[list.size()]);
-        coverages = new TableRow[libraries.length][];
-        for (int i = 0; i < coverages.length; i++) {
-            coverages[i] = null;
+
+        TableRow[] libraries_tmp = (TableRow[]) list.toArray(new TableRow[list.size()]);
+        libraries = new VPFLibrary[libraries_tmp.length];
+
+        for (int i = 0; i < libraries_tmp.length; i++) {
+            libraries[i] = new VPFLibrary(libraries_tmp[i], directory, this);
         }
     }
 
-    /**
-     * Method <code>getMinX</code> is used to perform 
-     *
-     * @return a <code><code>double</code></code> value
-     */
+    public VPFCoverage[] getCoverages() {
+        ArrayList arr = new ArrayList();
+        VPFCoverage[] tmp = null;
+
+        for (int i = 0; i < libraries.length; i++) {
+            tmp = libraries[i].getCoverages();
+
+            for (int j = 0; j < tmp.length; j++) {
+                arr.add(tmp[j]);
+            }
+        }
+
+        return (VPFCoverage[]) arr.toArray(tmp);
+    }
+
+    public void setTilingSchema(HashMap schema) {
+        tilingSchema = schema;
+    }
+
+    public HashMap getTilingSchema() {
+        return tilingSchema;
+    }
+
+    public VPFFeatureClass[] getFeatureClasses() {
+        ArrayList arr = new ArrayList();
+        VPFFeatureClass[] tmp = null;
+
+        for (int i = 0; i < libraries.length; i++) {
+            tmp = libraries[i].getFeatureClasses();
+
+            if (tmp != null) {
+                for (int j = 0; j < tmp.length; j++) {
+                    arr.add(tmp[j]);
+                }
+            }
+        }
+
+        return (VPFFeatureClass[]) arr.toArray(tmp);
+    }
+
+    public VPFLibrary[] getLibraries() {
+        return libraries;
+    }
+
     public double getMinX() {
-        double xmin = libraries[0].get(VPFLibraryIfc.FIELD_XMIN).getAsDouble();
-        for (int i = 1; i < libraries.length; i++) {
-            double temp =
-                libraries[i].get(VPFLibraryIfc.FIELD_XMIN).getAsDouble();
-            xmin = Math.min(xmin, temp);
+        if (libraries.length > 0) {
+            double xmin = libraries[0].getXmin();
+
+            for (int i = 1; i < libraries.length; i++) {
+                xmin = Math.min(xmin, libraries[i].getXmin());
+            }
+
+            return xmin;
         }
-        return xmin;
+
+        return 0d;
     }
 
-    /**
-     * Describe <code>getMinY</code> method here.
-     *
-     * @return a <code>double</code> value
-     */
     public double getMinY() {
-        double ymin = libraries[0].get(VPFLibraryIfc.FIELD_YMIN).getAsDouble();
-        for (int i = 1; i < libraries.length; i++) {
-            double temp =
-                libraries[i].get(VPFLibraryIfc.FIELD_YMIN).getAsDouble();
-            ymin = Math.min(ymin, temp);
+        if (libraries.length > 0) {
+            double ymin = libraries[0].getYmin();
+
+            for (int i = 1; i < libraries.length; i++) {
+                ymin = Math.min(ymin, libraries[i].getYmin());
+            }
+
+            return ymin;
         }
-        return ymin;
+
+        return 0d;
     }
 
-    /**
-     * Describe <code>getMaxX</code> method here.
-     *
-     * @return a <code>double</code> value
-     */
     public double getMaxX() {
-        double xmax = libraries[0].get(VPFLibraryIfc.FIELD_XMAX).getAsDouble();
-        for (int i = 1; i < libraries.length; i++) {
-            double temp =
-                libraries[i].get(VPFLibraryIfc.FIELD_XMAX).getAsDouble();
-            xmax = Math.min(xmax, temp);
+        if (libraries.length > 0) {
+            double xmax = libraries[0].getXmax();
+
+            for (int i = 1; i < libraries.length; i++) {
+                xmax = Math.min(xmax, libraries[i].getXmax());
+            }
+
+            return xmax;
         }
-        return xmax;
+
+        return 0d;
     }
 
-    /**
-     * Describe <code>getMaxY</code> method here.
-     *
-     * @return a <code>double</code> value
-     */
     public double getMaxY() {
-        double ymax = libraries[0].get(VPFLibraryIfc.FIELD_YMAX).getAsDouble();
-        for (int i = 1; i < libraries.length; i++) {
-            double temp =
-                libraries[i].get(VPFLibraryIfc.FIELD_YMAX).getAsDouble();
-            ymax = Math.min(ymax, temp);
+        if (libraries.length > 0) {
+            double ymax = libraries[0].getYmax();
+
+            for (int i = 1; i < libraries.length; i++) {
+                ymax = Math.min(ymax, libraries[i].getYmax());
+            }
+
+            return ymax;
         }
-        return ymax;
+
+        return 0d;
     }
 
-    /**
-     * Describe <code>getCoverages</code> method here.
-     *
-     * @param libId an <code>int</code> value
-     * @return a <code>TableRow[]</code> value
-     * @exception IOException if an error occurs
-     */
-    public TableRow[] getCoverages(int libId) throws IOException {
-        if (libId < 0 && libId >= coverages.length) {
-            return null;
-        }
-        if (coverages[libId] == null) {
-            String libCover =
-                libraries[libId].get(
-                    VPFLibraryIfc.FIELD_LIB_NAME).getAsString();
-            String vpfTableName =
-                new File(new File(directory, libCover),
-                         COVERAGE_ATTRIBUTE_TABLE).toString();
-            TableInputStream vpfTable = new TableInputStream(vpfTableName);
-            List list = vpfTable.readAllRows();
-            vpfTable.close();
-            coverages[libId] =
-                (TableRow[]) list.toArray(new TableRow[list.size()]);
-        }
-        return coverages[libId];
+    public String toString() {
+        return "This database has these extensions: \n" + getMinX() + " " + 
+               getMinY() + " - " + getMaxX() + " " + getMinY() + "\n";
     }
 
-    /**
-     * Describe <code>main</code> method here.
-     *
-     * @param args a <code>String[]</code> value
-     */
-    public static void main(String[] args) {
+    public VPFFeatureClass getFeatureClass(String typename) {
+        VPFFeatureClass tmp = null;
 
+        for (int i = 0; i < libraries.length; i++) {
+            tmp = libraries[i].getFeatureClass(typename);
+
+            if (tmp != null) {
+                return tmp;
+            }
+        }
+
+        return null;
     }
-
 }

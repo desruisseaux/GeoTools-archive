@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,11 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.data.vpf.io;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -36,6 +36,7 @@ public class VPFDate {
      *
      */
     private SimpleDateFormat sdf = null;
+
     /**
      * Describe variable <code>dateBin</code> here.
      *
@@ -121,6 +122,7 @@ public class VPFDate {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -137,6 +139,7 @@ public class VPFDate {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 }

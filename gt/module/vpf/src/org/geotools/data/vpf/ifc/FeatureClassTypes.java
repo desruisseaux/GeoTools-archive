@@ -14,13 +14,29 @@
  *    Lesser General Public License for more details.
  *
  */
+
 package org.geotools.data.vpf.ifc;
 
-/**
- * VPFRow.java Created: Mon Feb 24 22:51:21 2003
+/*
+ * FeatureTypes.java
  *
- * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFRow.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * Created on 21. april 2004, 15:35
+ *
+ * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
-public interface VPFRow {
-} // VPFRow
+public interface FeatureClassTypes {
+
+    public static final char FEATURE_POINT = 'P';
+
+    public static final char FEATURE_LINE = 'L';
+
+    public static final char FEATURE_TEXT = 'T';
+
+    public static final char FEATURE_AREA = 'A';
+
+    public static final String FIELD_CLASS = "fclass";
+
+    public static final String FIELD_TYPE = "type";
+
+    public static final String FIELD_DESCRIPTION = "descr";
+}

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,13 @@
 
 package org.geotools.data.vpf.util;
 
+import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.Coordinate2DDouble;
 import org.geotools.data.vpf.io.Coordinate2DFloat;
 import org.geotools.data.vpf.io.Coordinate3DDouble;
 import org.geotools.data.vpf.io.Coordinate3DFloat;
 import org.geotools.data.vpf.io.VPFDate;
-import org.geotools.data.vpf.ifc.DataTypesDefinition;
+
 
 /**
  * Class DataUtils.java is responsible for
@@ -47,6 +48,7 @@ public class DataUtils implements DataTypesDefinition {
         for (int i = 0; i < source.length; i++) {
             result[i] = source[source.length - (i + 1)];
         }
+
         return result;
     }
 
@@ -71,17 +73,20 @@ public class DataUtils implements DataTypesDefinition {
             for (int i = 0; i < bytes.length; i++) {
                 sb.append((char) bytes[i]);
             }
+
             boolean isNull = false;
 
             for (int i = 0; i < STRING_NULL_VALUES.length; i++) {
-                isNull |= sb.toString().trim().equalsIgnoreCase(
-                    STRING_NULL_VALUES[i]);
+                isNull |= sb.toString().trim()
+                            .equalsIgnoreCase(STRING_NULL_VALUES[i]);
             }
+
             if (isNull) {
                 result = null;
             } else {
                 result = sb.toString();
             }
+
             break;
 
         case DATA_SHORT_FLOAT:
@@ -104,7 +109,8 @@ public class DataUtils implements DataTypesDefinition {
 
             break;
 
-        case DATA_2_COORD_F: {
+        case DATA_2_COORD_F:
+        {
             float[][] coords = new float[bytes.length / DATA_2_COORD_F_LEN][2];
             byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
 
@@ -114,14 +120,15 @@ public class DataUtils implements DataTypesDefinition {
                 copyArrays(floatData, bytes, i * (DATA_2_COORD_F_LEN + 1));
                 coords[i][1] = decodeFloat(floatData);
             }
+
             result = new Coordinate2DFloat(coords);
         }
 
         break;
 
-        case DATA_2_COORD_R: {
-            double[][] coords =
-                new double[bytes.length / DATA_2_COORD_R_LEN][2];
+        case DATA_2_COORD_R:
+        {
+            double[][] coords = new double[bytes.length / DATA_2_COORD_R_LEN][2];
             byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
 
             for (int i = 0; i < coords.length; i++) {
@@ -130,12 +137,14 @@ public class DataUtils implements DataTypesDefinition {
                 copyArrays(doubleData, bytes, i * (DATA_2_COORD_R_LEN + 1));
                 coords[i][1] = decodeDouble(doubleData);
             }
+
             result = new Coordinate2DDouble(coords);
         }
 
         break;
 
-        case DATA_3_COORD_F: {
+        case DATA_3_COORD_F:
+        {
             float[][] coords = new float[bytes.length / DATA_3_COORD_F_LEN][3];
             byte[] floatData = new byte[DATA_SHORT_FLOAT_LEN];
 
@@ -147,14 +156,15 @@ public class DataUtils implements DataTypesDefinition {
                 copyArrays(floatData, bytes, i * (DATA_3_COORD_F_LEN + 2));
                 coords[i][2] = decodeFloat(floatData);
             }
+
             result = new Coordinate3DFloat(coords);
         }
 
         break;
 
-        case DATA_3_COORD_R: {
-            double[][] coords =
-                new double[bytes.length / DATA_3_COORD_R_LEN][3];
+        case DATA_3_COORD_R:
+        {
+            double[][] coords = new double[bytes.length / DATA_3_COORD_R_LEN][3];
             byte[] doubleData = new byte[DATA_LONG_FLOAT_LEN];
 
             for (int i = 0; i < coords.length; i++) {
@@ -165,6 +175,7 @@ public class DataUtils implements DataTypesDefinition {
                 copyArrays(doubleData, bytes, i * (DATA_3_COORD_R_LEN + 2));
                 coords[i][2] = decodeDouble(doubleData);
             }
+
             result = new Coordinate3DDouble(coords);
         }
 
@@ -178,9 +189,11 @@ public class DataUtils implements DataTypesDefinition {
         case DATA_NULL_FIELD:
             break;
 
-        case DATA_TRIPLET_ID:default:
+        case DATA_TRIPLET_ID:
+        default:
             break;
         }
+
         return result;
     }
 
@@ -208,9 +221,10 @@ public class DataUtils implements DataTypesDefinition {
         int shift = 8;
 
         for (int i = 0; (i < bytes.length) && (shift >= 0); i++) {
-            res |= (((short) (bytes[i] & 0xff)) << shift);
+            res |= ((short) (bytes[i] & 0xff) << shift);
             shift -= 8;
         }
+
         return res;
     }
 
@@ -224,6 +238,7 @@ public class DataUtils implements DataTypesDefinition {
     //     } // end of for (int i = 0; i < limit-1; i++)
     //     return res;
     //   }
+
     /**
      * Describe <code>decodeInt</code> method here.
      *
@@ -238,6 +253,7 @@ public class DataUtils implements DataTypesDefinition {
             res |= ((bytes[i] & 0xff) << shift);
             shift -= 8;
         }
+
         return res;
     }
 
@@ -255,6 +271,7 @@ public class DataUtils implements DataTypesDefinition {
             res |= ((bytes[i] & 0xff) << shift);
             shift -= 8;
         }
+
         return Float.intBitsToFloat(res);
     }
 
@@ -269,9 +286,10 @@ public class DataUtils implements DataTypesDefinition {
         int shift = 56;
 
         for (int i = 0; (i < bytes.length) && (shift >= 0); i++) {
-            res |= (((long) (bytes[i] & 0xff)) << shift);
+            res |= ((long) (bytes[i] & 0xff) << shift);
             shift -= 8;
         }
+
         return Double.longBitsToDouble(res);
     }
 
@@ -359,6 +377,7 @@ public class DataUtils implements DataTypesDefinition {
         default:
             break;
         }
+
         return size;
     }
 
@@ -396,6 +415,5 @@ public class DataUtils implements DataTypesDefinition {
         }
     }
 }
-
 
 // DataUtils

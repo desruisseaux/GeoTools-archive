@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2004, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,11 @@
  */
 package org.geotools.data.vpf.io;
 
-import org.geotools.data.vpf.ifc.DataTypesDefinition;
-import org.geotools.data.vpf.ifc.VPFHeader;
 import java.util.Collections;
 import java.util.List;
+
+import org.geotools.data.vpf.ifc.DataTypesDefinition;
+import org.geotools.data.vpf.ifc.VPFHeader;
 
 
 /**
@@ -85,8 +86,8 @@ public class TableHeader implements VPFHeader, DataTypesDefinition {
      * @param columnDefs a <code>List</code> value of all column definitions
      *        for this table.
      */
-    public TableHeader(int length, char byteOrder, String description,
-        String narrativeTable, List columnDefs) {
+    public TableHeader(int length, char byteOrder, String description, 
+                       String narrativeTable, List columnDefs) {
         this.headerLength = length;
         this.byteOrder = byteOrder;
         this.description = description;
@@ -115,8 +116,10 @@ public class TableHeader implements VPFHeader, DataTypesDefinition {
             for (int i = 0; i < columnDefs.size(); i++) {
                 buff.append(endLine + columnDefs.get(i).toString());
             }
+
             buff.append(endLine);
         }
+
         return buff.toString();
     }
 
@@ -151,6 +154,7 @@ public class TableHeader implements VPFHeader, DataTypesDefinition {
                 size += colDef.getColumnSize();
             }
         }
+
         return size;
     }
 
@@ -202,6 +206,5 @@ public class TableHeader implements VPFHeader, DataTypesDefinition {
         return Collections.unmodifiableList(this.columnDefs);
     }
 }
-
 
 // TableHeader
