@@ -88,7 +88,7 @@ public class BasicFeatureTypes
         }
         POINT = tmpPoint;
         LINE = tmpLine;
-        POLYGON = tmpLine;
+        POLYGON = tmpPolygon;
         
     }
 
