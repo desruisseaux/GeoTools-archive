@@ -18,8 +18,10 @@ package org.geotools.styling;
 
 import java.io.IOException;
 
+import javax.xml.transform.TransformerException;
 
-// J2SE dependencies
+import org.geotools.filter.FilterTransformer;
+
 
 /**
  * Exports a style as a OGC SLD document.  This class is does not generate
@@ -42,7 +44,7 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
     /** The logger for the filter module. */
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
         .getLogger("org.geotools.style");
-    private org.geotools.filter.XMLEncoder filterEncoder;
+
 
     /** To write the xml representations of filters to */
     private java.io.Writer out;
@@ -54,7 +56,6 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
      */
     public XMLEncoder(java.io.Writer out) {
         this.out = out;
-        filterEncoder = new org.geotools.filter.XMLEncoder(out);
         LOGGER.fine("creating a Style encoder");
     }
 
@@ -69,7 +70,6 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
     public XMLEncoder(java.io.Writer out, Style style)
         throws IOException {
         this.out = out;
-        filterEncoder = new org.geotools.filter.XMLEncoder(out);
         encode(style);
     }
 
@@ -90,10 +90,15 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
      * Encodes the expression to the current writer.
      *
      * @param expression the expression to encode.
+     * @throws IOException 
      */
-    private void encode(org.geotools.filter.Expression expression) {
+    private void encode(org.geotools.filter.Expression expression) throws IOException {
         if (expression != null) {
-            expression.accept(filterEncoder);
+            try {
+                out.write((new FilterTransformer()).transform(expression));
+            } catch (TransformerException e1) {
+                LOGGER.warning(e1.toString());
+            }
         }
     }
 
@@ -173,7 +178,11 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
 
             if (filter != null) {
                 out.write("<Filter>");
-                filter.accept(filterEncoder);
+                try {
+                    out.write((new FilterTransformer()).transform(filter));
+                } catch (TransformerException e1) {
+                    LOGGER.warning(e1.toString());
+                }
                 out.write("</Filter>");
             }
 
@@ -237,9 +246,9 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
         try {
             out.write("<PointSymbolizer>\n");
 
-            if (sym.geometryPropertyName() != null) {
+            if (sym.getGeometryPropertyName() != null) {
                 out.write("<Geometry>\n\t<ogc:PropertyName>"
-                    + sym.geometryPropertyName()
+                    + sym.getGeometryPropertyName()
                     + "</ogc:PropertyName>\n</Geometry>\n");
             }
 
@@ -254,9 +263,9 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
         try {
             out.write("<LineSymbolizer>\n");
 
-            if (sym.geometryPropertyName() != null) {
+            if (sym.getGeometryPropertyName() != null) {
                 out.write("<Geometry>\n\t<ogc:PropertyName>"
-                    + sym.geometryPropertyName()
+                    + sym.getGeometryPropertyName()
                     + "</ogc:PropertyName>\n</Geometry>\n");
             }
 
@@ -361,7 +370,7 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
         try {
             out.write("<PolygonSymbolizer>\n");
             out.write("<Geometry>\n\t<ogc:PropertyName>"
-                + sym.geometryPropertyName()
+                + sym.getGeometryPropertyName()
                 + "</ogc:PropertyName>\n</Geometry>\n");
 
             if (sym.getFill() != null) {
@@ -382,7 +391,11 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
         try {
             out.write("<Mark>\n");
             out.write("<WellKnownName>\n");
-            mark.getWellKnownName().accept(filterEncoder);
+            try {
+                out.write((new FilterTransformer()).transform(mark.getWellKnownName()));
+            } catch (TransformerException e1) {
+                LOGGER.warning(e1.toString());
+            }
             out.write("</WellKnownName>\n");
 
             if (mark.getFill() != null) {

@@ -397,7 +397,7 @@ public class SLDTransformer extends TransformerBase {
      */
     public static final void main(String[] args) throws Exception {
         java.net.URL url = new java.io.File(args[0]).toURL();
-        SLDStyle s = new SLDStyle(StyleFactory.createStyleFactory(),url);
+        SLDParser s = new SLDParser(StyleFactory.createStyleFactory(),url);
         SLDTransformer transformer = new SLDTransformer();
         transformer.setIndentation(4);
         transformer.transform(s.readXML(), new FileOutputStream(System.getProperty("java.io.tmpdir") + "/junk.eraseme"));
