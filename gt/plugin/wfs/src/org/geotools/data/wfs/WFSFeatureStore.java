@@ -33,8 +33,13 @@ import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystem;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -83,6 +88,14 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             try {
                 Feature f = reader.next();
                 r.add(f.getID());
+            	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
+            	for(int i=0;i<atrs.length;i++){
+            		if(atrs[i].isGeometry()){
+            			Geometry g = (Geometry)f.getAttribute(i);
+                		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                		g.setUserData(cs.getName());
+            		}
+            	}
                 ts.addAction(new InsertAction(f));
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
@@ -142,6 +155,11 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         Map props = new HashMap();
 
         for (int i = 0; i < type.length; i++) {
+        	if(type[i].isGeometry()){
+        		Geometry g = (Geometry)value[i];
+        		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
+        		g.setUserData(cs.getName());
+        	}
             props.put(type[i].getName(), value[i]);
         }
 
@@ -180,7 +198,16 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         while (reader.hasNext())
 
             try {
-                ts.addAction(new InsertAction(reader.next()));
+            	Feature f = reader.next();
+            	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
+            	for(int i=0;i<atrs.length;i++){
+            		if(atrs[i].isGeometry()){
+            			Geometry g = (Geometry)f.getAttribute(i);
+                		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                		g.setUserData(cs.getName());
+            		}
+            	}
+                ts.addAction(new InsertAction(f));
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
             } catch (IllegalAttributeException e) {

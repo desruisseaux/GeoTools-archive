@@ -293,16 +293,15 @@ public class GMLComplexTypes {
 
         // 	no GID
         if (g.getUserData() != null) {
-            // TODO Fix this when parsing is better ... should be a coord reference system
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-//            if (g.getSRID() != 0) {
-//                // deprecated version
-//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-//            } else {
-                ai = null;
-//            }
+            if (g.getSRID() != 0) {
+                // deprecated version
+                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+            } else {
+            	throw new IOException("srsName required for MultiPoint "+e.getName());
+            }
         }
 
         if (e == null) {
@@ -335,16 +334,15 @@ public class GMLComplexTypes {
 
         // 	no GID
         if (g.getUserData() != null) {
-            // TODO Fix this when parsing is better ... should be a coord reference system
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-//            if (g.getSRID() != 0) {
-//                // deprecated version
-//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-//            } else {
-                ai = null;
-//            }
+            if (g.getSRID() != 0) {
+                // deprecated version
+                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+            } else {
+            	throw new IOException("srsName required for MultiPoint "+e.getName());
+            }
         }
 
         if (e == null) {
@@ -376,16 +374,15 @@ public class GMLComplexTypes {
 
         // 	no GID
         if (g.getUserData() != null) {
-            // TODO Fix this when parsing is better ... should be a coord reference system
             ai.addAttribute("", "srsName", "", "anyURI",
                 g.getUserData().toString());
         } else {
-//            if (g.getSRID() != 0) {
-//                // deprecated version
-//                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
-//            } else {
-                ai = null;
-//            }
+            if (g.getSRID() != 0) {
+                // deprecated version
+                ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
+            } else {
+            	throw new IOException("srsName required for MultiPoint "+e.getName());
+            }
         }
 
         if (e == null) {
@@ -908,7 +905,12 @@ public class GMLComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Geometry;
+            if( element.getType()==null || !( value instanceof Geometry))
+            		return false;
+            // need to check inheritance ... 
+            if(element.getType() instanceof SimpleType)
+            	return false;
+            return true;
         }
 
         /**

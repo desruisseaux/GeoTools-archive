@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -109,9 +110,11 @@ public class WFSTransactionState implements State {
             try {
                 tr = commitPost();
             } catch (OperationNotSupportedException e) {
+e.printStackTrace();
                 WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             } catch (SAXException e) {
+e.printStackTrace();
                 WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             }
@@ -145,13 +148,15 @@ public class WFSTransactionState implements State {
     private TransactionResult commitPost()
         throws OperationNotSupportedException, IOException, SAXException {
         URL postUrl = ds.capabilities.getTransaction().getPost();
+        
+System.out.println("POST Commit URL = "+postUrl);
 
         if (postUrl == null) {
             return null;
         }
 
         HttpURLConnection hc = WFSDataStore.getConnection(postUrl,ds.auth,true);
-
+System.out.println("connection to commit");
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
 			WFSSchema.getInstance().getElements()[24]); // Transaction
@@ -170,12 +175,13 @@ public class WFSTransactionState implements State {
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction
         
+System.out.println("Ready to print Debug");
         // DEBUG
-        OutputStream debugos = System.out;
-        Writer debugw = new OutputStreamWriter(debugos);
-
-        DocumentWriter.writeDocument(this, WFSSchema.getInstance(), debugw, hints);
-        debugos.flush();
+StringWriter debugw = new StringWriter();
+DocumentWriter.writeDocument(this, WFSSchema.getInstance(), debugw, hints);
+System.out.println("TRANSACTION   \n\n");
+System.out.println(debugw.getBuffer());
+        // END DEBUG
         
         OutputStream os = hc.getOutputStream();
 
