@@ -543,7 +543,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
                         }
                     }
 
-                    if (ext.getChild() != null) {
+                    if (ct!=null && ext.getChild() != null) {
                         logger.finest("Looked up " + ext.getBase()
                             + " and found "
                             + ((ct == null) ? null
@@ -557,7 +557,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
 						ElementGrouping extensionChild =  ((ElementGroupingHandler)ext.getChild()).compress(parent);
                         dct.child = loadNewEG(extensionBaseType,extensionChild, parent); // note should override element def only ... not spot
                     } else {
-                        dct.child = ct.getChild();
+                    	if (ct != null) 
+                    		dct.child = ct.getChild();
                     }
                 } else {
                     //restriction
