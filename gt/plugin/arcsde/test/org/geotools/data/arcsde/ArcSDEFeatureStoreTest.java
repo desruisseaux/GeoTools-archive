@@ -38,6 +38,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
@@ -340,11 +341,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 Transaction.AUTO_COMMIT);
 
         Feature source;
-        Feature dest;
+        SimpleFeature dest;
 
         for (FeatureIterator fi = features.features(); fi.hasNext();) {
             source = fi.next();
-            dest = writer.next();
+            dest = (SimpleFeature)writer.next();
             dest.setAttributes(source.getAttributes((Object[]) null));
             writer.write();
         }

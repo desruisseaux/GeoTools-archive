@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
@@ -207,13 +208,15 @@ public class ArcSDEAdapter {
 				+ SeColumnDefinition.TYPE_STRING);
 
 		if (type.getType() == String.class) {
-			fieldLength = (type.getFieldLength() == 0) ? def.size : type
-					.getFieldLength();
+//			fieldLength = (type.getFieldLength() == 0) ? def.size : type
+//					.getFieldLength();
+			fieldLength = def.size;
 			fieldScale = def.scale;
 		} else {
 			fieldLength = def.size;
-			fieldScale = (type.getFieldLength() == 0) ? def.scale : type
-					.getFieldLength();
+//			fieldScale = (type.getFieldLength() == 0) ? def.scale : type
+//					.getFieldLength();
+			fieldScale = def.scale;
 		}
 
 		colDef = new SeColumnDefinition(colName, def.colDefType, fieldLength,
@@ -338,8 +341,8 @@ public class ArcSDEAdapter {
 				typeClass = getGeometryType(seShapeType);
 				isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
 				defValue = GeometryBuilder.defaultValueFor(typeClass);
-				attribute = new DefaultAttributeType.Geometric(seColumns[i]
-						.getName(), typeClass, isNilable, 0, defValue, crs);
+				attribute = new GeometricAttributeType(seColumns[i]
+						.getName(), typeClass, isNilable,1,1,defValue, crs,Filter.NONE);
 			} else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
 				throw new DataSourceException(
 						"Raster columns are not supported yet");
