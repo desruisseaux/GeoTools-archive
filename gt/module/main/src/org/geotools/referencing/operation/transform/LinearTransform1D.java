@@ -29,9 +29,9 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.GeneralMatrix;
 
@@ -109,6 +109,17 @@ public class LinearTransform1D extends AbstractMathTransform
             return IDENTITY;
         }
         return new LinearTransform1D(scale, offset);
+    }
+
+    /**
+     * Returns the matrix element value as a group of parameters. The amount of parameters
+     * depends the matrix size. The group will contains only elements different from their
+     * default value.
+     *
+     * @return The parameter values.
+     */
+    public ParameterValueGroup getParameterValues() {
+        return ProjectiveTransform.getParameterValues(getMatrix());
     }
     
     /**
@@ -254,17 +265,5 @@ public class LinearTransform1D extends AbstractMathTransform
              */
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

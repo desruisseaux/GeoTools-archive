@@ -199,7 +199,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
      *
      * @param  row    The row indice.
      * @param  column The column indice
-     * @return The parameter value for the specified matrix element.
+     * @return The parameter value for the specified matrix element (never <code>null</code>).
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
     public final ParameterValue getValue(final int row, final int column)
@@ -239,7 +239,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
         }
         ParameterValue param = rowValues[column];
         if (param == null) {
-            rowValues[column] = param = new org.geotools.parameter.ParameterValue(
+            rowValues[column] = param = new ParameterRealValue(
                     ((MatrixParameters) descriptor).getParameter(row, column, numRow, numCol));
         }
         return param;
@@ -257,6 +257,9 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
     /**
      * Returns the parameters values in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
+     * The parameter array will contains only matrix elements which have been requested at
+     * least once by one of <code>getValue(...)</code> methods. Never requested elements
+     * are left to their default value and omitted from the returned array.
      */
     public GeneralParameterValue[] getValues() {
         final int numRow = this.numRow.intValue();
@@ -265,13 +268,22 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
         int k = 0;
         parameters[k++] = this.numRow;
         parameters[k++] = this.numCol;
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                parameters[k++] = getValue(j,i, numRow, numCol);
+        if (values != null) {
+            final int maxRow = Math.min(numRow, values.length);
+            for (int j=0; j<maxRow; j++) {
+                final ParameterValue[] rowValues = values[j];
+                if (rowValues != null) {
+                    final int maxCol = Math.min(numCol, rowValues.length);
+                    for (int i=0; i<maxCol; i++) {
+                        final ParameterValue value = rowValues[i];
+                        if (value != null) {
+                            parameters[k++] = value;
+                        }
+                    }
+                }
             }
         }
-        assert k==parameters.length : k;
-        return parameters;
+        return (ParameterValue[]) XArray.resize(parameters, k);
     }
 
     /**
@@ -296,7 +308,10 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
                 final ParameterValue[] row = values[j];
                 if (row != null) {
                     for (int i=0; i<numCol; i++) {
-                        matrix.setElement(j, i, row[i].doubleValue());
+                        final ParameterValue element = row[i];
+                        if (element != null) {
+                            matrix.setElement(j, i, element.doubleValue());
+                        }
                     }                
                 }
             }
@@ -306,17 +321,35 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
 
     /**
      * Set all parameter values to the element value in the specified matrix.
+     * After this method call, {@link #getValues} will returns only the elements
+     * different from the default value.
      *
      * @param matrix The matrix to copy in this group of parameters.
      */
     public void setMatrix(final Matrix matrix) {
+        final MatrixParameters descriptor = ((MatrixParameters) this.descriptor);
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         this.numRow.setValue(numRow);
         this.numCol.setValue(numCol);
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
-                getValue(j,i, numRow, numCol).setValue(matrix.getElement(j,i));
+                final double element = matrix.getElement(j,i);
+                final Object def = descriptor.getParameter(j,i, numRow, numCol).getDefaultValue();
+                if (!(def instanceof Number) || element != ((Number)def).doubleValue()) {
+                    getValue(j,i, numRow, numCol).setValue(element);
+                } else {
+                    /*
+                     * The matrix element has the default value. Delete the corresponding
+                     * entry from this parameter value group.
+                     */
+                    if (values!=null && j<values.length) {
+                        final ParameterValue[] rowValues = values[j];
+                        if (rowValues!=null && i<rowValues.length) {
+                            rowValues[i] = null;
+                        }
+                    }
+                }
             }
         }
     }

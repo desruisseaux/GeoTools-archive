@@ -27,9 +27,9 @@ import java.awt.geom.AffineTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 
@@ -112,6 +112,15 @@ final class IdentityTransform extends AbstractMathTransform
     public int getDimTarget() {
         return dimension;
     }
+
+    /**
+     * Returns the matrix element value as a group of parameters.
+     *
+     * @return The parameter values.
+     */
+    public ParameterValueGroup getParameterValues() {
+        return ProjectiveTransform.getParameterValues(getMatrix());
+    }
     
     /**
      * Returns a copy of the identity matrix.
@@ -178,17 +187,5 @@ final class IdentityTransform extends AbstractMathTransform
             return this.dimension == that.dimension;
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

@@ -85,13 +85,16 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Returns the parameters for this math transform, or <code>null</code> if unknow. This method
      * is similar to {@link org.geotools.referencing.operation.Operation#getParameterValues},
-     * except that <code>MathTransform</code> returns parameter in standard units (usually
+     * except that <code>MathTransform</code> returns parameters in standard units (usually
      * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
+     * <br><br>
+     * <strong>Note 1:</strong> This method returns a copy of the parameters. Any change to a
+     *         returned parameter will have no effect on this math transform.
+     * <br><br>
+     * <strong>Note 2:</strong> if non-null, parameter values will be used for the default
+     *         implementation of {@link #formatWKT}.
      *
-     * Note that if non-null, parameter values will be used for the default implementation
-     * of {@link #formatWKT}.
-     *
-     * @return The parameters for this math transform, or <code>null</code> if unknow.
+     * @return A copy of the parameters for this math transform, or <code>null</code> if unknow.
      */
     public ParameterValueGroup getParameterValues() {
         return null;

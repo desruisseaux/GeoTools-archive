@@ -27,7 +27,6 @@ package org.geotools.referencing.operation.transform;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
-import java.util.Collections;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
@@ -41,18 +40,16 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameterGroup;
-import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies and resources
-import org.geotools.parameter.ParameterValue;
-import org.geotools.parameter.MatrixParameters;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.MatrixParameterValues;
+import org.geotools.parameter.MatrixParameters;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -161,6 +158,32 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             return IdentityTransform.create(2);
         }
         return new AffineTransform2D(matrix);
+    }
+
+    /**
+     * Returns the matrix element value as a group of parameters. The amount of parameters
+     * depends the matrix size. The group will contains only elements different from their
+     * default value.
+     *
+     * @param  matrix The matrix to returns as a group of parameters.
+     * @return The parameter values.
+     */
+    static ParameterValueGroup getParameterValues(final Matrix matrix) {
+        final MatrixParameterValues values;
+        values = (MatrixParameterValues) Provider.PARAMETERS.createValue();
+        values.setMatrix(matrix);
+        return values;
+    }
+
+    /**
+     * Returns the matrix element value as a group of parameters. The amount of parameters
+     * depends the matrix size. The group will contains only elements different from their
+     * default value.
+     *
+     * @return The parameter values.
+     */
+    public ParameterValueGroup getParameterValues() {
+        return getParameterValues(getMatrix());
     }
     
     /**
@@ -391,45 +414,6 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                    Arrays.equals(this.elt, that.elt);
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        return formatWKT(formatter, getMatrix());
-    }
-
-    /**
-     * Implementation of {@link #formatWKT(Formatter)} for the specified matrix.
-     *
-     * @todo Override {@link #getParameterValues} instead.
-     */
-    static String formatWKT(final Formatter formatter, final Matrix matrix) {
-        final int numRow = matrix.getNumRow();
-        final int numCol = matrix.getNumCol();
-        formatter.append("Affine");
-        formatter.append(new ParameterValue("num_row", numRow));
-        formatter.append(new ParameterValue("num_col", numCol));
-        final StringBuffer eltBuf = new StringBuffer("elt_");
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                final double value = matrix.getElement(j,i);
-                if (value != (i==j ? 1 : 0)) {
-                    eltBuf.setLength(4);
-                    eltBuf.append(j);
-                    eltBuf.append('_');
-                    eltBuf.append(i);
-                    formatter.append(new ParameterValue(eltBuf.toString(), value, null));
-                }
-            }
-        }
-        return "PARAM_MT";
     }
     
     /**

@@ -33,6 +33,7 @@ import javax.units.SI;
 
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameterGroup;
@@ -41,11 +42,10 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.parameter.ParameterValue;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.ParameterRealValue;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -183,6 +183,26 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(value)));
         }
+    }
+
+    /**
+     * The operation parameters. To be overrides by {@link Inverse} only.
+     */
+    OperationParameterGroup getParameters() {
+        return Provider.PARAMETERS;
+    }
+
+    /**
+     * Returns the parameters for this math transform.
+     *
+     * @return The parameters for this math transform.
+     */
+    public ParameterValueGroup getParameterValues() {
+        return new org.geotools.parameter.ParameterValueGroup(getParameters(),
+               new ParameterValue[] {
+                   new ParameterRealValue(Provider.SEMI_MAJOR, a),
+                   new ParameterRealValue(Provider.SEMI_MINOR, b)
+               });
     }
     
     /**
@@ -471,31 +491,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        return formatWKT(formatter, "Ellipsoid_To_Geocentric");
-    }
-
-    /**
-     * Implementation of the WKT formatting. The classification is
-     * "Ellipsoid_To_Geocentric" or "Geocentric_To_Ellipsoid".
-     *
-     * @todo Override {@link #getParameterValues} instead.
-     */
-    final String formatWKT(final Formatter formatter, final String classification) {
-        formatter.append(classification);
-        formatter.append(new ParameterValue("semi_major", a, SI.METER));
-        formatter.append(new ParameterValue("semi_minor", b, SI.METER));
-        return "PARAM_MT";
-    }
-    
-    /**
      * Inverse of a geocentric transform.
      *
      * @version $Id$
@@ -515,6 +510,13 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         }
 
         /**
+         * The operation parameters.
+         */
+        OperationParameterGroup getParameters() {
+            return ProviderInverse.PARAMETERS;
+        }
+
+        /**
          * Inverse transform an array of points.
          */
         public void transform(final double[] source, final int srcOffset,
@@ -530,15 +532,6 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                               final float[] dest,   final int dstOffset, final int length)
         {
             GeocentricTransform.this.inverseTransform(source, srcOffset, dest, dstOffset, length);
-        }
-    
-        /**
-         * Format the inner part of a
-         * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-         * Known Text</cite> (WKT)</A> element.
-         */
-        protected String formatWKT(final Formatter formatter) {
-            return GeocentricTransform.this.formatWKT(formatter, "Geocentric_To_Ellipsoid");
         }
 
         /**

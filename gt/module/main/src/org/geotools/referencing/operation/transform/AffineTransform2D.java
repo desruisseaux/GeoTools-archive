@@ -30,6 +30,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
@@ -75,6 +76,17 @@ final class AffineTransform2D extends XAffineTransform
     protected void checkPermission() {
         throw new UnsupportedOperationException(
                 Resources.format(ResourceKeys.ERROR_UNMODIFIABLE_AFFINE_TRANSFORM));
+    }
+
+    /**
+     * Returns the matrix element value as a group of parameters. The amount of parameters
+     * depends the matrix size. The group will contains only elements different from their
+     * default value.
+     *
+     * @return The parameter values.
+     */
+    public ParameterValueGroup getParameterValues() {
+        return ProjectiveTransform.getParameterValues(getMatrix());
     }
     
     /**
@@ -163,7 +175,10 @@ final class AffineTransform2D extends XAffineTransform
      * @return The WKT element name.
      */
     public String formatWKT(final Formatter formatter) {
-        return ProjectiveTransform.formatWKT(formatter, getMatrix());
+        final ParameterValueGroup parameters = getParameterValues();
+        formatter.append(formatter.getName(parameters.getDescriptor()));
+        formatter.append(parameters);
+        return "PARAM_MT";
     }
 
     /**

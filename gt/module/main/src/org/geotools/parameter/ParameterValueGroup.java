@@ -84,7 +84,6 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      */
     public ParameterValueGroup(final OperationParameterGroup descriptor) {
         super(descriptor);
-        ensureNonNull("values", values);
         final GeneralOperationParameter[] parameters = descriptor.getParameters();
         values = new GeneralParameterValue[parameters.length];
         for (int i=0; i<values.length; i++) {
