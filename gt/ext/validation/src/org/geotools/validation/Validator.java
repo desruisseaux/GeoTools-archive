@@ -195,12 +195,12 @@ public class Validator
 	 * 
 	 * Author: bowens<br>
 	 * Created on: Jun 26, 2004<br>
-	 * @param stores Map of required FeatureStores by typeRef (dataStoreId:typeName)
+	 * @param featureStores Map of required FeatureStores by typeRef (dataStoreId:typeName)
 	 * @param bBox
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void integrityValidation(Map stores, Envelope bBox, ValidationResults results )
+	public void integrityValidation(Map featureStores, Envelope bBox, ValidationResults results )
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();
@@ -209,13 +209,13 @@ public class Validator
 			LOGGER.warning( "Validation Processor unavaialble" );
 			return;
 		}
-		LOGGER.finer( "Required to validate "+stores.size()+" typeRefs" );
+		LOGGER.finer( "Required to validate "+featureStores.size()+" typeRefs" );
 		LOGGER.finer( "within "+bBox );
 		
 		// go through each typeName passed in through stores
 		// and ask what we need to check
 		Set typeRefs = new HashSet();                
-		for (Iterator i = stores.keySet().iterator(); i.hasNext();) 
+		for (Iterator i = featureStores.keySet().iterator(); i.hasNext();) 
 		{
 			String typeRef = (String) i.next();
 			typeRefs.add( typeRef );
@@ -240,10 +240,10 @@ public class Validator
 			 * They can be loaded already if we are in a transaction operation. If
 			 * this is for the "do it" button, there will be no feature stores
 			 * already loaded and thus we always hit the 'else' statement.*/
-			if (stores.containsKey( typeRef )) // if it was passed in through stores
+			if (featureStores.containsKey( typeRef )) // if it was passed in through stores
 			{
 				LOGGER.finer(" found required typeRef: " + typeRef +" (it was already loaded)");                
-				sources.put( typeRef, stores.get(typeRef));
+				sources.put( typeRef, featureStores.get(typeRef));
 			} 
 			else // if we have to go get it (ie. it is a dependant for a test)
 			{
@@ -270,7 +270,7 @@ public class Validator
 			//don't want transactions to mess up just because validation 
 			//stuff is messed up. ch
 			LOGGER.finer("Runing integrity tests using validation validationProcessor ");
-			validationProcessor.runIntegrityTests(stores.keySet(), sources, bBox, results);        	
+			validationProcessor.runIntegrityTests(featureStores.keySet(), sources, bBox, results);        	
 		} 
 		catch (Exception badIdea) 
 		{
