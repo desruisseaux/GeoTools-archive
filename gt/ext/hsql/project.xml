@@ -2,7 +2,7 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-indexed-shapefile</name>
+  <name>geotools-hsql</name>
   <id>hsql</id>
   <currentVersion>2.1.x</currentVersion>
   <shortDescription>hsql datastore module</shortDescription>
