@@ -185,7 +185,7 @@ public class GMLParserTest extends TestCase {
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
 
-        Schema s = SchemaFactory.getInstance("http:www.openplans.org/topp");
+        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
                 
         path = "oneFeature_out.xml";
         f = new File(f.getParentFile(),path);
@@ -218,7 +218,7 @@ public class GMLParserTest extends TestCase {
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
 
-        Schema s = SchemaFactory.getInstance("http:www.openplans.org/topp");
+        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
                 
         path = "oneFeature_out_hints.xml";
         f = new File(f.getParentFile(),path);
@@ -227,7 +227,7 @@ public class GMLParserTest extends TestCase {
         f.createNewFile();
         
         HashMap hints = new HashMap();
-        hints.put(DocumentWriter.SCHEMA_ORDER,new String[] {"http:www.opengis.net/wfs", "http:www.openplans.org/topp"});
+        hints.put(DocumentWriter.SCHEMA_ORDER,new String[] {"http://www.opengis.net/wfs", "http://www.openplans.org/topp"});
         DocumentWriter.writeDocument(doc,s,f,hints);
         
         doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);

@@ -276,7 +276,7 @@ public class XSISimpleTypes {
             } else {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
-                output.characters(value.toString());
+                output.characters((value == null? "":value.toString()));
                 output.endElement(element.getNamespace(), element.getName());
             }
         }

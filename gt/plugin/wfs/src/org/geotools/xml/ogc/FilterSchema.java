@@ -90,6 +90,8 @@ public class FilterSchema implements Schema {
             new DefaultElement("Filter_Capabilities",Filter_CapabilitiesType.getInstance()),
             
             // filter
+            new DefaultElement("FeatureId",FeatureIdType.getInstance(),comparisonOps),
+            new DefaultElement("Filter",FilterType.getInstance(),comparisonOps),
             
             // COMPARISON OPERATORS
             comparisonOps,
