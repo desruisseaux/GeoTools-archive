@@ -58,7 +58,7 @@ public class WFSDataStore extends AbstractDataStore{
  	private Authenticator auth = null;
  	
  	private int bufferSize = 10;
- 	private int timeout = 1000;
+ 	private int timeout = 3000;
  	
  	private WFSDataStore(){}
  	

@@ -90,7 +90,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements D
 //            throw new IOException("Cannot define both get and post");
         
         String user,pass; user = pass = null;
-        int timeout = 1000;
+        int timeout = 3000;
         int buffer = 10;
         if(params.containsKey(TIMEOUT.key))
             timeout = ((Integer)TIMEOUT.lookUp(params)).intValue();
