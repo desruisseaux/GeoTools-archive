@@ -122,7 +122,7 @@ public class StyledMapRenderer extends Renderer {
             final Envelope box = mapContext.getAreaOfInterest();
 
             // TODO: use CoordinateReferenceSystem instead?
-            final CoordinateSystem cs = (CoordinateSystem) mapContext.getCoordinateReferenceSystem();
+            final CoordinateSystem cs = CoordinateSystem.fromGeoAPI(mapContext.getCoordinateReferenceSystem());
             factory.setCoordinateSystem(cs);
             setCoordinateSystem(cs);
 

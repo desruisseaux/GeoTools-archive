@@ -97,7 +97,7 @@ public final class WKTElement {
          */
         int lower = position.getIndex();
         final int length = text.length();
-        while (lower<length && Character.isSpaceChar(text.charAt(lower))) {
+        while (lower<length && Character.isWhitespace(text.charAt(lower))) {
             lower++;
         }
         offset = lower;
@@ -198,7 +198,7 @@ public final class WKTElement {
         int index = position.getIndex();
         while (index < length) {
             final char c = text.charAt(index);
-            if (Character.isSpaceChar(c)) {
+            if (Character.isWhitespace(c)) {
                 index++;
                 continue;
             }
