@@ -70,8 +70,12 @@ public class Ellipsoid extends Info {
      * WGS 1984 ellipsoid. This ellipsoid is used in GPS systems
      * and is the default for most <code>org.geotools</code> packages.
      */
-    public static final Ellipsoid WGS84 = (Ellipsoid) pool.canonicalize(
-            createFlattenedSphere("WGS84", 6378137.0, 298.257223563, Unit.METRE));
+    public static final Ellipsoid WGS84;
+    static {
+        Ellipsoid wgs84 = createFlattenedSphere("WGS84", 6378137.0, 298.257223563, Unit.METRE); 
+        WGS84 = (Ellipsoid) pool.canonicalize( wgs84 );
+        System.out.println( WGS84 );
+    }
     
     /**
      * The equatorial radius.

@@ -81,7 +81,8 @@ public class CreationTest extends TestCase {
         final CoordinateSystemFactory factory = CoordinateSystemFactory.getDefault();
 
         final Ellipsoid airy1830;
-        airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910, Unit.METRE);
+        Unit m = Unit.METRE;
+        airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910, m );
         out.println();
         out.print("create Coodinate System....2: ");
         out.println(airy1830);

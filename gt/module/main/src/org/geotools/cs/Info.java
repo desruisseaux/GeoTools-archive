@@ -150,7 +150,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
             properties = null;
         }
         this.name = new InternationalString( name.toString() );
-        this.remarks = new InternationalString( (String) properties.get("remarks") );        
+        this.remarks = new InternationalString();        
     }
     
     /**
