@@ -491,7 +491,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                                                                .getSchema()
                                                                .getDefaultGeometry()
                                                                .getCoordinateSystem();
-
+                
                 if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on 
                     // unprojected geometries

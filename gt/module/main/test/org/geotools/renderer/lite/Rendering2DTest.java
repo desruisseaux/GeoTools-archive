@@ -77,6 +77,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 /**
  * @author jamesm
@@ -164,7 +165,8 @@ public class Rendering2DTest extends TestCase {
 
         AttributeType[] types = new AttributeType[2];
 
-        GeometryFactory geomFac = new GeometryFactory();
+        GeometryFactory geomFac = new GeometryFactory(PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
+        
 
         LineString line = makeSampleLineString(geomFac);
         if (crs != null)
