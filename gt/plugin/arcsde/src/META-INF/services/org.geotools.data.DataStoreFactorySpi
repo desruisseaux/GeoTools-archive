@@ -1,1 +1,1 @@
-org.geotools.data.arcsde.ArcSDEDataStoreFactory
+org.geotools.data.gml.GMLDataStoreFactory

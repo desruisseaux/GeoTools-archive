@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -20,46 +21,53 @@ public class GMLDataStoreFactory implements DataStoreFactorySpi{
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if(canProcess(params)){
-            File dir = (File) params.get("directory");
-            return new GMLDataStore(dir);
+        File file = (File) DIRECTORY.lookUp( params );
+        if( file.exists() && file.isDirectory() ){        
+            return new GMLDataStore( file );
         }
-        return null;
+        else {
+            throw new IOException( "Provided file was not a directory");
+        }        
     }
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
     public DataStore createNewDataStore(Map params) throws IOException {
-        if(!canProcess(params))
-            return null;
-        File dir = (File) params.get("directory");
-        if (dir.exists()) {
-            throw new IOException(dir + " already exists");
+        File file = (File) DIRECTORY.lookUp( params );
+        if (file.exists()) {
+            throw new IOException(file + " already exists");
         }
         boolean created;       
-        created = dir.mkdir();
+        created = file.mkdir();
         if (!created) {
-            throw new IOException("Could not create the directory" + dir);
+            throw new IOException("Could not create the directory" + file);
         }
-        return new GMLDataStore(dir);
+        return new GMLDataStore(file);
     }
 
+    public String getDisplayName() {
+        return "GML";
+    }
     /**
      * @see org.geotools.data.DataStoreFactorySpi#getDescription()
      */
     public String getDescription() {
         return "Read only data store for validating gml 2.x data";
     }
-
+    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+        File file = (File) DIRECTORY.lookUp( params );
+        String parent = file.getParent();
+        String name = file.getName();
+        return new DataSourceMetadataEnity( parent, name, "Access to GML files in "+name );
+    }
+    public static final Param DIRECTORY = new Param("directory", File.class,
+            "Directory containing gml files", true);
     /**
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        Param directory = new Param("directory", File.class,
-            "Directory containing gml files", true);
-
-        return new Param[] { directory, };
+        return new Param[] { DIRECTORY, };
     }
 
     /**
