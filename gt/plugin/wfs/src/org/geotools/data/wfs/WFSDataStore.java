@@ -691,10 +691,10 @@ public class WFSDataStore extends AbstractDataStore {
         FeatureReader t = null;
         SAXException sax = null;
         IOException io = null;
-System.out.println("Doing the Request");
+//System.out.println("Doing the Request");
         Filter[] filters = splitFilters(query,transaction); // [server][post]
-System.out.println("\nServer side Filter = "+filters[0]);
-System.out.println("Client side Filter = "+filters[1]+"\n\n");
+//System.out.println("\nServer side Filter = "+filters[0]);
+//System.out.println("Client side Filter = "+filters[1]+"\n\n");
         
         query = new DefaultQuery(query);
         // TODO modify bbox requests here

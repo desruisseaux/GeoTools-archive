@@ -149,14 +149,14 @@ e.printStackTrace();
         throws OperationNotSupportedException, IOException, SAXException {
         URL postUrl = ds.capabilities.getTransaction().getPost();
         
-System.out.println("POST Commit URL = "+postUrl);
+//System.out.println("POST Commit URL = "+postUrl);
 
         if (postUrl == null) {
             return null;
         }
 
         HttpURLConnection hc = WFSDataStore.getConnection(postUrl,ds.auth,true);
-System.out.println("connection to commit");
+//System.out.println("connection to commit");
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
 			WFSSchema.getInstance().getElements()[24]); // Transaction
@@ -175,13 +175,13 @@ System.out.println("connection to commit");
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction
         
-System.out.println("Ready to print Debug");
-        // DEBUG
-StringWriter debugw = new StringWriter();
-DocumentWriter.writeDocument(this, WFSSchema.getInstance(), debugw, hints);
-System.out.println("TRANSACTION   \n\n");
-System.out.println(debugw.getBuffer());
-        // END DEBUG
+//System.out.println("Ready to print Debug");
+//        // DEBUG
+//StringWriter debugw = new StringWriter();
+//DocumentWriter.writeDocument(this, WFSSchema.getInstance(), debugw, hints);
+//System.out.println("TRANSACTION   \n\n");
+//System.out.println(debugw.getBuffer());
+//        // END DEBUG
         
         OutputStream os = hc.getOutputStream();
 
