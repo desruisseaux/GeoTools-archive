@@ -125,7 +125,6 @@ import org.geotools.resources.geometry.XAffineTransform;
  * Use {@link #getProperty} instead.
  *
  * @version $Id$
- * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
 public abstract class Coverage extends PropertySourceImpl implements org.opengis.coverage.Coverage {
@@ -150,8 +149,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
     protected final CoordinateReferenceSystem crs;
     
     /**
-     * Construct a coverage using the specified coordinate system. If the coordinate system
-     * is <code>null</code>, then the subclasses must override {@link #getDimension()}.
+     * Construct a coverage using the specified coordinate reference system. If the
+     * coordinate reference system is <code>null</code>, then the subclasses must
+     * override {@link #getDimension()}.
      *
      * @param name The coverage name.
      * @param crs The coordinate reference system. This specifies the coordinate
