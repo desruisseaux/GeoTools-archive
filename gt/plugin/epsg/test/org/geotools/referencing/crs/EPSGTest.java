@@ -18,11 +18,13 @@
  */
 package org.geotools.referencing.crs;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.geotools.referencing.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -86,6 +88,10 @@ public class EPSGTest extends TestCase {
     public void test42102() throws Exception {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:42102");
         assertNotNull( crs );
+        assertNotNull(crs.getIdentifiers());
+        assertTrue(crs.getIdentifiers().length>0);
+        Identifier expected = new Identifier(org.geotools.metadata.citation.Citation.EPSG,"42102");
+        assertTrue( Arrays.asList( (Object[]) crs.getIdentifiers() ).contains( expected ));
     }
     public void testSuccess() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );

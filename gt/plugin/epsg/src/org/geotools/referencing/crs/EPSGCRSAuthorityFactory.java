@@ -25,6 +25,8 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.FactoryFinder;
@@ -49,6 +51,9 @@ import org.opengis.util.InternationalString;
  */
 //not quite sure how I am going to create a new factory (what should the geoapi method be)
 public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
+	
+	private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.crs.EPSGCRSAuthorityFactory");
+	
     public static final String AUTHORITY = "EPSG";
     public static final String AUTHORITY_PREFIX = "EPSG:";
     //would be nice to cache crs objects for codes that have already been requested    
@@ -162,11 +167,18 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
                 return (CoordinateReferenceSystem) value;
             }            
         }
-        final String WKT = epsg.getProperty( EPSG_NUMBER );
-        if( WKT == null ) {
+        String wkt = epsg.getProperty( EPSG_NUMBER );
+        if( wkt == null ) {
             throw new NoSuchAuthorityCodeException( "Unknown EPSG_NUMBER", AUTHORITY, code );
         }
-        return crsFactory.createFromWKT(WKT);
+        if( wkt.indexOf( EPSG_NUMBER ) == -1){
+        	wkt = wkt.trim();
+        	wkt = wkt.substring(0, wkt.length()-1 );
+        	wkt += ",AUTHORITY[\"EPSG\",\""+EPSG_NUMBER+"\"]]";
+        	LOGGER.log(Level.WARNING, "EPSG:"+EPSG_NUMBER+" lacks a proper identifying authority in its Well-Known Text. It is being added programmatically.");
+        }
+        return crsFactory.createFromWKT(wkt);
+        
     }
     
     public Object createObject(String code) throws FactoryException {
