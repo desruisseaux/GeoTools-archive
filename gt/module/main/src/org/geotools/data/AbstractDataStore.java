@@ -16,16 +16,27 @@
  */
 package org.geotools.data;
 
+import org.geotools.catalog.AbstractMetadataEntity;
+import org.geotools.catalog.DefaultQueryResult;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.opengis.catalog.Catalog;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.MetadataEntity;
+import org.opengis.catalog.QueryDefinition;
+import org.opengis.catalog.QueryResult;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +89,7 @@ import java.util.logging.Logger;
  *
  * @author jgarnett
  */
-public abstract class AbstractDataStore implements DataStore {
+public abstract class AbstractDataStore implements DataStore, Catalog {
     /** The logger for the filter module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
@@ -102,10 +113,16 @@ public abstract class AbstractDataStore implements DataStore {
      */
     private InProcessLockingManager lockingManager;
 
+    /** Default (Writeable) DataStore */
     public AbstractDataStore() {
         this(true);
     }
 
+    /**
+     * AbstractDataStore creation.
+     * 
+     * @param isWriteable true for writeable DataStore. 
+     */
     public AbstractDataStore(boolean isWriteable) {
         this.isWriteable = isWriteable;
         lockingManager = createLockingManager();
@@ -141,8 +158,82 @@ public abstract class AbstractDataStore implements DataStore {
         listenerManager.fireFeaturesChanged( typeName, Transaction.AUTO_COMMIT, bounds );
     }
 
+    /* (non-Javadoc)
+     * @see org.opengis.catalog.Catalog#add(org.opengis.catalog.CatalogEntry)
+     */
+    public void add(CatalogEntry arg0) throws IllegalStateException {
+        throw new UnsupportedOperationException("DataStore does not support the modification of catalog information" );
+    }
+    /* (non-Javadoc)
+     * @see org.opengis.catalog.Catalog#remove(org.opengis.catalog.CatalogEntry)
+     */
+    public void remove(CatalogEntry arg0) throws IllegalStateException {
+        throw new UnsupportedOperationException("DataStore does not support the modification of catalog information" );
+    }
+    /** Iterator of Catalog entries - one for each featureType provided by this Datastore */
+    public Iterator iterator() {
+        String typeNames[] = getTypeNames();
+        List list = new ArrayList( typeNames.length );
+        for( int i=0; i<typeNames.length; i++){
+            list.add( catalogEntry( typeNames[i] ));
+        }
+        return list.iterator();
+    }
+    public QueryResult query(QueryDefinition arg0) {
+        QueryResult result = new DefaultQueryResult();
+        
+        return null;
+    }
+    protected MetadataEntity metadata( final String typeName ){
+        return new AbstractMetadataEntity(){
+            String getName(){
+                return typeName;
+            }
+        };
+    }
+    protected CatalogEntry catalogEntry( final String typeName ){
+        return new CatalogEntry(){            
+            public Object getResource() {
+                try {
+                    return getFeatureSource( typeName );
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            public String getDataName() {
+                return typeName;
+            }
+            public int getNumMetadata() {
+                return 1;
+            }
+
+            public String[] getMetadataNames() {
+                return new String[]{ "default", };
+            }
+            public MetadataEntity getMetadata(int index) {
+                if( index == 1){
+                    return metadata( typeName );
+                }
+                return null;
+            }
+
+            public MetadataEntity getMetadata(String metadataName ) {
+                if( "default".equals( metadataName )){
+                    return metadata( typeName );
+                }
+                return null;
+            }
+
+            public Iterator iterator() {
+                return Collections.singleton( metadata( typeName) ).iterator();                
+            }
+            
+        };
+    }
+    /** Convience method for retriving all the names from the Catalog Entires */
     public abstract String[] getTypeNames();
 
+    /** Retrive schema information for typeName */
     public abstract FeatureType getSchema(String typeName)
         throws IOException;
 
