@@ -303,7 +303,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
      * @see org.geotools.data.DataStoreFactorySpi#getDisplayName()
      */
     public String getDisplayName() {
-        return "WFSDataStore";
+        return "Web Feature Server";
     }
 
     /**
