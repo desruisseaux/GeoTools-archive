@@ -1,0 +1,451 @@
+package org.geotools.data.store;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.catalog.CatalogEntry;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.data.AbstractFeatureLocking;
+import org.geotools.data.AbstractFeatureSource;
+import org.geotools.data.AbstractFeatureStore;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DiffFeatureReader;
+import org.geotools.data.EmptyFeatureReader;
+import org.geotools.data.EmptyFeatureWriter;
+import org.geotools.data.FeatureListener;
+import org.geotools.data.FeatureListenerManager;
+import org.geotools.data.FeatureLocking;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.FilteringFeatureReader;
+import org.geotools.data.InProcessLockingManager;
+import org.geotools.data.MaxFeatureReader;
+import org.geotools.data.Query;
+import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.Transaction;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
+import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
+
+/**
+ * Starting place for holding information about a FeatureType.
+ * <p>
+ * Like say for instance the FeatureType, its metadata and so on.
+ * </p>
+ * <p>
+ * The default implemenation should contain enough information to wean
+ * us off of AbstractDataStore. That is it should provide its own locking
+ * and event notification.
+ * </p>
+ * @author jgarnett
+ */
+final class TypeEntry implements CatalogEntry {
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.store");
+    
+    /**
+     * Remember parent.
+     * <p>
+     * We only refer to partent as a DataSource to keep hacks down.
+     * </p>
+     */
+    DataStore parent;
+    private final FeatureType schema;    
+    private final Map metadata;
+    
+    private FeatureListenerManager listeners = new FeatureListenerManager();
+    
+    public TypeEntry( DataStore store, FeatureType schema, Map metadata ) {
+        this.schema = schema;
+        this.metadata = metadata;
+    }
+
+    public Object getResource() {
+        try {
+            return getFeatureSource();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get unique data name for this CatalogEntry.
+     * 
+     * @return namespace:typeName
+     */
+    public String getDataName() {
+        return schema.getNamespace() + ":"+ schema.getTypeName();
+    }
+    
+    /**
+     * Metadata names from metadata.keySet().
+     * 
+     * @return metadata names mentioned in metadata.keySet();
+     */
+    public String[] getMetadataNames() {
+        return (String[]) metadata.keySet().toArray( new String[ metadata.size() ] );
+    }
+    /**
+     * Map of metadata by name.
+     * 
+     * @return Map of metadata by name
+     */
+    public Map metadata() {
+        return Collections.unmodifiableMap( metadata );
+    }
+    
+    /** Manages listener lists for FeatureSource implementation */
+    public FeatureListenerManager listenerManager = new FeatureListenerManager();
+    
+    //
+    // Start of TypeEntry framework
+    //
+    public String getTypeName() {
+        return schema.getTypeName();
+    }
+    public FeatureType getSchema() {
+        return schema;
+    }
+    /**
+     * Create a new FeatueSource allowing interaction with content.
+     * <p>
+     * Subclass may optionally implement:
+     * <ul>
+     * <li>FeatureStore - to allow read/write access
+     * <li>FeatureLocking - for locking support
+     * </ul>
+     * This choice may even be made a runtime (allowing the api
+     * to represent a readonly file).
+     * </p>
+     * <p>
+     * Several default implemenations are provided
+     * 
+     * @return FeatureLocking allowing access to content.
+     */
+    public FeatureSource getFeatureSource() throws IOException {        
+        return createFeatureSource();
+    }
+    /**
+     * Access a FeatureReader providing access to Feature information.
+     * <p>
+     * This implementation passes off responsibility to the following overrideable methods:
+     * <ul>
+     * <li>getFeatureReader(String typeName) - subclass *required* to implement
+     * </ul>
+     * </p>
+     * <p>If you can handle some aspects of Query natively (say expressions or reprojection) override the following:
+     * <li>
+     * <li>getFeatureReader(typeName, query) - override to handle query natively
+     * <li>getUnsupportedFilter(typeName, filter) - everything you cannot handle natively
+     * <li>getFeatureReader(String typeName) - you must implement this, but you could point it back to getFeatureReader( typeName, Query.ALL );
+     * </ul>
+     * </p>
+     */
+    public FeatureReader reader(Query query, Transaction transaction) throws IOException {
+        Filter filter = query.getFilter();
+        String typeName = query.getTypeName();
+        String propertyNames[] = query.getPropertyNames();
+        CoordinateSystem cs = null;
+
+        if (filter == null) {
+            throw new NullPointerException("getFeatureReader requires Filter: "
+                + "did you mean Filter.NONE?");
+        }
+        if( typeName == null ){
+            throw new NullPointerException(
+                "getFeatureReader requires typeName: "
+                + "use getTypeNames() for a list of available types");
+        }
+        if (transaction == null) {
+            throw new NullPointerException(
+                "getFeatureReader requires Transaction: "
+                + "did you mean to use Transaction.AUTO_COMMIT?");
+        }
+        FeatureType featureType = schema;
+
+        if( propertyNames != null || cs != null ){
+            try {
+                featureType = DataUtilities.createSubType( featureType, propertyNames, cs );
+            } catch (SchemaException e) {
+                LOGGER.log( Level.FINEST, e.getMessage(), e);
+                throw new DataSourceException( "Could not create Feature Type for query", e );
+
+            }
+        }
+        if ( filter == Filter.ALL || filter.equals( Filter.ALL )) {
+            return new EmptyFeatureReader(featureType);
+        }
+        //GR: allow subclases to implement as much filtering as they can,
+        //by returning just it's unsupperted filter
+        filter = getUnsupportedFilter( filter);
+        if(filter == null){
+            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.NONE?");
+        }
+
+        // This calls our subclass "simple" implementation
+        // All other functionality will be built as a reader around
+        // this class
+        //
+        FeatureReader reader = createReader( query);
+
+        if (!filter.equals( Filter.NONE ) ) {
+            reader = new FilteringFeatureReader(reader, filter);
+        }
+
+        if (transaction != Transaction.AUTO_COMMIT) {
+            Map diff = state(transaction).diff();
+            reader = new DiffFeatureReader(reader, diff);
+        }
+
+        if (!featureType.equals(reader.getFeatureType())) {
+            LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
+            reader = new ReTypeFeatureReader(reader, featureType);
+        }
+
+        if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
+                reader = new MaxFeatureReader(reader, query.getMaxFeatures());
+        }
+        return reader;
+    }
+
+    TypeDiffState state(Transaction transaction) {
+        synchronized (transaction) {
+            TypeDiffState state = (TypeDiffState) transaction.getState(this);
+
+            if (state == null) {
+                state = new TypeDiffState(this);
+                transaction.putState(this, state);
+            }
+
+            return state;
+        }
+    }    
+    public void fireAdded( Feature newFeature, Transaction transaction ){
+        Envelope bounds = newFeature != null ? newFeature.getBounds() : null;
+        listenerManager.fireFeaturesAdded( schema.getTypeName(), transaction, bounds );
+    }
+    public void fireRemoved( Feature removedFeature, Transaction transaction ){
+        Envelope bounds = removedFeature != null ? removedFeature.getBounds() : null;
+        listenerManager.fireFeaturesRemoved( schema.getTypeName(), transaction, bounds );
+    }
+    public void fireChanged( Feature before, Feature after, Transaction transaction ){
+        String typeName = after.getFeatureType().getTypeName();
+        Envelope bounds = new Envelope();
+        bounds.expandToInclude( before.getBounds() );
+        bounds.expandToInclude( after.getBounds() );
+        listenerManager.fireFeaturesChanged( typeName, transaction, bounds );
+    }    
+    //
+    // Start of Overrides
+    //    
+    /**
+     * Override to provide readonly access
+     * @param schema
+     * @return FeatureSource backed by this TypeEntry.
+     */
+    protected FeatureSource createFeatureSource() {
+        return new AbstractFeatureSource() {
+            public DataStore getDataStore() {
+                return parent;
+            }
+            public void addFeatureListener( FeatureListener listener ) {
+                listeners.addFeatureListener( this, listener );
+            }
+            public void removeFeatureListener( FeatureListener listener ) {
+                listeners.addFeatureListener( this, listener );
+            }
+            public FeatureType getSchema() {
+                return schema;
+            }
+        };
+    }
+    
+    /**
+     * Create the FeatureSource, override for your own custom implementation.
+     * <p>
+     * Default implementation makes use of DataStore getReader( ... ), and listenerManager.
+     * </p>
+     */
+    protected FeatureSource createFeatureSource( final FeatureType featureType ) {
+        return new AbstractFeatureSource() {
+            public DataStore getDataStore() {
+                return parent;
+            }
+
+            public void addFeatureListener(FeatureListener listener) {
+                listenerManager.addFeatureListener(this, listener);
+            }
+
+            public void removeFeatureListener(FeatureListener listener) {
+                listenerManager.removeFeatureListener(this, listener);
+            }
+
+            public FeatureType getSchema() {
+                return featureType;
+            }
+        };
+    }
+    
+    /**
+     * Create the FeatureStore, override for your own custom implementation.
+     */
+    protected FeatureStore createFeatureStore() {
+        
+        // This implementation needs FeatureWriters to work
+        // please provide your own override for a datastore that does not 
+        // support FeatureWriters (like WFS).
+        //
+        return new AbstractFeatureStore() {
+            public DataStore getDataStore() {
+                return parent;
+            }
+
+            public void addFeatureListener(FeatureListener listener) {
+                listenerManager.addFeatureListener(this, listener);
+            }
+
+            public void removeFeatureListener(
+                FeatureListener listener) {
+                listenerManager.removeFeatureListener(this, listener);
+            }
+
+            public FeatureType getSchema() {
+                return schema;
+            }
+        };
+    }
+    /**
+     * Create the FeatureLocking, override for your own custom implementation.
+     * <p>
+     * Warning: The default implementation of this method uses lockingManger.
+     * You must override this method if you support your own locking system (like WFS).
+     * <p>
+     */
+    protected FeatureLocking createFeatureLocking() {
+        return new AbstractFeatureLocking() {
+            public DataStore getDataStore() {
+                return parent;
+            }
+
+            public void addFeatureListener(FeatureListener listener) {
+                listenerManager.addFeatureListener(this, listener);
+            }
+
+            public void removeFeatureListener(
+                FeatureListener listener) {
+                listenerManager.removeFeatureListener(this, listener);
+            }
+
+            public FeatureType getSchema() {
+                return schema;
+            }
+        };
+    }
+
+    /**
+     * Create a reader for this query.
+     * <p>
+     * Subclass must override this to actually aquire content.
+     * </p>
+     * @param typeName
+     * @param query
+     * @return FeatureReader for all content
+     */
+    public FeatureReader createReader() {
+        return new EmptyFeatureReader( schema );
+    }
+
+    /**
+     * GR: this method is called from inside getFeatureReader(Query ,Transaction )
+     * to allow subclasses return an optimized FeatureReader wich supports the
+     * filter and attributes truncation specified in <code>query</code>
+     * <p>
+     * A subclass that supports the creation of such an optimized FeatureReader
+     * shold override this method. Otherwise, it just returns
+     * <code>getFeatureReader(typeName)</code>
+     * <p>
+     */
+    protected FeatureReader createReader(Query query)
+    throws IOException
+    {
+      return createReader();
+    }
+    
+    /**
+     * GR: if a subclass supports filtering, it should override this method
+     * to return the unsupported part of the passed filter, so a
+     * FilteringFeatureReader will be constructed upon it. Otherwise it will
+     * just return the same filter.
+     * <p>
+     * If the complete filter is supported, the subclass must return <code>Filter.NONE</code>
+     * </p>
+     */
+    protected Filter getUnsupportedFilter( Filter filter )
+    {
+      return filter;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
+     */
+    public FeatureWriter writer( Transaction transaction) throws IOException {        
+        if (transaction == null) {
+            throw new NullPointerException(
+                "getFeatureWriter requires Transaction: "
+                + "did you mean to use Transaction.AUTO_COMMIT?");
+        }
+
+        FeatureWriter writer;
+
+        if (transaction == Transaction.AUTO_COMMIT) {
+            writer = createWriter();
+        } else {
+            writer = state(transaction).writer();
+        }
+
+        if (parent.getLockingManager() != null &&
+            parent.getLockingManager() instanceof InProcessLockingManager ) {
+            // subclass has not provided locking so we will
+            // fake it with InProcess locks
+            InProcessLockingManager lockingManger = (InProcessLockingManager) parent.getLockingManager();            
+            writer = lockingManger.checkedWriter(writer, transaction);            
+        }
+        return writer;
+    }
+    
+    /**
+     * Low level feature writer access.
+     * <p>
+     * This is the only method you must implement to aquire content.
+     * </p>
+     * @return Subclass must supply a FeatureWriter
+     */
+    protected FeatureWriter createWriter() {
+        return new EmptyFeatureWriter( schema );
+    }
+    
+    /**
+     * It would be great to kill this method, and add a "skipToEnd" method to featureWriter?
+     * <p>
+     * Override this if you can provide a native optimization for this.
+     * (aka copy file, open the file in append mode, replace origional on close).
+     * </p>
+     */
+    protected FeatureWriter createAppend( Transaction transaction) throws IOException {
+        FeatureWriter writer = writer( transaction );
+        while (writer.hasNext()) {
+            writer.next(); // Hmmm this would be a use for skip() then?
+        }
+        return writer;
+    }
+    
+}
