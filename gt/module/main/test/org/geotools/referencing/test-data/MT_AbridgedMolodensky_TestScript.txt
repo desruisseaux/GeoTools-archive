@@ -1,71 +1,72 @@
 //AbridgedMolodenskyTransformation tests
 //Note that z values (third dimention) are not yet tested here.
 //the following test points are outside of the valid regions for these datums
-//Calculations were done with ArcGIS 8.3
+//Calculations were done with ArcGIS 8.3, calculations for Z were done
+//with a spreadsheet (OO.o)
 //May 29, 2004
 
 //nad 27 to nad 83
-set _MT_AMol1_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 2], PARAMETER["dx", -3.0], PARAMETER["dy", 142.0], PARAMETER["dz", 183.0], PARAMETER["src_semi_major", 6378206.4], PARAMETER["src_semi_minor", 6356583.8], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31414036]]
+set _MT_AMol1_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 3], PARAMETER["dx", -3.0], PARAMETER["dy", 142.0], PARAMETER["dz", 183.0], PARAMETER["src_semi_major", 6378206.4], PARAMETER["src_semi_minor", 6356583.8], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31414036]]
 
 math_transform=_MT_AMol1_
-test_tolerance=(1e-12, 1e-12)
+test_tolerance=(1e-12, 1e-12, 1e-8)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-123.101098871539, 49.2164240958503)
+pt_source=(-123.1, 49.2166666666, 10.0)
+pt_target=(-123.101098871539, 49.2164240958503, 4.9282499594)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(2.33833692871919, 43.9640212895491)
+pt_source=(2.33656753, 43.96499314, -23.5)
+pt_target=(2.33833692871919, 43.9640212895491, 60.28993444261)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(151.28200226145, -33.9129546039006)
+pt_source=(151.283333333, -33.9166666666, 41.2)
+pt_target=(151.28200226145, -33.9129546039006, -6.78433151658)
 
-pt_source=(-47.95, -15.75)
-pt_target=(-47.9491333141652, -15.7475483647123)
+pt_source=(-47.95, -15.75,-5.14)
+pt_target=(-47.9491333141652, -15.7475483647123,-106.36193587770)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(139.73215781909, 35.6821465395989)
+pt_source=(139.733333333, 35.6833333333, 852.1)
+pt_target=(139.73215781909, 35.6821465395989, 1023.70378192337)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(18.4514668586457, -33.913099310479)
+pt_source=(18.45, -33.9166666666, 0.0)
+pt_target=(18.4514668586457, -33.913099310479, -71.85501332647)
 
-pt_source=(0, 0)
-pt_target=(1.27559382381506E-03, 1.65510190152601E-03)
+pt_source=(0, 0, -12.0)
+pt_target=(1.27559382381506E-03, 1.65510190152601E-03, 54.40000000037)
 
-pt_source=(180, 0)
-pt_target=(179.998724406176, 1.65510190152601E-03)
+pt_source=(180, 0, 55.0)
+pt_target=(179.998724406176, 1.65510190152601E-03, 127.40000000037)
 
-pt_source=(-180, 0)
-pt_target=(179.998724406176, 1.65510190152601E-03)
+pt_source=(-180, 0, -2.0)
+pt_target=(179.998724406176, 1.65510190152601E-03, 70.40000000037)
 
-pt_source=(90, 0)
-pt_target=(90.0000269491653, 1.65510190152601E-03)
+pt_source=(90, 0, 0.0)
+pt_target=(90.0000269491653, 1.65510190152601E-03, 211.40000000037)
 
-pt_source=(-90, 0)
-pt_target=(-90.0000269491653, 1.65510190152601E-03)
+pt_source=(-90, 0, 13.45)
+pt_target=(-90.0000269491653, 1.65510190152601E-03, -59.14999999963)
 
-pt_source=(-76, -55)
-pt_target=(-75.9995086909825, -54.9980680476351)
+pt_source=(-76, -55, -124.5)
+pt_target=(-75.9995086909825, -54.9980680476351, -444.09413052980)
 
-pt_source=(12, -15)
-pt_target=(12.0012972403072, -14.9972650232531)
+pt_source=(12, -15, 45.0)
+pt_target=(12.0012972403072, -14.9972650232531, 76.78173456188)
 
-pt_source=(80, 6)
-pt_target=(80.0002494013643, 6.00106682317578)
+pt_source=(80, 6, -37.0)
+pt_target=(80.0002494013643, 6.00106682317578, 187.48772036401)
 
-pt_source=(-45, 71)
-pt_target=(-44.9972962660685, 71.0000900468279)
+pt_source=(-45, 71, 47.0)
+pt_target=(-44.9972962660685, 71.0000900468279, 43.35040637554)
 
-pt_source=(175, 66.67)
-pt_target=(174.996806357814, 66.6689717498428)
+pt_source=(175, 66.67, -15.33)
+pt_target=(174.996806357814, 66.6689717498428, 27.58997731544)
 
-pt_source=(60, -70)
-pt_target=(60.0019272456987, -69.9970450717445)
+pt_source=(60, -70, 7)
+pt_target=(60.0019272456987, -69.9970450717445, -264.10240137383)
 
-pt_source=(0, 90)
-pt_target=(0, 90)
+pt_source=(0, 90, -8)
+pt_target=(0, 90, 6.48327347512)
 
-pt_source=(0, -90)
-pt_target=(0, -90)
+pt_source=(0, -90, 0.0)
+pt_target=(0, -90, -351.51672652488)
 
 
 //_EPSG:4229_=GEOGCS["Egypt 1907" to wgs84
