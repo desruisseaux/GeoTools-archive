@@ -24,7 +24,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -54,8 +54,8 @@ public class ArcGridFormat extends AbstractGridFormat {
         mInfo = info;
         
         
-        readParameters = new ParameterGroupDescriptor( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS } );        
-        writeParameters = new ParameterGroupDescriptor( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS} );        
+        readParameters = new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS } );        
+        writeParameters = new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS} );        
     }
     
     /** Indicates whether the arcgrid data is compressed with GZIP */
