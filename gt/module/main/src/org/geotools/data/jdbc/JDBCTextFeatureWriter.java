@@ -101,7 +101,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 current.setID(mapper.createID(conn, current, statement));
             }
         } catch (SQLException sqle) {
-            String msg = "SQL Exception writing geometry column";
+            String msg = "SQL Exception writing geometry column" + sqle.getLocalizedMessage();
             LOGGER.log(Level.SEVERE, msg, sqle);
             queryData.close(sqle);
             throw new DataSourceException(msg, sqle);
