@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
 public class DefaultCSBuilder implements CSBuilder {
 
 	private Coordinate[] coordinateArray;
-	private CoordinateSequenceFactory factory = new DefaultCoordinateSequenceFactory();
+	private CoordinateSequenceFactory factory = DefaultCoordinateSequenceFactory.instance();
 
 	/**
 	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#start(int, int)
