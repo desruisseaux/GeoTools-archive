@@ -341,13 +341,17 @@ public class Parameter extends AbstractParameter
     public double doubleValue() throws InvalidParameterTypeException {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
+        } else if (value == null) {
+            return Double.NaN;
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
-        final String name = getName(descriptor);
-        if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
-        }
-        throw new InvalidParameterTypeException(getClassTypeError(), name);
+//        final String name = getName(descriptor);
+//        if (value == null) {
+//            throw new IllegalStateException(Resources.format(
+//                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+//        }
+//        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
