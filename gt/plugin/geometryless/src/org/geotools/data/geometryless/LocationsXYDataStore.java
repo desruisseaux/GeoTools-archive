@@ -52,6 +52,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
 
   private String XCoordColumnName = null;
    private String YCoordColumnName = null;
+    private String geomName = null;
    
     public LocationsXYDataStore(ConnectionPool connectionPool) throws IOException {
         super(connectionPool);
@@ -63,12 +64,12 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
-    public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName, String x, String y)    
+    public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName, String x, String y, String geomName)    
         throws IOException {
         super(connectionPool, databaseSchemaName);
        this.XCoordColumnName = x;
        this.YCoordColumnName = y;
-   
+       this.geomName = geomName;
     }
 
     /**
@@ -147,7 +148,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
 	     if (colName.equals(XCoordColumnName)) {
 		 //do type checking here, during config, not during reading.
 		 if (Number.class.isAssignableFrom(type)) {
-		     return AttributeTypeFactory.newAttributeType("the_geom",
+		     return AttributeTypeFactory.newAttributeType(geomName,
 								  Point.class);
 		 } else {
 		     String excMesg = "Specified X column of " + colName + 

@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -38,13 +34,28 @@ import java.util.logging.Logger;
  * in the DataStoreFactorySpi file.
  * </p>
  *
+ * <p>
+ * REVISIT: I believe the use of the namespace param needs to be revisited.  GeoServer
+ * is going to start making use of this, as the XML namespace that the feature
+ * type should be created with.  The use of namespace in this package is that
+ * of a database schema name.  Though investigating futher it looks like all
+ * the dbs use it that way.  So this is just a note that xml namespace and
+ * database namespace need to be reconciled.  The work done in this package
+ * seems to be begging some datastore hierarchy refactoring, hopefully when
+ * we do that we can also get jdbc datastore factories in a hierarchy, instead
+ * of each just doing their own thing. -ch
+ * </p>
+ *
  * @author Rob Atkinson, Social Change Online
+ * @author Chris Holmes, TOPP
+ * @version $Id$
  */
 public class LocationsXYDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
     	
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
 
+    private static final String GEOM_NAME_DEFAULT = "the_geom";
 
     /** Specified JDBC driver class. */
     static final Param  DRIVER = new Param("driver", String.class,
@@ -65,6 +76,9 @@ public class LocationsXYDataStoreFactory
     /** Param, package visibiity for JUnit tests */
     static final Param YCOLUMN = new Param("ycolumn", String.class,
             "name of JDBC results column containing northing (y, latitude etc)", true, "latitude");
+
+    static final Param GEOMNAME = new Param("geom_name", String.class, "the " +
+      "name of the geometry attribute from the x,y column", false, GEOM_NAME_DEFAULT);
 
     /** Param, package visibiity for JUnit tests */
     static final Param HOST = new Param("host", String.class,
@@ -116,7 +130,7 @@ public class LocationsXYDataStoreFactory
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,XCOLUMN,YCOLUMN
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,XCOLUMN,YCOLUMN, GEOMNAME
     };
 
     /**
@@ -218,7 +232,7 @@ public class LocationsXYDataStoreFactory
         String urlprefix =   (String) URLPREFIX.lookUp(params);
       String xcolumn =   (String) XCOLUMN.lookUp(params);
       String ycolumn =   (String) YCOLUMN.lookUp(params);
-
+      String geom_name = (String) GEOMNAME.lookUp(params);
 
         // Try processing params first so we can get an error message
         // back to the user
@@ -253,8 +267,12 @@ public class LocationsXYDataStoreFactory
             throw new DataSourceException("Could not create connection", e);
         }
 
+	if (geom_name == null) {
+	    geom_name = GEOM_NAME_DEFAULT;
+	}
         if (namespace != null) {
-            return new LocationsXYDataStore(pool, namespace, xcolumn,ycolumn);
+            return new LocationsXYDataStore(pool, namespace, xcolumn,
+                                            ycolumn, geom_name);
         } else {
             return new LocationsXYDataStore(pool);
         }
