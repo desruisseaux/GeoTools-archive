@@ -433,8 +433,9 @@ public class Rendering2DTest extends TestCase {
             frame.dispose();
         }
 
-        java.net.URL base = TestData.getResource(this, ".");
-        java.io.File file = new java.io.File(base.getPath(), testName+"_"
+        //java.net.URL base = TestData.getResource(this, ".");
+        java.io.File base = TestData.file(this, ".");
+        java.io.File file = new java.io.File(base, testName+"_"
                 + renderer.getClass().getName().replace('.', '_') + ".png");
         java.io.FileOutputStream out = new java.io.FileOutputStream(file);
         boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
