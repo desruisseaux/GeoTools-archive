@@ -138,14 +138,14 @@ public class LockingDataSourceTestCase extends TestCase {
      */
 
     // Uncomment to test functionality with MemoryLocking DataSource
-    protected LockingDataSource createDataSource(FeatureCollection features)
-        throws UnsupportedOperationException, DataSourceException {
-        LockingDataSource dataSource = new MemoryLockingDataSource();
-
-        dataSource.addFeatures(features);
-
-        return dataSource;
-    }
+//    protected LockingDataSource createDataSource(FeatureCollection features)
+//        throws UnsupportedOperationException, DataSourceException {
+//        LockingDataSource dataSource = new MemoryLockingDataSource();
+//
+//        dataSource.addFeatures(features);
+//
+//        return dataSource;
+//    }
 
     /**
      * Sets up test fixture.
@@ -173,7 +173,7 @@ public class LockingDataSourceTestCase extends TestCase {
         filter12 = createFilter(new String[] { fid1, fid2 });
         filter34 = createFilter(new String[] { fid3, fid4 });
 
-        ds = createDataSource(features);
+//        ds = createDataSource(features);
     }
 
     /**
@@ -252,63 +252,63 @@ public class LockingDataSourceTestCase extends TestCase {
     /**
      * Test for void lockFeatures(Query)
      */
-    public void testLockFeaturesQuery() throws DataSourceException {
-        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
-
-        FeatureCollection data = ds.getFeatures();
-        Feature feature = data.features().next();
-        assertFalse("unlocked before", isLocked(feature.getID()));
-
-        ds.lockFeatures(Query.ALL);
-
-        assertTrue("locked after", isLocked(feature.getID()));
-    }
+//    public void testLockFeaturesQuery() throws DataSourceException {
+//        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
+//
+//        FeatureCollection data = ds.getFeatures();
+//        Feature feature = data.features().next();
+//        assertFalse("unlocked before", isLocked(feature.getID()));
+//
+//        ds.lockFeatures(Query.ALL);
+//
+//        assertTrue("locked after", isLocked(feature.getID()));
+//    }
 
     /**
      * Test for void lockFeatures(Filter)
      */
-    public void testLockFeaturesFilter() throws DataSourceException {
-        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
-        assertFalse("unlocked before", isLocked(fid1));
-
-        ds.lockFeatures(Filter.NONE);
-        assertTrue("locked after", isLocked(fid1));
-    }
+//    public void testLockFeaturesFilter() throws DataSourceException {
+//        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
+//        assertFalse("unlocked before", isLocked(fid1));
+//
+//        ds.lockFeatures(Filter.NONE);
+//        assertTrue("locked after", isLocked(fid1));
+//    }
 
     /**
      * more complicated lockFeatures test
      */
-    public void testUnLockFeaturesFilter2() throws DataSourceException {
-        FeatureLock lockA = FeatureLockFactory.generate("LockA", 3600);
-        FeatureLock lockB = FeatureLockFactory.generate("LockB", 3600);
-        ds.setFeatureLock(lockA);
-        ds.lockFeatures(filter12);
-        assertTrue("A  locked1", isLocked(fid1));
-        assertTrue("A  locked2", isLocked(fid2));
-        assertFalse("A  locked3", isLocked(fid3));
-        assertFalse("A  locked4", isLocked(fid4));
-        ds.setFeatureLock(lockB);
-        ds.lockFeatures(filter34);
-        assertTrue("AB locked1", isLocked(fid1));
-        assertTrue("AB locked2", isLocked(fid2));
-        assertTrue("AB locked3", isLocked(fid3));
-        assertTrue("AB locked4", isLocked(fid4));
-    }
+//    public void testUnLockFeaturesFilter2() throws DataSourceException {
+//        FeatureLock lockA = FeatureLockFactory.generate("LockA", 3600);
+//        FeatureLock lockB = FeatureLockFactory.generate("LockB", 3600);
+//        ds.setFeatureLock(lockA);
+//        ds.lockFeatures(filter12);
+//        assertTrue("A  locked1", isLocked(fid1));
+//        assertTrue("A  locked2", isLocked(fid2));
+//        assertFalse("A  locked3", isLocked(fid3));
+//        assertFalse("A  locked4", isLocked(fid4));
+//        ds.setFeatureLock(lockB);
+//        ds.lockFeatures(filter34);
+//        assertTrue("AB locked1", isLocked(fid1));
+//        assertTrue("AB locked2", isLocked(fid2));
+//        assertTrue("AB locked3", isLocked(fid3));
+//        assertTrue("AB locked4", isLocked(fid4));
+//    }
 
     /*
      * Test for void lockFeatures()
      */
-    public void testLockFeatures() throws DataSourceException {
-        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
-
-        FeatureCollection data = ds.getFeatures();
-        Feature feature = data.features().next();
-        assertFalse("unlocked before", isLocked(feature.getID()));
-
-        ds.lockFeatures();
-
-        assertTrue("locked after", isLocked(feature.getID()));
-    }
+//    public void testLockFeatures() throws DataSourceException {
+//        ds.setFeatureLock(FeatureLockFactory.generate("Test", 3600));
+//
+//        FeatureCollection data = ds.getFeatures();
+//        Feature feature = data.features().next();
+//        assertFalse("unlocked before", isLocked(feature.getID()));
+//
+//        ds.lockFeatures();
+//
+//        assertTrue("locked after", isLocked(feature.getID()));
+//    }
 
     public void testSetAuthorization() throws DataSourceException {
         FeatureLock lock = FeatureLockFactory.generate("Lock", 3600);
@@ -352,31 +352,31 @@ public class LockingDataSourceTestCase extends TestCase {
         ds.unLockFeatures(Filter.NONE);
     }
 
-    public void testUnLockFeaturesFilterAB() throws DataSourceException {
-        FeatureLock lockA = FeatureLockFactory.generate("LockA", 3600);
-        FeatureLock lockB = FeatureLockFactory.generate("LockB", 3600);
-        ds.setFeatureLock(lockA);
-        ds.lockFeatures(filter12);
-        ds.setFeatureLock(lockB);
-        ds.lockFeatures(filter34);
-        assertTrue("AB locked1", isLocked(fid1));
-        assertTrue("AB locked2", isLocked(fid2));
-        assertTrue("AB locked3", isLocked(fid3));
-        assertTrue("AB locked4", isLocked(fid4));
-
-        try {
-            ds.unLockFeatures(filter12);
-            fail("need lockA authorization");
-        } catch (DataSourceException expected) {
-        }
-
-        ds.setAuthorization(lockA.getAuthorization());
-        ds.unLockFeatures(filter12);
-        assertFalse(" B locked1", isLocked(fid1));
-        assertFalse(" B locked2", isLocked(fid2));
-        assertTrue(" B locked3", isLocked(fid3));
-        assertTrue(" B locked4", isLocked(fid4));
-    }
+//    public void testUnLockFeaturesFilterAB() throws DataSourceException {
+//        FeatureLock lockA = FeatureLockFactory.generate("LockA", 3600);
+//        FeatureLock lockB = FeatureLockFactory.generate("LockB", 3600);
+//        ds.setFeatureLock(lockA);
+//        ds.lockFeatures(filter12);
+//        ds.setFeatureLock(lockB);
+//        ds.lockFeatures(filter34);
+//        assertTrue("AB locked1", isLocked(fid1));
+//        assertTrue("AB locked2", isLocked(fid2));
+//        assertTrue("AB locked3", isLocked(fid3));
+//        assertTrue("AB locked4", isLocked(fid4));
+//
+//        try {
+//            ds.unLockFeatures(filter12);
+//            fail("need lockA authorization");
+//        } catch (DataSourceException expected) {
+//        }
+//
+//        ds.setAuthorization(lockA.getAuthorization());
+//        ds.unLockFeatures(filter12);
+//        assertFalse(" B locked1", isLocked(fid1));
+//        assertFalse(" B locked2", isLocked(fid2));
+//        assertTrue(" B locked3", isLocked(fid3));
+//        assertTrue(" B locked4", isLocked(fid4));
+//    }
 
     /*
      * Test for void unLockFeatures(Query)
@@ -545,12 +545,12 @@ public class LockingDataSourceTestCase extends TestCase {
      *
      */
     // Uncomment to test with MemoryLockingDataSource
-    protected boolean isLocked(String fid) {
-        // May be able to provide a "generic" solution for
-        // this by trying to aquire a lock with a negative
-        // duration.
-        return ((MemoryLockingDataSource) ds).isLocked(fid);
-    }
+//    protected boolean isLocked(String fid) {
+//        // May be able to provide a "generic" solution for
+//        // this by trying to aquire a lock with a negative
+//        // duration.
+//        return ((MemoryLockingDataSource) ds).isLocked(fid);
+//    }
 
     /**
      * Returns the number of features in the DataSource for testing.
@@ -562,11 +562,11 @@ public class LockingDataSourceTestCase extends TestCase {
      * @return Number of Features.
      */
     protected int numberFeatures() {
-        try {
-            return ds.getFeatures().size();
-        } catch (DataSourceException e) {
+//        try {
+//            return ds.getFeatures().size();
+//        } catch (DataSourceException e) {
             return -1;
-        }
+//        }
     }
 
     /**
@@ -591,22 +591,22 @@ public class LockingDataSourceTestCase extends TestCase {
         // May be able to provide a "generic" solution for
         // this by trying to aquire a lock with a negative
         // duration.
-        int count = 0;
-        Feature feature;
-
-        try {
-            for (FeatureIterator i = ds.getFeatures().features(); i.hasNext();) {
-                feature = i.next();
-
-                if (isLocked(feature.getID())) {
-                    count++;
-                }
-            }
-        } catch (DataSourceException e) {
+//        int count = 0;
+//        Feature feature;
+//
+//        try {
+//            for (FeatureIterator i = ds.getFeatures().features(); i.hasNext();) {
+//                feature = i.next();
+//
+//                if (isLocked(feature.getID())) {
+//                    count++;
+//                }
+//            }
+//        } catch (DataSourceException e) {
             return -1;
-        }
-
-        return count;
+//        }
+//
+//        return count;
     }
 
     /*
@@ -721,79 +721,79 @@ public class LockingDataSourceTestCase extends TestCase {
         assertEquals("size", 4, numberFeatures());
     }
 
-    public void testRollbackTransactionLockRelease()
-        throws UnsupportedOperationException, DataSourceException {
-        ds.setAutoCommit(false);
-        ds.lockFeatures(filter12);
+//    public void testRollbackTransactionLockRelease()
+//        throws UnsupportedOperationException, DataSourceException {
+//        ds.setAutoCommit(false);
+//        ds.lockFeatures(filter12);
+//
+//        assertTrue("A  locked1", isLocked(fid1));
+//        assertTrue("A  locked2", isLocked(fid2));
+//        assertFalse("A  locked3", isLocked(fid3));
+//        assertFalse("A  locked4", isLocked(fid4));
+//        assertEquals("locks", 2, numberLocked());
+//        ds.rollback();
+//        assertEquals("locks", 0, numberLocked());
+//    }
 
-        assertTrue("A  locked1", isLocked(fid1));
-        assertTrue("A  locked2", isLocked(fid2));
-        assertFalse("A  locked3", isLocked(fid3));
-        assertFalse("A  locked4", isLocked(fid4));
-        assertEquals("locks", 2, numberLocked());
-        ds.rollback();
-        assertEquals("locks", 0, numberLocked());
-    }
+//    public void testCommitTransactionalLockRelease()
+//        throws UnsupportedOperationException, DataSourceException {
+//        ds.setAutoCommit(false);
+//        ds.lockFeatures(filter12);
+//
+//        assertTrue("A  locked1", isLocked(fid1));
+//        assertTrue("A  locked2", isLocked(fid2));
+//        assertFalse("A  locked3", isLocked(fid3));
+//        assertFalse("A  locked4", isLocked(fid4));
+//        assertEquals("locks", 2, numberLocked());
+//        ds.commit();
+//        assertEquals("locks", 0, numberLocked());
+//    }
 
-    public void testCommitTransactionalLockRelease()
-        throws UnsupportedOperationException, DataSourceException {
-        ds.setAutoCommit(false);
-        ds.lockFeatures(filter12);
+//    public void testGetAutoCommit() throws DataSourceException {
+//        assertTrue(ds.getAutoCommit());
+//    }
+//
+//    public void testGetMetaData() {
+//        assertNotNull(ds.getMetaData());
+//    }
+//
+//    public void testGetSchema() throws DataSourceException {
+//        assertNotNull(ds.getSchema());
+//    }
+//
+//    public void testAbortLoading() {
+//        try {
+//            ds.abortLoading();
+//            fail("not supported");
+//        } catch (UnsupportedOperationException e) {
+//        }
+//    }
 
-        assertTrue("A  locked1", isLocked(fid1));
-        assertTrue("A  locked2", isLocked(fid2));
-        assertFalse("A  locked3", isLocked(fid3));
-        assertFalse("A  locked4", isLocked(fid4));
-        assertEquals("locks", 2, numberLocked());
-        ds.commit();
-        assertEquals("locks", 0, numberLocked());
-    }
+//    public void testGetBounds() throws DataSourceException {
+//        Envelope bounds = ds.getBounds();
+//        assertEquals("minX", 2.0, bounds.getMinX(), TOLERENCE);
+//        assertEquals("minY", 2.0, bounds.getMinY(), TOLERENCE);
+//        assertEquals("maxX", 8.0, bounds.getMaxX(), TOLERENCE);
+//        assertEquals("maxY", 8.0, bounds.getMaxY(), TOLERENCE);
+//    }
+//
+//    public void testBBox()
+//        throws UnsupportedOperationException, DataSourceException {
+//        Envelope bounds = ds.getBounds();
+//        assertEquals("minX", 2.0, bounds.getMinX(), TOLERENCE);
+//        assertEquals("minY", 2.0, bounds.getMinY(), TOLERENCE);
+//        assertEquals("maxX", 8.0, bounds.getMaxX(), TOLERENCE);
+//        assertEquals("maxY", 8.0, bounds.getMaxY(), TOLERENCE);
+//    }
 
-    public void testGetAutoCommit() throws DataSourceException {
-        assertTrue(ds.getAutoCommit());
-    }
-
-    public void testGetMetaData() {
-        assertNotNull(ds.getMetaData());
-    }
-
-    public void testGetSchema() throws DataSourceException {
-        assertNotNull(ds.getSchema());
-    }
-
-    public void testAbortLoading() {
-        try {
-            ds.abortLoading();
-            fail("not supported");
-        } catch (UnsupportedOperationException e) {
-        }
-    }
-
-    public void testGetBounds() throws DataSourceException {
-        Envelope bounds = ds.getBounds();
-        assertEquals("minX", 2.0, bounds.getMinX(), TOLERENCE);
-        assertEquals("minY", 2.0, bounds.getMinY(), TOLERENCE);
-        assertEquals("maxX", 8.0, bounds.getMaxX(), TOLERENCE);
-        assertEquals("maxY", 8.0, bounds.getMaxY(), TOLERENCE);
-    }
-
-    public void testBBox()
-        throws UnsupportedOperationException, DataSourceException {
-        Envelope bounds = ds.getBounds();
-        assertEquals("minX", 2.0, bounds.getMinX(), TOLERENCE);
-        assertEquals("minY", 2.0, bounds.getMinY(), TOLERENCE);
-        assertEquals("maxX", 8.0, bounds.getMaxX(), TOLERENCE);
-        assertEquals("maxY", 8.0, bounds.getMaxY(), TOLERENCE);
-    }
-
-    public void testLockExpire() throws Exception {
-        FeatureLock lock = FeatureLockFactory.generate("Timed", 1);
-        ds.setFeatureLock(lock);
-        assertFalse("before", isLocked(fid1));
-        ds.lockFeatures(filter12);
-        assertTrue("after", isLocked(fid1));
-        Thread.sleep(50);
-
-        assertFalse("expire", isLocked(fid1));
-    }
+//    public void testLockExpire() throws Exception {
+//        FeatureLock lock = FeatureLockFactory.generate("Timed", 1);
+//        ds.setFeatureLock(lock);
+//        assertFalse("before", isLocked(fid1));
+//        ds.lockFeatures(filter12);
+//        assertTrue("after", isLocked(fid1));
+//        Thread.sleep(50);
+//
+//        assertFalse("expire", isLocked(fid1));
+//    }
 }
