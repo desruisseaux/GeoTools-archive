@@ -337,6 +337,11 @@ public class Parameter extends AbstractParameter
      * @see #getUnit
      * @see #setValue(double)
      * @see #doubleValueList()
+     *
+     * @todo Should throws an exception if the value is not set. Current implementation
+     *       returns NaN, which is a workaround for the SP2 default value in "Lambert"
+     *       projection (SP2 default to SP1). A more elaborated fix is needed, which will
+     *       require a custom implementation of ParameterDescriptor.
      */
     public double doubleValue() throws InvalidParameterTypeException {
         if (value instanceof Number) {

@@ -182,7 +182,9 @@ public class RenderedLegend extends RenderedLayer {
      *         during the rendering process.
      */
     protected void paint(final RenderingContext context) throws TransformException {
-        paint(context, text);
+        if (text != null) {
+            paint(context, text);
+        }
     }
 
     /**
