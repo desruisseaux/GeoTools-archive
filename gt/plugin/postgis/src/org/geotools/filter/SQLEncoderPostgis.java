@@ -72,7 +72,7 @@ public class SQLEncoderPostgis extends SQLEncoder
     public SQLEncoderPostgis() {
         capabilities = createFilterCapabilities();
         
-        setColnameEscape("\"");
+        setSqlNameEscape("\"");
     }
 
     public SQLEncoderPostgis(boolean looseBbox) {
