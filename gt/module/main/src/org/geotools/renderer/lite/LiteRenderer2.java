@@ -943,7 +943,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
             	AffineTransform tempTransform = graphics.getTransform(); 
-                graphics.setTransform(shape.getTransform()); 
+                graphics.setTransform(shape.getAffineTransform()); 
                 renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]); 
                 graphics.setTransform(tempTransform); 
             } else {
@@ -957,7 +957,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 		if (canTransform){
 		    try {
 				transform=getMathTransform(crs,
-				            destinationCrs, shape.getTransform());
+				            destinationCrs, shape.getAffineTransform());
 			} catch (Exception e) {
 				// fall through
 			}
@@ -987,8 +987,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     private Shape getTransformedShape(Geometry g, MathTransform2D transform)
         throws TransformException {
-        LiteShape base = new LiteShape(g, null, false);
-        return transform.createTransformedShape(base);
+        LiteShape shape=new LiteShape(g, null, false);
+        shape.setMathTransform(transform);
+        return shape;
     }
 
     /**

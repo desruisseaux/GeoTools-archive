@@ -23,6 +23,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -46,7 +47,7 @@ public class LiteShape implements Shape {
     private Geometry geometry;
 
     /** The transform needed to go from the object space to the device space */
-    private AffineTransform transform = null;
+    private AffineTransform affineTransform = null;
     private boolean generalize = false;
     private double maxDistance = 1;
     
@@ -57,7 +58,23 @@ public class LiteShape implements Shape {
 	private float xScale;
 
 	private float yScale;
+    
+    private MathTransform mathTransform;
+    
+    /**
+     * @param mathTransform The mathTransform to set.
+     */
+    public void setMathTransform( MathTransform mathTransform ) {
+        this.mathTransform = mathTransform;
+    }
 
+    /**
+     * @return Returns the mathTransform.
+     */
+    public MathTransform getMathTransform() {
+        return mathTransform;
+    }
+    
     /**
      * Creates a new LiteShape object.
      *
@@ -84,7 +101,7 @@ public class LiteShape implements Shape {
      */
     public LiteShape(Geometry geom, AffineTransform at, boolean generalize) {
         this.geometry = geom;
-        this.transform = at;
+        this.affineTransform = at;
         this.generalize = generalize;
         if (at==null){
         	yScale=xScale=1;
@@ -386,16 +403,16 @@ public class LiteShape implements Shape {
      *         traverses the geometry of the <code>Shape</code>.
      */
     public PathIterator getPathIterator(AffineTransform at) {
-        PathIterator pi = null;
+        AbstractLiteIterator pi = null;
 
         AffineTransform combined = null;
 
-        if (transform == null) {
+        if (affineTransform == null) {
             combined = at;
         } else if ((at == null) || at.isIdentity()) {
-            combined = transform;
+            combined = affineTransform;
         } else {
-            combined = new AffineTransform(transform);
+            combined = new AffineTransform(affineTransform);
             combined.concatenate(at);
         }
 
@@ -417,7 +434,7 @@ public class LiteShape implements Shape {
 //	            pi = new PackedLineIterator((LineString) geometry, combined, generalize,
 //	                    (float) maxDistance);
 //        	else
-        	if(combined == transform)
+        	if(combined == affineTransform)
         		lineIterator.init((LineString) geometry, combined, generalize,
 	                    (float) maxDistance, xScale, yScale);
         	else 
@@ -430,6 +447,7 @@ public class LiteShape implements Shape {
             pi = collIterator;
         }
 
+        pi.setMathTransform(mathTransform);
         return pi;
     }
 
@@ -610,7 +628,7 @@ public class LiteShape implements Shape {
      * Returns the affine transform for this lite shape
      * @return
      */
-    public AffineTransform getTransform() {
-        return transform;
+    public AffineTransform getAffineTransform() {
+        return affineTransform;
     }
 }

@@ -36,6 +36,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.AbstractFilter;
@@ -256,9 +257,18 @@ public class Rendering2DTest extends TestCase {
                 FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84);
                 Style style = createTestStyle();
     
+                StringBuffer stringBuffer=new StringBuffer();
+                for ( FeatureIterator reader=ft.features(); reader.hasNext(); ){
+                    Coordinate[] coords=reader.next().getDefaultGeometry().getCoordinates();
+                    for( int i = 0; i < coords.length; i++ ) {
+                        stringBuffer.append(coords[i]);
+                    }
+                }
+                
+                System.out.println(stringBuffer);
+                
                 MapContext map = new DefaultMapContext();
                 map.addLayer(ft, style);
-                System.out.println(map.getLayerBounds());
                 final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
                 LiteRenderer2 renderer = new LiteRenderer2(map);
                 CoordinateReferenceSystem crs=FactoryFinder
@@ -273,8 +283,6 @@ public class Rendering2DTest extends TestCase {
 
                 Envelope bounds = JTS.transform(env,t);
                 map.setAreaOfInterest(bounds, crs);
-                env=JTS.transform(bounds, t.inverse());
-                System.out.println(env);
                 
                 Rectangle rect = new Rectangle(400, 400);
                 renderer.setOptimizedDataLoadingEnabled(true);

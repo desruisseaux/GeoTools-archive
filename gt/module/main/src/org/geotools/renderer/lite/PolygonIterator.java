@@ -18,10 +18,12 @@ package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
 
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -47,7 +49,7 @@ class PolygonIterator extends AbstractLiteIterator {
     private int currentCoord = 0;
 
     /** The array of coordinates that represents the line geometry */
-    private Coordinate[] coords = null;
+    private CoordinateSequence coords = null;
 
     /** The previous coordinate (during iteration) */
     private Coordinate oldCoord = null;
@@ -92,7 +94,7 @@ class PolygonIterator extends AbstractLiteIterator {
         yScale = Math.sqrt((at.getScaleY() * at.getScaleY())
                 + (at.getShearY() * at.getShearY()));
 
-        coords = rings[0].getCoordinates();
+        coords = rings[0].getCoordinateSequence();
     }
 
     /**
@@ -164,16 +166,16 @@ class PolygonIterator extends AbstractLiteIterator {
      */
     public int currentSegment(double[] coords) {
         if (currentCoord == 0) {
-            coords[0] = this.coords[0].x;
-            coords[1] = this.coords[0].y;
+            coords[0] = this.coords.getX(0);
+            coords[1] = this.coords.getY(0);
             transform(coords, 0, coords, 0, 1);
 
             return SEG_MOVETO;
-        } else if (currentCoord == this.coords.length) {
+        } else if (currentCoord == this.coords.size()) {
             return SEG_CLOSE;
         } else {
-            coords[0] = this.coords[currentCoord].x;
-            coords[1] = this.coords[currentCoord].y;
+            coords[0] = this.coords.getX(currentCoord);
+            coords[1] = this.coords.getY(currentCoord);
             transform(coords, 0, coords, 0, 1);
 
             return SEG_LINETO;
@@ -209,11 +211,11 @@ class PolygonIterator extends AbstractLiteIterator {
      * direction.
      */
     public void next() {
-        if (currentCoord == coords.length) {
+        if (currentCoord == coords.size()) {
             if (currentRing < (rings.length - 1)) {
                 currentCoord = 0;
                 currentRing++;
-                coords = rings[currentRing].getCoordinates();
+                coords = rings[currentRing].getCoordinateSequence();
             } else {
                 done = true;
             }
@@ -221,7 +223,7 @@ class PolygonIterator extends AbstractLiteIterator {
             if (generalize) {
                 if (oldCoord == null) {
                     currentCoord++;
-                    oldCoord = coords[currentCoord];
+                    oldCoord = coords.getCoordinate(currentCoord);
                 } else {
                     double distx = 0;
                     double disty = 0;
@@ -229,18 +231,18 @@ class PolygonIterator extends AbstractLiteIterator {
                     do {
                         currentCoord++;
 
-                        if (currentCoord < coords.length) {
-                            distx = Math.abs(coords[currentCoord].x
+                        if (currentCoord < coords.size()) {
+                            distx = Math.abs(coords.getX(currentCoord)
                                     - oldCoord.x);
-                            disty = Math.abs(coords[currentCoord].y
+                            disty = Math.abs(coords.getY(currentCoord)
                                     - oldCoord.y);
                         }
                     } while (((distx * xScale) < maxDistance)
                             && ((disty * yScale) < maxDistance)
-                            && (currentCoord < coords.length));
+                            && (currentCoord < coords.size()));
 
-                    if (currentCoord < coords.length) {
-                        oldCoord = coords[currentCoord];
+                    if (currentCoord < coords.size()) {
+                        oldCoord = coords.getCoordinate(currentCoord);
                     } else {
                         oldCoord = null;
                     }
@@ -250,4 +252,13 @@ class PolygonIterator extends AbstractLiteIterator {
             }
         }
     }
+    
+
+    /**
+     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
+     */
+    public void setMathTransform( MathTransform transform ) {
+        transform(coords, transform);
+    }
+
 }

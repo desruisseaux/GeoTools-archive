@@ -95,7 +95,7 @@ public class GeometryCoordinateSequenceTransformer {
      * @return
      * @throws TransformException
      */
-    protected LineString transformLineString(LineString ls, GeometryFactory gf) throws TransformException {
+    public LineString transformLineString(LineString ls, GeometryFactory gf) throws TransformException {
         CoordinateSequence cs = projectCoordinateSequence(ls.getCoordinateSequence());
         if(ls instanceof LinearRing)
             return gf.createLinearRing(cs);
@@ -109,7 +109,7 @@ public class GeometryCoordinateSequenceTransformer {
      * @return
      * @throws TransformException
      */
-    protected Point transformPoint(Point point, GeometryFactory gf) throws TransformException {
+    public Point transformPoint(Point point, GeometryFactory gf) throws TransformException {
         CoordinateSequence cs = projectCoordinateSequence(point.getCoordinateSequence());
         return gf.createPoint(cs);
     }
@@ -120,7 +120,7 @@ public class GeometryCoordinateSequenceTransformer {
      * @return
      * @throws TransformException
      */
-    protected CoordinateSequence projectCoordinateSequence(CoordinateSequence cs) throws TransformException {
+    public CoordinateSequence projectCoordinateSequence(CoordinateSequence cs) throws TransformException {
         return csTransformer.transform(cs, transform);
     }
 
@@ -130,7 +130,7 @@ public class GeometryCoordinateSequenceTransformer {
      * @return
      * @throws TransformException
      */
-    protected Polygon transformPolygon(Polygon polygon, GeometryFactory gf) throws TransformException {
+    public Polygon transformPolygon(Polygon polygon, GeometryFactory gf) throws TransformException {
         LinearRing exterior = (LinearRing) transformLineString(polygon.getExteriorRing(), gf);
         LinearRing[] interiors = new LinearRing[polygon.getNumInteriorRing()];
         for (int i = 0; i < interiors.length; i++) {

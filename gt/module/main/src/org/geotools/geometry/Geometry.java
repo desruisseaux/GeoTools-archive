@@ -44,7 +44,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     private static final long serialVersionUID = -601532429079649232L;
 
     /**
-     * The default {@link CoordinateOperationFactory} to uses for {@link #transform}.
+     * The default {@link CoordinateOperationFactory} to uses for {@link #mathTransform}.
      * Will be constructed only when first requested.
      */
     private static CoordinateOperationFactory coordinateOperationFactory;

@@ -17,6 +17,15 @@
 package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
+import java.util.NoSuchElementException;
+
+import org.geotools.geometry.jts.CoordinateSequenceTransformer;
+import org.geotools.geometry.jts.DefaultCoordinateSequenceTransformer;
+import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
@@ -347,6 +356,13 @@ class LineIterator extends AbstractLiteIterator {
             return SEG_LINETO;
         }
 	}
+
+    /**
+     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
+     */
+    public void setMathTransform( MathTransform transform ) {
+        transform(coordinates, transform);
+    }
 
 	
 }

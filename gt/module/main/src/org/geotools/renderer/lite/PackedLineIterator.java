@@ -18,6 +18,8 @@ package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
 
+import org.opengis.referencing.operation.MathTransform;
+
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -291,4 +293,13 @@ class PackedLineIterator extends AbstractLiteIterator {
 		System.out.println("Double!");
 		return 0;
 	}
+
+
+    /**
+     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
+     */
+    public void setMathTransform( MathTransform transform ) {
+        transform(coordinates, transform);
+    }
+
 }

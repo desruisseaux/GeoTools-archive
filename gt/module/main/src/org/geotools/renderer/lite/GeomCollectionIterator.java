@@ -19,6 +19,8 @@ package org.geotools.renderer.lite;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
+import org.opengis.referencing.operation.MathTransform;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -35,7 +37,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Andrea Aime
  * @version $Id$
  */
-class GeomCollectionIterator implements PathIterator {
+class GeomCollectionIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 
@@ -129,7 +131,7 @@ class GeomCollectionIterator implements PathIterator {
      * @return the specific iterator for the geometry passed.
      */
     private PathIterator getIterator(Geometry g) {
-        PathIterator pi = null;
+        AbstractLiteIterator pi = null;
 
         if (g instanceof Polygon) {
             Polygon p = (Polygon) g;
@@ -149,7 +151,8 @@ class GeomCollectionIterator implements PathIterator {
             Point p = (Point) g;
             pi = new PointIterator(p, at);
         }
-
+        
+        pi.setMathTransform(getMathTransform());
         return pi;
     }
 
@@ -239,5 +242,12 @@ class GeomCollectionIterator implements PathIterator {
         } else {
             currentIterator.next();
         }
+    }
+
+    /**
+     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
+     */
+    public void setMathTransform( MathTransform transform ) {
+        mathTransform=transform;
     }
 }

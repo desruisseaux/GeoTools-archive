@@ -66,7 +66,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     /**
      * Maximal error tolerance in metres during assertions, in metres. If assertions
      * are enabled (JDK 1.4 only), then every coordinates transformed with
-     * {@link #inverseTransform} will be transformed again with {@link #transform}.
+     * {@link #inverseTransform} will be transformed again with {@link #mathTransform}.
      * If the distance between the resulting position and the original position
      * is greater than <code>MAX_ERROR</code>, then a {@link AssertionError} is thrown.
      */
