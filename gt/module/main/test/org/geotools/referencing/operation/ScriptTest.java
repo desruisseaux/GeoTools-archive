@@ -366,6 +366,7 @@ public class ScriptTest extends TestCase {
          */
         final String SET       = "set";
         final String PARAM_MT  = "PARAM_MT";
+        final String INVERSE_MT = "INVERSE_MT";
         final String COMPD_CRS  = "COMPD_CS";
         final String FITTED_CRS = "FITTED_CS";
         /*
@@ -403,7 +404,8 @@ public class ScriptTest extends TestCase {
             System.out.println("FITTED_CS not yet implemented.");
             return true;
         }
-        else if (value.regionMatches(true, 0, PARAM_MT, 0, PARAM_MT.length())) {
+        else if (value.regionMatches(true, 0, PARAM_MT, 0, PARAM_MT.length()) ||
+                 value.regionMatches(true, 0, INVERSE_MT, 0, INVERSE_MT.length())) {
             crs = mtFactory.createFromWKT(value);
             if (true) {
                 assertEquals("MathTransform.equals(...) failed", crs, crs);
