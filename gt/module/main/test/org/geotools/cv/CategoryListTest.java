@@ -232,7 +232,7 @@ public class CategoryListTest extends TestCase {
                     throw exception;
                 }
             }
-        } while (searchNearest = !searchNearest);
+        } while ((searchNearest = !searchNearest) == true);
         /*
          * Test transformation using methods working on arrays.
          * We assume that the 'transform(double)' version can
