@@ -15,16 +15,20 @@
 package org.geotools.demos.gui;
 
 // J2SE dependencies
+import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+
+// User interface
+import javax.swing.JFrame;
+import javax.swing.JApplet;
+import javax.swing.JLabel;
+import java.awt.Container;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
 
-import javax.swing.JFrame;
-
+// Geotools dependencies
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
@@ -38,13 +42,14 @@ import org.geotools.map.MapLayer;
 import org.geotools.renderer.j2d.RenderedMapScale;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.SLDParser;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.styling.SLDParser;
-import org.geotools.styling.StyleFactory;
 
 
 /**
@@ -72,13 +77,16 @@ import org.geotools.styling.StyleFactory;
  * <br><br>
  * NOTE: While not essential, it is recommanded to run this demos in server mode, with:
  * <blockquote><pre>
- * java -server org.geotools.demos.MapViewer2 <I>thefile.shp</I>
+ * java -server org.geotools.demos.MapViewer <I>thefile.shp</I>
  * </pre></blockquote>
+ *
+ * Note that this class extends <code>JApplet</code> so it can <strong>also</strong> be tested
+ * as an applet. If you don't want it to be an applet, remove the {@link #init()} method.
  *
  * @author Martin Desruisseaux
  * @version $Id: MapViewer.java,v 1.5 2004/04/10 16:03:18 aaime Exp $
  */
-public class MapViewer {
+public class MapViewer extends JApplet {
     /**
      * Run the test from the command line. If arguments are provided, then the first
      * argument is understood as the filename of the shapefile to load.
@@ -87,15 +95,14 @@ public class MapViewer {
      * @throws DataSource if an error occured while reading the data source.
      */
     public static void main(final String[] args) throws Exception {
-        final MapViewer viewer = new MapViewer();
         final MapContext context;
         switch (args.length) {
             default: // Fall through
-            case  2: context=viewer.loadContext(new File(args[0]).toURL(),new File(args[1]).toURL()); break;
-            case  1: context=viewer.loadContext(new File(args[0]).toURL(), null); break;
-            case  0: context=viewer.loadContext();                          break;
+            case  2: context=MapViewer.loadContext(new File(args[0]).toURL(), new File(args[1]).toURL()); break;
+            case  1: context=MapViewer.loadContext(new File(args[0]).toURL(), null); break;
+            case  0: context=MapViewer.loadContext(); break;
         }
-        viewer.showMapPane(context);
+        MapViewer.showMapPane(context);
     }
     
     /**
@@ -107,8 +114,8 @@ public class MapViewer {
      * @throws IOException is some other kind of I/O error occured.
      * @throws DataSource if an error occured while reading the data source.
      */
-    protected MapContext loadContext() throws IOException, DataSourceException {
-        return loadContext(getClass().getClassLoader().getResource("org/geotools/sampleData/statepop.shp"), null);
+    protected static MapContext loadContext() throws IOException, DataSourceException {
+        return loadContext(MapViewer.class.getClassLoader().getResource("org/geotools/sampleData/statepop.shp"), null);
     }
     
     /**
@@ -120,7 +127,7 @@ public class MapViewer {
      * @throws IOException is a I/O error occured.
      * @throws DataSource if an error occured while reading the data source.
      */
-    protected MapContext loadContext(final URL url, final URL sld) throws IOException, DataSourceException {
+    protected static MapContext loadContext(final URL url, final URL sld) throws IOException, DataSourceException {
         
         // Load the file
         if (url == null) {
@@ -161,11 +168,12 @@ public class MapViewer {
     }
     
     /**
-     * Create and show the map pane.
+     * Create and show the map pane. This method is used for running the map viewer
+     * as a standalone application only.
      *
      * @param context The context to show.
      */
-    protected void showMapPane(final MapContext context) throws Exception {
+    protected static void showMapPane(final MapContext context) throws Exception {
         // Create the map pane and add a map scale layer to it.
         final StyledMapPane mapPane = new StyledMapPane();
         mapPane.setMapContext(context);
@@ -181,5 +189,23 @@ public class MapViewer {
         container.add(new StatusBar(mapPane),     BorderLayout.SOUTH);
         frame.pack();
         frame.show();
+    }
+
+    /**
+     * Initialize the applet. This method is used for running the map viewer as an applet only.
+     */
+    public void init() {
+        final Container container = getContentPane();
+        container.setLayout(new BorderLayout());
+        try {
+            final StyledMapPane mapPane = new StyledMapPane();
+            mapPane.setMapContext(MapViewer.loadContext());
+            mapPane.setPaintingWhileAdjusting(false);
+            mapPane.getRenderer().addLayer(new RenderedMapScale());
+            container.add(mapPane.createScrollPane(), BorderLayout.CENTER);
+            container.add(new StatusBar(mapPane),     BorderLayout.SOUTH);
+        } catch (Exception exception) {
+            container.add(new JLabel(exception.getLocalizedMessage()), BorderLayout.CENTER);
+        }
     }
 }
