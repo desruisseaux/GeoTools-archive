@@ -28,9 +28,9 @@
   <!-- <distributionDirectory>/seis/raid1/Apache/htdocs/software/mavenRepository</distributionDirectory> -->
   <!-- <distributionSite>www.seis.sc.edu</distributionSite> -->
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.geotools.org:/cvsroot/geotools:geotools2/geotools-src/${pom.artifactId}</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.geotools.org:/cvsroot/geotools:geotools2/geotools-src/${pom.artifactId}</developerConnection>
-    <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/geotools/geotools2/geotools-src/${pom.artifactId}/</url>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/${pom.artifactId}</connection>
+    <developerConnection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/${pom.artifactId}</developerConnection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/</url>
   </repository>
   <mailingLists/>
   <developers>
