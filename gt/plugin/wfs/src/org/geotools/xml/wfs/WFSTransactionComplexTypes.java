@@ -21,8 +21,10 @@ import org.geotools.data.wfs.LockRequest;
 import org.geotools.data.wfs.LockResult;
 import org.geotools.data.wfs.TransactionRequest;
 import org.geotools.data.wfs.Action;
+import org.geotools.data.wfs.TransactionResult;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FidFilter;
+import org.geotools.filter.FilterFactory;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema;
@@ -53,8 +55,12 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+
 import javax.naming.OperationNotSupportedException;
 
 
@@ -1486,8 +1492,20 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1)
+        		throw new SAXException("Invalid children: too few");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	Set fidSet = new HashSet();
+        	for(int i=0;i<value.length;i++)
+        		fidSet.addAll(Arrays.asList(((FidFilter)value[i].getValue()).getFids()));
+        	FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+        	r.addAllFids(fidSet);
+        	return r;
         }
 
         /**
@@ -1501,8 +1519,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return FidFilter.class;
         }
 
         /**
@@ -1574,8 +1591,20 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1)
+        		throw new SAXException("Invalid children: too few");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	Set fidSet = new HashSet();
+        	for(int i=0;i<value.length;i++)
+        		fidSet.addAll(Arrays.asList(((FidFilter)value[i].getValue()).getFids()));
+        	FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+        	r.addAllFids(fidSet);
+        	return r;
         }
 
         /**
@@ -1589,8 +1618,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return FidFilter.class;
         }
 
         /**
@@ -1701,8 +1729,25 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1)
+        		throw new SAXException("Invalid children: too few");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	Set fidSet = new HashSet();
+        	for(int i=0;i<value.length-1;i++)
+        		fidSet.addAll(Arrays.asList(((FidFilter)value[i].getValue()).getFids()));
+        	FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+        	r.addAllFids(fidSet);
+        	
+        	Object[] t = (Object[])value[value.length-1].getValue();
+        	int status = ((Integer)t[0]).intValue();
+        	SAXException error = (SAXException)(t.length<2?null:t[1]);
+        	
+        	return new TransactionResult(status,r,error);
         }
 
         /**
@@ -1716,8 +1761,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return TransactionResult.class;
         }
 
         /**
@@ -1827,8 +1871,35 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1)
+        		throw new SAXException("Invalid children: too few");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	Object[] t = new Object[2];
+        	
+        	t[0] = value[0].getValue();
+        	String locator = null;
+        	String message = null;
+        	if(value.length>1){
+        		if(value[1].getElement()!=null && elems[1].getName().equals(value[1].getElement().getName())){
+        			locator = (String)value[1].getValue();
+        			if(value[2].getElement()!=null && elems[2].getName().equals(value[2].getElement().getName())){
+        				message = (String)value[2].getValue();
+            		}
+        		}else{
+        			if(value[1].getElement()!=null && elems[2].getName().equals(value[1].getElement().getName())){
+        				message = (String)value[1].getValue();
+            		}
+        		}
+        	}
+        	
+        	t[1] = message == null?(locator==null?null:new SAXException(locator)):(locator==null?new SAXException(message):new SAXException(message+":"+locator));
+        	
+        	return t;
         }
 
         /**
@@ -1842,8 +1913,8 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+        	// [int][SAXException]
+            return Object[].class;
         }
 
         /**
@@ -1919,8 +1990,20 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1)
+        		throw new SAXException("Invalid children: too few");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	Set fidSet = new HashSet();
+        	for(int i=0;i<value.length;i++)
+        		fidSet.addAll(Arrays.asList(((FidFilter)value[i].getValue()).getFids()));
+        	FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+        	r.addAllFids(fidSet);
+        	return r;
         }
 
         /**
@@ -1934,8 +2017,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return FidFilter.class;
         }
 
         /**
@@ -2011,8 +2093,17 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1 || value.length>1)
+        		throw new SAXException("Invalid children: too few or too many");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	if(value[0].getElement() == null || value[0].getElement().getName() == null)
+        		throw new SAXException("Invalid child element: no name was provided");
+        	
+        	return new Integer(TransactionResult.parseStatus(value[0].getElement().getName()));
         }
 
         /**
@@ -2026,8 +2117,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Integer.class;
         }
 
         /**

@@ -13,6 +13,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -462,8 +463,20 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length!=0)
+        		throw new SAXException("Invalid children: more than one");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	String fid = null;
+        	fid = attrs.getValue("",FeatureIdType.attrs[0].getName());
+        	if(fid == null || "".equals(fid))
+            	fid = attrs.getValue(FeatureIdType.attrs[0].getNamespace().toString(),FeatureIdType.attrs[0].getName());
+        	FidFilter r = FilterFactory.createFilterFactory().createFidFilter(fid);
+        	return r;
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -532,6 +545,8 @@ public class FilterOpsComplexTypes {
         		},
         };
         
+        private static Sequence seq = new DefaultSequence(elems);
+        
         public Type getParent(){
         	return ComparisonOpsType.getInstance();
         }
@@ -540,13 +555,13 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
