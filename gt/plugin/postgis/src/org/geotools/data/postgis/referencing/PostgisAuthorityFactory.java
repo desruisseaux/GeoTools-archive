@@ -16,13 +16,14 @@
  */
 package org.geotools.data.postgis.referencing;
 
-import java.util.Locale;
 import java.util.Set;
 
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.DerivedCRS;
@@ -33,135 +34,135 @@ import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.util.InternationalString;
 
 /**
  * @author jeichar
  */
 public class PostgisAuthorityFactory implements CRSAuthorityFactory {
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCoordinateReferenceSystem(java.lang.String)
-	 */
-	public CoordinateReferenceSystem createCoordinateReferenceSystem(String arg0)
-			throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    CRSFactory factory;
+    
+    /**
+     * Construct <code>PostgisAuthorityFactory</code>.
+     *
+     */
+    public PostgisAuthorityFactory() {
+        factory=FactoryFinder.getCRSFactory();
+    }
+    
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCoordinateReferenceSystem(java.lang.String)
+     */
+    public CoordinateReferenceSystem createCoordinateReferenceSystem( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCompoundCRS(java.lang.String)
-	 */
-	public CompoundCRS createCompoundCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCompoundCRS(java.lang.String)
+     */
+    public CompoundCRS createCompoundCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createDerivedCRS(java.lang.String)
-	 */
-	public DerivedCRS createDerivedCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createDerivedCRS(java.lang.String)
+     */
+    public DerivedCRS createDerivedCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createEngineeringCRS(java.lang.String)
-	 */
-	public EngineeringCRS createEngineeringCRS(String arg0)
-			throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createEngineeringCRS(java.lang.String)
+     */
+    public EngineeringCRS createEngineeringCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeographicCRS(java.lang.String)
-	 */
-	public GeographicCRS createGeographicCRS(String arg0)
-			throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeographicCRS(java.lang.String)
+     */
+    public GeographicCRS createGeographicCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeocentricCRS(java.lang.String)
-	 */
-	public GeocentricCRS createGeocentricCRS(String arg0)
-			throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeocentricCRS(java.lang.String)
+     */
+    public GeocentricCRS createGeocentricCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createImageCRS(java.lang.String)
-	 */
-	public ImageCRS createImageCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createImageCRS(java.lang.String)
+     */
+    public ImageCRS createImageCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createProjectedCRS(java.lang.String)
-	 */
-	public ProjectedCRS createProjectedCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createProjectedCRS(java.lang.String)
+     */
+    public ProjectedCRS createProjectedCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createTemporalCRS(java.lang.String)
-	 */
-	public TemporalCRS createTemporalCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createTemporalCRS(java.lang.String)
+     */
+    public TemporalCRS createTemporalCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.crs.CRSAuthorityFactory#createVerticalCRS(java.lang.String)
-	 */
-	public VerticalCRS createVerticalCRS(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createVerticalCRS(java.lang.String)
+     */
+    public VerticalCRS createVerticalCRS( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.AuthorityFactory#getFactory()
-	 */
-	public Factory getFactory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.AuthorityFactory#getObjectFactory()
+     */
+    public ObjectFactory getObjectFactory() {
+        return factory;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.AuthorityFactory#getAuthority()
-	 */
-	public Citation getAuthority() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.AuthorityFactory#getAuthority()
+     */
+    public Citation getAuthority() {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.AuthorityFactory#getAuthorityCodes(java.lang.Class)
-	 */
-	public Set getAuthorityCodes(Class arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.AuthorityFactory#getAuthorityCodes(java.lang.Class)
+     */
+    public Set getAuthorityCodes( Class arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.AuthorityFactory#getDescriptionText(java.lang.String, java.util.Locale)
-	 */
-	public String getDescriptionText(String arg0, Locale arg1)
-			throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.AuthorityFactory#getDescriptionText(java.lang.String)
+     */
+    public InternationalString getDescriptionText( String arg0 ) throws FactoryException {
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.opengis.referencing.AuthorityFactory#createObject(java.lang.String)
-	 */
-	public Object createObject(String arg0) throws FactoryException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.opengis.referencing.AuthorityFactory#createObject(java.lang.String)
+     */
+    public Object createObject( String arg0 ) throws FactoryException {
+        return null;
+    }
+
+    /**
+     * @see org.opengis.referencing.Factory#getVendor()
+     */
+    public Citation getVendor() {
+        return null;
+    }
+
+	
 
 }
