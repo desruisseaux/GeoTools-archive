@@ -10,7 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
 // Geotools dependencies
-import org.geotools.resources.XAffineTransform;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

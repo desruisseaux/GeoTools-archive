@@ -53,7 +53,7 @@ import org.geotools.util.NumberRange;
 // Resources
 import org.geotools.units.Unit;
 import org.geotools.units.UnitException;
-import org.geotools.resources.XAffineTransform;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 // Geotools dependencies
-import org.geotools.resources.XAffineTransform;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

@@ -32,7 +32,7 @@ import org.geotools.renderer.style.MarkStyle2D;
 import org.geotools.renderer.style.PolygonStyle2D;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.renderer.style.TextStyle2D;
-import org.geotools.resources.XDimension2D;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.XMath;
 import java.awt.Graphics2D;
 import java.awt.Image;

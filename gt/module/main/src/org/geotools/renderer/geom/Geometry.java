@@ -68,8 +68,8 @@ import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.TransformException;
 import org.geotools.feature.Feature; // For Javadoc
 import org.geotools.renderer.style.Style;
-import org.geotools.resources.XRectangle2D;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.math.Statistics;
 import org.geotools.util.Cloneable;
 

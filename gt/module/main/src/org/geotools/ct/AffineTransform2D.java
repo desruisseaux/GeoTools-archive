@@ -42,7 +42,7 @@ import org.geotools.pt.CoordinatePoint;
 // Resources
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.XAffineTransform;
+import org.geotools.resources.geometry.XAffineTransform;
 
 // J2SE dependencies
 import java.awt.geom.Point2D;

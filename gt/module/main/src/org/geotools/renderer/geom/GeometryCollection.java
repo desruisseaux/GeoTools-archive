@@ -74,9 +74,9 @@ import org.geotools.util.ProgressListener;
 import org.geotools.math.Statistics;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XRectangle2D;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**

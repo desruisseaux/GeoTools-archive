@@ -46,8 +46,8 @@ import java.util.Arrays;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.resources.XRectangle2D;
 import org.geotools.renderer.geom.CompressionLevel;
+import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**

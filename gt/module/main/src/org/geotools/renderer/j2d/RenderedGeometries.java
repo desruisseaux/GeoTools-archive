@@ -72,13 +72,13 @@ import org.geotools.renderer.geom.GeometryCollection;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.renderer.style.Style;
 import org.geotools.resources.XMath;
-import org.geotools.resources.XDimension2D;
-import org.geotools.resources.XRectangle2D;
-import org.geotools.resources.XAffineTransform;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

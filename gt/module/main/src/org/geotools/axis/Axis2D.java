@@ -64,8 +64,8 @@ import org.geotools.cs.AxisOrientation;
 import org.geotools.util.Cloneable;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XDimension2D;
-import org.geotools.resources.XAffineTransform;
+import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

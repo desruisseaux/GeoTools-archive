@@ -25,9 +25,9 @@ import java.io.Serializable;
 import java.awt.geom.Rectangle2D;
 
 // Geotools dependencies
-import org.geotools.resources.XRectangle2D;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.geometry.XRectangle2D;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

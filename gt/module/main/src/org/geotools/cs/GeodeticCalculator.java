@@ -44,6 +44,7 @@ import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.CoordinateFormat;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.geometry.Shape2D_Utilities;
 
 
 /**
@@ -997,7 +998,7 @@ public class GeodeticCalculator {
      */
     public static Geometry shapeToGeometry(final Shape shape, final GeometryFactory factory) {
         final PathIterator iterator = shape.getPathIterator(null,
-                org.geotools.resources.Geometry.getFlatness(shape));
+                                                            Shape2D_Utilities.getFlatness(shape));
         final double[] buffer = new double[6];
         final List     coords = new ArrayList();
         final List     lines  = new ArrayList();

@@ -12,18 +12,20 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.renderer.lite;
 
-import org.geotools.ct.MathTransform2D;
-import org.geotools.gc.GridCoverage;
-import org.geotools.resources.XAffineTransform;
+// J2SE dependencies
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import javax.media.jai.ImageMIPMap;
+
+// Geotools dependencies
+import org.geotools.ct.MathTransform2D;
+import org.geotools.gc.GridCoverage;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

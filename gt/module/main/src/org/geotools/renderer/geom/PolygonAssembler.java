@@ -61,9 +61,10 @@ import org.geotools.ct.TransformException;
 import org.geotools.math.Line;
 import org.geotools.units.Unit;
 import org.geotools.util.ProgressListener;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.Geometry;
+import org.geotools.renderer.geom.Geometry;
 import org.geotools.resources.XArray;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.geometry.Shape2D_Utilities;
 
 
 /**
@@ -207,7 +208,7 @@ final class PolygonAssembler implements Comparator {
      */
     public PolygonAssembler(final Shape clip, final ProgressListener progress) {
         this.progress  = progress;
-        this.flatness  = Geometry.getFlatness(clip);
+        this.flatness  = Shape2D_Utilities.getFlatness(clip);
         this.clip      = clip;
     }
 
@@ -223,7 +224,7 @@ final class PolygonAssembler implements Comparator {
     /**
      * Returns all {@link Polylines} objects in the given geometry.
      */
-    private static Collection getPolylines(final org.geotools.renderer.geom.Geometry geometry) {
+    private static Collection getPolylines(final Geometry geometry) {
         final Set set = new LinkedHashSet();
         geometry.getPolylines(set);
         return set;
@@ -965,7 +966,7 @@ final class PolygonAssembler implements Comparator {
         for (int border=0; !pit.isDone(); border++) {
             final boolean closed = nextSegment(pit); // Update 'pathLine'
             if (!isSingularity(pathLine)) {
-                final Point2D projected = Geometry.nearestColinearPoint(pathLine, ptRef);
+                final Point2D projected = Shape2D_Utilities.nearestColinearPoint(pathLine, ptRef);
                 final double distanceSq = ptRef.distanceSq(projected);
                 if (distanceSq < startingPoint.minDistanceSq) {
                     startingPoint.setLocation(projected, pathLine, border);
@@ -1347,7 +1348,7 @@ final class PolygonAssembler implements Comparator {
                          * Calcule la distance entre l'extrémité
                          * du polygone et la bordure de la carte.
                          */
-                        final Point2D projected = Geometry.nearestColinearPoint(pathLine, tmpPoint);
+                        final Point2D projected = Shape2D_Utilities.nearestColinearPoint(pathLine, tmpPoint);
                         distanceSq = distanceSq(tmpPoint, projected);
                         if (distanceSq < minDistanceSq) {
                             minDistanceSq = distanceSq;

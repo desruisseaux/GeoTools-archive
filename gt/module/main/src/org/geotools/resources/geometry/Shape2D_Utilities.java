@@ -16,23 +16,10 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.resources;
+package org.geotools.resources.geometry;
 
-// Géometry shapes
+// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -44,6 +31,9 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform; // For javadoc
 
+// Geotools dependencies
+import org.geotools.resources.XMath;
+
 
 /**
  * Static utilities methods. Those methods operate on geometric
@@ -52,7 +42,7 @@ import java.awt.geom.AffineTransform; // For javadoc
  * @version 1.0
  * @author Martin Desruisseaux
  */
-public final class Geometry {
+public final class Shape2D_Utilities {
     /**
      * Valeur limite pour détecter si des points sont
      * colinéaires ou si des coordonnées sont identiques.
@@ -74,10 +64,9 @@ public final class Geometry {
     public static final int HORIZONTAL = 1;
 
     /**
-     * Interdit la création
-     * d'objets de cette classe.
+     * Interdit la création d'objets de cette classe.
      */
-    private Geometry() {
+    private Shape2D_Utilities() {
     }
 
     /**

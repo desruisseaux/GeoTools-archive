@@ -46,7 +46,7 @@ import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.TransformException;
 import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.resources.XRectangle2D;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;

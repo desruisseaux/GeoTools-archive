@@ -70,9 +70,9 @@ import org.geotools.renderer.geom.Arrow2D;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.XAffineTransform;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

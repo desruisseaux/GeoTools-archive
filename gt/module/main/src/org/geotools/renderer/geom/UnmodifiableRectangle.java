@@ -35,7 +35,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 // Geotools dependencies
-import org.geotools.resources.XRectangle2D;
+import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**

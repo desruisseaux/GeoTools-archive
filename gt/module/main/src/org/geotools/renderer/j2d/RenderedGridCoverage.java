@@ -82,10 +82,10 @@ import org.geotools.gp.CannotReprojectException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.XDimension2D;
-import org.geotools.resources.XAffineTransform;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.image.DeferredPlanarImage;
 

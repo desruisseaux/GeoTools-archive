@@ -92,10 +92,10 @@ import org.geotools.pt.Longitude;
 import org.geotools.pt.AngleFormat;
 
 // Resources
-import org.geotools.resources.XDimension2D;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.geometry.XDimension2D;
 
 
 /**

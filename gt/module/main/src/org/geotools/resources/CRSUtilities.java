@@ -38,9 +38,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.geometry.Envelope;
 import org.geotools.geometry.DirectPosition;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XRectangle2D;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.util.UnsupportedImplementationException;
 
 

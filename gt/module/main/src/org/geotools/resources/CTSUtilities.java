@@ -38,6 +38,7 @@ import org.geotools.ct.*;
 import org.geotools.pt.*;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.geometry.XRectangle2D;
 
 // Miscellaneous
 import java.awt.geom.Point2D;

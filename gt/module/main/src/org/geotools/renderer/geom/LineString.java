@@ -70,11 +70,11 @@ import org.geotools.ct.CoordinateTransformation;
 import java.io.Serializable;
 import org.geotools.math.Statistics;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Geometry;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.geometry.Shape2D_Utilities;
 
 
 /**
@@ -1139,7 +1139,7 @@ final class LineString implements Serializable {
                     line.x2 = array[sourceIndex++];
                     line.y2 = array[sourceIndex++];
                     Point2D next;
-                    while ((next=Geometry.colinearPoint(line, point, resolution)) != null) {
+                    while ((next=Shape2D_Utilities.colinearPoint(line, point, resolution)) != null) {
                         if (destIndex == sourceIndex) {
                             final int extra = 256;
                             final float[] oldArray=array;
