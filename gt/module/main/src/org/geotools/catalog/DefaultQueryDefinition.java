@@ -47,18 +47,9 @@ public class DefaultQueryDefinition implements QueryDefinition {
     public boolean accept(CatalogEntry entry) {
         for (Iterator iter = entry.iterator(); iter.hasNext();) {
             MetadataEntity element = (MetadataEntity) iter.next();
-            try {
-                if (query.match(element)) {
-                    return true;
-                }
-            } catch (IOException ie) {
-                /* future versions may actually throw exceptions but the current version doesn't so
-                 * so check the method call: query.filter(fakeFeature) in the method Query.accepts()
-                 * (if it still exists)
-                 */
-                throw new RuntimeException(
-                    "See the Query.accepts()::filter.filter(fakeFeature).  It is not expected to throw an exception...but maybe will one day.");
-            }
+            if (query.match(element)) {
+                return true;
+            }            
         }
         return false;
     }

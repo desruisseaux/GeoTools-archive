@@ -53,7 +53,7 @@ public class QueryRequest {
     public QueryRequest( Expr expr ){
 		this.expr = expr;
 	}	
-    public boolean match( Object bean ) throws IOException{
+    public boolean match( Object bean ) {
         if( bean instanceof MetadataEntity ) {
             return matchMetadata( (MetadataEntity) bean );
         }        
@@ -61,13 +61,18 @@ public class QueryRequest {
             return matchBean( bean );
         }        
     }
-    protected boolean matchBean( Object bean ) throws IOException{
+    protected boolean matchBean( Object bean ) {
         return false; // need Jese to implement XPATH bean lookup
     }
-    protected boolean matchMetadata( MetadataEntity meta ) throws IOException{
+    protected boolean matchMetadata( MetadataEntity meta ) {
         Expr query = expr.resolve( meta );
-        Filter filter = query.filter( fakeFeatureType );
-		return filter.contains( fakeFeature );
+        Filter filter;
+        try {
+            filter = query.filter( fakeFeatureType );
+            return filter.contains( fakeFeature );            
+        } catch (IOException e) {
+            return false;
+        }        
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
 		public URI getNamespace() {

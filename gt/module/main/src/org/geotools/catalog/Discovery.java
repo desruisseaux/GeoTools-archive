@@ -56,7 +56,7 @@ public interface Discovery {
     List search(QueryRequest query); // really a List<CatalogEntry> 
 
     /**
-     * Entire contens of catalog.
+     * Entire contents.
      * <p>
      * Shortcut for query( QueryDefinition.ALL )
      * <M/p>
