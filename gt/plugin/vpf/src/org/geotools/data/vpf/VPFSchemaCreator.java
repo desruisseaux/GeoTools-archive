@@ -42,50 +42,12 @@ import org.geotools.feature.SchemaException;
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
 public class VPFSchemaCreator {
-    private static HashMap featureTypes = startSchema();
+    private static HashMap featureTypes = new HashMap();
 
     public static FeatureType getSchema(String featuretype)
                                  throws DataSourceException {
         try {
-            /* Should build a hashmap of the attributes which has been read from
-             * the featuretypeconfiguration
-             *
-             * Or should it be  built upon the header files of the featuretypes?
-             * This is probably the best solution
-             */
-            /*
-            AttributeType attributes[] = null;
-            if ( featuretype.equals( "roadl") ) {
-                attributes = new AttributeType[12];
-                attributes[0] = AttributeTypeFactory.newAttributeType( "START_NODE", Integer.class );
-                attributes[1] = AttributeTypeFactory.newAttributeType( "END_NODE", Integer.class );
-                attributes[2] = AttributeTypeFactory.newAttributeType( "RIGHT_EDGE", String.class );
-                attributes[3] = AttributeTypeFactory.newAttributeType( "LEFT_EDGE", String.class );
-                attributes[4] = AttributeTypeFactory.newAttributeType( "COORDINATES", LineString.class  );
-                attributes[5] = AttributeTypeFactory.newAttributeType( "FACC_FEATURE_CODE", String.class );
-                attributes[6] = AttributeTypeFactory.newAttributeType( "ACCURACY_CATEGORY", Integer.class );            
-                attributes[7] = AttributeTypeFactory.newAttributeType( "EXISTENCE_CATEGORY", Integer.class );
-                attributes[8] = AttributeTypeFactory.newAttributeType( "MEDIAN_CATEGORY", Integer.class );
-                attributes[9] = AttributeTypeFactory.newAttributeType( "TILE_REFERENCE_ID", Integer.class );
-                attributes[10] = AttributeTypeFactory.newAttributeType( "EDGE_PRIMITIVE_ID", Integer.class );
-                attributes[11] = AttributeTypeFactory.newAttributeType( "ROUTE_INTENDED_USE", Integer.class );                                        
-            } else if ( featuretype.equals( "landicea")) {
-                attributes = new AttributeType[2];
-                attributes[0] = AttributeTypeFactory.newAttributeType( "FEATURE_NUMBER", Integer.class );
-                attributes[1] = AttributeTypeFactory.newAttributeType( "COORDINATES", Polygon.class  );
-            } else if ( featuretype.equals( "builtupa")) {
-                attributes = new AttributeType[2];
-                attributes[0] = AttributeTypeFactory.newAttributeType( "FEATURE_NUMBER", Integer.class );
-                attributes[1] = AttributeTypeFactory.newAttributeType( "COORDINATES", Polygon.class  );
-            } else if ( featuretype.equals( "grassa")) {
-                attributes = new AttributeType[2];
-                attributes[0] = AttributeTypeFactory.newAttributeType( "FEATURE_NUMBER", Integer.class );
-                attributes[1] = AttributeTypeFactory.newAttributeType( "COORDINATES", Polygon.class  );
-            } else if ( featuretype.equals( "edgetype") )  {
-                attributes = new AttributeType[1];
-                attributes[0] = AttributeTypeFactory.newAttributeType( "COORDINATES", LineString.class  );
-            } 
-             */
+            
             Object type = featureTypes.get(featuretype);
 
             if (type == null) {
@@ -106,22 +68,6 @@ public class VPFSchemaCreator {
 
         for (int i = 0; i < tmp.length; i++) {
             tmp[i] = (String) v.elementAt(i);
-        }
-
-        return tmp;
-    }
-
-    private static HashMap startSchema() {
-        HashMap tmp = new HashMap();
-
-        try {
-            AttributeType[] attributes = new AttributeType[1];
-            attributes[0] = AttributeTypeFactory.newAttributeType("COORDINATES", 
-                                                                  LineString.class);
-            tmp.put("edgetype", 
-                    FeatureTypeFactory.newFeatureType(attributes, "edgetype"));
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return tmp;

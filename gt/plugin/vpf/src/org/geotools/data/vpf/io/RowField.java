@@ -58,7 +58,7 @@ public class RowField extends Number implements DataTypesDefinition {
         if (value != null) {
             return value.toString().trim();
         } else {
-            return "null";
+            return null;
         }
     }
 

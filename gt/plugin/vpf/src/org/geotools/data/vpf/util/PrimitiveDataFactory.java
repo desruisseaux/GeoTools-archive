@@ -46,7 +46,7 @@ public class PrimitiveDataFactory {
             ed.put("left_face", edge.get("left_face"));
             ed.put("right_edge", edge.get("right_edge"));
             ed.put("left_edge", edge.get("left_edge"));
-            ed.put("coordinates", edge.get("coordinates").toString());
+            ed.put("coordinates", edge.get("coordinates"));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -27,6 +27,7 @@ import org.geotools.data.vpf.io.TripletId;
 
 import org.geotools.feature.FeatureType;
 
+import org.opengis.spatialschema.geometry.DirectPosition;
 /*
  * EdgeData.java
  *
@@ -41,19 +42,24 @@ public class EdgeData extends HashMap {
             String key_s = (String) key;
 
             if (key_s.equals("coordinates")) {
-                StringBuffer sb = new StringBuffer();
-                StringTokenizer st = new StringTokenizer((String) value, "()");
-                Coordinate[] c = new Coordinate[st.countTokens()];
-                int i = 0;
-
-                while (st.hasMoreTokens()) {
-                    StringTokenizer st2 = new StringTokenizer(st.nextToken(), ",");
-                    c[i] = new Coordinate(Double.parseDouble(st2.nextToken()), 
-                                          Double.parseDouble(st2.nextToken()));
-                    i++;
+                Coordinate[] c = null;
+                if ( value instanceof RowField ) {
+                    value = ((RowField)value).getValue();
+                    if ( value instanceof DirectPosition[] ) {
+                        DirectPosition[] coords = (DirectPosition[]) value;
+                        c = new Coordinate[ coords.length ];
+                        double[] c_pair = null;  
+                        for( int i = 0; i < coords.length; i++ ) {
+                            c_pair = coords[i].getCoordinates();
+                            if ( coords[i].getDimension() == 2 ) {
+                                c[i] = new Coordinate( c_pair[0], c_pair[1] );
+                            } else if (coords[i].getDimension() == 3 ) {
+                                c[i] = new Coordinate( c_pair[0], c_pair[1], c_pair[2] );
+                            }                            
+                        }
+                    }                        
                 }
-
-                //this.COORDINATES = (LineString) type.getAttributeType( 0 ).parse( geofactory.createLineString( c ) );
+                
                 return super.put(key_s, geofactory.createLineString(c));
             } else if (key_s.equals("right_face") || 
                            key_s.equals("left_face") || 
