@@ -177,9 +177,11 @@ public class WebMapServer implements Catalog {
     public WebMapServer(final URL serverURL, boolean wait) {
         this.serverURL = serverURL;
 
-        specs = new Specification[2];
+        specs = new Specification[4];
         specs[0] = new WMS1_0_0();
-        specs[1] = new WMS1_1_1();
+        specs[1] = new WMS1_1_0();
+        specs[2] = new WMS1_1_1();
+        specs[3] = new WMS1_3_0();
 
         if (wait) {
             return;

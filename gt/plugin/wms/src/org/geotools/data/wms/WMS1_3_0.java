@@ -72,13 +72,20 @@ public class WMS1_3_0 extends WMS1_1_1 {
 			return "CRS";
 		}
 		protected int queryLayerLimit(Element serviceElement) {
-			return Integer.parseInt(serviceElement.getChildText("LayerLimit", defaultNamespace));
+			return extractIntChild(serviceElement, "LayerLimit", 0);
 		}
 		protected int queryMaxHeight(Element serviceElement) {
-			return Integer.parseInt(serviceElement.getChildText("MaxHeight", defaultNamespace));
+			return extractIntChild(serviceElement, "MaxHeight", 0);
 		}
 		protected int queryMaxWidth(Element serviceElement) {
-			return Integer.parseInt(serviceElement.getChildText("MaxWidth", defaultNamespace));
+			return extractIntChild(serviceElement, "MaxWidth", 0);
+		}
+		private int extractIntChild(Element element, String childName, int _default) {
+			String result = element.getChildText(childName, defaultNamespace);
+			if (result == null || result.length() == 0) {
+				return _default;
+			}
+			return Integer.parseInt(result);
 		}
 		protected String getBBoxCRSName() {
 			return "CRS";

@@ -419,6 +419,10 @@ public abstract class AbstractWMSParser implements WMSParser {
 
 	protected String[] queryKeywords(Element serviceElement) {
 	    String keywords = serviceElement.getChildTextTrim("Keywords", defaultNamespace); //$NON-NLS-1$
+	    
+	    if (keywords == null) {
+	    	return null;
+	    }
 	
 	    return keywords.split(" "); //$NON-NLS-1$
 	}
