@@ -25,7 +25,10 @@ package org.geotools.coverage.grid;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,6 +37,7 @@ import javax.media.jai.PropertySource;
 
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.EngineeringCRS;
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
@@ -42,6 +46,7 @@ import org.opengis.coverage.grid.GridNotEditableException;
 import org.opengis.coverage.grid.GridPacking;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.InvalidRangeException;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -171,41 +176,96 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, byte[])
 	 */
-	public byte[] getDataBlock(GridRange arg0, byte[] arg1) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+	public byte[] getDataBlock(GridRange range, byte[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
+		if (destination == null) {
+			destination = new byte[range.getLength(0) + range.getLength(1)];
+		}
+		int[] temp = new int[range.getLength(0) + range.getLength(1)];
+
+		image.getRaster().getPixels(range.getLower(0), range.getLower(1),
+				range.getLength(0), range.getLength(1), temp);
+		
+		for (int i = 0; i < temp.length; i++) {
+			destination[i] = (byte) temp[i];
+		}
+		
+		return destination;	
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, short[])
 	 */
-	public short[] getDataBlock(GridRange arg0, short[] arg1) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+	public short[] getDataBlock(GridRange range, short[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
+		if (destination == null) {
+			destination = new short[range.getLength(0) + range.getLength(1)];
+		}
+		int[] temp = new int[range.getLength(0) + range.getLength(1)];
+
+		image.getRaster().getPixels(range.getLower(0), range.getLower(1),
+				range.getLength(0), range.getLength(1), temp);
+		
+		for (int i = 0; i < temp.length; i++) {
+			destination[i] = (short) temp[i];
+		}
+		
+		return destination;	
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, int[])
 	 */
-	public int[] getDataBlock(GridRange arg0, int[] arg1) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+	public int[] getDataBlock(GridRange range, int[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
+		if (destination == null) {
+			destination = new int[range.getLength(0) + range.getLength(1)];
+		}
+		int[] temp = new int[range.getLength(0) + range.getLength(1)];
+
+		image.getRaster().getPixels(range.getLower(0), range.getLower(1),
+				range.getLength(0), range.getLength(1), temp);
+		
+		for (int i = 0; i < temp.length; i++) {
+			destination[i] = temp[i];
+		}
+		
+		return destination;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, float[])
 	 */
-	public float[] getDataBlock(GridRange arg0, float[] arg1) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+	public float[] getDataBlock(GridRange range, float[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
+		if (destination == null) {
+			destination = new float[range.getLength(0) + range.getLength(1)];
+		}
+		float[] temp = new float[range.getLength(0) + range.getLength(1)];
+
+		image.getRaster().getPixels(range.getLower(0), range.getLower(1),
+				range.getLength(0), range.getLength(1), temp);
+		
+		for (int i = 0; i < temp.length; i++) {
+			destination[i] = temp[i];
+		}
+		
+		return destination;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, double[])
 	 */
-	public double[] getDataBlock(GridRange arg0, double[] arg1) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+	public double[] getDataBlock(GridRange range, double[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
+		if (destination == null) {
+			destination = new double[range.getLength(0) + range.getLength(1)];
+		}
+		double[] temp = new double[range.getLength(0) + range.getLength(1)];
+
+		image.getRaster().getPixels(range.getLower(0), range.getLower(1),
+				range.getLength(0), range.getLength(1), temp);
+		
+		for (int i = 0; i < temp.length; i++) {
+			destination[i] = temp[i];
+		}
+		
+		return destination;
 	}
 
 	/* (non-Javadoc)
@@ -219,49 +279,64 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, boolean[])
 	 */
-	public void setDataBlock(GridRange arg0, boolean[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
+	public void setDataBlock(GridRange range, boolean[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		int[] temp = new int[values.length];
+		for (int i = 0; i < values.length; i++) {
+			temp[i] = values[i] ? 1 : 0; 
+		}
 		
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), temp);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, byte[])
 	 */
-	public void setDataBlock(GridRange arg0, byte[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
+	public void setDataBlock(GridRange range, byte[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		int[] temp = new int[values.length];
+		for (int i = 0; i < values.length; i++) {
+			temp[i] = (int) values[i]; 
+		}
 		
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), temp);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, short[])
 	 */
-	public void setDataBlock(GridRange arg0, short[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
+	public void setDataBlock(GridRange range, short[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		int[] temp = new int[values.length];
+		for (int i = 0; i < values.length; i++) {
+			temp[i] = (int) values[i]; 
+		}
 		
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), temp);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, int[])
 	 */
-	public void setDataBlock(GridRange arg0, int[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		
+	public void setDataBlock(GridRange range, int[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), values);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, float[])
 	 */
-	public void setDataBlock(GridRange arg0, float[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		
+	public void setDataBlock(GridRange range, float[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), values);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, double[])
 	 */
-	public void setDataBlock(GridRange arg0, double[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		
+	public void setDataBlock(GridRange range, double[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
+		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
+				range.getLength(0), range.getLength(1), values);
 	}
 
 	/* (non-Javadoc)
@@ -276,9 +351,19 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	 * @see org.opengis.coverage.Coverage#getDimensionNames()
 	 */
 	public InternationalString[] getDimensionNames() {
-		// TODO Auto-generated method stub
-//		return crs.getCoordinateSystem().getAxis(0).getI;
-		return null;
+		List results = new ArrayList();
+		
+		results.addAll(Arrays.asList(crs.getCoordinateSystem().getAxis(0).getIdentifiers()));
+		results.addAll(Arrays.asList(crs.getCoordinateSystem().getAxis(1).getIdentifiers()));
+		
+		InternationalString[] strings = new InternationalString[results.size()];
+		
+		for (int i = 0; i < results.size(); i++) {
+			Identifier identifier = (Identifier) results.get(i);
+			strings[i] = new SimpleInternationalString(identifier.getCode());
+		}
+
+		return strings;
 	}
 
 	/* (non-Javadoc)
