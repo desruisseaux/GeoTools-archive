@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -109,7 +110,6 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
         if (mConnectionParams == null) {
             return false;
         }
-
         return params.containsKey("dbtype") && params.get("dbtype").equals("geomedia") && params.containsKey("dbkey")
         && params.containsKey("dbdriver") && params.containsKey("user") && params.containsKey("passwd");
 
@@ -130,17 +130,14 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
      * @throws DataSourceException Thrown if there were any problems creating or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if (! canProcess(params)) {
-            return null;
-        }
-
         /* There are no defaults here. Calling canProcess verifies that
          * all these variables exist.
          */
-        String databaseDriver = (String) params.get("dbdriver");
-        String databasePoolKey = (String) params.get("dbkey");
-        String user = (String) params.get("user");
-        String passwd = (String) params.get("passwd");
+        String databaseDriver = (String) DBDRIVER.lookUp( params );
+        String databasePoolKey = (String) DBKEY.lookUp( params );
+        
+        String user = (String) USER.lookUp( params );
+        String passwd = (String) PASSWD.lookUp( params );
 
         try {
             GeoMediaConnectionFactory factory = new GeoMediaConnectionFactory(databaseDriver, databasePoolKey,
@@ -171,6 +168,9 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
         throw new UnsupportedOperationException("GeoTools cannot create a new GeoMedia Database");
     }
 
+    public String getDisplayName() {
+        return "GeoMedia";
+    }
     /**
      * Describe the nature of the datastore constructed by this factory.
      *
@@ -179,7 +179,15 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
     public String getDescription() {
         return "GeoMedia Spatial Database";
     }
-
+    // TODO: have a clue
+	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+	    String databaseDriver = (String) DBDRIVER.lookUp( params );
+        String databasePoolKey = (String) DBKEY.lookUp( params );
+        
+        String user = (String) USER.lookUp( params );        
+        
+	    return new DataSourceMetadataEnity( databasePoolKey, "GeoMedia "+user, "GeoMedia connection to "+databasePoolKey+" as "+user );
+	}
 	/**
 	 * Test to see if this datastore is available, if it has all the
 	 * appropriate libraries to construct a datastore.  This datastore just
@@ -197,6 +205,17 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
 		return true;
 	}
 
+	static final Param DBTYPE = new Param("dbtype", String.class, "This must be 'geomedia'.", true);
+	static final Param DBDRIVER = new Param("dbdriver", String.class, "Class name of a Type4 Javax DataSource database driver.", true);
+	static final Param USER = new Param("user", String.class, "The user name to log in with.", true);
+	static final Param PASSWD = new Param("passwd", String.class, "The password.", true);
+	static final Param DBKEY = new Param("databasePoolKey", String.class, "the port number on the host, usually 1433", true, "1433" );
+	static final Param[] PARAM_INFO = new Param[] {
+        DBTYPE,
+        DBDRIVER,
+        USER,
+        PASSWD
+    };
     /**
      * Describe parameters.
      *
@@ -205,11 +224,6 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
      * @see org.geolbs.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] {
-            new Param("dbtype", String.class, "This must be 'geomedia'.", true),
-            new Param("dbdriver", String.class, "Class name of a Type4 Javax DataSource database driver.", true),
-            new Param("user", String.class, "The user name to log in with.", true),
-            new Param("passwd", String.class, "The password.", true)
-        };
+        return PARAM_INFO;
     }
 }
