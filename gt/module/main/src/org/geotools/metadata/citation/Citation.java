@@ -196,7 +196,7 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
 
     /**
      * Returns the short name or other language name by which the cited information is known.
-     * Example: "DCW" as an alternative title for "Digital Chart of the World.
+     * Example: "DCW" as an alternative title for "Digital Chart of the World".
      */
     public List getAlternateTitles() {
         final List alternateTitles = this.alternateTitles; // Avoid synchronization

@@ -36,7 +36,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraivane
+ * @author Touraïvane
  */
 public class SecurityConstraints extends Constraints implements org.opengis.metadata.constraint.SecurityConstraints {
     /**

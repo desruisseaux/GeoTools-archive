@@ -40,7 +40,7 @@ import org.geotools.util.CheckedHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraivane
+ * @author Touraïvane
  */
 public class LegalConstraints extends Constraints implements org.opengis.metadata.constraint.LegalConstraints {
     /**

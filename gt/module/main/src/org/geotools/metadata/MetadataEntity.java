@@ -460,6 +460,15 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     }
 
     /**
+     * Returns <code>true</code> if this metadata entity is modifiable.
+     * This method returns <code>false</code> if {@link #unmodifiable()}
+     * has been invoked on this object.
+     */
+    public boolean isModifiable() {
+        return unmodifiable != this;
+    }
+
+    /**
      * Returns an unmodifiable copy of this metadata. Any attempt to modify an attribute of the
      * returned object will throw an {@link UnsupportedOperationException}. If this metadata is
      * already unmodifiable, then this method returns <code>this</code>.

@@ -38,7 +38,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraivane
+ * @author Touraïvane
  */
 public class Contact extends MetadataEntity implements org.opengis.metadata.citation.Contact {
     /**
