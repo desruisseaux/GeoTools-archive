@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  * @author jeichar
  *
  */
-public class TestQuery extends TestCase {
+public class QueryTest extends TestCase {
 
     /*
      * @see TestCase#setUp()

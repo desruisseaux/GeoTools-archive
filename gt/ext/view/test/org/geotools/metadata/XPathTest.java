@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  * @author jeichar
  *
  */
-public class TestXPath extends TestCase {
+public class XPathTest extends TestCase {
 
     /*
      * @see TestCase#setUp()

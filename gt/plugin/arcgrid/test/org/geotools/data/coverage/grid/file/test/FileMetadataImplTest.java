@@ -11,7 +11,6 @@ import org.geotools.data.arcgrid.test.TestCaseSupport;
 import org.geotools.data.coverage.grid.file.FileMetadata;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
 import org.geotools.metadata.Metadata;
-import org.geotools.metadata.StupidNestedMetadataImpl;
 import org.geotools.metadata.Metadata.Entity;
 
 /**
@@ -20,12 +19,12 @@ import org.geotools.metadata.Metadata.Entity;
  * @author jeichar
  *
  */
-public class TestFileMetadataImpl extends TestCaseSupport {
+public class FileMetadataImplTest extends TestCaseSupport {
 
     /**
      * @param name
      */
-    public TestFileMetadataImpl(String name) {
+    public FileMetadataImplTest(String name) {
         super(name);
      }
 

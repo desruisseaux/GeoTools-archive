@@ -14,7 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.data.coverage.grid.file.test;
+
+import org.geotools.metadata.Metadata;
 
 /**
  * TODO type description
