@@ -34,7 +34,7 @@ import org.geotools.styling.StyleBuilder;
 
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridFormatFinder;
+//import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.gc.GridCoverage;
 
@@ -56,7 +56,7 @@ public class ArcGridReader {
         
         //create the grid coverage reader
         URL url = ArcGridReader.class.getClassLoader().getResource("org/geotools/sampleData/spearfish_dem.asc.gz");
-        Format f = new org.geotools.data.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url);  //should this work also?
+        Format f = new org.geotools.gce.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url); //also works
         GridCoverageReader reader = f.getReader(url);
         
         //get the parameters and set them
@@ -66,7 +66,7 @@ public class ArcGridReader {
         params.parameter( "GRASS" ).setValue( true );
         
         //read the grid
-        if (reader.hasMoreGridCoverages()) {                 //not yet implemented
+        if (reader.hasMoreGridCoverages()) {                 //not yet implemented in arcgrid
             System.out.println("Reader has a GC to read");   
         }
         GridCoverage gc = reader.read( params );
