@@ -62,7 +62,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
 
     // private List constraints;
     private int hashCodeOffset = getOffset();
-    private Element cache = null;
+    private DefaultElement cache = null;
 
     /*
      * helper for hashCode()
@@ -321,34 +321,36 @@ public class ElementTypeHandler extends ElementGroupingHandler {
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
+
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultElement();
         }
 
-        DefaultElement elem = new DefaultElement();
-        elem.id = id;
-        elem.name = name;
-        elem.namespace = parent.getTargetNamespace();
-        elem.defaulT = defaulT;
-        elem.fixed = fixed;
-        elem.block = block;
-        elem.finaL = finaL;
-        elem.abstracT = abstracT;
-        elem.form = form;
-        elem.nillable = nillable;
-        elem.minOccurs = minOccurs;
-        elem.maxOccurs = maxOccurs;
+        cache.id = id;
+        cache.name = name;
+        cache.namespace = parent.getTargetNamespace();
+        cache.defaulT = defaulT;
+        cache.fixed = fixed;
+        cache.block = block;
+        cache.finaL = finaL;
+        cache.abstracT = abstracT;
+        cache.form = form;
+        cache.nillable = nillable;
+        cache.minOccurs = minOccurs;
+        cache.maxOccurs = maxOccurs;
 
         if (substitutionGroup != null) {
-            elem.substitutionGroup = parent.lookUpElement(substitutionGroup);
+            cache.substitutionGroup = parent.lookUpElement(substitutionGroup);
         }
 
         if (child == null) {
-            elem.type = parent.lookUpType(type);
+            cache.type = parent.lookUpType(type);
         } else if (child instanceof SimpleTypeHandler) {
-            elem.type = ((SimpleTypeHandler) child).compress(parent);
+            cache.type = ((SimpleTypeHandler) child).compress(parent);
         } else {
-            elem.type = ((ComplexTypeHandler) child).compress(parent);
+            cache.type = ((ComplexTypeHandler) child).compress(parent);
         }
 
         if (ref != null) {
@@ -359,35 +361,34 @@ public class ElementTypeHandler extends ElementGroupingHandler {
                     + "' was referenced and not found");
             }
 
-            elem.name = e.getName();
-            elem.type = e.getType();
+            cache.name = e.getName();
+            cache.type = e.getType();
 
             if ((defaulT == null) || "".equalsIgnoreCase(defaulT)) {
-                elem.defaulT = e.getDefault();
+                cache.defaulT = e.getDefault();
             }
 
             if ((fixed == null) || "".equalsIgnoreCase(fixed)) {
-                elem.fixed = e.getFixed();
+                cache.fixed = e.getFixed();
             }
 
             if (block == 0) {
-                elem.block = e.getBlock();
+                cache.block = e.getBlock();
             }
 
             if (finaL == 0) {
-                elem.finaL = e.getFinal();
+                cache.finaL = e.getFinal();
             }
 
-            elem.minOccurs = (minOccurs == 1) ? e.getMinOccurs() : minOccurs;
-            elem.maxOccurs = (maxOccurs == 1) ? e.getMaxOccurs() : maxOccurs;
+            cache.minOccurs = (minOccurs == 1) ? e.getMinOccurs() : minOccurs;
+            cache.maxOccurs = (maxOccurs == 1) ? e.getMaxOccurs() : maxOccurs;
 
             if (substitutionGroup != null) {
-                elem.substitutionGroup = e.getSubstitutionGroup();
+                cache.substitutionGroup = e.getSubstitutionGroup();
             }
         }
 
         //  TODO add constraint checking
-        cache = elem;
 
         return cache;
     }

@@ -55,7 +55,7 @@ public class AnyHandler extends ElementGroupingHandler {
     private int maxOccurs;
 
     //    private int processContents;
-    private Any cache = null;
+    private DefaultAny cache = null;
 
     /**
      * @see java.lang.Object#hashCode()
@@ -196,21 +196,20 @@ public class AnyHandler extends ElementGroupingHandler {
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultAny();
         }
+        cache.id = id;
+        cache.namespace = namespace;
+        cache.minOccurs = minOccurs;
+        cache.maxOccurs = maxOccurs;
 
-        DefaultAny da = new DefaultAny();
-        da.id = id;
-        da.namespace = namespace;
-        da.minOccurs = minOccurs;
-        da.maxOccurs = maxOccurs;
-
-        cache = da;
         id = null;
         namespace = null;
 
-        return da;
+        return cache;
     }
 
     /**

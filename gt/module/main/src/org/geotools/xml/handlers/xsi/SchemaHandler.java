@@ -754,6 +754,7 @@ public class SchemaHandler extends XSIElementHandler {
             }}
         }
 
+        if(complexTypes!=null){
         it = complexTypes.iterator();
 
         while (it.hasNext()) {
@@ -772,7 +773,7 @@ public class SchemaHandler extends XSIElementHandler {
                     return sst;
                 }
             }
-        }
+        }}
 
         return null;
     }

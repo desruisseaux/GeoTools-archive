@@ -19,9 +19,9 @@ package org.geotools.xml.handlers.xsi;
 import java.net.URI;
 
 import org.geotools.xml.XSIElementHandler;
+import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.Group;
-import org.geotools.xml.schema.impl.GroupGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -49,7 +49,7 @@ public class GroupHandler extends ElementGroupingHandler {
     private int minOccurs = 1;
     private ElementGroupingHandler child; // one of 'all', 'choice', or 'sequence'
     private int hashCodeOffset = getOffset();
-    private Group cache = null;
+    private DefaultGroup cache = null;
 
     /*
      * helper for hashCode()
@@ -156,7 +156,7 @@ public class GroupHandler extends ElementGroupingHandler {
         if (ref == null || "".equals(ref)) {
             ref = atts.getValue(namespaceURI, "ref"); // mutally exclusive with
         }
-System.out.println("REF ^^^ ="+ref);
+//System.out.println("REF ^^^ ="+ref);
         // name ...
         if ((min != null) && !"".equalsIgnoreCase(min)) {
             minOccurs = Integer.parseInt(min);
@@ -194,39 +194,39 @@ System.out.println("REF ^^^ ="+ref);
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
+
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultGroup();
         }
 
-        String id = this.id;
-        String name = this.name;
-        URI uri = parent.getTargetNamespace();
-        int minOccurs = this.minOccurs;
-        int maxOccurs = this.maxOccurs;
-        ElementGrouping child = (this.child == null) ? null
+        cache.id = this.id;
+        cache.name = this.name;
+        cache.namespace = parent.getTargetNamespace();
+        cache.min = this.minOccurs;
+        cache.max = this.maxOccurs;
+        cache.child = (this.child == null) ? null
               : this.child.compress(parent); // deal with all/choice/sequnce
-System.out.println("***** "+name+":::"+child);
+//System.out.println("***** "+name+":::"+child);
         if (ref != null) {
-System.out.println("Group Ref = "+ref);
+//System.out.println("Group Ref = "+ref);
             Group g = parent.lookUpGroup(ref);
-System.out.println("GroupHandler.compress()" + (g==null?"null":g.getClass().getName()));
+//System.out.println("GroupHandler.compress()" + (g==null?"null":g.getClass().getName()));
             if (g != null) {
                 if ((id == null) || "".equalsIgnoreCase(id)) {
                     id = g.getId();
                 }
 
-                minOccurs = g.getMinOccurs();
-                maxOccurs = g.getMaxOccurs();
-                name = g.getName();
-                uri = g.getNamespace();
+                cache.min = g.getMinOccurs();
+                cache.max = g.getMaxOccurs();
+                cache.name = g.getName();
+                cache.namespace = g.getNamespace();
                 
-                child = (g.getChild() == null) ? null : g.getChild();
+                cache.child = (g.getChild() == null) ? cache.child : g.getChild();
             }
         }
-System.out.println("$$$$$");
-
-        cache = new GroupGT(id, name, uri, child,
-                minOccurs, maxOccurs);
+//System.out.println("$$$$$");
 
         child = null;
 
@@ -246,5 +246,94 @@ System.out.println("$$$$$");
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
+        // do nothing
+    }
+    protected static class DefaultGroup implements Group{
+        protected ElementGrouping child;
+        protected String id;
+        protected int min,max;
+        protected String name;
+        protected URI namespace;
+        /**
+         * TODO summary sentence for getChild ...
+         * 
+         * @see org.geotools.xml.schema.Group#getChild()
+         * @return
+         */
+        public ElementGrouping getChild() {
+            return child;
+        }
+
+        /**
+         * TODO summary sentence for getId ...
+         * 
+         * @see org.geotools.xml.schema.Group#getId()
+         * @return
+         */
+        public String getId() {
+            return id;
+        }
+
+        /**
+         * TODO summary sentence for getMaxOccurs ...
+         * 
+         * @see org.geotools.xml.schema.Group#getMaxOccurs()
+         * @return
+         */
+        public int getMaxOccurs() {
+            return max;
+        }
+
+        /**
+         * TODO summary sentence for getMinOccurs ...
+         * 
+         * @see org.geotools.xml.schema.Group#getMinOccurs()
+         * @return
+         */
+        public int getMinOccurs() {
+            return min;
+        }
+
+        /**
+         * TODO summary sentence for getName ...
+         * 
+         * @see org.geotools.xml.schema.Group#getName()
+         * @return
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * TODO summary sentence for getNamespace ...
+         * 
+         * @see org.geotools.xml.schema.Group#getNamespace()
+         * @return
+         */
+        public URI getNamespace() {
+            return namespace;
+        }
+
+        /**
+         * TODO summary sentence for getGrouping ...
+         * 
+         * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
+         * @return
+         */
+        public int getGrouping() {
+            return GROUP;
+        }
+
+        /**
+         * TODO summary sentence for findChildElement ...
+         * 
+         * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
+         * @param name
+         * @return
+         */
+        public Element findChildElement( String name ) {
+            return child==null?null:child.findChildElement(name);
+        }
+        
     }
 }

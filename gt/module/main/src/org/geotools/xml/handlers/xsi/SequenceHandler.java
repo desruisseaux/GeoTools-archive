@@ -44,7 +44,7 @@ public class SequenceHandler extends ElementGroupingHandler {
     private int maxOccurs;
     private int minOccurs;
     private List children; // element, group, choice, sequence or any
-    private Sequence cache = null;
+    private DefaultSequence cache = null;
 
     /**
      * @see java.lang.Object#hashCode()
@@ -186,33 +186,34 @@ public class SequenceHandler extends ElementGroupingHandler {
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
+
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultSequence();
         }
 
-        DefaultSequence ds = new DefaultSequence();
-        ds.id = id;
-        ds.minOccurs = minOccurs;
-        ds.maxOccurs = maxOccurs;
+        cache.id = id;
+        cache.minOccurs = minOccurs;
+        cache.maxOccurs = maxOccurs;
 
         logger.finest(id + " :: This Sequence has "
             + ((children == null) ? 0 : children.size()) + " children");
 
         if (children != null) {
-            ds.children = new ElementGrouping[children.size()];
+            cache.children = new ElementGrouping[children.size()];
 
             // TODO compress sequences here
             // sequqnces can be inlined here.
-            for (int i = 0; i < ds.children.length; i++)
-                ds.children[i] = ((ElementGroupingHandler) children.get(i))
+            for (int i = 0; i < cache.children.length; i++)
+                cache.children[i] = ((ElementGroupingHandler) children.get(i))
                     .compress(parent);
         }
 
-        cache = ds;
         children = null;
         id = null;
 
-        return ds;
+        return cache;
     }
 
     /**

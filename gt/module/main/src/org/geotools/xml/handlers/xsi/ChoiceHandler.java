@@ -44,7 +44,7 @@ public class ChoiceHandler extends ElementGroupingHandler {
     private int minOccurs;
     private int maxOccurs;
     private List children; // element, group, choice, sequence, any
-    private Choice cache = null;
+    private DefaultChoice cache = null;
 
     /**
      * @see java.lang.Object#hashCode()
@@ -171,31 +171,31 @@ public class ChoiceHandler extends ElementGroupingHandler {
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
-        }
 
-        DefaultChoice dc = new DefaultChoice();
-        dc.id = id;
-        dc.maxOccurs = maxOccurs;
-        dc.minOccurs = minOccurs;
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultChoice();
+        }
+        
+        cache.id = id;
+        cache.maxOccurs = maxOccurs;
+        cache.minOccurs = minOccurs;
 
         if (children != null) {
-            dc.children = new ElementGrouping[children.size()];
+            cache.children = new ElementGrouping[children.size()];
 
             // TODO compress choices here
             // remove child choices and make the options as peers
-            for (int i = 0; i < dc.children.length; i++)
-                dc.children[i] = ((ElementGroupingHandler) children.get(i))
+            for (int i = 0; i < cache.children.length; i++)
+                cache.children[i] = ((ElementGroupingHandler) children.get(i))
                     .compress(parent);
         }
-
-        cache = dc;
 
         id = null;
         children = null;
 
-        return dc;
+        return cache;
     }
 
     /**

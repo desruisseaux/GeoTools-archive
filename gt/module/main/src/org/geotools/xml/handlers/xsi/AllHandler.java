@@ -44,7 +44,7 @@ public class AllHandler extends ElementGroupingHandler {
     private int minOccurs;
     private int maxOccurs;
     private List elements;
-    private All cache = null;
+    private DefaultAll cache = null;
 
     /**
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
@@ -113,29 +113,30 @@ public class AllHandler extends ElementGroupingHandler {
      */
     protected ElementGrouping compress(SchemaHandler parent)
         throws SAXException {
-        if (cache != null) {
-            return cache;
-        }
 
-        DefaultAll da = new DefaultAll();
-        da.id = id;
-        da.maxOccurs = maxOccurs;
-        da.minOccurs = minOccurs;
+        synchronized(this){
+            if (cache != null)
+            	return cache;
+            cache = new DefaultAll();
+        }
+            
+        cache.id = id;
+        cache.maxOccurs = maxOccurs;
+        cache.minOccurs = minOccurs;
 
         if (elements != null) {
-            da.elements = new Element[elements.size()];
+            cache.elements = new Element[elements.size()];
 
-            for (int i = 0; i < da.elements.length; i++)
-                da.elements[i] = (Element) ((ElementTypeHandler) elements.get(i))
+            for (int i = 0; i < cache.elements.length; i++){
+                cache.elements[i] = (Element) ((ElementTypeHandler) elements.get(i))
                     .compress(parent);
+            }
         }
-
-        cache = da;
 
         id = null;
         elements = null;
 
-        return da;
+        return cache;
     }
 
     /**
