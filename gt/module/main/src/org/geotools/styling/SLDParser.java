@@ -366,9 +366,9 @@ public class SLDParser {
 			}
 
 			if (childName.equalsIgnoreCase("Name")) {
-				layer.setName(child.getNodeValue());
-
-				// symbol.setStroke(parseStroke(child));
+				String layerName = child.getFirstChild().getNodeValue();
+				layer.setName(layerName);
+				LOGGER.info("layer name: " + layer.getName());
 			}
 
 			if (childName.equalsIgnoreCase("LayerFeatureConstraints")) {
