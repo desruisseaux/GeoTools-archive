@@ -3,7 +3,6 @@ package org.geotools.data.pickle;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -13,7 +12,6 @@ import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
-import org.geotools.data.mapinfo.MapInfoDataSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -21,8 +19,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-
-import com.thaiopensource.validate.Schema;
 
 /**
  * Pickel is really not very good, this is a simple wrap to let it
