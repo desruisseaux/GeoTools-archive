@@ -61,7 +61,7 @@ import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.geometry.Shape2D_Utilities;
+import org.geotools.resources.geometry.ShapeUtilities;
 
 
 /**
@@ -214,7 +214,7 @@ public abstract class AbstractMathTransform implements MathTransform {
      * @see MathTransform2D#createTransformedShape(Shape)
      */
     public Shape createTransformedShape(final Shape shape) throws TransformException {
-        return isIdentity() ? shape : createTransformedShape(shape, null, null, Shape2D_Utilities.PARALLEL);
+        return isIdentity() ? shape : createTransformedShape(shape, null, null, ShapeUtilities.PARALLEL);
     }
     
     /**
@@ -230,8 +230,8 @@ public abstract class AbstractMathTransform implements MathTransform {
      * @param  postTr Transformation affine à appliquer <em>après</em> avoir transformée la
      *                forme <code>shape</code>, ou <code>null</code> pour ne pas en appliquer.
      *                Cet argument sera surtout utile lors des transformations directes.
-     * @param quadDir Direction des courbes quadratiques ({@link Shape2D_Utilities#HORIZONTAL}
-     *                ou {@link Shape2D_Utilities#PARALLEL}).
+     * @param quadDir Direction des courbes quadratiques ({@link ShapeUtilities#HORIZONTAL}
+     *                ou {@link ShapeUtilities#PARALLEL}).
      *
      * @return La forme géométrique transformée.
      * @throws MismatchedDimensionException if this transform
@@ -354,10 +354,11 @@ public abstract class AbstractMathTransform implements MathTransform {
              * quadratique.
              */
             transform(buffer, 0, buffer, 0, 2);
-            if (Shape2D_Utilities.parabolicControlPoint(px, py,
-            buffer[indexCtrlPt], buffer[indexCtrlPt+1],
-            buffer[indexLastPt], buffer[indexLastPt+1],
-            quadDir, ctrl)!=null) {
+            if (ShapeUtilities.parabolicControlPoint(px, py,
+                                                     buffer[indexCtrlPt], buffer[indexCtrlPt+1],
+                                                     buffer[indexLastPt], buffer[indexLastPt+1],
+                                                     quadDir, ctrl)!=null)
+            {
                 path.quadTo(ctrl.x, ctrl.y, (float) (px=buffer[indexLastPt+0]),
                                             (float) (py=buffer[indexLastPt+1]));
             } else {
@@ -373,7 +374,7 @@ public abstract class AbstractMathTransform implements MathTransform {
         if (postTr!=null) {
             path.transform(postTr);
         }
-        return Shape2D_Utilities.toPrimitive(path);
+        return ShapeUtilities.toPrimitive(path);
     }
     
     /**

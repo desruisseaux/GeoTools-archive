@@ -42,7 +42,7 @@ import org.geotools.resources.XMath;
  * @version 1.0
  * @author Martin Desruisseaux
  */
-public final class Shape2D_Utilities {
+public final class ShapeUtilities {
     /**
      * Valeur limite pour détecter si des points sont
      * colinéaires ou si des coordonnées sont identiques.
@@ -66,7 +66,7 @@ public final class Shape2D_Utilities {
     /**
      * Interdit la création d'objets de cette classe.
      */
-    private Shape2D_Utilities() {
+    private ShapeUtilities() {
     }
 
     /**

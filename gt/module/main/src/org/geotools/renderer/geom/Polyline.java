@@ -92,7 +92,7 @@ import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.geometry.Shape2D_Utilities;
+import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.renderer.array.PointArray;
 import org.geotools.renderer.array.ArrayData;
 
@@ -365,7 +365,7 @@ public class Polyline extends Geometry {
         final float[]              buffer = new float[6];
         float[]                     array = new float[64];
         final PathIterator            pit = shape.getPathIterator(null,
-                                            Shape2D_Utilities.getFlatness(shape));
+                                            ShapeUtilities.getFlatness(shape));
         while (!pit.isDone()) {
             if (pit.currentSegment(array) != PathIterator.SEG_MOVETO) {
                 throw new IllegalPathStateException();
