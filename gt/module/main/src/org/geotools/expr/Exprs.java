@@ -22,7 +22,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.data.Extent;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BBoxExpression;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.LogicFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -46,10 +56,25 @@ import com.vividsolutions.jts.geom.Geometry;
  * Filter.
  * </p>
  * <p>
- * Example:<br>
+ * Example Expr:<br>
  * <code>Exprs.bbox( extent ).and( Exprs.attribute("cost").lt( 50 ) )</code>
  * </p>
  * <p>
+ * <p>
+ * Example Filter:<br>
+ * <pre><code>
+ * Expression extentExpression = factory.createBBoxExpression( bbox );
+ * Expression geomExpression = factory.createAttributeExpression( featureType, featureType.getDefaultGeometry().getName() );	    
+ * GeometryFilter disjointExpression = factory.createGeometryFilter( GeometryFilter.GEOMETRY_DISJOINT );
+ * disjointExpression.addLeftGeometry( geomExpression );
+ * disjointExpression.addRightGeometry( extentExpression );	    
+ * Filter bboxFilter = disjointExpression.not();	    
+ * AttributeExpression costExpression = factory.createAttributeExpression( featureType, "cost" );
+ * CompareFilter lessThanFilter = factory.createCompareFilter( CompareFilter.COMPARE_LESS_THAN );
+ * lessThanFilter.addLeftValue( costExpression );
+ * lessThanFilter.addRightValue( factory.createLiteralExpression( 50 ) );	    
+ * LogicFilter filter = factory.createLogicFilter( bboxFilter, lessThanFilter, LogicFilter.LOGIC_AND);	    
+ * </code></pre>
  * BTW: just so we can have everything make sense
  * <ul>
  * <li> Expr is immutable
