@@ -212,7 +212,7 @@ public class WorldImageReader implements GridCoverageReader {
 
 		gridLeft = false;
 		
-		GridCoverage coverage = new GridCoverage("", image, cs, envelope);
+		GridCoverage coverage = new GridCoverage(sourceURL.getFile(), image, cs, envelope);
 		return coverage;
 	}
 
