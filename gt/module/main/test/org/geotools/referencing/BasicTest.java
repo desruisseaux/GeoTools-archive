@@ -102,7 +102,7 @@ public class BasicTest extends TestCase {
     public void testReferenceSystem() {
         Map properties = new HashMap();
         properties.put("name",          "This is a name");
-        properties.put("name_fr",       "Voici un nom");
+        properties.put("name_fr",       "Voici un nom");                
         properties.put("scope",         "This is a scope");
         properties.put("scope_fr",      "Valide dans ce domaine");
         properties.put("remarks",       "There is remarks");

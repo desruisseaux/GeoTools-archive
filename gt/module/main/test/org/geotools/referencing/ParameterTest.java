@@ -81,7 +81,7 @@ public class ParameterTest extends TestCase {
      */
     public void testRangeIntegers() {
         ParameterValue param;
-        param = new ParameterValue(new OperationParameter("Range", 15, -30, +40));
+        param = new ParameterValue(new ParameterDescriptor("Range", 15, -30, +40));
         assertEquals("Range", 15, param.intValue());
         assertEquals("Range", 15, param.doubleValue(), 0.0);
         param.setValue(12);
@@ -114,7 +114,7 @@ public class ParameterTest extends TestCase {
      */
     public void testRangeDoubles() {
         ParameterValue param;
-        param = new ParameterValue(new OperationParameter("Range", 15.0, -30.0, +40.0, null));
+        param = new ParameterValue(new ParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
         assertEquals("Range", 15, param.intValue());
         assertEquals("Range", 15, param.doubleValue(), 0.0);
         param.setValue(12.0);
@@ -146,10 +146,10 @@ public class ParameterTest extends TestCase {
      */
     public void testGroup() {
         final Integer ONE = new Integer(1);
-        final OperationParameter p1, p2, p3;
-        p1 = new OperationParameter(Collections.singletonMap("name", "1"), 1, 1, Integer.class, null, ONE, null, null, null);
-        p2 = new OperationParameter(Collections.singletonMap("name", "2"), 1, 2, Integer.class, null, ONE, null, null, null);
-        p3 = new OperationParameter(Collections.singletonMap("name", "3"), 0, 1, Integer.class, null, ONE, null, null, null);
+        final ParameterDescriptor p1, p2, p3;
+        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"), 1, 1, Integer.class, null, ONE, null, null, null);
+        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"), 1, 2, Integer.class, null, ONE, null, null, null);
+        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), 0, 1, Integer.class, null, ONE, null, null, null);
         final ParameterValue v1, v2, v3, v1b, v2b, v3b, v1t, v2t, v3t;
         v1  = new ParameterValue(p1); v1.setValue( 10);
         v2  = new ParameterValue(p2); v2.setValue( 20);
@@ -180,8 +180,8 @@ public class ParameterTest extends TestCase {
         /*
          * Test creation with a pre-defined parameter group.
          */
-        final OperationParameterGroup group =
-              new OperationParameterGroup(properties, new OperationParameter[] {p1, p2, p3});
+        final ParameterGroupDescriptor group =
+              new ParameterGroupDescriptor(properties, new ParameterDescriptor[] {p1, p2, p3});
         new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3});
         new ParameterValueGroup(group, new ParameterValue[] {v1, v2});
         new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3, v2b});
@@ -212,7 +212,7 @@ public class ParameterTest extends TestCase {
      */
     public void testCodeList() {
         ParameterValue param = new ParameterValue("Test", AxisDirection.TOP);
-        OperationParameter op = (OperationParameter) param.getDescriptor();
+        ParameterDescriptor op = (ParameterDescriptor) param.getDescriptor();
         assertEquals("CodeList", new HashSet(Arrays.asList(AxisDirection.values())), op.getValidValues());
         assertEquals("Default", AxisDirection.TOP, op.getDefaultValue());
         param.setValue(AxisDirection.DOWN);
