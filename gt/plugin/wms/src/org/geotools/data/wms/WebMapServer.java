@@ -34,6 +34,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.opengis.catalog.Catalog;
 import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.MetadataEntity;
 import org.opengis.catalog.QueryDefinition;
 import org.opengis.catalog.QueryResult;
 
@@ -655,8 +656,10 @@ public class WebMapServer implements Catalog {
         
         for (int i = 0; i < capabilities.getLayers().length; i++) {
             Layer layer = capabilities.getLayers()[i];
+            
             if (layer.getName() != null && layer.getName().length() != 0) { //$NON-NLS-1$
-                layers.add(layer);
+                CatalogEntry entry = new WMSCatalogEntry(this, layer);
+                layers.add(entry);
             }
         }
         

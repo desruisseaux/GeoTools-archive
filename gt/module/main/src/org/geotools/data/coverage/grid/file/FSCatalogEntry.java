@@ -20,7 +20,7 @@ import org.opengis.catalog.CatalogEntry;
 import org.opengis.catalog.MetadataEntity;
 
 import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.UnkownFormat;
+import org.geotools.data.coverage.grid.UnknownFormat;
 import java.io.File;
 import java.util.Iterator;
 
@@ -53,7 +53,7 @@ public class FSCatalogEntry implements CatalogEntry {
                 metadata = new FileMetadataImpl(f, format);
         }
         if( metadata==null )
-            metadata = new FileMetadataImpl(f, new UnkownFormat());
+            metadata = new FileMetadataImpl(f, new UnknownFormat());
     }
 
     /**

@@ -28,11 +28,11 @@ import org.opengis.parameter.OperationParameterGroup;
  * @author $author$ (Last Modified)
  * @version $Revision: 1.9 $
  */
-public class UnkownFormat implements Format {
+public class UnknownFormat implements Format {
     /**
-     * Creates a new UnkownFormat object.
+     * Creates a new UnknownFormat object.
      */
-    public UnkownFormat() {
+    public UnknownFormat() {
     }
 
     /**
