@@ -127,12 +127,7 @@ public class DefaultQueryTest extends TestCase {
     public void testVersion() {
         System.out.println("testGetVersion");
         DefaultQuery query = new DefaultQuery();
-        try{
-            query.getVersion();
-            fail("exception should have been thrown");
-        }
-        catch(UnsupportedOperationException uoe){
-        }
+        assertNull( query.getVersion() );
     }
     
     /** Test of toString method, of class org.geotools.data.DefaultQuery. */
