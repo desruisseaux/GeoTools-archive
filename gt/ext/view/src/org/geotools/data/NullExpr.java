@@ -7,7 +7,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.NullFilter;
 
-class NullExpr extends AbstractFilterExpr {
+class NullExpr extends AbstractExpr {
 	Expr expr;
 	NullExpr( Expr expr ){
 		this.expr = expr;

@@ -17,7 +17,7 @@ import org.geotools.filter.IllegalFilterException;
  * readability.
  * </p>
  */
-public class LiteralExpr extends AbstractExpressionExpr {
+public class LiteralExpr extends AbstractExpr {
 	Object literal;
 	public LiteralExpr( int i ){
 		this( new Integer( i ) );		

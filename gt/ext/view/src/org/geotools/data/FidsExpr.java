@@ -8,7 +8,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 
-public class FidsExpr extends AbstractFilterExpr {
+public class FidsExpr extends AbstractExpr {
 	Set fids = new HashSet();
 	public FidsExpr( Collection fidCollection ){
 		fids.addAll( fidCollection );

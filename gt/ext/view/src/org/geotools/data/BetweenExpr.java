@@ -8,7 +8,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.IllegalFilterException;
 
-class BetweenExpr extends AbstractFilterExpr {
+class BetweenExpr extends AbstractExpr {
 	Expr expr, min, max;	
 	BetweenExpr( Expr min, Expr expr, Expr max ){
 		this.expr = expr;

@@ -18,30 +18,20 @@
 
  import java.io.IOException;
 import java.lang.reflect.Array;
- import java.util.Arrays;
- import java.util.Collection;
- import java.util.Collections;
- import java.util.HashSet;
- import java.util.Map;
- import java.util.Set;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
- import org.geotools.feature.Feature;
- import org.geotools.feature.FeatureType;
- import org.geotools.filter.BetweenFilter;
- import org.geotools.filter.CompareFilter;
- import org.geotools.filter.Expression;
- import org.geotools.filter.FidFilter;
- import org.geotools.filter.Filter;
- import org.geotools.filter.FilterFactory;
- import org.geotools.filter.FilterVisitor;
- import org.geotools.filter.FunctionExpression;
- import org.geotools.filter.GeometryDistanceFilter;
- import org.geotools.filter.GeometryFilter;
- import org.geotools.filter.IllegalFilterException;
- import org.geotools.filter.MathExpression;
- import org.geotools.filter.NullFilter;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.IllegalFilterException;
 
- import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Envelope;
 
  /**
   * Provides default Expr chaining implementations expression.
@@ -68,17 +58,129 @@ import java.lang.reflect.Array;
  abstract class AbstractExpr implements Expr {
  	protected FilterFactory factory = FilterFactory.createFilterFactory();
  	
- 	/* Subclass must implement */
- 	public abstract Filter filter(FeatureType schema) throws IOException;
- 	/* Subclass must implement */
- 	public abstract Expression expression( FeatureType schema ) throws IOException;
- 		
+ 	/**
+ 	 * Useful super class that casts expressions into a Filter.
+ 	 * <p>
+ 	 * To turn Expression into a Filter I am going to follow the usual
+ 	 * Perl defaults of "true".
+ 	 * <ul>
+ 	 * <li>Boolean.TRUE is true
+ 	 * <li>Non empty String is true
+ 	 * <li>Non zero is true
+ 	 * <li>Non zero length array is true
+ 	 * <li>Non isEmpty Collection/Map is true
+ 	 * <li>Non isNull Envelope is true
+ 	 * </ul>
+ 	 * Where true means that the generated Filter will accept the results.
+ 	 * </p>
+ 	 */
+	public Filter filter(final FeatureType schema) throws IOException {
+		return new Filter(){
+			public boolean contains(Feature feature) {
+				Expression expression;
+				try {
+					expression = expression( schema );
+				} catch (IOException e) {
+					return false;
+				}
+				Object value = expression.getValue( feature );
+				if( value == null ) return false;
+				if( value instanceof Boolean) {
+					return ((Boolean)value).booleanValue();
+				}
+				if( value instanceof Number ){
+					return ((Number)value).doubleValue() != 0.0;
+				}
+				if( value instanceof String ){
+					return ((String)value).length() != 0; 
+				}
+				if( value.getClass().isArray() ){
+					return Array.getLength( value ) != 0;
+				}
+				if( value instanceof Collection ){
+					return !((Collection)value).isEmpty();
+				}
+				if( value instanceof Map ){
+					return !((Map)value).isEmpty();
+				}
+				if( value instanceof Envelope ){
+					return ((Envelope)value).isNull();						
+				}
+				return false;
+			}
+			public Filter and(Filter filter) {
+				try {
+					return factory.createLogicFilter( this, filter, Filter.LOGIC_AND );
+				} catch (IllegalFilterException e) {
+					return null;
+				}				
+			}
+
+			public Filter or(Filter filter) {
+				try {
+					return factory.createLogicFilter( this, filter, Filter.LOGIC_OR );
+				} catch (IllegalFilterException e) {
+					return null;
+				}
+			}
+
+			public Filter not() {
+				try {
+					return factory.createLogicFilter( this, Filter.LOGIC_NOT );
+				} catch (IllegalFilterException e) {
+					return null;
+				}
+			}
+
+			public short getFilterType() {
+				return 0; // TODO: What is the value for "custom"?
+			}
+			public void accept(FilterVisitor visitor) {
+				try {
+					expression( schema ).accept( visitor );
+				} catch (IOException e) {					
+				}				
+			}			
+		};
+	}
+	/**
+	 * Turns a Filter into an a logical true/false expression.
+	 */
+	public Expression expression(final FeatureType schema) throws IOException {	
+		/** Boolean expression based on Filter.contains */
+		return new Expression(){
+			/**
+			 * Consider this a Function that
+			 * returns filter.contains( feature )
+			 */
+			public short getType() {
+				return Expression.FUNCTION;
+			}
+			public Object getValue(Feature feature) {
+				boolean contains;
+				try {
+					Filter filter = filter( feature.getFeatureType() );
+					contains = filter.contains( feature );
+				}
+				catch( IOException ignore ){
+					contains = false;
+				}
+				return contains ? Boolean.TRUE : Boolean.FALSE;
+			}
+			public void accept(FilterVisitor visitor) {
+				try {
+					filter( schema ).accept( visitor );
+				} catch (IOException e) {
+				}				
+			}					
+		};
+	} 		
  	//
  	// Convience methods
  	//
- 	/** Convience method for: geom().disjoint( literal( bbox )).not() */ 
+ 	/** Convience method for: geom().disjoint( geom( bbox )).not() */ 
  	public Expr bbox( Envelope bbox ){
- 		return and( geom().disjoint( literal( bbox )).not() );		
+ 		return and( Exprs.geom().disjoint( Exprs.geom( bbox )).not() );		
  	}
  	/**
  	 * Convience method for accessing a single fid
@@ -105,44 +207,8 @@ import java.lang.reflect.Array;
  	}
  	public Expr or( Expr expr ){
  		return new OrExpr( this, expr );		
- 	} 	 	
- 	/**
- 	 * Note literal is non chainging.
- 	 * 
- 	 * Should move this to a Chain class.
- 	 */
- 	public Expr literal( int i ){
- 		return new LiteralExpr( i );
  	}
- 	public Expr literal( double d ){
- 		return new LiteralExpr( d );
- 	}
- 	public Expr literal( boolean b ){
- 		return new LiteralExpr( b );
- 	}
- 	public Expr literal( Object literal ){
- 		return new LiteralExpr( literal );
- 	} 	
- 	public Expr add( Expr expr ){
- 		return new MathExpr( this, Expression.MATH_ADD, expr );
- 	}
- 	public Expr subtract( Expr expr ){
- 		return new MathExpr( this, Expression.MATH_SUBTRACT, expr );
- 	}
- 	public Expr divide( Expr expr ){
- 		return new MathExpr( this, Expression.MATH_DIVIDE, expr );
- 	}
- 	public Expr multiply( Expr expr ){
- 		return new MathExpr( this, Expression.MATH_MULTIPLY, expr );
- 	}
- 	/** Non chaining */
- 	public Expr attribute( String xpath ){
- 		return new AttributeExpr( xpath );
- 	}
- 	/** Non chaining */
- 	public Expr geom(){
- 		return new GeomExpr();
- 	} 	
+ 	
  	public Expr eq( Expr expr ){
  		return new CompareExpr(this, Filter.COMPARE_EQUALS, expr );
  	}
@@ -160,42 +226,13 @@ import java.lang.reflect.Array;
  	}
  	public Expr ne( Expr expr ){
  		return new CompareExpr(this, Filter.COMPARE_NOT_EQUALS, expr );
- 	}
- 	public Expr notNull(){
- 		return new NullExpr( this );
- 	}
+ 	} 	
  	public Expr between( Expr min, Expr max ){
  		return new BetweenExpr( min, this, max );
  	}
- 	public Expr beyond( Expr expr, double distance ){
- 		return new GeometryDistanceExpr( this, Filter.GEOMETRY_BEYOND, expr, distance );
- 	}
- 	public Expr contains( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_CONTAINS, expr );
- 	}
- 	public Expr crosses( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_CROSSES, expr );
- 	}
- 	public Expr disjoint( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_DISJOINT, expr );
- 	}	
- 	public Expr dwithin( Expr expr, double distance ){
- 		return new GeometryDistanceExpr( this, Filter.GEOMETRY_DWITHIN, expr, distance );
- 	}
- 	public Expr equal( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_EQUALS, expr );
- 	}
- 	public Expr intersects( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_INTERSECTS, expr );
- 	}
- 	public Expr overlaps( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_OVERLAPS, expr );
- 	}
- 	public Expr touches( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_TOUCHES, expr );
- 	}
- 	public Expr within( Expr expr ){
- 		return new GeometryExpr( this, Filter.GEOMETRY_WITHIN, expr );
+ 	
+ 	public Expr notNull(){
+ 		return new NullExpr( this );
  	}
  	public Expr fn( String name ){
  		return new FunctionExpr( name, this );

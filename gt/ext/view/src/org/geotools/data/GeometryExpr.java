@@ -1,36 +1,21 @@
 package org.geotools.data;
 
-import java.io.IOException;
-
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
-
-class GeometryExpr extends AbstractFilterExpr {
-	Expr expr1,expr2;	
-	short op;
-	double distance;
-	GeometryExpr( Expr expr1, short op, Expr expr2){
-		this( expr1, op, expr2, Double.NaN );
-	}
-	GeometryExpr( Expr expr1, short op, Expr expr2, double distance ){
-		this.expr1 = expr1;
-		this.expr2 = expr2;
-		this.op = op;
-		this.distance = distance;
-	}
-	public Filter filter(FeatureType schema) throws IOException {
-		try {
-			GeometryFilter filter = factory.createGeometryFilter( op );
-			Expression left = expr1.expression( schema );
-			Expression right = expr2.expression( schema );
-			filter.addLeftGeometry( left );
-			filter.addRightGeometry( right );			
-			return filter;
-		} catch (IllegalFilterException e) {
-			return null;
-		}				
-	}
+/**
+ * Expr known to be a Geometry type.
+ * <p>
+ * Allows us to issolate all Geometry opperations against a single\
+ * Expr subclass.
+ * </p>
+ */
+public interface GeometryExpr extends Expr {	
+	public GeometryExpr beyond( GeometryExpr expr, double distance );
+	public GeometryExpr contains( GeometryExpr expr );
+	public GeometryExpr crosses( GeometryExpr expr );
+	public GeometryExpr disjoint( GeometryExpr expr );	
+	public GeometryExpr dwithin( GeometryExpr expr, double distance );
+	public GeometryExpr equal( GeometryExpr expr );
+	public GeometryExpr intersects( GeometryExpr expr );
+	public GeometryExpr overlaps( GeometryExpr expr );
+	public GeometryExpr touches( GeometryExpr expr );
+	public GeometryExpr within( GeometryExpr expr );
 }

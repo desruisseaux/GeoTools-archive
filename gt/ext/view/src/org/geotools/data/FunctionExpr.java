@@ -23,7 +23,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
 
 
-public class FunctionExpr extends AbstractExpressionExpr {
+public class FunctionExpr extends AbstractExpr {
 	Expr expr[];	
 	String name;	
 	public FunctionExpr( String name, Expr expr ){		

@@ -16,31 +16,13 @@
  */
 package org.geotools.data;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterVisitor;
-import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.GeometryDistanceFilter;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.MathExpression;
-import org.geotools.filter.NullFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Filter/Expression construction kit - this class starts of chains.
@@ -98,7 +80,7 @@ public class Exprs {
 		
 	/** Convience method for: geom().disjoint( literal( bbox )).not() */ 
 	static public Expr bbox( Envelope bbox ){
-		return geom().disjoint( literal( bbox )).not();		
+		return geom().disjoint( geom( bbox )).not();		
 	}
 	/**
 	 * Convience method for accessing a single fid
@@ -122,7 +104,7 @@ public class Exprs {
 		if( expr.length == 1 ) return expr[0];
 		Expr e = expr[0];
 		for( int i=1; i<expr.length;i++){
-			e = e.add( expr[i] );
+			e = e.and( expr[i] );
 		}
 		return e;		
 	}	
@@ -135,6 +117,7 @@ public class Exprs {
 		}
 		return e;
 	}
+	
 	static public Expr literal( int i ){
 		return new LiteralExpr( i );
 	}
@@ -147,50 +130,99 @@ public class Exprs {
 	static public Expr literal( Object literal ){
 		return new LiteralExpr( literal );
 	}	
-	static public Expr add( Expr expr[] ){
-		if( expr.length == 0 ) return literal( 0 );
+	static public MathExpr add( MathExpr expr[] ){
+		if( expr.length == 0 ) return math( 0 );
 		if( expr.length == 1 ) return expr[0];
-		Expr e = expr[0];
+		MathExpr e = expr[0];
 		for( int i=1; i<expr.length;i++){
 			e = e.add( expr[i] );
 		}
 		return e;
 	}
-	static public Expr subtract( Expr expr[] ){
-		if( expr.length == 0 ) return literal( 0 );
+	static public MathExpr subtract( MathExpr expr[] ){
+		if( expr.length == 0 ) return math( 0 );
 		if( expr.length == 1 ) return expr[0];
-		Expr e = expr[0];
+		MathExpr e = expr[0];
 		for( int i=1; i<expr.length;i++){
 			e = e.subtract( expr[i] );
 		}
 		return e;
 	}
-	static public Expr divide( Expr expr[] ){
-		if( expr.length == 0 ) return literal( 1 );
+	static public MathExpr divide( MathExpr expr[] ){
+		if( expr.length == 0 ) return math( 1 );
 		if( expr.length == 1 ) return expr[0];
-		Expr e = expr[0];
+		MathExpr e = expr[0];
 		for( int i=1; i<expr.length;i++){
 			e = e.divide( expr[i] );
 		}
 		return e;
 	}
-	static public Expr multiply( Expr expr[] ){
-		if( expr.length == 0 ) return literal( 1 );
+	static public Expr multiply( MathExpr expr[] ){
+		if( expr.length == 0 ) return math( 1 );
 		if( expr.length == 1 ) return expr[0];
-		Expr e = expr[0];
+		MathExpr e = expr[0];
 		for( int i=1; i<expr.length;i++){
 			e = e.multiply( expr[i] );
 		}
 		return e;
 	}
-	/** Start of a Expr chain */
-	static public Expr attribute( String xpath ){
-		return new AttributeExpr( xpath );
+	
+	/**
+	 * Attribute access.
+	 * <p>
+	 * Allows access to chained opperations.
+	 * <p>
+	 * @param attribute xpath expression to attribute
+	 * @return Expr
+	 */
+	static public Expr attribute( String attribute ){
+		return new AttributeExpr( attribute );
 	}
-	/** Convience attribute expression that retrieves default geometry */
-	static public Expr geom(){
-		return new GeomExpr();
+
+	/**
+	 * Default Geometry access.
+	 */
+	static public GeometryExpr geom(){
+		return new AttributeGeometryExpr();
 	}
+	
+	/**
+	 * Geometry attribute access.
+	 * <p>
+	 * Allows access to chained spatial opperations.
+	 * <p>
+	 * @param attribute xpath expression to attribute
+	 * @return GeometryAttribtue
+	 */
+	static public GeometryExpr geom( String attribute ){
+		return new AttributeGeometryExpr( attribute );
+	}
+	/**
+	 * Literal Geometry access.
+	 */
+	static public GeometryExpr geom( Envelope extent ){
+		return new LiteralGeometryExpr( extent );
+	}
+	/**
+	 * Literal Geometry access.
+	 */
+	static public GeometryExpr geom( Geometry geom ){
+		return new LiteralGeometryExpr( geom );
+	}
+	
+	static public MathExpr math( String attribute ){
+		return new AttributeMathExpr( attribute );
+	}
+	static public MathExpr math( int number ){
+		return new LiteralMathExpr( number );
+	}
+	static public MathExpr math( double number ){
+		return new LiteralMathExpr( number );
+	}
+	static public MathExpr math( Number number ){
+		return new LiteralMathExpr( number );
+	}
+	
 	static public Expr fn( String name, Expr expr ){
  		return new FunctionExpr( name, expr );
  	}

@@ -125,34 +125,26 @@ interface Expr {
 	/** Expr Disjunction */
 	public Expr or( Expr expr );
 	
-	// Standard Expr chains
-	/** this + expr */
-	public Expr add( Expr expr );
-	/** this - expr */
-	public Expr subtract( Expr expr );
-	/** this / expr */
-	public Expr divide( Expr expr );
-	public Expr multiply( Expr expr );		
+	/** expr == expr */
 	public Expr eq( Expr expr );
+	/** expr > expr */
 	public Expr gt( Expr expr );
+	
+	/** expr >= expr */
 	public Expr gte( Expr expr );
+	/** expr < expr */
 	public Expr lt( Expr expr );
+	/** expr <= expr */
 	public Expr lte( Expr expr );
+	/** expr != expr */
 	public Expr ne( Expr expr );
+	/** expr != null */
 	public Expr notNull();
-	public Expr between( Expr min, Expr max );
-	public Expr beyond( Expr expr, double distance );
-	public Expr contains( Expr expr );
-	public Expr crosses( Expr expr );
-	public Expr disjoint( Expr expr );	
-	public Expr dwithin( Expr expr, double distance );
-	public Expr equal( Expr expr );
-	public Expr intersects( Expr expr );
-	public Expr overlaps( Expr expr );
-	public Expr touches( Expr expr );
-	public Expr within( Expr expr );
+	/** name( expr ) */
  	public Expr fn( String name );
+ 	/** name( expr, expr ) */
  	public Expr fn( String name, Expr expr );
+ 	/** name( expr[0], expr[0], ... ) */
  	public Expr fn( String name, Expr expr[] );
 }
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 
-class AndExpr extends AbstractFilterExpr {
+class AndExpr extends AbstractExpr {
 	Expr expr1,expr2;
 	AndExpr( Expr expr1, Expr expr2 ){
 		this.expr1 = expr1;

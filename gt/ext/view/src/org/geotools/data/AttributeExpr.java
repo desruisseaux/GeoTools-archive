@@ -11,7 +11,7 @@ import org.geotools.filter.IllegalFilterException;
  * Expr.attribute( path ) if I can figure out how.
  * </p>
  */
-public class AttributeExpr extends AbstractExpressionExpr {
+public class AttributeExpr extends AbstractExpr {
 	String path;	
 	public AttributeExpr( String path ){
 		this.path = path;

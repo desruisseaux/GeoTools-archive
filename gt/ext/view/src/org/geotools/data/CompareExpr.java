@@ -8,7 +8,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.IllegalFilterException;
 
-class CompareExpr extends AbstractFilterExpr {
+class CompareExpr extends AbstractExpr {
 	Expr expr1,expr2;
 	short op;
 	CompareExpr( Expr expr1, short op, Expr expr2 ){
