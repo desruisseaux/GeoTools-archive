@@ -395,6 +395,11 @@ public final class CRSUtilities {
                     final GeneralEnvelope candidate;
                     if (geo instanceof GeographicBoundingBox) {
                         final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
+                        if (!bounds.getInclusion()) {
+                            // TODO: we could uses Envelope.substract if such
+                            //       a method is defined in a future version.
+                            continue;
+                        }
                         candidate = new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
                                                                       bounds.getWestBoundLongitude()},
                                                         new double[] {bounds.getSouthBoundLatitude(),
