@@ -142,6 +142,7 @@ public interface ResourceKeys
     public static final int ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1    =   114;
     public static final int ERROR_NULL_ARGUMENT_$1                      =   115;
     public static final int ERROR_NULL_VALUE_$2                         =   116;
+    public static final int ERROR_PARAMETER_NAME_CLASH_$4               =   131;
     public static final int ERROR_POINT_OUTSIDE_GRID                    =   117;
     public static final int ERROR_POINT_OUTSIDE_HEMISPHERE              =   118;
     public static final int ERROR_POLE_PROJECTION_$1                    =   119;

@@ -58,8 +58,6 @@ public class Parameters {
      * parameters. This lookup offers a bridge allowing you to lookup a
      * GeneralParameterDescriptor and use list or seach.
      * </p>
-     * @param type
-     * @return
      *
      * @deprecated In latest implementation, names are no longer localized.
      */

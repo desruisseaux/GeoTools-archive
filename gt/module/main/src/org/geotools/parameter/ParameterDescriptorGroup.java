@@ -32,9 +32,11 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup; // For javadoc
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.metadata.Identifier;  // For javadoc
 
 // Geotools dependencies
@@ -122,7 +124,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
     public ParameterDescriptorGroup(final Map properties,
                                     final int minimumOccurs,
                                     final int maximumOccurs,
-                                    final GeneralParameterDescriptor[] parameters)
+                                    GeneralParameterDescriptor[] parameters)
     {
         super(properties, minimumOccurs, maximumOccurs);
         this.maximumOccurs = maximumOccurs;
@@ -131,6 +133,23 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
         for (int i=0; i<parameters.length; i++) {
             this.parameters[i] = parameters[i];
             ensureNonNull("parameters", parameters, i);
+        }
+        /*
+         * Ensure there is no conflict in parameter names.
+         */
+        parameters = this.parameters;
+        for (int i=0; i<parameters.length; i++) {
+            final String name = parameters[i].getName().getCode();
+            for (int j=0; j<parameters.length; j++) {
+                if (i != j) {
+                    if (nameMatches(parameters[j], name)) {
+                        throw new InvalidParameterNameException(Resources.format(
+                            ResourceKeys.ERROR_PARAMETER_NAME_CLASH_$4,
+                            parameters[j].getName().getCode(), new Integer(j),
+                            name, new Integer(i)), name);
+                    }
+                }
+            }
         }
     }
 

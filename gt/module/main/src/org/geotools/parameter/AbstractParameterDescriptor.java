@@ -26,6 +26,9 @@ package org.geotools.parameter;
 import java.util.Map;
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValue; // For javadoc
+
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;

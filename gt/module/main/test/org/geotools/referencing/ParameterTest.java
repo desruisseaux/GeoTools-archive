@@ -33,6 +33,7 @@ import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.InvalidParameterCardinalityException;
 
 // Geotools dependencies
 import org.geotools.parameter.*;
@@ -369,19 +370,19 @@ public class ParameterTest extends TestCase {
         assertEquals("v3",  30, group.parameter("3").intValue());
 
         // Tests the replacement of some values
-        assertFalse("v1b", group.values().remove(v1b));
-//        try {
-//            assertTrue(group.values().remove(v1));
-//            fail("v1 is a mandatory parameter; it should not be removeable.");
-//        } catch (InvalidParameterCardinalityException e) {
-//            // This is the expected exception.
-//        }
-        assertTrue  ("v1b", group.values().add(v1b));
-        assertTrue  ("v2b", group.values().add(v2b));
-        assertTrue  ("v3b", group.values().add(v3b));
-        assertFalse ("v1b", group.values().add(v1b)); // Already present
-        assertFalse ("v2b", group.values().add(v2b)); // Already present
-        assertFalse ("v3b", group.values().add(v3b)); // Already present
+        assertFalse("v1b", content.remove(v1b));
+        try {
+            assertTrue(content.remove(v1));
+            fail("v1 is a mandatory parameter; it should not be removeable.");
+        } catch (InvalidParameterCardinalityException e) {
+            // This is the expected exception.
+        }
+        assertTrue  ("v1b", content.add(v1b));
+        assertTrue  ("v2b", content.add(v2b));
+        assertTrue  ("v3b", content.add(v3b));
+        assertFalse ("v1b", content.add(v1b)); // Already present
+        assertFalse ("v2b", content.add(v2b)); // Already present
+        assertFalse ("v3b", content.add(v3b)); // Already present
         assertEquals("v1b", -10, group.parameter("1").intValue());
         assertEquals("v2b", -20, group.parameter("2").intValue());
         assertEquals("v3b", -30, group.parameter("3").intValue());
@@ -414,18 +415,35 @@ public class ParameterTest extends TestCase {
         assertTrue     ("automatic",  content.contains(automatic));
 
         // Tests the replacement of some values
-        assertTrue  ("v1b", group.values().add(v1b));
-        assertTrue  ("v2b", group.values().add(v2b));
-        assertTrue  ("v3b", group.values().add(v3b));
-        assertFalse ("v1b", group.values().add(v1b)); // Already present
-        assertFalse ("v2b", group.values().add(v2b)); // Already present
-        assertFalse ("v3b", group.values().add(v3b)); // Already present
+        assertFalse("v1b", content.remove(v1b));       assertEquals("values", 3, content.size());
+        assertFalse("v3",  content.remove(v3));        assertEquals("values", 3, content.size());
+        assertTrue ("v3",  content.remove(automatic)); assertEquals("values", 2, content.size());
+        try {
+            assertTrue(content.remove(v1));
+            fail("v1 is a mandatory parameter; it should not be removeable.");
+        } catch (InvalidParameterCardinalityException e) {
+            // This is the expected exception.
+        }
+
+        assertEquals("values", 2, content.size());
+        assertTrue  ("v1b", content.add(v1b));
+        assertTrue  ("v2b", content.add(v2b));
+        assertTrue  ("v3b", content.add(v3b));
+        assertFalse ("v1b", content.add(v1b)); // Already present
+        assertFalse ("v2b", content.add(v2b)); // Already present
+        assertFalse ("v3b", content.add(v3b)); // Already present
         assertEquals("v1b", -10, group.parameter("1").intValue());
         assertEquals("v2b", -20, group.parameter("2").intValue());
         assertEquals("v3b", -30, group.parameter("3").intValue());
         assertEquals("values", 3, content.size());
-if (true) return;
 
+        /* --------------------------------------------- *
+         * Case (v1, v2, v3, v2b) where:
+         *    - v1   is mandatory
+         *    - v2   is mandatory and included twice
+         *    - v3   is optional
+         * --------------------------------------------- */
+if (true) return;
         group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v2b});
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = group.values();

@@ -450,7 +450,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     /**
      * Write the content of this parameter to the specified table.
      *
-     * @param  The table where to format the parameter value.
+     * @param  table The table where to format the parameter value.
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {

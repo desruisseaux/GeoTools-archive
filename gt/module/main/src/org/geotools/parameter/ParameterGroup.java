@@ -26,15 +26,9 @@ package org.geotools.parameter;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.AbstractList;
 import java.util.LinkedHashMap;
-import java.util.RandomAccess;
-import java.io.Serializable;
 import java.io.IOException;
 
 // OpenGIS dependencies
@@ -45,8 +39,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.InvalidParameterNameException;
-//import org.opengis.parameter.InvalidParameterCardinalityException;
+import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.metadata.Identifier;  // For javadoc
 
 // Geotools dependencies
@@ -54,7 +47,6 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.io.TableWriter;
 
 
@@ -81,7 +73,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     private static final long serialVersionUID = -1985309386356545126L;
 
     /**
-     * The {@linkplain #getValues parameter values} for this group.
+     * The {@linkplain #values() parameter values} for this group.
      * Note: consider as final. This field is not final only in order
      * to allows {@link #clone} to work.
      */
@@ -100,7 +92,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
 
     /**
      * Construct a parameter group from the specified descriptor.
-     * All {@linkplain #getValues parameter values} will be initialized
+     * All {@linkplain #values parameter values} will be initialized
      * to their default value.
      *
      * @param descriptor The descriptor for this group.
@@ -235,12 +227,9 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             final int max   = descriptor.getMaximumOccurs();
             if (!(count>=min && count<=max)) {
                 final String name = descriptor.getName().getCode();
-                throw new IllegalStateException(Resources.format(
+                throw new InvalidParameterCardinalityException(Resources.format(
                           ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
-                          new Integer(count), new Integer(min), new Integer(max)));
-//                throw new InvalidParameterCardinalityException(Resources.format(
-//                          ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
-//                          new Integer(count), new Integer(min), new Integer(max)), name);
+                          new Integer(count), new Integer(min), new Integer(max)), name);
             }
         }
     }
@@ -252,11 +241,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      */
     public List values() {
         if (asList == null) {
-            if (values == null){
-                asList = Collections.EMPTY_LIST;
-            } else {
-                asList = new ValueList();
-            }
+            asList = new ParameterValueList((ParameterDescriptorGroup) descriptor, values);
         }
         return asList;
     }
@@ -398,7 +383,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      *         of subgroups of the given name.
      */
     public org.opengis.parameter.ParameterValueGroup addGroup(String name)
-            throws ParameterNotFoundException//, InvalidParameterCardinalityException
+            throws ParameterNotFoundException, InvalidParameterCardinalityException
     {
         final GeneralParameterDescriptor check = 
                 ((ParameterDescriptorGroup) descriptor).descriptor(name);
@@ -406,18 +391,16 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             throw new ParameterNotFoundException(Resources.format(
                       ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
         }
-        int occurs = 0;
+        int count = 0;
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
             if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
-                occurs++;
+                count++;
             }
         }
-        if (occurs >= check.getMaximumOccurs()) {
-            throw new IllegalStateException(Resources.format(
-                ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(occurs)));
-//            throw new InvalidParameterCardinalityException(Resources.format(
-//                ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(occurs)), name);
+        if (count >= check.getMaximumOccurs()) {
+            throw new InvalidParameterCardinalityException(Resources.format(
+                ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
         }
         final org.opengis.parameter.ParameterValueGroup value =
             (org.opengis.parameter.ParameterValueGroup) // Remove this cast for J2SE 1.5.
@@ -449,7 +432,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      *             <code>ParameterValue</code> object.
      */
     public void add(ParameterValue parameter) throws InvalidParameterTypeException {
-        add((GeneralParameterValue) parameter);
+        values().add(parameter);
     }
     
     /**
@@ -469,109 +452,14 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      *  would result in more parameters than allowed by maxOccurs, or if this
      *  parameter is not allowable by the groups descriptor 
      *
-     * @deprecated User should never add {@link ParameterValueGroup} himself. Parameter value
-     *             creation should be controlled by this class. We should probably add a
-     *             <code>addGroup(String)</code> method instead, which create and returns a
+     * @deprecated User should never add {@link org.opengis.parameter.ParameterValueGroup} himself.
+     *             Parameter value creation should be controlled by this class. We should probably
+     *             add a <code>addGroup(String)</code> method instead, which create and returns a
      *             <code>ParameterValueGroup</code> object.
      */
     public void add(org.opengis.parameter.ParameterValueGroup group) throws InvalidParameterTypeException {
-        add((GeneralParameterValue) group);
+        values().add(group);
     }    
-
-    /**
-     * Adds a {@linkplain ParameterValue parameter value} or an other
-     * {@linkplain org.opengis.parameter.ParameterGroup parameter group}
-     * to this group. If an existing parameter is already included for
-     * the same {@linkplain ParameterDescriptor#getName identifier}, then
-     * there is a choice:
-     * <UL>
-     *   <LI>For <code>{@linkplain GeneralParameterDescriptor#getMaximumOccurs maximumOccurs}
-     *       == 1</code>, the new parameter will replace the existing parameter.</LI>
-     *   <LI>For <code>{@linkplain GeneralParameterDescriptor#getMaximumOccurs maximumOccurs}
-     *       &gt; 1</code>, the new parameter will be added. If adding the new parameter will
-     *       increase the number past what is allowable by <code>maximumOccurs</code>, then
-     *       an {@link IllegalStateException} will be thrown.</LI>
-     * </UL>
-     * 
-     * @param  parameter New parameter to be added to this group.
-     * @return <code>true</code> if this object changed as a result of this call.
-     * @throws IllegalArgumentException if the specified parameter is not allowable by the
-     *         groups descriptor.
-     * @throws InvalidParameterCardinalityException if adding this parameter would result in
-     *         more parameters than allowed by <code>maximumOccurs</code>.
-     */
-    final boolean add(final GeneralParameterValue parameter) {
-        final GeneralParameterDescriptor type = parameter.getDescriptor();
-        final List descriptors = ((ParameterDescriptorGroup) descriptor).descriptors();
-        final String name = type.getName().getCode();
-        if (!descriptors.contains(type)) {
-            /*
-             * For a more accurate error message, check if the operation failed because
-             * the parameter name was not found, or the parameter descriptor doesn't matches.
-             */
-            for (final Iterator it=descriptors.iterator(); it.hasNext();) {
-                if (IdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
-                    /*
-                     * Found a matching name. Concequently, the operation failed because
-                     * the descriptor was illegal.
-                     */
-                    throw new IllegalArgumentException(Resources.format(
-                              ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1, name));
-                }
-            }
-            /*
-             * Found no matching name. Concequently, the operation failed because the name
-             * was invalid.
-             */
-            final Object value;
-            if (parameter instanceof ParameterValue) {
-                value = ((ParameterValue) parameter).getValue();
-            } else {
-                value = "(group)";
-            }
-            throw new InvalidParameterNameException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, value), name);
-        }
-        final int min = type.getMinimumOccurs();
-        final int max = type.getMaximumOccurs();
-        if (max == 1) {
-            /*
-             * Optional or mandatory parameter - we will simply replace what is there.
-             */
-            for (int i=values.size(); --i>=0;) {
-                final GeneralParameterValue oldValue = (GeneralParameterValue) values.get(i);
-                final GeneralParameterDescriptor oldDescriptor = oldValue.getDescriptor();
-                if (type.equals(oldDescriptor)) {
-                    assert IdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
-                    final boolean same = parameter.equals(oldValue);
-                    values.set(i, parameter);
-                    return !same;
-                }
-            }
-            // Value will be added at the end of this method.
-        } else {
-            /*
-             * Parameter added (usually a group). Check the cardinality.
-             */
-            int count = 0;
-            for (final Iterator it=values.iterator(); it.hasNext();) {
-                final GeneralParameterValue value = (GeneralParameterValue) it.next();
-                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
-                    count++;
-                }
-            }
-            if (count >= max) {
-                throw new IllegalStateException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
-                          new Integer(count+1), new Integer(min), new Integer(max)));
-//                throw new InvalidParameterCardinalityException(Resources.format(
-//                          ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
-//                          new Integer(count+1), new Integer(min), new Integer(max)), name);
-            }
-        }
-        values.add(parameter);
-        return true;
-    }
     
     /**
      * Compares the specified object with this parameter for equality.
@@ -650,47 +538,5 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             inner.flush();
         }
         table.nextLine();
-    }
-
-    /**
-     * Values as list. This class performs check on the parameter value to
-     * be added or removed. This implementation supports {@link #add} and
-     * {@link #remove} operations.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    private final class ValueList extends AbstractList implements RandomAccess {
-        /*
-         * CAUTION: Some methods are NOT forwared to 'values', and this is on purpose!
-         *          This include all modification methods (add, set, remove, etc.).
-         *          We must rely on the default AbstractList implementation for them.
-         */
-        public boolean isEmpty    ()         {return values.isEmpty    ( );}
-        public int     size       ()         {return values.size       ( );}
-        public Object  get        (int i)    {return values.get        (i);}
-        public int     indexOf    (Object o) {return values.indexOf    (o);}
-        public int     lastIndexOf(Object o) {return values.lastIndexOf(o);}
-        public boolean equals     (Object o) {return values.equals     (o);}
-        public int     hashCode   ()         {return values.hashCode   ( );}
-
-        /**
-         * Add a value to this list. This method is automatically invoked by the default
-         * implementation of some collection methods like {@link #addAll}. This method
-         * delegates the work to the enclosing class, which will performs the necessary
-         * checks.
-         */
-        public boolean add(final Object object) {
-            modCount++;
-            return ParameterGroup.this.add((GeneralParameterValue) object);
-        }
-
-        /**
-         * Remove a value from this list. This method is automatically invoked by 
-         */
-        public Object remove(final int index) {
-            modCount++;
-            return values.remove(index);
-        }
     }
 }
