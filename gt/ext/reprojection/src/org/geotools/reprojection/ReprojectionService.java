@@ -83,7 +83,7 @@ public class ReprojectionService {
 	 * @return coordinate system for the provided code
 	 * @throws FactoryException
 	 */
-	public CoordinateSystem createCoodinateSystem( String code ) throws FactoryException{
+	public CoordinateSystem createCoordinateSystem( String code ) throws FactoryException{
 		int split = code.indexOf(":");
 		String key = "EPSG";
 		if( split != -1 ){
