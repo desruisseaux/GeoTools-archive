@@ -12,12 +12,20 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultFeatureReader;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.DefaultFeatureCollections;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.CompareFilter;
@@ -35,7 +43,16 @@ import org.geotools.filter.IllegalFilterException;
  *
  */
 public class WFSDataStoreWriteTest extends TestCase {
-    public void testEmpty(){/**/}
+    public void testEmpty() throws NoSuchElementException, IOException, IllegalAttributeException, FactoryConfigurationError{
+//        URL u = new URL("http://localhost:8080/geoserver/wfs");
+//        WFSDataStore ds = getDataStore(u);
+//        FeatureType ft = ds.getSchema("states");
+//        Feature f = ds.getFeatureReader("states").next();
+//        doDelete(ds,ft,FilterFactory.createFilterFactory().createFidFilter(f.getID()));
+//        FeatureCollection fc = DefaultFeatureCollections.newCollection();
+//        fc.add(f);
+//        doInsert(ds,ft,(new CollectionDataStore(fc)).getFeatureReader("states"));
+    }
 
     
     public WFSDataStoreWriteTest(){
