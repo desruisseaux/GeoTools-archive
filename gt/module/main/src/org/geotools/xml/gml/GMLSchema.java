@@ -23,8 +23,10 @@ import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultAttributeValue;
+import org.geotools.xml.schema.DefaultFacet;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
@@ -760,7 +762,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Attribute#getNameSpace()
          */
-        public String getNameSpace() {
+        public String getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 
@@ -838,6 +840,13 @@ public class GMLSchema implements Schema {
          * @see schema.AttributeGroup#getNameSpace()
          */
         public String getNameSpace() {
+            return GMLSchema.NAMESPACE;
+        }
+
+        /**
+         * @see schema.Attribute#getNameSpace()
+         */
+        public String getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 
@@ -993,6 +1002,32 @@ public class GMLSchema implements Schema {
             output.startElement(element.getNamespace(),element.getName(),null);
             output.characters(value.toString());
             output.endElement(element.getNamespace(),element.getName());
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getChildType()
+         */
+        public int getChildType() {
+            return RESTRICTION;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getParents()
+         */
+        public SimpleType[] getParents() {
+            return new SimpleType[] {XSISimpleTypes.String.getInstance(),};
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getFacets()
+         */
+        public Facet[] getFacets() {
+            return new Facet[] {
+                    new DefaultFacet(Facet.ENUMERATION,"inapplicable"),
+                    new DefaultFacet(Facet.ENUMERATION,"unknown"),
+                    new DefaultFacet(Facet.ENUMERATION,"unavailable"),
+                    new DefaultFacet(Facet.ENUMERATION,"missing"),
+            };
         }
     }
 

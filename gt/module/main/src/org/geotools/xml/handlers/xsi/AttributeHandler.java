@@ -17,7 +17,7 @@
 package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.Attribute;import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -255,16 +255,14 @@ public class AttributeHandler extends XSIElementHandler {
             return cache;
         }
 
-        AttributeDefault a = new AttributeDefault();
-        a.defaulT = def;
-        a.fixed = fixed;
-        a.id = id;
-        a.name = name;
-        a.use = use;
-
         // a.form = form; TODO add form support?
+        SimpleType st = null;
+        String name = this.name;
+        String def = this.def;
+        String fixed = this.fixed;
+        int use = this.use;
         if (simpleType != null) {
-            a.simpleType = simpleType.compress(parent);
+            st = simpleType.compress(parent);
         } else {
             if ((ref != null) && !"".equalsIgnoreCase(ref)) {
                 Attribute refA = parent.lookUpAttribute(ref);
@@ -274,26 +272,26 @@ public class AttributeHandler extends XSIElementHandler {
                         + "' was refered and not found");
                 }
 
-                a.simpleType = refA.getSimpleType();
-                a.name = refA.getName();
-                a.use = use | refA.getUse();
+                st = refA.getSimpleType();
+                name = refA.getName();
+                use = use | refA.getUse();
 
                 if ((def == null) || "".equalsIgnoreCase(def)) {
-                    a.defaulT = refA.getDefault();
+                    def = refA.getDefault();
                 }
 
                 if ((fixed == null) || "".equalsIgnoreCase(fixed)) {
-                    a.fixed = refA.getFixed();
+                    fixed = refA.getFixed();
                 }
             } else if ((type != null) && (!"".equalsIgnoreCase(type))) {
                 // 	look it up --- find it
-                a.simpleType = parent.lookUpSimpleType(type);
+                st = parent.lookUpSimpleType(type);
             }
         }
 
-        cache = a;
+        cache = new DefaultAttribute(id, name, parent.getTargetNamespace(),st,use,def,fixed,false);
 
-        id = type = ref;
+        id = type = ref = null;
         
         return cache;
     }
@@ -312,82 +310,5 @@ public class AttributeHandler extends XSIElementHandler {
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-    }
-
-    /**
-     * 
-     * <p> 
-     * Represents an Attribute
-     * </p>
-     * @see Attribute
-     * @author dzwiers
-     *
-     */
-    private class AttributeDefault implements Attribute {
-        // file visible to avoid set* methods
-        
-        String defaulT;
-        String fixed;
-        String id;
-        String name;
-        int use;
-        boolean form;
-        SimpleType simpleType;
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getDefault()
-         */
-        public String getDefault() {
-            return defaulT;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getFixed()
-         */
-        public String getFixed() {
-            return fixed;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#isForm()
-         */
-        public boolean isForm() {
-            return form;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getId()
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getName()
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getSimpleType()
-         */
-        public SimpleType getSimpleType() {
-            return simpleType;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Attribute#getUse()
-         */
-        public int getUse() {
-            return use;
-        }
     }
 }

@@ -17,6 +17,7 @@
 package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
+import org.geotools.xml.schema.Facet;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -450,7 +451,7 @@ class EnumerationHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.ENUMERATION;
+        return Facet.ENUMERATION;
     }
 
     /**
@@ -478,7 +479,7 @@ class FractionDigitsHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.FRACTIONDIGITS;
+        return Facet.FRACTIONDIGITS;
     }
 
     /**
@@ -505,7 +506,7 @@ class LengthHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.LENGTH;
+        return Facet.LENGTH;
     }
 
     /**
@@ -533,7 +534,7 @@ class MinInclusiveHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MININCLUSIVE;
+        return Facet.MININCLUSIVE;
     }
 
     /**
@@ -561,7 +562,7 @@ class MaxInclusiveHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MAXINCLUSIVE;
+        return Facet.MAXINCLUSIVE;
     }
 
     /**
@@ -588,7 +589,7 @@ class MinExclusiveHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MINEXCLUSIVE;
+        return Facet.MINEXCLUSIVE;
     }
 
     /**
@@ -616,7 +617,7 @@ class MaxExclusiveHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MAXEXCLUSIVE;
+        return Facet.MAXEXCLUSIVE;
     }
 
     /**
@@ -643,7 +644,7 @@ class MinLengthHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MINLENGTH;
+        return Facet.MINLENGTH;
     }
 
     /**
@@ -670,7 +671,7 @@ class MaxLengthHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.MAXLENGTH;
+        return Facet.MAXLENGTH;
     }
 
     /**
@@ -698,7 +699,7 @@ class PatternHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.PATTERN;
+        return Facet.PATTERN;
     }
 
     /**
@@ -726,7 +727,7 @@ class TotalDigitsHandler extends FacetHandler {
      * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
      */
     public int getType() {
-        return FacetHandler.TOTALDIGITS;
+        return Facet.TOTALDIGITS;
     }
 
     /**

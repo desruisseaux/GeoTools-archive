@@ -33,6 +33,7 @@ import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.DefaultAttributeValue;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
@@ -52,6 +53,7 @@ import org.xml.sax.SAXException;
  */
 public class XSISimpleTypes {
     private static Map m;
+    public static final java.lang.String NAMESPACE = "http://www.w3.org/2001/XMLSchema";
 
     /**
      * <p>
@@ -270,7 +272,7 @@ public class XSISimpleTypes {
          * @see org.geotools.xml.xsi.Type#getNamespace()
          */
         public java.lang.String getNamespace() {
-            return "http://www.w3.org/2001/XMLSchema";
+            return NAMESPACE;
         }
 
         /**
@@ -286,6 +288,27 @@ public class XSISimpleTypes {
          * @see org.geotools.xml.xsi.SimpleType#getId()
          */
         public java.lang.String getId() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getChildType()
+         */
+        public int getChildType() {
+            return NONE; // this should be ok
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getParents()
+         */
+        public SimpleType[] getParents() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getFacets()
+         */
+        public Facet[] getFacets() {
             return null;
         }
     }

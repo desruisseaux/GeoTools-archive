@@ -79,19 +79,6 @@ public interface Type {
 
     /**
      * <p>
-     * This is used to represent the heirarchy represented within an xml schema
-     * document(s). This is particularily useful, as the parent will have the
-     * first attempt to create a real (non Object[]) value of the element. For
-     * more information see getValue.
-     * </p>
-     * 
-     * @see Type#getValue(Element, ElementValue[], Attributes)
-     * @return
-     */
-    public Type getParent();
-
-    /**
-     * <p>
      * This will return the intended Java Class for this element type. For
      * generic complex types this will be an object array. SimpleTypes will
      * match as they are parsed, and custom extensions will also return the

@@ -18,6 +18,8 @@ package org.geotools.xml.schema;
 
 import java.util.Map;
 
+import org.xml.sax.Attributes;
+
 /**
  * <p>
  * This interface is intended to represent an XML Schema complexType. This
@@ -29,6 +31,19 @@ import java.util.Map;
  * @author dzwiers www.refractions.net
  */
 public interface ComplexType extends Type {
+
+    /**
+     * <p>
+     * This is used to represent the heirarchy represented within an xml schema
+     * document(s). This is particularily useful, as the parent will have the
+     * first attempt to create a real (non Object[]) value of the element. For
+     * more information see getValue.
+     * </p>
+     * 
+     * @see Type#getValue(Element, ElementValue[], Attributes)
+     * @return
+     */
+    public Type getParent();
     
     /**
      * Returns true when the complexType should be considered abstract, as 

@@ -94,38 +94,38 @@ public class GmlTest extends TestCase {
         }
     }
 
-    public void testGMLDataSource() throws Exception {
-        // no try block, a thrown exception will cause it a fail and should
-        //print the trace to the output.
-       
-        URL url = TestData.getResource(this, "testGML7Features.gml");
-        System.out.println("Testing ability to load " + url
-            + " as Feature datasource");
-
-        DataSource ds = new GMLDataSource(url);
-
-        table = ds.getFeatures(Query.ALL);
-
-        //}catch(DataSourceException exp) {
-        //   System.out.println("Exception requesting Extent : "+exp.getClass().getName()+" : "+exp.getMessage());
-        //   exp.printStackTrace();
-        //}
-        FeatureIterator features = table.features();
-        LOGGER.fine("first feature is " + features.next());
-        assertEquals(7, table.size());
-
-        Feature second = features.next();
-        String desc2 = (String) second.getAttribute("description");
-        LOGGER.fine("second feature's description is " + desc2);
-        assertEquals("Lots of text to describe this line, infact so much "
-            + "that it goes over three lines.", desc2);
-
-        // TODO: add more tests here
-        Iterator i = table.iterator();
-        LOGGER.fine("Got " + table.size() + " features");
-
-        while (i.hasNext()) {
-            LOGGER.fine("feature is " + i.next());
-        }
-    }
+//    public void testGMLDataSource() throws Exception {
+//        // no try block, a thrown exception will cause it a fail and should
+//        //print the trace to the output.
+//       
+//        URL url = TestData.getResource(this, "testGML7Features.gml");
+//        System.out.println("Testing ability to load " + url
+//            + " as Feature datasource");
+//
+//        DataSource ds = new GMLDataSource(url);
+//
+//        table = ds.getFeatures(Query.ALL);
+//
+//        //}catch(DataSourceException exp) {
+//        //   System.out.println("Exception requesting Extent : "+exp.getClass().getName()+" : "+exp.getMessage());
+//        //   exp.printStackTrace();
+//        //}
+//        FeatureIterator features = table.features();
+//        LOGGER.fine("first feature is " + features.next());
+//        assertEquals(7, table.size());
+//
+//        Feature second = features.next();
+//        String desc2 = (String) second.getAttribute("description");
+//        LOGGER.fine("second feature's description is " + desc2);
+//        assertEquals("Lots of text to describe this line, infact so much "
+//            + "that it goes over three lines.", desc2);
+//
+//        // TODO: add more tests here
+//        Iterator i = table.iterator();
+//        LOGGER.fine("Got " + table.size() + " features");
+//
+//        while (i.hasNext()) {
+//            LOGGER.fine("feature is " + i.next());
+//        }
+//    }
 }

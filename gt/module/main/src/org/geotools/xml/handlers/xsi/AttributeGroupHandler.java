@@ -19,6 +19,7 @@ package org.geotools.xml.handlers.xsi;
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.DefaultAttributeGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -176,14 +177,9 @@ public class AttributeGroupHandler extends XSIElementHandler {
             return cache;
         }
 
-        AttributeGroupDefault agd = new AttributeGroupDefault();
-
-        agd.id = id;
-        agd.name = name;
-        agd.anyAttributeNamespace = (anyAttribute == null) ? null
-                                                           : anyAttribute
-            .getNamespace();
-
+        String anyAttributeNamespace = (anyAttribute == null) ? null
+                : anyAttribute.getNamespace();
+        Attribute[] attributes = null;
         if (attrDecs != null) {
             Iterator i = attrDecs.iterator();
             HashSet h = new HashSet();
@@ -206,9 +202,10 @@ public class AttributeGroupHandler extends XSIElementHandler {
                 }
             }
 
-            agd.attributes = (Attribute[]) h.toArray(new Attribute[h.size()]);
+            attributes = (Attribute[]) h.toArray(new Attribute[h.size()]);
         }
 
+        String name = this.name;
         if ((ref != null) && !"".equalsIgnoreCase(ref)) {
             AttributeGroup ag = parent.lookUpAttributeGroup(ref);
 
@@ -217,22 +214,22 @@ public class AttributeGroupHandler extends XSIElementHandler {
                     + "' was refered and not found");
             }
 
-            agd.name = ag.getName();
+            name = ag.getName();
 
             if ((anyAttribute == null)
                     || "".equalsIgnoreCase(anyAttribute.getNamespace())) {
-                agd.anyAttributeNamespace = ag.getAnyAttributeNameSpace();
+                anyAttributeNamespace = ag.getAnyAttributeNameSpace();
             }
 
-            if (agd.attributes != null) {
+            if (attributes != null) {
                 throw new SAXException(
                     "Cannot have a ref and children for an AttributeGroup");
             }
 
-            agd.attributes = ag.getAttributes();
+            attributes = ag.getAttributes();
         }
 
-        cache = agd;
+        cache = new DefaultAttributeGroup(id,name,parent.getTargetNamespace(),attributes,anyAttributeNamespace);
 
         return cache;
     }
@@ -251,53 +248,5 @@ public class AttributeGroupHandler extends XSIElementHandler {
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-    }
-
-    /**
-     * 
-     * <p> 
-     * An implementation of AttributeGroup
-     * </p>
-     * @see AttributeGroup
-     * @author dzwiers
-     *
-     */
-    private class AttributeGroupDefault implements AttributeGroup {
-        String anyAttributeNamespace;
-        Attribute[] attributes;
-        String id;
-        String name;
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.AttributeGroup#getAnyAttributeNameSpace()
-         */
-        public String getAnyAttributeNameSpace() {
-            return anyAttributeNamespace;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.AttributeGroup#getAttributes()
-         */
-        public Attribute[] getAttributes() {
-            return attributes;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.AttributeGroup#getId()
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.AttributeGroup#getName()
-         */
-        public String getName() {
-            return name;
-        }
     }
 }

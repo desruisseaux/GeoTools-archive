@@ -92,6 +92,7 @@ public interface Attribute {
      * @return
      */
     public String getName();
+    public String getNamespace();
 
     /**
      * <p>

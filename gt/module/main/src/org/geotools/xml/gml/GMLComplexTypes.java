@@ -691,9 +691,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Geometry));
         }
 
@@ -855,9 +855,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Geometry));
         }
 
@@ -1016,9 +1016,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof LineString));
         }
 
@@ -1180,9 +1180,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Polygon));
         }
 
@@ -1344,9 +1344,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof LinearRing));
         }
 
@@ -1505,9 +1505,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Point));
         }
 
@@ -1677,9 +1677,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof LineString));
         }
 
@@ -1848,9 +1848,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof LinearRing));
         }
 
@@ -2024,9 +2024,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Geometry));
         }
 
@@ -2200,9 +2200,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Polygon));
         }
 
@@ -2340,9 +2340,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof GeometryCollection));
         }
 
@@ -2482,9 +2482,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof MultiPoint));
         }
 
@@ -2624,9 +2624,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof MultiLineString));
         }
 
@@ -2766,9 +2766,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof MultiPolygon));
         }
 
@@ -2933,9 +2933,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Coordinate));
         }
 
@@ -3129,9 +3129,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof CoordinateSequence));
         }
 
@@ -3393,9 +3393,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || element == null || !(value instanceof Feature))
                 return false;
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -3627,11 +3627,11 @@ public class GMLComplexTypes {
         public boolean cache(Element element, Map hints){
             if(hints==null || hints.get(STREAM_HINT)==null)
                 return true;
-            Type e = element.getType();
+            ComplexType e = element.getType() instanceof ComplexType?(ComplexType)element.getType():null;
             while(e!=null){
                 if(e.getName()!=null && e.getName().equals(BoxType.getInstance().getName()))
                     return true;
-                e = e.getParent();
+                e = e.getParent() instanceof ComplexType?(ComplexType)e.getParent():null;
             }
             return false;
         }
@@ -3684,9 +3684,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof FeatureCollection));
         }
 
@@ -3868,9 +3868,9 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return (t!=null && (value instanceof Geometry));
         }
 
@@ -4029,9 +4029,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(!(value instanceof Feature))
                 return false;
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t == this;
         }
 
@@ -4164,9 +4164,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || element == null || !(value instanceof Geometry))
                 return false;
-            Type t = element.getType();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
             while(t!=null && t!=this)
-                t = t.getParent();
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -4320,9 +4320,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof Point))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -4457,9 +4457,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof Polygon))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -4594,9 +4594,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof LineString))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -4731,9 +4731,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof MultiPoint))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -4869,9 +4869,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof MultiLineString))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -5007,9 +5007,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof MultiPolygon))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 
@@ -5145,9 +5145,9 @@ public class GMLComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if(value == null || !(value instanceof GeometryCollection))
                 return false;
-            Type t = element.getType();
-            while(t != null && t!=this)
-                t = t.getParent();
+            ComplexType t = element.getType() instanceof ComplexType? (ComplexType)element.getType():null;
+            while(t!=null && t!=this)
+                t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
             return t!=null;
         }
 

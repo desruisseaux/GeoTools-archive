@@ -92,4 +92,23 @@ public interface SimpleType extends Type {
     public AttributeValue toAttribute(Attribute attribute, Object value, Map hints);
 
     public boolean canCreateAttributes(Attribute attribute, Object value, Map hints);
+    
+    /**
+     * Returns an int of either List, Union or Restriction
+     * 
+     * @return
+     */
+    public int getChildType();
+    
+    /**
+     * A simple simpleType when either a List or Restriction ... A set when a Union
+     * @return
+     */
+    public SimpleType[] getParents();
+    
+    /**
+     * The list of facets for this Restriction ... Null if another type (List, Union)
+     * @return
+     */
+    public Facet[] getFacets();
 }

@@ -16,30 +16,18 @@
  */
 package org.geotools.xml.handlers.xsi;
 
-import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.Attribute;
-import org.geotools.xml.schema.AttributeValue;
-import org.geotools.xml.schema.DefaultAttribute;
-import org.geotools.xml.schema.DefaultAttributeValue;
-import org.geotools.xml.schema.Element;
-import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.DefaultFacet;
+import org.geotools.xml.schema.DefaultSimpleType;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.SimpleType;
-import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -248,19 +236,87 @@ public class SimpleTypeHandler extends XSIElementHandler {
             return cache;
         }
 
-        DefaultSimpleType dst = new DefaultSimpleType();
-        dst.finaL = finaL;
-        dst.id = id;
-        dst.name = name;
-        dst.namespace = parent.getTargetNamespace();
-        dst.setup(child, parent);
+        Facet[] facets = null;
+        if(child.getHandlerType() == SimpleType.RESTRICTION)
+            facets = getFacets((RestrictionHandler)child);
+                
+        SimpleType[] simpleTypes = getSimpleTypes(child,parent);
         
-        cache = dst;
+        cache = new DefaultSimpleType(id,name,parent.getTargetNamespace(),child.getHandlerType(),simpleTypes,facets,finaL);
 
         logger.info("End compressing SimpleType " + getName());
         id = null;child = null;
 
-        return dst;
+        return cache;
+    }
+    
+    static SimpleType[] getSimpleTypes(XSIElementHandler child, SchemaHandler parent) {
+        switch (child.getHandlerType()) {
+        case RESTRICTION:
+            return getSimpleTypes((RestrictionHandler) child, parent);
+        case LIST:
+            return getSimpleTypes((ListHandler) child, parent);
+        case UNION:
+            return getSimpleTypes((UnionHandler) child, parent);
+        default:
+            throw new RuntimeException(
+                "Should not be here ... child is one of the other three types.");
+        }
+    }
+    
+    static SimpleType[] getSimpleTypes(RestrictionHandler rest, SchemaHandler parent) {
+        SimpleType[] children = new SimpleType[1];
+        if (rest.getChild() != null) {
+            children[0] = ((SimpleTypeHandler) rest.getChild()).compress(parent);
+        } else {
+            children[0] = parent.lookUpSimpleType(rest.getBase());
+        }
+        return children;
+    }
+    static SimpleType[] getSimpleTypes(ListHandler rest, SchemaHandler parent) {
+        SimpleType[] children = new SimpleType[1];
+        if (rest.getSimpleType() != null) {
+            children[0] = ((SimpleTypeHandler) rest.getSimpleType()).compress(parent);
+        } else {
+            children[0] = parent.lookUpSimpleType(rest.getItemType());
+        }
+        return children;
+    }
+    
+    static SimpleType[] getSimpleTypes(UnionHandler union, SchemaHandler parent) {
+
+        List l = new LinkedList();
+
+        if (union.getMemberTypes() != null) {
+            String[] qNames = union.getMemberTypes().split("\\s");
+
+            for (int i = 0; i < qNames.length; i++)
+                l.add(parent.lookUpSimpleType(qNames[i]));
+        }
+
+        if (union.getSimpleTypes() != null) {
+            Iterator i = union.getSimpleTypes().iterator();
+
+            while (i.hasNext()) {
+                l.add(((SimpleTypeHandler) i.next()).compress(parent));
+            }
+        }
+
+        return (SimpleType[]) l.toArray(new SimpleType[l.size()]);
+    }
+    
+    static Facet[] getFacets(RestrictionHandler rh){
+        List contraints = rh.getConstraints();
+        if(contraints==null || contraints.size()==0)
+            return null;
+        Facet[] facets = new Facet[contraints.size()];
+        Iterator i = contraints.iterator();
+        int index = 0;
+        while(i.hasNext()){
+            FacetHandler fh = (FacetHandler)i.next();
+            facets[index] = new DefaultFacet(fh.getType(),fh.getValue());
+        }
+        return facets;
     }
 
     /**
@@ -277,611 +333,5 @@ public class SimpleTypeHandler extends XSIElementHandler {
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-    }
-
-    /**
-     * 
-     * <p> 
-     * Default implementation of a Simpletype to represent parsed instances
-     * </p>
-     * @see SimpleType
-     * @author dzwiers
-     *
-     */
-    private static class DefaultSimpleType implements SimpleType {
-        // file visible to avoid set* methods
-        int finaL;
-        String id;
-        String name;
-        String namespace;
-        private SimpleType[] children = null;
-        private boolean isUnion = false;
-        private boolean isList = false;
-        private FacetHandler[] constraints;
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getInstanceType()
-         */
-        public Class getInstanceType() {
-            // if it's a union ... deal with it i guess
-            return children[0].getInstanceType();
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.SimpleType#getFinal()
-         */
-        public int getFinal() {
-            return finaL;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.SimpleType#getId()
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getName()
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getParent()
-         */
-        public Type getParent() {
-            if (!isUnion && (children != null) && (children.length == 1)) {
-                return children[0];
-            }
-
-            return null;
-        }
-
-        /**
-         * 
-         * <p>
-         * used inplace of a constructor to allow for fancier recursive calls.
-         * </p>
-         *
-         * @param child
-         * @param parent
-         */
-        void setup(XSIElementHandler child, SchemaHandler parent) {
-            switch (child.getHandlerType()) {
-            case RESTRICTION:
-                setup((RestrictionHandler) child, parent);
-
-                break;
-
-            case LIST:
-                setup((ListHandler) child, parent);
-
-                break;
-
-            case UNION:
-                setup((UnionHandler) child, parent);
-
-                break;
-
-            default:
-                throw new RuntimeException(
-                    "Should not be here ... child is one of the other three types.");
-            }
-        }
-
-        /**
-         * 
-         * <p>
-         * helper method for setup(XSIElementHandler,SchemaHandler)
-         * </p>
-         *
-         * @param rest
-         * @param parent
-         */
-        void setup(RestrictionHandler rest, SchemaHandler parent) {
-            if (rest.getChild() != null) {
-                children = new SimpleType[1];
-                children[0] = ((SimpleTypeHandler) rest.getChild()).compress(parent);
-            } else {
-                // find this rest.getBase()
-                children = new SimpleType[1];
-                children[0] = parent.lookUpSimpleType(rest.getBase());
-            }
-
-            if (rest.getConstraints() != null) {
-                constraints = (FacetHandler[]) rest.getConstraints().toArray(new FacetHandler[0]);
-            }
-        }
-
-        /**
-         * 
-         * <p>
-         * helper method for setup(XSIElementHandler,SchemaHandler)
-         * </p>
-         *
-         * @param rest
-         * @param parent
-         */
-        void setup(ListHandler lst, SchemaHandler parent) {
-            isList = true;
-
-            if (lst.getSimpleType() != null) {
-                children = new SimpleType[1];
-                children[0] = (lst.getSimpleType()).compress(parent);
-            } else {
-                // find this rest.getBase()
-                children = new SimpleType[1];
-                children[0] = parent.lookUpSimpleType(lst.getItemType());
-            }
-        }
-
-        /**
-         * 
-         * <p>
-         * helper method for setup(XSIElementHandler,SchemaHandler)
-         * </p>
-         *
-         * @param rest
-         * @param parent
-         */
-        void setup(UnionHandler union, SchemaHandler parent) {
-            isUnion = true;
-
-            List l = new LinkedList();
-
-            if (union.getMemberTypes() != null) {
-                String[] qNames = union.getMemberTypes().split("\\s");
-
-                for (int i = 0; i < qNames.length; i++)
-                    l.add(parent.lookUpSimpleType(qNames[i]));
-            }
-
-            if (union.getSimpleTypes() != null) {
-                Iterator i = union.getSimpleTypes().iterator();
-
-                while (i.hasNext()) {
-                    l.add(((SimpleTypeHandler) i.next()).compress(parent));
-                }
-            }
-
-            children = (SimpleType[]) l.toArray(children);
-        }
-
-        /**
-         * <p>
-         * This method ignores the attributes from the xml node
-         * </p>
-         *
-         * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
-         */
-        public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
-            if ((value == null) || (value.length != 1)) {
-                throw new SAXException(
-                    "can only have one text value ... and one is required");
-            }
-
-            if (isUnion) {
-                return getUnionValue(element, value[0], attrs, hints);
-            }
-
-            if (isList) {
-                return getListValue(element, value[0], attrs, hints);
-            }
-
-            return getRestValue(element, value[0], attrs, hints);
-        }
-
-        /*
-         * Helper for getValue(Element,ElementValue[])
-         */
-        private Object getUnionValue(Element element, ElementValue value,
-            Attributes attrs, Map hints) throws SAXException {
-            if (children == null) {
-                return null;
-            }
-            ElementValue[] valss = new ElementValue[1];
-            valss[0] = value;
-            for (int i = 0; i < children.length; i++) {
-                Object o = children[0].getValue(element, valss, attrs, hints);
-                if (o != null) {
-                    return o;
-                }
-            }
-            return null;
-        }
-
-        /*
-         * Helper for getValue(Element,ElementValue[])
-         */
-        private Object getListValue(Element element, ElementValue value,
-            Attributes attrs, Map hints) throws SAXException {
-            if ((children == null) || (children[0] == null)) {
-                return null;
-            }
-
-            String[] vals = ((String) value.getValue()).split("\\s");
-            List l = new LinkedList();
-            DefaultElementValue[] valss = new DefaultElementValue[1];
-            valss[0] = new DefaultElementValue();
-            valss[0].e = value.getElement();
-
-            for (int i = 0; i < vals.length; i++) {
-                valss[0].val = vals[i];
-                l.add(children[0].getValue(element, valss, attrs, hints));
-            }
-
-            valss[0].val = l;
-
-            return valss[0];
-        }
-
-        /*
-         * Helper for getValue(Element,ElementValue[])
-         */
-        private Object getRestValue(Element element, ElementValue value,
-            Attributes attrs, Map hints) throws SAXException {
-            if ((children == null) || (children[0] == null)) {
-                return null;
-            }
-
-            if (constraints == null) {
-                return null;
-            }
-
-            if (constraints.length == 0) {
-                ElementValue[] t = new ElementValue[1];
-                t[0] = value;
-
-                return children[0].getValue(element, t, attrs, hints);
-            }
-
-            String val = (String) value.getValue();
-
-            if (constraints[0].getType() == FacetHandler.ENUMERATION) {
-                for (int i = 0; i < constraints.length; i++) {
-                    if (val.equalsIgnoreCase(constraints[i].getValue())) {
-                        ElementValue[] t = new ElementValue[1];
-                        t[0] = value;
-
-                        return children[0].getValue(element, t, attrs, hints);
-                    }
-                }
-
-                return null;
-            } else {
-                Number nval = null;
-                Date dval = null;
-                String sval = val;
-
-                ElementValue[] t = new ElementValue[1];
-                t[0] = value;
-
-                Object o = children[0].getValue(element, t, attrs, hints);
-
-                if (o instanceof Number) {
-                    nval = (Number) o;
-                }
-
-                if (o instanceof Date) {
-                    dval = (Date) o;
-                }
-
-                // check each constraint
-                for (int i = 0; i < constraints.length; i++) {
-                    switch (constraints[i].getType()) {
-                    case FacetHandler.ENUMERATION:
-                        throw new SAXException(
-                            "cannot have enumerations mixed with other facets.");
-
-                    case FacetHandler.FRACTIONDIGITS:
-
-                        int decimals = val.length() - val.indexOf(".");
-                        int maxDec = Integer.parseInt(constraints[i].getValue());
-
-                        if (decimals > maxDec) {
-                            throw new SAXException("Too many decimal places");
-                        }
-
-                        break;
-
-                    case FacetHandler.LENGTH:
-
-                        int maxLength = Integer.parseInt(constraints[i]
-                                .getValue());
-
-                        if (val.length() != maxLength) {
-                            throw new SAXException("Too long places");
-                        }
-
-                        break;
-
-                    case FacetHandler.MAXEXCLUSIVE:
-
-                        if (nval != null) {
-                            Double max = Double.valueOf(constraints[i].getValue());
-
-                            if (nval.doubleValue() > max.doubleValue()) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                        if (dval != null) {
-                            Date max;
-
-                            try {
-                                max = DateFormat.getDateTimeInstance().parse(constraints[i]
-                                        .getValue());
-                            } catch (ParseException e) {
-                                throw new SAXException(e);
-                            }
-
-                            if (dval.after(max)) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                        break;
-
-                    case FacetHandler.MAXINCLUSIVE:
-
-                        if (nval != null) {
-                            Double max = Double.valueOf(constraints[i].getValue());
-
-                            if (nval.doubleValue() >= max.doubleValue()) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                        if (dval != null) {
-                            Date max;
-
-                            try {
-                                max = DateFormat.getDateTimeInstance().parse(constraints[i]
-                                        .getValue());
-                            } catch (ParseException e) {
-                                throw new SAXException(e);
-                            }
-
-                            if (dval.compareTo(max) > 0) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                    case FacetHandler.MAXLENGTH:
-                        maxLength = Integer.parseInt(constraints[i].getValue());
-
-                        if (val.length() > maxLength) {
-                            throw new SAXException("Too long places");
-                        }
-
-                        break;
-
-                    case FacetHandler.MINEXCLUSIVE:
-
-                        if (nval != null) {
-                            Double max = Double.valueOf(constraints[i].getValue());
-
-                            if (nval.doubleValue() < max.doubleValue()) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                        if (dval != null) {
-                            Date max;
-
-                            try {
-                                max = DateFormat.getDateTimeInstance().parse(constraints[i]
-                                        .getValue());
-                            } catch (ParseException e) {
-                                throw new SAXException(e);
-                            }
-
-                            if (dval.before(max)) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                    case FacetHandler.MININCLUSIVE:
-
-                        if (nval != null) {
-                            Double max = Double.valueOf(constraints[i].getValue());
-
-                            if (nval.doubleValue() <= max.doubleValue()) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                        if (dval != null) {
-                            Date max;
-
-                            try {
-                                max = DateFormat.getDateTimeInstance().parse(constraints[i]
-                                        .getValue());
-                            } catch (ParseException e) {
-                                throw new SAXException(e);
-                            }
-
-                            if (dval.compareTo(max) < 0) {
-                                throw new SAXException("Too large a value");
-                            }
-                        }
-
-                    case FacetHandler.MINLENGTH:
-                        maxLength = Integer.parseInt(constraints[i].getValue());
-
-                        if (val.length() < maxLength) {
-                            throw new SAXException("Too short places");
-                        }
-
-                        break;
-
-                    case FacetHandler.PATTERN:
-
-                        if (val.split(constraints[i].getValue()).length != 1) {
-                            throw new SAXException("Does not match pattern");
-                        }
-
-                        break;
-
-                    case FacetHandler.TOTALDIGITS:
-                        maxLength = Integer.parseInt(constraints[i].getValue())
-                            + 1;
-
-                        if (val.length() > maxLength) {
-                            throw new SAXException("Too many digits");
-                        }
-
-                        break;
-                    }
-                }
-
-                return o;
-            }
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getNamespace()
-         */
-        public String getNamespace() {
-            return namespace;
-        }
-
-        private static class DefaultElementValue implements ElementValue {
-            private Element e;
-            private Object val;
-
-            /* (non-Javadoc)
-             * @see schema.ElementValue#getElement()
-             */
-            public Element getElement() {
-                return e;
-            }
-
-            /* (non-Javadoc)
-             * @see schema.ElementValue#getValue()
-             */
-            public Object getValue() {
-                return val;
-            }
-        }
-
-        /**
-         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
-            if(value == null)return null;
-            if(isUnion){
-                for(int i=0;i<children.length;i++){
-                    // finds first that works
-                    // TODO check that 'equals' works here
-                    if(children[i].equals(attribute.getSimpleType()) && children[i].canCreateAttributes(attribute,value,hints))
-                        return children[i].toAttribute(attribute,value,hints);
-                }
-                return children[0].toAttribute(attribute,value,hints);
-            }else{
-                if(isList){
-                    List l = (List)value;
-                    Iterator i = l.iterator();
-                    String s = "";
-                    if(i.hasNext()){
-                        Object t = children[0].toAttribute(attribute,i.next(),hints).getValue();
-                        s = t.toString();
-                        while(i.hasNext()){
-                            t = children[0].toAttribute(attribute,i.next(),hints).getValue();
-                            s = s+" "+t.toString();
-                    	}
-                    }
-                    return new DefaultAttributeValue(attribute,s);
-                }else
-                    return children[0].toAttribute(attribute,value,hints);
-            }
-        }
-
-        /**
-         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
-            if(value == null)return false;
-            if(isUnion){
-                for(int i=0;i<children.length;i++){
-                    // finds first that works
-                    // TODO check that 'equals' works here
-                    if(children[i].equals(attribute.getSimpleType()) && children[i].canCreateAttributes(attribute,value,hints))
-                        return true;
-                }
-                return false;
-            }else{
-                if(isList){
-                    return children[0].canCreateAttributes(attribute,value,hints);
-                }else
-                    return children[0].canCreateAttributes(attribute,value,hints);
-            }
-        }
-
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
-        public boolean canEncode(Element element, Object value, Map hints) {
-            if(value == null)return false;
-            if(isUnion){
-                for(int i=0;i<children.length;i++){
-                    // finds first that works
-                    // TODO check that 'equals' works here
-                    if(children[i].equals(element.getType()) && children[i].canEncode(element,value,hints))
-                        return true;
-                }
-                return false;
-            }else{
-                if(isList){
-                    return children[0].canEncode(element,value,hints);
-                }else
-                    return children[0].canEncode(element,value,hints);
-            }
-        }
-
-        /**
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
-         */
-        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            if(value == null)return;
-            if(isUnion){
-                for(int i=0;i<children.length;i++){
-                    // finds first that works
-                    // TODO check that 'equals' works here
-                    if(children[i].equals(element.getType()) && children[i].canEncode(element,value,hints))
-                        children[i].encode(element,value,output,hints);
-                    	return;
-                }
-                children[0].encode(element,value,output,hints);
-                return;
-            }else{
-                if(isList){
-                    List l = (List)value;
-                    Iterator i = l.iterator();
-                    String s = "";
-                    if(i.hasNext()){
-                        Object t = children[0].toAttribute(new DefaultAttribute(null,null,children[0],0,null,null,false),value,hints).getValue();
-                        s = t.toString();
-                        while(i.hasNext()){
-                            t = children[0].toAttribute(new DefaultAttribute(null,null,children[0],0,null,null,false),value,hints).getValue();
-                            s = s+" "+t.toString();
-                    	}
-                    }
-                    children[0].encode(element,s,output,hints);
-                    return;
-                }else
-                    children[0].encode(element,value,output,hints);
-                	return;
-            }
-        }
     }
 }

@@ -34,38 +34,38 @@ import org.xml.sax.SAXNotRecognizedException;
  * @version $Id$
  */
 public abstract class FacetHandler extends XSIElementHandler {
-    /** ENUMERATION  */
-    public static final int ENUMERATION = 1;
-
-    /** FRACTIONDIGITS  */
-    public static final int FRACTIONDIGITS = 2;
-
-    /** LENGTH  */
-    public static final int LENGTH = 4;
-
-    /** MAXEXCLUSIVE  */
-    public static final int MAXEXCLUSIVE = 8;
-
-    /** MAXINCLUSIVE  */
-    public static final int MAXINCLUSIVE = 16;
-
-    /** MAXLENGTH  */
-    public static final int MAXLENGTH = 32;
-
-    /** MINEXCLUSIVE  */
-    public static final int MINEXCLUSIVE = 64;
-
-    /** MININCLUSIVE  */
-    public static final int MININCLUSIVE = 128;
-
-    /** MINLENGTH  */
-    public static final int MINLENGTH = 264;
-
-    /** PATTERN  */
-    public static final int PATTERN = 512;
-
-    /** TOTALDIGITS  */
-    public static final int TOTALDIGITS = 1024;
+//    /** ENUMERATION  */
+//    public static final int ENUMERATION = 1;
+//
+//    /** FRACTIONDIGITS  */
+//    public static final int FRACTIONDIGITS = 2;
+//
+//    /** LENGTH  */
+//    public static final int LENGTH = 4;
+//
+//    /** MAXEXCLUSIVE  */
+//    public static final int MAXEXCLUSIVE = 8;
+//
+//    /** MAXINCLUSIVE  */
+//    public static final int MAXINCLUSIVE = 16;
+//
+//    /** MAXLENGTH  */
+//    public static final int MAXLENGTH = 32;
+//
+//    /** MINEXCLUSIVE  */
+//    public static final int MINEXCLUSIVE = 64;
+//
+//    /** MININCLUSIVE  */
+//    public static final int MININCLUSIVE = 128;
+//
+//    /** MINLENGTH  */
+//    public static final int MINLENGTH = 264;
+//
+//    /** PATTERN  */
+//    public static final int PATTERN = 512;
+//
+//    /** TOTALDIGITS  */
+//    public static final int TOTALDIGITS = 1024;
     
     private String value;
 

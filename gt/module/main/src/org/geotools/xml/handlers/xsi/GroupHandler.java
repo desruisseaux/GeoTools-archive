@@ -17,7 +17,7 @@
 package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.DefaultGroup;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.Group;
 import org.xml.sax.Attributes;
@@ -202,33 +202,31 @@ public class GroupHandler extends ElementGroupingHandler {
             return cache;
         }
 
-        DefaultGroup dg = new DefaultGroup();
-        dg.id = id;
-        dg.name = name;
-        dg.minOccurs = minOccurs;
-        dg.maxOccurs = maxOccurs;
-        dg.child = (child == null) ? null : child.compress(parent); // deal with all/choice/sequnce
+        String id = this.id;
+        String name = this.name;
+        int minOccurs = this.minOccurs;
+        int maxOccurs = this.maxOccurs;
+        ElementGrouping child = (this.child == null) ? null : this.child.compress(parent); // deal with all/choice/sequnce
 
         if (ref != null) {
             Group g = parent.lookUpGroup(ref);
 
             if (g != null) {
                 if ((id == null) || "".equalsIgnoreCase(id)) {
-                    dg.id = g.getId();
+                    id = g.getId();
                 }
 
-                dg.minOccurs = g.getMinOccurs();
-                dg.maxOccurs = g.getMaxOccurs();
-                dg.child = (g.getChild() == null) ? null : g.getChild();
+                minOccurs = g.getMinOccurs();
+                maxOccurs = g.getMaxOccurs();
+                child = (g.getChild() == null) ? null : g.getChild();
             }
         }
 
-        cache = dg;
+        cache = new DefaultGroup(id,name,parent.getTargetNamespace(),child,minOccurs,maxOccurs);
         
-        ref = id = null;
         child = null;
 
-        return dg;
+        return cache;
     }
 
     /**
@@ -245,83 +243,5 @@ public class GroupHandler extends ElementGroupingHandler {
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-    }
-
-    /**
-     * 
-     * <p> 
-     * Represents a default Group
-     * </p>
-     * @see Group
-     * @author dzwiers
-     *
-     */
-    private static class DefaultGroup implements Group {
-        // file visible to avoid set* methods 
-        ElementGrouping child;
-        String id;
-        String name;
-        int maxOccurs;
-        int minOccurs;
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
-         */
-        public Element findChildElement(String name) {
-            if (child == null) {
-                return null;
-            }
-
-            return child.findChildElement(name);
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Group#getChild()
-         */
-        public ElementGrouping getChild() {
-            return child;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Group#getId()
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
-         */
-        public int getMaxOccurs() {
-            return maxOccurs;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
-         */
-        public int getMinOccurs() {
-            return minOccurs;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.Group#getName()
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * 
-         * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
-         */
-        public int getGrouping() {
-            return GROUP;
-        }
     }
 }

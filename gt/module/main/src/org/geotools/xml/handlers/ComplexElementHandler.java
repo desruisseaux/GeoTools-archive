@@ -30,7 +30,6 @@ import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Sequence;
-import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -343,7 +342,7 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         if (indexHandler.getElement().getType() instanceof ComplexType) {
             ComplexType ct = (ComplexType) indexHandler.getElement().getType();
-            Type parent = ct.getParent();
+            ComplexType parent = ct.getParent() instanceof ComplexType?(ComplexType)ct.getParent():null;
 
             while (parent != null) {
                 if ((parent.getName() != null)
@@ -351,8 +350,7 @@ public class ComplexElementHandler extends XMLElementHandler {
                                                                         .getName())) {
                     return index + 1;
                 }
-
-                parent = parent.getParent();
+                parent = ct.getParent() instanceof ComplexType?(ComplexType)ct.getParent():null;
             }
         }
 

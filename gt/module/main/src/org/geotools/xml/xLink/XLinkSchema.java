@@ -25,8 +25,10 @@ import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultAttributeValue;
+import org.geotools.xml.schema.DefaultFacet;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
@@ -156,7 +158,31 @@ public class XLinkSchema implements Schema{
         public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
             return attribute.getName()!=null && attribute.getName().equals(Actuate.getInstance().getName()) && lookUpTable.contains(value);
         }
-			
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getChildType()
+         */
+        public int getChildType() {
+            return RESTRICTION;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getParents()
+         */
+        public SimpleType[] getParents() {
+            return new SimpleType[]{XSISimpleTypes.String.getInstance()};
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getFacets()
+         */
+        public Facet[] getFacets() {
+            return new Facet[] {new DefaultFacet(Facet.ENUMERATION,"onLoad"),
+                    new DefaultFacet(Facet.ENUMERATION,"onRequest"),
+                    new DefaultFacet(Facet.ENUMERATION,"other"),
+                    new DefaultFacet(Facet.ENUMERATION,"none"),
+            };
+        }
 	}
 
 	/**
@@ -265,6 +291,32 @@ public class XLinkSchema implements Schema{
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
             // it's an attribute ... do nothing
         }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getChildType()
+         */
+        public int getChildType() {
+            return RESTRICTION;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getParents()
+         */
+        public SimpleType[] getParents() {
+            return new SimpleType[]{XSISimpleTypes.String.getInstance()};
+        }
+
+        /**
+         * @see org.geotools.xml.schema.SimpleType#getFacets()
+         */
+        public Facet[] getFacets() {
+            return new Facet[] {new DefaultFacet(Facet.ENUMERATION,"new"),
+                    new DefaultFacet(Facet.ENUMERATION,"replace"),
+                    new DefaultFacet(Facet.ENUMERATION,"embed"),
+                    new DefaultFacet(Facet.ENUMERATION,"other"),
+                    new DefaultFacet(Facet.ENUMERATION,"none"),
+            };
+        }
 	}
 
 	// local list of attribute declarations
@@ -306,7 +358,7 @@ public class XLinkSchema implements Schema{
 		/**
          * @see schema.Attribute#getNameSpace()
          */
-		public String getNameSpace() {
+		public String getNamespace() {
 			return XLinkSchema.NAMESPACE;
 		}
 
@@ -872,7 +924,7 @@ public class XLinkSchema implements Schema{
 		/**
          * @see schema.AttributeGroup#getNameSpace()
          */
-		public String getNameSpace() {
+		public String getNamespace() {
 			return XLinkSchema.NAMESPACE;
 		}
 

@@ -10,16 +10,17 @@ package org.geotools.xml.schema;
  */
 public class DefaultAttribute implements Attribute {
 
-    private String defualT,fixed,id,name;
+    private String defualT,fixed,id,name,namespace;
     private int use;
     private SimpleType type;
     private boolean form;
     
     private DefaultAttribute(){}
     
-    public DefaultAttribute(String id, String name, SimpleType type, int use, String defaulT, String fixed, boolean form){
+    public DefaultAttribute(String id, String name, String namespace, SimpleType type, int use, String defaulT, String fixed, boolean form){
         this.id = id;
         this.name = name;
+        this.namespace = namespace;
         this.type = type;
         this.use = use;
         this.defualT = defaulT;
@@ -66,8 +67,7 @@ public class DefaultAttribute implements Attribute {
      * @see org.geotools.xml.schema.Attribute#getUse()
      */
     public int getUse() {
-        // TODO Auto-generated method stub
-        return 0;
+        return use;
     }
 
     /**
@@ -75,6 +75,13 @@ public class DefaultAttribute implements Attribute {
      */
     public SimpleType getSimpleType() {
         return type;
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Attribute#getNamespace()
+     */
+    public String getNamespace() {
+        return namespace;
     }
 
 }
