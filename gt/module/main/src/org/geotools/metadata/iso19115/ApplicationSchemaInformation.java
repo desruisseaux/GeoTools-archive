@@ -8,7 +8,7 @@ import org.opengis.metadata.citation.Citation;
 /**
  * Sample ISO19115 MetaData implementation for ApplicationSchemaInformation.
  */
-public class ApplicationSchemaInformation extends ISOMetadata implements
+public class ApplicationSchemaInformation extends MetaData implements
 		org.opengis.metadata.ApplicationSchemaInformation {
 	
 	private Citation name;

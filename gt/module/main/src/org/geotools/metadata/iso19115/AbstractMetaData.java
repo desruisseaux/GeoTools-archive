@@ -22,34 +22,17 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collections;
 
-
-import org.opengis.metadata.ApplicationSchemaInformation;
-import org.opengis.metadata.MetaData;
-import org.opengis.metadata.MetadataExtensionInformation;
-import org.opengis.metadata.PortrayalCatalogueReference;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.constraint.Constraints;
-import org.opengis.metadata.content.ContentInformation;
-import org.opengis.metadata.distribution.Distribution;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.maintenance.MaintenanceInformation;
-import org.opengis.metadata.maintenance.ScopeCode;
-import org.opengis.metadata.quality.DataQuality;
-import org.opengis.metadata.spatial.SpatialRepresentation;
-import org.opengis.referencing.ReferenceSystem;
 import org.geotools.metadata.Metadata;
 import org.geotools.metadata.XPath;
-import org.geotools.metadata.Metadata.Element;
-import org.geotools.metadata.Metadata.Entity;
+import org.opengis.metadata.MetaData;
 
 /**
  * A superclass for implementing ISO19115 MetaData interfaces and allowing
@@ -72,7 +55,7 @@ import org.geotools.metadata.Metadata.Entity;
  * @author jgarnett
  * @since 2.1
  */
-public class ISOMetadata implements Metadata, MetaData {
+public abstract class AbstractMetaData implements Metadata, MetaData {
     ISO19115Entity entity;
     
     /**
@@ -370,138 +353,10 @@ public class ISOMetadata implements Metadata, MetaData {
 		return Locale.getDefault();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getCharacterSet()
-	 */
-	public String getCharacterSet() {
-		return "Unicode";
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getParentIdentifier()
-	 */
-	public String getParentIdentifier() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getHierarchyLevels()
-	 */
-	public ScopeCode[] getHierarchyLevels() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getHierarchyLevelNames()
-	 */
-	public String[] getHierarchyLevelNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getContact()
-	 */
-	public ResponsibleParty getContact() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getDateStamp()
-	 */
-	public Date getDateStamp() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getMetadataStandardName()
-	 */
 	public String getMetadataStandardName() {
 		return "ISO19115";
 	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getMetadataStandardVersion()
-	 */
 	public String getMetadataStandardVersion() {
 		return "5.0";
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getSpatialRepresentationInfo()
-	 */
-	public SpatialRepresentation[] getSpatialRepresentationInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getReferenceSystemInfo()
-	 */
-	public ReferenceSystem[] getReferenceSystemInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getMetadataExtensionInfo()
-	 */
-	public MetadataExtensionInformation[] getMetadataExtensionInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getIdentificationInfo()
-	 */
-	public Identification[] getIdentificationInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getContentInfo()
-	 */
-	public ContentInformation[] getContentInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getDistributionInfo()
-	 */
-	public Distribution getDistributionInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getDataQualityInfo()
-	 */
-	public DataQuality[] getDataQualityInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getPortrayalCatalogueInfo()
-	 */
-	public PortrayalCatalogueReference[] getPortrayalCatalogueInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getMetadataConstraints()
-	 */
-	public Constraints[] getMetadataConstraints() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getApplicationSchemaInfo()
-	 */
-	public ApplicationSchemaInformation[] getApplicationSchemaInfo() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.MetaData#getMetadataMaintenance()
-	 */
-	public MaintenanceInformation getMetadataMaintenance() {
-		return null;
 	}
 }
