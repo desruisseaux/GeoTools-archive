@@ -18,8 +18,9 @@ package org.geotools.renderer.lite;
 
 import java.io.IOException;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeType;
@@ -27,8 +28,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.crs.GeographicCRS;
@@ -36,20 +35,14 @@ import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyledLayerDescriptor;
-import org.geotools.styling.UserLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-
-import junit.framework.TestCase;
 
 /**
  * Tests the LiteRenderer labelling algorithms
@@ -89,7 +82,7 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
+//        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
 	}
 
 	private Style loadStyle(String sldFilename) throws IOException {
@@ -146,7 +139,7 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {
