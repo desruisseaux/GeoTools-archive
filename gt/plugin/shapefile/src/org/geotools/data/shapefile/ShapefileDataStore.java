@@ -686,7 +686,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     header.maxY());
             if(schema!=null)
                 return new ReferencedEnvelope(env,schema.getDefaultGeometry().getCoordinateSystem());
-            return env;
+            return new ReferencedEnvelope(env,null);
         } catch (IOException ioe) {
             // What now? This seems arbitrarily appropriate !
             throw new DataSourceException("Problem getting Bbox", ioe);

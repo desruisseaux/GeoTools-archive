@@ -833,7 +833,9 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             if(schema!=null)
                 return new ReferencedEnvelope(retEnv,schema.getDefaultGeometry().getCoordinateSystem());
-            return retEnv;
+            if(query.getCoordinateSystem()!=null)
+                return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
+            return new ReferencedEnvelope(retEnv,null);
         } catch (SQLException sqlException) {
             JDBCUtils.close(conn, transaction, sqlException);
             conn = null;
