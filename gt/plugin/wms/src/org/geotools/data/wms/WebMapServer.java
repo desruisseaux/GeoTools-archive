@@ -658,7 +658,7 @@ public class WebMapServer implements Catalog {
             Layer layer = capabilities.getLayers()[i];
             
             if (layer.getName() != null && layer.getName().length() != 0) { //$NON-NLS-1$
-                CatalogEntry entry = new WMSCatalogEntry(this, layer);
+                CatalogEntry entry = new WMSLayerCatalogEntry(this, layer);
                 layers.add(entry);
             }
         }

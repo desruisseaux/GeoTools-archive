@@ -21,9 +21,12 @@ import junit.framework.TestCase;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
+import org.geotools.data.wms.WMSLayerCatalogEntry;
+import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.opengis.catalog.CatalogEntry;
 
 import java.awt.image.BufferedImage;
 
@@ -211,9 +214,13 @@ public class WebMapServerTest extends TestCase {
         assertNotNull(iter);
         
         while(iter.hasNext()) {
-            Layer layer = (Layer) iter.next();
-            assertNotNull(layer);
-            assertNotNull(layer.getName());
+            WMSLayerCatalogEntry entry = (WMSLayerCatalogEntry) iter.next();
+            assertNotNull(entry);
+            assertEquals(entry.getMetadataNames()[0], WMSLayerMetadataEntity.TYPE_NAME);
+            assertNotNull(entry.getDataName());
+            WMSLayerMetadataEntity metadata = (WMSLayerMetadataEntity) entry.getMetadata(WMSLayerMetadataEntity.TYPE_NAME);
+            assertNotNull(metadata);
+            assertNotNull(metadata.getName());
         }
     }
 }
