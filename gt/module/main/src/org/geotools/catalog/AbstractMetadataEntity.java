@@ -77,6 +77,14 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
      */
     public final Object getElement(String xpath) {
+        for( Iterator i=getEntityType().getElements().iterator(); i.hasNext();){
+            Element element = (Element) i.next();
+            if( xpath.equals( element.getName() )){
+                return getElement( element );
+            }
+        }
+        // Did not find a direct match 
+        //
         List elements = XPathFactory.value(xpath, this);
 
         if (elements.isEmpty()) {
@@ -99,8 +107,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
         if (element instanceof ElementImpl) {
             elemImpl = (ElementImpl) element;
         } else {
-            elemImpl = (ElementImpl) getEntityType().getElement(
-                    element.getName());
+            elemImpl = (ElementImpl) getEntityType().getElement(element.getName());
         }
 
         return invoke(elemImpl.getGetMethod());
@@ -110,8 +117,9 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
         try {
             return m.invoke(this, null);
         } catch (Exception e) {
+            System.out.println( this.getClass().getName() + " could not invoke "+ m.getDeclaringClass().getName()+" "+m.getName());
             throw new RuntimeException(
-                    "There must be a bug in the EntityImpl class during the introspection.",
+                    "Cannot access metadata for "+m.getName()+": "+e,
                     e);
         }
     }
@@ -252,16 +260,22 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
             return getMethods;
         }
 
-        /**
-         * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
-         */
         public Object getElement(String xpath) {
+            // TODO: Jesse you don't have a factory for MetadataEntity.EntityTyp
+            //
             List result = XPathFactory.find(xpath, this);
-
+            if( result == null ){
+                for( Iterator i=getElements().iterator(); i.hasNext(); ){
+                    Element element = (Element) i.next();
+                    if( xpath.equals( element.getName() )){
+                        return element;
+                    }
+                }
+                return null;
+            }
             if (result.isEmpty()) {
                 return null;
             }
-
             if (result.size() == 1) {
                 return result.get(0);
             }

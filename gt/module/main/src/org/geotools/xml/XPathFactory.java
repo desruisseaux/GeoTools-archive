@@ -31,6 +31,7 @@ import java.util.List;
  * @version $Revision: 1.9 $
  */
 public class XPathFactory {
+    
     /**
      * <b>NOTE:<b>  This method is the only method that needs to be modified by developers
      *
@@ -45,7 +46,6 @@ public class XPathFactory {
         if (root == null) {
             return null;
         }
-
         if (Node.class.isAssignableFrom(root)) {
             return new DOMXPath(xpath);
         } //if		
@@ -101,8 +101,9 @@ public class XPathFactory {
      */
     public static List value(String xpath, Object root) {
         XPath xp = createXPath(xpath, root);
-        if( xp == null ) return null;
-
+        if( xp == null ) {
+            return null;
+        }
         return xp.value(root);
     }
 
