@@ -234,37 +234,39 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
         if (source instanceof GeodeticDatum && target instanceof GeodeticDatum) {
             final BursaWolfParameters[] sourceParam = ((GeodeticDatum) source).transformations;
             final BursaWolfParameters[] targetParam = ((GeodeticDatum) target).transformations;
-            org.opengis.referencing.datum.GeodeticDatum sourceStep;
-            org.opengis.referencing.datum.GeodeticDatum targetStep;
-            for (int i=0; i<sourceParam.length; i++) {
-                sourceStep = sourceParam[i].targetDatum;
-                for (int j=0; j<targetParam.length; j++) {
-                    targetStep = targetParam[j].targetDatum;
-                    if (equals(sourceStep, targetStep, false)) {
-                        final Matrix step1, step2;
-                        if (exclusion == null) {
-                            exclusion = new HashSet();
-                        }
-                        if (exclusion.add(source)) {
-                            if (exclusion.add(target)) {
-                                step1 = getAffineTransform(source, sourceStep, exclusion);
-                                if (step1 instanceof GMatrix) {
-                                    step2 = getAffineTransform(targetStep, target, exclusion);
-                                    if (step2 instanceof GMatrix) {
-                                        /*
-                                         * Note: GMatrix.mul(GMatrix) is equivalents to
-                                         *       AffineTransform.concatenate(...): First
-                                         *       transform by the supplied transform and
-                                         *       then transform the result by the original
-                                         *       transform.
-                                         */
-                                        ((GMatrix) step2).mul((GMatrix) step1);
-                                        return step2;
-                                    }
-                                }
-                                exclusion.remove(target);
+            if (sourceParam!=null && targetParam!=null) {
+                org.opengis.referencing.datum.GeodeticDatum sourceStep;
+                org.opengis.referencing.datum.GeodeticDatum targetStep;
+                for (int i=0; i<sourceParam.length; i++) {
+                    sourceStep = sourceParam[i].targetDatum;
+                    for (int j=0; j<targetParam.length; j++) {
+                        targetStep = targetParam[j].targetDatum;
+                        if (equals(sourceStep, targetStep, false)) {
+                            final Matrix step1, step2;
+                            if (exclusion == null) {
+                                exclusion = new HashSet();
                             }
-                            exclusion.remove(source);
+                            if (exclusion.add(source)) {
+                                if (exclusion.add(target)) {
+                                    step1 = getAffineTransform(source, sourceStep, exclusion);
+                                    if (step1 instanceof GMatrix) {
+                                        step2 = getAffineTransform(targetStep, target, exclusion);
+                                        if (step2 instanceof GMatrix) {
+                                            /*
+                                             * Note: GMatrix.mul(GMatrix) is equivalents to
+                                             *       AffineTransform.concatenate(...): First
+                                             *       transform by the supplied transform and
+                                             *       then transform the result by the original
+                                             *       transform.
+                                             */
+                                            ((GMatrix) step2).mul((GMatrix) step1);
+                                            return step2;
+                                        }
+                                    }
+                                    exclusion.remove(target);
+                                }
+                                exclusion.remove(source);
+                            }
                         }
                     }
                 }

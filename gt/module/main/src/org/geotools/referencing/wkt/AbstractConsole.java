@@ -33,12 +33,14 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 
 // OpenGIS dependencies
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.MathTransform;       // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
 
 // Geotools dependencies
+import org.geotools.io.TableWriter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
@@ -82,6 +84,11 @@ public abstract class AbstractConsole implements Runnable {
      * The WKT parser, usually a {@link Parser} object.
      */
     protected final Format parser;
+
+    /**
+     * The command-line prompt.
+     */
+    private String prompt = "crs>";
     
     /**
      * The set of objects defined during the execution of this console. Keys are
@@ -97,12 +104,6 @@ public abstract class AbstractConsole implements Runnable {
     private transient Set names;
 
     /**
-     * <code>true</code> for disabling output confirmation messages.
-     * This flag is checked by {@link #firePropertyChange}.
-     */
-    private boolean quiet;
-
-    /**
      * The last line read, or <code>null</code> if none.
      */
     private transient String line;
@@ -115,6 +116,11 @@ public abstract class AbstractConsole implements Runnable {
      * error offset} in case of failure.
      */
     private transient Replacement replacements;
+
+    /**
+     * Set to <code>true</code> if {@link #stop()} was invoked.
+     */
+    private transient volatile boolean stop;
     
     /**
      * Creates a new console instance using {@linkplain System#in standard input stream},
@@ -187,6 +193,41 @@ public abstract class AbstractConsole implements Runnable {
             names = Collections.unmodifiableSet(definitions.keySet());
         }
         return names;
+    }
+
+    /**
+     * Format to the {@linkplain #out output stream} a table of all definitions.
+     * The content of this table is inferred from the values given to the
+     * {@link #addDefinition} method.
+     *
+     * @throws IOException if an error occured while writting to the output stream.
+     * @todo Localize table header.
+     */
+    public void printDefinitions() throws IOException {
+        final TableWriter table = new TableWriter(out, " \u2502 ");
+        table.setMultiLinesCells(true);
+        table.writeHorizontalSeparator();
+        table.write("Name");
+        table.nextColumn();
+        table.write("Type");
+        table.nextColumn();
+        table.write("Description");
+        table.nextLine();
+        table.writeHorizontalSeparator();
+        for (final Iterator it=definitions.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry entry = (Map.Entry) it.next();
+            final Object   object = ((Definition) entry.getValue()).asObject;
+            table.write(String.valueOf(entry.getKey()));
+            table.nextColumn();
+            table.write(Utilities.getShortClassName(object));
+            table.nextColumn();
+            if (object instanceof IdentifiedObject) {
+                table.write(((IdentifiedObject) object).getName().getCode());
+            }
+            table.nextLine();
+        }
+        table.writeHorizontalSeparator();
+        table.flush();
     }
 
     /**
@@ -268,7 +309,6 @@ public abstract class AbstractConsole implements Runnable {
         value = substitute(value);
         final Definition newDef = new Definition(value, parseObject(value));
         final Definition oldDef = (Definition) definitions.put(name, newDef);
-        firePropertyChange(name, oldDef, newDef);
     }
 
     /**
@@ -283,20 +323,14 @@ public abstract class AbstractConsole implements Runnable {
      * @throws ParseException if a well know text (WKT) can't be parsed.
      */
     public void loadDefinitions(final LineNumberReader in) throws IOException, ParseException {
-        final boolean oldQuiet = quiet;
-        try {
-            quiet = true;
-            while ((line=readLine(in)) != null) {
-                String name=line, value=null;
-                final int i = line.indexOf('=');
-                if (i >= 0) {
-                    name  = line.substring(0,i).trim();
-                    value = line.substring(i+1).trim();
-                }
-                addDefinition(name, value);
+        while ((line=readLine(in)) != null) {
+            String name=line, value=null;
+            final int i = line.indexOf('=');
+            if (i >= 0) {
+                name  = line.substring(0,i).trim();
+                value = line.substring(i+1).trim();
             }
-        } finally {
-            quiet = oldQuiet;
+            addDefinition(name, value);
         }
     }
 
@@ -329,21 +363,30 @@ public abstract class AbstractConsole implements Runnable {
     /**
      * Process instructions from the {@linkplain #in input stream} specified at construction
      * time. All lines are read until the end of stream (<code>[Ctrl-Z]</code> for input from
-     * the keyboard). Non-empty and non-comment lines are given to the {@link #execute} method.
-     * Errors are catched and printed to the {@linkplain #err error stream}.
+     * the keyboard), or until {@link #stop()} is invoked. Non-empty and non-comment lines are
+     * given to the {@link #execute} method. Errors are catched and printed to the
+     * {@linkplain #err error stream}.
      */
     public void run() {
         try {
-            while ((line=readLine(in)) != null) {
+            while (!stop) {
+                if (prompt != null) {
+                    out.write(prompt);
+                }
+                out.flush();
+                line = readLine(in);
+                if (line == null) {
+                    break;
+                }
                 try {
                     execute(line);
-                    out.flush();
                 } catch (Exception exception) {
                     reportError(exception);
                 }
             }
+            out.flush();
+            stop = false;
         } catch (IOException exception) {
-            // Applies only to 'readLine(in)'
             reportError(exception);
         }
     }
@@ -355,6 +398,15 @@ public abstract class AbstractConsole implements Runnable {
      * @throws Exception if the instruction failed.
      */
     protected abstract void execute(String instruction) throws Exception;
+
+    /**
+     * Stops the {@link #run} method. This method can been invoked from any thread.
+     * If a line is in process, it will be finished before the {@link #run} method
+     * stops.
+     */
+    public void stop() {
+        this.stop = true;
+    }
 
     /**
      * For every definition key found in the given string, substitute
@@ -465,6 +517,20 @@ public abstract class AbstractConsole implements Runnable {
     }
 
     /**
+     * Returns the command-line prompt, or <code>null</code> if there is none.
+     */
+    public String getPrompt() {
+        return prompt;
+    }
+
+    /**
+     * Set the command-line prompt, or <code>null</code> for none.
+     */
+    public void setPrompt(final String prompt) {
+        this.prompt = prompt;
+    }
+
+    /**
      * Print an exception message to the {@linkplain System#err standard error stream}.
      * The error message includes the line number, and the column where the failure
      * occured in the exception is an instance of {@link ParseException}.
@@ -491,55 +557,6 @@ public abstract class AbstractConsole implements Runnable {
         if (line!=null && exception instanceof ParseException) {
             AbstractParser.reportError(err, line, ((ParseException)exception).getErrorOffset());
         }
-    }
-
-    /**
-     * Invoked when a property changed. The default implementation prints a report to
-     * the {@linkplain #out output stream}.
-     *
-     * @param  name The name of the modified value.
-     * @param  oldValue The old value, or <code>null</code> if a the value is added.
-     * @param  newValue The new value, or <code>null</code> if a the value is removed.
-     * @throws IOException if an error occured while writting to the output stream.
-     * @todo   localize.
-     */
-    protected void firePropertyChange(final String name,
-                                      final Object oldValue,
-                                      final Object newValue)
-            throws IOException
-    {
-        if (!quiet) {
-            out.write(Utilities.equals(oldValue, newValue) ? "Reset"   :
-                                       oldValue == null    ? "Added"   :
-                                       newValue == null    ? "Removed" :
-                                                             "Updated");
-            out.write(" value for \"");
-            out.write(name);
-            out.write("\".");
-            out.write(lineSeparator);
-        }
-    }
-
-    /**
-     * Returns the quiet mode. In quiet mode, the {@link #firePropertyChange
-     * firePropertyChange} method do not print confirmation message. The default
-     * value is <code>false</code>.
-     *
-     * @return <code>true</code> if confirmation messages are not printed.
-     */
-    public boolean isQuiet() {
-        return quiet;
-    }
-
-    /**
-     * Enable or disable quiet mode. In quiet mode, the {@link #firePropertyChange
-     * firePropertyChange} method do not print confirmation message. The default
-     * value is <code>false</code>.
-     *
-     * @param quiet <code>true</code> for disabling printing of confirmation messages.
-     */
-    public void setQuiet(final boolean quiet) {
-        this.quiet = quiet;
     }
 
     /**

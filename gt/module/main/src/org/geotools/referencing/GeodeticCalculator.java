@@ -16,7 +16,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.cs;
+package org.geotools.referencing;
 
 // J2SE dependencies
 import java.awt.Shape;
@@ -36,8 +36,10 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+// OpenGIS dependencies
+import org.opengis.referencing.datum.Ellipsoid;
+
 // Geotools dependencies
-import org.geotools.cs.Ellipsoid;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.CoordinateFormat;
@@ -63,8 +65,6 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * @version $Id$
  * @author Daniele Franzoni
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.GeodeticCalculator}.
  */
 public class GeodeticCalculator {
     /**
@@ -128,16 +128,12 @@ public class GeodeticCalculator {
     /**
      * The (<var>latitude</var>, <var>longitude</var>) coordinate of the first point
      * <strong>in radians</strong>. This point is set by {@link #setAnchorPoint}.
-     *
-     * @task TODO: rename as 'latitude1' and 'longitude1' when everything else will be finished.
      */
     private double lat1, long1;
 
     /**
      * The (<var>latitude</var>, <var>longitude</var>) coordinate of the destination point
      * <strong>in radians</strong>. This point is set by {@link #setDestinationPoint}.
-     *
-     * @task TODO: rename as 'latitude2' and 'longitude2' when everything else will be finished.
      */
     private double lat2, long2;
 
@@ -276,7 +272,7 @@ public class GeodeticCalculator {
      * Constructs a new geodetic calculator associated with the WGS84 ellipsoid.
      */
     public GeodeticCalculator() {
-        this(Ellipsoid.WGS84);
+        this(org.geotools.referencing.datum.Ellipsoid.WGS84);
     }
 
     /**
@@ -501,9 +497,10 @@ public class GeodeticCalculator {
         if (!directionValid) {
             computeDirection();
             final double check;
-            assert (check = Math.abs(ellipsoid.orthodromicDistance(
-                                     Math.toDegrees(long1), Math.toDegrees(lat1),
-                                     Math.toDegrees(long2), Math.toDegrees(lat2)) - distance))
+            assert !(ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) ||
+                   (check = Math.abs(distance-((org.geotools.referencing.datum.Ellipsoid)ellipsoid)
+                   .orthodromicDistance(Math.toDegrees(long1), Math.toDegrees(lat1),
+                                        Math.toDegrees(long2), Math.toDegrees(lat2))))
                    <= semiMajorAxis*TOLERANCE_2 : check;
         }
         return distance;
@@ -816,8 +813,7 @@ public class GeodeticCalculator {
      *         {@linkplain #getAnchorPoint anchor point} to the
      *         {@linkplain #getDestinationPoint destination point}.
      *
-     * @task TODO: We should check for cases where the path cross the
-     *             90°N, 90°S, 90°E or 90°W boundaries.
+     * @todo We should check for cases where the path cross the 90°N, 90°S, 90°E or 90°W boundaries.
      */
     public Shape getGeodeticCurve(final int numberOfPoints) {
         checkNumberOfPoints(numberOfPoints);
@@ -997,7 +993,7 @@ public class GeodeticCalculator {
      * @param  factory  The JTS factory to use for creating geometry.
      * @return The JTS geometry.
      *
-     * @task REVISIT: Maybe we should move this method somewhere else (in some utility class).
+     * @todo Maybe we should move this method somewhere else (in some utility class).
      */
     public static Geometry shapeToGeometry(final Shape shape, final GeometryFactory factory) {
         final PathIterator iterator = shape.getPathIterator(null, ShapeUtilities.getFlatness(shape));

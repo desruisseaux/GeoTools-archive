@@ -35,6 +35,7 @@ import java.io.IOException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -88,10 +89,22 @@ import org.geotools.geometry.GeneralDirectPosition;
  *   <P align="justify">Inverse transforms the specified coordinates from target CRS to source CRS
  *   and prints the result.</P>
  *
- *   <tr><td nowrap valign="top"><P><code>status</code></P></td><td>
- *   <P align="justify">Print the current status (source and target
+ *   <tr><td nowrap valign="top"><P><code>print set</code></P></td><td>
+ *   <P align="justify">Prints the set of shortcuts defined in previous calls to <code>SET</code>
+ *   instruction.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>print crs</code></P></td><td>
+ *   <P align="justify">Prints the source and target
  *   {@linkplain CoordinateReferenceSystem coordinate reference system},
- *   {@linkplain MathTransform math transform} and its inverse).</P></td></tr>
+ *   {@linkplain MathTransform math transform} and its inverse
+ *   as Well Know Text (wkt).</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>print pts</code></P></td><td>
+ *   <P align="justify">Prints the source and target points, their transformed points, and
+ *   the distance between them.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>exit</code></P></td><td>
+ *   <P align="justify">Quit the console.</P></td></tr>
  * </table>
  *
  * @version $Id$
@@ -101,7 +114,7 @@ public class Console extends AbstractConsole {
     /**
      * The number format to use for reading coordinate points.
      */
-    private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    private final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 
     /**
      * The number separator in vectors. Usually <code>,</code>, but could
@@ -130,6 +143,19 @@ public class Console extends AbstractConsole {
      * The math transform, or <code>null</code> if not yet determined.
      */
     private MathTransform transform;
+
+    /**
+     * The tolerance value. If non-null, the difference between the computed and the specified
+     * target point will be compared against this tolerance threshold. If it is greater, a message
+     * will be printed.
+     */
+    private double[] tolerance;
+
+    /**
+     * The last error thats occured while processing an instruction.
+     * Used in order to print the stack trace on request.
+     */
+    private transient Exception lastError;
     
     /**
      * Creates a new console instance using {@linkplain System#in standard input stream},
@@ -156,6 +182,7 @@ public class Console extends AbstractConsole {
      * As a side effect, this method also adjust the minimum and maximum digits.
      */
     private static String getNumberSeparator(final NumberFormat numberFormat) {
+        numberFormat.setGroupingUsed(false);
         numberFormat.setMinimumFractionDigits(6);
         numberFormat.setMaximumFractionDigits(6);
         if (numberFormat instanceof DecimalFormat) {
@@ -177,8 +204,6 @@ public class Console extends AbstractConsole {
      *   <TR><TD NOWRAP><CODE>-load</CODE> <VAR>&lt;filename&gt;</VAR></TD>
      *       <TD>&nbsp;Load a definition file before to run instructions from
      *           the standard input stream.</TD></TR>
-     *   <TR><TD NOWRAP><CODE>-quiet</CODE></TD>
-     *       <TD>&nbsp;Do not print a confirmation for each command executed.</TD></TR>
      *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
      *       <TD>&nbsp;Set the character encoding.</TD></TR>
      *   <TR><TD NOWRAP><CODE>-locale</CODE> <VAR>&lt;language&gt;</VAR></TD>
@@ -189,7 +214,6 @@ public class Console extends AbstractConsole {
      */
     public static void main(String[] args) {
         final Arguments arguments = new Arguments(args);
-        final boolean quiet = arguments.getFlag          ("-quiet");
         final String   load = arguments.getOptionalString("-load" );
         final String   file = arguments.getOptionalString("-file" );
         args = arguments.getRemainingArguments(0);
@@ -208,6 +232,7 @@ public class Console extends AbstractConsole {
         } else try {
             input   = new LineNumberReader(new FileReader(file));
             console = new Console(input);
+            console.setPrompt(null);
         } catch (IOException exception) {
             System.err.println(exception.getLocalizedMessage());
             return;
@@ -233,7 +258,6 @@ public class Console extends AbstractConsole {
         /*
          * Run all instructions and close the stream if it was a file one.
          */
-        console.setQuiet(quiet);
         console.run();
         if (input != null) try {
             input.close();
@@ -263,63 +287,96 @@ public class Console extends AbstractConsole {
         }
         final StringTokenizer keywords = new StringTokenizer(instruction);
         if (keywords.hasMoreTokens()) {
-            /*
-             * 1-keyword instructions
-             * Example: status, transform
-             */
             final String key0 = keywords.nextToken();
             if (!keywords.hasMoreTokens()) {
-                if (key0.equalsIgnoreCase("status")) {
+                // -------------------------------
+                //   exit
+                // -------------------------------
+                if (key0.equalsIgnoreCase("exit")) {
                     if (value != null) {
-                        throw unexpectedArgument("status");
+                        throw unexpectedArgument("exit");
                     }
-                    executeStatus();
+                    stop();
                     return;
                 }
+                // -------------------------------
+                //   stacktrace
+                // -------------------------------
+                if (key0.equalsIgnoreCase("stacktrace")) {
+                    if (value != null) {
+                        throw unexpectedArgument("stacktrace");
+                    }
+                    if (lastError != null) {
+                        lastError.printStackTrace(err);
+                    }
+                    return;
+                }
+                // -------------------------------
+                //   transform = <the transform>
+                // -------------------------------
                 if (key0.equalsIgnoreCase("transform")) {
-                    final MathTransform old = transform;
                     transform = (MathTransform) fromDefinition(value, MathTransform.class);
                     sourceCRS = null;
                     targetCRS = null;
-                    firePropertyChange("transform", old, transform);
                     return;
                 }
             } else {
-                /*
-                 * 2-keywords instructions
-                 * Example: source crs, target crs, set <name>
-                 */
                 final String key1 = keywords.nextToken();
                 if (!keywords.hasMoreTokens()) {
+                    // -------------------------------
+                    //   print definition|crs|points
+                    // -------------------------------
+                    if (key0.equalsIgnoreCase("print")) {
+                        if (value != null) {
+                            throw unexpectedArgument("print");
+                        }
+                        if (key1.equalsIgnoreCase("set")) {
+                            printDefinitions();
+                            return;
+                        }
+                        if (key1.equalsIgnoreCase("crs")) {
+                            printCRS();
+                            return;
+                        }
+                        if (key1.equalsIgnoreCase("pts")) {
+                            printPts();
+                            return;
+                        }
+                    }
+                    // -------------------------------
+                    //   set <name> = <wkt>
+                    // -------------------------------
                     if (key0.equalsIgnoreCase("set")) {
                         addDefinition(key1, value);
                         return;
                     }
+                    // -------------------------------
+                    //   source|target crs = <wkt>
+                    // -------------------------------
                     if (key1.equalsIgnoreCase("crs")) {
                         if (key0.equalsIgnoreCase("source")) {
-                            final CoordinateReferenceSystem old = sourceCRS;
                             sourceCRS = (CoordinateReferenceSystem)
                                         fromDefinition(value, CoordinateReferenceSystem.class);
                             transform = null;
-                            firePropertyChange("source CRS", old, sourceCRS);
                             return;
                         }
                         if (key0.equalsIgnoreCase("target")) {
-                            final CoordinateReferenceSystem old = targetCRS;
                             targetCRS = (CoordinateReferenceSystem)
                                         fromDefinition(value, CoordinateReferenceSystem.class);
                             transform = null;
-                            firePropertyChange("target CRS", old, targetCRS);
                             return;
                         }
                     }
+                    // -------------------------------
+                    //   source|target pt = <coords>
+                    // -------------------------------
                     if (key1.equalsIgnoreCase("pt")) {
                         if (key0.equalsIgnoreCase("source")) {
-                            executeSourcePt(value);
+                            sourcePosition = new GeneralDirectPosition(parseVector(value));
                             return;
                         }
                         if (key0.equalsIgnoreCase("target")) {
-                            executeTargetPt(value);
+                            targetPosition = new GeneralDirectPosition(parseVector(value));
                             return;
                         }
                     }
@@ -331,27 +388,10 @@ public class Console extends AbstractConsole {
     }
 
     /**
-     * Execute the "<code>status</code>" instruction.
-     * This instruction print the current console state.
-     *
+     * Executes the "<code>print crs</code>" instruction.
      * @todo Localize
      */
-    private final void executeStatus() throws FactoryException, IOException {
-        /*
-         * Format the list of pre-defined objects first.
-         */
-        if (true) {
-            String separator = "Predefined objects: ";
-            for (final Iterator it=getDefinitionNames().iterator(); it.hasNext();) {
-                out.write(separator);
-                out.write(String.valueOf(it.next()));
-                separator = ", ";
-            }
-            out.write(lineSeparator);
-        }
-        /*
-         * Format source and target CRS, if any.
-         */
+    private void printCRS() throws FactoryException, IOException {
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         char separator = '\u2500';
@@ -395,55 +435,86 @@ public class Console extends AbstractConsole {
         table.writeHorizontalSeparator();
         table.flush();
     }
-    
+
     /**
-     * Execute the "source pt" instruction.
+     * Print the source and target point, and their transforms.
      *
-     * @param  value The value on the right side of <code>=</code>.
-     * @throws ParseException if the point can't be parsed.
-     * @throws TransformException if the transformation can't be performed.
+     * @throws FactoryException if the transform can't be computed.
+     * @throws TransformException if a transform failed.
+     * @throws IOException if an error occured while writing to the output stream.
+     * @todo Localize line headers.
      */
-    private void executeSourcePt(final String value)
-            throws ParseException, FactoryException, TransformException, IOException
-    {
-        final double[] vector = parseVector(value);
-        final DirectPosition old = sourcePosition;
-        sourcePosition = new GeneralDirectPosition(vector);
+    private void printPts() throws FactoryException, TransformException, IOException {
         update();
+        DirectPosition transformedSource;
+        DirectPosition transformedTarget;
         if (transform != null) {
-            targetPosition = transform.transform(sourcePosition, null);
-            printVector(vector);
-            out.write(" --> ");
-            printVector(targetPosition.getCoordinates());
-            out.write(lineSeparator);
+            transformedSource = transform          .transform(sourcePosition, null);
+            transformedTarget = transform.inverse().transform(targetPosition, null);
         } else {
-            firePropertyChange("source pt", old, sourcePosition);
+            transformedSource = null;
+            transformedTarget = null;
+        }
+        final TableWriter table = new TableWriter(out, 0);
+        table.setMultiLinesCells(true);
+        table.writeHorizontalSeparator();
+        table.setAlignment(TableWriter.ALIGN_RIGHT);
+        if (sourcePosition != null) {
+            table.write("Source point:");
+            print(sourcePosition,    table);
+            print(transformedSource, table);
+            table.nextLine();
+        }
+        if (targetPosition != null) {
+            table.write("Target point:");
+            print(transformedTarget, table);
+            print(targetPosition,    table);
+            table.nextLine();
+        }
+//        if (transformedSource != null) {
+//            table.write("Distance:");
+//            
+//        }
+        table.writeHorizontalSeparator();
+        table.flush();
+    }
+
+    /**
+     * Print the specified point to the specified table.
+     * This helper method is for use by {@link #printPts}.
+     *
+     * @param  point The point to print, or <code>null</code> if none.
+     * @throws IOException if an error occured while writting to the output stream.
+     */
+    private void print(final DirectPosition point, final TableWriter table) throws IOException {
+        if (point != null) {
+            table.nextColumn();
+            table.write("  (");
+            final double[] coords = point.getCoordinates();
+            for (int i=0; i<coords.length; i++) {
+                if (i != 0) {
+                    table.write(", ");
+                }
+                table.nextColumn();
+                table.write(numberFormat.format(coords[i]));
+            }
+            table.write(')');
         }
     }
-    
+
     /**
-     * Execute the "target pt" instruction.
-     *
-     * @param  value The value on the right side of <code>=</code>.
-     * @throws ParseException if the point can't be parsed.
-     * @throws TransformException if the transformation can't be performed.
+     * Print the distance between the specified points.
      */
-    private void executeTargetPt(final String value)
-            throws ParseException, FactoryException, TransformException, IOException
+    private void printDistance(final DirectPosition pt1, final DirectPosition pt2,
+                               final CoordinateReferenceSystem crs)
+            throws IOException
     {
-        final double[] vector = parseVector(value);
-        final DirectPosition old = targetPosition;
-        targetPosition = new GeneralDirectPosition(vector);
-        update();
-        if (transform != null) {
-            sourcePosition = transform.inverse().transform(targetPosition, null);
-            printVector(sourcePosition.getCoordinates());
-            out.write(" <-- ");
-            printVector(vector);
-            out.write(lineSeparator);
-        } else {
-            firePropertyChange("target pt", old, targetPosition);
-        }
+//        final Ellipsoid ellipsoid = CRSUtilities.getEllipsoid(crs);
+//        if (ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) {
+//            final double distance = ((org.geotools.referencing.datum.Ellipsoid) ellipsoid)
+//                                    .orthodromicDistance(p1, p2);
+//        } else {
+//        }
     }
 
 
@@ -496,24 +567,6 @@ public class Console extends AbstractConsole {
     }
 
     /**
-     * Print the specified vector to the output stream.
-     *
-     * @param  values The vector to print.
-     * @throws IOException if an error occured while writting to the output stream.
-     */
-    private void printVector(final double[] values) throws IOException {
-        out.write('(');
-        for (int i=0; i<values.length; i++) {
-            if (i != 0) {
-                out.write(numberSeparator);
-                out.write(' ');
-            }
-            out.write(numberFormat.format(values[i]));
-        }
-        out.write(')');
-    }
-
-    /**
      * Update the internal state after a change, before to apply transformation.
      * The most important change is to update the math transform, if needed.
      */
@@ -533,5 +586,15 @@ public class Console extends AbstractConsole {
     private static ParseException unexpectedArgument(final String instruction) {
         return new ParseException("Unexpected argument for instruction \"" +
                                   instruction + "\".", 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param exception The exception to report.
+     */
+    protected void reportError(final Exception exception) {
+        super.reportError(exception);
+        lastError = exception;
     }
 }
