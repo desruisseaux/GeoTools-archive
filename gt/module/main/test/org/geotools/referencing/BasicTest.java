@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -140,9 +140,9 @@ public class BasicTest extends TestCase {
         assertNull(properties.put("remarks",          "There is remarks"));
         assertNull(properties.put("remarks_fr",       "Voici des remarques"));
         assertNull(properties.put("dummy",            "Doesn't matter"));
-        assertNull(properties.put("dummy_fr",         "Rien d'intï¿½ressant"));
+        assertNull(properties.put("dummy_fr",         "Rien d'intéressant"));
         assertNull(properties.put("local",            "A custom localized string"));
-        assertNull(properties.put("local_fr",         "Une chaï¿½ne personalisï¿½e"));
+        assertNull(properties.put("local_fr",         "Une chaîne personalisée"));
         assertNull(properties.put("anchorPoint",      "Anchor point"));
         assertNull(properties.put("realizationEpoch", "Realization epoch"));
         assertNull(properties.put("validArea",        "Valid area"));
@@ -156,9 +156,9 @@ public class BasicTest extends TestCase {
         // Check extra properties
         assertEquals("Size:",    6,                    remaining.size());
         assertEquals("dummy",    "Doesn't matter",     remaining.get("dummy"));
-        assertEquals("dummy_fr", "Rien d'intï¿½ressant", remaining.get("dummy_fr"));
+        assertEquals("dummy_fr", "Rien d'intéressant", remaining.get("dummy_fr"));
         assertEquals("local",    "A custom localized string", ((InternationalString) remaining.get("local")).toString(null));
-        assertEquals("local_fr", "Une chaï¿½ne personalisï¿½e",   ((InternationalString) remaining.get("local")).toString(Locale.FRENCH));
+        assertEquals("local_fr", "Une chaîne personalisée",   ((InternationalString) remaining.get("local")).toString(Locale.FRENCH));
         assertFalse ("local_fr", remaining.containsKey("local_fr"));
 
         // Check the case of some special property keys

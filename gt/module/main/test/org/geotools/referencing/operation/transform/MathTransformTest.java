@@ -1,7 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le D�veloppement
+ * (C) 2005, Geotools Project Management Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,17 +23,12 @@ import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.Random;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.geometry.DirectPosition1D;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.MathTransformFactory;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -45,6 +39,15 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.geometry.DirectPosition1D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.MathTransformFactory;
 
 
 /**
@@ -97,6 +100,36 @@ public class MathTransformTest extends TestCase {
     }
 
     /**
+     * Tests a transformation on a <code>DirectPosition</code> object.
+     */
+    public void testDirectPositionTransform() throws FactoryException, TransformException {
+        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory().createFromWKT(
+                "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                      +
+                "  GEOGCS[\"GCS_North_American_1983\",\n"                  +
+                "    DATUM[\"D_North_American_1983\",\n"                   +
+                "      TOWGS84[0,0,0,0,0,0,0]\n,"                          +
+                "      SPHEROID[\"GRS_1980\", 6378137, 298.257222101]],\n" +
+                "    PRIMEM[\"Greenwich\",0],\n"                           +
+                "    UNIT[\"Degree\", 0.017453292519943295]],\n"           +
+                "  PROJECTION[\"Transverse_Mercator\"],\n"                 +
+                "  PARAMETER[\"False_Easting\",500000],\n"                 +
+                "  PARAMETER[\"False_Northing\",0],\n"                     +
+                "  PARAMETER[\"Central_Meridian\",-123],\n"                +
+                "  PARAMETER[\"Scale_Factor\",0.9996],\n"                  +
+                "  PARAMETER[\"Latitude_Of_Origin\",0],\n"                 +
+                "  UNIT[\"Meter\",1]]");
+        
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+                                        GeographicCRS.WGS84, crs).getMathTransform();
+        
+        DirectPosition position=new GeneralDirectPosition(-123, 55);
+        
+        t.transform(position, position);
+        
+        
+    }
+
+    /**
      * Tests the {@link ProjectiveTransform} implementation.
      */
     public void testAffineTransform() throws TransformException {
@@ -111,19 +144,6 @@ public class MathTransformTest extends TestCase {
                 new AffineTransform2D(transform)
             });
         }
-    }
-
-    public void testDirectPositionTransform() throws Exception {
-        CoordinateReferenceSystem crs=FactoryFinder.getCRSFactory().createFromWKT(
-                "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
-        
-        MathTransform t=FactoryFinder.getCoordinateOperationFactory().createOperation( GeographicCRS.WGS84, crs).getMathTransform();
-        
-        DirectPosition position=new GeneralDirectPosition(-123, 55);
-        
-        t.transform(position, position);
-        
-        
     }
     
     /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2002, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -122,6 +122,6 @@ public class FormatTest extends TestCase {
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
 	GeneralDirectPosition position = new GeneralDirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
-        assertEquals("23ï¿½46,8'E 12ï¿½44,4'S 127,9 4 janv. 2003", format.format(position));
+        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
      }
 }
