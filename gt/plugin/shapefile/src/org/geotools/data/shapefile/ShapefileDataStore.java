@@ -976,16 +976,23 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         protected void copyAndDelete(URL src) throws IOException {
             File storage = getStorageFile(src);
             File dest = new File(src.getFile());
-            FileChannel in = new FileInputStream(storage).getChannel();
-            FileChannel out = new FileOutputStream(dest).getChannel();
-            long len = in.size();
-            long copied = out.transferFrom(in, 0, in.size());
-
-            if (len != copied) {
-                throw new IOException("unable to complete write");
+            FileChannel in = null;
+            FileChannel out = null;
+            try {
+                in = new FileInputStream(storage).getChannel();
+                out = new FileOutputStream(dest).getChannel();
+                long len = in.size();
+                long copied = out.transferFrom(in, 0, in.size());
+                
+                if (len != copied) {
+                    throw new IOException("unable to complete write");
+                }
+                
+                storage.delete();
+            } finally {
+                if( in != null ) in.close();
+                if( out != null ) out.close();
             }
-
-            storage.delete();
         }
 
         /**
