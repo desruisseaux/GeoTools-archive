@@ -64,7 +64,7 @@ public class ExpandedTabWriter extends FilterWriter {
      * @param  out a Writer object to provide the underlying stream.
      * @param  tabWidth The tab width. Must be greater than 0.
      * @throws IllegalArgumentException if <code>tabWidth</code>
-     * is not greater than 0.
+     *         is not greater than 0.
      */
     public ExpandedTabWriter(Writer out, int tabWidth) throws IllegalArgumentException {
         super(out);
@@ -76,14 +76,13 @@ public class ExpandedTabWriter extends FilterWriter {
      *
      * @param  tabWidth The tab width. Must be greater than 0.
      * @throws IllegalArgumentException if <code>tabWidth</code>
-     * is not greater than 0.
+     *         is not greater than 0.
      */
     public void setTabWidth(final int tabWidth) throws IllegalArgumentException {
         synchronized (lock) {
-            if (tabWidth>0) {
-                this.tabWidth=tabWidth;
-            }
-            else {
+            if (tabWidth > 0) {
+                this.tabWidth = tabWidth;
+            } else {
                 throw new IllegalArgumentException(Integer.toString(tabWidth));
             }
         }
@@ -134,7 +133,7 @@ public class ExpandedTabWriter extends FilterWriter {
      */
     public void write(final char[] buffer, final int offset, int length) throws IOException {
         synchronized (lock) {
-            int start=offset;
+            int start = offset;
             length += offset;
             for (int end=offset; end<length; end++) {
                 final char c=buffer[end];
@@ -166,7 +165,7 @@ public class ExpandedTabWriter extends FilterWriter {
      */
     public void write(final String string, final int offset, int length) throws IOException {
         synchronized (lock) {
-            int start=offset;
+            int start = offset;
             length += offset;
             for (int end=offset; end<length; end++) {
                 final char c=string.charAt(end);
