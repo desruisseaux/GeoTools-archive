@@ -1,5 +1,7 @@
 package org.geotools.metadata;
 
+import java.util.List;
+
 /**
  * The MetadataEntity is a set of metadata elements describing the same aspect of data
  * 
@@ -26,26 +28,16 @@ package org.geotools.metadata;
  */
 public interface Metadata {
     /**
-     * Copy all the MetadataElements of this Entity into the given array. If the
-     * argument array is null, a new one will be created. Gets all MetadataElements
-     * from this Entity, returned as a complex object array.  
-     * NOTE:  MetadataEntities will be included in the array if the MetadataEntity contains other 
-     * MetadataEntities 
+     * Copy all the MetadataElements of this Entity into the given list. If the
+     * argument list is null, a new one will be created. Gets all MetadataElements
+     * from this Entity, returned as a complex object list.  
      *
-     * @param attributes An array to copy elements into. May be null.
+     * @param attributes A list to copy elements into. May be null.
      *
-     * @return The array passed in, or a new one if null.
+     * @return The list passed in, or a new one if null.
      */
-    Object[] getElements(Object[] elements);
-    /**
-     * Gets an element by the given zero-based index.
-     *
-     * @param index The requested index. Must be 0 &lt;= idx &lt;
-     *        getNumberOfElements().
-     *
-     * @return A copy of the requested element, or NULL_ELEMENT.
-     */    
-    Object getElement(int index);    
+    List getElements(List list);
+    
      /**
       * Gets an MetadataElements for this Entity at the location specified by xPath.
       * Due to the complex nature of xpath, the return Object may be a single
@@ -57,14 +49,8 @@ public interface Metadata {
       * @return A copy of the requested element, null if the requested xpath
       *         is not found, or NULL_ELEMENT.
       */
-
     Object getElement(String xPath);
-    /**
-     * Get the number of elements this feature has. 
-     * 
-     * @return The total number of elements this Feature contains.
-     */
-    int getNumElements();
+
     
     /**
      * 
