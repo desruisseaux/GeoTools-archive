@@ -202,7 +202,7 @@ public class DefaultTypeEntry implements TypeEntry {
             }
             try {
                 CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
-                bbox = FactoryFinder.toGeographic(bbox,cs);
+                bbox = FactoryFinder.toGeographic( bbox, cs );
             }
             catch (Throwable badRepoject ) {
                 badRepoject.printStackTrace();

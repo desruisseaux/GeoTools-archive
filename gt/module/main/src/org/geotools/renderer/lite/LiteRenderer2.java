@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import javax.media.jai.util.Range;
 
 import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.MathTransform2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -58,6 +57,8 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.gc.GridCoverage;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.operation.CoordinateOperationFactory;
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledShapePainter;
@@ -74,7 +75,12 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -122,6 +128,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     /** Filter factory for creating bounding box filters */
     private FilterFactory filterFactory = FilterFactory.createFilterFactory();
+	CoordinateOperationFactory operationFactory= new CoordinateOperationFactory();
 
     /**
      * Context which contains the layers and the bouning box which needs to be
@@ -490,10 +497,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on 
                     // unprojected geometries
-                    MathTransform2D transform = (MathTransform2D) CRSService.reproject(destinationCrs,
-                            sourceCrs, true);
+                    MathTransform transform = operationFactory.createOperation(destinationCrs, sourceCrs).getMathTransform();
                     if( transform!=null)
-                    	envelope = CRSService.transform(envelope, transform);
+                    	envelope = transform(envelope, transform);
                 }
 
                 Filter filter = null;
@@ -510,7 +516,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 q.setFilter(filter);
                 q.setPropertyNames(attributes);
                 query = q;
-            } catch (TransformException e) {
+            } catch (Exception e) {
                 LOGGER.severe(
                     "Got a tranform exception while trying to de-project the current "
                     + "envelope, falling back on full data loading (no bbox query)");
@@ -550,6 +556,20 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     }
 
     /**
+     * Transforms the Envelope using the MathTransform.
+	 * @param envelope the envelope to transform
+	 * @param transform the transformation to use
+	 * @return a new Envelope
+     * @throws TransformException 
+	 */
+	private Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
+		double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
+		double[] newcoords=new double[4];
+		transform.transform(coords, 0, newcoords, 0, 4);
+		return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
+	}
+
+	/**
      * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
      * attribute names, returning at least the default geometry attribute
      * name.
@@ -950,9 +970,14 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                         symbolizers[m]);
                 MathTransform2D transform = null;
 		
-		if (canTransform)
-		    transform=getMathTransform(crs,
-                        destinationCrs, shape.getTransform());
+		if (canTransform){
+		    try {
+				transform=getMathTransform(crs,
+				            destinationCrs, shape.getTransform());
+			} catch (Exception e) {
+				// fall through
+			}
+		}
 
                 if (transform != null) {
                     Shape transformedShape = getTransformedShape(g, transform);
@@ -995,11 +1020,13 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @return
      *
      * @throws CannotCreateTransformException
+     * @throws FactoryException 
+     * @throws OperationNotFoundException 
      */
     private MathTransform2D getMathTransform(
         CoordinateReferenceSystem sourceCrs,
         CoordinateReferenceSystem destinationCrs, AffineTransform at)
-        throws CannotCreateTransformException {
+        throws CannotCreateTransformException, OperationNotFoundException, FactoryException {
         MathTransform2D transform = (MathTransform2D) transformMap.get(sourceCrs);
 
         if (transform != null) {
@@ -1011,10 +1038,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             return null;
         }
 
-        transform = (MathTransform2D) CRSService.reproject(sourceCrs, destinationCrs, true);
+        transform = (MathTransform2D) operationFactory.createOperation(sourceCrs, destinationCrs).getMathTransform();;
 
         if (transform != null) {
-            transform = CRSService.concatenate(transform, at);
+            transform = (MathTransform2D) operationFactory.getMathTransformFactory().createConcatenatedTransform( transform, 
+            	operationFactory.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at)));
         }
 
         transformMap.put(sourceCrs, transform);
