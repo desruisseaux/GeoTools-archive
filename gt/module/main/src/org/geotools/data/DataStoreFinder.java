@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -52,6 +54,9 @@ import java.util.Set;
  * </p>
  */
 public final class DataStoreFinder {
+	/** The logger for the filter module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    
     private DataStoreFinder() {
     }
 
@@ -81,9 +86,11 @@ public final class DataStoreFinder {
                     return fac.createDataStore(params);
                 }
             } catch (Throwable t) {
+            	/** The logger for the filter module. */
+                LOGGER.log( Level.WARNING, "Could not aquire "+fac.getDescription()+":"+t, t );            	
                 // Protect against DataStores that don't carefully
                 // code canProcess
-                // -ArcSDE do not handle non string values
+                
                 continue;
             }
         }

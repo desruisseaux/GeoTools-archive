@@ -918,7 +918,7 @@ public abstract class JDBCDataStore implements DataStore {
         try {
             return connectionPool.getConnection();
         } catch (SQLException sqle) {
-            throw new DataSourceException("Could not get connection", sqle);
+            throw new DataSourceException("Connection failed:"+sqle, sqle );
         }
     }
 
