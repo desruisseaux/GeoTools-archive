@@ -198,6 +198,7 @@
             <include>**/*.csv</include>
             <include>**/*.png</include>
             <include>**/*.gml</include>
+            <include>**/*.sld</include>
           </includes>
         </resource>
       </resources>
