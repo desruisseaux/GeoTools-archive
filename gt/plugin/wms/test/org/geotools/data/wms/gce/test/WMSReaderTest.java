@@ -14,6 +14,13 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSReader;
+<<<<<<< .mine
+import org.geotools.gc.GridCoverage;
+import org.geotools.parameter.ParameterGroup;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.OperationParameterGroup;
+=======
+>>>>>>> .r7857
 
 
 /**
@@ -50,6 +57,88 @@ public class WMSReaderTest extends TestCase {
     public void testHasMoreGridCoverages() {
     }
 
+<<<<<<< .mine
+    public void testRead() throws Exception {
+        OperationParameterGroup info = reader.getFormat().getReadParameters();            
+            
+        ParameterGroup group = (ParameterGroup) info.createValue();
+        GeneralParameterValue[] values = group.getValues(); // new WMSParameterValue[16];
+        
+        for (int i = 0; i < values.length; i++) {
+            WMSOperationParameter parameter = (WMSOperationParameter) values[i].getDescriptor();
+            if (parameter.getName(null).equals("LAYERS")) {
+                ArrayList layerList = new ArrayList();
+                List availableLayers = parameter.getAvailableLayers();
+
+                for (int j = 0; j < availableLayers.size(); j++) {
+                    SimpleLayer simpleLayer = (SimpleLayer) availableLayers.get(j);
+                    simpleLayer.setStyle("");
+                    layerList.add(j, simpleLayer);
+                }
+                // We should of used the value that was created for u
+                // ...and then modifed it?
+                values[i] = new WMSParameterValue(layerList, parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("FORMAT")) {
+                Iterator iter = parameter.getValidValues().iterator();
+
+                if (iter.hasNext()) {
+                    String format = (String) iter.next();
+                    values[i] = new WMSParameterValue(format, parameter);
+                }
+                
+                continue;
+            }
+
+            if (parameter.getName(null).equals("WIDTH") ||
+                    parameter.getName(null).equals("HEIGHT")) {
+                values[i] = new WMSParameterValue("400", parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("SRS")) {
+                values[i] = new WMSParameterValue("EPSG:26904", parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("BBOX_MINX")) {
+                values[i] = new WMSParameterValue("366800", parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("BBOX_MINY")) {
+                values[i] = new WMSParameterValue("2170400", parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("BBOX_MAXX")) {
+                values[i] = new WMSParameterValue("816000", parameter);
+
+                continue;
+            }
+
+            if (parameter.getName(null).equals("BBOX_MAXY")) {
+                values[i] = new WMSParameterValue("2460400", parameter);
+
+                continue;
+            }
+
+            // All of these should be no-ops..because we used the Group to create
+            //
+            // values[i] = parameter.createValue();
+            // values[i] = new WMSParameterValue(parameter.getDefaultValue(), parameter);
+        }            
+        ParameterGroup parameters = new ParameterGroup( info, values );            
+        GridCoverage coverage = reader.read( parameters );
+    }
+=======
 //    public void testRead() throws Exception {
 //        OperationParameterGroup info = reader.getFormat().getReadParameters();            
 //            
@@ -135,4 +224,5 @@ public class WMSReaderTest extends TestCase {
 //        ParameterValueGroup parameters = new ParameterValueGroup( info, values );            
 //        GridCoverage coverage = reader.read( parameters );
 //    }
+>>>>>>> .r7857
 }
