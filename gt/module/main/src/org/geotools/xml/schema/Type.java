@@ -50,14 +50,14 @@ public interface Type {
      * getValue(ElementValue[],Attributes)] method should be used.
      * </p>
      * 
-     * @throws SAXNotSupportedException
+     * @throws OperationNotSupportedException
      * 
      * @see ElementValue
      * 
      * @return Object
      */
     public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException;
+            Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException;
 
     /**
      * <p>

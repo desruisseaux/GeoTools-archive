@@ -18,6 +18,8 @@ package org.geotools.xml.schema;
 
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
 
 /**
  * <p>
@@ -91,7 +93,7 @@ public interface SimpleType extends Type {
      * @return
      */
     public AttributeValue toAttribute(Attribute attribute, Object value,
-        Map hints);
+        Map hints) throws OperationNotSupportedException;
 
     /**
      * DOCUMENT ME!
