@@ -28,17 +28,13 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * Provides ...TODO summary sentence
  * <p>
  * TODO Description
  * </p><p>
- * Responsibilities:
- * <ul>
- * <li>
- * <li>
- * </ul>
  * </p><p>
  * Example Use:<pre><code>
  * GeometryAttributeType x = new GeometryAttributeType( ... );
@@ -47,6 +43,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * </p>
  * @author Leprosy
  * @since 0.3
+ * TODO: test wkt geometry parse.
  */
 public class GeometricAttributeType extends DefaultAttributeType implements org.geotools.feature.GeometryAttributeType{
     /** CoordianteSystem used by this GeometryAttributeType */
@@ -105,8 +102,19 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
             return value;
         }
 
-        // consider wkt/wkb/gml support?
-        throw new RuntimeException(
+	if (value instanceof String) {
+	    String wkt = (String) value;
+	    WKTReader reader = new WKTReader();
+	    try {
+		return reader.read(wkt);
+	    } catch (com.vividsolutions.jts.io.ParseException pe) {
+		throw new IllegalArgumentException("Could not parse the " + 
+						   "string: " + wkt + 
+						   " to well known text");
+	    }
+	}
+        // consider wkb/gml support?
+        throw new IllegalArgumentException(
             "AttributeGT.Geometric cannot parse " + value);
     }
     
