@@ -62,7 +62,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
 //    public static final Param DIRECTORY = new Param("directory", File.class,
 //            "Directory containing gml files", true);
 
-    private static final Param URLP = new Param("url", URL.class,
+    public static final Param URLP = new Param("url", URL.class,
         "url to a gml file");
     /**
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
