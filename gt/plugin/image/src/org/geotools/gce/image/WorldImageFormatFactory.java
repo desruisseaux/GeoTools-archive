@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.image;
 
-
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
@@ -27,12 +26,11 @@ import org.opengis.coverage.grid.Format;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WorldImageFormatFactory implements GridFormatFactorySpi {
+    public Format createFormat() {
+        return new WorldImageFormat();
+    }
 
-	public Format createFormat() {
-		return new WorldImageFormat();
-	}
-	public boolean isAvailable() {
-		return true;
-	}
-
+    public boolean isAvailable() {
+        return true;
+    }
 }
