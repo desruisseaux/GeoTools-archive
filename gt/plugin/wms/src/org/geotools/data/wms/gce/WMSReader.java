@@ -34,6 +34,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -120,7 +121,7 @@ public class WMSReader implements GridCoverageReader {
     /* (non-Javadoc)
      * @see org.geotools.data.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
      */
-    public GridCoverage read(GeneralParameterValue[] parameters)
+    public GridCoverage read(ParameterValueGroup parameters)
         throws IllegalArgumentException, IOException {
         GetMapRequest request = wms.createGetMapRequest();
 
@@ -129,8 +130,9 @@ public class WMSReader implements GridCoverageReader {
         String maxx = "";
         String maxy = "";
 
-        for (int i = 0; i < parameters.length; i++) {
-            WMSParameterValue value = (WMSParameterValue) parameters[i];
+        GeneralParameterValue[] values = parameters.getValues();
+        for (int i = 0; i < values.length; i++) {
+            WMSParameterValue value = (WMSParameterValue) values[i];
 
             if ((value == null) || (value.getValue() == null)) {
                 continue;

@@ -46,28 +46,28 @@ public class WMSOperationParameter implements OperationParameter {
     Class valueClass = WMSParameterValue.class;
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getValueClass()
+     * @see org.opengis.parameter.ParameterDescriptor#getValueClass()
      */
     public Class getValueClass() {
         return valueClass;
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getValidValues()
+     * @see org.opengis.parameter.ParameterDescriptor#getValidValues()
      */
     public Set getValidValues() {
         return validValues;
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getDefaultValue()
+     * @see org.opengis.parameter.ParameterDescriptor#getDefaultValue()
      */
     public Object getDefaultValue() {
         return defaultValue;
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getMinimumValue()
+     * @see org.opengis.parameter.ParameterDescriptor#getMinimumValue()
      */
     public Comparable getMinimumValue() {
         // TODO Auto-generated method stub
@@ -75,7 +75,7 @@ public class WMSOperationParameter implements OperationParameter {
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getMaximumValue()
+     * @see org.opengis.parameter.ParameterDescriptor#getMaximumValue()
      */
     public Comparable getMaximumValue() {
         // TODO Auto-generated method stub
@@ -83,7 +83,7 @@ public class WMSOperationParameter implements OperationParameter {
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.OperationParameter#getUnit()
+     * @see org.opengis.parameter.ParameterDescriptor#getUnit()
      */
     public Unit getUnit() {
         // TODO Auto-generated method stub
@@ -91,21 +91,21 @@ public class WMSOperationParameter implements OperationParameter {
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.GeneralOperationParameter#createValue()
+     * @see org.opengis.parameter.GeneralParameterDescriptor#createValue()
      */
     public GeneralParameterValue createValue() {
         return new WMSParameterValue(null, this);
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.GeneralOperationParameter#getMinimumOccurs()
+     * @see org.opengis.parameter.GeneralParameterDescriptor#getMinimumOccurs()
      */
     public int getMinimumOccurs() {
         return minOccurs;
     }
 
     /* (non-Javadoc)
-     * @see org.opengis.parameter.GeneralOperationParameter#getMaximumOccurs()
+     * @see org.opengis.parameter.GeneralParameterDescriptor#getMaximumOccurs()
      */
     public int getMaximumOccurs() {
         return maxOccurs;

@@ -20,11 +20,15 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.parameter.ParameterGroupDescriptor;
 
 import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.OperationParameterGroup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -129,27 +133,31 @@ public class WMSFormat extends AbstractGridFormat {
      * user interface.
      * </p>
      */
-    public GeneralOperationParameter[] getReadParameters() {
-        readParameters = new GeneralOperationParameter[16];
+    public OperationParameterGroup getReadParameters() {
+        GeneralOperationParameter params[] = new GeneralOperationParameter[16];
 
         WMSParameterMaker maker = new WMSParameterMaker(capabilities);
-        readParameters[0] = maker.createVersionReadParam();
-        readParameters[1] = maker.createRequestReadParam();
-        readParameters[2] = maker.createFormatReadParam();
-        readParameters[3] = maker.createHeightReadParam();
-        readParameters[4] = maker.createWidthReadParam();
-        readParameters[5] = maker.createSRSReadParam();
-        readParameters[6] = maker.createLayersReadParam();
-        readParameters[7] = maker.createBBoxMinXReadParam();
-        readParameters[8] = maker.createBBoxMinYReadParam();
-        readParameters[9] = maker.createBBoxMaxXReadParam();
-        readParameters[10] = maker.createBBoxMaxYReadParam();
-        readParameters[11] = maker.createTransparentReadParam();
-        readParameters[12] = maker.createBGColorReadParam();
-        readParameters[13] = maker.createExceptionsReadParam();
-        readParameters[14] = maker.createElevationReadParam();
-        readParameters[15] = maker.createTimeReadParam();
+        params[0] = maker.createVersionReadParam();
+        params[1] = maker.createRequestReadParam();
+        params[2] = maker.createFormatReadParam();
+        params[3] = maker.createHeightReadParam();
+        params[4] = maker.createWidthReadParam();
+        params[5] = maker.createSRSReadParam();
+        params[6] = maker.createLayersReadParam();
+        params[7] = maker.createBBoxMinXReadParam();
+        params[8] = maker.createBBoxMinYReadParam();
+        params[9] = maker.createBBoxMaxXReadParam();
+        params[10] = maker.createBBoxMaxYReadParam();
+        params[11] = maker.createTransparentReadParam();
+        params[12] = maker.createBGColorReadParam();
+        params[13] = maker.createExceptionsReadParam();
+        params[14] = maker.createElevationReadParam();
+        params[15] = maker.createTimeReadParam();
 
+        Map properties = new HashMap();
+        properties.put( "name", capabilities.getService().getName() );
+        properties.put( "remarks", capabilities.getService().get_abstract() );
+        readParameters = new ParameterGroupDescriptor( properties, params );
         return readParameters;
     }
 }
