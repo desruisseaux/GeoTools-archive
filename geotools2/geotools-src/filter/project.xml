@@ -16,7 +16,11 @@
   <shortDescription>OGC Filter parsing module</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>Classes for reading OGC Filters which are encoded in
-  their standard XML format.</description>
+  their standard XML format.  The definitions of Filters are 
+contained in core, these classes are for the reading and 
+writing of Filters.  Note that a number of have moved to the 
+data module to resolve dependancy circles.  This should not 
+be a problem after the module merge.</description>
   <developers>
     <developer>
       <name>Chris Holmes</name>
