@@ -257,7 +257,10 @@ public class DataRepository {
     public Set getDataStores() {
     	return Collections.unmodifiableSet( new HashSet( datastores.values()) );
     }
-    
+    public FeatureSource source( String dataStoreId, String typeName ) throws IOException{
+		DataStore ds = datastore( dataStoreId );
+		return  ds.getFeatureSource( typeName );
+    }
     /** FeatureView wrapper on FeatureSource. 
      * @throws IOException*/
     public FeatureView view( String dataStoreId, String typeName ) throws IOException{
