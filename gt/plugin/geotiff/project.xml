@@ -42,11 +42,6 @@
       <version>2.1.x</version>
     </dependency>
     <dependency>
-      <artifactId>view</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.1.x</version>
-    </dependency>
-    <dependency>
       <id>geoapi</id>
       <version>SNAPSHOT</version>
       <url>http://geoapi.sourceforge.net</url>
