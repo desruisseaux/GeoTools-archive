@@ -17,14 +17,22 @@
 
 package org.geotools.data.vpf;
 
-import java.io.*;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.vpf.ifc.*;
-import org.geotools.data.vpf.io.*;
+import org.geotools.data.vpf.ifc.DataTypesDefinition;
+import org.geotools.data.vpf.ifc.FeatureClassTypes;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.data.vpf.ifc.VPFCoverageIfc;
+import org.geotools.data.vpf.ifc.VPFLibraryIfc;
+import org.geotools.data.vpf.io.TableInputStream;
+import org.geotools.data.vpf.io.TableRow;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 

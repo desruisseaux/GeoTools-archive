@@ -17,17 +17,14 @@
 
 package org.geotools.data.vpf.util;
 
-import com.vividsolutions.jts.geom.*;
-
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import org.geotools.data.vpf.io.RowField;
 import org.geotools.data.vpf.io.TripletId;
-
-import org.geotools.feature.FeatureType;
-
 import org.opengis.spatialschema.geometry.DirectPosition;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 /*
  * EdgeData.java
  *

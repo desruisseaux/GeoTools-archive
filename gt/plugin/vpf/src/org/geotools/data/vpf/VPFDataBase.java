@@ -16,17 +16,17 @@
  */
 package org.geotools.data.vpf;
 
-import org.geotools.data.vpf.file.VPFFile;
-import org.geotools.data.vpf.file.VPFFileFactory;
-import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.feature.Feature;
-import org.geotools.feature.SchemaException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import org.geotools.data.vpf.file.VPFFile;
+import org.geotools.data.vpf.file.VPFFileFactory;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.feature.Feature;
+import org.geotools.feature.SchemaException;
 
 
 /**

@@ -18,7 +18,6 @@ package org.geotools.data.vpf.io;
 
 import java.io.EOFException;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

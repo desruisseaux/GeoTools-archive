@@ -17,8 +17,8 @@
 
 package org.geotools.data.vpf;
 
-import java.io.*;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +29,8 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
-import org.geotools.data.vpf.ifc.*;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.data.vpf.ifc.VPFLibraryIfc;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;

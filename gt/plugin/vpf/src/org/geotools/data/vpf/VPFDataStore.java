@@ -16,13 +16,13 @@
  */
 package org.geotools.data.vpf;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**

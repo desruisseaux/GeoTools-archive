@@ -17,21 +17,26 @@
 
 package org.geotools.data.vpf;
 
-import com.vividsolutions.jts.geom.*;
-
-import java.io.*;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.vpf.ifc.*;
-import org.geotools.data.vpf.io.*;
-import org.geotools.data.vpf.readers.*;
-
+import org.geotools.data.vpf.ifc.DataTypesDefinition;
+import org.geotools.data.vpf.ifc.FeatureClassTypes;
+import org.geotools.data.vpf.io.TableColumnDef;
+import org.geotools.data.vpf.io.TableHeader;
+import org.geotools.data.vpf.io.TableInputStream;
+import org.geotools.data.vpf.io.TableRow;
+import org.geotools.data.vpf.readers.VPFReader;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /*
  * VPFFeatureClass.java

@@ -19,7 +19,6 @@ package org.geotools.data.vpf.io;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFHeader;
 import org.geotools.data.vpf.ifc.VPFRow;
 import org.geotools.data.vpf.util.DataUtils;
-
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.opengis.spatialschema.geometry.DirectPosition;

@@ -22,7 +22,6 @@ import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**

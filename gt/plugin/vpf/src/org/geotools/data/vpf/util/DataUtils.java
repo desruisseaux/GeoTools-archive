@@ -18,14 +18,7 @@
 package org.geotools.data.vpf.util;
 
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
-//import org.geotools.data.vpf.io.Coordinate2DDouble;
-//import org.geotools.data.vpf.io.Coordinate2DFloat;
-//import org.geotools.data.vpf.io.Coordinate3DDouble;
-//import org.geotools.data.vpf.io.Coordinate3DFloat;
 import org.geotools.data.vpf.io.VPFDate;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**

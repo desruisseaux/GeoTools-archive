@@ -17,9 +17,11 @@
 
 package org.geotools.data.vpf.readers;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import org.geotools.feature.*;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 
 
 /**

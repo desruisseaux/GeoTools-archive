@@ -19,17 +19,15 @@ package org.geotools.data.vpf.readers;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.HashMap;
 
-import org.geotools.data.vpf.*;
-import org.geotools.data.vpf.VPFDataBase;
-import org.geotools.data.vpf.ifc.*;
-import org.geotools.data.vpf.io.*;
-import org.geotools.data.vpf.util.*;
-
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+import org.geotools.data.vpf.VPFDataStore;
+import org.geotools.data.vpf.VPFFeatureReader;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.data.vpf.io.RowField;
+import org.geotools.data.vpf.io.TableInputStream;
+import org.geotools.data.vpf.io.TableRow;
+import org.geotools.data.vpf.util.EdgeData;
 
 /**
  * VPFLineFeatureReader.java

@@ -16,11 +16,13 @@
  */
 package org.geotools.data.vpf.readers;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+
 import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
@@ -28,12 +30,12 @@ import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**

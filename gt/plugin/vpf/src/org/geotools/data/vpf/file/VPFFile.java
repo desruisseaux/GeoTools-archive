@@ -16,10 +16,16 @@
  */
 package org.geotools.data.vpf.file;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateList;
-import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+
 import org.geotools.data.vpf.VPFColumn;
 import org.geotools.data.vpf.exc.VPFDataException;
 import org.geotools.data.vpf.exc.VPFHeaderFormatException;
@@ -37,15 +43,11 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.AbstractList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateList;
+import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**

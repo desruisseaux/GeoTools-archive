@@ -20,10 +20,12 @@
  */
 package org.geotools.data.vpf;
 
-import org.geotools.data.vpf.ifc.*;
+import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.data.vpf.util.DataUtils;
-import org.geotools.feature.*;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 
 import com.vividsolutions.jts.geom.Geometry;

@@ -19,20 +19,25 @@
 
 package org.geotools.data.vpf.readers;
 
-import com.vividsolutions.jts.geom.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.geotools.data.vpf.*;
-import org.geotools.data.vpf.VPFDataBase;
+import org.geotools.data.vpf.VPFDataStore;
+import org.geotools.data.vpf.VPFFeatureReader;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.data.vpf.io.*;
-import org.geotools.data.vpf.util.*;
+import org.geotools.data.vpf.io.RowField;
+import org.geotools.data.vpf.io.TableInputStream;
+import org.geotools.data.vpf.io.TableRow;
+import org.geotools.data.vpf.io.TripletId;
+import org.geotools.data.vpf.util.EdgeData;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 /**
  * VPFAreaFeatureReader.java
  *

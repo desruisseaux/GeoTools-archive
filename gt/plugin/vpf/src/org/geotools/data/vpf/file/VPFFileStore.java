@@ -20,14 +20,15 @@
  */
 package org.geotools.data.vpf.file;
 
-import org.geotools.data.AbstractDataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.geotools.data.AbstractDataStore;
+import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 
 
 /**

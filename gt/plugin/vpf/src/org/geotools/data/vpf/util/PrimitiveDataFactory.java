@@ -19,11 +19,7 @@ package org.geotools.data.vpf.util;
 
 import java.util.HashMap;
 
-import org.geotools.data.vpf.VPFSchemaCreator;
-import org.geotools.data.vpf.io.RowField;
 import org.geotools.data.vpf.io.TableRow;
-import org.geotools.data.vpf.io.TripletId;
-
 import org.geotools.feature.FeatureType;
 
 /*

@@ -28,7 +28,6 @@ import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.data.vpf.io.TableRow;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 
