@@ -53,13 +53,9 @@ public class Header {
             }
         }
     }
-    public static void java( File file ) throws Exception {
-        File tmp = new File( file.getAbsolutePath()+".tmp" );
+    public static void java( File file ) throws Exception {        
         FileReader filerd = new FileReader( file );
-        FileWriter filewr = new FileWriter( tmp );
-        
         BufferedReader reader = new BufferedReader( filerd );
-        BufferedWriter writer = new BufferedWriter( filewr );
         
         String line = reader.readLine();
         HEADER: for( ; line != null; line = reader.readLine() ){            
@@ -69,6 +65,10 @@ public class Header {
             System.err.println("Warning: "+file+"does not have 'package' ... skipping" );
             return; // this file does not even have pacakge?
         }
+        File tmp = new File( file.getAbsolutePath()+".tmp" );
+        tmp.deleteOnExit();        
+        FileWriter filewr = new FileWriter( tmp );
+        BufferedWriter writer = new BufferedWriter( filewr );
         header( writer );
         COPY: do {
             writer.write( line ); writer.write( "\n" );            
@@ -78,9 +78,8 @@ public class Header {
         writer.close();
         
         System.out.println( "Processed "+file );
-        file.delete();
+        //file.delete();
         tmp.renameTo( file );
-        tmp.deleteOnExit();        
     }
     
     private static void header( BufferedWriter w ) throws IOException {
