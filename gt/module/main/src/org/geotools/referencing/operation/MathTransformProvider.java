@@ -177,11 +177,11 @@ public abstract class MathTransformProvider extends OperationMethod {
             if (identifiers!=null && identifiers.length!=0) {
                 name = identifiers[0].getCode();
             } else {
-                name = userDescriptor.getName().toString();
+                name = userDescriptor.getName().getCode();
             }
-            final ParameterDescriptor descriptor;
+            final GeneralParameterDescriptor descriptor;
             try {
-                descriptor = getParameters().getParameter(name);
+                descriptor = getParameters().descriptor(name);
             } catch (ParameterNotFoundException cause) {
                 final InvalidParameterNameException exception =
                       new InvalidParameterNameException(Resources.format(
@@ -190,8 +190,9 @@ public abstract class MathTransformProvider extends OperationMethod {
                 throw exception;
             }
             if (value instanceof ParameterValue) {
-                org.geotools.parameter.Parameter.ensureValidValue(descriptor, 
-                                                      ((ParameterValue) value).getValue());
+                org.geotools.parameter.Parameter.ensureValidValue(
+                        (ParameterDescriptor) descriptor, 
+                        ((ParameterValue) value).getValue());
             }
         }
     }

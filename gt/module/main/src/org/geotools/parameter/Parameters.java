@@ -41,47 +41,24 @@ import org.opengis.referencing.IdentifiedObject;
 
 /**
  * Utility class for methods helping implementing, and working with the
- * Parameter API from org.opengis.parameter.
+ * parameter API from <code>org.opengis.parameter</code>.
  * 
  * @author Jody Garnett (Refractions Research)
  */
 public class Parameters {
-    /** Empty ParameterGroup */
+    /**
+     * An empty parameter group. This group contains no parameters.
+     */
     public static ParameterDescriptorGroup EMPTY_GROUP =
             new org.geotools.parameter.ParameterDescriptorGroup("empty",
             new GeneralParameterDescriptor[0]);
-    
-    /**
-     * Locate by GeneralParameterDescriptor by ID (rather than name).
-     * <p>
-     * Name is localized - and not especially useful as a key to retrive
-     * parameters. This lookup offers a bridge allowing you to lookup a
-     * GeneralParameterDescriptor and use list or seach.
-     * </p>
-     *
-     * @deprecated In latest implementation, names are no longer localized.
-     */
-    public static GeneralParameterDescriptor id( ParameterDescriptorGroup type, String id ){
-//        GeneralParameterDescriptor types[] = type.descriptors();
-        return null;
-    }
-
-    /**
-     * @deprecated Not yet implemented.
-     */
-    public static IdentifiedObject id( IdentifiedObject objs[], String id ){
-        for( int i=0; i<objs.length; i++){
-            IdentifiedObject obj = objs[i];
-        }
-        return null;
-    }
 
     /**
      * @deprecated Use <code>group.descriptors().contains(type)</code> instead.
      */
-    public static boolean allowed( ParameterDescriptorGroup group, GeneralParameterDescriptor type){
+    public static boolean allowed(ParameterDescriptorGroup group, GeneralParameterDescriptor type) {
         List types = group.descriptors();
-        for(final Iterator it=types.iterator(); it.hasNext();) {
+        for (final Iterator it=types.iterator(); it.hasNext();) {
             if (it.next() == type) {
                 return true;
             }
@@ -205,8 +182,10 @@ public class Parameters {
      * </p>
      * @param type GeneralParameterDescriptor to search for
      * @return List (possibly empty of GeneralParameter
+     *
+     * @deprecated Parameter should be searched by name.
      */
-    public static int indexOf( ParameterValueGroup group, GeneralParameterDescriptor type){
+    public static int indexOf(ParameterValueGroup group, GeneralParameterDescriptor type) {
         GeneralParameterValue[] params = array( group );
         if( params == null ){
             return -1;
@@ -228,7 +207,7 @@ public class Parameters {
      * @param type GeneralParameterDescriptor to search for
      * @return List (possibly empty of GeneralParameter
      */
-    public static List list( ParameterValueGroup group, GeneralParameterDescriptor type){
+    public static List list(ParameterValueGroup group, GeneralParameterDescriptor type) {
         GeneralParameterValue[] params = array( group );
         if( params == null ){
             return Collections.EMPTY_LIST;
@@ -251,7 +230,7 @@ public class Parameters {
      * @param type GeneralParameterDescriptor to search for
      * @return List (possibly empty of GeneralParameter
      */
-    public static List search( ParameterValueGroup group, GeneralParameterDescriptor type){
+    public static List search(ParameterValueGroup group, GeneralParameterDescriptor type) {
         GeneralParameterValue[] params = array( group );
         if( params == null ){
             return Collections.EMPTY_LIST;
