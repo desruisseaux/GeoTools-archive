@@ -66,7 +66,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
     /**
      * Construct a new envelope with the same data than the specified envelope.
      */
-    private Envelope(final org.opengis.spatialschema.geometry.Envelope envelope) {
+    public Envelope(final org.opengis.spatialschema.geometry.Envelope envelope) {
         if (envelope instanceof Envelope) {
             final Envelope e = (Envelope) envelope;
             ordinates = (double[]) e.ordinates.clone();

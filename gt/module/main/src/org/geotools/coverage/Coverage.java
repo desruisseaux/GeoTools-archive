@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // Images
 import java.awt.Image;
@@ -32,9 +32,6 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderContext;
 import java.awt.image.renderable.RenderableImage;
 import java.awt.image.renderable.ParameterBlock;
-import javax.media.jai.TiledImage;
-import javax.media.jai.iterator.RectIterFactory;
-import javax.media.jai.iterator.WritableRectIter;
 
 // Geometry
 import java.awt.Shape;
@@ -50,13 +47,10 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.Arrays;
 import java.util.Locale;
-import java.rmi.RemoteException;
-import java.rmi.ServerException; // For Javadoc
-import java.rmi.server.UnicastRemoteObject;
-import java.lang.ref.WeakReference;
 
 // JAI dependencies
 import javax.media.jai.JAI;
+import javax.media.jai.TiledImage;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.ImageFunction;
@@ -64,26 +58,24 @@ import javax.media.jai.PropertySource;
 import javax.media.jai.PropertySourceImpl;
 import javax.media.jai.util.CaselessStringKey; // For Javadoc
 import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
+import javax.media.jai.iterator.RectIterFactory;
+import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
-import org.opengis.cv.CV_Coverage;
-import org.opengis.pt.PT_Envelope;
-import org.opengis.pt.PT_CoordinatePoint;
-import org.opengis.cs.CS_CoordinateSystem;
-import org.opengis.cv.CV_SampleDimension;
-import org.opengis.gc.GC_GridCoverage;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.coverage.CannotEvaluateException;
 
-// Geotools dependencies (CTS)
-import org.geotools.pt.Matrix;
-import org.geotools.pt.Envelope;
-import org.geotools.pt.Dimensioned;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.AxisOrientation;
+// Geotools dependencies (CRS)
+import org.geotools.geometry.Envelope;
+import org.geotools.referencing.operation.Matrix;
 
 // Resources
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ImageUtilities;
@@ -116,7 +108,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * coverages may be 3D or 4D. The dimension of grid coverage may be queried in many ways:
  *
  * <ul>
- *   <li><code>{@link #getCoordinateSystem}.getDimension();</code></li>
+ *   <li><code>{@link #getCoordinateReferenceSystem}.getCoordinateSystem().getDimension();</code></li>
  *   <li><code>{@link #getDimensionNames}.length;</code></li>
  *   <li><code>{@link #getDimension};</code></li>
  * </ul>
@@ -135,13 +127,8 @@ import org.geotools.resources.geometry.XAffineTransform;
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
- *
- * @see org.opengis.cv.CV_Coverage
- *
- * @deprecated Replaced by {@link org.geotools.coverage.Coverage}
- *             in the <code>org.geotools.coverage</code> package.
  */
-public abstract class Coverage extends PropertySourceImpl implements Dimensioned {
+public abstract class Coverage extends PropertySourceImpl /*implements org.opengis.coverage.Coverage*/ {
     /**
      * The set of default axis name.
      */
@@ -160,20 +147,14 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
     /**
      * The coordinate system, or <code>null</code> if there is none.
      */
-    protected final CoordinateSystem coordinateSystem;
-
-    /**
-     * OpenGIS object returned by {@link #getProxy}.
-     * It may be a hard or a weak reference.
-     */
-    transient Object proxy;
+    protected final CoordinateReferenceSystem crs;
     
     /**
      * Construct a coverage using the specified coordinate system. If the coordinate system
      * is <code>null</code>, then the subclasses must override {@link #getDimension()}.
      *
      * @param name The coverage name.
-     * @param coordinateSystem The coordinate system. This specifies the coordinate
+     * @param crs The coordinate reference system. This specifies the coordinate
      *        system used when accessing a coverage or grid coverage with the
      *        <code>evaluate(...)</code> methods.
      * @param source The source for this coverage, or <code>null</code> if none.
@@ -186,14 +167,14 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      *        be {@link String} or {@link CaselessStringKey} objects,  while values may
      *        be any {@link Object}.
      */
-    protected Coverage(final String           name,
-                       final CoordinateSystem coordinateSystem,
-                       final PropertySource   source,
-                       final Map              properties)
+    protected Coverage(final String                   name,
+                       final CoordinateReferenceSystem crs,
+                       final PropertySource         source,
+                       final Map                properties)
     {
         super(properties, source);
-        this.name             = name;
-        this.coordinateSystem = coordinateSystem;
+        this.name = name;
+        this.crs  = crs;
     }
     
     /**
@@ -206,8 +187,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
         //       In many cases, it is not a problem since GridCoverage
         //       will retains a strong reference to its source anyway.
         super(null, coverage);
-        this.name             = coverage.name;
-        this.coordinateSystem = coverage.coordinateSystem;
+        this.name = coverage.name;
+        this.crs  = coverage.crs;
     }
     
     /**
@@ -243,11 +224,10 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * @return The coordinate system, or <code>null</code> if this coverage
      *         does not have an associated coordinate system.
      *
-     * @see CV_Coverage#getCoordinateSystem()
      * @see org.geotools.gc.GridGeometry#getGridToCoordinateSystem
      */
-    public CoordinateSystem getCoordinateSystem() {
-        return coordinateSystem;
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return crs;
     }
     
     /**
@@ -264,22 +244,19 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * The default implementation returns the coordinate system envelope if there is one.
      *
      * @return The bounding box for the coverage domain in coordinate system coordinates.
-     *
-     * @see CV_Coverage#getEnvelope()
      */
-    public Envelope getEnvelope() {
-        final CoordinateSystem cs = getCoordinateSystem();
-        return (cs!=null) ? cs.getDefaultEnvelope() : null;
+    public org.opengis.spatialschema.geometry.Envelope getEnvelope() {
+        return CRSUtilities.getEnvelope(crs);
     }
     
     /**
      * Returns the dimension of the grid coverage. The default implementation
-     * returns the dimension of the underlying {@link CoordinateSystem}.
+     * returns the dimension of the underlying {@link CoordinateReferenceSystem}.
      *
      * @return The number of dimensions of this coverage.
      */
     public int getDimension() {
-        return getCoordinateSystem().getDimension();
+        return crs.getCoordinateSystem().getDimension();
     }
     
     /**
@@ -291,17 +268,15 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * The {@linkplain #getDimension number of dimensions} of the coverage is the
      * number of entries in the list of dimension names.
      *
-     * The default implementation ask for {@link CoordinateSystem}
+     * The default implementation ask for {@link CoordinateReferenceSystem}
      * axis names, or returns "x", "y"... if this coverage has no coordinate system.
      *
      * @param  locale The desired locale, or <code>null</code> for the default locale.
      * @return The names of each dimension. The array's length is equals to {@link #getDimension}.
-     *
-     * @see CV_Coverage#getDimensionNames()
      */
     public String[] getDimensionNames(final Locale locale) {
-        final CoordinateSystem cs = getCoordinateSystem();
-        if (cs != null) {
+        if (crs != null) {
+            final CoordinateSystem cs = crs.getCoordinateSystem();
             final String[] names = new String[cs.getDimension()];
             for (int i=0; i<names.length; i++) {
                 names[i] = cs.getAxis(i).getName(locale);
@@ -324,9 +299,6 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * with the dimension. A coverage must have at least one sample dimension.
      *
      * @return Sample dimension information for the coverage.
-     *
-     * @see CV_Coverage#getNumSampleDimensions()
-     * @see CV_Coverage#getSampleDimension(int)
      */
     public abstract SampleDimension[] getSampleDimensions();
     
@@ -335,7 +307,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * A value for each sample dimension is included in the sequence. The default interpolation
      * type used when accessing grid values for points which fall between grid cells is
      * nearest neighbor. The coordinate system of the point is the same as the grid
-     * coverage {@linkplain #getCoordinateSystem coordinate system}.
+     * coverage {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest  An array in which to store values, or <code>null</code> to
@@ -345,10 +317,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
-     *
-     * @see CV_Coverage#evaluateAsBoolean
      */
-    public boolean[] evaluate(final CoordinatePoint coord, boolean[] dest)
+    public boolean[] evaluate(final DirectPosition coord, boolean[] dest)
             throws CannotEvaluateException
     {
         final double[] result = evaluate(coord, (double[])null);
@@ -367,8 +337,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * A value for each sample dimension is included in the sequence. The default
      * interpolation type used when accessing grid values for points which fall
      * between grid cells is nearest neighbor. The coordinate system of the
-     * point is the same as the coverage {@linkplain #getCoordinateSystem
-     * coordinate system}.
+     * point is the same as the coverage {@linkplain #getCoordinateReferenceSystem
+     * coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest  An array in which to store values, or <code>null</code> to
@@ -378,10 +348,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
-     *
-     * @see CV_Coverage#evaluateAsInteger
      */
-    public byte[] evaluate(final CoordinatePoint coord, byte[] dest)
+    public byte[] evaluate(final DirectPosition coord, byte[] dest)
             throws CannotEvaluateException
     {
         final double[] result = evaluate(coord, (double[])null);
@@ -401,8 +369,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * A value for each sample dimension is included in the sequence. The default
      * interpolation type used when accessing grid values for points which fall
      * between grid cells is nearest neighbor. The coordinate system of the
-     * point is the same as the coverage {@linkplain #getCoordinateSystem
-     * coordinate system}.
+     * point is the same as the coverage {@linkplain #getCoordinateReferenceSystem
+     * coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest  An array in which to store values, or <code>null</code> to
@@ -412,10 +380,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
-     *
-     * @see CV_Coverage#evaluateAsInteger
      */
-    public int[] evaluate(final CoordinatePoint coord, int[] dest)
+    public int[] evaluate(final DirectPosition coord, int[] dest)
             throws CannotEvaluateException
     {
         final double[] result = evaluate(coord, (double[])null);
@@ -435,7 +401,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * A value for each sample dimension is included in the sequence. The default interpolation
      * type used when accessing grid values for points which fall between grid cells is
      * nearest neighbor. The coordinate system of the point is the same as the coverage
-     * {@linkplain #getCoordinateSystem coordinate system}.
+     * {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest  An array in which to store values, or <code>null</code> to
@@ -446,7 +412,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
-    public float[] evaluate(final CoordinatePoint coord, float[] dest)
+    public float[] evaluate(final DirectPosition coord, float[] dest)
             throws CannotEvaluateException
     {
         final double[] result = evaluate(coord, (double[])null);
@@ -474,10 +440,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
-     *
-     * @see CV_Coverage#evaluateAsDouble
      */
-    public abstract double[] evaluate(CoordinatePoint coord, double[] dest)
+    public abstract double[] evaluate(DirectPosition coord, double[] dest)
             throws CannotEvaluateException;
     
     /**
@@ -539,7 +503,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * to evaluate the coverage. By default, all ordinates are initialized to 0. Subclasses
          * should set the desired values in their constructor if needed.
          */
-        protected final CoordinatePoint coordinate = new CoordinatePoint(getDimension());
+        protected final org.geotools.geometry.DirectPosition coordinate =
+                    new org.geotools.geometry.DirectPosition(getDimension());
 
         /**
          * Construct a renderable image.
@@ -551,7 +516,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             super(null, Coverage.this);
             this.xAxis = xAxis;
             this.yAxis = yAxis;
-            final Envelope envelope = getEnvelope();
+            final Envelope envelope = new Envelope(getEnvelope());
             bounds = new Rectangle2D.Double(envelope.getMinimum(xAxis),
                                             envelope.getMinimum(yAxis),
                                             envelope.getLength (xAxis),
@@ -586,7 +551,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * Gets the width in coverage coordinate space.
          *
          * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateSystem
+         * @see Coverage#getCoordinateReferenceSystem
          */
         public float getWidth() {
             return (float)bounds.getWidth();
@@ -596,7 +561,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * Gets the height in coverage coordinate space.
          *
          * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateSystem
+         * @see Coverage#getCoordinateReferenceSystem
          */
         public float getHeight() {
             return (float)bounds.getHeight();
@@ -608,7 +573,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * for the {@linkplain #xAxis x axis}.
          *
          * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateSystem
+         * @see Coverage#getCoordinateReferenceSystem
          */
         public float getMinX() {
             return (float)bounds.getX();
@@ -620,7 +585,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * for the {@linkplain #yAxis y axis}.
          *
          * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateSystem
+         * @see Coverage#getCoordinateReferenceSystem
          */
         public float getMinY() {
             return (float)bounds.getY();
@@ -735,7 +700,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
                  * interest.
                  */
                 // Clones the coordinate point in order to allow multi-thread invocation.
-                final CoordinatePoint coordinate = new CoordinatePoint(this.coordinate);
+                final org.geotools.geometry.DirectPosition coordinate =
+                  new org.geotools.geometry.DirectPosition(this.coordinate);
                 final TiledImage tiled = new TiledImage(gridBounds.x, gridBounds.y,
                                                         gridBounds.width, gridBounds.height,
                                                         0, 0, sampleModel, colorModel);
@@ -754,8 +720,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
                                 point2D.y = y;
                                 csToGrid.inverseTransform(point2D, point2D);
                                 if (area==null || area.contains(point2D)) {
-                                    coordinate.ord[xAxis] = point2D.x;
-                                    coordinate.ord[yAxis] = point2D.y;
+                                    coordinate.setOrdinate(xAxis, point2D.x);
+                                    coordinate.setOrdinate(yAxis, point2D.y);
                                     iterator.setPixel(evaluate(coordinate, samples));
                                 } else {
                                     iterator.setPixel(padNaNs);
@@ -812,13 +778,13 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             final Matrix matrix;
             final Envelope srcEnvelope = new Envelope(bounds);
             final Envelope dstEnvelope = new Envelope(gridBounds);
-            final CoordinateSystem  cs = getCoordinateSystem();
-            if (cs != null) {
-                final AxisOrientation[] axis = new AxisOrientation[] {
-                    cs.getAxis(xAxis).orientation,
-                    cs.getAxis(yAxis).orientation
+            if (crs != null) {
+                final CoordinateSystem cs = crs.getCoordinateSystem();
+                final AxisDirection[] axis = new AxisDirection[] {
+                    cs.getAxis(xAxis).getDirection(),
+                    cs.getAxis(yAxis).getDirection()
                 };
-                final AxisOrientation[] normalized = (AxisOrientation[]) axis.clone();
+                final AxisDirection[] normalized = (AxisDirection[]) axis.clone();
                 if (true) {
                     // Normalize axis: Is it really a good idea?
                     // We should provide a rendering hint for configuring that.
@@ -850,7 +816,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image
          * type is not <code>double</code>. The default implementation invokes
-         * {@link Coverage#evaluate(CoordinatePoint,float[])} recursively.
+         * {@link Coverage#evaluate(DirectPosition,float[])} recursively.
          */
         public void getElements(final float startX, final float startY,
                                 final float deltaX, final float deltaY,
@@ -860,16 +826,17 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             int index = 0;
             float[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
-            final CoordinatePoint coordinate = new CoordinatePoint(this.coordinate);
-            coordinate.ord[1] = startY;
+            final org.geotools.geometry.DirectPosition coordinate =
+              new org.geotools.geometry.DirectPosition(this.coordinate);
+            coordinate.setOrdinate(1, startY);
             for (int j=0; j<countY; j++) {
-                coordinate.ord[0] = startX;
+                coordinate.setOrdinate(0, startX);
                 for (int i=0; i<countX; i++) {
                     buffer = evaluate(coordinate, buffer);
                     real[index++] = buffer[element];
-                    coordinate.ord[0] += deltaX;
+                    coordinate.setOrdinate(0, coordinate.getOrdinate(0) + deltaX);
                 }
-                coordinate.ord[1] += deltaY;
+                coordinate.setOrdinate(1, coordinate.getOrdinate(1) + deltaY);
             }
         }
 
@@ -879,7 +846,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image type
          * is <code>double</code>. The default implementation invokes
-         * {@link Coverage#evaluate(CoordinatePoint,double[])} recursively.
+         * {@link Coverage#evaluate(DirectPosition,double[])} recursively.
          */
         public void getElements(final double startX, final double startY,
                                 final double deltaX, final double deltaY,
@@ -889,16 +856,17 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             int index = 0;
             double[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
-            final CoordinatePoint coordinate = new CoordinatePoint(this.coordinate);
-            coordinate.ord[1] = startY;
+            final org.geotools.geometry.DirectPosition coordinate =
+              new org.geotools.geometry.DirectPosition(this.coordinate);
+            coordinate.setOrdinate(1, startY);
             for (int j=0; j<countY; j++) {
-                coordinate.ord[0] = startX;
+                coordinate.setOrdinate(0, startX);
                 for (int i=0; i<countX; i++) {
                     buffer = evaluate(coordinate, buffer);
                     real[index++] = buffer[element];
-                    coordinate.ord[0] += deltaX;
+                    coordinate.setOrdinate(0, coordinate.getOrdinate(0) + deltaX);
                 }
-                coordinate.ord[1] += deltaY;
+                coordinate.setOrdinate(1, coordinate.getOrdinate(1) + deltaY);
             }
         }
     }
@@ -932,299 +900,19 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
         buffer.append("[\"");
         buffer.append(getName(locale));
         buffer.append('"');
-        final Envelope envelope = getEnvelope();
+        final org.opengis.spatialschema.geometry.Envelope envelope = getEnvelope();
         if (envelope != null) {
             buffer.append(", ");
             buffer.append(envelope);
         }
-        final CoordinateSystem cs = getCoordinateSystem();
-        if (cs != null) {
+        if (crs != null) {
             buffer.append(", ");
-            buffer.append(Utilities.getShortClassName(cs));
+            buffer.append(Utilities.getShortClassName(crs));
             buffer.append("[\"");
-            buffer.append(cs.getName(locale));
+            buffer.append(crs.getName(locale));
             buffer.append("\"]");
         }
         buffer.append(']');
         return buffer.toString();
-    }
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////
-    ////////////////                                         ////////////////
-    ////////////////             OPENGIS ADAPTER             ////////////////
-    ////////////////                                         ////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Export a Geotools {@link Coverage} as an OpenGIS {@link CV_Coverage} object.
-     * This class is suitable for RMI use. User should not create instance of this
-     * class directly. The method {@link Adapters#export(Coverage)} should be used
-     * instead.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    protected class Export extends UnicastRemoteObject implements CV_Coverage, PropertySource {
-        /**
-         * The originating adapter.
-         */
-        protected final Adapters adapters;
-
-        /**
-         * Constructs a remote object. This object is automatically added to the cache in
-         * the enclosing {@link Coverage} object. The cached <code>Export</code> instance
-         * can be queried with {@link Adapters#export(Coverage)}.
-         *
-         * @param  adapters The originating adapter.
-         * @throws RemoteException if this object can't be exported through RMI.
-         */
-        protected Export(final Adapters adapters) throws RemoteException {
-            super(); // TODO: Fetch the port number from the adapter.
-            this.adapters = adapters;
-            proxy = new WeakReference(this);
-        }
-
-        /**
-         * Returns the underlying implementation. Note: This method is not available or remote
-         * machine, since we don't implement {@link org.geotools.resources.RemoteProxy}.  This
-         * is because {@link Coverage} may not be serializable. For example,
-         * {@link org.geotools.gc.GridCoverage} will usually contains a non-serializable
-         * {@link java.awt.image.RenderedImage}.
-         */
-        final Coverage getImplementation() {
-            return Coverage.this;
-        }
-
-        /**
-         * Returns the names of each dimension in the coverage.
-         * The default implementation invokes {@link Coverage#getDimensionNames}.
-         *
-         * @return the names of each dimension in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public String[] getDimensionNames() throws RemoteException {
-            return Coverage.this.getDimensionNames(null);
-        }
-
-        /**
-         * Returns The number of sample dimensions in the coverage.
-         * The default implementation invokes {@link Coverage#getSampleDimensions}.
-         *
-         * @return the number of sample dimensions in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public int getNumSampleDimensions() throws RemoteException {
-            return Coverage.this.getSampleDimensions().length;
-        }
-
-        /**
-         * Retrieve sample dimension information for the coverage.
-         * The default implementation invokes {@link Coverage#getSampleDimensions}.
-         *
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public CV_SampleDimension getSampleDimension(int index) throws RemoteException {
-            return adapters.export(Coverage.this.getSampleDimensions()[index]);
-        }
-
-        /**
-         * Returns the number of grid coverages which the grid coverage was derived from.
-         * The default implementation returns <code>0</code>.
-         *
-         * @return the number of grid coverages which this coverage was derived from.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public int getNumSources() throws RemoteException {
-            return 0;
-        }
-
-        /**
-         * Returns the source data for a grid coverage.
-         * The default implementation throws an {@link ArrayIndexOutOfBoundsException},
-         * since {@link #getNumSources} returned 0.
-         *
-         * @param  sourceDataIndex Source grid coverage index. Indexes start at 0.
-         * @return the source data for a grid coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public GC_GridCoverage getSource(int sourceDataIndex) throws RemoteException {
-            throw new ArrayIndexOutOfBoundsException(sourceDataIndex);
-        }
-
-        /**
-         * Returns the list of metadata keywords for a coverage.
-         * The default implementation invokes {@link #getPropertyNames}.
-         *
-         * @return the list of metadata keywords for a coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public String[] getMetadataNames() throws RemoteException {
-            return getPropertyNames();
-        }
-
-        /**
-         * Retrieve the metadata value for a given metadata name.
-         * The default implementation invokes {@link #getProperty}
-         * and replace {@link java.awt.Image#UndefinedProperty} by
-         * <code>null</code>.
-         *
-         * @param  name Metadata keyword for which to retrieve data.
-         * @return the metadata value for a given metadata name.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public String getMetadataValue(String name) throws RemoteException {
-            final Object value = getProperty(name);
-            return (value!=null && value!=Image.UndefinedProperty) ? value.toString() : null;
-        }
-
-        /**
-         * Returns an array of {@link String}s recognized as names by this property source.
-         * The default implementation invokes {@link Coverage#getPropertyNames()}.
-         *
-         * @return an array of strings giving the valid property names, or <code>null</code>.
-         */
-        public String[] getPropertyNames() {
-            return Coverage.this.getPropertyNames();
-        }
-
-        /**
-         * Returns an array of {@link String}s recognized as names by this property source
-         * that begin with the supplied prefix. The default implementation invokes {@link
-         * Coverage#getPropertyNames(String)}.
-         *
-         * @return an array of strings giving the valid property names.
-         */
-        public String[] getPropertyNames(final String prefix) {
-            return Coverage.this.getPropertyNames(prefix);
-        }
-
-        /**
-         * Returns the class expected to be returned by a request for the property with
-         * the specified name. If this information is unavailable, <code>null</code> will
-         * be returned.
-         *
-         * @param  name the name of the property.
-         * @return The class expected to be return by a request for the value
-         *         of this property, or <code>null</code>.
-         */
-        public Class getPropertyClass(final String name) {
-            return Coverage.this.getPropertyClass(name);
-        }
-
-        /**
-         * Returns the value of a property. If the property name is not recognized,
-         * then {@link java.awt.Image#UndefinedProperty} will be returned.
-         *
-         * @param  name the name of the property.
-         * @return the value of the property, or the value
-         *         {@link java.awt.Image#UndefinedProperty}.
-         */
-        public Object getProperty(final String name) {
-            return Coverage.this.getProperty(name);
-        }
-
-        /**
-         * Returns coordinate system used when accessing a coverage or grid coverage
-         * with the <code>evaluate</code> methods. The default implementation invokes
-         * {@link Coverage#getCoordinateSystem}.
-         *
-         * @return the coordinate system used when accessing a coverage or
-         *         grid coverage with the <code>evaluate</code> methods.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public CS_CoordinateSystem getCoordinateSystem() throws RemoteException {
-            return adapters.CTS.export(Coverage.this.getCoordinateSystem());
-        }
-
-        /**
-         * Returns the bounding box for the coverage domain in coordinate system coordinates.
-         * The default implementation invokes {@link Coverage#getEnvelope}.
-         *
-         * @return the bounding box for the coverage domain in coordinate system coordinates.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public PT_Envelope getEnvelope() throws RemoteException {
-            return adapters.CTS.export(Coverage.this.getEnvelope());
-        }
-
-        /**
-         * Return the value vector for a given point in the coverage.
-         * The default implementation invokes one of other <code>CV_Coverage</code> method
-         * (for example {@link #evaluateAsDouble}) according the underlying data type.
-         *
-         * @param  point point at which to find the grid values.
-         * @return the value vector for a given point in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         *
-         * @task TODO: Check the underlying data type.
-         */
-        public Object evaluate(PT_CoordinatePoint point) throws RemoteException {
-            return evaluateAsDouble(point);
-        }
-
-        /**
-         * Return a sequence of Boolean values for a given point in the coverage.
-         * The default implementation invokes {@link Coverage#evaluate(CoordinatePoint, boolean[])}.
-         *
-         * @param  point point at which to find the coverage values.
-         * @return a sequence of boolean values for a given point in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public boolean[] evaluateAsBoolean(PT_CoordinatePoint point) throws RemoteException {
-            return Coverage.this.evaluate(adapters.CTS.wrap(point), (boolean[]) null);
-        }
-
-        /**
-         * Return a sequence of unsigned byte values for a given point in the coverage.
-         * The default implementation invokes {@link Coverage#evaluate(CoordinatePoint, byte[])}.
-         *
-         * @param  point point at which to find the coverage values.
-         * @return a sequence of unsigned byte values for a given point in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public byte[] evaluateAsByte(PT_CoordinatePoint point) throws RemoteException {
-            return Coverage.this.evaluate(adapters.CTS.wrap(point), (byte[]) null);
-        }
-
-        /**
-         * Return a sequence of integer values for a given point in the coverage.
-         * The default implementation invokes {@link Coverage#evaluate(CoordinatePoint, int[])}.
-         *
-         * @param  point point at which to find the grid values.
-         * @return a sequence of integer values for a given point in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public int[] evaluateAsInteger(PT_CoordinatePoint point) throws RemoteException {
-            return Coverage.this.evaluate(adapters.CTS.wrap(point), (int[]) null);
-        }
-
-        /**
-         * Return a sequence of double values for a given point in the coverage.
-         * The default implementation invokes {@link Coverage#evaluate(CoordinatePoint, double[])}.
-         *
-         * @param  point point at which to find the grid values.
-         * @return a sequence of double values for a given point in the coverage.
-         * @throws RemoteException if a remote call failed. More specifically, the exception will
-         *         be an instance of {@link ServerException} if an error occurs on the server side.
-         */
-        public double[] evaluateAsDouble(PT_CoordinatePoint point) throws RemoteException {
-            return Coverage.this.evaluate(adapters.CTS.wrap(point), (double[]) null);
-        }
     }
 }

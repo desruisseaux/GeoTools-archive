@@ -45,6 +45,8 @@ import javax.media.jai.util.Range;
 // OpenGIS dependencies
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.ColorInterpretation;
+import org.opengis.coverage.PaletteInterpretation;
+import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
@@ -83,11 +85,16 @@ import org.geotools.referencing.operation.LinearTransform1D;
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
-public class SampleDimension implements Serializable {
+public class SampleDimension implements org.opengis.coverage.SampleDimension, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6026936545776852758L;
+
+    /**
+     * An empty array of metadata names.
+     */
+    private static final String[] EMPTY_METADATA = new String[0];
 
     /**
      * Ordinal values of {@link SampleDimensionType}. Used for a "switch" statement.
@@ -267,7 +274,7 @@ public class SampleDimension implements Serializable {
      *         dimension, or <code>null</code> if none. This is the values to be returned by
      *         {@link #getCategoryNames}.
      * @param  nodata the values to indicate "no data", or <code>null</code> if none. This is the
-     *         values to be returned by {@link #getNoDataValue}.
+     *         values to be returned by {@link #getNoDataValues}.
      * @param  minimum The lower value, inclusive. The <code>[minimum..maximum]</code> range may or
      *         may not includes the <code>nodata</code> values; the range will be adjusted as
      *         needed. If <code>categories</code> was non-null, then <code>minimum</code> is
@@ -773,6 +780,16 @@ public class SampleDimension implements Serializable {
         }
         throw new IllegalArgumentException(String.valueOf(value));
     }
+
+    /**
+     * Get the sample dimension title or description.
+     *
+     * @deprecated Uses {@link #getDescription(Locale)} instead.
+     *             This method may be removed in GeoAPI 1.1.
+     */
+    public String getDescription() {
+        return getDescription(Locale.getDefault());
+    }    
     
     /**
      * Get the sample dimension title or description.
@@ -786,6 +803,16 @@ public class SampleDimension implements Serializable {
     public String getDescription(final Locale locale) {
         return (categories!=null) ? categories.getName(locale) : null;
     }
+
+    /**
+     * Returns a sequence of category names for the values contained in this sample dimension.
+     *
+     * @deprecated Uses {@link #getCategoryNames(Locale)} instead.
+     *             This method may be removed in GeoAPI 1.1.
+     */
+    public String[] getCategoryNames() {
+        return getCategoryNames(Locale.getDefault());
+    }    
 
     /**
      * Returns a sequence of category names for the values contained in this sample dimension.
@@ -869,7 +896,7 @@ public class SampleDimension implements Serializable {
      * example reprojected in an other coordinate system) and the resampled image do not
      * fit in a rectangular area. It can also be used in various situation where a raisonable
      * "no data" category is needed. The default implementation try to returns one
-     * of the {@linkplain #getNoDataValue no data values}. If no suitable category is found,
+     * of the {@linkplain #getNoDataValues no data values}. If no suitable category is found,
      * then a {@linkplain Category#NODATA default} one is returned.
      *
      * @return A category to use as background for the "Resample" operation.
@@ -886,12 +913,12 @@ public class SampleDimension implements Serializable {
      *
      * <ul>
      *   <li>If {@link #getSampleToGeophysics} returns <code>null</code>, then
-     *       <code>getNoDataValue()</code> returns <code>null</code> as well.
+     *       <code>getNoDataValues()</code> returns <code>null</code> as well.
      *       This means that this sample dimension contains no category or contains
      *       only qualitative categories (e.g. a band from a classified image).</li>
      *
      *   <li>If {@link #getSampleToGeophysics} returns an identity transform,
-     *       then <code>getNoDataValue()</code> returns <code>null</code>.
+     *       then <code>getNoDataValues()</code> returns <code>null</code>.
      *       This means that sample value in this sample dimension are already
      *       expressed in geophysics values and that all "no data" values (if any)
      *       have already been converted into <code>NaN</code> values.</li>
@@ -915,7 +942,7 @@ public class SampleDimension implements Serializable {
      *
      * @see #getSampleToGeophysics
      */
-    public double[] getNoDataValue() throws IllegalStateException {
+    public double[] getNoDataValues() throws IllegalStateException {
         if (!hasQuantitative) {
             return null;
         }
@@ -1104,7 +1131,7 @@ public class SampleDimension implements Serializable {
      *
      * <blockquote><pre>offset + scale*sample</pre></blockquote>
      *
-     * Together with {@link #getScale()} and {@link #getNoDataValue()}, this method provides a
+     * Together with {@link #getScale()} and {@link #getNoDataValues()}, this method provides a
      * limited way to transform sample values into geophysics values. However, the recommended
      * way is to use the {@link #getSampleToGeophysics sampleToGeophysics} transform instead,
      * which is more general and take care of converting automatically "no data" values
@@ -1128,7 +1155,7 @@ public class SampleDimension implements Serializable {
      *
      * <blockquote><pre>offset + scale*sample</pre></blockquote>
      *
-     * Together with {@link #getOffset()} and {@link #getNoDataValue()}, this method provides a
+     * Together with {@link #getOffset()} and {@link #getNoDataValues()}, this method provides a
      * limited way to transform sample values into geophysics values. However, the recommended
      * way is to use the {@link #getSampleToGeophysics sampleToGeophysics} transform instead,
      * which is more general and take care of converting automatically "no data" values
@@ -1186,7 +1213,7 @@ public class SampleDimension implements Serializable {
      * already geophysics values (including <code>NaN</code> for "no data" values), then this
      * method returns an identity transform. Otherwise, this method returns a transform expecting
      * sample values as input and computing geophysics value as output. This transform will take
-     * care of converting all "{@linkplain #getNoDataValue() no data values}" into
+     * care of converting all "{@linkplain #getNoDataValues() no data values}" into
      * <code>NaN</code> values.
      * The <code>sampleToGeophysics.{@linkplain MathTransform1D#inverse() inverse()}</code>
      * transform is capable to differenciate <code>NaN</code> values to get back the original
@@ -1198,7 +1225,7 @@ public class SampleDimension implements Serializable {
      *
      * @see #getScale
      * @see #getOffset
-     * @see #getNoDataValue
+     * @see #getNoDataValues
      * @see #rescale
      */
     public MathTransform1D getSampleToGeophysics() {
@@ -1259,9 +1286,44 @@ public class SampleDimension implements Serializable {
         }
         return inverse;
     }
-    
-    // NOTE: "getPaletteInterpretation()" is not available in Geotools since
-    //       palette are backed by IndexColorModel, which support only RGB.
+
+    /**
+     * Color palette associated with the sample dimension.
+     * A color palette can have any number of colors.
+     * See palette interpretation for meaning of the palette entries.
+     * If the grid coverage has no color palette, <code>null</code> will be returned.
+     *
+     * @return The color palette associated with the sample dimension.
+     *
+     * @see #getPaletteInterpretation
+     * @see #getColorInterpretation
+     * @see IndexColorModel
+     */
+    public int[][] getPalette() {
+        final ColorModel color = getColorModel();
+        if (color instanceof IndexColorModel) {
+            final IndexColorModel cm = (IndexColorModel) color;
+            final int[][] colors = new int[cm.getMapSize()][];
+            for (int i=0; i<colors.length; i++) {
+                colors[i] = new int[] {cm.getRed(i), cm.getGreen(i), cm.getBlue(i)};
+            }
+            return colors;
+        }
+        return null;
+    }
+
+    /**
+     * Indicates the type of color palette entry for sample dimensions which have a
+     * palette. If a sample dimension has a palette, the color interpretation must
+     * be {@link ColorInterpretation#GRAY_INDEX GRAY_INDEX}
+     * or {@link ColorInterpretation#PALETTE_INDEX PALETTE_INDEX}.
+     * A palette entry type can be Gray, RGB, CMYK or HLS.
+     *
+     * @return The type of color palette entry for sample dimensions which have a palette.
+     */
+    public PaletteInterpretation getPaletteInterpretation() {
+        return PaletteInterpretation.RGB;
+    }
     
     /**
      * Returns the color interpretation of the sample dimension.
@@ -1414,7 +1476,7 @@ public class SampleDimension implements Serializable {
     /**
      * Returns a sample dimension using new {@link #getScale scale} and {@link #getOffset offset}
      * coefficients. Other properties like the {@linkplain #getRange sample value range},
-     * {@linkplain #getNoDataValue no data values} and {@linkplain #getColorModel colors}
+     * {@linkplain #getNoDataValues no data values} and {@linkplain #getColorModel colors}
      * are unchanged.
      *
      * @param scale  The value which is multiplied to grid values for the new sample dimension.
@@ -1438,6 +1500,33 @@ public class SampleDimension implements Serializable {
             return this;
         }
         return new SampleDimension(categories, getUnits());
+    }
+
+    /**
+     * The list of metadata keywords for a sample dimension.
+     * If no metadata is available, the sequence will be empty.
+     *
+     * @return The list of metadata keywords for a sample dimension.
+     *
+     * @see #getMetadataValue
+     * @see javax.media.jai.PropertySource#getPropertyNames
+     */
+    public String[] getMetaDataNames() {
+        return EMPTY_METADATA;
+    }    
+
+    /**
+     * Retrieve the metadata value for a given metadata name.
+     *
+     * @param  name Metadata keyword for which to retrieve metadata.
+     * @return The metadata value for a given metadata name.
+     * @throws MetadataNameNotFoundException if there is no value for the specified metadata name.
+     *
+     * @see #getMetaDataNames
+     * @see javax.media.jai.PropertySource#getProperty
+     */
+    public String getMetadataValue(String name) throws MetadataNameNotFoundException {
+        throw new MetadataNameNotFoundException();
     }
     
     /**
@@ -1480,10 +1569,7 @@ public class SampleDimension implements Serializable {
             return Utilities.getShortClassName(this);
         }
     }
-
-
-
-
+    
     /////////////////////////////////////////////////////////////////////////////////
     ////////                                                                 ////////
     ////////        REGISTRATION OF "SampleTranscode" IMAGE OPERATION        ////////

@@ -26,6 +26,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
@@ -348,6 +349,36 @@ public final class CRSUtilities {
             return null;
         }
         return ((GeodeticDatum) crs.getDatum()).getEllipsoid();
+    }
+
+    /**
+     * Returns the bounding box of the specified coordinate reference system, or <code>null</code>
+     * if none. This method search in the metadata informations.
+     *
+     * @param  crs The coordinate reference system, or <code>null</code>.
+     * @return The envelope, or <code>null</code> if none.
+     */
+    public static org.opengis.spatialschema.geometry.Envelope getEnvelope(final CoordinateReferenceSystem crs) {
+        if (crs != null) {
+            final Datum datum = crs.getDatum();
+            if (datum != null) {
+                Extent validArea = datum.getValidArea();
+                if (validArea != null) {
+                    GeographicExtent geo = validArea.getGeographicElement();
+                    if (geo instanceof GeographicBoundingBox) {
+                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
+                        return new Envelope(new double[] {bounds.getEastBoundLongitude(),
+                                                          bounds.getWestBoundLongitude()},
+                                            new double[] {bounds.getSouthBoundLatitude(),
+                                                          bounds.getNorthBoundLatitude()});
+                    }
+                    if (geo instanceof BoundingPolygon) {
+                        return ((BoundingPolygon) geo).getPolygon().getEnvelope();
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     /**
