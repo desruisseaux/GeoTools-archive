@@ -182,10 +182,10 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     public Point2D transform(final Point2D ptSrc, final Point2D ptDst) throws TransformException {
         int dim;
-        if ((dim = getDimSource()) != 2) {
+        if ((dim = getSourceDimensions()) != 2) {
             throw new MismatchedDimensionException(constructMessage("ptSrc", 2, dim));
         }
-        if ((dim = getDimTarget()) != 2) {
+        if ((dim = getTargetDimensions()) != 2) {
             throw new MismatchedDimensionException(constructMessage("ptDst", 2, dim));
         }
         final double[] ord = new double[] {ptSrc.getX(), ptSrc.getY()};
@@ -207,8 +207,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             throws TransformException
     {
               int  dimPoint = ptSrc.getDimension();
-        final int dimSource = getDimSource();
-        final int dimTarget = getDimTarget();
+        final int dimSource = getSourceDimensions();
+        final int dimTarget = getTargetDimensions();
         if (dimPoint != dimSource) {
             throw new MismatchedDimensionException(constructMessage("ptSrc", dimPoint, dimSource));
         }
@@ -265,8 +265,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                           final float[] dstPts, final int dstOff, final int numPts)
         throws TransformException
     {
-        final int dimSource = getDimSource();
-        final int dimTarget = getDimTarget();
+        final int dimSource = getSourceDimensions();
+        final int dimTarget = getTargetDimensions();
         final double[] tmpPts = new double[numPts*Math.max(dimSource, dimTarget)];
         for (int i=numPts*dimSource; --i>=0;) {
             tmpPts[i] = srcPts[srcOff+i];
@@ -321,7 +321,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         throws TransformException
     {
         int dim;
-        if ((dim=getDimSource())!=2 || (dim=getDimTarget())!=2) {
+        if ((dim=getSourceDimensions())!=2 || (dim=getTargetDimensions())!=2) {
             throw new MismatchedDimensionException(constructMessage("shape", 2, dim));
         }
         final PathIterator    it = shape.getPathIterator(preTr);
@@ -468,7 +468,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @see MathTransform2D#derivative(Point2D)
      */
     public Matrix derivative(final Point2D point) throws TransformException {
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         if (dimSource != 2) {
             throw new MismatchedDimensionException(constructMessage("point", 2, dimSource));
         }
@@ -500,7 +500,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      *         specified point.
      */
     public Matrix derivative(final DirectPosition point) throws TransformException {
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         if (point == null) {
             if (dimSource == 2) {
                 return derivative((Point2D) null);
@@ -589,7 +589,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Returns a hash value for this transform.
      */
     public int hashCode() {
-        return getDimSource() + 37*getDimTarget();
+        return getSourceDimensions() + 37*getTargetDimensions();
     }
     
     /**
@@ -686,7 +686,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getSourceDimensions() {
-            return AbstractMathTransform.this.getDimTarget();
+            return AbstractMathTransform.this.getTargetDimensions();
         }
         
         /**
@@ -695,7 +695,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getTargetDimensions() {
-            return AbstractMathTransform.this.getDimSource();
+            return AbstractMathTransform.this.getSourceDimensions();
         }
         
         /**

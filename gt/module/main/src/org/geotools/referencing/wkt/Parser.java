@@ -838,7 +838,7 @@ public class Parser extends MathTransformParser {
          * construct the one which contains as few information as possible, in
          * order to avoid providing wrong informations.
          */
-        final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[toBase.getDimSource()];
+        final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[toBase.getSourceDimensions()];
         final StringBuffer buffer = new StringBuffer(name);
         buffer.append(" axis ");
         final int start = buffer.length();

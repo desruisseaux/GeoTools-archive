@@ -199,7 +199,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      */
     public ParameterValueGroup getParameterValues() {
         final ParameterDescriptorGroup descriptor = getParameterDescriptors();
-        final int dim = getDimSource();
+        final int dim = getSourceDimensions();
         final boolean includeDim = (dim != ((Number)Provider.DIM.getDefaultValue()).intValue());
         final ParameterValue[] parameters = new ParameterValue[includeDim ? 3 : 2];
         int index = 0;
@@ -244,7 +244,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                            int numPts, boolean hasHeight)
     {
         int step = 0;
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         hasHeight |= (dimSource>=3);
         if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
             step = -dimSource;
@@ -276,7 +276,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                           final float[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         final boolean hasHeight = (dimSource>=3);
         if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*dimSource>dstOff) {
             step = -dimSource;
@@ -311,7 +311,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                  final double[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         final boolean hasHeight = (dimSource>=3);
         boolean   computeHeight = hasHeight;
         assert computeHeight=true; // Intentional side effect
@@ -381,7 +381,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                  final float[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
-        final int dimSource = getDimSource();
+        final int dimSource = getSourceDimensions();
         final boolean hasHeight = (dimSource>=3);
         boolean   computeHeight = hasHeight;
         assert computeHeight=true; // Intentional side effect

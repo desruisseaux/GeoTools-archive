@@ -143,7 +143,7 @@ public class MathTransformTest extends TestCase {
                 assertTrue  (sub.isAffine());
                 assertEquals(sub, ((LinearTransform) transform).getMatrix());
                 assertInterfaced(transform);
-                assertTrue(i ==  transform.getDimSource());
+                assertTrue(i ==  transform.getSourceDimensions());
             }
             /*
              * Check transformations and the inverse transformations.
@@ -200,8 +200,8 @@ public class MathTransformTest extends TestCase {
             for (int i=0; i<transforms.length; i++) {
                 final MathTransform transform = transforms[i];
                 assertInterfaced(transform);
-                assertEquals("dimSource["+i+']', dimSource, transform.getDimSource());
-                assertEquals("dimTarget["+i+']', dimTarget, transform.getDimTarget());
+                assertEquals("dimSource["+i+']', dimSource, transform.getSourceDimensions());
+                assertEquals("dimTarget["+i+']', dimTarget, transform.getTargetDimensions());
                 transform.transform(sourcePt, 0, compare, 0, numPts);
                 String name = "transform["+i+"]("+dimSource+" -> "+dimInterm+" -> "+dimTarget+')';
                 assertPointsEqual(name, targetPt, compare, delta);
@@ -374,8 +374,8 @@ public class MathTransformTest extends TestCase {
         int maxDimSource = 0;
         int maxDimTarget = 0;
         for (int i=0; i<transforms.length; i++) {
-            final int dimSource = transforms[i].getDimSource();
-            final int dimTarget = transforms[i].getDimTarget();
+            final int dimSource = transforms[i].getSourceDimensions();
+            final int dimTarget = transforms[i].getTargetDimensions();
             if (dimSource > maxDimSource) maxDimSource = dimSource;
             if (dimTarget > maxDimTarget) maxDimTarget = dimTarget;
             sources[i] = new GeneralDirectPosition(dimSource);
@@ -507,8 +507,8 @@ public class MathTransformTest extends TestCase {
                 return;
             }
         }
-        int dim = transform.getDimSource();
-        if (transform.getDimTarget() != dim) {
+        int dim = transform.getSourceDimensions();
+        if (transform.getTargetDimensions() != dim) {
             dim = 0;
         }
         assertTrue("MathTransform1D", (dim==1) == (transform instanceof MathTransform1D));

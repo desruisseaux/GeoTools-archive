@@ -179,9 +179,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         // If one transform is the inverse of the
         // other, returns the identity transform.
         if (areInverse(tr1, tr2) || areInverse(tr2, tr1)) {
-            assert tr1.getDimSource() == tr2.getDimTarget();
-            assert tr1.getDimTarget() == tr2.getDimSource();
-            return IdentityTransform.create(tr1.getDimSource());
+            assert tr1.getSourceDimensions() == tr2.getTargetDimensions();
+            assert tr1.getTargetDimensions() == tr2.getSourceDimensions();
+            return IdentityTransform.create(tr1.getSourceDimensions());
         }
 
         // If one or both math transform are instance of ConcatenatedTransform,
@@ -224,8 +224,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     static ConcatenatedTransform createConcatenatedTransform(final MathTransform tr1,
                                                              final MathTransform tr2)
     {
-        final int dimSource = tr1.getDimSource();
-        final int dimTarget = tr2.getDimTarget();
+        final int dimSource = tr1.getSourceDimensions();
+        final int dimTarget = tr2.getTargetDimensions();
         //
         // Check if the result need to be a MathTransform1D.
         //
@@ -251,7 +251,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //
         // Check for the general case.
         //
-        if (dimSource==tr1.getDimTarget() && tr2.getDimSource()==dimTarget) {
+        if (dimSource==tr1.getTargetDimensions() && tr2.getSourceDimensions()==dimTarget) {
             return new ConcatenatedTransformDirect(tr1, tr2);
         } else {
             return new ConcatenatedTransform(tr1, tr2);
@@ -279,21 +279,21 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * implementation check if transfert dimension match.
      */
     boolean isValid() {
-        return transform1.getDimTarget() == transform2.getDimSource();
+        return transform1.getTargetDimensions() == transform2.getSourceDimensions();
     }
     
     /**
      * Gets the dimension of input points.
      */
     public final int getSourceDimensions() {
-        return transform1.getDimSource();
+        return transform1.getSourceDimensions();
     }
     
     /**
      * Gets the dimension of output points.
      */
     public final int getTargetDimensions() {
-        return transform2.getDimTarget();
+        return transform2.getTargetDimensions();
     }
     
     /**
@@ -320,7 +320,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //  Note: If we know that the transfert dimension is the same than source
         //        and target dimension, then we don't need to use an intermediate
         //        buffer. This optimization is done in ConcatenatedTransformDirect.
-        final double[] tmp = new double[numPts*transform1.getDimTarget()];
+        final double[] tmp = new double[numPts*transform1.getTargetDimensions()];
         transform1.transform(srcPts, srcOff, tmp, 0, numPts);
         transform2.transform(tmp, 0, dstPts, dstOff, numPts);
     }
@@ -336,7 +336,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //  Note: If we know that the transfert dimension is the same than source
         //        and target dimension, then we don't need to use an intermediate
         //        buffer. This optimization is done in ConcatenatedTransformDirect.
-        final float[] tmp = new float[numPts*transform1.getDimTarget()];
+        final float[] tmp = new float[numPts*transform1.getTargetDimensions()];
         transform1.transform(srcPts, srcOff, tmp, 0, numPts);
         transform2.transform(tmp, 0, dstPts, dstOff, numPts);
     }

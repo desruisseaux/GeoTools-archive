@@ -55,8 +55,8 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
      */
     boolean isValid() {
         return super.isValid() &&
-               transform1.getDimSource() == transform1.getDimTarget() &&
-               transform2.getDimSource() == transform2.getDimTarget();
+               transform1.getSourceDimensions() == transform1.getTargetDimensions() &&
+               transform2.getSourceDimensions() == transform2.getTargetDimensions();
     }
     
     /**

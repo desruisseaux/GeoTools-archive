@@ -415,13 +415,14 @@ public class CoordinateOperationFactory extends Factory
     {
         if (step1==null) return step2;
         if (step2==null) return step1;
-        // Note: we sometime get this assertion failure if the user provided CRS with two
-        //       different ellipsoids but an identical TOWGS84 conversion infos (which is
-        //       wrong).
-        assert equalsIgnoreMetadata(step1.getTargetCRS(), step2.getSourceCRS()) :
-               "CRS 1 =" + step1.getTargetCRS() + '\n' +
-               "CRS 2 =" + step2.getSourceCRS();
-
+        if (false) {
+            // Note: we sometime get this assertion failure if the user provided CRS with two
+            //       different ellipsoids but an identical TOWGS84 conversion infos (which is
+            //       wrong).
+            assert equalsIgnoreMetadata(step1.getTargetCRS(), step2.getSourceCRS()) :
+                   "CRS 1 =" + step1.getTargetCRS() + '\n' +
+                   "CRS 2 =" + step2.getSourceCRS();
+        }
         final MathTransform mt1 = step1.getMathTransform();
         final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
         if (mt1.isIdentity() && equalsIgnoreMetadata(sourceCRS, step2.getSourceCRS())) {

@@ -67,7 +67,7 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
      * Check if transforms are compatibles with this implementation.
      */
     boolean isValid() {
-        return super.isValid() && getDimSource()==1 && getDimTarget()==1;
+        return super.isValid() && getSourceDimensions()==1 && getTargetDimensions()==1;
     }
     
     /**

@@ -49,6 +49,6 @@ final class ConcatenatedTransform2D extends ConcatenatedTransform implements Mat
      * Check if transforms are compatibles with this implementation.
      */
     boolean isValid() {
-        return super.isValid() && getDimSource()==2 && getDimTarget()==2;
+        return super.isValid() && getSourceDimensions()==2 && getTargetDimensions()==2;
     }
 }

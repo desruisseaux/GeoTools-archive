@@ -171,8 +171,8 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
         super(properties, getDatum(base), derivedCS);
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS = base;
-        final int dimSource = baseToDerived.getDimSource();
-        final int dimTarget = baseToDerived.getDimTarget();
+        final int dimSource = baseToDerived.getSourceDimensions();
+        final int dimTarget = baseToDerived.getTargetDimensions();
         int dim1, dim2;
         if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
             (dim1=dimTarget) != (dim2=derivedCS.getDimension()))

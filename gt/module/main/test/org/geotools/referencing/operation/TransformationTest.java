@@ -171,8 +171,8 @@ public class TransformationTest extends TestCase {
      * @param transform The transform to test.
      */
     public static void assertInterfaced(final MathTransform transform) {
-        int dim = transform.getDimSource();
-        if (transform.getDimTarget() != dim) {
+        int dim = transform.getSourceDimensions();
+        if (transform.getTargetDimensions() != dim) {
             dim = 0;
         }
         assertTrue("MathTransform1D", (dim==1) == (transform instanceof MathTransform1D));

@@ -405,8 +405,8 @@ public final class CRSUtilities {
     public static Envelope transform(final MathTransform transform, final GeneralEnvelope envelope)
             throws TransformException
     {
-        final int sourceDim = transform.getDimSource();
-        final int targetDim = transform.getDimTarget();
+        final int sourceDim = transform.getSourceDimensions();
+        final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
             throw new MismatchedDimensionException(Resources.format(
                       ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,

@@ -135,6 +135,15 @@ public class ScriptTest extends TestCase {
 //    }
     
     /**
+     * Run the "ObliqueMercator.txt".
+     *
+     * @throws Exception If a test failed.
+     */
+    public void testObliqueMercator() throws Exception {
+        runScript("scripts/ObliqueMercator.txt");
+    }
+    
+    /**
      * Run the {@link #TRANSVERSE_MERCATOR_SCRIPT}.
      *
      * @throws Exception If a test failed.

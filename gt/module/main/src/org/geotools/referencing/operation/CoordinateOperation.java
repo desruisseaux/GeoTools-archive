@@ -200,8 +200,8 @@ public class CoordinateOperation extends IdentifiedObject
         this.targetCRS = targetCRS;
         this.transform = transform;
         ensureNonNull("transform", transform);
-        checkDimension("sourceCRS", sourceCRS, transform.getDimSource());
-        checkDimension("targetCRS", targetCRS, transform.getDimTarget());
+        checkDimension("sourceCRS", sourceCRS, transform.getSourceDimensions());
+        checkDimension("targetCRS", targetCRS, transform.getTargetDimensions());
     }
 
     /**

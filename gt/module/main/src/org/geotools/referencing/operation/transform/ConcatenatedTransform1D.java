@@ -54,7 +54,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      * Check if transforms are compatibles with this implementation.
      */
     boolean isValid() {
-        return super.isValid() && getDimSource()==1 && getDimTarget()==1;
+        return super.isValid() && getSourceDimensions()==1 && getTargetDimensions()==1;
     }
     
     /**
@@ -62,7 +62,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      */
     public double transform(final double value) throws TransformException {
         final double[] values = new double[] {value};
-        final double[] buffer = new double[] {transform1.getDimTarget()};
+        final double[] buffer = new double[] {transform1.getTargetDimensions()};
         transform1.transform(values, 0, buffer, 0, 1);
         transform2.transform(buffer, 0, values, 0, 1);
         return values[0];

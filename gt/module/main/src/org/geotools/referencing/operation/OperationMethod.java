@@ -292,9 +292,13 @@ public class OperationMethod extends IdentifiedObject
         if (method!=null && transform!=null) {
             final String name;
             int actual, expected;
-            if ((actual=transform.getDimSource()) != (expected=method.getSourceDimensions())) {
+            if ((actual=transform.getSourceDimensions()) !=
+                 (expected=method.getSourceDimensions()))
+            {
                 name = "sourceDimensions";
-            } else if ((actual=transform.getDimTarget()) != (expected=method.getTargetDimensions())) {
+            } else if ((actual=transform.getTargetDimensions()) !=
+                        (expected=method.getTargetDimensions()))
+            {
                 name = "targetDimensions";
             } else {
                 return;

@@ -672,8 +672,8 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         int step = 0;
 
         if ((srcPts == dstPts) && (srcOff < dstOff)
-                && ((srcOff + (numPts * getDimSource())) > dstOff)) {
-            step = -getDimSource();
+                && ((srcOff + (numPts * getSourceDimensions())) > dstOff)) {
+            step = -getSourceDimensions();
             srcOff -= ((numPts - 1) * step);
             dstOff -= ((numPts - 1) * step);
         }
@@ -730,8 +730,8 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         int step = 0;
 
         if ((srcPts == dstPts) && (srcOff < dstOff)
-                && ((srcOff + (numPts * getDimSource())) > dstOff)) {
-            step = -getDimSource();
+                && ((srcOff + (numPts * getSourceDimensions())) > dstOff)) {
+            step = -getSourceDimensions();
             srcOff -= ((numPts - 1) * step);
             dstOff -= ((numPts - 1) * step);
         }

@@ -173,7 +173,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      */
     public ParameterValueGroup getParameterValues() {
         final ParameterValue dim = new org.geotools.parameter.Parameter(Provider.DIM);
-        dim.setValue(getDimSource());
+        dim.setValue(getSourceDimensions());
         return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
                    dim,
@@ -226,7 +226,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                           final double[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
-        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*getDimSource()>dstOff) {
+        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*getSourceDimensions()>dstOff) {
             if (source3D != target3D) {
                 // TODO: we need to figure out a general way to handle this case
                 //       (overwritting the source array  while source and target
@@ -234,7 +234,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 //       in the CTS implementation...
                 throw new UnsupportedOperationException("Not yet implemented.");
             }
-            step = -getDimSource();
+            step = -getSourceDimensions();
             srcOff -= (numPts-1)*step;
             dstOff -= (numPts-1)*step;
         }

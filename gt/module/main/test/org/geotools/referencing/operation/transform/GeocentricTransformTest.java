@@ -148,9 +148,9 @@ public class GeocentricTransformTest extends TransformationTest {
         final CoordinateReferenceSystem targetCRS = GeocentricCRS.CARTESIAN;
         final CoordinateOperation       operation = opFactory.createOperation(sourceCRS, targetCRS);
         final MathTransform             transform = operation.getMathTransform();
-        final int                       dimension = transform.getDimSource();
+        final int                       dimension = transform.getSourceDimensions();
         assertEquals("Source dimension", 3, dimension);
-        assertEquals("Target dimension", 3, transform.getDimTarget());
+        assertEquals("Target dimension", 3, transform.getTargetDimensions());
         assertSame("Inverse transform", transform, transform.inverse().inverse());
         assertInterfaced(transform);
         /*

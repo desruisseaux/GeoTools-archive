@@ -111,10 +111,10 @@ public class PassthroughTransformTest extends TransformationTest {
                    sub, mtFactory.createPassThroughTransform(0, sub, 0));
 
         final int subLower = 2;
-        final int subUpper = subLower + sub.getDimSource();
+        final int subUpper = subLower + sub.getSourceDimensions();
         final MathTransform passthrough = mtFactory.createPassThroughTransform(subLower, sub, 1);
-        assertEquals("Wrong number of source dimensions", sub.getDimSource() + subLower + 1, passthrough.getDimSource());
-        assertEquals("Wrong number of target dimensions", sub.getDimTarget() + subLower + 1, passthrough.getDimTarget());
+        assertEquals("Wrong number of source dimensions", sub.getSourceDimensions() + subLower + 1, passthrough.getSourceDimensions());
+        assertEquals("Wrong number of target dimensions", sub.getTargetDimensions() + subLower + 1, passthrough.getTargetDimensions());
         compare(passthrough, sub, 2);
 /*
  *      TODO: The following was ported from the legacy test package, but the 'subTransform'
@@ -125,13 +125,13 @@ public class PassthroughTransformTest extends TransformationTest {
 //                   JAIUtilities.createSequence(0, subLower-1), null).isIdentity());
 //
 //        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
-//                   JAIUtilities.createSequence(subUpper, passthrough.getDimSource()-1), null).isIdentity());
+//                   JAIUtilities.createSequence(subUpper, passthrough.getSourceDimensions()-1), null).isIdentity());
 //
 //        final IntegerSequence outputDimensions = new IntegerSequence();
 //        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(subLower, subUpper-1);
 //        assertEquals("'createSubTransform' failed", sub, mtFactory.createSubTransform(passthrough,
 //                     inputDimensions, outputDimensions));
-//        final int[] expectedDimensions = new int[sub.getDimTarget()];
+//        final int[] expectedDimensions = new int[sub.getTargetDimensions()];
 //        for (int i=0; i<expectedDimensions.length; i++) {
 //            expectedDimensions[i] = subLower + i;
 //        }
@@ -152,8 +152,8 @@ public class PassthroughTransformTest extends TransformationTest {
             throws TransformException
     {
         final int  pointCount = 500;
-        final int mtDimension = mt.getDimSource();
-        final int atDimension = submt.getDimSource();
+        final int mtDimension = mt.getSourceDimensions();
+        final int atDimension = submt.getSourceDimensions();
         final double[] atData = new double[pointCount * atDimension];
         final double[] mtData = new double[pointCount * mtDimension];
         for (int j=0; j<pointCount; j++) {

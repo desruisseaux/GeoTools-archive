@@ -75,7 +75,7 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * Check if transforms are compatibles with this implementation.
      */
     boolean isValid() {
-        return super.isValid() && getDimSource()==2 && getDimTarget()==2;
+        return super.isValid() && getSourceDimensions()==2 && getTargetDimensions()==2;
     }
     
     /**

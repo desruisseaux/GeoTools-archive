@@ -135,8 +135,8 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      *         inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
      * @return A pass through transform with the following dimensions:<br>
      *         <pre>
-     * Source: firstAffectedOrdinate + subTransform.getDimSource() + numTrailingOrdinates
-     * Target: firstAffectedOrdinate + subTransform.getDimTarget() + numTrailingOrdinates</pre>
+     * Source: firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates
+     * Target: firstAffectedOrdinate + subTransform.getTargetDimensions() + numTrailingOrdinates</pre>
      */
     public static MathTransform create(final int firstAffectedOrdinate,
                                        final MathTransform subTransform,
@@ -159,8 +159,8 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
          * Optimize the "Identity transform" case.
          */
         if (subTransform.isIdentity()) {
-            final int dimension = subTransform.getDimSource();
-            if (dimension == subTransform.getDimTarget()) {
+            final int dimension = subTransform.getSourceDimensions();
+            if (dimension == subTransform.getTargetDimensions()) {
                 return IdentityTransform.create(firstAffectedOrdinate + dimension + numTrailingOrdinates);
             }
         }
@@ -189,7 +189,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * @return The modified coordinates.
      */
     public int[] getModifiedCoordinates() {
-        final int[] index = new int[subTransform.getDimSource()];
+        final int[] index = new int[subTransform.getSourceDimensions()];
         for (int i=0; i<index.length; i++) {
             index[i] = i + firstAffectedOrdinate;
         }
@@ -200,14 +200,14 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
-        return firstAffectedOrdinate + subTransform.getDimSource() + numTrailingOrdinates;
+        return firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates;
     }
     
     /**
      * Gets the dimension of output points.
      */
     public int getTargetDimensions() {
-        return firstAffectedOrdinate + subTransform.getDimTarget() + numTrailingOrdinates;
+        return firstAffectedOrdinate + subTransform.getTargetDimensions() + numTrailingOrdinates;
     }
     
     /**
@@ -224,13 +224,13 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
                           final float[] dstPts, int dstOff, int numPts)
         throws TransformException
     {
-        final int subDimSource = subTransform.getDimSource();
-        final int subDimTarget = subTransform.getDimTarget();
+        final int subDimSource = subTransform.getSourceDimensions();
+        final int subDimTarget = subTransform.getTargetDimensions();
         int srcStep = numTrailingOrdinates;
         int dstStep = numTrailingOrdinates;
         if (srcPts==dstPts && srcOff<dstOff) {
-            final int dimSource = getDimSource();
-            final int dimTarget = getDimTarget();
+            final int dimSource = getSourceDimensions();
+            final int dimTarget = getTargetDimensions();
             srcOff += numPts * dimSource;
             dstOff += numPts * dimTarget;
             srcStep -= 2*dimSource;
@@ -252,13 +252,13 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
                           final double[] dstPts, int dstOff, int numPts)
         throws TransformException
     {
-        final int subDimSource = subTransform.getDimSource();
-        final int subDimTarget = subTransform.getDimTarget();
+        final int subDimSource = subTransform.getSourceDimensions();
+        final int subDimTarget = subTransform.getTargetDimensions();
         int srcStep = numTrailingOrdinates;
         int dstStep = numTrailingOrdinates;
         if (srcPts==dstPts && srcOff<dstOff) {
-            final int dimSource = getDimSource();
-            final int dimTarget = getDimTarget();
+            final int dimSource = getSourceDimensions();
+            final int dimTarget = getTargetDimensions();
             srcOff += numPts * dimSource;
             dstOff += numPts * dimTarget;
             srcStep -= 2*dimSource;
@@ -278,7 +278,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      */
     public Matrix derivative(final DirectPosition point) throws TransformException {
         final int nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
-        final int transDim = subTransform.getDimSource();
+        final int transDim = subTransform.getSourceDimensions();
         final int pointDim = point.getDimension();
         if (pointDim != transDim+nSkipped) {
             throw new MismatchedDimensionException(Resources.format(
