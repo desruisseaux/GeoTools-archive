@@ -4083,13 +4083,17 @@ public class GMLComplexTypes {
             }
 
             String nm = (String) hints.get(STREAM_FEATURE_NAME_HINT);
-
+            Feature f;
             if ((nm != null) && nm.equals(element.getName())) {
-                stream(getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(STREAM_HINT)).ft), (FCBuffer) hints.get(STREAM_HINT));
+                f = getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(STREAM_HINT)).ft);
+//System.out.println(f.getID());
+                stream(f, (FCBuffer) hints.get(STREAM_HINT));
 
                 return null;
             }
-            return getFeature(element, value, attrs, hints, null);
+            f = getFeature(element, value, attrs, hints, null);
+//System.out.println(f.getID());
+            return f;
         }
 
         public Feature getFeature(Element element, ElementValue[] value,

@@ -198,10 +198,12 @@ public class ComplexElementHandler extends XMLElementHandler {
         int i = 0;
         int count =0;
         int[] i2 = new int[2];
+        int cache = 0; // old pos.
         i2[1]=1;
         while(i<elements.size() && i2[1] == 1){
         	i2[0] = i;
         	i2[1] = 0;
+            cache = i2[0];
             i2 = valid(type.getChild(), i);
             if( i2[1] == 0 && i == i2[0] ){
             	// done running
@@ -210,7 +212,12 @@ public class ComplexElementHandler extends XMLElementHandler {
                         + type.getName() + "("+elem.getName()+")");
                 }
             }else{
-            	i = i2[0];
+                if(cache == i2[0]){
+                    // we have not progressed .. progress us
+                    i = i2[0]+1;
+                }else{
+                    i = i2[0];
+                }
             	count++;
             }
         }
@@ -220,7 +227,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         if (i != elements.size()) {
-System.out.println("Elements.size == "+elements.size());
+//System.out.println("Elements.size == "+elements.size());
             throw new SAXException("Invalid element order according: "
                 + type.getName() + "[" + i + "]");
         }
@@ -238,7 +245,9 @@ System.out.println("Elements.size == "+elements.size());
 
         switch (eg.getGrouping()) {
         case ElementGrouping.SEQUENCE:
-            return valid((Sequence) eg, index);
+            int[] tmp = valid((Sequence) eg, index);
+//            System.out.println("TMP SEQ "+tmp[0]+" "+tmp[1]);
+                        return tmp;
 
         case ElementGrouping.ALL:
             return valid((All) eg, index);
@@ -253,7 +262,9 @@ System.out.println("Elements.size == "+elements.size());
             return valid((Group) eg, index);
 
         case ElementGrouping.ELEMENT:
-            return valid((Element) eg, index);
+            tmp = valid((Element) eg, index);
+//System.out.println("TMP ELE "+tmp[0]+" "+tmp[1]);
+            return tmp;
         }
 
         return new int[]{index,1};
@@ -441,6 +452,7 @@ System.out.println("Elements.size == "+elements.size());
         while(t<eg.length && tIndex<elements.size()){
 //System.out.println("Sequence #child="+eg.length+" child="+t+" tIndex ="+tIndex);
         	i2 = valid(eg[t],tIndex); // new top element
+//System.out.println("RESULTS - seq "+i2[0]+" "+i2[1]);
         	if(i2[1]==1){ // they matched
         	    if(tIndex==i2[0]){
         	        // didn't more ahead ...
@@ -462,6 +474,8 @@ System.out.println("Elements.size == "+elements.size());
         	        }
         	    }
         	}else{
+                // didn't match
+                
     			// move along and retest that spot
     			if(eg[t].getMinOccurs()>count){
     				// not good
@@ -472,7 +486,7 @@ System.out.println("Elements.size == "+elements.size());
     			count=0; // next defined type
         	}
         }
-        
+//System.out.println("RR");
         return new int[]{tIndex,1};
     }
 

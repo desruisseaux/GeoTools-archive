@@ -247,4 +247,35 @@ public class GMLParserTest extends TestCase {
             fail(e.toString());
         }
     }
+    
+    public void testProblemFeatures() throws SAXException, IOException {
+       try {
+           SAXParserFactory spf = SAXParserFactory.newInstance();
+           spf.setNamespaceAware(true);
+           spf.setValidating(false);
+
+           SAXParser parser = spf.newSAXParser();
+
+           String path = "iba-gml-bad.xml";
+           File f = TestData.file(this,path);
+           URI u = f.toURI();
+
+           XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+           XMLSAXHandler.setLogLevel(Level.WARNING);
+           XSISAXHandler.setLogLevel(Level.WARNING);
+           XMLElementHandler.setLogLevel(Level.WARNING);
+           XSIElementHandler.setLogLevel(Level.WARNING);
+
+           parser.parse(f, xmlContentHandler);
+
+           Object doc = xmlContentHandler.getDocument();
+           assertNotNull("Document missing", doc);
+//           System.out.println(doc);
+           
+           checkFeatureCollection((FeatureCollection)doc);
+           fail("Didn't catch an exception :(");
+       } catch (Throwable e) {
+           e.printStackTrace();
+       }
+   }
 }
