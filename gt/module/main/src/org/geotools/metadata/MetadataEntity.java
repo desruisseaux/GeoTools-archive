@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.metadata;
 
@@ -118,6 +117,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * {@link org.opengis.catalog.MetadataEntity.EntityType} schema information.
      *
      * @return List of {@linkplain org.opengis.catalog.MetadataEntity.Element elements}.
+     *
+     * @deprecated This method was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this method will be removed from {@code MetadataEntity}, but actually would
+     *             moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     public final List elements() {
         final BeanEntity entity = (BeanEntity) getEntityType();
@@ -156,6 +162,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      *
      * @param xPath XPath representation of element location.
      * @return element value, List of element value, or null if xPath did not match anything.
+     *
+     * @deprecated This method was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this method will be removed from {@code MetadataEntity}, but actually would
+     *             moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     public final Object getElement(final String xPath) {
         final List elements = XPathFactory.value(xPath, this);
@@ -172,6 +185,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * @param  element Element that indicates the value the caller wishes to obtain.
      * @return The value of the element the parameter represents
      *         null if the current Metadata does not contain the element.
+     *
+     * @deprecated This method was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this method will be removed from {@code MetadataEntity}, but actually would
+     *             moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     public final Object getElement(final Element element) {
         final BeanElement elemImpl;
@@ -208,6 +228,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * Returns the entity type that describes the schema of this Metadata.
      *
      * @return the entity type that describes the current Metadata object.
+     *
+     * @deprecated This method was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this method will be removed from {@code MetadataEntity}, but actually would
+     *             moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     public final EntityType getEntityType() {
         if (entity == null) try {
@@ -228,6 +255,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * 
      * @author Jody Garnett
      * @author Martin Desruisseaux
+     *
+     * @deprecated This class was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this inner class will be removed from {@code MetadataEntity}, but actually
+     *             would moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     private static final class BeanEntity implements EntityType {
         /**
@@ -386,6 +420,13 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * 
      * @author Jody Garnett
      * @author Martin Desruisseaux
+     *
+     * @deprecated This class was implemented for catalog support, but the catalog API 1.0 has
+     *             been withdrawn from GeoAPI. The catalog API need to be revisited in light of
+     *             latest specification (2.0) before to bring it back to GeoAPI. I suspect that
+     *             this inner class will be removed from {@code MetadataEntity}, but actually
+     *             would moves in an other class (some kind of wrapper around arbitrary metadata
+     *             interface, not just Geotools implementations).
      */
     private static final class BeanElement implements Element {
         /**

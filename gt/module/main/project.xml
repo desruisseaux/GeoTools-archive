@@ -240,12 +240,6 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
-      <excludes>
-        <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
-        <exclude>**/org/geotools/ct/ScriptTest.java</exclude>
-        <exclude>**/org/geotools/referencing/operation/ScriptTest.java</exclude>
-        <exclude>**/org/geotools/referencing/operation/transform/MathTransformTest.java</exclude>
-      </excludes>     
       <resources>
         <resource>
           <directory>${basedir}/test</directory>

@@ -2,6 +2,9 @@ package org.geotools.metadata.iso19115;
 
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.Series}.
+ */
 public class Series extends MetaData implements
 		org.opengis.metadata.citation.Series {
 

@@ -5,6 +5,9 @@ import java.net.URL;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.OnLineResource}.
+ */
 public class OnLineResource extends MetaData implements
 		org.opengis.metadata.citation.OnLineResource {
 	private OnLineFunction function;

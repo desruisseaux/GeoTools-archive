@@ -17,6 +17,9 @@ import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.ReferenceSystem;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.MetaData}.
+ */
 public class MetaData extends AbstractMetaData implements
 		org.opengis.metadata.MetaData {
     /** Set of ScopeCode */

@@ -1,5 +1,8 @@
 package org.geotools.metadata.iso19115;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.Telephone}.
+ */
 public class Telephone extends MetaData implements
 		org.opengis.metadata.citation.Telephone {
 

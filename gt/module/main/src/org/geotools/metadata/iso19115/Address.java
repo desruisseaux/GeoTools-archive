@@ -5,6 +5,9 @@ import java.util.Set;
 import org.geotools.util.CheckedHashSet;
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.Address}.
+ */
 public class Address extends MetaData implements
 		org.opengis.metadata.citation.Address {
     

@@ -14,6 +14,9 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.Citation}.
+ */
 public class Citation extends MetaData implements
 		org.opengis.metadata.citation.Citation {
 

@@ -5,6 +5,9 @@ import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.Telephone;
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link org.geotools.metadata.citation.Contact}.
+ */
 public class Contact extends MetaData implements
 	org.opengis.metadata.citation.Contact {
     

@@ -724,10 +724,10 @@ public abstract class Geometry implements Shape, Cloneable, Serializable {
             buffer.append("\", ");
         }
         buffer.append("x={");
-        format.format(minY, buffer, dummy).append(" \u2026 ");
-        format.format(maxY, buffer, dummy).append("}, y={");
         format.format(minX, buffer, dummy).append(" \u2026 ");
-        format.format(maxX, buffer, dummy).append("} (");
+        format.format(maxX, buffer, dummy).append("}, y={");
+        format.format(minY, buffer, dummy).append(" \u2026 ");
+        format.format(maxY, buffer, dummy).append("} (");
         buffer.append(getPointCount()); buffer.append(" pts)");
         if (style != null) {
             buffer.append(", style=");

@@ -7,6 +7,7 @@ import org.opengis.metadata.citation.Citation;
 
 /**
  * Sample ISO19115 MetaData implementation for ApplicationSchemaInformation.
+ * @deprecated Replaced by {@link org.geotools.metadata.ApplicationSchemaInformation}.
  */
 public class ApplicationSchemaInformation extends MetaData implements
 		org.opengis.metadata.ApplicationSchemaInformation {

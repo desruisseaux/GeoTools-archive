@@ -54,6 +54,7 @@ import org.opengis.metadata.MetaData;
  *  
  * @author jgarnett
  * @since 2.1
+ * @deprecated Replaced by {@link org.geotools.metadata.MetadataEntity}.
  */
 public abstract class AbstractMetaData implements MetadataEntity, MetaData {
     ISO19115Entity entity;
