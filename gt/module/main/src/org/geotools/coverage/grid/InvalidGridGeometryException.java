@@ -18,7 +18,7 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 
 /**
@@ -28,10 +28,8 @@ package org.geotools.gc;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.InvalidGridGeometryException}.
  */
-public class InvalidGridGeometryException extends org.geotools.coverage.grid.InvalidGridGeometryException {
+public class InvalidGridGeometryException extends IllegalStateException {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -54,6 +52,7 @@ public class InvalidGridGeometryException extends org.geotools.coverage.grid.Inv
      * Construct an exception with the specified detail message and cause.
      */
     public InvalidGridGeometryException(final String message, final Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
     }
 }

@@ -361,7 +361,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Gets the derivative of this transform at a point. The default implementation always
      * throw an exception. Subclasses that implement the {@link MathTransform2D} interface
      * should override this method. Other subclasses should override
-     * {@link #derivative(CoordinatePoint)} instead.
+     * {@link #derivative(DirectPosition)} instead.
      *
      * @param  point The coordinate point where to evaluate the derivative.
      * @return The derivative at the specified point as a 2&times;2 matrix.

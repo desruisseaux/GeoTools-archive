@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.io.Serializable;
@@ -30,15 +30,7 @@ import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 
-// Weak references
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-
-// OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-
 // Geotools dependencies
-import org.geotools.pt.Dimensioned;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -48,14 +40,9 @@ import org.geotools.resources.gcs.ResourceKeys;
  * Defines a range of grid coverage coordinates.
  *
  * @version $Id$
- * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
- *
- * @see GC_GridRange
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.GridRange}.
  */
-public class GridRange implements Dimensioned, Serializable {
+public class GridRange implements org.opengis.coverage.grid.GridRange, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -66,12 +53,6 @@ public class GridRange implements Dimensioned, Serializable {
      * ordinates, while the last half contains maximum ordinates.
      */
     private final int[] index;
-
-    /**
-     * OpenGIS object returned by {@link #toOpenGIS}.
-     * It may be a hard or a weak reference.
-     */
-    transient Object proxy;
     
     /**
      * Check if ordinate values in the minimum index are less than or
@@ -198,7 +179,6 @@ public class GridRange implements Dimensioned, Serializable {
      * Returns the valid minimum inclusive grid
      * coordinate along the specified dimension.
      *
-     * @see GC_GridRange#getLo
      * @see #getLowers
      */
     public int getLower(final int dimension) {
@@ -212,7 +192,6 @@ public class GridRange implements Dimensioned, Serializable {
      * Returns the valid maximum exclusive grid
      * coordinate along the specified dimension.
      *
-     * @see GC_GridRange#getHi
      * @see #getUppers
      */
     public int getUpper(final int dimension) {
@@ -300,8 +279,8 @@ public class GridRange implements Dimensioned, Serializable {
      * different implementations of the same class.
      */
     public int hashCode() {
-        int code=45123678;
-        if (index!=null) {
+        int code = (int)serialVersionUID;
+        if (index != null) {
             for (int i=index.length; --i>=0;) {
                 code = code*31 + index[i];
             }
@@ -340,84 +319,5 @@ public class GridRange implements Dimensioned, Serializable {
         }
         buffer.append(']');
         return buffer.toString();
-    }
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////
-    ////////////////                                         ////////////////
-    ////////////////             OPENGIS ADAPTER             ////////////////
-    ////////////////                                         ////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Returns an OpenGIS interface for this grid range. This method first
-     * looks in the cache. If no interface was previously cached, then this
-     * method creates a new adapter and caches the result.
-     *
-     * @param  adapters The originating {@link Adapters}.
-     * @return The OpenGIS interface. The returned type is a generic {@link Object}
-     *         in order to avoid premature class loading of OpenGIS interface.
-     */
-    final synchronized Object toOpenGIS(final Object adapters) {
-        if (proxy != null) {
-            if (proxy instanceof Reference) {
-                final Object ref = ((Reference) proxy).get();
-                if (ref != null) {
-                    return ref;
-                }
-            } else {
-                return proxy;
-            }
-        }
-        final Object opengis = new Export(adapters);
-        proxy = new WeakReference(opengis);
-        return opengis;
-    }
-
-    /**
-     * Wraps a {@link GridRange} object for use with OpenGIS.
-     */
-    final class Export implements GC_GridRange, Serializable {
-        /**
-         * Serial number for interoperability with different versions.
-         */
-        private static final long serialVersionUID = -4941451644914317370L;
-
-        /**
-         * Constructs an OpenGIS structure.
-         */
-        public Export(final Object adapters) {
-        }
-        
-        /**
-         * Returns the underlying implementation.
-         */
-        public final GridRange getImplementation() {
-            return GridRange.this;
-        }
-
-        /**
-         * The valid minimum inclusive grid coordinate.
-         */
-        public int[] getLo() {
-            final int[] lower = new int[getDimension()];
-            for (int i=0; i<lower.length; i++) {
-                lower[i] = getLower(i);
-            }
-            return lower;
-        }
-
-        /**
-         * The valid maximum exclusive grid coordinate.
-         */
-        public int[] getHi() {
-            final int[] upper = new int[getDimension()];
-            for (int i=0; i<upper.length; i++) {
-                upper[i] = getUpper(i);
-            }
-            return upper;
-        }
     }
 }

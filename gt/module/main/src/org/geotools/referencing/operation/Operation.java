@@ -126,7 +126,8 @@ public class Operation extends SingleOperation
     /**
      * Compare this operation method with the specified object for equality.
      * If <code>compareMetadata</code> is <code>true</code>, then all available
-     * properties are compared including {@linkplain #getFormula formula}.
+     * properties are compared including
+     * {@linkplain org.geotools.referencing.operation.OperationMethod#getFormula formula}.
      *
      * @param  object The object to compare to <code>this</code>.
      * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
@@ -136,7 +137,7 @@ public class Operation extends SingleOperation
     public boolean equals(final Info object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final Operation that = (Operation) object;
-            return equals(this.method, that.method) &&
+            return equals(this.method, that.method, compareMetadata) &&
                    Arrays.equals(this.values, that.values);
         }
         return false;

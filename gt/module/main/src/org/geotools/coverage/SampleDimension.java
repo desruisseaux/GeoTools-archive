@@ -592,6 +592,42 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     }
 
     /**
+     * Wrap the specified OpenGIS's sample dimension into a Geotools's implementation
+     * of <code>SampleDimension</code>.
+     *
+     * @param sd The sample dimension to wrap into a Geotools implementation.
+     */
+    public static SampleDimension wrap(final org.opengis.coverage.SampleDimension sd) {
+        if (sd instanceof SampleDimension) {
+            return (SampleDimension) sd;
+        }
+        final int[][] palette = sd.getPalette();
+        final Color[] colors;
+        if (palette != null) {
+            colors = new Color[palette.length];
+            for (int i=0; i<colors.length; i++) {
+                // Assuming RGB. It will be checked in the constructor.
+                final int[] color = palette[i];
+                colors[i] = new Color(color[0], color[1], color[2]);
+            }
+        } else {
+            colors = null;
+        }
+        final Locale locale = Locale.getDefault();
+        return new SampleDimension(sd.getDescription(locale),
+                                   sd.getSampleDimensionType(),
+                                   sd.getColorInterpretation(),
+                                   colors,
+                                   sd.getCategoryNames(locale),
+                                   sd.getNoDataValues(),
+                                   sd.getMinimumValue(),
+                                   sd.getMaximumValue(),
+                                   sd.getScale(),
+                                   sd.getOffset(),
+                                   sd.getUnits());
+    }
+
+    /**
      * Returns a code value indicating grid value data type.
      * This will also indicate the number of bits for the data type.
      *

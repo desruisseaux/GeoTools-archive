@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.io.Serializable;
@@ -31,38 +31,33 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;  // For Javadoc
 import java.awt.image.BufferedImage;  // For Javadoc
-
-// RMI and weak references
-import java.rmi.RemoteException;
-import java.lang.ref.WeakReference;
-import java.lang.ref.Reference;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
 
 // JAI dependencies
 import javax.media.jai.IntegerSequence;
 
 // OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-import org.opengis.gc.GC_GridGeometry;
-import org.opengis.ct.CT_MathTransform;
-
-// OpenGIS dependencies
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.Envelope;
-import org.geotools.pt.Dimensioned;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.pt.MismatchedDimensionException;
-import org.geotools.cv.CannotEvaluateException;
-import org.geotools.cs.FactoryException;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.Matrix;
 
 // Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.image.JAIUtilities;
@@ -73,14 +68,9 @@ import org.geotools.resources.image.JAIUtilities;
  * transform to transform grid coordinates to real world coordinates.
  *
  * @version $Id$
- * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
- *
- * @see GC_GridGeometry
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.GridGeometry}.
  */
-public class GridGeometry implements Dimensioned, Serializable {
+public class GridGeometry implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -119,12 +109,6 @@ public class GridGeometry implements Dimensioned, Serializable {
      * The inverse of <code>gridToCoordinateSystem2D</code>.
      */
     private final MathTransform2D gridFromCoordinateSystem2D;
-
-    /**
-     * OpenGIS object returned by {@link #toOpenGIS}.
-     * It may be a hard or a weak reference.
-     */
-    transient Object proxy;
     
     /**
      * Construct a new grid geometry from a math transform.
@@ -151,10 +135,10 @@ public class GridGeometry implements Dimensioned, Serializable {
             final int dimSource = gridToCoordinateSystem.getDimSource();
             final int dimTarget = gridToCoordinateSystem.getDimTarget();
             if (dimRange != dimSource) {
-                throw new MismatchedDimensionException(dimRange, dimSource);
+                throw new MismatchedDimensionException(format(dimRange, dimSource));
             }
             if (dimRange != dimTarget) {
-                throw new MismatchedDimensionException(dimRange, dimTarget);
+                throw new MismatchedDimensionException(format(dimRange, dimTarget));
             }
         }
     }
@@ -184,11 +168,12 @@ public class GridGeometry implements Dimensioned, Serializable {
          * Check arguments validity. Dimensions must match.
          */
         final int dimension = gridRange.getDimension();
-        if (userRange.getDimension() != dimension) {
-            throw new MismatchedDimensionException(gridRange, userRange);
+        final int userDim   = userRange.getDimension();
+        if (userDim != dimension) {
+            throw new MismatchedDimensionException(format(dimension, userDim));
         }
         if (inverse!=null && inverse.length!=dimension) {
-            throw new MismatchedDimensionException(dimension, inverse.length);
+            throw new MismatchedDimensionException(format(dimension, inverse.length));
         }
         /*
          * Prepare elements for the 2D sub-transform. Those
@@ -225,13 +210,18 @@ public class GridGeometry implements Dimensioned, Serializable {
                 case 1: scaleY=scale; transY=trans; break;
             }
         }
-        final MathTransformFactory factory = MathTransformFactory.getDefault();
-        gridToCoordinateSystem = factory.createAffineTransform(matrix);
-        if (gridToCoordinateSystem instanceof MathTransform2D) {
-            gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
-        } else {
-            gridToCoordinateSystem2D = factory.createAffineTransform(
-                    new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
+        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
+        try {
+            gridToCoordinateSystem = factory.createAffineTransform(matrix);
+            if (gridToCoordinateSystem instanceof MathTransform2D) {
+                gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
+            } else {
+                gridToCoordinateSystem2D = factory.createAffineTransform(
+                        new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
+            }
+        } catch (FactoryException exception) {
+            // TODO: provides a better exception.
+            throw new IllegalArgumentException();
         }
         this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
     }
@@ -261,11 +251,15 @@ public class GridGeometry implements Dimensioned, Serializable {
         final double transY = userRange.getMaxY()   + gridRange.y*scaleY;
         final AffineTransform tr = new AffineTransform(scaleX, 0, 0, -scaleY, transX, transY);
         tr.translate(0.5, 0.5); // Map to pixel center
-        
-        this.gridRange                  = new GridRange(gridRange);
-        this.gridToCoordinateSystem2D   = MathTransformFactory.getDefault().createAffineTransform(tr);
-        this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
-        this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
+        try {
+            this.gridRange                  = new org.geotools.coverage.grid.GridRange(gridRange);
+            this.gridToCoordinateSystem2D   = FactoryFinder.getMathTransformFactory().createAffineTransform(tr);
+            this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
+            this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
+        } catch (FactoryException exception) {
+            // TODO: provides a better exception.
+            throw new IllegalArgumentException();
+        }
     }
     
     /**
@@ -286,6 +280,15 @@ public class GridGeometry implements Dimensioned, Serializable {
             }
         }
         return null;
+    }
+
+    /**
+     * Format an error message for mismatched dimension.
+     */
+    private static String format(final int dim1, final int dim2) {
+        return org.geotools.resources.cts.Resources.format(
+               org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+               new Integer(dim1), new Integer(dim2));
     }
     
     /**
@@ -311,7 +314,7 @@ public class GridGeometry implements Dimensioned, Serializable {
      */
     public Envelope getEnvelope() throws InvalidGridGeometryException {
         final int dimension = getDimension();
-        final Envelope envelope = new Envelope(dimension);
+        final org.geotools.geometry.Envelope envelope = new org.geotools.geometry.Envelope(dimension);
         for (int i=0; i<dimension; i++) {
             // According OpenGIS specification, GridGeometry maps pixel's center.
             // We want a bounding box for all pixels, not pixel's centers. Offset by
@@ -320,7 +323,7 @@ public class GridGeometry implements Dimensioned, Serializable {
         }
         final MathTransform gridToCoordinateSystem = getGridToCoordinateSystem();
         try {
-            return CTSUtilities.transform(gridToCoordinateSystem, envelope);
+            return CRSUtilities.transform(gridToCoordinateSystem, envelope);
         } catch (TransformException exception) {
             throw new InvalidGridGeometryException(Resources.format(
                     ResourceKeys.ERROR_BAD_TRANSFORM_$1,
@@ -416,19 +419,20 @@ public class GridGeometry implements Dimensioned, Serializable {
         if (transform==null || transform instanceof MathTransform2D) {
             return (MathTransform2D) transform;
         }
-        final MathTransformFactory factory = MathTransformFactory.getDefault();
+        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
         final IntegerSequence  inputDimensions = JAIUtilities.createSequence(0, 1);
         final IntegerSequence outputDimensions = new IntegerSequence();
-        try {
-            transform = factory.createSubTransform(transform, inputDimensions, outputDimensions);
-        } catch (FactoryException exception) {
-            // A MathTransform2D is not mandatory. Just tell that we have none.
-            return null;
-        }
-        if (JAIUtilities.containsAll(outputDimensions, 0, 2)) {
-            transform = factory.createFilterTransform(transform, inputDimensions);
-            return (MathTransform2D) transform;
-        }
+// TODO
+//        try {
+//            transform = factory.createSubTransform(transform, inputDimensions, outputDimensions);
+//        } catch (FactoryException exception) {
+//            // A MathTransform2D is not mandatory. Just tell that we have none.
+//            return null;
+//        }
+//        if (JAIUtilities.containsAll(outputDimensions, 0, 2)) {
+//            transform = factory.createFilterTransform(transform, inputDimensions);
+//            return (MathTransform2D) transform;
+//        }
         return null;
     }
     
@@ -446,11 +450,34 @@ public class GridGeometry implements Dimensioned, Serializable {
             try {
                 return gridFromCoordinateSystem2D.transform(point, null);
             } catch (TransformException exception) {
-                throw new CannotEvaluateException(point, exception);
+                throw new CannotEvaluateException(
+                          Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
+                          toString(new DirectPosition2D(point)), exception));
             }
         }
         throw new InvalidGridGeometryException(Resources.format(
                   ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+    }
+    
+    /**
+     * Construct a string for the specified point. This is
+     * used by constructor expecting a coordinate point.
+     *
+     * @param  point The coordinate point to format.
+     * @return The coordinate point as a string, without '(' or ')' characters.
+     */
+    static String toString(final DirectPosition point) {
+        final StringBuffer buffer = new StringBuffer();
+        final FieldPosition dummy = new FieldPosition(0);
+        final NumberFormat format = NumberFormat.getNumberInstance();
+        final int       dimension = point.getDimension();
+        for (int i=0; i<dimension; i++) {
+            if (i!=0) {
+                buffer.append(", ");
+            }
+            format.format(point.getOrdinate(i), buffer, dummy);
+        }
+        return buffer.toString();
     }
     
     /**
@@ -461,7 +488,7 @@ public class GridGeometry implements Dimensioned, Serializable {
     final Rectangle inverseTransform(Rectangle2D bounds) {
         if (bounds!=null && gridFromCoordinateSystem2D!=null) {
             try {
-                bounds = CTSUtilities.transform(gridFromCoordinateSystem2D, bounds, null);
+                bounds = CRSUtilities.transform(gridFromCoordinateSystem2D, bounds, null);
                 final int xmin = (int)Math.floor(bounds.getMinX() - 0.5);
                 final int ymin = (int)Math.floor(bounds.getMinY() - 0.5);
                 final int xmax = (int)Math.ceil(bounds.getMaxX() - 0.5);
@@ -484,7 +511,7 @@ public class GridGeometry implements Dimensioned, Serializable {
      *         if this array can't be deduced.
      */
     final boolean[] areAxisInverted() {
-        final Matrix matrix;
+        final org.opengis.referencing.operation.Matrix matrix;
         try {
             // Try to get the affine transform, assuming it is
             // insensitive to location (thus the 'null' argument).
@@ -559,95 +586,5 @@ public class GridGeometry implements Dimensioned, Serializable {
         buffer.append(gridToCoordinateSystem);
         buffer.append(']');
         return buffer.toString();
-    }
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////
-    ////////////////                                         ////////////////
-    ////////////////             OPENGIS ADAPTER             ////////////////
-    ////////////////                                         ////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Returns an OpenGIS interface for this grid geometry. This method first
-     * looks in the cache. If no interface was previously cached, then this
-     * method creates a new adapter and caches the result.
-     *
-     * @param  adapters The originating {@link Adapters}.
-     * @return The OpenGIS interface. The returned type is a generic {@link Object}
-     *         in order to avoid premature class loading of OpenGIS interface.
-     */
-    final synchronized Object toOpenGIS(final Object adapters) {
-        if (proxy != null) {
-            if (proxy instanceof Reference) {
-                final Object ref = ((Reference) proxy).get();
-                if (ref != null) {
-                    return ref;
-                }
-            } else {
-                return proxy;
-            }
-        }
-        final Object opengis = new Export(adapters);
-        proxy = new WeakReference(opengis);
-        return opengis;
-    }
-
-    /**
-     * Wraps a {@link GridGeometry} object for use with OpenGIS.
-     *
-     * @task TODO: This class is not really serializable, since adapters are not.
-     *             Actually, maybe GC_GridGeometry should be a remote interface,
-     *             since CT_MathTransform is a remote interface and may not be
-     *             serializable neither.
-     */
-    final class Export implements GC_GridGeometry, Serializable {
-        /**
-         * Serial number for interoperability with different versions.
-         */
-        private static final long serialVersionUID = 578135758412768567L;
-
-        /**
-         * The originating adapter.
-         */
-        private final Adapters adapters;
-
-        /**
-         * Constructs an OpenGIS structure.
-         */
-        public Export(final Object adapters) {
-            this.adapters = (Adapters) adapters;
-        }
-        
-        /**
-         * Returns the underlying implementation.
-         */
-        public final GridGeometry getImplementation() {
-            return GridGeometry.this;
-        }
-
-        /**
-         * The valid coordinate range of a grid coverage.
-         */
-        public GC_GridRange getGridRange() {
-            return adapters.export(GridGeometry.this.getGridRange());
-        }
-
-        /**
-         * The math transform allows for the transformations from grid coordinates to real
-         * world earth coordinates. The transform is often an affine transformation.
-         *
-         * @task REVISIT: This method should throws RemoteException. However, it is not allowed
-         *                since GridGeometry is not a remote interface. Should it be a remote one?
-         */
-        public CT_MathTransform getGridToCoordinateSystem() {
-            try {
-                return adapters.CTS.export(GridGeometry.this.getGridToCoordinateSystem());
-            } catch (RemoteException exception) {
-                throw new RuntimeException(exception.getLocalizedMessage(), exception);
-            }
-        }
     }
 }

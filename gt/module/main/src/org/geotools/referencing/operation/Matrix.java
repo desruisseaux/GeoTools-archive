@@ -27,11 +27,8 @@ import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
-//import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// To be deleted after GeoAPI 1.1.
-import org.geotools.geometry.Envelope;
 
 // Resources
 import org.geotools.resources.Utilities;

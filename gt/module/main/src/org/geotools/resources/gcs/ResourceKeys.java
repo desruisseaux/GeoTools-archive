@@ -70,6 +70,7 @@ public interface ResourceKeys
     public static final int ERROR_BAD_PARAMETER_TYPE_$2          =    42;
     public static final int ERROR_BAD_RANGE_$2                   =    43;
     public static final int ERROR_BAD_TRANSFORM_$1               =    44;
+    public static final int ERROR_CANT_CONVERT_FROM_TYPE_$1      =    83;
     public static final int ERROR_CANT_EVALUATE_$1               =    45;
     public static final int ERROR_CANT_REGISTER_JAI_OPERATION_$1 =    46;
     public static final int ERROR_CANT_REPROJECT_$1              =    47;

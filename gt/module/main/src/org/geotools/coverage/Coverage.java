@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.Arrays;
 import java.util.Locale;
+import java.lang.reflect.Array;
 
 // JAI dependencies
 import javax.media.jai.JAI;
@@ -67,6 +68,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.coverage.MetadataNameNotFoundException;
 
 // Geotools dependencies (CRS)
 import org.geotools.geometry.Envelope;
@@ -119,10 +121,6 @@ import org.geotools.resources.geometry.XAffineTransform;
  * may be better understood as the number of bands for 2D grid coverage.
  * A coverage has a corresponding {@link SampleDimension} for each sample
  * dimension in the coverage.
- * <br><br>
- * There is no <code>getMetadataValue(...)</code> method in this implementation.
- * OpenGIS's metadata are called "Properties" in <em>Java Advanced Imaging</em>.
- * Use {@link #getProperty} instead.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -132,6 +130,11 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * The set of default axis name.
      */
     private static final String[] DIMENSION_NAMES = {"x", "y", "z", "t"};
+
+    /**
+     * The sequence of string to returns when there is no metadata.
+     */
+    private static final String[] NO_PROPERTIES = new String[0];
 
     /**
      * The sample dimension to make visible by {@link #getRenderableImage}.
@@ -290,17 +293,21 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             return names;
         }
     }
-    
+
     /**
-     * Retrieve sample dimension information for the coverage.
-     * For a grid coverage, a sample dimension is a band. The sample dimension information
-     * include such things as description, data type of the value (bit, byte, integer...),
-     * the no data values, minimum and maximum values and a color table if one is associated
-     * with the dimension. A coverage must have at least one sample dimension.
-     *
-     * @return Sample dimension information for the coverage.
+     * Returns a localized error message the specified array.
      */
-    public abstract SampleDimension[] getSampleDimensions();
+    private static String formatErrorMessage(final Object array) {
+        String text = "<null>";
+        if (array != null) {
+            Class type = array.getClass();
+            if (type.isArray()) {
+                type = type.getComponentType();
+            }
+            text = Utilities.getShortName(type);
+        }
+        return Resources.format(ResourceKeys.ERROR_CANT_CONVERT_FROM_TYPE_$1, text);
+    }
     
     /**
      * Returns a sequence of boolean values for a given point in the coverage.
@@ -316,18 +323,24 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
-     *         failed because the input point has invalid coordinates.
+     *         failed because the input point has invalid coordinates. This exception may also be
+     *         throws if the coverage data type can't be converted to <code>boolean</code> by an
+     *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public boolean[] evaluate(final DirectPosition coord, boolean[] dest)
             throws CannotEvaluateException
     {
-        final double[] result = evaluate(coord, (double[])null);
-        if (dest == null) {
-            dest = new boolean[result.length];
-        }
-        for (int i=0; i<result.length; i++) {
-            final double value = result[i];
-            dest[i] = (!Double.isNaN(value) && value!=0);
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            if (dest == null) {
+                dest = new boolean[length];
+            }
+            for (int i=0; i<length; i++) {
+                dest[i] = Array.getBoolean(array, i);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(array), exception);
         }
         return dest;
     }
@@ -347,19 +360,24 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
-     *         failed because the input point has invalid coordinates.
+     *         failed because the input point has invalid coordinates. This exception may also be
+     *         throws if the coverage data type can't be converted to <code>byte</code> by an
+     *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public byte[] evaluate(final DirectPosition coord, byte[] dest)
             throws CannotEvaluateException
     {
-        final double[] result = evaluate(coord, (double[])null);
-        if (dest == null) {
-            dest = new byte[result.length];
-        }
-        for (int i=0; i<result.length; i++) {
-            final double value = Math.rint(result[i]);
-            dest[i] = (value < Byte.MIN_VALUE) ? Byte.MIN_VALUE :
-                      (value > Byte.MAX_VALUE) ? Byte.MAX_VALUE : (byte) value;
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            if (dest == null) {
+                dest = new byte[length];
+            }
+            for (int i=0; i<length; i++) {
+                dest[i] = Array.getByte(array, i);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(array), exception);
         }
         return dest;
     }
@@ -379,19 +397,24 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
-     *         failed because the input point has invalid coordinates.
+     *         failed because the input point has invalid coordinates. This exception may also be
+     *         throws if the coverage data type can't be converted to <code>int</code> by an
+     *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public int[] evaluate(final DirectPosition coord, int[] dest)
             throws CannotEvaluateException
     {
-        final double[] result = evaluate(coord, (double[])null);
-        if (dest == null) {
-            dest = new int[result.length];
-        }
-        for (int i=0; i<result.length; i++) {
-            final double value = Math.rint(result[i]);
-            dest[i] = (value < Integer.MIN_VALUE) ? Integer.MIN_VALUE :
-                      (value > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) value;
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            if (dest == null) {
+                dest = new int[length];
+            }
+            for (int i=0; i<length; i++) {
+                dest[i] = Array.getInt(array, i);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(array), exception);
         }
         return dest;
     }
@@ -410,17 +433,24 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
-     *         failed because the input point has invalid coordinates.
+     *         failed because the input point has invalid coordinates. This exception may also be
+     *         throws if the coverage data type can't be converted to <code>float</code> by an
+     *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public float[] evaluate(final DirectPosition coord, float[] dest)
             throws CannotEvaluateException
     {
-        final double[] result = evaluate(coord, (double[])null);
-        if (dest == null) {
-            dest = new float[result.length];
-        }
-        for (int i=0; i<result.length; i++) {
-            dest[i] = (float)result[i];
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            if (dest == null) {
+                dest = new float[length];
+            }
+            for (int i=0; i<length; i++) {
+                dest[i] = Array.getFloat(array, i);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(array), exception);
         }
         return dest;
     }
@@ -439,10 +469,27 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
-     *         failed because the input point has invalid coordinates.
+     *         failed because the input point has invalid coordinates. This exception may also be
+     *         throws if the coverage data type can't be converted to <code>double</code> by an
+     *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
-    public abstract double[] evaluate(DirectPosition coord, double[] dest)
-            throws CannotEvaluateException;
+    public double[] evaluate(DirectPosition coord, double[] dest)
+            throws CannotEvaluateException
+    {
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            if (dest == null) {
+                dest = new double[length];
+            }
+            for (int i=0; i<length; i++) {
+                dest[i] = Array.getDouble(array, i);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(array), exception);
+        }
+        return dest;
+    }
     
     /**
      * Returns 2D view of this grid coverage as a renderable image.
@@ -516,7 +563,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             super(null, Coverage.this);
             this.xAxis = xAxis;
             this.yAxis = yAxis;
-            final Envelope envelope = new Envelope(getEnvelope());
+            final org.opengis.spatialschema.geometry.Envelope envelope = getEnvelope();
             bounds = new Rectangle2D.Double(envelope.getMinimum(xAxis),
                                             envelope.getMinimum(yAxis),
                                             envelope.getLength (xAxis),
@@ -662,10 +709,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             /*
              * Compute some properties of the image to be created.
              */
-            final Dimension tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
-            final SampleDimension[] sampleDimensions = getSampleDimensions();
-            final ColorModel colorModel = sampleDimensions[VISIBLE_BAND].getColorModel(
-                                                           VISIBLE_BAND, sampleDimensions.length);
+            final Dimension      tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
+            final SampleDimension    band = SampleDimension.wrap(getSampleDimension(VISIBLE_BAND));
+            final ColorModel   colorModel = band.getColorModel(VISIBLE_BAND, getNumSampleDimensions());
             final SampleModel sampleModel = colorModel.createCompatibleSampleModel(
                                                            tileSize.width, tileSize.height);
             /*
@@ -807,7 +853,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * default implementation returns the number of sample dimensions in the coverage.
          */
         public int getNumElements() {
-            return getSampleDimensions().length;
+            return getNumSampleDimensions();
         }
 
         /**
@@ -869,6 +915,35 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
                 coordinate.ordinates[1] += deltaY;
             }
         }
+    }
+
+    /**
+     * List of metadata keywords for a coverage. If no metadata is available, the sequence
+     * will be empty. The default implementation gets the list of metadata names from the
+     * {@link #getPropertyNames()} method.
+     *
+     * @return the list of metadata keywords for a coverage.
+     */
+    public String[] getMetadataNames() {
+        final String[] list = getPropertyNames();
+        return (list != null) ? list : NO_PROPERTIES;
+    }
+
+    /**
+     * Retrieve the metadata value for a given metadata name. The default implementation query
+     * the {@link #getProperty(String)} method.
+     *
+     * @param name Metadata keyword for which to retrieve data.
+     * @return the metadata value for a given metadata name.
+     * @throws MetadataNameNotFoundException if there is no value for the specified metadata name.
+     */
+    public String getMetadataValue(final String name) throws MetadataNameNotFoundException {
+        final Object value = getProperty(name);
+        if (value == java.awt.Image.UndefinedProperty) {
+            throw new MetadataNameNotFoundException(Resources.format(
+                    ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, name));
+        }
+        return (value!=null) ? value.toString() : null;
     }
 
     /**
