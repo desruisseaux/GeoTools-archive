@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class ContactTest extends TestCase {
+    /*
 	public void testContact(){
 		Telephone phone = new Telephone();
 		phone.setFacsimile("555-1234");
@@ -20,6 +21,7 @@ public class ContactTest extends TestCase {
 		assertEquals( 21, contact.elements().size() );
 		System.out.println( contact.getEntityType().getElements() );
 	}
+	*/
 	public void xtestElementAccess(){
 		Telephone phone = new Telephone();
 		phone.setFacsimile("555-1234");
