@@ -19,43 +19,59 @@
  */
 package org.geotools.data.mapinfo;
 
-import com.vividsolutions.jts.geom.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import java.util.logging.*;
-
-import org.geotools.data.DataSourceMetaData;
-import org.geotools.data.DataSource;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.Extent;
-import org.geotools.data.AbstractDataSource;
 import org.geotools.data.Query;
-
-import org.geotools.feature.*;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.styling.ExternalGraphic;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
+import org.geotools.styling.Stroke;
+import org.geotools.styling.StyleFactory;
 
-import org.geotools.filter.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.TopologyException;
 
-import org.geotools.styling.*;
 
-
-/** Parses MIF and MID file pair into features
+/**
+ * Parses MIF and MID file pair into features.
+ * <p>
+ * DataSource is no longer with us - but this MapInfoDataSource lives on in zombie
+ * form - it serves as a reference point for when james has a run at making a DataStore.
+ * </p>
  * @version $Revision: 1.7 $
  * @author Ian Turton
  * @author James Macgill
  */
-public class MapInfoDataSource extends AbstractDataSource implements DataSource {
+public class MapInfoDataSource {
     private static Logger LOGGER = Logger.getLogger("org.geotools.mifmid");
     
     
