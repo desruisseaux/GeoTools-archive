@@ -21,6 +21,7 @@ package org.geotools.referencing.crs;
 import junit.framework.TestCase;
 
 import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Ensure that FactoryFinder can cope.
@@ -30,18 +31,18 @@ import org.geotools.referencing.CRS;
  * @version 2.1.M3
  */
 public class CRSAutoFactoryTest extends TestCase {
-    /** UDIG requires this to work */
-    public void test4326() throws Exception {
-        assertNotNull( CRS.decode("EPSG:4326") );
+    CRSAUTOFactory factory;
+    /*
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+        factory = new CRSAUTOFactory();
     }
     /** UDIG requires this to work */
-    public void test4269() throws Exception {
-        assertNotNull( CRS.decode("EPSG:4269") );
-        
+    public void test42001() throws Exception {
+        CoordinateReferenceSystem utm =
+            (CoordinateReferenceSystem) factory.createObject("AUTO:42001,0.0,0.0");
+        assertNotNull( "auto-utm", utm );
     }
-    /** UDIG requires this to work */
-    public void test42102() throws Exception {
-        assertNotNull( CRS.decode("EPSG:42102") );        
-    }
-   
 }
