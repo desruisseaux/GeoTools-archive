@@ -409,6 +409,7 @@ public class WFSDataStore extends AbstractDataStore{
         			}
         		}else{
         			// rest
+        			if(request.getFilter() != Filter.NONE)
         			url += "&FILTER="+printFilter(request.getFilter());
         		}}
         	}

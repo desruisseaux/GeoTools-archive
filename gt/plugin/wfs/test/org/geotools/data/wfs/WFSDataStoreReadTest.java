@@ -88,12 +88,12 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public void testGeoServer() throws NoSuchElementException, IOException, IllegalAttributeException{
-        URL url = new URL("http://192.168.50.35:8080/geoserver/wfs?Request=GetCapabilities&service=WFS");
+        URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
         
         System.out.println("\nGeoServer");
-//        doFeatureType(url,true,true);
-//        doFeatureReader(url,true,true);
-//        doFeatureReaderWithFilter(url,true,true);
+        doFeatureType(url,true,true);
+        doFeatureReader(url,true,true);
+        doFeatureReaderWithFilter(url,true,true);
         System.out.println("");
     }
     
@@ -133,14 +133,14 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     // Permission issues
-//    public void testMapServer() throws NoSuchElementException, IOException, IllegalAttributeException{
-//        URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
-//        System.out.println("\nMapServer");
+    public void testMapServer() throws NoSuchElementException, IOException, IllegalAttributeException{
+        URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
+        System.out.println("\nMapServer");
 //        doFeatureType(url,true,false);
 //        doFeatureReader(url,true,false);
 //        doFeatureReaderWithFilter(url,true,false);
-//        System.out.println("");
-//    }
+        System.out.println("");
+    }
     
     public void doFeatureType(URL url,boolean get, boolean post) throws IOException{
         DataStore wfs = null;

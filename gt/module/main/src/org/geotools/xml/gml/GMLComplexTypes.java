@@ -3738,7 +3738,8 @@ public class GMLComplexTypes {
          * @see schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return AbstractGeometryCollectionBaseType.attributes;
+//            return AbstractGeometryCollectionBaseType.attributes;
+        	return attributes;
         }
 
         /**
@@ -4014,9 +4015,8 @@ public class GMLComplexTypes {
                 stream(f, (FCBuffer) hints.get(STREAM_HINT));
 
                 return null;
-            } else {
-                return f;
             }
+            return f;
         }
 
         public Feature getFeature(Element element, ElementValue[] value,
@@ -4043,10 +4043,18 @@ public class GMLComplexTypes {
                             ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
                         j = k;
                 }
-//System.out.print(j+" "+(j!=-1?ft.getAttributeType(j).getName()+"  ":"")+value[i].getElement().getName()+" ");
+//System.out.print(j+" "+(j!=-1?ft.getAttributeType(j).getName()+"  ":"")+value[i].getElement().getName()+" ** "+value[i].getValue());
+//System.out.println(" ft?"+(j!=-1?ft.getAttributeType(j).isNillable()+"  ":"null")+" elem?"+value[i].getElement().isNillable());
                 if(j!=-1)
                     values[j] = value[i].getValue();
             }
+//for(int i=0;i<values.length;i++){
+//	System.out.print(i+" ** ");
+//	System.out.print(values[i]);
+//	System.out.print(" ? ");
+//	System.out.print(ft.getAttributeType(i).isNillable());
+//	System.out.println();
+//}
 
             String fid = attrs.getValue("", "fid");
 
@@ -6228,9 +6236,9 @@ public class GMLComplexTypes {
         GeometryAttributeType geometryAttribute = null;
 
         ElementGrouping child = ((ComplexType)element.getType()).getChild();
-        FeatureType parent = null;
-        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
-            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
+//        FeatureType parent = null;
+//        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
+//            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
         
 //        if(parent != null && parent.getAttributeTypes()!=null){
 //            typeFactory.addTypes(parent.getAttributeTypes());
@@ -6277,9 +6285,9 @@ public class GMLComplexTypes {
         GeometryAttributeType geometryAttribute = null;
 
         ElementGrouping child = (element).getChild();
-        FeatureType parent = null;
-        if(element.getParent()instanceof ComplexType)
-            parent = createFeatureType((ComplexType)element.getParent());
+//        FeatureType parent = null;
+//        if(element.getParent()instanceof ComplexType)
+//            parent = createFeatureType((ComplexType)element.getParent());
         
 //        if(parent != null && parent.getAttributeTypes()!=null){
 //            typeFactory.addTypes(parent.getAttributeTypes());
@@ -6346,6 +6354,8 @@ public class GMLComplexTypes {
     }
     
     private static AttributeType getAttribute(Element eg){
-        return AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
+    	AttributeType at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
+//System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable());
+    	return at;
     }
 }

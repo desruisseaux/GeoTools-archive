@@ -26,7 +26,8 @@ public class WFSDemo {
     public static void main(String[] args){
         System.out.println("WFS Demo");
         try{
-            URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
+//            URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
+        	URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
         
             Map m = new HashMap();
             m.put(WFSDataStoreFactory.GET_CAPABILITIES_URL.key,url);

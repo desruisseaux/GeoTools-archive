@@ -191,9 +191,8 @@ public class FCBuffer extends Thread implements FeatureReader {
         // the original thread
         if (state == FINISH || state == STOP) {
             return null;
-        } else {
-            return featureType;
         }
+        return featureType;
     }
 
     /**

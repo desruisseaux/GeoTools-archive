@@ -261,7 +261,9 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         if ((nillable == null) || "".equalsIgnoreCase(nillable)) {
             this.nillable = false;
         } else {
-            this.nillable = Boolean.getBoolean(nillable);
+//System.out.print("Parse Nill "+nillable+" : ");
+            this.nillable = Boolean.valueOf(nillable).booleanValue();
+//System.out.println(this.nillable+" : "+name);
         }
 
         // ref
