@@ -35,14 +35,14 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class ReprojectionServiceTest extends TestCase {
 	
-	private CRSService service;
+	private CRSServiceDead service;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		service = new CRSService();
+		service = new CRSServiceDead();
 	}
 
 	public void testEPSG42102() throws Exception {
@@ -66,7 +66,7 @@ public class ReprojectionServiceTest extends TestCase {
         CoordinateSystem bc = service.createCoordinateSystem("EPSG:42102");
         CoordinateSystem latlong = service.createCoordinateSystem("EPSG:4269");
         
-        MathTransform transform = CRSService.reproject( bc, latlong, true );
+        MathTransform transform = CRSServiceDead.reproject( bc, latlong, true );
         
         // origional bc alberts
         Polygon poly1 = poly( new double[] {
@@ -80,14 +80,14 @@ public class ReprojectionServiceTest extends TestCase {
                 -123.454638288508,48.5497352036088, -123.455007082796,48.5429008916377,
                 -123.470095558323,48.5432615620081} );        
         
-        Polygon polyAfter = CRSService.transform( poly1, transform );
+        Polygon polyAfter = CRSServiceDead.transform( poly1, transform );
         System.out.println( "  actual:"+ polyAfter );
         System.out.println( "expected:"+ poly2 );        
         //assertEquals( poly2, polyAfter );
         
         Envelope before = poly1.getEnvelopeInternal();
         Envelope expected = poly2.getEnvelopeInternal();
-        Envelope after = CRSService.transform( before, transform );
+        Envelope after = CRSServiceDead.transform( before, transform );
         
         System.out.println( "  actual:"+ after );
         System.out.println( "expected:"+ expected );                
