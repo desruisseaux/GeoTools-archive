@@ -644,13 +644,15 @@ public class WFSBasicComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            throws OperationNotSupportedException, SAXException {
             String lock = null;
             lock = attrs.getValue("", "lockID");
 
