@@ -268,7 +268,7 @@
 
   <build>
     <nagEmailAddress>jmacgill@users.sourceforge.net</nagEmailAddress>
-    <unitTestSourceDirectory>tests/unit</unitTestSourceDirectory>
+    <unitTestSourceDirectory>test/</unitTestSourceDirectory>
     <integrationUnitTestSourceDirectory/>
     <aspectSourceDirectories/>
     <integrationUnitTestPatterns/>
