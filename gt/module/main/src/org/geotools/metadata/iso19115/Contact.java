@@ -7,13 +7,14 @@ import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.Telephone;
 
 public class Contact extends MetaData implements
-		org.opengis.metadata.citation.Contact {
+	org.opengis.metadata.citation.Contact {
 
 	private String contactInstructions;
 	private String hoursOfService;
 	private OnLineResource onLineResource;
 	private Address address;
 	private Telephone phone;
+	
 	/* (non-Javadoc)
 	 * @see org.opengis.metadata.citation.Contact#getPhone()
 	 */
@@ -50,13 +51,13 @@ public class Contact extends MetaData implements
 	public String getContactInstructions(Locale arg0) {
 		return contactInstructions;
 	}
-	public String getContactInstructions() {
+	public String getContactInstruction() {
 		return contactInstructions;
 	}
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	public void setContactInstructions(String contactInstructions) {
+	public void setContactInstruction(String contactInstructions) {
 		this.contactInstructions = contactInstructions;
 	}
 	public void setHoursOfService(String hoursOfService) {

@@ -59,20 +59,16 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
     ISO19115Entity entity;
     
     /**
-     * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
+     * @see org.geotools.metadata.Metadata#elements()
      */
-    public final List getElements(List elements) {
+    public final List elements() {
     	ISO19115Entity entity = getType();
-        if (elements == null) {
-            elements = new ArrayList( entity.getElements().size() );            
-        }
-        else {
-        	elements.clear();
-        }
+    	List elements = new ArrayList( entity.getElements().size() );            
+        
         for (Iterator iter = entity.propertyMap().values().iterator(); iter.hasNext();) {        	
         	PropertyDescriptor descriptor =(PropertyDescriptor) iter.next();
         	Method read = descriptor.getReadMethod();        	
-        	Method method = (Method) iter.next();
+        	Method method = (Method) descriptor.getReadMethod();
             try {
             	Object value = read.invoke( this, null );
             	elements.add( value );                
@@ -130,11 +126,10 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
         return getType();
     }
 
-    private ISO19115Entity getType() {
+    protected ISO19115Entity getType() {
         if (entity == null) {
             entity = ISO19115Entity.getEntity(getClass());
         }
-
         return entity;
     }
 
@@ -148,11 +143,11 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
      */
     private static class ISO19115Entity implements Metadata.Entity {
         static HashMap entityMap = new HashMap();
-        ArrayList elemList = new ArrayList();
-        HashMap elemMap = new HashMap();
-        
+                
         /** Map of PropertyDescriptor by name */
         Map propertyMap;
+
+		private ArrayList elements;
 
         private ISO19115Entity(Class clazz) {
             init(clazz);
@@ -181,10 +176,6 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
          * @return
          */
         private final Map introspectISO19115( Class metaDataType ){
-        	if( !metaDataType.isInterface() ||
-        		!metaDataType.isAssignableFrom( MetaData.class )){
-        		return Collections.EMPTY_MAP;
-        	}
         	BeanInfo beanInfo;
 			try {
 				beanInfo = Introspector.getBeanInfo( metaDataType );
@@ -214,21 +205,47 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
         	}
         	return map;
         }
-        private final Map introspect( Class type ){
-        	Class interfaces[] = type.getInterfaces();
-        	if( interfaces == null ){
-        		return Collections.EMPTY_MAP;
+        private final boolean isMetaDataInterface( Class type ){
+        	if( type == null ){
+        		return false;
         	}
+        	if ( org.opengis.metadata.MetaData.class == type ){
+				return true;
+			}
+			Class interfaces[] = type.getInterfaces();			
+			for( int i=0; i<interfaces.length; i++){
+				if( isMetaDataInterface( interfaces[i] )){
+					return true;
+				}
+			}
+			return isMetaDataInterface( type.getSuperclass() );			
+        }
+        private final Map introspect( Class baseType ){
         	Map map = new TreeMap();
-        	for( int i=0; i<interfaces.length; i++){
-        		if( interfaces[i].isAssignableFrom( MetaData.class )){
-        			map.putAll( introspectISO19115( interfaces[i] ));
+        	
+        	for( Class type=baseType; type != null; type = type.getSuperclass() ){
+        		Class interfaces[] = type.getInterfaces();
+        		if( interfaces != null){        			
+        			for( int i=0; i<interfaces.length; i++){
+        				//System.out.println("\t interface "+interfaces[i] + " "+isMetaDataInterface( interfaces[i] ) );        				
+        				if( isMetaDataInterface( interfaces[i] ) ){
+        					Map properties = introspectISO19115( interfaces[i] );							
+        					map.putAll( properties );
+        				}
+        			}
         		}
         	}
         	return map;
         }
         private void init(Class type) {
         	propertyMap = introspect( type );
+        	
+        	elements = new ArrayList( propertyMap.size() );
+        	for( Iterator i=propertyMap.values().iterator(); i.hasNext(); ){
+        		PropertyDescriptor property = (PropertyDescriptor) i.next();
+        		ISO19115Element element = new ISO19115Element( property );
+        		elements.add( element );
+        	}
         }
         private Map propertyMap(){
         	return propertyMap;
@@ -257,7 +274,7 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
          * @see org.geotools.metadata.Metadata.Entity#getElements()
          */
         public List getElements() {
-            return elemList;
+        	return elements;
         }
 
 		/**
@@ -334,6 +351,9 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
          */
         public Entity getEntity() {
             return entity;
+        }
+        public String toString(){
+        	return property.getName();
         }
     }
 

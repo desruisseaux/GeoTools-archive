@@ -44,13 +44,12 @@ public abstract class AbstractMetadata implements Metadata {
     EntityImpl entity;
 
     /**
-     * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
+     * @see org.geotools.metadata.Metadata#elements()
      */
-    public final List getElements(List elements) {
-        if (elements == null) {
-            elements = new ArrayList();
-        }
-
+    public final List elements() {
+    	Entity type = getType();
+    	
+        List elements = new ArrayList( type.getElements().size() );        
         List methods = getType().getGetMethods();
 
         for (Iterator iter = methods.iterator(); iter.hasNext();) {
