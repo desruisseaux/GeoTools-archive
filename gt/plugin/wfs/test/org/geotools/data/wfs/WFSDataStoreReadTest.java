@@ -156,6 +156,7 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
         assertNotNull("FeatureType was null",ft);
         assertTrue(wfs.getTypeNames()[1]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+        System.out.println("DefaultGeom name = "+ft.getDefaultGeometry().getName());
         }if(post){
         // post
         System.out.println("Post FeatureTypeTest");
@@ -166,6 +167,9 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+        System.out.println("DefaultGeom name = "+ft.getDefaultGeometry().getName());
+
+        System.out.println("FT name = "+wfs.getTypeNames()[1]);
     }}
     
     public void doFeatureReader(URL url, boolean get, boolean post) throws NoSuchElementException, IOException, IllegalAttributeException{

@@ -16,6 +16,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.NullFilter;
 import org.geotools.xml.PrintHandler;
@@ -95,7 +96,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS)!= FilterCapabilities.SIMPLE_COMPARISONS)
         			return false;
@@ -184,7 +185,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if(fc.getSpatialOps()==0)
         			return false;
@@ -277,7 +278,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
         			return false;
@@ -374,7 +375,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if(fc.getScalarOps()==0 && fc.getSpatialOps()==0)
         			return false;
@@ -570,7 +571,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & (FilterCapabilities.SIMPLE_COMPARISONS | FilterCapabilities.SIMPLE_ARITHMETIC))!= (FilterCapabilities.SIMPLE_COMPARISONS | FilterCapabilities.SIMPLE_ARITHMETIC))
         			return false;
@@ -587,11 +588,58 @@ public class FilterOpsComplexTypes {
         	
         	output.startElement(element.getNamespace(),element.getName(),null);
         	// TODO is this order dependant?
-        	elems[0].getType().encode(elems[0],cf.getLeftValue(),output,hints);
-        	elems[0].getType().encode(elems[0],cf.getRightValue(),output,hints);
+        	encodeExpr(cf.getLeftValue(),output,hints);
+        	encodeExpr(cf.getRightValue(),output,hints);
         	
         	output.endElement(element.getNamespace(),element.getName());
         }
+    }
+    
+    private static void encodeExpr(Expression expr,PrintHandler output,Map hints) throws OperationNotSupportedException, IOException{
+    	int i = 0;
+    	switch(expr.getType()){
+    	
+    	   /* Types implemented by ExpressionLiteral */
+
+        case Expression.LITERAL_DOUBLE:
+        case Expression.LITERAL_INTEGER:
+		case Expression.LITERAL_STRING:
+		case Expression.LITERAL_GEOMETRY:
+        	i = 36;
+    	break;
+
+        /* Types implemented by ExpressionMath. */
+		case Expression.MATH_ADD:
+        	i = 29;
+    	break;
+		case Expression.MATH_SUBTRACT:
+        	i = 30;
+    	break;
+		case Expression.MATH_MULTIPLY:
+        	i = 31;
+    	break;
+		case Expression.MATH_DIVIDE:
+        	i = 32;
+    	break;
+
+        /* Types implemented by ExpressionAttribute. */
+
+        /** Defines an attribute expression with a declared double type. */
+		case Expression.ATTRIBUTE_DOUBLE:
+		case Expression.ATTRIBUTE_INTEGER:
+		case Expression.ATTRIBUTE_STRING:
+		case Expression.ATTRIBUTE_GEOMETRY:
+		case Expression.ATTRIBUTE_UNDECLARED:
+		case Expression.ATTRIBUTE:
+        	i = 36;
+    	break;
+		case Expression.FUNCTION:
+        	i = 35;
+    	break;
+			
+    	}
+    	if(i!=0)
+    	FilterSchema.getInstance().getElements()[i].getType().encode(FilterSchema.getInstance().getElements()[i],expr,output,hints);
     }
     public static class PropertyIsLikeType extends FilterComplexType{
         private static final ComplexType instance = new PropertyIsLikeType();
@@ -668,7 +716,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.LIKE)!= FilterCapabilities.LIKE)
         			return false;
@@ -755,7 +803,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.NULL_CHECK)!= FilterCapabilities.NULL_CHECK)
         			return false;
@@ -839,7 +887,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.BETWEEN)!= FilterCapabilities.BETWEEN)
         			return false;
@@ -909,7 +957,7 @@ public class FilterOpsComplexTypes {
             return Expression.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
         			return false;
@@ -977,7 +1025,7 @@ public class FilterOpsComplexTypes {
             return Expression.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
         			return false;
@@ -1061,7 +1109,7 @@ public class FilterOpsComplexTypes {
             return GeometryFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		int elementkey = FilterCapabilities.findOperation(element.getName());
         		if(elementkey == 0 || (fc.getSpatialOps() & elementkey) != elementkey)
@@ -1078,21 +1126,21 @@ public class FilterOpsComplexTypes {
             GeometryFilter lf = (GeometryFilter)value;
                         
             output.startElement(element.getNamespace(),element.getName(),null);
-            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING || lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE_STRING || lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE){
                 elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
                 if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
-                    elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+                    elems[1].getType().encode(elems[1],((LiteralExpression)lf.getRightGeometry()).getLiteral(),output,hints); // geom
                 else
-                    elems[2].getType().encode(elems[2],lf.getRightGeometry(),output,hints); // geom
+                    elems[2].getType().encode(elems[2],((LiteralExpression)lf.getRightGeometry()).getLiteral(),output,hints); // geom
             }else{
-                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING || lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE_STRING || lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.ATTRIBUTE){
                     elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
                     if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
-                        elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                        elems[1].getType().encode(elems[1],((LiteralExpression)lf.getLeftGeometry()).getLiteral(),output,hints); // geom
                     else
-                        elems[2].getType().encode(elems[2],lf.getLeftGeometry(),output,hints); // geom
+                        elems[2].getType().encode(elems[2],((LiteralExpression)lf.getLeftGeometry()).getLiteral(),output,hints); // geom
                 }else{
-                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name");
+                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name l="+lf.getLeftGeometry().getType()+" r="+lf.getRightGeometry().getType());
                 }
             }
             
@@ -1158,7 +1206,7 @@ public class FilterOpsComplexTypes {
             return GeometryFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getSpatialOps() & FilterCapabilities.BBOX)!= FilterCapabilities.BBOX)
         			return false;
@@ -1250,7 +1298,7 @@ public class FilterOpsComplexTypes {
             return GeometryDistanceFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getSpatialOps() & (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))!= (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))
         			return false;
@@ -1335,7 +1383,7 @@ public class FilterOpsComplexTypes {
             return GeometryDistanceFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getSpatialOps() & (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))!= (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))
         			return false;
@@ -1425,7 +1473,7 @@ public Type getParent() {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
         			return false;
@@ -1516,7 +1564,7 @@ public Type getParent() {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        	if(hints !=null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
         		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
         		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
         			return false;

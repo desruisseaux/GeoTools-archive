@@ -716,7 +716,7 @@ public class FilterComplexTypes {
             case ATTRIBUTE_INTEGER:
             case ATTRIBUTE_STRING:
             case ATTRIBUTE_UNDECLARED:
-                PropertyNameType.getInstance().encode(element!=null?element:new FilterElement("PropertyName",PropertyNameType.getInstance()),e,output,hints);
+                PropertyNameType.getInstance().encode(new FilterElement("PropertyName",PropertyNameType.getInstance()),e,output,hints);
                 return;
             case FUNCTION:
                 FunctionType.getInstance().encode(element!=null?element:new FilterElement("Function",FunctionType.getInstance()),e,output,hints);

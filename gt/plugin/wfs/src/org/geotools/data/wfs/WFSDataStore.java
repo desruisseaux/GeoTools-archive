@@ -121,8 +121,12 @@ public class WFSDataStore extends AbstractDataStore{
  	   InputStream result = null;
  	   synchronized(Authenticator.class){
  	      Authenticator.setDefault(auth);
-
+ 	      try{
  	      result = url.getInputStream();
+ 	      }catch(MalformedURLException e){
+ 	      	logger.warning(e.toString());
+ 	      	throw e;
+ 	      }
  	      url.connect();
  	      
  	      Authenticator.setDefault(null);
