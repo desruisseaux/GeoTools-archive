@@ -21,7 +21,9 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -40,6 +42,16 @@ public class MySQLDataStoreFactoryTest extends TestCase {
     
     Map remote;
     Map local;
+
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    public static Test suite() {
+        TestSuite suite = new TestSuite(MySQLDataStoreFactoryTest.class);
+        return suite;
+    }    
+
     /*
      * @see TestCase#setUp()
      */

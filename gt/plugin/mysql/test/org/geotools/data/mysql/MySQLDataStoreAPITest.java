@@ -26,6 +26,8 @@ import java.sql.Statement;
 import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
@@ -116,6 +118,19 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             throw new AssertionError("test supressed " + test);
         }
     }
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    public static Test suite() {
+        LOGGER.info("starting suite...");
+
+        TestSuite suite = new TestSuite(MySQLDataStoreAPITest.class);
+        LOGGER.info("made suite...");
+
+        return suite;
+    }    
 
     /**
      * @see TestCase#setUp()
