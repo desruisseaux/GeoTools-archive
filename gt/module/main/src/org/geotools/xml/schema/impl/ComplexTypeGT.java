@@ -218,9 +218,10 @@ public class ComplexTypeGT implements ComplexType {
      * @return
      * @throws SAXException
      * @throws OperationNotSupportedException
+     * @throws SAXException 
      */
     public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ) throws
-            OperationNotSupportedException {
+            OperationNotSupportedException, SAXException {
         throw new OperationNotSupportedException();
     }
 

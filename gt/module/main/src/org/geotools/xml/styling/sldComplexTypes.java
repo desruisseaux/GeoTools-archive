@@ -11,9 +11,11 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
 import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.ContrastEnhancementImpl;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
@@ -25,6 +27,8 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.SelectedChannelType;
+import org.geotools.styling.SelectedChannelTypeImpl;
 import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.StyleFactory;
@@ -41,6 +45,7 @@ import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 public class sldComplexTypes {
 
@@ -97,9 +102,10 @@ public class sldComplexTypes {
          * @param hints
          * @return
          * @throws OperationNotSupportedException
+         * @throws SAXException 
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -159,7 +165,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -176,6 +182,10 @@ public class sldComplexTypes {
                 new sldElement("Histogram", sldComplexTypes._Histogram.getInstance(), null, 1, 1),
                 new sldElement("GammaValue", org.geotools.xml.xsi.XSISimpleTypes.Double
                         .getInstance()/* simpleType name is double */, null, 0, 1)};
+        
+        private static int NORMALIZE = 0;
+        private static int HISTORGRAM = 1;
+        private static int GAMMAVALUE = 2;
 
         private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new ChoiceGT(null, 0, 1, new ElementGrouping[]{elems[0], elems[1]}),
@@ -227,9 +237,27 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                throws OperationNotSupportedException, SAXException {
+            ContrastEnhancement symbol = new ContrastEnhancementImpl();
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[NORMALIZE].getName().equals(e.getName()))
+                    symbol.setNormalize(); // (Graphic)value[i].getValue()
+
+                if(elems[HISTORGRAM].getName().equals(e.getName()))
+                    symbol.setHistogram(); // (Graphic)value[i].getValue()
+
+                if(elems[GAMMAVALUE].getName().equals(e.getName())){
+                    symbol.setGammaValue(FilterFactory.createFilterFactory().createLiteralExpression(((Double)value[i].getValue()).doubleValue()));
+                }
+            }
+            
+            return symbol;
         }
     }
     protected static class SelectedChannelType extends sldComplexType {
@@ -252,6 +280,9 @@ public class sldComplexTypes {
                                          */, null, 1, 1),
                 new sldElement("ContrastEnhancement", sldComplexTypes._ContrastEnhancement
                         .getInstance(), null, 0, 1)}, 1, 1);
+        
+        private static int SOURCECHANNELNAME = 0;
+        private static int CONTRASTENHANCEMENT = 1;
 
         private SelectedChannelType() {
             super("SelectedChannelType", child, attrs, elems, null, false, false);
@@ -298,9 +329,23 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                throws OperationNotSupportedException, SAXException {
+            org.geotools.styling.SelectedChannelType symbol = new org.geotools.styling.SelectedChannelTypeImpl();
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[SOURCECHANNELNAME].getName().equals(e.getName()))
+                    symbol.setChannelName((String)value[i].getValue());
+
+                if(elems[CONTRASTENHANCEMENT].getName().equals(e.getName()))
+                    symbol.setContrastEnhancement((Expression)value[i].getValue());
+            }
+            
+            return symbol;
         }
     }
     protected static class ParameterValueType extends sldComplexType {
@@ -312,11 +357,13 @@ public class sldComplexTypes {
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("expression",
                 org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null, 1, 1)};
+        
+        private static int EXPRESSION = 0;
 
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("expression",
                         org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null,
-                        1, 1)}, 0, 2147483647);
+                        1, 1)}, 0, Element.UNBOUNDED);
 
         private ParameterValueType() {
             super("ParameterValueType", child, attrs, elems, null, false, false);
@@ -363,9 +410,19 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                throws OperationNotSupportedException, SAXException {
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[EXPRESSION].getName().equals(e.getName()))
+                    return value[i].getValue(); // TODO check this?
+            }
+            
+            return null;
         }
     }
     protected static class SymbolizerType extends sldComplexType {
@@ -423,9 +480,9 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
+            // abstract type ...
             return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
         }
     }
     protected static class _Displacement extends sldComplexType {
@@ -492,7 +549,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -557,7 +614,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
 //            Geometry symbol = StyleFactory.createStyleFactory().getDefaultRasterSymbolizer();
             // symbol.setGraphic(null);
 
@@ -632,7 +689,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -701,7 +758,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -763,7 +820,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -783,7 +840,7 @@ public class sldComplexTypes {
 
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("expression",
-                        org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null, 1, 1)}, 0, 2147483647);
+                        org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null, 1, 1)}, 0, Element.UNBOUNDED);
 
         private _CssParameter() {
             super(null, child, attrs, elems, sldComplexTypes.ParameterValueType.getInstance(),
@@ -831,7 +888,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -848,7 +905,11 @@ public class sldComplexTypes {
                 new sldElement("GraphicStroke", sldComplexTypes._GraphicStroke.getInstance(), null,
                         1, 1),
                 new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null,
-                        0, 2147483647)};
+                        0, Element.UNBOUNDED)};
+        
+        private static int GRAPHICFILL = 0;
+        private static int GRAPHICSTROKE = 1;
+        private static int CSSPARAMETER = 2; 
 
         private static ElementGrouping child = new SequenceGT(
                 new ElementGrouping[]{
@@ -905,8 +966,27 @@ public class sldComplexTypes {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+            Stroke symbol = StyleFactory.createStyleFactory().getDefaultStroke();
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[GRAPHICFILL].getName().equals(e.getName()))
+                    symbol.setGraphicFill((Graphic)value[i].getValue());
+
+                if(elems[GRAPHICSTROKE].getName().equals(e.getName()))
+                    symbol.setGraphicStroke((Graphic)value[i].getValue());
+
+                if(elems[CSSPARAMETER].getName().equals(e.getName())){
+                    Expression css = (Expression)value[i].getValue();
+                    // TODO apply the css
+                }
+            }
+            
+            return symbol;
         }
     }
     protected static class _Mark extends sldComplexType {
@@ -922,6 +1002,11 @@ public class sldComplexTypes {
                 new sldElement("Fill", null, null, 0, 1),
                 new sldElement("Stroke", sldComplexTypes._Stroke.getInstance(), null, 0, 1)};
 
+        // array spots
+        private static int WELLKNOWNNAME = 0;
+        private static int FILL = 1;
+        private static int STROKE = 2;
+        
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{
                         new sldElement("WellKnownName", org.geotools.xml.xsi.XSISimpleTypes.String
@@ -975,8 +1060,25 @@ public class sldComplexTypes {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+            Mark symbol = StyleFactory.createStyleFactory().getDefaultMark();
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[WELLKNOWNNAME].getName().equals(e.getName()))
+                    symbol.setWellKnownName((Expression)value[i].getValue());
+
+                if(elems[FILL].getName().equals(e.getName()))
+                    symbol.setFill((Fill)value[i].getValue());
+
+                if(elems[STROKE].getName().equals(e.getName()))
+                    symbol.setStroke((Stroke)value[i].getValue());
+            }
+            
+            return symbol;
         }
     }
     protected static class _Graphic extends sldComplexType {
@@ -1004,7 +1106,7 @@ public class sldComplexTypes {
         private static int ROTATION = 0;
         
         private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
-                new ChoiceGT(null, 0, 2147483647, new ElementGrouping[]{
+                new ChoiceGT(null, 0, Element.UNBOUNDED, new ElementGrouping[]{
                         new sldElement("ExternalGraphic", sldComplexTypes._ExternalGraphic
                                 .getInstance(), null, 1, 1),
                         new sldElement("Mark", sldComplexTypes._Mark.getInstance(), null, 1, 1)}),
@@ -1146,11 +1248,11 @@ public class sldComplexTypes {
          * @param hints
          * @return
          * @throws OperationNotSupportedException
+         * @throws SAXException 
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                throws OperationNotSupportedException, SAXException {
+            return _Graphic.getInstance().getValue(element,value,attrs1,hints);
         }
     }
     protected static class _Fill extends sldComplexType {
@@ -1164,13 +1266,16 @@ public class sldComplexTypes {
                 new sldElement("GraphicFill", sldComplexTypes._GraphicFill.getInstance(), null, 0,
                         1),
                 new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null,
-                        0, 2147483647)};
+                        0, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("GraphicFill", sldComplexTypes._GraphicFill.getInstance(), null, 0,
                         1),
                 new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null,
-                        0, 2147483647)}, 1, 1);
+                        0, Element.UNBOUNDED)}, 1, 1);
+        
+        private static int GRAPHICFILL = 0;
+        private static int CSSPARAMETER = 1; 
 
         private _Fill() {
             super(null, child, attrs, elems, null, false, false);
@@ -1218,8 +1323,24 @@ public class sldComplexTypes {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+            Stroke symbol = StyleFactory.createStyleFactory().getDefaultStroke();
+
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+
+                Element e = value[i].getElement();
+                if(elems[GRAPHICFILL].getName().equals(e.getName()))
+                    symbol.setGraphicFill((Graphic)value[i].getValue());
+
+                if(elems[CSSPARAMETER].getName().equals(e.getName())){
+                    Expression css = (Expression)value[i].getValue();
+                    // TODO apply the css
+                }
+            }
+            
+            return symbol;
         }
     }
     protected static class _PolygonSymbolizer extends sldComplexType {
@@ -1379,7 +1500,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1439,7 +1560,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1507,7 +1628,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1524,7 +1645,7 @@ public class sldComplexTypes {
                         .getInstance()/* simpleType name is string */, null, 0, 1),
                 new sldElement("Filter", org.geotools.xml.filter.FilterOpsComplexTypes.FilterType
                         .getInstance()/* complexType name is FilterType */, null, 0, 1),
-                new sldElement("Extent", sldComplexTypes._Extent.getInstance(), null, 0, 2147483647)};
+                new sldElement("Extent", sldComplexTypes._Extent.getInstance(), null, 0, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(elems);
 
@@ -1573,7 +1694,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1586,12 +1707,12 @@ public class sldComplexTypes {
 
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("FeatureTypeConstraint",
-                sldComplexTypes._FeatureTypeConstraint.getInstance(), null, 1, 2147483647)};
+                sldComplexTypes._FeatureTypeConstraint.getInstance(), null, 1, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(
                 null,
                 new ElementGrouping[]{new sldElement("FeatureTypeConstraint",
-                        sldComplexTypes._FeatureTypeConstraint.getInstance(), null, 1, 2147483647)},
+                        sldComplexTypes._FeatureTypeConstraint.getInstance(), null, 1, Element.UNBOUNDED)},
                 1, 1);
 
         private _LayerFeatureConstraints() {
@@ -1639,7 +1760,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1883,7 +2004,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1943,7 +2064,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -1956,11 +2077,11 @@ public class sldComplexTypes {
 
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("CssParameter",
-                sldComplexTypes._CssParameter.getInstance(), null, 0, 2147483647)};
+                sldComplexTypes._CssParameter.getInstance(), null, 0, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("CssParameter", sldComplexTypes._CssParameter
-                        .getInstance(), null, 0, 2147483647)}, 1, 1);
+                        .getInstance(), null, 0, Element.UNBOUNDED)}, 1, 1);
 
         private _Font() {
             super(null, child, attrs, elems, null, false, false);
@@ -2007,7 +2128,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2071,7 +2192,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2131,7 +2252,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2157,7 +2278,7 @@ public class sldComplexTypes {
                 new sldElement("MaxScaleDenominator", org.geotools.xml.xsi.XSISimpleTypes.Double
                         .getInstance()/* simpleType name is double */, null, 0, 1),
                 new sldElement("Symbolizer", sldComplexTypes.SymbolizerType.getInstance(), null, 1,
-                        2147483647)};
+                        Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(
                 new ElementGrouping[]{
@@ -2217,7 +2338,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2236,8 +2357,8 @@ public class sldComplexTypes {
                 new sldElement("FeatureTypeName", org.geotools.xml.xsi.XSISimpleTypes.String
                         .getInstance()/* simpleType name is string */, null, 0, 1),
                 new sldElement("SemanticTypeIdentifier", org.geotools.xml.xsi.XSISimpleTypes.String
-                        .getInstance()/* simpleType name is string */, null, 0, 2147483647),
-                new sldElement("Rule", sldComplexTypes._Rule.getInstance(), null, 1, 2147483647)};
+                        .getInstance()/* simpleType name is string */, null, 0, Element.UNBOUNDED),
+                new sldElement("Rule", sldComplexTypes._Rule.getInstance(), null, 1, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(elems);
 
@@ -2286,7 +2407,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2305,7 +2426,7 @@ public class sldComplexTypes {
                 new sldElement("IsDefault", org.geotools.xml.xsi.XSISimpleTypes.Boolean
                         .getInstance()/* simpleType name is boolean */, null, 0, 1),
                 new sldElement("FeatureTypeStyle", sldComplexTypes._FeatureTypeStyle.getInstance(),
-                        null, 1, 2147483647)};
+                        null, 1, Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(elems);
 
@@ -2354,7 +2475,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2423,7 +2544,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2496,7 +2617,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2556,7 +2677,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2622,7 +2743,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2692,7 +2813,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2759,7 +2880,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2777,7 +2898,7 @@ public class sldComplexTypes {
                 new sldElement("LayerFeatureConstraints", sldComplexTypes._LayerFeatureConstraints
                         .getInstance(), null, 1, 1),
                 new sldElement("UserStyle", sldComplexTypes._UserStyle.getInstance(), null, 1,
-                        2147483647)};
+                        Element.UNBOUNDED)};
 
         private static ElementGrouping child = new SequenceGT(null,
                 elems, 1, 1);
@@ -2827,7 +2948,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2905,7 +3026,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -2969,7 +3090,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3038,7 +3159,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3106,7 +3227,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3277,7 +3398,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3344,7 +3465,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3413,7 +3534,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3482,7 +3603,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
@@ -3497,7 +3618,7 @@ public class sldComplexTypes {
         private static Element[] elems = new Element[]{new sldElement("ColorMapEntry",
                 sldComplexTypes._ColorMapEntry.getInstance(), null, 1, 1)};
 
-        private static ElementGrouping child = new ChoiceGT(null, 0, 2147483647,
+        private static ElementGrouping child = new ChoiceGT(null, 0, Element.UNBOUNDED,
                 new ElementGrouping[]{new sldElement("ColorMapEntry",
                         sldComplexTypes._ColorMapEntry.getInstance(), null, 1, 1)});
 
@@ -3546,7 +3667,7 @@ public class sldComplexTypes {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+                throws OperationNotSupportedException, SAXException {
             return super.getValue(element, value, attrs1, hints);
             // TODO fill me in
         }
