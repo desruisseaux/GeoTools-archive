@@ -39,12 +39,9 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.filter.Expression;
 import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -113,6 +110,15 @@ public class GraphicImpl implements Graphic, Cloneable {
 
     public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
         this.externalGraphics.clear();
+        
+        for(int i = 0; i < symbols.size(); ) {
+            Object symbol = symbols.get(i);
+            if(symbol instanceof ExternalGraphic) {
+                symbols.remove(i);
+            } else {
+                i++;
+            }
+        }
 
         if(externalGraphics != null) {
             for (int i = 0; i < externalGraphics.length; i++) {
@@ -147,6 +153,15 @@ public class GraphicImpl implements Graphic, Cloneable {
 
     public void setMarks(Mark[] marks) {
         this.marks.clear();
+        
+        for(int i = 0; i < symbols.size(); ) {
+            Object symbol = symbols.get(i);
+            if(symbol instanceof Mark) {
+                symbols.remove(i);
+            } else {
+                i++;
+            }
+        }
 
         for (int i = 0; i < marks.length; i++) {
             addMark(marks[i]);
@@ -175,10 +190,12 @@ public class GraphicImpl implements Graphic, Cloneable {
      *         size of 6 pixels (unless a size is specified) is provided.
      */
     public Symbol[] getSymbols() {
-        Symbol[] ret = new Symbol[] { new MarkImpl() };
+        Symbol[] ret = null;
 
         if (symbols.size() > 0) {
             ret = (Symbol[]) symbols.toArray(new Symbol[symbols.size()]);
+        } else {
+            ret = new Symbol[] { new MarkImpl() };
         }
 
         return ret;
