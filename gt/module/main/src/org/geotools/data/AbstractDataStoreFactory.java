@@ -24,10 +24,10 @@ import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterGroupDescriptor;
-import org.geotools.parameter.ParameterRealValue;
-import org.geotools.parameter.ParameterValue;
+import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.Parameter;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 
 /**
@@ -155,14 +155,13 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         return true;
     }
 
-    public OperationParameterGroup getParameters(){
+    public ParameterGroupDescriptor getParameters(){
         Param params[] = getParametersInfo();
         ParameterDescriptor parameters[] = new ParameterDescriptor[ params.length ];
         for( int i=0; i<params.length; i++ ){
             Param param = params[i];            
             parameters[i] = new ParamDescriptor( params[i] );
-        }
-        
+        }        
         Map properties = new HashMap();
         properties.put( "name", getDisplayName() );
         properties.put( "remarks", getDescription() );        
@@ -179,13 +178,13 @@ class ParamDescriptor extends ParameterDescriptor {
     }
     public GeneralParameterValue createValue() {
         if (Double.TYPE.equals( getValueClass())) {
-            return new ParameterRealValue(this){
+            return new ParameterReal(this){
                 protected Object valueOf(String text) throws IOException {
     	            return param.handle( text );
     	        }
             };
         }
-        return new ParameterValue(this){
+        return new Parameter(this){
 	        protected Object valueOf(String text) throws IOException {
 	            return param.handle( text );
 	        }

@@ -356,7 +356,7 @@ public class Adapters extends org.geotools.pt.Adapters {
      * Returns an OpenGIS structure for an axis info.
      */
     public CS_AxisInfo export(final AxisInfo axis) {
-        return (axis!=null) ? new CS_AxisInfo(axis.name, export(axis.orientation)) : null;
+        return (axis!=null) ? new CS_AxisInfo( axis.name.toString(), export(axis.orientation)) : null;
     }
     
     /**

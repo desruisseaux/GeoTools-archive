@@ -67,11 +67,11 @@ public class ParameterTest extends TestCase {
      */
     public void testSequence() {
         for (int i=-1000; i<=1000; i++) {
-            assertEquals("Integer", i, new ParameterValue("Integer", i)          .intValue());
-            assertEquals("Double",  i, new ParameterValue("Double",  i, null    ).doubleValue(), 0.0);
-            assertEquals("Double",  i, new ParameterValue("Double",  i, Unit.ONE).doubleValue(), 0.0);
+            assertEquals("Integer", i, new Parameter("Integer", i)          .intValue());
+            assertEquals("Double",  i, new Parameter("Double",  i, null    ).doubleValue(), 0.0);
+            assertEquals("Double",  i, new Parameter("Double",  i, Unit.ONE).doubleValue(), 0.0);
             assertEquals("Double",  Math.toRadians(i),
-                         new ParameterValue("Double",  i, NonSI.DEGREE_ANGLE).doubleValue(SI.RADIAN), 1E-6);
+                         new Parameter("Double",  i, NonSI.DEGREE_ANGLE).doubleValue(SI.RADIAN), 1E-6);
         }
     }
 
@@ -80,8 +80,8 @@ public class ParameterTest extends TestCase {
      * inside and outside this range. Tests also the uses of values of the wrong type.
      */
     public void testRangeIntegers() {
-        ParameterValue param;
-        param = new ParameterValue(new ParameterDescriptor("Range", 15, -30, +40));
+        Parameter param;
+        param = new Parameter(new ParameterDescriptor("Range", 15, -30, +40));
         assertEquals("Range", 15, param.intValue());
         assertEquals("Range", 15, param.doubleValue(), 0.0);
         param.setValue(12);
@@ -113,8 +113,8 @@ public class ParameterTest extends TestCase {
      * inside and outside this range. Tests also the uses of values of the wrong types.
      */
     public void testRangeDoubles() {
-        ParameterValue param;
-        param = new ParameterValue(new ParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
+        Parameter param;
+        param = new Parameter(new ParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
         assertEquals("Range", 15, param.intValue());
         assertEquals("Range", 15, param.doubleValue(), 0.0);
         param.setValue(12.0);
@@ -150,29 +150,29 @@ public class ParameterTest extends TestCase {
         p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"), 1, 1, Integer.class, null, ONE, null, null, null);
         p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"), 1, 2, Integer.class, null, ONE, null, null, null);
         p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), 0, 1, Integer.class, null, ONE, null, null, null);
-        final ParameterValue v1, v2, v3, v1b, v2b, v3b, v1t, v2t, v3t;
-        v1  = new ParameterValue(p1); v1.setValue( 10);
-        v2  = new ParameterValue(p2); v2.setValue( 20);
-        v3  = new ParameterValue(p3); v3.setValue( 30);
-        v1b = new ParameterValue(p1); v1.setValue(-10);
-        v2b = new ParameterValue(p2); v2.setValue(-20);
-        v3b = new ParameterValue(p3); v3.setValue(-30);
+        final Parameter v1, v2, v3, v1b, v2b, v3b, v1t, v2t, v3t;
+        v1  = new Parameter(p1); v1.setValue( 10);
+        v2  = new Parameter(p2); v2.setValue( 20);
+        v3  = new Parameter(p3); v3.setValue( 30);
+        v1b = new Parameter(p1); v1.setValue(-10);
+        v2b = new Parameter(p2); v2.setValue(-20);
+        v3b = new Parameter(p3); v3.setValue(-30);
         /*
          * Test creation without pre-defined parameter group.
          */
         final Map properties = Collections.singletonMap("name", "group");
-        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3});
-        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2});
-        new ParameterValueGroup(properties, new ParameterValue[] {v1, v3});
-        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3, v2b});
+        new ParameterGroup(properties, new Parameter[] {v1, v2, v3});
+        new ParameterGroup(properties, new Parameter[] {v1, v2});
+        new ParameterGroup(properties, new Parameter[] {v1, v3});
+        new ParameterGroup(properties, new Parameter[] {v1, v2, v3, v2b});
         try {
-            new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3, v3b});
+            new ParameterGroup(properties, new Parameter[] {v1, v2, v3, v3b});
             fail("Parameter 3 was not allowed to be inserted twice.");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
         }
         try {
-            new ParameterValueGroup(properties, new ParameterValue[] {v1, v3, v1b});
+            new ParameterGroup(properties, new Parameter[] {v1, v3, v1b});
             fail("Parameter 1 was not allowed to be inserted twice.");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
@@ -182,23 +182,23 @@ public class ParameterTest extends TestCase {
          */
         final ParameterGroupDescriptor group =
               new ParameterGroupDescriptor(properties, new ParameterDescriptor[] {p1, p2, p3});
-        new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3});
-        new ParameterValueGroup(group, new ParameterValue[] {v1, v2});
-        new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3, v2b});
+        new ParameterGroup(group, new Parameter[] {v1, v2, v3});
+        new ParameterGroup(group, new Parameter[] {v1, v2});
+        new ParameterGroup(group, new Parameter[] {v1, v2, v3, v2b});
         try {
-            new ParameterValueGroup(group, new ParameterValue[] {v1, v3});
+            new ParameterGroup(group, new Parameter[] {v1, v3});
             fail("Parameter 2 was mandatory.");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
         }
         try {
-            new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3, v3b});
+            new ParameterGroup(group, new Parameter[] {v1, v2, v3, v3b});
             fail("Parameter 3 was not allowed to be inserted twice.");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
         }
         try {
-            new ParameterValueGroup(group, new ParameterValue[] {v1, v3, v1b});
+            new ParameterGroup(group, new Parameter[] {v1, v3, v1b});
             fail("Parameter 1 was not allowed to be inserted twice.");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
@@ -211,7 +211,7 @@ public class ParameterTest extends TestCase {
      * parameter.
      */
     public void testCodeList() {
-        ParameterValue param = new ParameterValue("Test", AxisDirection.TOP);
+        Parameter param = new Parameter("Test", AxisDirection.TOP);
         ParameterDescriptor op = (ParameterDescriptor) param.getDescriptor();
         assertEquals("CodeList", new HashSet(Arrays.asList(AxisDirection.values())), op.getValidValues());
         assertEquals("Default", AxisDirection.TOP, op.getDefaultValue());
@@ -229,7 +229,7 @@ public class ParameterTest extends TestCase {
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception.
         }
-        param = new ParameterValue("Test", AxisDirection.TOP);
+        param = new Parameter("Test", AxisDirection.TOP);
         param.setValue(dummy); // Should not fails.
         assertEquals("Equals", param, param.clone());
     }
@@ -253,8 +253,8 @@ public class ParameterTest extends TestCase {
                 GeneralMatrix copy = (GeneralMatrix) matrix.clone();
                 copy.setSize(height, width);
                 parameters.setMatrix(copy);
-                assertEquals("height", height, ((ParameterValue) parameters.getValue("num_row")).intValue());
-                assertEquals("width",  width,  ((ParameterValue) parameters.getValue("num_col")).intValue());
+                assertEquals("height", height, ((Parameter) parameters.getValue("num_row")).intValue());
+                assertEquals("width",  width,  ((Parameter) parameters.getValue("num_col")).intValue());
                 assertEquals("equals", copy,   parameters.getMatrix());
                 assertEquals("Equals", parameters, parameters.clone());
             }        

@@ -218,7 +218,7 @@ public final class CRSUtilities {
                 if (!(crs instanceof CompoundCRS)) {
                     throw new TransformException(Resources.format(
                             ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
-                            crs.getName(Locale.getDefault())));
+                            crs.getName().toString()));
                 }
                 final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
                 if (c.length == 0) {

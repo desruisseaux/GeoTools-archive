@@ -113,7 +113,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
             if (buffer.length() != 0) {
                 buffer.append(" / ");
             }
-            buffer.append(cs[i].getName(locale));
+            buffer.append(cs[i].getName().toString(locale));
         }
         return buffer.toString();
     }

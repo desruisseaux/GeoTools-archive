@@ -162,7 +162,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
             final int dimension = crs.getCoordinateSystem().getDimension();
             if (dimension < minimalDimension) {
                 throw new IllegalArgumentException(Resources.format(
-                       ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, crs.getName(Locale.getDefault()),
+                       ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, crs.getName().toString(),
                                     new Integer(dimension), new Integer(minimalDimension)));
             }
         }

@@ -164,13 +164,13 @@ public class CoordinateTransformation extends Info {
      * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getName}.
      */
     public String getName(final Locale locale) {
-        final String name = super.getName(locale);
+        final String name = super.getName().toString(locale);
         if (name.length()!=0) {
             return name;
         } else if (transform instanceof AbstractMathTransform) {
             return ((AbstractMathTransform) transform).getName(locale);
         } else {
-            return sourceCS.getName(locale)+"\u00A0\u21E8\u00A0"+targetCS.getName(locale);
+            return sourceCS.getName().toString(locale)+"\u00A0\u21E8\u00A0"+targetCS.getName().toString(locale);
         }
     }
     
@@ -425,7 +425,7 @@ public class CoordinateTransformation extends Info {
          * Gets the provider-supplied remarks.
          */
         public String getRemarks() throws RemoteException {
-            return CoordinateTransformation.this.getRemarks(null);
+            return CoordinateTransformation.this.getRemarks().toString();
         }
         
         /**

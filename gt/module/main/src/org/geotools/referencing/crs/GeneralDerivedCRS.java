@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
@@ -169,9 +169,9 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
         parameters = (GeneralParameterValue[]) properties.get("parameters");
         OperationMethod method = (OperationMethod) properties.get("method");
         if (method == null) {
-            final GeneralOperationParameter[] descriptors;
+            final GeneralParameterDescriptor[] descriptors;
             if (parameters != null) {
-                descriptors = new GeneralOperationParameter[parameters.length];
+                descriptors = new GeneralParameterDescriptor[parameters.length];
                 for (int i=0; i<descriptors.length; i++) {
                     descriptors[i] = parameters[i].getDescriptor();
                 }

@@ -544,7 +544,7 @@ public class OperationJAI extends Operation {
                 if (coordinateSystem.equals(headCS, false)) {
                     targetCS = sourceCS;
                 } else {
-                    targetCS = new CompoundCoordinateSystem(coordinateSystem.getName(null),
+                    targetCS = new CompoundCoordinateSystem(coordinateSystem.getName().toString(),
                                                             coordinateSystem, tailCS);
                 }
                 /*

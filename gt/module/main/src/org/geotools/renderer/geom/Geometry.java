@@ -720,7 +720,7 @@ public abstract class Geometry implements Shape, Cloneable, Serializable {
         }
         if (cs != null) {
             buffer.append("cs=\"");
-            buffer.append(cs.getName(null));
+            buffer.append(cs.getName());
             buffer.append("\", ");
         }
         buffer.append("x={");

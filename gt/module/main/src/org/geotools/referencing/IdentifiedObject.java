@@ -37,12 +37,11 @@ import org.opengis.metadata.Identifier;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
-import org.geotools.util.InternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formattable;
-
+import org.geotools.util.InternationalString;    
 
 /**
  * A base class for metadata applicable to reference system objects.
@@ -192,8 +191,8 @@ public class IdentifiedObject extends Formattable
     {
         ensureNonNull("properties", properties);
         
-        InternationalString name        = new InternationalString();
-        InternationalString remarks     = new InternationalString();
+        InternationalString name        = new org.geotools.util.InternationalString();
+        InternationalString remarks     = new org.geotools.util.InternationalString();
         Identifier[] identifiers        = null;
         /*
          * Iterate through each map entry. This have two purposes:
@@ -275,7 +274,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
         }
         return name.toString( locale );        
     }
-    public InternationalString getName(){
+    public org.opengis.util.InternationalString getName(){
         return name;
     }
     /**
@@ -304,7 +303,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
         }         
         return remarks.toString( locale);
     }
-    public InternationalString getRemarks(){       
+    public org.opengis.util.InternationalString getRemarks(){       
         return remarks;
     }
     
@@ -375,7 +374,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     {
         identifier = identifier.trim();
         if (identifiers==null || identifiers.length==0) {
-            return identifier.equalsIgnoreCase(info.getName(null).trim());
+            return identifier.equalsIgnoreCase(info.getName().toString().trim());
         }
         final String code, codespace;
         final int separator = identifier.indexOf(':');

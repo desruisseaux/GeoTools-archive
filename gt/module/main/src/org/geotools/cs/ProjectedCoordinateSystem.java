@@ -153,13 +153,13 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
         if (invalidParameter != null) {
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_INCOMPATIBLE_ELLIPSOID_$2,
-                    invalidParameter, ellipsoid.getName(null)));
+                    invalidParameter, ellipsoid.getName().toString()));
         }
         if (resetAxisLength) {
             final ParameterList parameters = projection.getParameters();
             parameters.setParameter("semi_major", semiMajor);
             parameters.setParameter("semi_minor", semiMinor);
-            projection = new Projection(projection.getName(null),
+            projection = new Projection(projection.getName().toString(),
                                         projection.getClassName(),
                                         parameters);
         }

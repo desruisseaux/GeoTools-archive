@@ -24,7 +24,7 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
-import javax.units.Unit;
+//import javax.units.Unit;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.datum.Datum;

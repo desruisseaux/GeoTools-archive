@@ -346,7 +346,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
                                                     sourceCS, targetDim, sourceDim);
                     if (tailCS != null) {
                         targetCS = new CompoundCoordinateSystem(
-                                       targetCS.getName(null), targetCS, tailCS);
+                                       targetCS.getName().toString(), targetCS, tailCS);
                     }
                 }
                 try {

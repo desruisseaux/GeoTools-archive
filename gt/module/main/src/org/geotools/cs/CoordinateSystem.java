@@ -294,7 +294,7 @@ public abstract class CoordinateSystem extends Info
             for (int i=0; i<axis.length; i++) {
                 axis[i] = new AxisInfo(getAxis(i), getUnits(i));
             }
-            cs = new org.geotools.referencing.cs.CoordinateSystem(getName(null), axis);
+            cs = new org.geotools.referencing.cs.CoordinateSystem(getName().toString(), axis);
         }
         return cs;
     }    

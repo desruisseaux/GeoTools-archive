@@ -28,7 +28,7 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
+//import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;

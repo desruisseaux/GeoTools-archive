@@ -260,7 +260,7 @@ public class PropertyParser {
     public static final Key PROJECTION_NAME = new Key("Projection name") {
         public Object getValue(final GridCoverage coverage) {
             final Projection proj = CTSUtilities.getProjection(coverage.getCoordinateSystem());
-            return (proj!=null) ? proj.getName(null) : null;
+            return (proj!=null) ? proj.getName().toString() : null;
         }
     };
 
@@ -273,7 +273,7 @@ public class PropertyParser {
     public static final Key COORDINATE_SYSTEM_NAME = new Key("CoordinateSystem name") {
         public Object getValue(final GridCoverage coverage) {
             final CoordinateSystem cs = coverage.getCoordinateSystem();
-            return (cs!=null) ? cs.getName(null) : null;
+            return (cs!=null) ? cs.getName().toString() : null;
         }
     };
 

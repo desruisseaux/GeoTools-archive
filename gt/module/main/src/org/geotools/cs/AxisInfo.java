@@ -30,6 +30,7 @@ import java.io.Serializable;
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
+import org.geotools.util.InternationalString;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -122,7 +123,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getName}.
      */
-    public final String name;
+    public final InternationalString name;
     
     /**
      * Enumerated value for orientation.
@@ -145,7 +146,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param orientation The axis orientation.
      */
     public AxisInfo(final String name, final AxisOrientation orientation) {
-        this.name        = name;
+        this.name        = new InternationalString( name );
         this.orientation = orientation;
         this.unit        = null;
         Info.ensureNonNull("name",        name);
@@ -168,7 +169,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param locale The locale, or <code>null</code> for the default locale.
      * @return The localized string.
      */
-    public String getName(final Locale locale) {
+    public org.opengis.util.InternationalString getName() {
         return name;
     }
     
@@ -218,7 +219,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
 
     /** For compatibility with GeoAPI interfaces. */
     public String getAbbreviation() {
-        return name;
+        return name.toString();
     }
     
     /** For compatibility with GeoAPI interfaces. */
@@ -232,7 +233,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
     }
     
     /** For compatibility with GeoAPI interfaces. */
-    public String getRemarks(Locale locale) {
+    public org.opengis.util.InternationalString  getRemarks() {
         return null;
     }
     

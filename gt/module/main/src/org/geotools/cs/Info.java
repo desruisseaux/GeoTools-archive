@@ -35,6 +35,7 @@ import org.opengis.metadata.Identifier;
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.util.WeakHashSet;
+import org.geotools.util.InternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.cts.Resources;
@@ -104,8 +105,12 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     /**
      * The non-localized object name.
      */
-    private final String name;
+    private final InternationalString name;
     
+    /**
+     * The non-localized object remarks.
+     */
+    private final InternationalString remarks;
     /**
      * Properties for all <code>get</code>methods except {@link #getName}.
      * For example, the method {@link #getAuthorityCode} returns the value
@@ -135,14 +140,17 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      * @param name This object name.
      */
     public Info(final CharSequence name) {
-        ensureNonNull("name", name);
-        this.name = name.toString();
+        ensureNonNull("name", name);                
         if (name instanceof Map) {
-            properties = new InfoProperties((Map) name);
+            // that has to be the strangest thing I have seen in a long time!
+            // JG - a CharSequence that is a map?
+            properties = new InfoProperties( (Map) name);
             proxy = properties.get("proxy");
         } else {
             properties = null;
         }
+        this.name = new InternationalString( name.toString() );
+        this.remarks = new InternationalString( (String) properties.get("remarks") );        
     }
     
     /**
@@ -156,7 +164,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getName()
      */
-    public String getName(final Locale locale) {
+    public org.opengis.util.InternationalString getName() {
         return name;
     }
     
@@ -243,8 +251,8 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getRemarks()
      */
-    public String getRemarks(final Locale locale) {
-        return getProperty("remarks");
+    public org.opengis.util.InternationalString getRemarks() {
+        return remarks;
     }
     
     /**
@@ -382,7 +390,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      * To be overriden by {@link Projection} only.
      */
     String getWKTName(final Locale locale) {
-        return getName(locale);
+        return name.toString(locale);
     }
     
     /**
@@ -611,7 +619,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
          * Gets the name.
          */
         public String getName() throws RemoteException {
-            return Info.this.getName(null);
+            return Info.this.getName().toString();
         }
         
         /**
@@ -646,7 +654,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
          * Gets the provider-supplied remarks.
          */
         public String getRemarks() throws RemoteException {
-            return Info.this.getRemarks(null);
+            return Info.this.getRemarks().toString();
         }
         
         /**

@@ -198,12 +198,12 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test {@link ParameterValue}.
+     * Test {@link Parameter}.
      */
     public void testParameter() {
-        assertEquals(   "intValue", 14,  new ParameterValue("Test", 14).intValue());
-        assertEquals("doubleValue", 27,  new ParameterValue("Test", 27).doubleValue(), 0);
-        assertEquals("doubleValue", 300, new ParameterValue("Test",  3, SI.METER).doubleValue(SI.CENTI(SI.METER)), 0);
+        assertEquals(   "intValue", 14,  new Parameter("Test", 14).intValue());
+        assertEquals("doubleValue", 27,  new Parameter("Test", 27).doubleValue(), 0);
+        assertEquals("doubleValue", 300, new Parameter("Test",  3, SI.METER).doubleValue(SI.CENTI(SI.METER)), 0);
     }
 
     /**

@@ -152,7 +152,7 @@ public final class CTSUtilities {
             while (cs.getDimension() != 2) {
                 if (!(cs instanceof CompoundCoordinateSystem)) {
                     throw new TransformException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs.getName(null)));
+                            ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs.getName().toString()));
                 }
                 cs = ((CompoundCoordinateSystem) cs).getHeadCS();
             }

@@ -26,7 +26,7 @@ package org.geotools.referencing.crs;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Collections;
-import javax.units.Unit;
+//import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS direct dependencies

@@ -25,15 +25,15 @@ package org.geotools.referencing.crs;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Collections;
-import javax.units.NonSI;
+//import javax.units.NonSI;
 import javax.units.Unit;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
+//import org.opengis.referencing.cs.AxisDirection;
+//import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
 import org.geotools.referencing.ReferenceSystem;  // For javadoc

@@ -1430,7 +1430,7 @@ public class Renderer implements Renderer2D {
     private static String toString(final CoordinateSystem cs) {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(cs));
         buffer.append('[');
-        final String name = cs.getName(null);
+        final String name = cs.getName().toString();
         if (name != null) {
             buffer.append('"');
             buffer.append(name);

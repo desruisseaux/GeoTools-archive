@@ -991,7 +991,7 @@ final class LineString implements Serializable {
             if (!Utilities.equals(xUnit, yUnit)) {
                 throw new IllegalArgumentException(Resources.format(
                                             ResourceKeys.ERROR_NON_CARTESIAN_COORDINATE_SYSTEM_$1,
-                                            targetCS.getName(null)));
+                                            targetCS.getName().toString()));
             }
             ellipsoid = CTSUtilities.getHeadGeoEllipsoid(targetCS);
         } else {
@@ -1079,7 +1079,7 @@ final class LineString implements Serializable {
             {
                 throw new IllegalArgumentException(Resources.format(
                                             ResourceKeys.ERROR_NON_CARTESIAN_COORDINATE_SYSTEM_$1,
-                                            targetCS.getName(null)));
+                                            targetCS.getName().toString()));
             }
             final MathTransform tr = transformation.getMathTransform();
             if (!tr.isIdentity()) {

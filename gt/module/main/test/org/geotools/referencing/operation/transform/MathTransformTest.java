@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
-import org.geotools.parameter.ParameterValue;
+import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
@@ -344,16 +344,16 @@ public class MathTransformTest extends TestCase {
             "Affine"
         };
         final String identifier = candidates[random.nextInt(candidates.length)];
-        final ParameterValue[] parameters;
+        final Parameter[] parameters;
         if (identifier.equalsIgnoreCase("Affine")) {
-            parameters = new ParameterValue[] {
-                new ParameterValue("num_row", 2),
-                new ParameterValue("num_col", 2),
-                new ParameterValue("elt_0_0", random.nextDouble()*2+0.1, null),   // scale
-                new ParameterValue("elt_0_1", random.nextDouble()*1 - 2, null)};  // offset
+            parameters = new Parameter[] {
+                new Parameter("num_row", 2),
+                new Parameter("num_col", 2),
+                new Parameter("elt_0_0", random.nextDouble()*2+0.1, null),   // scale
+                new Parameter("elt_0_1", random.nextDouble()*1 - 2, null)};  // offset
         } else {
-            parameters = new ParameterValue[] {
-                new ParameterValue("base", random.nextDouble()*4 + 0.1, null)};
+            parameters = new Parameter[] {
+                new Parameter("base", random.nextDouble()*4 + 0.1, null)};
         }
         return (MathTransform1D) factory.createParameterizedTransform(identifier, parameters);
     }
@@ -442,7 +442,7 @@ public class MathTransformTest extends TestCase {
     {
         assertEquals(input.length, expected.length);
         final MathTransform1D direct = (MathTransform1D) factory.createParameterizedTransform(
-                identifier, new ParameterValue[] {new ParameterValue("base", base, null)});
+                identifier, new Parameter[] {new Parameter("base", base, null)});
 
         final MathTransform1D inverse = (MathTransform1D) direct.inverse();
         final DirectPosition1D point = new DirectPosition1D();

@@ -612,10 +612,10 @@ final class Resampler extends GridCoverage {
             log(Resources.getResources(locale).getLogRecord(Level.FINE,
                 ResourceKeys.APPLIED_RESAMPLE_$11, new Object[] {
                 /*  {0} */ sourceCoverage.getName(locale),
-                /*  {1} */ sourceCoverage.getCoordinateSystem().getName(locale),
+                /*  {1} */ sourceCoverage.getCoordinateSystem().getName().toString(locale),
                 /*  {2} */ new Integer(sourceImage.getWidth()),
                 /*  {3} */ new Integer(sourceImage.getHeight()),
-                /*  {4} */ targetCoverage.getCoordinateSystem().getName(locale),
+                /*  {4} */ targetCoverage.getCoordinateSystem().getName().toString(locale),
                 /*  {5} */ new Integer(targetImage.getWidth()),
                 /*  {6} */ new Integer(targetImage.getHeight()),
                 /*  {7} */ targetImage.getOperationName(),
