@@ -183,6 +183,17 @@ public class WMSComplexTypes {
         }        
     }
     
+    protected static class __ExtendedCapabilitiesType extends WMSComplexType {
+    	private static final WMSComplexType instance = new __ExtendedCapabilitiesType();
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+        
+		public boolean isAbstract() {
+			return true;
+		}
+    }
+    
     protected static class _RequestType extends WMSComplexType {
         private static final WMSComplexType instance = new _RequestType();
         
@@ -542,6 +553,18 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+    }
+    
+    protected static class _OnlineResourceType extends WMSComplexType {
+    	private static final WMSComplexType instance = new _OnlineResourceType();
+    	
+    	private static Attribute[] attrs = new Attribute[] {
+    			//TODO FINISH THIS
+    	};
+    	
+        public static WMSComplexType getInstance() {
+        	return instance;
+        }    	
     }
     
     static class LongitudeType implements SimpleType {

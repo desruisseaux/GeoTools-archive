@@ -17,9 +17,6 @@ import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttribute;
-import org.geotools.xml.schema.DefaultFacet;
-import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
@@ -29,13 +26,15 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AttributeGT;
+import org.geotools.xml.schema.impl.FacetGT;
+import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.wfs.WFSSchema;
+import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import org.geotools.data.wms.xml.WMSComplexTypes.OperationType;
-import org.geotools.data.wms.xml.WMSComplexTypes._WMS_CapabilitiesType;
+import org.geotools.data.wms.xml.WMSComplexTypes.*;
 
 /**
  * @author Richard Gould
@@ -95,7 +94,7 @@ public class WMSSchema implements Schema {
         new WMSElement("Post", _PostType.getInstance()),
                 
         new WMSElement("Exception", _ExceptionType.getInstance()),
-        new WMSElement("_ExtendedCapabilities", _ExtendedCapabilitiesType.getInstance()),
+        new WMSElement("_ExtendedCapabilities", __ExtendedCapabilitiesType.getInstance()),
         
         new WMSElement("Layer", _LayerType.getInstance()),
         new WMSElement("CRS", XSISimpleTypes.String.getInstance()),
@@ -111,7 +110,7 @@ public class WMSSchema implements Schema {
         new WMSElement("FeatureListURL", _FeatureListURLType.getInstance()),
         new WMSElement("Style", _StyleType.getInstance()),
         new WMSElement("LegendURL", _LegendURLType.getInstance()),
-        new WMSElement("StyleSheetURL", _StyleSHeetURLType.getInstance()),
+        new WMSElement("StyleSheetURL", _StyleSheetURLType.getInstance()),
         new WMSElement("StyleURL", _StyleURLType.getInstance()),
         new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance()),
         new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance())
@@ -122,19 +121,19 @@ public class WMSSchema implements Schema {
     };
 
     static final SimpleType[] simpleTypes = new SimpleType[] {
-        new DefaultSimpleType(null, "longitudeType", NAMESPACE, DefaultSimpleType.RESTRICTION,
+        new SimpleTypeGT(null, "longitudeType", NAMESPACE, SimpleType.RESTRICTION,
                 new SimpleType[] { XSISimpleTypes.String.getInstance() },
                 	new Facet[] { 
-                		new DefaultFacet(Facet.MININCLUSIVE, "-180"),
-                		new DefaultFacet(Facet.MAXINCLUSIVE, "180") },
+                		new FacetGT(Facet.MININCLUSIVE, "-180"),
+                		new FacetGT(Facet.MAXINCLUSIVE, "180") },
                 	SimpleType.NONE
                 ),
                 
-        new DefaultSimpleType(null, "latitudeType", NAMESPACE, DefaultSimpleType.RESTRICTION,
+        new SimpleTypeGT(null, "latitudeType", NAMESPACE, SimpleType.RESTRICTION,
                 new SimpleType[] { XSISimpleTypes.String.getInstance() },
                 	new Facet[] { 
-                		new DefaultFacet(Facet.MININCLUSIVE, "-90"),
-                		new DefaultFacet(Facet.MAXINCLUSIVE, "90") },
+                		new FacetGT(Facet.MININCLUSIVE, "-90"),
+                		new FacetGT(Facet.MAXINCLUSIVE, "90") },
                 SimpleType.NONE
         ),
 
@@ -204,12 +203,11 @@ public class WMSSchema implements Schema {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getImports()
-     */
+    private static Schema[] imports = new Schema[]{
+            XLinkSchema.getInstance()
+    };
     public Schema[] getImports() {
-        // TODO Auto-generated method stub
-        return null;
+        return imports;
     }
 
     /* (non-Javadoc)
