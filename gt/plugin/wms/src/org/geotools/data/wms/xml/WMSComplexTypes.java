@@ -2164,7 +2164,7 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(new ElementGrouping[]{elems[0], elems[1], elems[2], elems[3],
                 new ChoiceGT(null, 0, Integer.MAX_VALUE, new Element[]{elems[4], elems[19]}),
                 new ChoiceGT(null, 0, 1, new Element[]{elems[5], elems[20]}), elems[6], elems[7], elems[8], elems[9], elems[10],
-                elems[11], elems[12], elems[13], elems[14], elems[15], elems[16], elems[17], elems[18], elems[21]});
+                elems[11], elems[12], elems[13], elems[14], elems[15], elems[16], elems[17], elems[21], elems[18]});
 
         private static Attribute[] attributes = new Attribute[]{
                 new WMSAttribute(null, "queryable", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(),

@@ -199,7 +199,7 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         boolean textFound = false;
         while ((line = in.readLine()) != null) {
             System.out.println(line);
-            if (line.indexOf("89360") != -1) {
+            if (line.indexOf("570") != -1) {
                 textFound = true;
             }
         }

@@ -22,7 +22,7 @@ import org.geotools.data.wms.WebMapServer;
 public class ServersTest extends TestCase {
     public void testServers() throws Exception{
     	URL[] servers = new URL[15];
-// Access Forbidden   	servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
+//servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
 //This one can't do 1.3.0    	
 //    	servers[1] = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetCapabilities");
 //    	servers[2] = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
@@ -41,6 +41,7 @@ public class ServersTest extends TestCase {
 //    	servers[11] = new URL("http://www.refractions.net:8080/geoserver/wms/?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"); //$NON-NLS-1$
 //Can't parse vendor caps. 1.0.0 freezes.    	
 //    	servers[12] = new URL("http://mapserv2.esrin.esa.it/cubestor/cubeserv/cubeserv.cgi?VERSION=1.1.1&REQUEST=GetCapabilities&SERVICE=WMS");
+//		servers[13] = new URL("http://mesonet.agron.iastate.edu/wms/comprad.php?request=getcapabilities");
    	
     	for (int i = 0; i < servers.length; i++) {
     		if (servers[i] != null) {
