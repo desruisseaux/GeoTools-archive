@@ -88,7 +88,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeInsertSql(current);
-            LOGGER.info(sql);
+            LOGGER.fine(sql);
             statement.executeUpdate(sql);
 
             // should the ID be generated during an insert, we need to read it back
@@ -246,7 +246,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeDeleteSql(current);
-            LOGGER.info(sql);
+            LOGGER.fine(sql);
             //System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException sqle) {
@@ -315,7 +315,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeUpdateSql(live, current);
-            LOGGER.info(sql);
+            LOGGER.fine(sql);
             System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException sqle) {
@@ -362,7 +362,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
             if (!DataUtilities.attributesEqual(currAtt, liveAtt)) {
                 if (LOGGER.isLoggable(Level.INFO)) {
-                    LOGGER.info("modifying att# " + i + " to " + currAtt);
+                    LOGGER.fine("modifying att# " + i + " to " + currAtt);
                 }
 		String colName = encodeName(attributes[i].getName());
                 statementSQL.append(colName).append(" = ")
