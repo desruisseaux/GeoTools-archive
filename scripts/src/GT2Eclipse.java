@@ -340,18 +340,18 @@ public class GT2Eclipse {
 			     String path, String target) {
 	if (new File(project, path + "/" + target + "/src").exists()) {
 	    classpath.println("    <classpathentry kind=\"src\"");
-	    classpath.println("        output=\"" + path + "/" + target
-			      + "/target/classes\"");
-	    classpath.println("        path=\"" + path + "/" + target
-			      + "/src\"/>");
+            classpath.println("        excluding=\"**/.svn/\"");
+	    // comment out output so it uses target\eclipse so M9 and Maven don't trip on each other
+	  //classpath.println("        output=\"" + path + "/" + target + "/target/classes\"");
+	    classpath.println("        path=\"" + path + "/" + target + "/src\"/>");
 	}
 	if (new File(project, path + "/" + target + "/test").exists()) {
 	    classpath.print("      <classpathentry");
 	    classpath.println(" kind=\"src\"");
-	    classpath.println("        output=\"" + path + "/" + target
-			      + "/target/test-classes\"");
-	    classpath.println("        path=\"" + path + "/" + target
-			      + "/test\"/>");
+            classpath.println("        excluding=\"**/.svn/\"");
+	    // comment out output so it uses target\eclipse so M9 and Maven don't trip on each other
+         // classpath.println("        output=\"" + path + "/" + target + "/target/test-classes\"");
+	    classpath.println("        path=\"" + path + "/" + target + "/test\"/>");
 	}
     }
     public static void die( String msg ){
@@ -435,12 +435,11 @@ public class GT2Eclipse {
 					.println("    <classpathentry kind=\"var\" path=\"MAVEN_REPO/"
 							+ jar + "\"/>");
 		}
-		classpath
-				.println("    <classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>");
-		classpath
-				.println("    <classpathentry kind=\"output\" path=\"geotools-src\"/>");
+		classpath.println("    <classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>");
+		classpath.println("    <classpathentry kind=\"output\" path=\"target\\eclise\"/>");
 		classpath.println("</classpath>");
 		classpath.close();
+
 		project.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		project.println("<projectDescription>");
 		project.println("  <name>gtbuild</name>");
