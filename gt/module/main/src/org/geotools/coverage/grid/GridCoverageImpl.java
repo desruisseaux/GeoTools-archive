@@ -278,6 +278,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	public InternationalString[] getDimensionNames() {
 		// TODO Auto-generated method stub
 //		return crs.getCoordinateSystem().getAxis(0).getI;
+		return null;
 	}
 
 	/* (non-Javadoc)
