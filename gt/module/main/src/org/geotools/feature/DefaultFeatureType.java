@@ -73,6 +73,10 @@ public class DefaultFeatureType implements FeatureType {
     /**
      * Constructs a new DefaultFeatureType.
      *
+     * <p>
+     * Attributes from the superTypes will be copied to the list of attributes
+     * for this feature type.  
+     *
      * @param typeName The name to give this FeatureType.
      * @param namespace The namespace of the new FeatureType.
      * @param types The attributeTypes to use for validation.
@@ -91,9 +95,18 @@ public class DefaultFeatureType implements FeatureType {
 
         this.typeName = typeName;
         this.namespace = namespace == null ? GMLSchema.NAMESPACE : namespace;
-        this.types = (AttributeType[]) types.toArray(new AttributeType[types
-                .size()]);
         this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
+                .size()]);
+
+        Collection attributes = new java.util.ArrayList( types );
+        for (int i = 0, ii = ancestors.length; i < ii; i++) {
+            FeatureType ancestor = ancestors[i];
+            for (int j = 0, jj = ancestor.getAttributeCount(); j < jj; j++) {
+                attributes.add(ancestor.getAttributeType(j));
+            }
+        }
+        
+        this.types = (AttributeType[]) attributes.toArray(new AttributeType[attributes
                 .size()]);
 
         this.defaultGeom = defaultGeom;
@@ -161,14 +174,14 @@ public class DefaultFeatureType implements FeatureType {
         if( original == null ) return null;
         FeatureType featureType = original.getFeatureType();
         if (!featureType.equals(this)) { 
-	    throw new IllegalAttributeException("Feature type " + featureType
-						+ " does not match " + this);
+        throw new IllegalAttributeException("Feature type " + featureType
+                        + " does not match " + this);
         }
         String id = original.getID();
         int numAtts = featureType.getAttributeCount();
         Object attributes[] = new Object[numAtts];
         for (int i = 0; i < numAtts; i++) {
-	    AttributeType curAttType = getAttributeType(i);
+        AttributeType curAttType = getAttributeType(i);
             attributes[i] = curAttType.duplicate(original.getAttribute(i));
         }
         return featureType.create(attributes, id );
