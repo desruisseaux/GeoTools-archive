@@ -297,7 +297,7 @@ public class TransactionStateDiff implements State {
         FeatureReader reader = store.getFeatureReader(typeName);
 
         return new DiffFeatureWriter(reader, diff) {
-                void fireNotification(int eventType, Envelope bounds) {
+                public void fireNotification(int eventType, Envelope bounds) {
                     switch (eventType) {
                     case FeatureEvent.FEATURES_ADDED:
                         store.listenerManager.fireFeaturesAdded(typeName,

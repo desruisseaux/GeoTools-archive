@@ -220,5 +220,5 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      *        FeatureType.FEATURES_REMOVED
      * @param bounds
      */
-    abstract void fireNotification(int eventType, Envelope bounds);
+    protected abstract void fireNotification(int eventType, Envelope bounds);
 }
