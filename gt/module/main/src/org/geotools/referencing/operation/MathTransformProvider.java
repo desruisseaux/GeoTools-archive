@@ -302,14 +302,17 @@ public abstract class MathTransformProvider extends OperationMethod {
      *
      * @param  group The parameter value group to search into.
      * @param  param The parameter to look for.
-     * @return The requested parameter value in standard unit.
+     * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo What to do with unit? (if some action is taken, don't forget to check
+     *       for null units).
      */
     protected static double doubleValue(final ParameterValueGroup group,
                                         final OperationParameter  param)
             throws ParameterNotFoundException
     {
-        return getValue(group, param).doubleValue(param.getUnit());
+        return getValue(group, param).doubleValue();
     }
 
     /**
