@@ -16,15 +16,14 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeTable;
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
@@ -37,14 +36,19 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeLayer;
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -137,20 +141,66 @@ class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * Obtains the schema for the given featuretype name.
+     * 
+     * <p>
+     * Just for convenience, if the type name is not full qualified, it will be
+     * prepended by the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string.
+     * Anyway, it is strongly recommended that you use <b>only</b> full
+     * qualified type names. The rational for this is that the actual ArcSDE
+     * name of a featuretype is full qualified,  and more than a single type
+     * can exist with the same non qualified name, if they pertein to
+     * different database users. So, if a non qualified name is passed, the
+     * user name which will be prepended to it is the user used to create the
+     * connections (i.e., the one you specified with the "user" parameter to
+     * create the datastore.
+     * </p>
      *
      * @param typeName DOCUMENT ME!
      *
      * @return DOCUMENT ME!
      *
      * @throws java.io.IOException DOCUMENT ME!
+     * @throws NullPointerException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public synchronized FeatureType getSchema(String typeName)
         throws java.io.IOException {
+        if (typeName == null) {
+            throw new NullPointerException("typeName is null");
+        }
+
+        //connection used to retrieve the user name if a non qualified type name was passed in
+        SeConnection conn = null;
+
+        //check if it is not qualified and prepend it with "instance.user." 
+        if (typeName.indexOf('.') == -1) {
+            try {
+                conn = getConnectionPool().getConnection();
+                LOGGER.warning(
+                    "A non qualified type name was given, qualifying it...");
+                typeName = conn.getDatabaseName() + "." + conn.getUser() + "."
+                    + typeName;
+                LOGGER.info("full qualified name is " + typeName);
+            } catch (DataSourceException e) {
+                throw e;
+            } catch (UnavailableConnectionException e) {
+                throw new DataSourceException("A non qualified type name ("
+                    + typeName
+                    + ") was passed and a connection to retrieve the user name "
+                    + " is not available.", e);
+            } catch (SeException e) {
+                throw new DataSourceException("error obtaining the user name from a connection",
+                    e);
+            } finally {
+                getConnectionPool().release(conn);
+            }
+        }
+
         FeatureType schema = (FeatureType) schemasCache.get(typeName);
 
         if (schema == null) {
-            schema = ArcSDEAdapter.createSchema(getConnectionPool(), typeName);
+            schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName);
             schemasCache.put(typeName, schema);
         }
 
@@ -158,21 +208,221 @@ class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
+     * Creates the given featuretype in the underlying ArcSDE database.
+     * 
+     * <p>
+     * The common use case to create an ArcSDE layer is to setup the SeTable
+     * object with all the non-geometry attributes first, then create the
+     * SeLayer and set the geometry column name and its properties. This
+     * approach brings a nice problem, since we need to create the attributes
+     * in exactly the same order as specified in the passed FeatureType, which
+     * means that the geometry attribute needs not to be the last one.
+     * </p>
+     * 
+     * <p>
+     * To avoid this, the following workaround is performed: instead of
+     * creating the schema as described above, we will first create the
+     * SeTable with a single, temporary column, since it is not possible to
+     * create a table without columns. The, we will iterate over the
+     * AttributeTypes and add them as they appear using
+     * <code>SeTable.addColumn(SeColumnDefinition)</code>. But if we found
+     * that the current AttributeType is geometric, instead of adding the
+     * column we just create the SeLayer object. This way, the geometric
+     * attribute is inserted at the end, and then we keep iterating and adding
+     * the rest of the columns. Finally, the first column is removed, since it
+     * was temporal (note that I advertise it, it is a _workaround_).
+     * </p>
      *
+     * @param featureType the feature type containing the name, attributes and
+     *        coordinate reference system of the new ArcSDE layer.
+     *
+     * @throws IOException see <code>throws DataSourceException</code> bellow
+     * @throws IllegalArgumentException if the passed feature type does not
+     *         contains at least one geometric attribute, or if the type name
+     *         contains '.' (dots).
+     * @throws NullPointerException if <code>featureType</code> is
+     *         <code>null</code>
+     * @throws DataSourceException if there is <b>not an available (free)
+     *         connection</b> to the ArcSDE instance(in that case maybe you
+     *         need to increase the maximun number of connections for the
+     *         connection pool), or an SeException exception is catched while
+     *         creating the feature type at the ArcSDE instance (e.g. a table
+     *         with that name already exists).
      */
-    public void createSchema(FeatureType featureType) throws IOException {
-        SeConnection connection = null;
+    public void createSchema(FeatureType featureType)
+        throws IOException, IllegalArgumentException {
+        if (featureType == null) {
+            throw new NullPointerException(
+                "You have to provide a FeatureType instance");
+        }
+
+        if (featureType.getDefaultGeometry() == null) {
+            throw new IllegalArgumentException(
+                "FeatureType must have at least a geometry attribute");
+        }
+
+        final String nonQualifiedTypeName = featureType.getTypeName();
+
+        if (nonQualifiedTypeName.indexOf('.') != -1) {
+            throw new IllegalArgumentException(
+                "Please do not use type names that contains '.' (dots)");
+        }
 
         // Create a new SeTable/SeLayer with the specified attributes....
+        SeConnection connection = null;
+        SeTable table = null;
+        SeLayer layer = null;
+
+        //flag to know if the table was created by us when catching an exception.
+        boolean tableCreated = false;
+
+        //placeholder to a catched exception to know in the finally block
+        //if we should cleanup the crap we left in the database
+        Exception error = null;
+
         try {
             connection = connectionPool.getConnection();
+
+            //create a table with provided username
+            String qualifiedName = connection.getUser() + "."
+                + featureType.getTypeName();
+            LOGGER.info("new full qualified type name: " + qualifiedName);
+
+            layer = new SeLayer(connection);
+            layer.setTableName(qualifiedName);
+
+            final String HACK_COL_NAME = "gt_workaround_col_";
+            table = createSeTable(connection, qualifiedName, HACK_COL_NAME);
+            tableCreated = true;
+
+            AttributeType[] atts = featureType.getAttributeTypes();
+            AttributeType currAtt;
+
+            for (int currAttIndex = 0; currAttIndex < atts.length;
+                    currAttIndex++) {
+                currAtt = atts[currAttIndex];
+
+                if (currAtt instanceof GeometryAttributeType) {
+                    GeometryAttributeType geometryAtt = (GeometryAttributeType) currAtt;
+                    createSeLayer(layer, qualifiedName, geometryAtt);
+                } else {
+                    LOGGER.info("Creating column definition for " + currAtt);
+
+                    SeColumnDefinition newCol = ArcSDEAdapter
+                        .createSeColumnDefinition(currAtt);
+                    ///////////////////////////////////////////////////////////////
+                    //HACK!!!!: this hack is just to avoid the error that occurs //
+                    //when adding a column wich is not nillable. Need to fix this//
+                    //but by now it conflicts with the requirement of creating   //
+                    //the schema with the correct attribute order.               //
+                    ///////////////////////////////////////////////////////////////
+                    newCol = new SeColumnDefinition(newCol.getName(), newCol.getType(),
+                    		newCol.getSize(), newCol.getScale(), true);
+                    ///////////////////////////////////////////////////////////////
+                    //END of horrible HACK                                       //
+                    ///////////////////////////////////////////////////////////////
+                    LOGGER.info("Adding column " + newCol.getName() + " to the actual table.");
+                    table.addColumn(newCol);
+                }
+            }
+
+            LOGGER.info("deleting the 'workaround' column...");
+            table.dropColumn(HACK_COL_NAME);
+            LOGGER.info("Schema correctly created: " + featureType);
+        } catch (SeException e) {
+            LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
+            throw new DataSourceException(e.getMessage(), e);
         } catch (DataSourceException dse) {
             LOGGER.log(Level.WARNING, dse.getMessage(), dse);
+            throw dse;
         } catch (UnavailableConnectionException uce) {
             LOGGER.log(Level.WARNING, uce.getMessage(), uce);
+            throw new DataSourceException(uce.getMessage(), uce);
         } finally {
+            if ((error != null) && tableCreated) {
+            }
+
             connectionPool.release(connection);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param connection
+     * @param qualifiedName
+     * @param hackColName DOCUMENT ME!
+     *
+     * @return
+     *
+     * @throws SeException
+     */
+    private SeTable createSeTable(SeConnection connection,
+        String qualifiedName, String hackColName) throws SeException {
+        SeTable table;
+        final SeColumnDefinition[] tmpCol = {
+                new SeColumnDefinition(hackColName,
+                    SeColumnDefinition.TYPE_SMALLINT, 4, 0, true)
+            };
+        table = new SeTable(connection, qualifiedName);
+
+        LOGGER.info("creating table " + qualifiedName);
+
+        //create the table using DBMS default configuration keyword.
+        //valid keywords are defined in the dbtune table.
+        table.create(tmpCol, "DEFAULTS");
+        LOGGER.info("table " + qualifiedName + " created...");
+
+        return table;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param layer
+     * @param qualifiedName
+     * @param geometryAtt
+     *
+     * @throws SeException
+     */
+    private void createSeLayer(SeLayer layer, String qualifiedName,
+        GeometryAttributeType geometryAtt) throws SeException {
+        String spatialColName = geometryAtt.getName();
+        LOGGER.info("setting spatial column name: " + spatialColName);
+        layer.setSpatialColumnName(spatialColName);
+
+        //Set the shape types that can be inserted into this layer
+        int seShapeTypes = ArcSDEAdapter.guessShapeTypes(geometryAtt);
+        layer.setShapeTypes(seShapeTypes);
+        layer.setGridSizes(1100, 0, 0);
+        layer.setExtent(new SeExtent(-180, -90, 180, 90));
+
+        //Define the layer's Coordinate Reference
+        CoordinateReferenceSystem crs = geometryAtt.getCoordinateSystem();
+
+        if (crs == null) {
+            LOGGER.warning("Creating feature type " + qualifiedName
+                + ": the geometry attribute does not supply a coordinate reference system");
+        } else {
+            SeCoordinateReference coordref = new SeCoordinateReference();
+            LOGGER.info("Creating the SeCoordRef object for CRS " + crs);
+
+            String WKT = crs.toWKT();
+            coordref.setCoordSysByDescription(WKT);
+            LOGGER.info("Applying CRS " + coordref.getCoordSysDescription());
+            layer.setCoordRef(coordref);
+            LOGGER.info("CRS applyed to the new layer.");
+        }
+
+        //this param is used by ArcSDE for database initialization purposes
+        int estInitFeatCount = 100;
+
+        //this param is used by ArcSDE as an estimation of the average number
+        //of points the layer's geometries will have, one never will know what for
+        int estAvgPointsPerFeature = 4;
+        LOGGER.info("Creating the layer...");
+        layer.create(estInitFeatCount, estAvgPointsPerFeature);
+        LOGGER.info("ArcSDE layer created.");
     }
 
     /**
@@ -431,12 +681,14 @@ class ArcSDEDataStore extends AbstractDataStore {
         Transaction transaction) throws IOException {
         ArcTransactionState state = null;
 
-        synchronized (this) {
-            state = (ArcTransactionState) transaction.getState(this);
+        if (Transaction.AUTO_COMMIT != transaction) {
+            synchronized (this) {
+                state = (ArcTransactionState) transaction.getState(this);
 
-            if (state == null) {
-                state = new ArcTransactionState(this);
-                transaction.putState(this, state);
+                if (state == null) {
+                    state = new ArcTransactionState(this);
+                    transaction.putState(this, state);
+                }
             }
         }
 

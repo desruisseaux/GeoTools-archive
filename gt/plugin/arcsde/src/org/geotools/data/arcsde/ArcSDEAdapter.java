@@ -17,10 +17,13 @@
 package org.geotools.data.arcsde;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -28,9 +31,11 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.GeometryEncoderException;
@@ -38,8 +43,13 @@ import org.geotools.filter.GeometryEncoderSDE;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderSDE;
 import org.geotools.filter.SQLUnpacker;
+import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
@@ -47,9 +57,12 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -66,36 +79,48 @@ public class ArcSDEAdapter {
                                                                              .getName());
 
     /** mappings of SDE attribute's types to Java ones */
-    private static final Map sdeTypes = new HashMap();
+    private static final Map sde2JavaTypes = new HashMap();
 
     /** inverse of sdeTypes, maps Java types to SDE ones */
-    private static final Map javaTypes = new HashMap();
+    private static final Map java2SDETypes = new HashMap();
 
     static {
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_STRING), String.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_SMALLINT), Short.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_INTEGER), Integer.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT), Float.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_DOUBLE), Double.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_DATE), Date.class);
-        sdeTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB), byte[].class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_STRING),
+            String.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT16),
+            Short.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT32),
+            Integer.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT32),
+            Float.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT64),
+            Double.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DATE), Date.class);
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),
+            byte[].class);
+
+        /**
+         * By now keep using the deprecated constants (TYPE_INTEGER, etc.),
+         * switching directly to the new ones gives problems with ArcSDE
+         * instances prior to version 9.0.
+         */
 
         //SeColumnDefinition.TYPE_RASTER is not supported...
-        javaTypes.put(String.class,
+        java2SDETypes.put(String.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_STRING, 255, 0));
-        javaTypes.put(Short.class,
+        java2SDETypes.put(Short.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_SMALLINT, 4, 0));
-        javaTypes.put(Integer.class,
+        java2SDETypes.put(Integer.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
-        javaTypes.put(Float.class,
+        java2SDETypes.put(Float.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_FLOAT, 5, 2));
-        javaTypes.put(Double.class,
+        java2SDETypes.put(Double.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
-        javaTypes.put(Date.class,
+        java2SDETypes.put(Date.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_DATE, 1, 0));
-        javaTypes.put(byte[].class,
+        java2SDETypes.put(byte[].class,
             new SdeTypeDef(SeColumnDefinition.TYPE_BLOB, 1, 0));
-        javaTypes.put(Number.class,
+        java2SDETypes.put(Number.class,
             new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
     }
 
@@ -106,24 +131,16 @@ public class ArcSDEAdapter {
      *
      * @return DOCUMENT ME!
      *
+     * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public static int guessShapeTypes(AttributeType attribute) {
+    public static int guessShapeTypes(GeometryAttributeType attribute) {
         if (attribute == null) {
-            throw new IllegalArgumentException("null is not valid as argument");
-        }
-
-        if (!attribute.isGeometry()) {
-            throw new IllegalArgumentException(attribute.getName()
-                + " is not a geometry attribute");
+            throw new NullPointerException(
+                "a GeometryAttributeType must be provided, got null");
         }
 
         Class geometryClass = attribute.getType();
-
-        if (Geometry.class.isAssignableFrom(geometryClass)) {
-            throw new IllegalArgumentException(geometryClass
-                + " is not a valid Geometry class");
-        }
 
         int shapeTypes = 0;
 
@@ -145,12 +162,18 @@ public class ArcSDEAdapter {
                     "no SDE geometry mapping for " + geometryClass);
             }
         } else {
-            if (geometryClass == MultiPoint.class) {
+            if (geometryClass == Point.class) {
                 shapeTypes |= SeLayer.SE_POINT_TYPE_MASK;
-            } else if (geometryClass == MultiLineString.class) {
+            } else if (geometryClass == LineString.class) {
                 shapeTypes |= SeLayer.SE_LINE_TYPE_MASK;
-            } else if (geometryClass == MultiPolygon.class) {
+            } else if (geometryClass == Polygon.class) {
                 shapeTypes |= SeLayer.SE_AREA_TYPE_MASK;
+            } else if (geometryClass == Geometry.class) {
+                LOGGER.info(
+                    "Creating SeShape types for all types of geometries.");
+                shapeTypes |= (SeLayer.SE_MULTIPART_TYPE_MASK
+                | SeLayer.SE_POINT_TYPE_MASK | SeLayer.SE_LINE_TYPE_MASK
+                | SeLayer.SE_AREA_TYPE_MASK);
             } else {
                 throw new IllegalArgumentException(
                     "no SDE geometry mapping for " + geometryClass);
@@ -167,7 +190,8 @@ public class ArcSDEAdapter {
         throws DataSourceException {
         int nCols = featureType.getAttributeCount();
         AttributeType[] atts = featureType.getAttributeTypes();
-        SeColumnDefinition[] coldefs = new SeColumnDefinition[nCols];
+        AttributeType currAtt;
+        List coldefs = new ArrayList(nCols - 1);
 
         //new SeColumnDefinition( "Integer_Val", SeColumnDefinition.TYPE_INTEGER, 10, 0, isNullable);
         for (int i = 0; i < nCols; i++) {
@@ -175,34 +199,102 @@ public class ArcSDEAdapter {
                 continue;
             }
 
-            String attName = atts[i].getName();
-            Class attClass = atts[i].getType();
-            boolean nillable = atts[i].isNillable();
+            currAtt = atts[i];
 
-            SdeTypeDef sdeType = (SdeTypeDef) javaTypes.get(attClass);
-
-            if (sdeType == null) {
-                throw new DataSourceException(
-                    "No ArcSDE equivalent type found for: "
-                    + attClass.getName());
-            }
-
+            /*
+               String attName = currAtt.getName();
+               Class attClass = currAtt.getType();
+               LOGGER.info("Creating SeColumnDefinition for field "
+                   + currAtt.getName());
+               SdeTypeDef sdeType = getSdeType(attClass);
+               LOGGER.fine("Java type is " + attClass
+                   + ", SeColumnDefinition type is " + sdeType.colDefType);
+               if (currAtt.getFieldLength() != 0) {
+                   LOGGER.fine("Setting field length to "
+                       + currAtt.getFieldLength());
+                   sdeType.size = currAtt.getFieldLength();
+               }
+               boolean nillable = currAtt.isNillable();
+               LOGGER.fine("Nillable: " + nillable);
+               LOGGER.info("SeColumnDefinition  params: " + sdeType);
+             */
             try {
-                coldefs[i] = new SeColumnDefinition(attName,
-                        sdeType.colDefType, sdeType.size, sdeType.scale,
-                        nillable);
+                SeColumnDefinition colDef = createSeColumnDefinition(currAtt);
+                coldefs.add(colDef);
             } catch (SeException ex) {
                 throw new DataSourceException(
-                    "Cannot create the column definition named " + attName
-                    + ": " + ex.getSeError().getSdeErrMsg(), ex);
+                    "Cannot create the column definition named "
+                    + currAtt.getName() + ": " + ex.getSeError().getSdeErrMsg(),
+                    ex);
             }
         }
 
-        return coldefs;
+        return (SeColumnDefinition[]) coldefs.toArray(new SeColumnDefinition[coldefs
+            .size()]);
     }
 
     /**
-     * creates the schema of a given ArcSDE featureclass
+     * DOCUMENT ME!
+     *
+     * @param type DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws SeException DOCUMENT ME!
+     */
+    public static SeColumnDefinition createSeColumnDefinition(
+        AttributeType type) throws SeException {
+        SeColumnDefinition colDef = null;
+        String colName = type.getName();
+        int fieldLength;
+        int fieldScale;
+        boolean nillable = type.isNillable();
+
+        SdeTypeDef def = getSdeType(type.getType());
+
+        LOGGER.info("def.type=" + def.colDefType + ", string type="
+            + SeColumnDefinition.TYPE_STRING);
+
+        if (type.getType() == String.class) {
+            fieldLength = (type.getFieldLength() == 0) ? def.size
+                                                       : type.getFieldLength();
+            fieldScale = def.scale;
+        } else {
+            fieldLength = def.size;
+            fieldScale = (type.getFieldLength() == 0) ? def.scale
+                                                      : type.getFieldLength();
+        }
+
+        colDef = new SeColumnDefinition(colName, def.colDefType, fieldLength,
+                def.scale, nillable);
+
+        return colDef;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param attClass
+     *
+     * @return an SdeTypeDef instance with default values for the given class
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    private static SdeTypeDef getSdeType(Class attClass)
+        throws IllegalArgumentException {
+        SdeTypeDef sdeType = (SdeTypeDef) java2SDETypes.get(attClass);
+
+        if (sdeType == null) {
+            throw new IllegalArgumentException("No SDE type mapping for "
+                + attClass.getName());
+        }
+
+        return sdeType;
+    }
+
+    /**
+     * Fetches the schema of a given ArcSDE featureclass and creates its
+     * corresponding Geotools FeatureType
      *
      * @param connPool DOCUMENT ME!
      * @param typeName DOCUMENT ME!
@@ -212,7 +304,7 @@ public class ArcSDEAdapter {
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
      */
-    public static FeatureType createSchema(ArcSDEConnectionPool connPool,
+    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool,
         String typeName) throws IOException {
         SeLayer sdeLayer = connPool.getSdeLayer(typeName);
         SeTable sdeTable = connPool.getSdeTable(typeName);
@@ -249,19 +341,20 @@ public class ArcSDEAdapter {
         int fieldLen;
         Object defValue;
 
-        SeColumnDefinition[] wichCols = null;
+        SeColumnDefinition[] seColumns = null;
 
         try {
-            wichCols = table.describe();
+            seColumns = table.describe();
         } catch (SeException ex) {
+            LOGGER.log(Level.WARNING, ex.getSeError().getErrDesc(), ex);
             throw new DataSourceException("Error obtaining table schema from "
                 + table.getQualifiedName());
         }
 
-        int nCols = wichCols.length;
+        int nCols = seColumns.length;
         AttributeType[] attTypes = new AttributeType[nCols];
         AttributeType attribute = null;
-        Class typeClass;
+        Class typeClass = null;
 
         for (int i = 0; i < nCols; i++) {
             //well, once again, the "great" ArcSDE Java API seems to not provide
@@ -273,28 +366,71 @@ public class ArcSDEAdapter {
             isNilable = true;
             defValue = null;
 
-            Integer sdeType = new Integer(wichCols[i].getType());
-            fieldLen = wichCols[i].getSize();
+            Integer sdeType = new Integer(seColumns[i].getType());
+            fieldLen = seColumns[i].getSize();
 
             if (sdeType.intValue() == SeColumnDefinition.TYPE_SHAPE) {
+                CoordinateReferenceSystem crs = null;
+
+                crs = parseCRS(sdeLayer);
+
                 int seShapeType = sdeLayer.getShapeTypes();
                 typeClass = getGeometryType(seShapeType);
                 isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
                 defValue = GeometryBuilder.defaultValueFor(typeClass);
+                attribute = new DefaultAttributeType.Geometric(seColumns[i]
+                        .getName(), typeClass, isNilable, 0, defValue, crs);
             } else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
                 throw new DataSourceException(
                     "Raster columns are not supported yet");
             } else {
-                typeClass = (Class) sdeTypes.get(sdeType);
+                typeClass = (Class) sde2JavaTypes.get(sdeType);
+                attribute = DefaultAttributeTypeFactory.newAttributeType(seColumns[i]
+                        .getName(), typeClass, isNilable, fieldLen, defValue);
             }
-
-            attribute = DefaultAttributeTypeFactory.newAttributeType(wichCols[i]
-                    .getName(), typeClass, isNilable, fieldLen, defValue);
 
             attTypes[i] = attribute;
         }
 
         return attTypes;
+    }
+
+    /**
+     * Obtains the <code>SeCoordinateReference</code> of the given
+     * <code>SeLayer</code> and tries to create a
+     * <code>org.opengis.referencing.crs.CoordinateReferenceSystem</code> from
+     * its WKT.
+     *
+     * @param sdeLayer the SeLayer from which to query the CRS in ArcSDE form.
+     *
+     * @return the actual CRS or null if <code>sdeLayer</code> does not defines
+     *         its coordinate system.
+     *
+     * @throws DataSourceException if the WKT can't be parsed to an opengis CRS
+     *         using the CRSFactory
+     */
+    private static CoordinateReferenceSystem parseCRS(SeLayer sdeLayer)
+        throws DataSourceException {
+        CoordinateReferenceSystem crs = null;
+        SeCoordinateReference seCRS = sdeLayer.getCoordRef();
+        String WKT = seCRS.getProjectionDescription();
+
+        if ("UNKNOWN".equalsIgnoreCase(WKT)) {
+            LOGGER.warning("ArcSDE layer " + sdeLayer.getName()
+                + " does not provides a Coordinate Reference System");
+        } else {
+            CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+
+            try {
+                crs = crsFactory.createFromWKT(WKT);
+            } catch (FactoryException e) {
+                LOGGER.warning("CRS factory does not knows how to parse " + WKT);
+                throw new DataSourceException("Can't build CRS provided by ArcSDE",
+                    e);
+            }
+        }
+
+        return crs;
     }
 
     /**
@@ -506,57 +642,61 @@ public class ArcSDEAdapter {
     }
 
     /**
-	 * Returns the numeric identifier of a FeatureId, given by the full
-	 * qualified name of the featureclass prepended to the ArcSDE feature id.
-	 * ej: SDE.SDE.SOME_LAYER.1
-	 *
-	 * @param fid a geotools FeatureID
-	 *
-	 * @return an ArcSDE feature ID
-	 *
-	 * @throws IllegalArgumentException If the given string is not properly
-	 *         formatted [anystring].[long value]
-	 */
-	public static long getNumericFid(String fid)
-	    throws IllegalArgumentException {
-	    int dotIndex = fid.lastIndexOf('.');
-	
-	    try {
-	        return Long.decode(fid.substring(++dotIndex)).longValue();
-	    } catch (Exception ex) {
-	        throw new IllegalArgumentException("FeatureID " + fid
-	            + " does not seems as a valid ArcSDE FID");
-	    }
-	}
+     * Returns the numeric identifier of a FeatureId, given by the full
+     * qualified name of the featureclass prepended to the ArcSDE feature id.
+     * ej: SDE.SDE.SOME_LAYER.1
+     *
+     * @param fid a geotools FeatureID
+     *
+     * @return an ArcSDE feature ID
+     *
+     * @throws IllegalArgumentException If the given string is not properly
+     *         formatted [anystring].[long value]
+     */
+    public static long getNumericFid(String fid)
+        throws IllegalArgumentException {
+        int dotIndex = fid.lastIndexOf('.');
 
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param stringFids DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 *
-	 * @throws IllegalArgumentException DOCUMENT ME!
-	 */
-	public static long[] getNumericFids(String[] stringFids)
-	    throws IllegalArgumentException {
-	    int nfids = stringFids.length;
-	    long[] fids = new long[nfids];
-	
-	    for (int i = 0; i < nfids; i++) {
-	        fids[i] = ArcSDEAdapter.getNumericFid(stringFids[i]);
-	    }
-	
-	    return fids;
-	}
+        try {
+            return Long.decode(fid.substring(++dotIndex)).longValue();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("FeatureID " + fid
+                + " does not seems as a valid ArcSDE FID");
+        }
+    }
 
-	/**
+    /**
      * DOCUMENT ME!
      *
-     * @author $author$
+     * @param stringFids DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public static long[] getNumericFids(String[] stringFids)
+        throws IllegalArgumentException {
+        int nfids = stringFids.length;
+        long[] fids = new long[nfids];
+
+        for (int i = 0; i < nfids; i++) {
+            fids[i] = ArcSDEAdapter.getNumericFid(stringFids[i]);
+        }
+
+        return fids;
+    }
+
+    /**
+     * Holds default values for the properties (size and scale) of a
+     * SeColumnDefinition, given by its column type
+     * (SeColumnDefinition.SE_STRING, etc).
+     * 
+     * <p></p>
+     *
+     * @author Gabriel Roldan, Axios Engineering
      * @version $Revision: 1.4 $
      */
-    public static class SdeTypeDef {
+    private static class SdeTypeDef {
         /** DOCUMENT ME! */
         final int colDefType;
 
@@ -578,6 +718,16 @@ public class ArcSDEAdapter {
             this.size = size;
             this.scale = scale;
         }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public String toString() {
+            return "SdeTypeDef[colDefType=" + colDefType + ", size=" + size
+            + ", scale=" + scale + "]";
+        }
     }
 
     /**
@@ -587,16 +737,16 @@ public class ArcSDEAdapter {
      * @version $Revision: 1.9 $
      */
     public static class FilterSet {
-        /** DOCUMENT ME!  */
+        /** DOCUMENT ME! */
         private Filter sourceFilter;
 
-        /** DOCUMENT ME!  */
+        /** DOCUMENT ME! */
         private Filter sqlFilter;
 
-        /** DOCUMENT ME!  */
+        /** DOCUMENT ME! */
         private Filter geometryFilter;
 
-        /** DOCUMENT ME!  */
+        /** DOCUMENT ME! */
         private Filter unsupportedFilter;
 
         /** DOCUMENT ME! */

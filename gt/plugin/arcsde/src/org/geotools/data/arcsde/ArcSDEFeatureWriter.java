@@ -34,6 +34,7 @@ import org.geotools.feature.IllegalAttributeException;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeInsert;
@@ -134,7 +135,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
      */
     public FeatureType getFeatureType() {
         try {
-            return ArcSDEAdapter.createSchema(dataStore.getConnectionPool(),
+            return ArcSDEAdapter.fetchSchema(dataStore.getConnectionPool(),
                 layer.getQualifiedName());
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
@@ -449,11 +450,13 @@ class ArcSDEFeatureWriter implements FeatureWriter {
                 try {
                     GeometryBuilder geometryBuilder = GeometryBuilder
                         .builderFor(value.getClass());
-                    SeShape shape = geometryBuilder.constructShape((Geometry) value,
-                            layer.getCoordRef());
+                    SeCoordinateReference coordRef = layer.getCoordRef();
+                    Geometry geom = (Geometry) value;
+                    SeShape shape = geometryBuilder.constructShape(geom, coordRef);
                     row.setShape(index, shape);
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                	String msg = e instanceof SeException? ((SeException)e).getSeError().getErrDesc() : e.getMessage();
+                    LOGGER.log(Level.WARNING, msg, e);
                     throw new IOException(e.getMessage());
                 }
             } else {

@@ -16,15 +16,16 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.logging.Logger;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
+import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeTable;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import junit.framework.TestCase;
-
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -48,15 +49,18 @@ import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.xml.sax.helpers.ParserAdapter;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 
 /**
- * SdeDatasource's test cases
+ * ArcSDEDAtaStore test cases
  *
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEDataStoreTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDEDataStoreTest extends TestCase {
@@ -111,7 +115,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         testData = null;
         super.tearDown();
     }
-
+    
     /**
      * DOCUMENT ME!
      *
@@ -143,7 +147,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         congfig = new ConnectionConfig(testData.getConProps());
 
         try {
-            ArcSDEConnectionPool pool = pf.getPoolFor(congfig);
+            ArcSDEConnectionPool pool = pf.createPool(congfig);
             LOGGER.info("connection succeed " + pool.getPoolSize()
                 + " connections ready");
         } catch (DataSourceException ex) {
@@ -165,6 +169,10 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void testGetTypeNames() throws IOException {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
+
+        for (int i = 0; i < featureTypes.length; i++)
+            System.out.println(featureTypes[i]);
+
         testTypeExists(featureTypes, testData.getPoint_table());
         testTypeExists(featureTypes, testData.getLine_table());
         testTypeExists(featureTypes, testData.getPolygon_table());
@@ -209,7 +217,8 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     public void testGetFeatureReader()
         throws IOException, IllegalAttributeException {
-        final int NUM_READERS = Integer.parseInt(testData.getConProps().getProperty("pool.maxConnections"));
+        final int NUM_READERS = Integer.parseInt(testData.getConProps()
+                                                         .getProperty("pool.maxConnections"));
         String[] typeNames = {
                 testData.getPoint_table(), testData.getLine_table(),
                 testData.getPolygon_table()
@@ -358,26 +367,36 @@ public class ArcSDEDataStoreTest extends TestCase {
         //verify both filter constraints are met
         testFilter(mixedFilter, fs, EXPECTED_RESULT_COUNT);
 
-        //check that getBounds and getCount do function
-        FeatureResults results = fs.getFeatures(mixedFilter);
-        Envelope bounds = results.getBounds();
-        assertNotNull(bounds);
-        LOGGER.info("results bounds: " + bounds);
+        final int LOOP_COUNT = 6;
 
-        FeatureReader reader = results.reader();
+        for (int i = 0; i < LOOP_COUNT;) {
+        	LOGGER.info("Running #" + i + " iteration for mixed query test");
+            //check that getBounds and getCount do function
+            try {
+				FeatureResults results = fs.getFeatures(mixedFilter);
+				Envelope bounds = results.getBounds();
+				assertNotNull(bounds);
+				LOGGER.info("results bounds: " + bounds);
 
-        /*verify that then features are already being fetched, getBounds and
-         * getCount still work
-         */
-        reader.next();
-        bounds = results.getBounds();
-        assertNotNull(bounds);
-        LOGGER.info("results bounds when reading: " + bounds);
+				FeatureReader reader = results.reader();
 
-        int count = results.getCount();
-        assertEquals(EXPECTED_RESULT_COUNT, count);
-        LOGGER.info("wooohoooo...");
-        reader.close();
+				/*verify that then features are already being fetched, getBounds and
+				 * getCount still work
+				 */
+				reader.next();
+				bounds = results.getBounds();
+				assertNotNull(bounds);
+				LOGGER.info("results bounds when reading: " + bounds);
+
+				int count = results.getCount();
+				assertEquals(EXPECTED_RESULT_COUNT, count);
+				LOGGER.info("wooohoooo...");
+				reader.close();
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, "At iteration " + i, e);
+				throw e;
+			}
+        }
     }
 
     /**
@@ -385,22 +404,18 @@ public class ArcSDEDataStoreTest extends TestCase {
      *
      * @throws UnsupportedOperationException DOCUMENT ME!
      */
-    /*
     public void testFidFilters() {
         throw new UnsupportedOperationException("Don't forget to implement");
     }
-    */
 
     /**
      * Test that all supported geometry filters are working properly
      *
      * @throws UnsupportedOperationException DOCUMENT ME!
      */
-    /*
     public void testGeometryFilters() {
         throw new UnsupportedOperationException("Don't forget to implement");
     }
-    */
 
     /**
      * test that getFeatureSource over the point_table table works

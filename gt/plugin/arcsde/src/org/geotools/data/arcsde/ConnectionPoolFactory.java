@@ -69,7 +69,7 @@ class ConnectionPoolFactory {
      *
      * @throws DataSourceException DOCUMENT ME!
      */
-    public synchronized ArcSDEConnectionPool getPoolFor(ConnectionConfig config)
+    public synchronized ArcSDEConnectionPool createPool(ConnectionConfig config)
         throws DataSourceException {
         ArcSDEConnectionPool pool = (ArcSDEConnectionPool) currentPools.get(config);
 

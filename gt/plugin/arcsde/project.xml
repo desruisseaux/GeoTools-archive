@@ -54,6 +54,16 @@
       <version>SNAPSHOT</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
+    <dependency>
+      <artifactId>epsg</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <artifactId>units</artifactId>
+      <groupId>units</groupId>
+      <version>0.01</version>
+    </dependency>
 
     <dependency>
       <artifactId>jsde_sdk</artifactId>
@@ -87,8 +97,8 @@
       <excludes>
         <exclude>**/ArcSDEDataStoreTest.java</exclude>
         <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
-        <exclude>**/ArcSDEQueryTest.java</exclude>
         <exclude>**/ArcSDEFeatureStoreTest.java</exclude>
+        <exclude>**/ArcSDEQueryTest.java</exclude>
         <exclude>**/FilterTest.java</exclude>
       </excludes>
       <!-- End exclude tests -->

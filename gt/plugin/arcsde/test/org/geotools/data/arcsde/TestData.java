@@ -94,7 +94,7 @@ public class TestData {
         //that a failed test leaves in use connections and affect the next tests
         pfac.clear();
         ConnectionConfig config = new ConnectionConfig(conProps);
-        ArcSDEConnectionPool pool = pfac.getPoolFor(config);
+        ArcSDEConnectionPool pool = pfac.createPool(config);
         ArcSDEDataStore ds = new ArcSDEDataStore(pool);
 
         return ds;

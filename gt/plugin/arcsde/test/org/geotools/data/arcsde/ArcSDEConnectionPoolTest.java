@@ -16,6 +16,9 @@
  */
 package org.geotools.data.arcsde;
 
+import com.esri.sde.sdk.client.SeConnection;
+import junit.framework.TestCase;
+import org.geotools.data.DataSourceException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -23,25 +26,26 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
-import org.geotools.data.DataSourceException;
-
-import com.esri.sde.sdk.client.SeConnection;
-
 
 /**
  * Tests de functionality of a pool of ArcSDE connection objects over a live
  * ArcSDE database
  *
- * @author Gabriel Roldán
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEConnectionPoolTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDEConnectionPoolTest extends TestCase {
+    /** DOCUMENT ME!  */
     private static Logger LOGGER = Logger.getLogger("org.geotools.data.sde");
+
+    /** DOCUMENT ME!  */
     private Map connectionParameters;
-    private ConnectionConfig ConnectionConfig = null;
-    private ArcSDEConnectionPool ArcSDEConnectionPool = null;
+
+    /** DOCUMENT ME!  */
+    private ConnectionConfig connectionConfig = null;
+
+    /** DOCUMENT ME!  */
+    private ArcSDEConnectionPool pool = null;
 
     /**
      * Creates a new ArcSDEConnectionPoolTest object.
@@ -81,7 +85,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         //test that mandatory connection parameters are set
         try {
-            ConnectionConfig = new ConnectionConfig(conProps);
+            connectionConfig = new ConnectionConfig(conProps);
         } catch (Exception ex) {
             throw new IllegalStateException(
                 "No valid connection parameters found in "
@@ -95,13 +99,13 @@ public class ArcSDEConnectionPoolTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
-        ConnectionConfig = null;
+        connectionConfig = null;
 
-        if (ArcSDEConnectionPool != null) {
-            ArcSDEConnectionPool.close();
+        if (pool != null) {
+            pool.close();
         }
 
-        ArcSDEConnectionPool = null;
+        pool = null;
         super.tearDown();
     }
 
@@ -125,19 +129,19 @@ public class ArcSDEConnectionPoolTest extends TestCase {
     private ArcSDEConnectionPool createPool(Map connParams)
         throws IllegalArgumentException, NullPointerException, 
             DataSourceException {
-        this.ConnectionConfig = new ConnectionConfig(connParams);
+        this.connectionConfig = new ConnectionConfig(connParams);
         LOGGER.info("creating a new ArcSDEConnectionPool with "
-            + ConnectionConfig);
+            + connectionConfig);
 
-        if (this.ArcSDEConnectionPool != null) {
+        if (this.pool != null) {
             LOGGER.info("pool already created, closing it");
-            this.ArcSDEConnectionPool.close();
+            this.pool.close();
         }
 
-        this.ArcSDEConnectionPool = new ArcSDEConnectionPool(ConnectionConfig);
+        this.pool = new ArcSDEConnectionPool(connectionConfig);
         LOGGER.info("pool created");
 
-        return this.ArcSDEConnectionPool;
+        return this.pool;
     }
 
     /**
@@ -157,9 +161,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //the configured parameters to test the connections' pool
         //availability
         Map params = new HashMap(this.connectionParameters);
-        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+        params.put(connectionConfig.MIN_CONNECTIONS_PARAM,
             new Integer(MIN_CONNECTIONS));
-        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
+        params.put(connectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
 
         //this MUST fail, since maxConnections is lower than minConnections
         try {
@@ -167,32 +171,28 @@ public class ArcSDEConnectionPoolTest extends TestCase {
                 "testing parameters' sanity check at pool creation time");
             createPool(params);
             fail(
-                "the connection pool creation should have failed since a wrong set of arguments was passed");
+                "the connection pool creation must have failed since a wrong set of arguments was passed");
         } catch (IllegalArgumentException ex) {
             //it's ok, it is what's expected
             LOGGER.info("pramams assertion passed");
-        } catch (Exception e) {
-            //any other kind of exception is wrong
-            e.printStackTrace();
-            super.fail(e.getMessage());
-        }
+        } 
 
-        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
+        params.put(connectionConfig.MAX_CONNECTIONS_PARAM,
             new Integer(MAX_CONNECTIONS));
-        params.put(ConnectionConfig.CONNECTIONS_INCREMENT_PARAM, new Integer(1));
+        params.put(connectionConfig.CONNECTIONS_INCREMENT_PARAM, new Integer(1));
         createPool(params);
 
         //check that after creation, the pool contains the minimun number
         //of connections specified
         assertEquals("after creation, the pool must contain the minimun number of connections specified",
-            MIN_CONNECTIONS, this.ArcSDEConnectionPool.getPoolSize());
+            MIN_CONNECTIONS, this.pool.getPoolSize());
 
         //try to get the maximun number of connections specified
         SeConnection[] conns = new SeConnection[MAX_CONNECTIONS];
 
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             try {
-                conns[i] = ArcSDEConnectionPool.getConnection();
+                conns[i] = pool.getConnection();
             } catch (UnavailableConnectionException ex) {
                 fail(ex.getMessage());
             } catch (DataSourceException ex) {
@@ -203,7 +203,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //now that the max number of connections is reached, the pool
         //should throw an UnavailableConnectionException
         try {
-            this.ArcSDEConnectionPool.getConnection();
+            this.pool.getConnection();
             fail(
                 "since the max number of connections was reached, the pool should have throwed an UnavailableConnectionException");
         } catch (UnavailableConnectionException ex) {
@@ -217,22 +217,29 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //now, free one and check the same conection is returned on the
         //next call to getConnection()
         SeConnection expected = conns[0];
-        this.ArcSDEConnectionPool.release(expected);
+        this.pool.release(expected);
 
-        SeConnection conn = this.ArcSDEConnectionPool.getConnection();
+        SeConnection conn = this.pool.getConnection();
         assertEquals(expected, conn);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @throws DataSourceException DOCUMENT ME!
-     */
-    public void testRefresh() throws DataSourceException {
-        //ArcSDEConnectionPool.refresh();
+    public void testCreateWithNullDBName()throws DataSourceException{
+    	Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(1));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
 
-        /**
-         * @todo fill in the test code
-         */
+        params.remove(ConnectionConfig.INSTANCE_NAME_PARAM);
+        createPool(params);
+    }
+
+    public void testCreateWithEmptyDBName()throws DataSourceException{
+    	Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(1));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
+
+        params.put(ConnectionConfig.INSTANCE_NAME_PARAM, "");
+        createPool(params);
     }
 }

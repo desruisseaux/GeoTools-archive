@@ -16,19 +16,20 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeTable;
-import org.geotools.data.DataSourceException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeTable;
 
 
 /**

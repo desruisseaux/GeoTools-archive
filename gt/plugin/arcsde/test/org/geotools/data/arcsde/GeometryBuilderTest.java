@@ -45,7 +45,7 @@ import com.vividsolutions.jts.io.WKTReader;
 /**
  * DOCUMENT ME!
  *
- * @author Gabriel Rold�n
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: GeometryBuilderTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class GeometryBuilderTest extends TestCase {
@@ -107,35 +107,35 @@ public class GeometryBuilderTest extends TestCase {
     /**
      * DOCUMENT ME!
      */
-    public void testPointBuilder() {
+    public void testPointBuilder() throws Exception{
         testBuildGeometries(Point.class, "pointtest.wkt");
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testMultiPointBuilder() {
+    public void testMultiPointBuilder() throws Exception{
         testBuildGeometries(MultiPoint.class, "multipointtest.wkt");
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testLineStringBuilder() {
+    public void testLineStringBuilder() throws Exception{
         testBuildGeometries(LineString.class, "linestringtest.wkt");
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testMultiLineStringBuilder() {
+    public void testMultiLineStringBuilder() throws Exception{
         testBuildGeometries(MultiLineString.class, "multilinestringtest.wkt");
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testMultiPolygonBuilder() {
+    public void testMultiPolygonBuilder() throws Exception{
         testBuildGeometries(MultiPolygon.class, "multipolygontest.wkt");
     }
 
@@ -296,11 +296,10 @@ public class GeometryBuilderTest extends TestCase {
      * @param testDataResource DOCUMENT ME!
      */
     private void testBuildGeometries(final Class geometryClass,
-        final String testDataResource) {
+        final String testDataResource) throws Exception{
         LOGGER.info("---- testBuildGeometries: testing " + testDataResource
             + " ----");
 
-        try {
             geometryBuilder = GeometryBuilder.builderFor(geometryClass);
             LOGGER.info("created " + geometryBuilder.getClass().getName());
 
@@ -315,10 +314,6 @@ public class GeometryBuilderTest extends TestCase {
                 createdGeometry = geometryBuilder.newGeometry(sdeCoords);
                 assertTrue(expectedGeometry.equals(createdGeometry));
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
     }
 
     /**

@@ -16,11 +16,9 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -28,7 +26,7 @@ import org.geotools.data.DataStoreFactorySpi;
 /**
  * DOCUMENT ME!
  *
- * @author Gabriel Rold�n
+ * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
@@ -51,18 +49,18 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 "port number in wich the ArcSDE server is listening for connections.Generally it's 5151",
                 true, new Integer(5151));
         paramMetadata[4] = new Param("instance", String.class,
-                "database instance name", true);
+                "the specific database to connect to. Only applicable to certain databases. Value ignored if not applicable.", false);
         paramMetadata[5] = new Param("user", String.class,
-                "database user name", true);
+                "name of a valid database user account.", true);
         paramMetadata[6] = new Param("password", String.class,
-                "database user password", true);
+                "the database user's password.", true);
 
         //optional parameters:
         paramMetadata[7] = new Param("pool.minConnections", Integer.class,
                 "Minimun number of open connections", false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_CONNECTIONS));
         paramMetadata[8] = new Param("pool.maxConnections", Integer.class,
-                "Maximun number of open connections (will not work <2)", false,
+                "Maximun number of open connections (will not work if < 2)", false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
         paramMetadata[9] = new Param("pool.increment", Integer.class,
                 "Number of connections created on each pool size increment",
@@ -137,7 +135,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     public DataStore createDataStore(Map params) throws java.io.IOException {
         ArcSDEDataStore sdeDStore = null;
         ConnectionConfig config = new ConnectionConfig(params);
-        ArcSDEConnectionPool connPool = poolFactory.getPoolFor(config);
+        ArcSDEConnectionPool connPool = poolFactory.createPool(config);
         sdeDStore = new ArcSDEDataStore(connPool);
 
         return sdeDStore;

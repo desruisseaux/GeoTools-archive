@@ -18,6 +18,7 @@ package org.geotools.data.arcsde;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -31,6 +32,10 @@ import java.util.Map;
  * @version $Id: ConnectionConfig.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ConnectionConfig {
+	/**
+	 * Shared package's logger
+	 */
+	private static final Logger LOGGER = Logger.getLogger(ConnectionConfig.class.getPackage().getName());
     /**
      * message of the exception thrown if a mandatory parameter is not supplied
      */
@@ -279,7 +284,7 @@ public class ConnectionConfig {
 
         //check for nullity
         if ((serverName == null) || (portNumber == null)
-                || (databaseName == null) || (userName == null)
+                || (userName == null)
                 || (userPassword == null)) {
             throw new NullPointerException(NULL_ARGUMENTS_MSG);
         }
@@ -288,8 +293,10 @@ public class ConnectionConfig {
             throwIllegal(SERVER_NAME_PARAM, serverName);
         }
 
-        if (databaseName.length() == 0) {
-            throwIllegal(INSTANCE_NAME_PARAM, databaseName);
+        if (databaseName == null || databaseName.length() == 0) {
+        	LOGGER.warning("No database name specified");
+			databaseName = "";
+            //throwIllegal(INSTANCE_NAME_PARAM, databaseName);
         }
 
         if (userName.length() == 0) {
@@ -377,13 +384,16 @@ public class ConnectionConfig {
      * @return DOCUMENT ME!
      */
     public int hashCode() {
-        return getServerName().hashCode() * getPortNumber().hashCode() * getDatabaseName()
-                                                                             .hashCode() * getUserName()
-                                                                                               .hashCode();
+        int hash = 37;
+        hash *= getServerName().hashCode();
+        hash *= getPortNumber().hashCode();
+        hash *= getUserName().hashCode();
+        return hash;
     }
 
     /**
-     * checks for equality over another <code>SdeConnectionConfig</code>
+     * checks for equality over another <code>ConnectionConfig</code>, taking
+     * in count the values of database name, user name, and port number.
      *
      * @param o DOCUMENT ME!
      *
@@ -402,7 +412,6 @@ public class ConnectionConfig {
 
         return config.getServerName().equals(getServerName())
         && config.getPortNumber().equals(getPortNumber())
-        && config.getDatabaseName().equals(getDatabaseName())
         && config.getUserName().equals(getUserName());
     }
 
