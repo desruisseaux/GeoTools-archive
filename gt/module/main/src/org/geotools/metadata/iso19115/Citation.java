@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
-import org.geotools.util.ListOf;
-import org.geotools.util.MapOf;
-import org.geotools.util.SetOf;
+import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashMap;
+import org.geotools.util.CheckedHashSet;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.PresentationForm;
@@ -18,17 +18,17 @@ import org.opengis.metadata.citation.Series;
 public class Citation extends MetaData implements
 		org.opengis.metadata.citation.Citation {
 
-	private List alternateTitles = new ListOf( InternationalString.class );
-	private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
+	private List alternateTitles = new CheckedArrayList( InternationalString.class );
+	private Set citedResponsibleParties = new CheckedHashSet( ResponsibleParty.class );
 	
 	private InternationalString title;
-	private Map dates = new MapOf( DateType.class, Date.class );
+	private Map dates = new CheckedHashMap( DateType.class, Date.class );
 	private InternationalString edition;
 	private Date editionDate;
-	private Set identifiers = new SetOf( String.class );
-	private Set identifierTypes = new SetOf( String.class );
+	private Set identifiers = new CheckedHashSet( String.class );
+	private Set identifierTypes = new CheckedHashSet( String.class );
 	
-	private Set presentationForm = new SetOf( PresentationForm.class );
+	private Set presentationForm = new CheckedHashSet( PresentationForm.class );
 	private Series series;
 	private InternationalString otherCitationDetails;
 	private InternationalString collectiveTitle;
