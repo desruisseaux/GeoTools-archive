@@ -236,6 +236,11 @@
   </dependencies>
 
   <build>
+    <resources> 
+      <excludes>
+        <exclude>**/org/geotools/referencing/operation/transform/MathTransformTest.java</exclude>
+      </excludes>
+    </resources>
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
