@@ -1068,18 +1068,22 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return value instanceof AttributeExpression && element.getType()!=null && getName().equals(element.getType().getName());
+            return (value instanceof AttributeExpression || value instanceof String) && element.getType()!=null && getName().equals(element.getType().getName());
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
             if(!canEncode(element,value,hints))
-                throw new OperationNotSupportedException("Cannot encode "+(element==null?"null":element.getName()));
-            AttributeExpression name = (AttributeExpression)value;
-            
+                throw new OperationNotSupportedException("Cannot encode "+(element==null?"null":element.getName())+" "+(element==null?"null":element.getNamespace().toString())+" "+(value == null?null:value.getClass().getName()));
+                        
             output.startElement(element.getNamespace(),element.getName(),null);
-            output.characters(name.getAttributePath());
+            if(value instanceof String){
+                output.characters((String)value);
+            }else{
+                AttributeExpression name = (AttributeExpression)value;
+                output.characters(name.getAttributePath());
+            }
             output.endElement(element.getNamespace(),element.getName());
         }
     }
