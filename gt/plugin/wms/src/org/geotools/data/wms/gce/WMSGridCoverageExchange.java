@@ -18,6 +18,10 @@ import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.geotools.data.wms.ParseCapabilitiesException;
+import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.jdom.JDOMException;
 
 /**
  * @author rgould
@@ -27,9 +31,26 @@ import org.geotools.data.coverage.grid.GridFormatFinder;
  */
 public class WMSGridCoverageExchange implements GridCoverageExchange {
     private Format[] formats;
+    private WMT_MS_Capabilities capabilities;
     
-    public WMSGridCoverageExchange () {
-    	formats = GridFormatFinder.getFormatArray();
+    public WMSGridCoverageExchange (Object source) throws MalformedURLException, IOException, ParseCapabilitiesException {
+    	if (source instanceof String || source instanceof URL) {
+    		URL url = null;
+    		if (source instanceof String) {
+    			url = new URL ((String) source);
+    		} else {
+    			url = (URL) source;
+    		}
+    		try {
+    			capabilities = WebMapServer.getCapabilities(url);
+    		} catch (JDOMException e) {
+    			throw new RuntimeException ("Data at the URL is not valid XML", e);
+    		}
+    	} else if (source instanceof WMT_MS_Capabilities) {
+    		capabilities = (WMT_MS_Capabilities) source;
+    	}
+    	formats = new Format[1];
+    	formats[0] = new WMSFormat();
     }
 	
 	public void dispose() throws IOException {
@@ -42,10 +63,12 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 	
 	public GridCoverageReader getReader(Object source) throws IOException {
 		if (source instanceof String || source instanceof URL) {
-			try {
-				new URL((String) source);
-			} catch (MalformedURLException e) {
-				throw new InvalidParameterException("Unable to convert source to a URL (it is malformed)");
+			if (source instanceof String) {
+				try {
+					new URL((String) source);
+				} catch (MalformedURLException e) {
+					throw new InvalidParameterException("Unable to convert source to a URL (it is malformed)");
+				}
 			}
 			
 			for (int i = 0; i < formats.length; i++) {
@@ -80,5 +103,8 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 			}
 		}
 		return false;
+	}
+	public WMT_MS_Capabilities getCapabilities() {
+		return capabilities;
 	}
 }
