@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.opengis.catalog.MetadataEntity;
+
 
 /**
  * A superclass for most metadata.

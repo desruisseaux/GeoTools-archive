@@ -16,8 +16,9 @@
  */
 package org.geotools.data.coverage.grid.file;
 
+import org.opengis.catalog.CatalogEntry;
+
 import org.geotools.catalog.AbstractCatalog;
-import org.geotools.catalog.CatalogEntry;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
@@ -54,6 +55,13 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
      * Creates a new FileSystemGridCoverageExchange object.
      */
     public FileSystemGridCoverageExchange() {
+        formats=GridFormatFinder.getFormatArray();
+    }
+
+    /**
+     * Creates a FileSystemGridCoverageExchange that 
+     */
+    public FileSystemGridCoverageExchange( File root ) {
         formats=GridFormatFinder.getFormatArray();
     }
 

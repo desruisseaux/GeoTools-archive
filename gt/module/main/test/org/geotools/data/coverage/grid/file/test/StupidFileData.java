@@ -6,7 +6,7 @@
  */
 package org.geotools.data.coverage.grid.file.test;
 
-import org.geotools.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity;
 
 /**
  * @author jeichar

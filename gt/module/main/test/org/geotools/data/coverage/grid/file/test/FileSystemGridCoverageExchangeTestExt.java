@@ -10,9 +10,10 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 
-import org.geotools.catalog.CatalogEntry;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.QueryResult;
+
 import org.geotools.catalog.DefaultQueryDefinition;
-import org.geotools.catalog.QueryResult;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;

@@ -17,7 +17,8 @@
 package org.geotools.catalog;
 
 import java.util.List;
-import org.geotools.catalog.MetadataEntity.Element;
+
+import org.opengis.catalog.MetadataEntity.Element;
 
 import junit.framework.TestCase;
 

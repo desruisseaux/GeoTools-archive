@@ -1,6 +1,7 @@
 package org.geotools.expr;
 
-import org.geotools.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;

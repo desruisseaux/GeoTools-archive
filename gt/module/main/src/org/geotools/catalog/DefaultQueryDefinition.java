@@ -19,6 +19,10 @@ package org.geotools.catalog;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.MetadataEntity;
+import org.opengis.catalog.QueryDefinition;
+
 /**
  * Wraps a query and applies it to the metadata contained by catalogentries.
  *
@@ -38,7 +42,7 @@ public class DefaultQueryDefinition implements QueryDefinition {
     }
 
     /**
-     * @see org.geotools.catalog.QueryDefinition#evaluate(org.geotools.catalog.CatalogEntry)
+     * @see opengis.catalog.QueryDefinition#evaluate(org.geotools.catalog.CatalogEntry)
      */
     public boolean accept(CatalogEntry entry) {
         for (Iterator iter = entry.iterator(); iter.hasNext();) {

@@ -19,7 +19,8 @@ package org.geotools.expr;
 import java.io.IOException;
 import java.util.Set;
 
-import org.geotools.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;

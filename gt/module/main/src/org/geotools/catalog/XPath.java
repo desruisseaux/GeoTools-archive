@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.opengis.catalog.MetadataEntity;
+
 
 /**
  * Used to resolve an XPath expression used on a MetadataEntity element

@@ -19,6 +19,11 @@ package org.geotools.catalog;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.opengis.catalog.Catalog;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.QueryDefinition;
+import org.opengis.catalog.QueryResult;
+
 
 /**
  * A general superclass that handles queries and iteration through a catalog

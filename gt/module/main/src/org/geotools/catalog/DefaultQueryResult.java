@@ -9,6 +9,9 @@ package org.geotools.catalog;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.QueryResult;
+
 /**
  * @author jeichar
  *

@@ -10,11 +10,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.opengis.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity.EntityType;
+
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.coverage.grid.file.FileMetadata;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
-import org.geotools.catalog.MetadataEntity;
-import org.geotools.catalog.MetadataEntity.EntityType;
 import org.geotools.resources.TestData;
 
 /**

@@ -2,6 +2,8 @@ package org.geotools.catalog;
 
 import java.io.IOException;
 
+import org.opengis.catalog.MetadataEntity;
+
 import org.geotools.expr.Expr;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;

@@ -16,6 +16,8 @@
  */
 package org.geotools.catalog;
 
+import org.opengis.catalog.MetadataEntity;
+
 /**
  * TODO type description
  * 

@@ -30,7 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.geotools.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity;
+
 import org.geotools.catalog.XPath;
 import org.opengis.metadata.MetaData;
 

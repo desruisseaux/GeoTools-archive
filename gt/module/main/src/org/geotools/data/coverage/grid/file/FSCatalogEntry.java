@@ -16,8 +16,9 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.MetadataEntity;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.MetadataEntity;
+
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.UnkownFormat;
 import java.io.File;
@@ -56,14 +57,14 @@ public class FSCatalogEntry implements CatalogEntry {
     }
 
     /**
-     * @see org.geotools.catalog.CatalogEntry#getDataName()
+     * @see opengis.catalog.CatalogEntry#getDataName()
      */
     public String getDataName() {
         return resource.getPath();
     }
 
     /**
-     * @see org.geotools.catalog.CatalogEntry#getMetaDataEntityNames()
+     * @see opengis.catalog.CatalogEntry#getMetaDataEntityNames()
      */
     public String[] getMetadataNames() {
         String[] n = new String[1];
@@ -73,14 +74,14 @@ public class FSCatalogEntry implements CatalogEntry {
     }
 
     /**
-     * @see org.geotools.catalog.CatalogEntry#getMetadata(java.lang.String)
+     * @see opengis.catalog.CatalogEntry#getMetadata(java.lang.String)
      */
     public MetadataEntity getMetadata(String name) {
         return metadata;
     }
 
     /**
-     * @see org.geotools.catalog.CatalogEntry#getResource()
+     * @see opengis.catalog.CatalogEntry#getResource()
      */
     public Object getResource() {
         return resource;
@@ -94,7 +95,7 @@ public class FSCatalogEntry implements CatalogEntry {
     }
 
     /**
-     * @see org.geotools.catalog.CatalogEntry#getNumMetaDataEntity()
+     * @see opengis.catalog.CatalogEntry#getNumMetaDataEntity()
      */
     public int getNumMetadata() {
         return 1;
