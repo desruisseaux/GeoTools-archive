@@ -46,16 +46,16 @@ import org.geotools.feature.FeatureType;
 public class SourceFeatureTypeCard extends WizzardCard {
     /** DOCUMENT ME! */
     private static final String HELP_MSG = "Select a feature type to export";
-
+    
     /** DOCUMENT ME! */
     private DataStore dataStore;
-
+    
     /** DOCUMENT ME! */
     private JList typeNamesList = new JList(new DefaultListModel());
-
+    
     /** DOCUMENT ME!  */
     private JTable propsTable = new JTable(new FeatureTypeTableModel());
-
+    
     /**
      * Creates a new SourceFeatureTypeCard object.
      *
@@ -64,49 +64,49 @@ public class SourceFeatureTypeCard extends WizzardCard {
      */
     public SourceFeatureTypeCard(CardListener listener, WizzardCard prev) {
         super(listener, prev);
-
+        
         JPanel typesPanel = new JPanel(new BorderLayout(2, 2));
         JScrollPane scroll = new JScrollPane(typeNamesList);
         scroll.setPreferredSize(new Dimension(240, 100));
         typesPanel.add(scroll, BorderLayout.WEST);
         typesPanel.add(new JLabel("Select a feature type: "), BorderLayout.NORTH);
-
+        
         JPanel propsPanel = new JPanel(new BorderLayout(2, 2));
         propsPanel.add(new JLabel("FeatureType attributes:"), BorderLayout.NORTH);
         scroll = new JScrollPane(propsTable);
         scroll.setPreferredSize(new Dimension(240, 100));
         propsPanel.add(scroll, BorderLayout.CENTER);
-
+        
         getGui().add(typesPanel, BorderLayout.WEST);
         getGui().add(propsPanel, BorderLayout.CENTER);
-
+        
         typeNamesList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    if (e.getValueIsAdjusting()) {
-                        return;
-                    }
-
-                    String typeName = (String) typeNamesList.getSelectedValue();
-                    FeatureType schema = null;
-
-                    getListener().setNextEnabled(typeName != null);
-
-                    if (typeName != null) {
-                        try {
-                            schema = dataStore.getSchema(typeName);
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                            showError("ERROR obtaining schema", e1.getMessage());
-                        }
-                    }
-
-                    FeatureTypeTableModel schemaTableModel = (FeatureTypeTableModel) propsTable
-                        .getModel();
-                    schemaTableModel.setFeatureType(schema);
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    return;
                 }
-            });
+                
+                String typeName = (String) typeNamesList.getSelectedValue();
+                FeatureType schema = null;
+                
+                getListener().setNextEnabled(typeName != null);
+                
+                if (typeName != null) {
+                    try {
+                        schema = dataStore.getSchema(typeName);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        showError("ERROR obtaining schema", e1.getMessage());
+                    }
+                }
+                
+                FeatureTypeTableModel schemaTableModel = (FeatureTypeTableModel) propsTable
+                        .getModel();
+                schemaTableModel.setFeatureType(schema);
+            }
+        });
     }
-
+    
     /**
      * DOCUMENT ME!
      *
@@ -115,7 +115,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
     public String getHelpMessage() {
         return HELP_MSG;
     }
-
+    
     /**
      * DOCUMENT ME!
      *
@@ -126,12 +126,12 @@ public class SourceFeatureTypeCard extends WizzardCard {
     public void setParameter(Object paramObject) {
         if (!(paramObject instanceof DataStore)) {
             throw new IllegalArgumentException("Expected DataStore: "
-                + paramObject);
+                    + paramObject);
         }
-
+        
         this.dataStore = (DataStore) paramObject;
     }
-
+    
     /**
      * DOCUMENT ME!
      */
@@ -141,68 +141,68 @@ public class SourceFeatureTypeCard extends WizzardCard {
         getListener().setNextEnabled(getSchema() != null);
         fillTypeNames();
     }
-
+    
     /**
      * DOCUMENT ME!
      */
     private void fillTypeNames() {
         String[] typeNames;
-
+        
         try {
             typeNames = dataStore.getTypeNames();
         } catch (IOException e) {
             showError("Error getting typenames", e.getMessage());
-
+            
             return;
         }
-
+        
         DefaultListModel list = (DefaultListModel) typeNamesList.getModel();
         list.clear();
         Arrays.sort(typeNames);
-
+        
         for (int i = 0; i < typeNames.length; i++) {
             list.addElement(typeNames[i]);
         }
     }
-
+    
     /**
      * DOCUMENT ME!
      */
     public boolean nextPressed() {
         FeatureType schema = getSchema();
         FeatureSource fsource = null;
-
+        
         try {
             fsource = dataStore.getFeatureSource(schema.getTypeName());
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error obtaining feature source for "
-                + schema.getTypeName(), e.getMessage());
+                    + schema.getTypeName(), e.getMessage());
             return false;
         }
-
+        
         WizzardCard next = getNextCard();
         next.setParameter(fsource);
         return true;
     }
-
+    
     /**
-	 * @return
-	 */
-	private FeatureType getSchema() {
-		FeatureTypeTableModel model = (FeatureTypeTableModel) propsTable
-            .getModel();
+     * @return
+     */
+    private FeatureType getSchema() {
+        FeatureTypeTableModel model = (FeatureTypeTableModel) propsTable
+                .getModel();
         FeatureType schema = model.getFeatureType();
-		return schema;
-	}
-
-	/**
+        return schema;
+    }
+    
+    /**
      * DOCUMENT ME!
      */
     public boolean previousPressed() {
-    	return true;
+        return true;
     }
-
+    
     /**
      * DOCUMENT ME!
      *
@@ -211,23 +211,23 @@ public class SourceFeatureTypeCard extends WizzardCard {
     public String getCardName() {
         return "FSOURCE_CARD";
     }
-
+    
     /**
      * Table model to show a the attributes of a FeatureType
      */
     private class FeatureTypeTableModel extends DefaultTableModel {
         /** DOCUMENT ME! */
         private FeatureType schema;
-
+        
         /** DOCUMENT ME! */
         private final String[] colNames = { "Name", "Type", "Length" };
-
+        
         /**
          * Creates a new FeatureTypesTableModel object.
          */
         public FeatureTypeTableModel() {
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -237,7 +237,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
             this.schema = schema;
             fireTableDataChanged();
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -246,7 +246,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
         public FeatureType getFeatureType() {
             return schema;
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -255,7 +255,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
         public int getColumnCount() {
             return colNames.length;
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -266,7 +266,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
         public String getColumnName(int column) {
             return colNames[column];
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -275,7 +275,7 @@ public class SourceFeatureTypeCard extends WizzardCard {
         public int getRowCount() {
             return (schema == null) ? 0 : schema.getAttributeCount();
         }
-
+        
         /**
          * DOCUMENT ME!
          *
@@ -287,29 +287,47 @@ public class SourceFeatureTypeCard extends WizzardCard {
         public Object getValueAt(int row, int column) {
             AttributeType attr = schema.getAttributeType(row);
             Object val = null;
-
+            
             switch (column) {
-            case 0:
-                val = attr.getName();
-
-                break;
-
-            case 1:
-                val = attr.getType().getName();
-
-                break;
-
-            case 2:
-                val = (attr.getFieldLength() == 0) ? null
-                                                   : new Integer(attr
-                        .getFieldLength());
-
-                break;
+                case 0:
+                    val = attr.getName();
+                    
+                    break;
+                    
+                case 1:
+                    val = attr.getType().getName();
+                    
+                    break;
+                    
+                case 2:
+                    
+                    org.geotools.filter.Filter f = attr.getRestriction();
+                    if(f !=null && f!=org.geotools.filter.Filter.ALL && f != org.geotools.filter.Filter.NONE && (f.getFilterType() == f.COMPARE_LESS_THAN || f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL)){
+                        try{
+                            org.geotools.filter.CompareFilter cf = (org.geotools.filter.CompareFilter)f;
+                            if(cf.getLeftValue() instanceof org.geotools.filter.LengthFunction){
+                                val = Integer.parseInt(((org.geotools.filter.LiteralExpression)cf.getRightValue()).getLiteral().toString());
+                            }else{
+                                if(cf.getRightValue() instanceof org.geotools.filter.LengthFunction){
+                                    val = Integer.parseInt(((org.geotools.filter.LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+                                }
+                            }
+                        }catch(NumberFormatException e){
+                            val = null;
+                        }
+                    }else{
+                        val = null;
+                    }
+                    
+                    if (val <= 0) {
+                        val = null;
+                    }
+                    break;
             }
-
+            
             return val;
         }
-
+        
         /**
          * DOCUMENT ME!
          *
