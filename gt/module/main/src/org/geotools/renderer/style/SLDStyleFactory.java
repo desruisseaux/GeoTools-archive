@@ -640,7 +640,7 @@ public class SLDStyleFactory {
 
             List f = Arrays.asList(ge.getAvailableFontFamilyNames());
             fontFamilies.addAll(f);
-
+           
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("there are " + fontFamilies.size() + " fonts available");
             }
@@ -789,7 +789,7 @@ public class SLDStyleFactory {
 
         // if everything else fails fall back on a default font distributed
         // along with the jdk
-        return java.awt.Font.getFont("Lucida Sans");
+        return new java.awt.Font("Serif",java.awt.Font.PLAIN,12);
     }
 
     void setScaleRange(Style style, Range scaleRange) {
