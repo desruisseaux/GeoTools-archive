@@ -47,6 +47,16 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         super(srcURL);
     }
 
+    public GRASSArcGridRaster(Reader reader) throws IOException {
+        super(reader);
+    }
+
+    public GRASSArcGridRaster(PrintWriter writer) throws IOException {
+        super(writer);
+    }
+
+    
+    
     protected void parseHeader(StreamTokenizer st) throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();

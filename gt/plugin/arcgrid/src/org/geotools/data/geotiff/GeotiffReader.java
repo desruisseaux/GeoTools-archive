@@ -94,4 +94,19 @@ public class GeotiffReader implements GridCoverageReader {
 	public void dispose() throws IOException {
 		// @todo Auto-generated method stub
 	}
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
+	 */
+	public boolean hasMoreGridCoverages() throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
+	 */
+	public void skip() throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }

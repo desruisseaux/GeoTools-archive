@@ -83,6 +83,10 @@ public class ArcGridRaster {
 	protected int nCols = -1;
     
 	protected int nRows = -1;
+	
+	private Reader reader=null;
+	
+	private PrintWriter writer=null;
     
     /**
      * Creates a new instance of ArcGridRaster
@@ -90,8 +94,32 @@ public class ArcGridRaster {
      * @param srcURL URL of a ArcGridRaster
      *
      */
-    public ArcGridRaster(URL srcURL) throws IOException {
+	public ArcGridRaster(URL srcURL) throws IOException {
         this.srcURL = srcURL;
+    }
+    
+    /**
+     * Creates a new instance of ArcGridRaster
+     *
+     * Used Exclusively by ArcGridReader
+     * 
+     * @param Reader reader to be used for reading the Raster
+     *
+     */
+	public ArcGridRaster(Reader reader) throws IOException {
+        this.reader=reader;
+    }
+	
+    /**
+     * Creates a new instance of ArcGridRaster
+     *
+     * Used Exclusively by ArcGridWriter
+     * 
+     * @param Writer writer to be used for writing the Raster
+     *
+     */
+	public ArcGridRaster(PrintWriter writer) throws IOException {
+        this.writer=writer;
     }
     
     /**
@@ -244,6 +272,9 @@ public class ArcGridRaster {
      * Obtain the best reader for the situation
      */
     protected Reader openReader() throws IOException {
+    	
+    	if( reader != null )
+    		return reader;
         // gzipped source, may be remote URL
         if (srcURL.getFile().endsWith(".gz")) {
             InputStream in = new java.util.zip.GZIPInputStream(
@@ -265,7 +296,11 @@ public class ArcGridRaster {
      * Open the best writer for the situation.
      */
     protected PrintWriter openWriter(boolean compress) throws IOException {
-        java.io.OutputStream out;
+
+    	if (writer != null )
+    		return writer;
+    	
+    	java.io.OutputStream out;
         if (srcURL.getProtocol().equals("file")) {
             out = new java.io.BufferedOutputStream(
                 new java.io.FileOutputStream(new File(java.net.URLDecoder.decode(srcURL.getPath(),"UTF-8")))
