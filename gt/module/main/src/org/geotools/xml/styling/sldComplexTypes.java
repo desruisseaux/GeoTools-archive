@@ -1,4 +1,4 @@
-package org.geotools.styling.xml;
+package org.geotools.xml.styling;
 
 /**
  * This code generated using Refractions SchemaCodeGenerator For more information, view the attached

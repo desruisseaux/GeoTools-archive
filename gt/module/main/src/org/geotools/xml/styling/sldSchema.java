@@ -1,4 +1,4 @@
-package org.geotools.styling.xml;
+package org.geotools.xml.styling;
 
 /**
  * This code generated using Refractions SchemaCodeGenerator For more information, view the attached
@@ -15,6 +15,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.Type;
 
 public class sldSchema implements Schema {
 
@@ -264,5 +265,11 @@ public class sldSchema implements Schema {
     }
     public SimpleType[] getSimpleTypes() {
         return null;
+    }
+    
+    private static final int SLD_ELEMENT = 32;
+    
+    public Type getSLDType() {
+        return getElements()[SLD_ELEMENT].getType();
     }
 }

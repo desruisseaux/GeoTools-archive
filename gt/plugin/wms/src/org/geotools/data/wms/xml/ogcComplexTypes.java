@@ -6,6 +6,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.impl.AttributeGT;
 import org.geotools.xml.schema.impl.SequenceGT;
+import org.geotools.xml.styling.sldSchema;
 
 public class ogcComplexTypes {
 
@@ -83,9 +84,7 @@ public class ogcComplexTypes {
                         .getFacets()[0].getValue(), false)};
 
         private static Element[] elems = new Element[]{
-//                new ogcElement("StyledLayerDescriptor",
-//                        org.geotools.xml.handlers.xsi.ComplexTypeHandler.DefaultComplexType
-//                                .getInstance()/* complexType name is null */, null, 1, 1),
+                new ogcElement("StyledLayerDescriptor", new sldSchema().getSLDType(), null, 1, 1),
                 new ogcElement("BoundingBox", org.geotools.xml.gml.GMLComplexTypes.BoxType
                         .getInstance(), null, 1, 1),
                 new ogcElement("Output", ogcComplexTypes._Output.getInstance(), null, 1, 1),
