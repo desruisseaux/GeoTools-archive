@@ -96,7 +96,7 @@ final class UnitFormat {
     /**
      * Symbole repr�sentant la multiplication de deux unit�s.
      */
-    private static final char DOT_SYMBOL = '�'; // TODO: on devrait plut�t utiliser '\u22C5', mais ce symbole n'est pas affich� correctement.
+    private static final char DOT_SYMBOL = '\u22C5'; // TODO: on devrait plut�t utiliser '\u22C5', mais ce symbole n'est pas affich� correctement.
     
     /**
      * Symbole repr�sentant la division de deux unit�s.
