@@ -551,6 +551,26 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
     }
 
     /**
+     * Creates a linear coordinate system.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  axis The axis.
+     * @throws FactoryException if the object creation failed.
+     */
+    public LinearCS createLinearCS(Map            properties,
+                                   CoordinateSystemAxis axis) throws FactoryException
+    {
+        LinearCS cs;
+        try {
+            cs = new org.geotools.referencing.cs.LinearCS(properties, axis);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        cs = (LinearCS) canonicalize(cs);
+        return cs;
+    }
+
+    /**
      * Creates a two dimensional user defined coordinate system from the given pair of axis.
      *
      * @param  properties Name and other properties to give to the new object.

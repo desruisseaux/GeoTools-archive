@@ -375,14 +375,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     /**
      * Gets the dimension of input points.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return numCol-1;
     }
     
     /**
      * Gets the dimension of output points.
      */
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return numRow-1;
     }
     

@@ -169,14 +169,14 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     /**
      * Returns the dimension of input points.
      */    
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return 2;
     }
     
     /**
      * Returns the dimension of output points.
      */    
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return 2;
     }
     

@@ -291,7 +291,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      *
      * @return the source dimention.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return 2;
     }
 
@@ -300,7 +300,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      *
      * @return the target dimention.
      */
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return 2;
     }
 

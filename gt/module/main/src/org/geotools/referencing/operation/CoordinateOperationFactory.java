@@ -416,7 +416,7 @@ public class CoordinateOperationFactory extends Factory
         if (step1==null) return step2;
         if (step2==null) return step1;
         // Note: we sometime get this assertion failure if the user provided CRS with two
-        //       different ellipsoid but an identical TOWGS84 conversion infos (which is
+        //       different ellipsoids but an identical TOWGS84 conversion infos (which is
         //       wrong).
         assert equalsIgnoreMetadata(step1.getTargetCRS(), step2.getSourceCRS()) :
                "CRS 1 =" + step1.getTargetCRS() + '\n' +

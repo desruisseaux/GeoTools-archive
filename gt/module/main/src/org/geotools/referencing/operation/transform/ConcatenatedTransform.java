@@ -285,14 +285,14 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     /**
      * Gets the dimension of input points.
      */
-    public final int getDimSource() {
+    public final int getSourceDimensions() {
         return transform1.getDimSource();
     }
     
     /**
      * Gets the dimension of output points.
      */
-    public final int getDimTarget() {
+    public final int getTargetDimensions() {
         return transform2.getDimTarget();
     }
     

@@ -15,7 +15,7 @@
 
 //geogCS's 
 set _WGS84_  = GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
-set _sphere_ = GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
+set _sphere_ = GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0,   0          ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
 
 
 ////////////////////////////////////////////

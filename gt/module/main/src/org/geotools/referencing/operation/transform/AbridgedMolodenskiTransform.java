@@ -183,14 +183,14 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     /**
      * Gets the dimension of input points.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return source3D ? 3 : 2;
     }
     
     /**
      * Gets the dimension of output points.
      */
-    public final int getDimTarget() {
+    public final int getTargetDimensions() {
         return target3D ? 3 : 2;
     }
     

@@ -199,14 +199,14 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
     /**
      * Gets the dimension of input points.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return firstAffectedOrdinate + subTransform.getDimSource() + numTrailingOrdinates;
     }
     
     /**
      * Gets the dimension of output points.
      */
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return firstAffectedOrdinate + subTransform.getDimTarget() + numTrailingOrdinates;
     }
     

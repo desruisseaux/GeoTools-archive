@@ -216,14 +216,14 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     /**
      * Gets the dimension of input points, which is 2 or 3.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return hasHeight ? 3 : 2;
     }
     
     /**
      * Gets the dimension of output points, which is 3.
      */
-    public final int getDimTarget() {
+    public final int getTargetDimensions() {
         return 3;
     }
     

@@ -103,14 +103,14 @@ final class IdentityTransform extends AbstractMathTransform
     /**
      * Gets the dimension of input points.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return dimension;
     }
     
     /**
      * Gets the dimension of output points.
      */
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return dimension;
     }
 

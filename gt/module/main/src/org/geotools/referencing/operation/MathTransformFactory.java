@@ -339,8 +339,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *         inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
      * @return A pass through transform with the following dimensions:<br>
      *         <pre>
-     * Source: firstAffectedOrdinate + subTransform.getDimSource() + numTrailingOrdinates
-     * Target: firstAffectedOrdinate + subTransform.getDimTarget() + numTrailingOrdinates</pre>
+     * Source: firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates
+     * Target: firstAffectedOrdinate + subTransform.getTargetDimensions() + numTrailingOrdinates</pre>
      * @throws FactoryException if the object creation failed.
      */
     public MathTransform createPassThroughTransform(final int firstAffectedOrdinate,

@@ -80,6 +80,36 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
+     * Gets the dimension of input points.
+     *
+     * @deprecated Renamed {@link #getSourceDimensions} for consistency with
+     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     */
+    public final int getDimSource() {
+        return getSourceDimensions();
+    }
+
+    /**
+     * Gets the dimension of input points.
+     */
+    public abstract int getSourceDimensions();
+    
+    /**
+     * Gets the dimension of output points.
+     *
+     * @deprecated Renamed {@link #getTargetDimensions} for consistency with
+     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     */
+    public final int getDimTarget() {
+        return getTargetDimensions();
+    }
+    
+    /**
+     * Gets the dimension of output points.
+     */
+    public abstract int getTargetDimensions();
+
+    /**
      * Returns the parameter descriptors for this math transform,
      * or <code>null</code> if unknow. This method is similar to
      * {@link org.opengis.referencing.operation.OperationMethod#getParameters}, except
@@ -655,7 +685,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * implementation returns the dimension of output
          * points of the enclosing math transform.
          */
-        public int getDimSource() {
+        public int getSourceDimensions() {
             return AbstractMathTransform.this.getDimTarget();
         }
         
@@ -664,7 +694,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * implementation returns the dimension of input
          * points of the enclosing math transform.
          */
-        public int getDimTarget() {
+        public int getTargetDimensions() {
             return AbstractMathTransform.this.getDimSource();
         }
         

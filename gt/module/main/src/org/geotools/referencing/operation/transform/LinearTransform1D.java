@@ -133,14 +133,14 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * Gets the dimension of input points, which is 1.
      */
-    public int getDimSource() {
+    public int getSourceDimensions() {
         return 1;
     }
     
     /**
      * Gets the dimension of output points, which is 1.
      */
-    public int getDimTarget() {
+    public int getTargetDimensions() {
         return 1;
     }
 

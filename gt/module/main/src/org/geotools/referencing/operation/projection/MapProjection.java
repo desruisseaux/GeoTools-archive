@@ -423,14 +423,14 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Returns the dimension of input points.
      */
-    public final int getDimSource() {
+    public final int getSourceDimensions() {
         return 2;
     }
     
     /**
      * Returns the dimension of output points.
      */
-    public final int getDimTarget() {
+    public final int getTargetDimensions() {
         return 2;
     }
     
