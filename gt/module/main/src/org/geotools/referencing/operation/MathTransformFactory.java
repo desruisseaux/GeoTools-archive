@@ -48,11 +48,11 @@ import org.opengis.parameter.ParameterValueGroup;
 // Geotools dependencies
 import org.geotools.referencing.Identifier;         // For javadoc
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.AbstractParser;
+import org.geotools.referencing.wkt.Symbols;
+import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.parameter.ParameterWriter;
 
 // Resources
@@ -105,8 +105,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
      */
-    private transient AbstractParser parser;
-    
+    private transient MathTransformParser parser;
+
     /**
      * A pool of math transform. This pool is used in order to
      * returns instance of existing math transforms when possible.
@@ -384,12 +384,12 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     public MathTransform createFromWKT(final String text) throws FactoryException {
         if (parser == null) {
             // Not a big deal if we are not synchronized. If this method is invoked in
-            // same time by two different threads, we may have two WKTParser objects
+            // same time by two different threads, we may have two WKT Parser objects
             // for a short time. It doesn't hurt...
-            parser = new MathTransformParser();
+            parser = new MathTransformParser(Symbols.DEFAULT, this);
         }
         try {
-            return (MathTransform) parser.parseObject(text);
+            return parser.parseMathTransform(text);
         } catch (ParseException exception) {
             final Throwable cause = exception.getCause();
             if (cause instanceof FactoryException) {

@@ -398,6 +398,9 @@ public class ParameterWriter extends FilterWriter {
          * Prepare the list of alias before any write to the output stream.
          * We need to prepare the list first, because not all identified objects
          * may have generic names with the same scopes in the same order.
+         *
+         *   titles    -  The column number for each column title.
+         *   names     -  The names (including alias) for each line.
          */
         final Map    titles = new LinkedHashMap/*<Object,Integer>*/();
         final List    names = new ArrayList/*<String[]>*/();
@@ -443,15 +446,40 @@ public class ParameterWriter extends FilterWriter {
             names.add(elementNames);
         }
         /*
+         * Trim the columns that duplicates the identifier column (#0). This is
+         * usually the case of the OGC column (usually #1), since we already use
+         * OGC name as the main identifier in most cases.
+         */
+        final boolean[] hide = new boolean[titles.size()];
+trim:   for (int column=hide.length; --column>=1;) {
+            for (final Iterator it=names.iterator(); it.hasNext();) {
+                final String[] alias = (String[]) it.next();
+                if (alias.length > column) {
+                    final String name = alias[column];
+                    if (name!=null && !name.equals(alias[0])) {
+                        // No need to looks at the next lines.
+                        // Move to previous column.
+                        continue trim;
+                    }
+                }
+            }
+            // A column duplicating the identifier column has been found.
+            hide[column] = true;
+        }
+        /*
          * Write the table. The header will contains one column for each alias's
          * scope (or authority) declared in 'titles', in the same order.
          */
+        int column = 0;
         synchronized (lock) {
             final TableWriter table = new TableWriter(out, " \u2502 ");
             table.setMultiLinesCells(true);
             table.writeHorizontalSeparator();
             for (final Iterator it=titles.keySet().iterator(); it.hasNext();) {
                 final Object element = it.next();
+                if (hide[column++]) {
+                    continue;
+                }
                 final String title;
                 if (element == null) {
                     title = "Identifier"; // TODO: localize
@@ -466,8 +494,11 @@ public class ParameterWriter extends FilterWriter {
             table.writeHorizontalSeparator();
             for (final Iterator it=names.iterator(); it.hasNext();) {
                 final String[] aliases = (String[]) it.next();
-                for (int i=0; i<aliases.length; i++) {
-                    final String alias = aliases[i];
+                for (column=0; column<aliases.length; column++) {
+                    if (hide[column]) {
+                        continue;
+                    }
+                    final String alias = aliases[column];
                     if (alias != null) {
                         table.write(alias);
                     }

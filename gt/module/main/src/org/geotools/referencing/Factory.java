@@ -22,9 +22,10 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.Date;
+import java.text.ParseException;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -37,6 +38,10 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.Identifier;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Parser;
+import org.geotools.referencing.wkt.Symbols;
 
 
 /**
@@ -99,6 +104,12 @@ import org.opengis.metadata.Identifier;
  * @author Martin Desruisseaux
  */
 public class Factory implements CSFactory, DatumFactory, CRSFactory {
+    /**
+     * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
+     * Will be created only when first needed.
+     */
+    private transient Parser parser;
+
     /**
      * Construct a default factory. This method is public in order to allows instantiations
      * from a {@linkplain javax.imageio.spi.ServiceRegistry service registry}. Users should
@@ -898,11 +909,24 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      *
      * @param  wkt Coordinate system encoded in Well-Known Text format.
      * @throws FactoryException if the object creation failed.
-     *
-     * @todo Code not yet ported from legacy CTS code.
      */
-    public CoordinateReferenceSystem createFromWKT(String wkt) throws FactoryException {
-        throw new FactoryException("Not yet implemented");
+    public CoordinateReferenceSystem createFromWKT(final String wkt) throws FactoryException {
+        if (parser == null) {
+            // Not a big deal if we are not synchronized. If this method is invoked in
+            // same time by two different threads, we may have two WKT Parser objects
+            // for a short time. It doesn't hurt...
+            parser = new Parser(Symbols.DEFAULT, this, this, this,
+                                FactoryFinder.getMathTransformFactory());
+        }
+        try {
+            return parser.parseCoordinateReferenceSystem(wkt);
+        } catch (ParseException exception) {
+            final Throwable cause = exception.getCause();
+            if (cause instanceof FactoryException) {
+                throw (FactoryException) cause;
+            }
+            throw new FactoryException(exception);
+        }
     }
 
     /**

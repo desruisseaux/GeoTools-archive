@@ -78,7 +78,7 @@ public class Formatter {
     /**
      * The preferred authority for object or parameter names.
      */
-    private final Citation authority = org.geotools.metadata.citation.Citation.OPEN_GIS;
+    Citation authority = org.geotools.metadata.citation.Citation.OPEN_GIS;
 
     /**
      * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
@@ -125,6 +125,14 @@ public class Formatter {
      * new indentation level.
      */
     private int margin;
+
+    /**
+     * <code>true</code> if a new line were requested during the execution
+     * of {@link #append(Formattable)}. This is used to determine if
+     * <code>UNIT</code> and <code>AUTHORITY</code> elements should appears
+     * on a new line too.
+     */
+    private boolean lineChanged;
 
     /**
      * <code>true</code> if the WKT is invalid.
@@ -187,18 +195,10 @@ public class Formatter {
 
     /**
      * Add a separator to the buffer, if needed.
-     */
-    private void appendSeparator() {
-        appendSeparator(false, false);
-    }
-
-    /**
-     * Add a separator to the buffer, if needed.
      *
      * @param newLine if <code>true</code>, add a line separator too.
-     * @param indent  <code>true</code> for increasing the indentation.
      */
-    private void appendSeparator(final boolean newLine, final boolean indent) {
+    private void appendSeparator(final boolean newLine) {
         int length = buffer.length();
         char c;
         do {
@@ -213,20 +213,9 @@ public class Formatter {
         buffer.append(symbols.separator);
         buffer.append(symbols.space);
         if (newLine && indentation != 0) {
-            if (indent) {
-                margin += indentation;
-            }
             buffer.append(System.getProperty("line.separator", "\n"));
             buffer.append(Utilities.spaces(margin));
-        }
-    }
-
-    /**
-     * Reduce the indentation after a call to <code>appendSeparator(true, true)</code>.
-     */
-    private void reduceIndentation() {
-        if (margin >= 0) {
-            margin -= indentation;
+            lineChanged = true;
         }
     }
 
@@ -239,7 +228,15 @@ public class Formatter {
      * @param formattable The formattable object to append to the WKT.
      */
     public void append(final Formattable formattable) {
-        appendSeparator(true, true);
+        /*
+         * Formats the opening bracket and the object name (e.g. "NAD27").
+         * The WKT entity name (e.g. "PROJCS") will be formatted later.
+         * The result of this code portion looks like the following:
+         *
+         *         <previous text>,
+         *           ["NAD27 / Idaho Central"
+         */
+        appendSeparator(true);
         final int base = buffer.length();
         buffer.append(symbols.open);
         final IdentifiedObject info = (formattable instanceof IdentifiedObject)
@@ -249,6 +246,17 @@ public class Formatter {
             buffer.append(getName(info));
             buffer.append(symbols.quote);
         }
+        /*
+         * Formats the part after the object name, then insert the WKT element name
+         * in front of them. The result of this code portion looks like the following:
+         *
+         *         <previous text>,
+         *           PROJCS["NAD27 / Idaho Central",
+         *             GEOGCS[...etc...],
+         *             ...etc...
+         */
+        indent(+1);
+        lineChanged = false;
         String keyword = formattable.formatWKT(this);
         if (usesClassname) {
             keyword = Utilities.getShortClassName(formattable);
@@ -258,13 +266,26 @@ public class Formatter {
             }
         }
         buffer.insert(base, keyword);
+        /*
+         * Formats the AUTHORITY[<name>,<code>] entity, if there is one. The entity
+         * will be on the same line than the enclosing one if no line separator were
+         * added (e.g. SPHEROID["Clarke 1866", ..., AUTHORITY["EPSG","7008"]]), or on
+         * a new line otherwise. After this block, the result looks like the following:
+         *
+         *         <previous text>,
+         *           PROJCS["NAD27 / Idaho Central",
+         *             GEOGCS[...etc...],
+         *             ...etc...
+         *             AUTHORITY["EPSG","26769"]]
+         */
         final Identifier identifier = getIdentifier(info);
         if (identifier != null) {
             final Citation authority = identifier.getAuthority();
             if (authority != null) {
                 /*
-                 * Format the authority code. Since WKT often use abbreviations,
-                 * we will search for the shortest title or alternate title.
+                 * Since WKT often use abbreviations, search for the shortest
+                 * title or alternate title. If one is found, it will be used
+                 * as the authority name (e.g. "EPSG").
                  */
                 InternationalString inter = authority.getTitle();
                 String title = (inter!=null) ? inter.toString(symbols.locale) : null;
@@ -280,8 +301,7 @@ public class Formatter {
                     }
                 }
                 if (title != null) {
-                    buffer.append(symbols.separator);
-                    buffer.append(symbols.space);
+                    appendSeparator(lineChanged);
                     buffer.append("AUTHORITY");
                     buffer.append(symbols.open);
                     buffer.append(symbols.quote);
@@ -299,7 +319,8 @@ public class Formatter {
             }
         }
         buffer.append(symbols.close);
-        reduceIndentation();
+        lineChanged = true;
+        indent(-1);
     }
 
     /**
@@ -333,7 +354,7 @@ public class Formatter {
      */
     public void append(final CodeList code) {
         if (code != null) {
-            appendSeparator();
+            appendSeparator(false);
             buffer.append(code.name());
         }
     }
@@ -361,7 +382,7 @@ public class Formatter {
                     unit = angularUnit;
                 }
             }
-            appendSeparator(true, false);
+            appendSeparator(true);
             buffer.append("PARAMETER");
             buffer.append(symbols.open);
             buffer.append(symbols.quote);
@@ -414,7 +435,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final int number) {
-        appendSeparator();
+        appendSeparator(false);
         format(number);
     }
 
@@ -423,7 +444,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final double number) {
-        appendSeparator();
+        appendSeparator(false);
         format(number);
     }
 
@@ -433,7 +454,7 @@ public class Formatter {
      */
     public void append(final Unit unit) {
         if (unit != null) {
-            appendSeparator();
+            appendSeparator(lineChanged);
             buffer.append(usesClassname ? "Unit" : "UNIT");
             buffer.append(symbols.open);
             buffer.append(symbols.quote);
@@ -463,7 +484,7 @@ public class Formatter {
      * A comma (or any other element separator) will be written before the string if needed.
      */
     public void append(final String text) {
-        appendSeparator();
+        appendSeparator(false);
         buffer.append(symbols.quote);
         buffer.append(text);
         buffer.append(symbols.quote);
@@ -498,6 +519,15 @@ public class Formatter {
      */
     private void format(final double number) {
         numberFormat.format(number, buffer, dummy);
+    }
+
+    /**
+     * Increase or reduce the indentation. A value of <code>+1</code> increase
+     * the indentation by the amount of spaces specified at construction time,
+     * and a value of <code>+1</code> reduce it.
+     */
+    private void indent(final int amount) {
+        margin = Math.max(0, margin + indentation*amount);
     }
 
     /**
@@ -538,8 +568,8 @@ public class Formatter {
             return true;
         }
         return (citation != null) && 
-               authority.getTitle().toString(null).equalsIgnoreCase(
-                citation.getTitle().toString(null));
+               authority.getTitle().toString(Locale.US).equalsIgnoreCase(
+                citation.getTitle().toString(Locale.US));
     }
 
     /**
@@ -556,9 +586,24 @@ public class Formatter {
         if (!authorityMatches(name.getAuthority())) {
             final GenericName[] aliases = info.getAlias();
             if (aliases != null) {
-                final String title = authority.getTitle().toString(null);
+                /*
+                 * The main name doesn't matches. Search in alias. We will first
+                 * check if alias implements Identifier (this is the case of
+                 * Geotools implementation). Otherwise, we will look at the
+                 * scope in generic name.
+                 */
                 for (int i=0; i<aliases.length; i++) {
-                    GenericName alias = aliases[i];
+                    final GenericName alias = aliases[i];
+                    if (alias instanceof Identifier) {
+                        final Identifier candidate = (Identifier) alias;
+                        if (authorityMatches(candidate.getAuthority())) {
+                            return candidate.getCode();
+                        }
+                    }
+                }
+                final String title = authority.getTitle().toString(Locale.US);
+                for (int i=0; i<aliases.length; i++) {
+                    final GenericName alias = aliases[i];
                     final GenericName scope = alias.getScope();
                     if (scope != null) {
                         if (title.equalsIgnoreCase(scope.toString())) {
@@ -663,6 +708,7 @@ public class Formatter {
         }
         linearUnit  = null;
         angularUnit = null;
+        lineChanged = false;
         invalidWKT  = false;
         margin      = 0;
     }

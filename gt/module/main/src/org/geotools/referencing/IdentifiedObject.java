@@ -286,10 +286,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
              *       so it should not change across implementations.
              */
             switch (key.hashCode()) {
-                // Fix case for common keywords.
+                // Fix case for common keywords. They are not used
+                // by this class, but are used by some subclasses.
                 case -1528693765: if (key.equals("anchorpoint"))      key="anchorPoint";      break;
                 case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
                 case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
+                // ----------------------------
+                // "name": String or Identifier
+                // ----------------------------
                 case 3373707: {
                     if (key.equals(NAME_PROPERTY)) {
                         if (value instanceof String) {
@@ -302,6 +306,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     }
                     break;
                 }
+                // -------------------------------------------------------
+                // "alias": String, String[], GenericName or GenericName[]
+                // -------------------------------------------------------
                 case 92902992: {
                     if (key.equals(ALIAS_PROPERTY)) {
                         if (value instanceof String) {
@@ -322,6 +329,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     }
                     break;
                 }
+                // -----------------------------------------
+                // "identifiers": Identifier or Identifier[]
+                // -----------------------------------------
                 case 1368189162: {
                     if (key.equals(IDENTIFIERS_PROPERTY)) {
                         if (value != null) {
@@ -335,6 +345,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     }
                     break;
                 }
+                // ----------------------------------------
+                // "remarks": String or InternationalString
+                // ----------------------------------------
                 case 1091415283: {
                     if (key.equals(REMARKS_PROPERTY)) {
                         if (value instanceof InternationalString) {

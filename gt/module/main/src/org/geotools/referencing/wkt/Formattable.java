@@ -27,10 +27,13 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 
 // GeoAPI dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -127,7 +130,7 @@ public class Formattable {
     /**
      * Returns a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> for this object using a default {@linkplain Formatter formatter}.
+     * Known Text</cite> (WKT)</A> for this object using the specified indentation.
      *
      * @param  indentation The amount of spaces to use in indentation for WKT formatting,
      *         or 0 for formatting the whole WKT on a single line.
@@ -139,11 +142,40 @@ public class Formattable {
      *         implementations can be formatted as WKT.
      */
     public String toWKT(final int indentation) throws UnformattableObjectException {
+        return toWKT(org.geotools.metadata.citation.Citation.OPEN_GIS, indentation);
+    }
+
+    /**
+     * Returns a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> for this object using the specified indentation and authority.
+     *
+     * @param  authority The authority to prefer when choosing WKT entities names.
+     * @param  indentation The amount of spaces to use in indentation for WKT formatting,
+     *         or 0 for formatting the whole WKT on a single line.
+     * @return The Well Know Text for this object.
+     * @throws UnformattableObjectException If this object can't be formatted as WKT.
+     *         A formatting may fails because an object is too complex for the WKT format
+     *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+     *         engineering CRS} with different unit for each axis), or because only some specific
+     *         implementations can be formatted as WKT.
+     */
+    public String toWKT(final Citation authority, final int indentation)
+            throws UnformattableObjectException
+    {
+        if (authority == null) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "authority"));
+        }
         // No need to synchronize. This is not a big deal
         // if two formatters co-exist for a short time.
         Formatter formatter = WKT_FORMATTER;
-        if (formatter==null || formatter.indentation!=indentation) {
+        if (formatter             == null        ||
+            formatter.indentation != indentation ||
+            formatter.authority   != authority)
+        {
             formatter = new Formatter(Symbols.DEFAULT, indentation);
+            formatter.authority = authority;
             WKT_FORMATTER = formatter;
         }
         synchronized (formatter) {

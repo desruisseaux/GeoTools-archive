@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.parameter.InvalidParameterValueException;
@@ -80,27 +81,26 @@ public abstract class AbstractParser extends Format {
     }
 
     /**
-     * Returns a tree of {@link Element} for the specified text.
-     *
-     * @param  text       The text to parse.
-     * @param  position   In input, the position where to start parsing from.
-     *                    In output, the first character after the separator.
+     * Returns the preferred authority for formatting WKT entities.
+     * The {@link #format format} methods will uses the name specified
+     * by this authority, if available.
      */
-    protected final Element getTree(final String text, final ParsePosition position)
-            throws ParseException
-    {
-        return new Element(new Element(this, text, position));
+    public Citation getAuthority() {
+        return getFormatter().authority;
     }
 
-
     /**
-     * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
-     *
-     * @param  element The element to be parsed.
-     * @return The object.
-     * @throws ParseException if the element can't be parsed.
+     * Set the preferred authority for formatting WKT entities.
+     * The {@link #format format} methods will uses the name specified
+     * by this authority, if available.
      */
-    protected abstract Object parse(final Element element) throws ParseException;
+    public void setAuthority(final Citation authority) {
+        if (authority == null) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "authority"));
+        }
+        getFormatter().authority = authority;
+    }
 
     /**
      * Parses a <cite>Well Know Text</cite> (WKT).
@@ -137,6 +137,38 @@ public abstract class AbstractParser extends Format {
     }
 
     /**
+     * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
+     *
+     * @param  element The element to be parsed.
+     * @return The object.
+     * @throws ParseException if the element can't be parsed.
+     */
+    protected abstract Object parse(final Element element) throws ParseException;
+
+    /**
+     * Returns a tree of {@link Element} for the specified text.
+     *
+     * @param  text       The text to parse.
+     * @param  position   In input, the position where to start parsing from.
+     *                    In output, the first character after the separator.
+     */
+    protected final Element getTree(final String text, final ParsePosition position)
+            throws ParseException
+    {
+        return new Element(new Element(this, text, position));
+    }
+
+    /**
+     * Returns the formatter. Creates it if needed.
+     */
+    private Formatter getFormatter() {
+        if (formatter == null) {
+            formatter = new Formatter(symbols, numberFormat);
+        }
+        return formatter;
+    }
+
+    /**
      * Format the specified object as a Well Know Text.
      * Formatting will uses the same set of symbols than the one used for parsing.
      */
@@ -144,9 +176,7 @@ public abstract class AbstractParser extends Format {
                                final StringBuffer  toAppendTo,
                                final FieldPosition pos)
     {
-        if (formatter == null) {
-            formatter = new Formatter(symbols, numberFormat);
-        }
+        final Formatter formatter = getFormatter();
         try {
             formatter.buffer = toAppendTo;
             formatter.bufferBase = toAppendTo.length();

@@ -78,7 +78,7 @@ public class WKTParserTest extends TestCase {
      * Parse parsing of coordinate reference systems.
      */
     public void testCoordinateReferenceSystem() throws IOException, ParseException {
-//        testParsing(new Parser(), "wkt/CoordinateReferenceSystem.txt");
+        testParsing(new Parser(), "wkt/CoordinateReferenceSystem.txt");
     }
 
     /**
@@ -122,7 +122,9 @@ public class WKTParserTest extends TestCase {
              * Format the object and parse it again.
              * Ensure that the result is consistent.
              */
-            final String formatted = parser.format(parsed);
+            String formatted = parser.format(parsed);
+            if (line.indexOf("semi_major")<0) formatted=remove(formatted, "semi_major");
+            if (line.indexOf("semi_minor")<0) formatted=remove(formatted, "semi_minor");
             final Object again;
             try {
                 again = parser.parseObject(formatted);
@@ -143,5 +145,28 @@ public class WKTParserTest extends TestCase {
             assertTrue("Inconsistent hashCode or equals method.",  pool.contains(again));
         }
         reader.close();
+    }
+
+    /**
+     * Remove the "PARAMETER" statement of the given name. This is needed because
+     * "semi_major" and "semi_minor" are not explicit parameters in the original
+     * WKT strings. The WKT formatter add them, but may format them in a different
+     * unit. Parsing them again may result in rounding errors.
+     */
+    private static String remove(final String wkt, final String param) {
+        int offset = -1;
+        while ((offset=wkt.indexOf("PARAMETER[", offset+1)) >= 0) {
+            final int present = wkt.indexOf(param);
+            int end = wkt.indexOf(']', offset);
+            if (present>=offset && present<end) {
+                final int length = wkt.length();
+                while (++end<length && Character.isWhitespace(wkt.charAt(end)));
+                if (end<length && wkt.charAt(end)==',') {
+                    end++;
+                }
+                return wkt.substring(0, offset) + wkt.substring(end);
+            }
+        }
+        return wkt;
     }
 }

@@ -271,7 +271,7 @@ public class Parser extends MathTransformParser {
         final double   factor = element.pullDouble("factor");
         final Map  properties = parseAuthority(element, name);
         element.close();
-        return unit.multiply(factor);
+        return (factor!=1) ? unit.multiply(factor) : unit;
     }
 
     /**
@@ -314,12 +314,28 @@ public class Parser extends MathTransformParser {
                   Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
         }
         try {
-            return csFactory.createCoordinateSystemAxis(
-                   Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, name),
-                   name, direction, unit);
+            return createAxis(name, direction, unit);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
+    }
+
+    /**
+     * Creates an axis.
+     *
+     * @param  name The axis name.
+     * @param  direction The axis direction.
+     * @param  unit The axis unit.
+     * @return The axis.
+     * @throws FactoryException if the axis can't be created.
+     */
+    private CoordinateSystemAxis createAxis(final String        name,
+                                            final AxisDirection direction,
+                                            final Unit          unit)
+            throws FactoryException
+    {
+        return csFactory.createCoordinateSystemAxis(Collections.singletonMap(
+               IdentifiedObject.NAME_PROPERTY, name), name, direction, unit);
     }
 
     /**
@@ -631,19 +647,21 @@ public class Parser extends MathTransformParser {
         final PrimeMeridian meridian = parsePrimem   (element, NonSI.DEGREE_ANGLE);
         final GeodeticDatum    datum = parseDatum    (element, meridian);
         final Unit        linearUnit = parseUnit     (element, SI.METER);
-        final CartesianCS cs;
-        final CoordinateSystemAxis axis0 = parseAxis(element, linearUnit, false);
+        CoordinateSystemAxis axis0, axis1, axis2;
+        axis0 = parseAxis(element, linearUnit, false);
         try {
             if (axis0 != null) {
-                final CoordinateSystemAxis axis1 = parseAxis(element, linearUnit, true);
-                final CoordinateSystemAxis axis2 = parseAxis(element, linearUnit, true);
-                cs = csFactory.createCartesianCS(properties, axis0, axis1, axis2);
-            }
-            else {
-                cs = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+                axis1 = parseAxis(element, linearUnit, true);
+                axis2 = parseAxis(element, linearUnit, true);
+            } else {
+                // Those default values are part of WKT specification.
+                axis0 = createAxis("X", AxisDirection.OTHER, linearUnit);
+                axis1 = createAxis("Y", AxisDirection.EAST,  linearUnit);
+                axis2 = createAxis("Z", AxisDirection.NORTH, linearUnit);
             }
             element.close();
-            return crsFactory.createGeocentricCRS(properties, datum, cs);
+            return crsFactory.createGeocentricCRS(properties, datum,
+                    csFactory.createCartesianCS(properties, axis0, axis1, axis2));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -672,10 +690,10 @@ public class Parser extends MathTransformParser {
         CoordinateSystemAxis axis = parseAxis(element, linearUnit, false);
         Map            properties = parseAuthority(element, name);
         element.close();
-        if (axis == null) {
-            axis = org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE;
-        }
         try {
+            if (axis == null) {
+                axis = createAxis("Z", AxisDirection.UP, linearUnit);
+            }
             return crsFactory.createVerticalCRS(properties, datum,
                     csFactory.createVerticalCS(Collections.singletonMap("name", name), axis));
         } catch (FactoryException exception) {
@@ -702,19 +720,18 @@ public class Parser extends MathTransformParser {
         PrimeMeridian     meridian = parsePrimem   (element, angularUnit);
         GeodeticDatum        datum = parseDatum    (element, meridian);
         CoordinateSystemAxis axis0 = parseAxis     (element, angularUnit, false);
-        CoordinateSystemAxis axis1 = null;
-        EllipsoidalCS cs;
-        if (axis0 != null) {
-            axis1 = parseAxis(element, angularUnit, true);
-        }
-        element.close();
+        CoordinateSystemAxis axis1;
         try {
             if (axis0 != null) {
-                cs = csFactory.createEllipsoidalCS(properties, axis0, axis1);
+                axis1 = parseAxis(element, angularUnit, true);
             } else {
-                cs = org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D;
+                // Those default values are part of WKT specification.
+                axis0 = createAxis("Lon", AxisDirection.EAST,  angularUnit);
+                axis1 = createAxis("Lat", AxisDirection.NORTH, angularUnit);
             }
-            return crsFactory.createGeographicCRS(properties, datum, cs);
+            element.close();
+            return crsFactory.createGeographicCRS(properties, datum,
+                    csFactory.createEllipsoidalCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -743,20 +760,19 @@ public class Parser extends MathTransformParser {
         Unit               angularUnit = geoCRS.getCoordinateSystem().getAxis(0).getUnit();
         ParameterValueGroup projection = parseProjection(element, ellipsoid, linearUnit, angularUnit);
         CoordinateSystemAxis     axis0 = parseAxis(element, linearUnit, false);
-        CoordinateSystemAxis     axis1 = null;
-        CartesianCS cs;
-        if (axis0 != null) {
-            axis1 = parseAxis(element, linearUnit, true);
-        }
-        element.close();
+        CoordinateSystemAxis     axis1;
         try {
             if (axis0 != null) {
-                cs = csFactory.createCartesianCS(properties, axis0, axis1);
+                axis1 = parseAxis(element, linearUnit, true);
             } else {
-                cs = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+                // Those default values are part of WKT specification.
+                axis0 = createAxis("X", AxisDirection.EAST,  linearUnit);
+                axis1 = createAxis("Y", AxisDirection.NORTH, linearUnit);
             }
+            element.close();
             return crsFactory.createProjectedCRS(properties, geoCRS,
-                    mtFactory.createParameterizedTransform(projection), cs);
+                    mtFactory.createParameterizedTransform(projection),
+                    csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -844,6 +860,8 @@ public class Parser extends MathTransformParser {
      * Optional arguments are:
      *
      * <TABLE CELLPADDING='0' CELLSPACING='0'>
+     *   <TR><TD NOWRAP><CODE>-authority</CODE> <VAR>&lt;name&gt;</VAR></TD>
+     *       <TD NOWRAP>&nbsp;The authority to prefer when choosing WKT entities names.</TD></TR>
      *   <TR><TD NOWRAP><CODE>-indentation</CODE> <VAR>&lt;value&gt;</VAR></TD>
      *       <TD NOWRAP>&nbsp;Set the indentation (0 for output on a single line)</TD></TR>
      *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
@@ -855,15 +873,21 @@ public class Parser extends MathTransformParser {
     public static void main(String[] args) {
         final Arguments arguments = new Arguments(args);
         final Integer indentation = arguments.getOptionalInteger(Formattable.INDENTATION);
+        final String    authority = arguments.getOptionalString("-authority");
         args = arguments.getRemainingArguments(0);
         if (indentation != null) {
             Formattable.setIndentation(indentation.intValue());        
         }
         final BufferedReader in = new BufferedReader(Arguments.getReader(System.in));
         try {
-            new Parser().reformat(in, arguments.out, arguments.err);
+            final Parser parser = new Parser();
+            if (authority != null) {
+                parser.setAuthority(Citation.createCitation(authority));
+            }
+            parser.reformat(in, arguments.out, arguments.err);
         } catch (Exception exception) {
             exception.printStackTrace(arguments.err);
         }
+        // Do not close 'in', since it is the standard input stream.
     }
 }

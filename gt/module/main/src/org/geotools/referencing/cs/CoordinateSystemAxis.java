@@ -484,7 +484,7 @@ public class CoordinateSystemAxis extends IdentifiedObject
     private static Map toMap(final InternationalString name) {
         final Map properties = new HashMap(4);
         if (name != null) {
-            properties.put(NAME_PROPERTY,  name.toString(null));
+            properties.put(NAME_PROPERTY,  name.toString(Locale.US));
             properties.put(ALIAS_PROPERTY, NameFactory.create(new InternationalString[] {name}));
         }
         return properties;

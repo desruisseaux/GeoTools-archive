@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 // Geotools dependencies
+import org.geotools.util.LocalName;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
@@ -61,7 +62,8 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
     static {
         final Map properties = new HashMap(4);
         properties.put( NAME_PROPERTY, "Unknow");
-        properties.put(ALIAS_PROPERTY, Resources.formatInternational(ResourceKeys.UNKNOW));
+        properties.put(ALIAS_PROPERTY,
+                       new LocalName(Resources.formatInternational(ResourceKeys.UNKNOW)));
         UNKNOW = new EngineeringDatum(properties);
     }
 
