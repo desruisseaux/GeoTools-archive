@@ -92,6 +92,11 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     static final double TOL = 1E-10;
     
     /**
+     * Maximum number of itterations for iterative computations.
+     */
+    static final int MAX_ITER = 15;
+    
+    /**
      * Classification string for this projection (e.g. "Transverse_Mercator").
      */
     private final String classification;
@@ -928,7 +933,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     final double cphi2(final double ts) throws ProjectionException {
         final double eccnth = 0.5*e;
         double phi = (Math.PI/2) - 2.0*Math.atan(ts);
-        for (int i=0; i<16; i++) {
+        for (int i=0; i<MAX_ITER; i++) {
             final double con  = e*Math.sin(phi);
             final double dphi = (Math.PI/2) - 2.0*Math.atan(ts * Math.pow((1-con)/(1+con), eccnth)) - phi;
             phi += dphi;
