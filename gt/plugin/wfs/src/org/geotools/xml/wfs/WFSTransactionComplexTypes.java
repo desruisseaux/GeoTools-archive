@@ -916,11 +916,16 @@ public class WFSTransactionComplexTypes {
             Element e = null;
 
             if (els != null) {
-                for (int i = 0; i < els.length; i++)
-                    if (f.getFeatureType().getTypeName().equals(els[i].getName())) {
-                        e = els[i];
-                        i = els.length;
-                    }
+                for (int i = 0; i < els.length; i++){
+	                String typeName = f.getFeatureType().getTypeName();
+	                if (typeName.indexOf(':')>=0) {
+	                   	typeName = typeName.substring(typeName.indexOf(':')+1);
+	                }
+	                if (typeName.equals(els[i].getName())) {
+	                     e = els[i];
+	                     i = els.length;
+	                }
+                }
             }
 
             // write it

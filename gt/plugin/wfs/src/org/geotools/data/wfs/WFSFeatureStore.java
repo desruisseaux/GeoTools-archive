@@ -37,7 +37,6 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -93,7 +92,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             		if(atrs[i].isGeometry()){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getName());
+                		g.setUserData(cs.getIdentifiers()[0].toString());
             		}
             	}
                 ts.addAction(new InsertAction(f));
@@ -158,7 +157,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         	if(type[i].isGeometry()){
         		Geometry g = (Geometry)value[i];
         		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
-        		g.setUserData(cs.getName());
+        		g.setUserData(cs.getIdentifiers()[0].toString());
         	}
             props.put(type[i].getName(), value[i]);
         }
@@ -204,7 +203,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             		if(atrs[i].isGeometry()){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getName());
+                		g.setUserData(cs.getIdentifiers()[0].toString());
             		}
             	}
                 ts.addAction(new InsertAction(f));
