@@ -357,7 +357,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
         for (int i=0; i<names.length; i++) {
             final String alias = names[i].asLocalName().toString();
             final Object[] previous = (Object[]) aliasMap.put(alias.toLowerCase(), names);
-            assert Arrays.equals(aliases, previous);
+            assert previous==names || Arrays.equals(aliases, previous) : alias;
         }
         return names;
     }
