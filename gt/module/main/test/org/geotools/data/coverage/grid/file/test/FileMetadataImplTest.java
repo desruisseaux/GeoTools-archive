@@ -41,8 +41,8 @@ public class FileMetadataImplTest extends TestCase {
         super.setUp();
         resource = TestData.getResource(this,"ArcGrid.asc");
         assertNotNull(resource);
-        uri=new URI(URLDecoder.decode(resource.toString(),"UTF-8"));
-        f=new File(uri);
+        f = TestData.file(this, "ArcGrid.asc");
+        uri = f.toURI();
         assertTrue(f.exists());
     }
 
