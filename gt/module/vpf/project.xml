@@ -12,12 +12,31 @@
   <mailingLists />
   <developers>
     <developer>
+      <name>Jeff Yutzler</name>
+      <id>kobit</id>
+      <email>jeff@ionicenterprise.com</email>
+      <organization>IONIC</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Knut-Erik Johnsen</name>
+      <id>knutejoh</id>
+      <email>knuterik@onemap.org</email>
+      <organization>Project OneMap</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Artur Hefczyc</name>
       <id>kobit</id>
       <email>kobit@users.sourceforge.net</email>
       <organization>CCG</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
