@@ -71,7 +71,7 @@ public interface ElementGrouping {
      */
     public static final int ALL = 32;
     
-    public static final int UNBOUNDED = -1;
+    public static final int UNBOUNDED = Integer.MAX_VALUE;
 
     /**
      * <p>
