@@ -19,13 +19,13 @@ package org.geotools.data;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -59,7 +59,22 @@ import com.vividsolutions.jts.geom.Envelope;
  * On the way we thre we are not going to have the difference between
  * Filter/Expression. Expr can make an Expression, and Expr can make a
  * Filter.
+ * </p>
  * <p>
+ * BTW: just so we can have everything make sense
+ * <ul>
+ * <li> Expr is immutable
+ * <li> I don't care if Expr trees simplfy themselves during construction
+ * <li> If you are going to simply - '.' means AND - <br>
+ *      <code>Expr.bbox( extent ).lt( Expr.attribute("cost"), 50 ) ==
+ *  	Expr.bbox( extent ).and( lt( Expr.attribute("cost"), 50 ) )</code>
+ * <li> There are convience methods that make sense - <br>
+ * 		<code>Expr.bbox( extent ) == geom().disjoint( Expr.literal( extent)).not()</code>
+ * <li> Or you have to do by hand - <br>
+ *      <code>Expr.fid( "road.1234" ).or( Expr.fid("road.4321) )</code>
+ * <li> or do you? <br>
+ * 		<code>Expr.fid( "road.1234" ).or( "road.4321" )</code> 
+ * </p>
  * @author Jody Garnett
  */
 public class Expr {
@@ -77,9 +92,27 @@ public class Expr {
 			return null;
 		} 
 	}
-	Expr fid( final String featureID ){
-		return new FidsExpr( featureID );		
+	//
+	// Convience methods
+	//
+	/** Convience method for: geom().disjoint( literal( bbox )).not() */ 
+	Expr bbox( Envelope bbox ){
+		return geom().disjoint( literal( bbox )).not();		
 	}
+	/**
+	 * Convience method for accessing a single fid
+	 * 
+	 * @param fetureID
+	 * @return
+	 */
+	Expr fid( final String featureID ){		
+		Set set = new HashSet();
+		set.add( featureID );
+		return new FidsExpr( set );		
+	}
+	//
+	// Default Implemetnation
+	//
 	Expr fid( final Set fids ){
 		return new FidsExpr( fids );
 	}
@@ -87,14 +120,25 @@ public class Expr {
 		return new NotExpr( this );
 	}
 	Expr and( Expr expr ){
-		return new AndExpr( this, expr );		
+		return new AndExpr( this, expr );
 	}
 	Expr or( Expr expr ){
 		return new OrExpr( this, expr );		
 	}
-	Expr bbox( Envelope bbox ){
-		return new BBoxExpr( bbox );
-	}
+	
+	/**
+	 * Allows or chaining with out extra mess.
+	 * <p>
+	 * Example:
+	 * <code>Expr.fid( "road.1234" ).or( "road.4321" )</code>
+	 * </p>
+	 * @param next
+	 * @return
+	 */
+	Expr or( Object next ){
+		return new LiteralExpr( next );
+	}	
+	
 	Expr literal( int i ){
 		return new LiteralExpr( i );
 	}
@@ -304,18 +348,20 @@ class FidsExpr extends FilterExpr {
 		filter.addAllFids( fids );
 		return filter;
 	}
-	Expr fid(Set moreFids ) {
+	Expr or( Expr expr ){
+		if( expr instanceof FidsExpr ){
+			return or( (FidsExpr) expr );
+		}
+		else {
+			return new OrExpr( this, expr );
+		}
+	}
+	Expr or(FidsExpr expr ) {
 		Set allFids = new HashSet();
 		allFids.addAll( fids );
-		allFids.addAll( moreFids );
+		allFids.addAll( expr.fids );
 		return new FidsExpr( allFids );
-	}
-	Expr fid(String featureID) {
-		Set allFids = new HashSet();
-		allFids.addAll( fids );
-		allFids.add( featureID );
-		return new FidsExpr( allFids );
-	}
+	}	
 }
 class NotExpr extends FilterExpr {
 	Expr expr;
@@ -352,19 +398,7 @@ class OrExpr extends FilterExpr {
 		return filter1.or( filter2 );		
 	}
 }
-class BBoxExpr extends ExpressionExpr {
-	Envelope bbox;
-	BBoxExpr( Envelope bbox ){
-		this.bbox = bbox;		
-	}
-	Expression expression(FeatureType schema) {
-		try {
-			return factory.createBBoxExpression( bbox );		
-		} catch (IllegalFilterException e) {
-			return null;
-		}
-	}
-}
+
 class LiteralExpr extends ExpressionExpr {
 	Object literal;
 	LiteralExpr( int i ){
