@@ -245,6 +245,14 @@
         <role>Module Maintainer</role>
       </roles>
     </developer> 		
+    <developer>
+      <name>Rueben Schulz</name>
+      <organization>University of British Columbia</organization>
+      <roles>
+        <role>Java developper</role>
+        <role>Tester</role>
+      </roles>
+    </developer>
   </developers>
 
   <dependencies>
