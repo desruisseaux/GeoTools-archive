@@ -93,7 +93,7 @@ public class GMLComplexTypes {
     	l.setLevel(Level.WARNING);
     	return l;
     }
-    	
+
 
     /** DOCUMENT ME!  */
     public static final String STREAM_HINT = "org.geotools.xml.gml.STREAM_HINT";
@@ -565,7 +565,7 @@ public class GMLComplexTypes {
      * @see ElementValue
      */
     private static class DefaultElementValue implements ElementValue {
-        // local data variables 
+        // local data variables
         private Element elem;
         private Object value;
 
@@ -775,7 +775,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return null;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new AbstractGeometryType();
 
@@ -923,7 +923,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return null;
         }
-        
+
         private static final Attribute[] attributes = {
                 new GMLSchema.GMLAttribute("gid",
                     XSISimpleTypes.ID.getInstance()),
@@ -1067,7 +1067,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elems;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new GeometryAssociationType();
 
@@ -1241,7 +1241,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PointMemberType();
 
@@ -1257,7 +1257,7 @@ public class GMLComplexTypes {
                         1, true, null)),
             };
 
-        // static sequence 
+        // static sequence
         private static final DefaultSequence seq = new DefaultSequence(elements);
 
         /*
@@ -1422,11 +1422,11 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new LineStringMemberType();
 
-        // static list of attributes 
+        // static list of attributes
         private static final Attribute[] attributes = loadAttributes();
 
         // static list of elements
@@ -1602,7 +1602,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PolygonMemberType();
 
@@ -1785,7 +1785,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new LinearRingMemberType();
 
@@ -1966,7 +1966,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PointType();
 
@@ -2145,7 +2145,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new LineStringType();
 
@@ -2340,7 +2340,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new LinearRingType();
 
@@ -2529,7 +2529,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new BoxType();
 
@@ -2724,12 +2724,12 @@ public class GMLComplexTypes {
                 return;
             }
 
-            output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
+            //output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
 
 //            Coordinate[] coords = g.getCoordinates();
             Envelope e = g.getEnvelopeInternal();
             encodeCoords(element, e, output);
-            output.endElement(GMLSchema.NAMESPACE, element.getName());
+//            output.endElement(GMLSchema.NAMESPACE, element.getName());
         }
     }
 
@@ -2753,7 +2753,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PolygonType();
 
@@ -2929,7 +2929,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new GeometryCollectionType();
 
@@ -3088,7 +3088,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiPointType();
 
@@ -3250,7 +3250,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiLineStringType();
 
@@ -3412,7 +3412,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiPolygonType();
 
@@ -3573,7 +3573,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new CoordType();
 
@@ -3761,7 +3761,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return null;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new CoordinatesType();
 
@@ -3976,7 +3976,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // static attribute list
         private static final Attribute[] attributes = {
                 new GMLAttribute("fid", XSISimpleTypes.ID.getInstance(),
@@ -4188,7 +4188,7 @@ public class GMLComplexTypes {
          */
         private FeatureType loadFeatureType(Element element,
             ElementValue[] value, Attributes attrs) throws SAXException {
-            
+
             FeatureType ft = createFeatureType(element);
                 featureTypeMappings.put(element.getType().getNamespace() + "#"
                     + element.getName(), ft);
@@ -4410,7 +4410,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new AbstractFeatureCollectionType();
 
@@ -4504,8 +4504,8 @@ public class GMLComplexTypes {
         private FeatureCollection getCollection(ElementValue[] value) {
             //bbox slot
             GMLFeatureCollection fc = new GMLFeatureCollection(((Geometry)value[0].getValue()).getEnvelopeInternal());
-            
-            
+
+
             for (int i = 1; i < value.length; i++) // bbox is slot 0
                 fc.add(value[i].getValue());
 
@@ -4662,7 +4662,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new GeometryPropertyType();
 
@@ -4839,7 +4839,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new FeatureAssociationType();
 
@@ -5021,7 +5021,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new BoundingShapeType();
 
@@ -5189,7 +5189,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PointPropertyType();
 
@@ -5347,7 +5347,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new PolygonPropertyType();
 
@@ -5505,7 +5505,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new LineStringPropertyType();
 
@@ -5664,7 +5664,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiPointPropertyType();
 
@@ -5823,7 +5823,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiLineStringPropertyType();
 
@@ -5983,7 +5983,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiPolygonPropertyType();
 
@@ -6143,7 +6143,7 @@ public class GMLComplexTypes {
         public Element[] getChildElements() {
             return elements;
         }
-        
+
         // singleton instance
         private static final GMLComplexType instance = new MultiGeometryPropertyType();
 
@@ -6302,14 +6302,14 @@ public class GMLComplexTypes {
 //        FeatureType parent = null;
 //        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
 //            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
-        
+
 //        if(parent != null && parent.getAttributeTypes()!=null){
 //            typeFactory.addTypes(parent.getAttributeTypes());
 //            if(parent.getDefaultGeometry()!=null){
 //                geometryAttribute = parent.getDefaultGeometry();
 //            }
 //        }
-        
+
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
@@ -6352,14 +6352,14 @@ public class GMLComplexTypes {
 //        FeatureType parent = null;
 //        if(element.getParent()instanceof ComplexType)
 //            parent = createFeatureType((ComplexType)element.getParent());
-        
+
 //        if(parent != null && parent.getAttributeTypes()!=null){
 //            typeFactory.addTypes(parent.getAttributeTypes());
 //            if(parent.getDefaultGeometry()!=null){
 //                geometryAttribute = parent.getDefaultGeometry();
 //            }
 //        }
-        
+
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
@@ -6387,13 +6387,13 @@ public class GMLComplexTypes {
             throw new SAXException(e);
         }
     }
-    
+
     private static List getAttributes(ElementGrouping eg){
         ElementGrouping[] elems = null;
     	List l = new LinkedList();
-        
+
         switch(eg.getGrouping()){
-        
+
         case ElementGrouping.CHOICE:
             // assume for most cases the first is chosen
             // TODO make a better solution
@@ -6404,7 +6404,7 @@ public class GMLComplexTypes {
             // AttributeType
             l.add(getAttribute((Element)eg));
         	return l;
-            
+
         case ElementGrouping.ALL:
             elems = ((All)eg).getElements();
         	break;
@@ -6417,11 +6417,11 @@ public class GMLComplexTypes {
         	    l.addAll(getAttributes(elems[i]));
         return l;
     }
-    
+
     private static AttributeType getAttribute(Element eg){
     	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
     		return null;
-    	
+
     	AttributeType at = null;
 		if(eg.getType() instanceof ComplexType && eg.getType().getInstanceType().equals(Object[].class)){
 			ComplexType ct = (ComplexType)eg.getType();
@@ -6436,11 +6436,11 @@ public class GMLComplexTypes {
 				List l =  getAttributes(ct.getChild());
 				if(l!=null)
 				return (AttributeType)l.get(0); // HACK
- 
+
 		}}
 	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
 //	    	System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable()+" "+eg.getType().getInstanceType()+" "+eg.getType().getNamespace()+":"+eg.getType().getName());
-		
+
     	return at;
     }
 }
