@@ -20,6 +20,7 @@ import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
+import org.geotools.filter.SQLEncoderMySQL;
 import org.geotools.filter.SQLEncoder;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -244,6 +245,9 @@ public class MySQLDataStore extends JDBCDataStore {
     }
 
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
+        //SQLEncoder encoder = new SQLEncoderMySQL(); replace with this once
+	//it is fully tested, the test cases work, but I don't have a live
+        //mysql database. -ch
         SQLEncoder encoder = new SQLEncoder();
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new MySQLSQLBuilder(encoder);
