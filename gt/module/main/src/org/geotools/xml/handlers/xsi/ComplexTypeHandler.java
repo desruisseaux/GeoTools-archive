@@ -518,7 +518,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
                     dct.parent = ct;
 
                     // attributes
-                    if (ct.getAttributes() != null) {
+                    if (ct!=null && ct.getAttributes() != null) {
                         Attribute[] it = ct.getAttributes();
 
                         for (int i = 0; i < it.length; i++) {
