@@ -242,7 +242,7 @@
   <build>
     <unitTest>
       <includes>
-        <include>**/*Test.xjava</include>
+        <include>**/*Test.java</include>
       </includes>
       <excludes>
         <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
