@@ -22,7 +22,7 @@
  *    National Oceanic & Atmospheric Administration. NOAA's work
  *    is fully acknowledged here.
  */
-package org.geotools.science.astro;
+package org.geotools.nature;
 
 // J2SE dependencies
 import java.util.Date;
@@ -71,8 +71,6 @@ import java.awt.geom.Point2D;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @deprecated Moved to the {@link org.geotools.nature} package.
  */
 public class SunRelativePosition {
     /**

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -282,14 +283,23 @@ public final class FactoryFinder {
      * @param  out The output stream where to format the list.
      * @param  locale The locale for the list, or <code>null</code>.
      * @throws IOException if an error occurs while writting to <code>out</code>.
+     *
+     * @todo Localize the title line.
      */
     public static synchronized void listProviders(final Writer out, final Locale locale)
             throws IOException
     {
         getProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
-        final TableWriter table  = new TableWriter(out, 1);
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        final TableWriter table  = new TableWriter(out, 1);
         table.setMultiLinesCells(true);
+        table.write("Factory");
+        table.nextColumn();
+        table.write("Implementation(s)");
+        table.nextLine();
+        table.nextColumn('\u2500');
+        table.nextColumn('\u2500');
+        table.nextLine();
         for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
             final Class category = (Class)categories.next();
             table.write(Utilities.getShortName(category));
@@ -302,7 +312,8 @@ public final class FactoryFinder {
                 }
                 first = false;
                 final Factory provider = (Factory)providers.next();
-                table.write(provider.getVendor().getTitle().toString(locale));
+                final Citation vendor = provider.getVendor();
+                table.write(vendor.getTitle().toString(locale));
             }
             table.nextLine();
         }

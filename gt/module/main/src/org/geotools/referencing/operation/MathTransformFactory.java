@@ -174,31 +174,29 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
 
     /**
      * Returns the math transform provider for the specified operation method.
-     * This provider can be used in order to query parameter for an identifier
+     * This provider can be used in order to query parameter for a classification
      * code (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
      * or any of the alias in a given locale.
      *
-     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code}
-     *         of the operation method to search for (e.g. "Transverse_Mercator").
+     * @param  classification The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the operation method to search for (e.g. <code>"Transverse_Mercator"</code>).
      * @return The math transform provider.
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
-     *         operation method identifier.
-     *
-     * @todo Rename resource keys as "NO_TRANSFORM_FOR_IDENTIFIER_$1", and rename the
-     *       message content too.
+     *         classification.
      */
-    private MathTransformProvider getProvider(final String identifier)
+    private MathTransformProvider getProvider(final String classification)
             throws NoSuchIdentifierException
     {
         final Iterator providers = getProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
             final MathTransformProvider provider = (MathTransformProvider) providers.next();            
-            if (provider.nameMatches(identifier)) {
+            if (provider.nameMatches(classification)) {
                 return provider;
             }
         }
         throw new NoSuchIdentifierException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, identifier), identifier);
+                  ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, classification),
+                  classification);
     }
     
     /**
@@ -215,20 +213,22 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @param  classification The case insensitive classification to search for (e.g.
      * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
      * @return The default parameter values.
-     * @throws NoSuchIdentifierException if there is no transform registered for the specified classification.
+     * @throws NoSuchIdentifierException if there is no transform registered for the specified
+     *         classification.
      *
      * @see #getAvailableTransforms
      */
     public ParameterValueGroup getDefaultParameters(final String classification)
             throws NoSuchIdentifierException
     {
-        final ParameterDescriptorGroup type = getProvider(classification).getParameters();
-        return (ParameterValueGroup) type.createValue();
+        // Remove the cast when we will be allowed to compile for J2SE 1.5.
+        return (ParameterValueGroup) getProvider(classification).getParameters().createValue();
     }
 
     /**
-     * Creates a transform from a group of parameters. The {@linkplain ParameterDescriptorGroup#getName
-     * parameter group name} is used as the classification name of the transform to construct (e.g.
+     * Creates a transform from a group of parameters. The
+     * {@linkplain ParameterDescriptorGroup#getName parameter group name}
+     * is used as the classification name of the transform to construct (e.g.
      * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
      * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
      * parameters for cartographic projection transforms. Example:
@@ -252,39 +252,11 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     public MathTransform createParameterizedTransform(final ParameterValueGroup parameters)
             throws FactoryException
     {
-        return createParameterizedTransform(parameters.getDescriptor().getName().getCode(),
-                                            Parameters.array(parameters));
-    }    
-
-    /**
-     * Creates a transform from an {@linkplain org.geotools.referencing.operation.OperationMethod
-     * operation method} identifier and parameters. The client must supply <code>"semi_major"</code>
-     * and <code>"semi_minor"</code> parameters for cartographic projection transforms.
-     *
-     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code} of the
-     *         operation method to search for (e.g. "Transverse_Mercator").
-     * @param  parameters The parameter values. A default set can be obtained with
-     *         <code>{@linkplain #getDefaultParameters getDefaultParameters}(identifier)}</code>
-     *         and modified before to be given to this method.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the specified
-     *         operation method identifier.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     *
-     * @see #getDefaultParameters
-     * @see #getAvailableTransforms
-     *
-     * @deprecated Use {@link #createParameterizedTransform(ParameterValueGroup)} instead.
-     */
-    public MathTransform createParameterizedTransform(final String identifier,
-                                                      final GeneralParameterValue[] parameters)
-            throws FactoryException
-    {
-        final MathTransformProvider provider = getProvider(identifier);
+        final String classification = parameters.getDescriptor().getName().getCode();
+        final MathTransformProvider provider = getProvider(classification);
         MathTransform tr;
         try {
-            tr = provider.createMathTransform(parameters);
+            tr = provider.createMathTransform(Parameters.array(parameters));
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }

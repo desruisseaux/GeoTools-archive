@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.science.astro;
+package org.geotools.nature;
 
 // J2SE dependencies
 import java.util.Date;
@@ -27,7 +27,7 @@ import java.text.ParseException;
 
 
 /**
- * Approximations de quelques calculs astronomiques relatifs aux calendrier terrestre.
+ * Approximations de quelques calculs astronomiques relatifs aux calendriers terrestres.
  * Les différents cycles astronomiques (notamment le jour, le mois et l'année) ne sont pas
  * constants. Par exemple, la longueur de l'année tropicale (le nombre moyen de jours entre
  * deux équinoxes vernales) était d'environ 365,242196 jours en 1900 et devrait être d'environ
@@ -45,8 +45,6 @@ import java.text.ParseException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Moved to the {@link org.geotools.nature} package.
  */
 public final class Calendar {
     /**

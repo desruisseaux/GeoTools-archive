@@ -18,7 +18,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.science.oceano;
+package org.geotools.nature;
 
 
 /**
@@ -35,8 +35,6 @@ package org.geotools.science.oceano;
  * @version $Id$
  * @author Bernard Pelchat
  * @author Martin Desruisseaux
- *
- * @deprecated Moved to the {@link org.geotools.nature} package.
  */
 public final class SeaWater {
     /*

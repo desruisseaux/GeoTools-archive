@@ -406,58 +406,6 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         values.add(value);
         return value;
     }
-
-    /**
-     * Adds a parameter to this group.
-     * <p>
-     * If an existing ParameterValue is already included:
-     * <ul>
-     * <li>For maxOccurs == 1, the new parameter will replace the existing parameter.
-     * <li>For maxOccurs > 1, the new parameter will be added
-     * <li>If adding the new parameter will increase the number past what
-     * is allowable by maxOccurs an InvalidParameterTypeException will be thrown.
-     * </p>
-     * <p>
-     * 
-     * @param parameter New parameter to be added to this group
-     * @throws InvalidParameterTypeException if adding this parameter
-     *  would result in more parameters than allowed by maxOccurs, or if this
-     *  parameter is not allowable by the groups descriptor 
-     *
-     * @deprecated User should never add {@link ParameterValue} himself. Parameter value
-     *             creation should be controlled by this class. We should probably add a
-     *             <code>add(String)</code> method instead, which create and returns a
-     *             <code>ParameterValue</code> object.
-     */
-    public void add(ParameterValue parameter) throws InvalidParameterTypeException {
-        values().add(parameter);
-    }
-    
-    /**
-     * Adds new parameter group to this group.
-     * <p>
-     * If an existing ParameterValueGroup is already included:
-     * <ul>
-     * <li>For maxOccurs == 1, the new group will replace the existing group.
-     * <li>For maxOccurs > 1, the new group will be added
-     * <li>If adding the new group will increase the number past what
-     * is allowable by maxOccurs an InvalidParameterTypeException will be thrown.
-     * </p>
-     * <p>
-     * 
-     * @param group New ParameterValueGroup to be added to this group
-     * @throws InvalidParameterTypeException if adding this parameter
-     *  would result in more parameters than allowed by maxOccurs, or if this
-     *  parameter is not allowable by the groups descriptor 
-     *
-     * @deprecated User should never add {@link org.opengis.parameter.ParameterValueGroup} himself.
-     *             Parameter value creation should be controlled by this class. We should probably
-     *             add a <code>addGroup(String)</code> method instead, which create and returns a
-     *             <code>ParameterValueGroup</code> object.
-     */
-    public void add(org.opengis.parameter.ParameterValueGroup group) throws InvalidParameterTypeException {
-        values().add(group);
-    }    
     
     /**
      * Compares the specified object with this parameter for equality.
