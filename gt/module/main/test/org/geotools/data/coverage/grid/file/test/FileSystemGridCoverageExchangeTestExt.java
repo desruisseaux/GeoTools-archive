@@ -1,9 +1,4 @@
-/*
- * Created on Jun 28, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
@@ -11,18 +6,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
+
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.DefaultQueryDefinition;
 import org.geotools.catalog.QueryResult;
-import org.geotools.data.arcgrid.ArcGridReader;
-import org.geotools.data.arcgrid.test.TestCaseSupport;
+import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.TestCaseSupport;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
 import org.geotools.metadata.Query;
-import org.geotools.data.coverage.grid.Format;
+
+
 
 
 
@@ -32,19 +29,12 @@ import org.geotools.data.coverage.grid.Format;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class FileSystemGridCoverageExchangeTest extends TestCaseSupport {
+public class FileSystemGridCoverageExchangeTestExt extends TestCaseSupport {
 
 	File root;
 	FileSystemGridCoverageExchange exchange;
 	
-	/**
-	 * @param name
-	 */
-	public FileSystemGridCoverageExchangeTest(String name) {
-		super(name);
-	}
-
-	
+		
 	
 	private void init(){
 		URL url=getTestResource("ArcGrid.asc");
@@ -110,7 +100,6 @@ public class FileSystemGridCoverageExchangeTest extends TestCaseSupport {
 		
 		GridCoverageReader reader=exchange.getReader(result.getEntry(0));
 		assertNotNull(reader);
-		assertEquals(ArcGridReader.class, reader.getClass());
 	}
 
 	public void testGetWriter() throws IOException{
