@@ -65,10 +65,12 @@ public class Citation extends MetadataEntity
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
      *
      * @see org.geotools.metadata.citation.ResponsibleParty#OPEN_GIS
+     *
+     * @todo Uncomment once GeoAPI.jar has been fixed.
      */
     public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
     static {
-        OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
+//        OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
         OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
                  org.geotools.metadata.citation.ResponsibleParty.OPEN_GIS));
         OPEN_GIS.freeze();
