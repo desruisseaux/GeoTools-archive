@@ -78,6 +78,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.filter.Filter;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.FactoryException;
@@ -702,7 +703,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
     
     protected Envelope getBounds(Query query) throws IOException {
-        if (query == Query.ALL) {
+        if (query.getFilter().equals(Filter.NONE) ) {
             return getBounds();
         }
         return null; // too expensive
