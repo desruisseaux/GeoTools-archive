@@ -20,7 +20,6 @@ package org.geotools.data.vpf.readers;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.HashMap;
 
 import org.geotools.data.AttributeReader;
@@ -28,15 +27,14 @@ import org.geotools.data.vpf.VPFSchemaCreator;
 import org.geotools.data.vpf.io.TableInputStream;
 import org.geotools.data.vpf.io.TableRow;
 import org.geotools.data.vpf.util.PrimitiveDataFactory;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
-/*
+/**
  * VPFReader.java
  *
  * Created on 13. april 2004, 14:55
- *
+ * @deprecated
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
 public abstract class VPFReader extends PrimitiveDataFactory
