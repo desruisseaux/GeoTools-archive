@@ -36,6 +36,8 @@ import org.geotools.feature.Feature;
  * @author wolf
  */
 public class MultiColumnFIDMapper extends AbstractFIDMapper {
+    private static final long serialVersionUID = 1L;
+    
     private static final String UTF8 = "UTF-8";
     private boolean[] autoIncrement;
     private int[] colTypes;

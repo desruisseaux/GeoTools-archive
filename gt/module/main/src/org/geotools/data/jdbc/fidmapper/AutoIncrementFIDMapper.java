@@ -33,6 +33,8 @@ import org.geotools.feature.Feature;
  * @author wolf
  */
 public class AutoIncrementFIDMapper implements FIDMapper {
+    private static final long serialVersionUID = 1L;
+    
     private String colName;
     private int dataType;
 

@@ -55,6 +55,7 @@ import javax.xml.parsers.SAXParserFactory;
  *
  * @author Ian Turton, CCG
  * @version $Id: GMLDataSource.java,v 1.5 2003/08/14 17:11:04 cholmesny Exp $
+ * @deprecated Please make use of org.geotools.xml package
  */
 public class GMLDataSource extends AbstractDataSource {
     /** The logger for the GML module. */

@@ -29,13 +29,10 @@ import java.util.logging.Logger;
  * This class provides a skeletal implementation of the DataSource interface to
  * minimize the effort of required to implement this interface.
  * 
- * <p></p>
- * 
- * <p></p>
- *
  * @author Chris Holmes, TOPP
  * @author Sean Geoghegan
  * @version $Id: JDBCDataSource.java,v 1.4 2003/11/04 00:34:02 cholmesny Exp $
+ * @deprecated Use JDBCDataStore
  */
 public abstract class JDBCDataSource extends AbstractDataSource {
     /** The logger for the data package. */

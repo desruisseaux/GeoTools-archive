@@ -33,6 +33,8 @@ import org.geotools.feature.Feature;
  * @author wolf
  */
 public class NullFIDMapper extends AbstractFIDMapper {
+    private static final long serialVersionUID = 1L;
+    
     private static final String ARRAY_OUT_OF_BOUND_MESSAGE = "There are no columns in this FIDMapper";
 
     public NullFIDMapper() {

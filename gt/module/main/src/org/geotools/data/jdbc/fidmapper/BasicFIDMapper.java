@@ -34,6 +34,8 @@ import org.geotools.feature.Feature;
  * @author Dani Daniele Franzoni
  */
 public class BasicFIDMapper extends AbstractFIDMapper {
+    private static final long serialVersionUID = 1L;
+
     private boolean returnFIDColumnsAsAttributes;
 
     /** The name of the field of the primary key */

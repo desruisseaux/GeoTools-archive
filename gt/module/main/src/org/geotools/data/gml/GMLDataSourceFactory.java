@@ -14,11 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * GMLDataSourceFactory.java
- *
- * Created on March 4, 2003, 3:44 PM
- */
 package org.geotools.data.gml;
 
 import org.geotools.data.DataSource;
@@ -27,9 +22,10 @@ import java.util.Map;
 
 
 /**
- * DOCUMENT ME!
- *
+ * Factory for the creation of a GMLDataSource.
+ * 
  * @author jamesm
+ * @deprecated Please use org.geotools.xml services
  */
 public class GMLDataSourceFactory
     implements org.geotools.data.DataSourceFactorySpi {

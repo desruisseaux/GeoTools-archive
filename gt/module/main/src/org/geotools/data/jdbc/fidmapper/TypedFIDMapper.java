@@ -31,6 +31,8 @@ import org.geotools.feature.Feature;
  * @author wolf
  */
 public class TypedFIDMapper extends AbstractFIDMapper {
+    private static final long serialVersionUID = 1L;
+    
     private String featureTypeName;
     private FIDMapper wrappedMapper;
 

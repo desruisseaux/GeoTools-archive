@@ -40,6 +40,8 @@ import org.geotools.feature.Feature;
  * @author aaime
  */
 public class MaxIncFIDMapper extends AbstractFIDMapper {
+    private static final long serialVersionUID = 1L;
+    
     private boolean returnIDAsAttribute;
     private String FIDColumn;
     private int FIDColumnType;
