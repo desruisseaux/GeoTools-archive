@@ -41,7 +41,7 @@ public class ImportHandler extends XSIElementHandler {
 
     //    private String id;
     private URI namespace;
-    private String schemaLocation;
+    private URI schemaLocation;
     private int hashCodeOffset = getOffset();
 
     /*
@@ -80,11 +80,17 @@ public class ImportHandler extends XSIElementHandler {
         //        if (id == null) {
         //            id = atts.getValue(namespaceURI, "id");
         //        }
-        schemaLocation = atts.getValue("", "schemaLocation");
+        String sl = atts.getValue("", "schemaLocation");
 
-        if (schemaLocation == null) {
-            schemaLocation = atts.getValue(namespaceURI, "schemaLocation");
+        if (sl == null) {
+        	sl = atts.getValue(namespaceURI, "schemaLocation");
         }
+        try {
+			schemaLocation = sl!=null?new URI(sl):null;
+		} catch (URISyntaxException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+		}
 
         String namespace = atts.getValue("", "namespace");
 
@@ -130,7 +136,7 @@ public class ImportHandler extends XSIElementHandler {
      *
      * @return
      */
-    public String getSchemaLocation() {
+    public URI getSchemaLocation() {
         return schemaLocation;
     }
 
