@@ -17,6 +17,7 @@
 package org.geotools.filter;
 
 import java.io.StringWriter;
+import org.geotools.filter.visitor.Extractor;
 
 
 /**
@@ -66,5 +67,7 @@ public class EnvironmentVariableResolverTest extends FilterTestSupport {
         Expression resolved = resolver.resolve(add, 10);
         assertEquals(15,((Number)resolved.getValue(testFeature)).intValue());
     }
+    
+  
 
 }
