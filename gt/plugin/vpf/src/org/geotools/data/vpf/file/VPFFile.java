@@ -1022,11 +1022,11 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         String result = null;
         String fileName = getFileName();
 
-        if (fileName.toUpperCase().equals(FEATURE_CLASS_SCHEMA_TABLE)) {
-            result = getDirectoryName().concat(File.separator).concat("FCZ");
+        if (fileName.toLowerCase().equals(FEATURE_CLASS_SCHEMA_TABLE)) {
+            result = getDirectoryName().concat(File.separator).concat("fcz");
         } else {
             result = getDirectoryName().concat(File.separator).concat(fileName
-                    .substring(0, fileName.length() - 1) + "X");
+                    .substring(0, fileName.length() - 1) + "x");
         }
 
         return result;
