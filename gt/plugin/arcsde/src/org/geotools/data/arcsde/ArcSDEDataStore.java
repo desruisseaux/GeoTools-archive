@@ -253,7 +253,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 sdeQuery.close();
             }
 
-            throw new IOException(t.getMessage());
+            throw new DataSourceException("Problem with feature reader: " +
+                                          t.getMessage(), t);
         }
 
         return reader;
