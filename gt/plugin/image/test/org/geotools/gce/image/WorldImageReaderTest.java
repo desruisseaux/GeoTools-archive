@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.resources.TestData;
 
 /**
@@ -46,7 +47,7 @@ public class WorldImageReaderTest extends TestCase {
 	public void testRead() throws IOException {
 		org.opengis.coverage.grid.GridCoverage coverage = wiReader.read(null);
 		assertNotNull(coverage);
-		assertNotNull(coverage.getRenderableImage(0,1));
+		assertNotNull(((GridCoverageImpl)coverage).getRenderedImage());
 		assertNotNull(coverage.getEnvelope());
 	}
 }
