@@ -5,6 +5,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class ContactTest extends TestCase {
+    public void testNothing(){
+        
+    }
     /*
 	public void testContact(){
 		Telephone phone = new Telephone();
