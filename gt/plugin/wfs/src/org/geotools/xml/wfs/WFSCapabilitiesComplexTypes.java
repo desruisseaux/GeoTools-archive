@@ -1335,13 +1335,7 @@ public class WFSCapabilitiesComplexTypes {
 
                 fsd.setLatLongBoundingBox(e);
             }
-
-            //            if (mdurl.size() > 0) {
-            //                fsd.setMetadataURL((MetadataURL[]) mdurl.toArray(
-            //                        new MetadataURL[mdurl.size()]));
-            //            }
-            if ((fsd.getName() == null) || (fsd.getSRS() == null)
-                    || (llbb.size() < 1)) {
+            if ((fsd.getName() == null) || (fsd.getSRS() == null)) {
                 throw new SAXException(
                     "Missing child element for FeatureTypeType");
             }
