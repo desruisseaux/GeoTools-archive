@@ -154,7 +154,7 @@ public class VPFFeatureReader implements FeatureReader {
             result = false;
 		}
 		// Exclude objects with a different FACC Code
-		else if (featureType.getFaccCode() == null){
+		else if (featureType.getFaccCode() != null){
 		    try {
                 String faccCode = row.getAttribute("f_code").toString().trim(); 
                 if(featureType.getFaccCode().equals(faccCode)){
