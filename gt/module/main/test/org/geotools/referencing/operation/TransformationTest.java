@@ -179,6 +179,44 @@ public class TransformationTest extends TestTransform {
     }
 
     /**
+     * Tests a transformation that requires a datum shift with TOWGS84[0,0,0].
+     * In addition, this method tests datum aliases.
+     */
+    public void testEllipsoidShift() throws Exception {
+        final CoordinateReferenceSystem sourceCRS = crsFactory.createFromWKT(
+                "GEOGCS[\"NAD83\",\n"                                           +
+                "  DATUM[\"North_American_Datum_1983\",\n"                      +
+                "    SPHEROID[\"GRS 1980\", 6378137.0, 298.257222101,\n"        +
+                "      AUTHORITY[\"EPSG\",\"7019\"]],\n"                        +
+                "    TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],\n"             +
+                "    AUTHORITY[\"EPSG\",\"6269\"]],\n"                          +
+                "  PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]],\n" +
+                "  UNIT[\"degree\", 0.017453292519943295],\n"                   +
+                "  AXIS[\"Lon\", EAST],\n"                                      +
+                "  AXIS[\"Lat\", NORTH],\n"                                     +
+                "  AUTHORITY[\"EPSG\",\"4269\"]]");
+
+        final CoordinateReferenceSystem targetCRS = crsFactory.createFromWKT(
+                "GEOGCS[\"GCS_WGS_1984\",\n"                               +
+                "  DATUM[\"D_WGS_1984\",\n"                                +
+                "    SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],\n" +
+                "  PRIMEM[\"Greenwich\", 0.0],\n"                          +
+                "  UNIT[\"degree\", 0.017453292519943295],\n"              +
+                "  AXIS[\"Lon\", EAST],\n"                                 +
+                "  AXIS[\"Lat\", NORTH]]");
+
+        final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
+        assertSame(sourceCRS, operation.getSourceCRS());
+        assertSame(targetCRS, operation.getTargetCRS());
+
+        final MathTransform transform = operation.getMathTransform();
+        assertInterfaced(transform);
+        assertTransformEquals2_2(transform, -180, -88.21076182660325, -180, -88.21076182655470);
+        assertTransformEquals2_2(transform, +180,  85.41283436546335, +180,  85.41283436548373);
+        // Note: Expected values above were computed with Geotools (not an external library).
+    }
+
+    /**
      * Tests a transformation that requires a datum shift.
      */
     public void testDatumShift() throws Exception {
