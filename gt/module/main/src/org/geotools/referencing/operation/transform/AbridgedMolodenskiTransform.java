@@ -29,8 +29,9 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -430,16 +431,23 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 "tgt_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
+         * The parameters group.
+         */
+        static final OperationParameterGroup PARAMETERS = group(
+                     new Identifier[] {
+                        new Identifier(Citation.OPEN_GIS, null,  "Abridged_Molodenski"),
+                        new Identifier(Citation.EPSG,    "EPSG", "9605")
+                     }, new OperationParameter[] {
+                        DIM, DX, DY, DZ,
+                        SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
+                        TGT_SEMI_MAJOR, TGT_SEMI_MINOR
+                     });
+
+        /**
          * Constructs a provider.
          */
         public Provider() {
-            super(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, null,  "Abridged_Molodenski"),
-                new Identifier(Citation.EPSG,    "EPSG", "9605")},
-                3, 3, 
-                new OperationParameter[] {DIM, DX, DY, DZ,
-                                          SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
-                                          TGT_SEMI_MAJOR, TGT_SEMI_MINOR});
+            super(3, 3, PARAMETERS);
         }
         
         /**

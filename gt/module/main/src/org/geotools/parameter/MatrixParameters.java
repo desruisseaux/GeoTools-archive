@@ -284,10 +284,8 @@ public class MatrixParameters extends OperationParameterGroup {
          * to synchronize since it is not a big deal if the same parameter is constructed twice.
          */
         param = new org.geotools.parameter.OperationParameter(prefix + row + separator + column,
-                                                              row==column ? 1.0 : 0.0,
-                                                              Double.NEGATIVE_INFINITY,
-                                                              Double.POSITIVE_INFINITY,
-                                                              Unit.ONE);
+                Double.TYPE, org.geotools.parameter.ParameterValue.wrap(row==column ? 1.0 : 0.0),
+                null, null, Unit.ONE);
         if (index >= 0) {
             parameters[index] = param;
         }

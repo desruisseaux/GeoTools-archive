@@ -61,8 +61,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.parameter.OperationParameter
  * @see org.geotools.parameter.ParameterValueGroup
  */
-public class ParameterRealValue extends GeneralParameterValue
-                             implements org.opengis.parameter.ParameterValue
+final class ParameterRealValue extends GeneralParameterValue
+                            implements org.opengis.parameter.ParameterValue
 {
     /**
      * Serial number for interoperability with different versions.
@@ -75,24 +75,30 @@ public class ParameterRealValue extends GeneralParameterValue
     private double value;
 
     /**
-     * Construct a parameter from the specified descriptor and value.
+     * Construct a parameter from the specified descriptor. The descriptor
+     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass() value class}
+     * must be <code>{@linkplain Double}.class</code>.
      *
-     * @param descriptor The abstract definition of this parameter.
-     * @param value The parameter value.
+     * @param  descriptor The abstract definition of this parameter.
+     * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
      */
-    public ParameterRealValue(final OperationParameter descriptor, final double value) {
+    public ParameterRealValue(final OperationParameter descriptor) {
         super(descriptor);
-        this.value = value;
+        final Class type = descriptor.getValueClass();
+        final Class expected = Double.class;
+        if (!expected.equals(type) && !Double.TYPE.equals(type)) {
+            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+                      Utilities.getShortName(type), Utilities.getShortName(expected)));
+        }
+        final Number value = (Number) descriptor.getDefaultValue();
+        this.value = (value!=null) ? value.doubleValue() : Double.NaN;
     }
 
     /**
-     * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}.
+     * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}. The default
+     * implementation always delegates to {@link org.geotools.parameter.OperationParameter#getUnit}.
      *
      * @return The unit of measure, or <code>null</code> if none.
-     *
-     * @see #doubleValue()
-     * @see #doubleValueList()
-     * @see #getValue
      */
     public Unit getUnit() {
         return ((OperationParameter) descriptor).getUnit();
@@ -106,9 +112,6 @@ public class ParameterRealValue extends GeneralParameterValue
      * @return The numeric value represented by this parameter after conversion to type
      *         <code>double</code> and conversion to <code>unit</code>.
      * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
-     *
-     * @see #getUnit
-     * @see #setValue(double,Unit)
      */
     public double doubleValue(final Unit unit) throws IllegalArgumentException {
         ensureNonNull("unit", unit);
@@ -129,9 +132,6 @@ public class ParameterRealValue extends GeneralParameterValue
      * associated {@linkplain #getUnit unit of measure}.
      *
      * @return The numeric value represented by this parameter after conversion to type <code>double</code>.
-     *
-     * @see #getUnit
-     * @see #setValue(double)
      */
     public double doubleValue() {
         return value;

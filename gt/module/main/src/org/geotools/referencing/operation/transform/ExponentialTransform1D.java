@@ -26,6 +26,7 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -343,11 +344,20 @@ public class ExponentialTransform1D extends AbstractMathTransform
                 "scale", 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
+         * The parameters group.
+         */
+        static final OperationParameterGroup PARAMETERS = group(
+                     new Identifier[] {
+                        new Identifier(Citation.GEOTOOLS, null, "Exponential")
+                     }, new OperationParameter[] {
+                        BASE, SCALE
+                     });
+
+        /**
          * Create a provider for logarithmic transforms.
          */
         public Provider() {
-            super(new Identifier[] {new Identifier(Citation.GEOTOOLS, null, "Exponential")},
-                  1, 1, new OperationParameter[] {BASE, SCALE});
+            super(1, 1, PARAMETERS);
         }
         
         /**

@@ -35,6 +35,7 @@ import javax.units.SI;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -586,21 +587,35 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                 "dim_geoCS", 3, 2, 3);
 
         /**
-         * Constructs a provider.
+         * The parameters group.
          */
-        public Provider() {
-            this("Ellipsoid_To_Geocentric", "9602");
-            //"Geocentric_To_Ellipsoid"
+        static final OperationParameterGroup PARAMETERS = group("Ellipsoid_To_Geocentric", "9602");
+
+        /**
+         * Construct the parameters group.
+         */
+        static OperationParameterGroup group(final String ogc, final String epsg) {
+            return group(
+                     new Identifier[] {
+                        new Identifier(Citation.OPEN_GIS, null,  ogc),
+                        new Identifier(Citation.EPSG,    "EPSG", epsg)
+                     }, new OperationParameter[] {
+                        SEMI_MAJOR, SEMI_MINOR, DIM_GEOCS
+                     });
         }
 
         /**
-         * Constructs a provider using the specified identifiers.
+         * Constructs a provider.
          */
-        Provider(final String ogc, final String epsg) {
-            super(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, null,  ogc),
-                new Identifier(Citation.EPSG,    "EPSG", epsg)},
-                  3, 3, new OperationParameter[] {SEMI_MAJOR, SEMI_MINOR, DIM_GEOCS});
+        public Provider() {
+            this(PARAMETERS);
+        }
+
+        /**
+         * Constructs a provider.
+         */
+        public Provider(final OperationParameterGroup parameters) {
+            super(3, 3, parameters);
         }
         
         /**
@@ -644,11 +659,16 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         private static final long serialVersionUID = -7356791540110076789L;
 
         /**
+         * The parameters group.
+         * NOTE: The EPSG code seems to be the same than for the direct transform.
+         */
+        static final OperationParameterGroup PARAMETERS = group("Geocentric_To_Ellipsoid", "9602");
+
+        /**
          * Create a provider.
          */
         public ProviderInverse() {
-            super("Geocentric_To_Ellipsoid", "9602");
-            // NOTE: The EPSG code seems to be the same than for the direct transform.
+            super(PARAMETERS);
         }
         
         /**

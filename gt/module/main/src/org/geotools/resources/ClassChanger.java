@@ -255,6 +255,46 @@ public abstract class ClassChanger {
     }
 
     /**
+     * Convert a wrapper class to a primitive class. For example this method converts
+     * <code>{@linkplain Double}.class</code> to <code>Double.{@linkplain Double#TYPE TYPE}</code>.
+     *
+     * @param  c The wrapper class.
+     * @return The primitive class.
+     * @throws IllegalArgumentException if the specified class is not a wrapper for a primitive.
+     */
+    public static Class toPrimitive(final Class c) throws IllegalArgumentException {
+        if (Double   .class.equals(c)) return Double   .TYPE;
+        if (Float    .class.equals(c)) return Float    .TYPE;
+        if (Long     .class.equals(c)) return Long     .TYPE;
+        if (Integer  .class.equals(c)) return Integer  .TYPE;
+        if (Short    .class.equals(c)) return Short    .TYPE;
+        if (Byte     .class.equals(c)) return Byte     .TYPE;
+        if (Boolean  .class.equals(c)) return Boolean  .TYPE;
+        if (Character.class.equals(c)) return Character.TYPE;
+        throw new IllegalArgumentException(Utilities.getShortName(c));
+    }
+
+    /**
+     * Convert a primitive class to a wrapper class. For example this method converts
+     * <code>Double.{@linkplain Double#TYPE TYPE}</code> to <code>{@linkplain Double}.class</code>.
+     *
+     * @param  c The primitive class.
+     * @return The wrapper class.
+     * @throws IllegalArgumentException if the specified class is not a primitive.
+     */
+    public static Class toWrapper(final Class c) throws IllegalArgumentException {
+        if (Double   .TYPE.equals(c)) return Double   .class;
+        if (Float    .TYPE.equals(c)) return Float    .class;
+        if (Long     .TYPE.equals(c)) return Long     .class;
+        if (Integer  .TYPE.equals(c)) return Integer  .class;
+        if (Short    .TYPE.equals(c)) return Short    .class;
+        if (Byte     .TYPE.equals(c)) return Byte     .class;
+        if (Boolean  .TYPE.equals(c)) return Boolean  .class;
+        if (Character.TYPE.equals(c)) return Character.class;
+        throw new IllegalArgumentException(Utilities.getShortName(c));
+    }
+
+    /**
      * Cast the number to the specified class. The class must by one of {@link Byte},
      * {@link Short}, {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      */

@@ -34,13 +34,16 @@ import org.opengis.util.CodeList;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
+import org.geotools.resources.ClassChanger;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
 
 
 /**
  * The definition of a parameter used by an operation method. Most parameter values are
- * numeric, but other types of parameter values are possible.
+ * numeric, but other types of parameter values are possible. For numeric values, the
+ * {@linkplain #getValueClass value class} is usually <code>{@linkplain Double}.class</code>,
+ * <code>{@linkplain Integer}.class</code> or some other Java wrapper class.
  *  
  * @version $Id$
  * @author Martin Desruisseaux
@@ -52,12 +55,22 @@ public class OperationParameter extends GeneralOperationParameter implements org
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -6950429235472736017L;
+    private static final long serialVersionUID = -295668622297737705L;
 
     /**
      * The class that describe the type of the parameter.
+     * This class can never be a primitive.
      */
     private final Class valueClass;
+
+    /**
+     * The class that describe the type of the parameter, maybe as a primitive. This is the
+     * value class that the user specified at construction time.  This is usually identical
+     * to <code>valueClass</code>. However, some optimization may be done for some primitive
+     * types, for example a special implementation of {@link ParameterValue} for the
+     * <code>double</code> type.
+     */
+    private final Class primitiveClass;
 
     /**
      * A immutable, finite set of valid values (usually from a {linkplain org.opengis.util.CodeList
@@ -232,7 +245,7 @@ public class OperationParameter extends GeneralOperationParameter implements org
     public OperationParameter(final Map        properties,
                               final int        minimumOccurs,
                               final int        maximumOccurs,
-                              final Class      valueClass,
+                                    Class      valueClass,
                               final Object[]   validValues,
                               final Object     defaultValue,
                               final Comparable minimum,
@@ -240,12 +253,16 @@ public class OperationParameter extends GeneralOperationParameter implements org
                               final Unit       unit)
     {
         super(properties, minimumOccurs, maximumOccurs);
-        this.valueClass   = valueClass;
-        this.defaultValue = defaultValue;
-        this.minimum      = minimum;
-        this.maximum      = maximum;
-        this.unit         = unit;
+        this.primitiveClass = valueClass;
+        this.defaultValue   = defaultValue;
+        this.minimum        = minimum;
+        this.maximum        = maximum;
+        this.unit           = unit;
         GeneralParameterValue.ensureNonNull("valueClass",  valueClass);
+        if (valueClass.isPrimitive()) {
+            valueClass = ClassChanger.toWrapper(valueClass);
+        }
+        this.valueClass = valueClass;
         GeneralParameterValue.ensureValidClass(valueClass, defaultValue);
         GeneralParameterValue.ensureValidClass(valueClass, minimum);
         GeneralParameterValue.ensureValidClass(valueClass, maximum);
@@ -273,15 +290,27 @@ public class OperationParameter extends GeneralOperationParameter implements org
      * initialized with the {@linkplain #getDefaultValue default value}.
      * The {@linkplain org.geotools.parameter.ParameterValue#getDescriptor parameter value
      * descriptor} for the created parameter value will be <code>this</code> object.
+     * <br><br>
+     * If the {@linkplain #getValueClass value class} specified at construction time was
+     * a primitive type (e.g. <code>Double.{@linkplain Double#TYPE TYPE}</code> instead
+     * of <code>{@linkplain Double}.class</code>), then this method may returns a specialized
+     * parameter value implementation for this primitive type. Specialized implementations may
+     * use less storage space and be more flexible during conversions, but this flexibility is
+     * not always wanted.
      */
     public org.opengis.parameter.GeneralParameterValue createValue() {
+        if (Double.TYPE.equals(primitiveClass)) {
+            return new ParameterRealValue(this);
+        }
         return new ParameterValue(this);
     }
 
     /**
-     * Returns the class that describe the type of the parameter.
+     * Returns the class that describe the type of the parameter. If the value class specified
+     * at construction time was a primitive type (e.g. <code>double</code>), it is converted to
+     * the corresponding wrapper class (e.g. {@link Double}).
      *
-     * @return The parameter value class.
+     * @return The parameter value class (never a primitive type).
      */
     public Class getValueClass() {
         return valueClass;
@@ -360,12 +389,12 @@ public class OperationParameter extends GeneralOperationParameter implements org
     public boolean equals(final Info object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final OperationParameter that = (OperationParameter) object;
-            return equals(this.valueClass,   that.valueClass)   &&
-                   equals(this.validValues,  that.validValues)  &&
-                   equals(this.defaultValue, that.defaultValue) &&
-                   equals(this.minimum,      that.minimum)      &&
-                   equals(this.maximum,      that.maximum)      &&
-                   equals(this.unit,         that.unit);
+            return equals(this.primitiveClass, that.primitiveClass)   &&
+                   equals(this.validValues,    that.validValues)  &&
+                   equals(this.defaultValue,   that.defaultValue) &&
+                   equals(this.minimum,        that.minimum)      &&
+                   equals(this.maximum,        that.maximum)      &&
+                   equals(this.unit,           that.unit);
         }
         return false;
     }

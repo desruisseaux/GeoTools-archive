@@ -26,6 +26,7 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -309,11 +310,20 @@ public class LogarithmicTransform1D extends AbstractMathTransform
                 "offset", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
+         * The parameters group.
+         */
+        static final OperationParameterGroup PARAMETERS = group(
+                     new Identifier[] {
+                        new Identifier(Citation.GEOTOOLS, null, "Logarithmic")
+                     }, new OperationParameter[] {
+                        BASE, OFFSET
+                     });
+
+        /**
          * Create a provider for logarithmic transforms.
          */
         public Provider() {
-            super(new Identifier[] {new Identifier(Citation.GEOTOOLS, null, "Logarithmic")},
-                  1, 1, new OperationParameter[] {BASE, OFFSET});
+            super(1, 1, PARAMETERS);
         }
         
         /**

@@ -24,6 +24,8 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.Serializable;
@@ -38,6 +40,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
 
@@ -445,18 +448,28 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         private static final long serialVersionUID = 649555815622129472L;
 
         /**
-         * Create a provider for affine transform with a default matrix size.
+         * The parameters group.
          *
          * @todo We should register EPSG parameter identifiers (A0, A1, A2, B0, B1, B2) as well.
          */
+        static final OperationParameterGroup PARAMETERS;
+        static {
+            final Map properties = new HashMap(4);
+            properties.put("name", "Affine");
+            properties.put("identifiers", new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, null,  "Affine"),
+                new Identifier(Citation.EPSG,    "EPSG", "9624")
+            });
+            PARAMETERS = new MatrixParameters(properties);
+        }
+
+        /**
+         * Create a provider for affine transform with a default matrix size.
+         */
         public Provider() {
-            super(new Identifier[] {
-                      new Identifier(Citation.OPEN_GIS, null,  "Affine"),
-                      new Identifier(Citation.EPSG,    "EPSG", "9624")},
+            super(MatrixParameters.DEFAULT_MATRIX_SIZE-1,
                   MatrixParameters.DEFAULT_MATRIX_SIZE-1,
-                  MatrixParameters.DEFAULT_MATRIX_SIZE-1,
-                  new GeneralOperationParameter[] {
-                      new MatrixParameters(Collections.singletonMap("name", "Affine"))});
+                  PARAMETERS);
         }
 
         /**

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.referencing.Info;
 import org.opengis.referencing.Identifier;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
@@ -75,38 +76,19 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected final OperationParameterGroup parameters;
 
     /**
-     * Constructs a math transform provider from a set of identifiers. This operation method
-     * is identified by codes provided by one or more authorities. Common authorities are
-     * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
-     * {@link org.geotools.metadata.citation.Citation#EPSG}.
+     * Constructs a math transform provider from a set of parameters. The provider
+     * {@linkplain #getIdentifiers identifiers} will be the same than the parameter
+     * ones.
      *
-     * @param identifiers The operation identifiers. Should contains at least one identifier.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     * @param parameters The set of parameters (never <code>null</code>).
      */
-    public MathTransformProvider(final Identifier[] identifiers,
-                                 final int sourceDimensions,
+    public MathTransformProvider(final int sourceDimensions,
                                  final int targetDimensions,
-                                 final GeneralOperationParameter[] parameters)
+                                 final OperationParameterGroup parameters)
     {
-        this(toMap(identifiers), sourceDimensions, targetDimensions, parameters);
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static Map toMap(final Identifier[] identifiers) {
-        ensureNonNull("identifiers", identifiers);
-        if (identifiers.length == 0) {
-            // TODO: provides a localized message.
-            throw new IllegalArgumentException();
-        }
-        final Map properties = new HashMap(4);
-        properties.put("name", identifiers[0].getCode());
-        properties.put("identifiers", identifiers);
-        return properties;
+        this(toMap(parameters, null), sourceDimensions, targetDimensions, parameters);
     }
 
     /**
@@ -118,20 +100,50 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     * @param parameters The set of parameters (never <code>null</code>).
      */
     public MathTransformProvider(final Map properties,
                                  final int sourceDimensions,
                                  final int targetDimensions,
-                                 final GeneralOperationParameter[] parameters)
+                                 final OperationParameterGroup parameters)
     {
-        super(properties, sourceDimensions, targetDimensions, parameters);
-        if (parameters.length==1 && parameters[0] instanceof OperationParameterGroup) {
-            this.parameters = (OperationParameterGroup) parameters[0];
-        } else {
-            this.parameters = new org.geotools.parameter.OperationParameterGroup(
-                Collections.singletonMap("name", super.getName(null)), parameters);
+        super(properties, sourceDimensions, targetDimensions, parameters.getParameters());
+        this.parameters = parameters;
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static Map toMap(final Info parameters, Identifier[] identifiers) {
+        if (identifiers == null) {
+            ensureNonNull("parameters", parameters);
+            identifiers = parameters.getIdentifiers();
         }
+        ensureNonNull("identifiers", identifiers);
+        if (identifiers.length == 0) {
+            // TODO: provides a localized message.
+            throw new IllegalArgumentException();
+        }
+        final Map properties = new HashMap(4);
+        properties.put("name", (parameters!=null) ? parameters.getName(null) : identifiers[0].getCode());
+        properties.put("identifiers", identifiers);
+        return properties;
+    }
+
+    /**
+     * Constructs a parameter group from a set of identifiers. The parameter group is
+     * identified by codes provided by one or more authorities. Common authorities are
+     * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
+     * {@link org.geotools.metadata.citation.Citation#EPSG}.
+     *
+     * @param identifiers The operation identifiers. Should contains at least one identifier.
+     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     */
+    protected static OperationParameterGroup group(final Identifier[] identifiers,
+                                                   final GeneralOperationParameter[] parameters)
+    {
+        return new org.geotools.parameter.OperationParameterGroup(toMap(null, identifiers), parameters);
     }
 
     /**
