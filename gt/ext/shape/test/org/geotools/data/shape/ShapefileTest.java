@@ -10,9 +10,12 @@ package org.geotools.data.shape;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.geotools.data.shape.shp.IndexFile;
-import org.geotools.data.shape.shp.ShapefileReader;
-import org.geotools.data.shape.shp.ShapefileReader.Record;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.shapefile.shp.IndexFile;
+import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -90,13 +93,11 @@ public class ShapefileTest extends TestCaseSupport {
     ShapefileReader reader1 = new ShapefileReader(getTestResourceChannel(STATEPOP));
     ShapefileReader reader2 = new ShapefileReader(getReadableFileChannel(STATEPOP));
     IndexFile index = new IndexFile(getTestResourceChannel(STATEPOP_IDX));
-    Record r = null;
     for (int i = 0; i < index.getRecordCount(); i++) {
       if (reader1.hasNext()) {
-        r = reader1.nextRecord();
-        Geometry g1 = (Geometry) r.shape();
-        Geometry g2 = (Geometry) reader2.shapeAt(index.getOffset(i) * 2);
-        
+
+        Geometry g1 = (Geometry) reader1.nextRecord().shape();
+        Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i) - 50));
         assertTrue(g1.equalsExact(g2));
         
       } else {
@@ -119,11 +120,18 @@ public class ShapefileTest extends TestCaseSupport {
     tmpFile.delete();
     
     // write features
-    ShapefileDataSource s = new ShapefileDataSource(tmpFile.toURL());
-    s.setFeatures(features);
+    ShapefileDataStoreFactory make = new ShapefileDataStoreFactory();
+    DataStore s = make.createDataStore( tmpFile.toURL() );
+    s.createSchema( type );
+    String typeName = type.getTypeName();
+    FeatureStore store = (FeatureStore) s.getFeatureSource( typeName );
     
-    s = new ShapefileDataSource(tmpFile.toURL());
-    FeatureCollection fc = s.getFeatures();
+    store.addFeatures( DataUtilities.reader( features ));
+    
+    s = new ShapefileDataStore( tmpFile.toURL() );
+    typeName = s.getTypeNames()[0];
+    FeatureSource source = s.getFeatureSource( typeName );
+    FeatureCollection fc = source.getFeatures().collection(); 
     
     ShapefileReadWriteTest.compare(features,fc);
   }

@@ -114,6 +114,7 @@ public class FileSystemPageStore extends PageStore {
                                short splitAlg)
     throws TreeException
     {
+        super(def, maxNodeEntries, minNodeEntries, splitAlg);
         
         if (file.exists() && file.length() != 0) {
             throw new TreeException("Cannot set dataDefinition, " +

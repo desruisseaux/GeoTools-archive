@@ -11,9 +11,17 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+
+import junit.framework.AssertionFailedError;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
 
 /**
  *
@@ -41,33 +49,52 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
       throw new Exception("Couldn't setup temp file");
   } 
   
-  public void testAll() {
+  public void testAll() throws Throwable {
     StringBuffer errors = new StringBuffer();
+    Exception bad = null;
     for (int i = 0, ii = files.length; i < ii; i++) {
       try {
         test(files[i]);
       } catch (Exception e) {
         e.printStackTrace();
         errors.append("\nFile " + files[i] + " : " + e.getMessage());
+        bad = e;
       }
     }
     if (errors.length() > 0) {
-      fail(errors.toString());
+        fail( errors.toString(), bad );      
     }
   }
   
+/**
+ * @param arg0
+ */
+public void fail(String message, Throwable cause ) throws Throwable {
+    Throwable fail = new AssertionFailedError( message );
+    fail.initCause( cause );
+    throw fail;
+}
   void test(String f) throws Exception {
-    ShapefileDataSource s = new ShapefileDataSource(getTestResource(f));
-    org.geotools.filter.Filter filter = null;
-    FeatureCollection one = s.getFeatures(filter);
+    ShapefileDataStore s = new ShapefileDataStore(getTestResource(f));
+    String typeName = s.getTypeNames()[0];
+    FeatureSource source = s.getFeatureSource( typeName );
+    FeatureType type = source.getSchema();
+    FeatureResults one = source.getFeatures();
     File tmp = getTempFile();
-    s = new ShapefileDataSource(tmp.toURL());
-    s.setFeatures(one);
     
-    s = new ShapefileDataSource(tmp.toURL());
-    FeatureCollection two = s.getFeatures(filter);
+    ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();    
+    s = (ShapefileDataStore) maker.createDataStore( tmp.toURL() );    
     
-    compare(one,two);
+    s.createSchema( type );
+    FeatureStore store = (FeatureStore) s.getFeatureSource( type.getTypeName() );
+    FeatureReader reader = one.reader();
+    store.addFeatures( reader );
+    
+    s = new ShapefileDataStore( tmp.toURL() );
+    typeName = s.getTypeNames()[0];
+    FeatureResults two = s.getFeatureSource( typeName ).getFeatures();
+    
+    compare(one.collection(),two.collection());
   }
   
   static void compare(FeatureCollection one,FeatureCollection two) throws Exception {

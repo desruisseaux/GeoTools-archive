@@ -955,6 +955,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             LOGGER.info("Creating spatial index for " + shpURL.getPath());
 
             ShapeFileIndexer indexer = new ShapeFileIndexer();
+            indexer.setIdxType(ShapeFileIndexer.RTREE);
             indexer.setShapeFileName(shpURL.getPath());
             try {
                 indexer.index(false);
@@ -1274,7 +1275,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         || (colType == Float.class)
                         || (colType == Number.class)) {
                     int l = Math.min(fieldLen, 33);
-                    header.addColumn(colName, 'N', l, l / 2);
+                    int d = Math.max(l - 2, 0);
+                    header.addColumn(colName, 'N', l, d);
                 } else if (java.util.Date.class.isAssignableFrom(colType)) {
                     header.addColumn(colName, 'D', fieldLen, 0);
                 } else if (colType == Boolean.class) {
@@ -1334,16 +1336,23 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         protected void copyAndDelete(URL src) throws IOException {
             File storage = getStorageFile(src);
             File dest = new File(src.getFile());
-            FileChannel in = new FileInputStream(storage).getChannel();
-            FileChannel out = new FileOutputStream(dest).getChannel();
-            long len = in.size();
-            long copied = out.transferFrom(in, 0, in.size());
-
-            if (len != copied) {
-                throw new IOException("unable to complete write");
+            FileChannel in = null;
+            FileChannel out = null;
+            try {
+                in = new FileInputStream(storage).getChannel();
+                out = new FileOutputStream(dest).getChannel();
+                long len = in.size();
+                long copied = out.transferFrom(in, 0, in.size());
+                
+                if (len != copied) {
+                    throw new IOException("unable to complete write");
+                }
+                
+                storage.delete();
+            } finally {
+                if( in != null ) in.close();
+                if( out != null ) out.close();
             }
-
-            storage.delete();
         }
 
         /**
