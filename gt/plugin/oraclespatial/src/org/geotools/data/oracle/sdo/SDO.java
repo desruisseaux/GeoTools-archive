@@ -2196,7 +2196,7 @@ public final class SDO {
             // Single Point Type Optimization
             coords = SDO.coordinates(gf.getCoordinateSequenceFactory(), GTYPE,
                     point);
-            elemInfo = new int[] { 1, ETYPE.CUSTOM, 1 };
+            elemInfo = new int[] { 1, ETYPE.POINT, 1 };
         } else {
             coords = SDO.coordinates(gf.getCoordinateSequenceFactory(), GTYPE,
                     ordinates);
