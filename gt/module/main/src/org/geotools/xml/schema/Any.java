@@ -29,6 +29,8 @@ import java.net.URI;
  * @author dzwiers www.refractions.net
  */
 public interface Any extends ElementGrouping {
+    
+    public static final URI ALL = null;
     /**
      * <p>
      * Returns the element declaration's id for this schema element.

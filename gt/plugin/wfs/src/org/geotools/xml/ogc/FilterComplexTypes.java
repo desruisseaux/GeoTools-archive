@@ -31,15 +31,19 @@ import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
 import org.geotools.xml.ogc.FilterSchema.FilterElement;
 import org.geotools.xml.schema.Any;
 import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Sequence;
+import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AnyGT;
 import org.geotools.xml.schema.impl.ChoiceGT;
+import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
@@ -47,6 +51,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
@@ -1822,6 +1827,267 @@ public class FilterComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             throw new OperationNotSupportedException();
+        }
+    }
+
+    /**
+     * This is a Filter 1.0.20 filter element. As such it has not been included in the FilterSchema
+     */
+    public static class SortByType extends FilterComplexType {
+        private static SortByType instance = new SortByType();
+        private SortByType(){}
+        public static SortByType getInstance() {
+            return instance;
+        }
+
+        private static Element[] elems = loadE();
+        private static Element[] loadE(){
+            Element exp = new FilterElement("expression",
+                    ExpressionType.getInstance()) {
+                public boolean isAbstract() {
+                    return true;
+                }
+            };
+            return new Element[]{
+                new FilterElement("PropertyName",PropertyNameType.getInstance(),exp){
+                    public int getMaxOccurs(){return Element.UNBOUNDED;}
+            	}
+            };
+        }
+        private static Sequence seq = new SequenceGT(elems);
+        private static Attribute[] attrs = new Attribute[]{
+            new FilterAttribute("sortOrder",SortOrderType.getInstance(),Attribute.OPTIONAL,"DESC",null,false)
+        };
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elems;
+        }
+
+        /**
+         * TODO summary sentence for getAttributes ...
+         * 
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         * @return
+         */
+        public Attribute[] getAttributes() {
+            return attrs;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
+         *      org.geotools.xml.schema.ElementValue[],
+         *      org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value,
+            Attributes attrs, Map hints)
+            throws OperationNotSupportedException{
+            throw new OperationNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "SortByType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, org.geotools.xml.PrintHandler,
+         *      java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output,
+            Map hints) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+    }
+    /** also from the 1.0.20 version, and excluded from the Schema object
+     * 
+     */
+    public static class SortOrderType implements SimpleType{
+
+        private static SortOrderType instance = new SortOrderType();
+        private SortOrderType(){}
+        public static SortOrderType getInstance() {
+            return instance;
+        }
+        /**
+         * TODO summary sentence for getFinal ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#getFinal()
+         * @return
+         */
+        public int getFinal() {
+            return 0;
+        }
+        /**
+         * TODO summary sentence for getId ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#getId()
+         * @return
+         */
+        public String getId() {
+            return null;
+        }
+        /**
+         * TODO summary sentence for toAttribute ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @param attribute
+         * @param value
+         * @param hints
+         * @return
+         * @throws OperationNotSupportedException
+         */
+        public AttributeValue toAttribute( Attribute attribute, Object value, Map hints ) throws OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /**
+         * TODO summary sentence for canCreateAttributes ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @param attribute
+         * @param value
+         * @param hints
+         * @return
+         */
+        public boolean canCreateAttributes( Attribute attribute, Object value, Map hints ) {
+            return false;
+        }
+        /**
+         * TODO summary sentence for getChildType ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#getChildType()
+         * @return
+         */
+        public int getChildType() {
+            return RESTRICTION;
+        }
+        /**
+         * TODO summary sentence for getParents ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#getParents()
+         * @return
+         */
+        public SimpleType[] getParents() {
+            return parents;
+        }
+        private static SimpleType[] parents = new SimpleType[]{
+            XSISimpleTypes.String.getInstance()
+        };
+        /**
+         * TODO summary sentence for getFacets ...
+         * 
+         * @see org.geotools.xml.schema.SimpleType#getFacets()
+         * @return
+         */
+        public Facet[] getFacets() {
+            return facets;
+        }
+        private static Facet[] facets = new Facet[]{
+            new FacetGT(Facet.ENUMERATION,"DESC"),
+            new FacetGT(Facet.ENUMERATION,"ASC")
+        };
+        /**
+         * TODO summary sentence for getValue ...
+         * 
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         * @param element
+         * @param value
+         * @param attrs
+         * @param hints
+         * @return
+         * @throws SAXException
+         * @throws OperationNotSupportedException
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /**
+         * TODO summary sentence for getName ...
+         * 
+         * @see org.geotools.xml.schema.Type#getName()
+         * @return
+         */
+        public String getName() {
+            return "SortOrderType";
+        }
+        /**
+         * TODO summary sentence for getNamespace ...
+         * 
+         * @see org.geotools.xml.schema.Type#getNamespace()
+         * @return
+         */
+        public URI getNamespace() {
+            return FilterSchema.NAMESPACE;
+        }
+        /**
+         * TODO summary sentence for getInstanceType ...
+         * 
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         * @return
+         */
+        public Class getInstanceType() {
+            return String.class;
+        }
+        /**
+         * TODO summary sentence for canEncode ...
+         * 
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         * @param element
+         * @param value
+         * @param hints
+         * @return
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /**
+         * TODO summary sentence for encode ...
+         * 
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         * @param element
+         * @param value
+         * @param output
+         * @param hints
+         * @throws IOException
+         * @throws OperationNotSupportedException
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /**
+         * TODO summary sentence for findChildElement ...
+         * 
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         * @param name
+         * @return
+         */
+        public Element findChildElement( String name ) {
+            return null;
         }
     }
 }
