@@ -43,6 +43,10 @@ public interface Request {
     /**
      * Sets the name/value property for this request.
      * 
+     * Note that for comma delimited values (such as LAYERS or STYLES),
+     * the request will be unable to automatically encoded the value in
+     * accordance with the WMS spec. See section 6.3.2 of the WMS 1.3.0 spec. 
+     * 
      * @param name the name of the property
      * @param value the value of the property
      */
