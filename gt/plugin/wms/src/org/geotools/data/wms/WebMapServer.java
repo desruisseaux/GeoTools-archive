@@ -29,11 +29,13 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.Request;
 import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
@@ -371,6 +373,8 @@ public class WebMapServer implements Discovery {
             currentResponse = new GetMapResponse(contentType, inputStream);
         } else if (currentRequest instanceof DescribeLayerRequest) {
             currentResponse = new DescribeLayerResponse(contentType, inputStream);
+        } else if (currentRequest instanceof GetLegendGraphicRequest) {
+            currentResponse = new GetLegendGraphicResponse(contentType, inputStream);
         } else {
             throw new RuntimeException("Request is an invalid type. I do not know it.");
         }
@@ -428,9 +432,30 @@ public class WebMapServer implements Discovery {
     }
     
     public DescribeLayerRequest createDescribeLayerRequest() throws UnsupportedOperationException, IOException {
+        if (getCapabilities().getRequest().getDescribeLayer() == null ) {
+            throw new UnsupportedOperationException("Server does not specify a DescribeLayer operation. Cannot be performed");
+        }
+        
         URL onlineResource = getCapabilities().getRequest().getDescribeLayer().getGet();
+        
         DescribeLayerRequest request = specification.createDescribeLayerRequest(onlineResource);
+        
         return request;
+    }
+    
+    public GetLegendGraphicRequest createGetLegendGraphicRequest() throws UnsupportedOperationException, IOException {
+        if (getCapabilities().getRequest().getGetLegendGraphic() == null) {
+            throw new UnsupportedOperationException("Server does not specify a GetLegendGraphic operation. Cannot be performed");
+        }
+        
+        URL onlineResource = getCapabilities().getRequest().getGetLegendGraphic().getGet();
+        
+        GetLegendGraphicRequest request = specification.createGetLegendGraphicRequest(onlineResource, 
+                Utils.findDrawableLayers(getCapabilities().getLayers()),
+                getCapabilities().getRequest().getGetLegendGraphic().getFormatStrings(), 
+                null);
+        
+        return request;        
     }
     
     /**********************************************************

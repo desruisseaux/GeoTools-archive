@@ -1,0 +1,163 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.data.wms.request;
+
+import java.net.URL;
+import java.util.Properties;
+
+import org.geotools.data.wms.SimpleLayer;
+
+/**
+ * Provides functionality for a basic GetLegendGraphic request
+ * 
+ * @author Richard Gould
+ */
+public abstract class AbstractGetLegendGraphicRequest extends AbstractRequest implements GetLegendGraphicRequest {
+
+    private SimpleLayer[] layers;
+    private String[] formats;
+    private String[] exceptions;
+
+    /**
+     * @param onlineResource
+     */
+    public AbstractGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) {
+        super(onlineResource, null);
+
+        this.layers = layers;
+        this.formats = formats;
+        this.exceptions = exceptions;
+        
+        initVersion();
+        initRequest();
+    }
+    
+    protected void initRequest() {
+        setProperty(REQUEST, "GetLegendGraphic");
+    }
+    
+    protected abstract void initVersion();
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setLayer(java.lang.String)
+     */
+    public void setLayer( String layer ) {
+        setProperty(LAYER, layer);
+    }
+    
+    /**
+     * Sets this request's layer and style properties
+     * @param layer a SimpleLayer object containing a layer name and style
+     */
+    public void setLayer(SimpleLayer layer) {
+        setLayer(layer.getName());
+        setStyle(layer.getStyle());
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setStyle(java.lang.String)
+     */
+    public void setStyle( String style ) {
+        setProperty(STYLE, style);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setFeatureType(java.lang.String)
+     */
+    public void setFeatureType( String featureType ) {
+        setProperty(FEATURETYPE, featureType);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setRule(java.lang.String)
+     */
+    public void setRule( String rule ) {
+        setProperty(RULE, rule);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setScale(java.lang.String)
+     */
+    public void setScale( String scale ) {
+        setProperty(SCALE, scale);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setSLD(java.lang.String)
+     */
+    public void setSLD( String sld ) {
+        setProperty(SLD, sld);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setSLDBody(java.lang.String)
+     */
+    public void setSLDBody( String sldBody ) {
+        setProperty(SLD_BODY, sldBody);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setFormat(java.lang.String)
+     */
+    public void setFormat( String format ) {
+        setProperty(FORMAT, format);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setWidth(java.lang.String)
+     */
+    public void setWidth( String width ) {
+        setProperty(WIDTH, width);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setHeight(java.lang.String)
+     */
+    public void setHeight( String height ) {
+        setProperty(HEIGHT, height);
+
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#setExceptions(java.lang.String)
+     */
+    public void setExceptions( String exceptions ) {
+        setProperty(EXCEPTIONS, exceptions);
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#getLayers()
+     */
+    public SimpleLayer[] getLayers() {
+        return layers;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#getFormats()
+     */
+    public String[] getFormats() {
+        return formats;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.request.GetLegendGraphic#getExceptions()
+     */
+    public String[] getExceptions() {
+        return exceptions;
+    }
+
+}

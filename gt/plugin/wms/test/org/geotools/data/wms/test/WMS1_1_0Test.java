@@ -1,28 +1,42 @@
 /*
- * Created on Sep 11, 2004
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.wms.test;
 
-import java.io.BufferedReader;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
+
+import javax.imageio.ImageIO;
 
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.DescribeLayerRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.DescribeLayerResponse;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -77,6 +91,43 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         
         assertEquals(layerDescs[1].getQueries()[0], "park");
         assertEquals(layerDescs[4].getQueries()[0], "popplace");
+        
+    }
+    
+    public void testCreateGetLegendGraphicRequest() throws Exception {
+        WebMapServer wms = new CustomWMS(server);
+        GetLegendGraphicRequest request = wms.createGetLegendGraphicRequest();
+        
+        assertNotNull(request);
+        
+        SimpleLayer[] layers = request.getLayers();
+        SimpleLayer park = null;
+        for (int i = 0; i < layers.length; i++) {
+            if (layers[i].getName().equals("park")) {
+                park = layers[i];
+                break;
+            }
+        }
+        
+        assertNotNull(park);
+        
+        park.setStyle("");
+        request.setLayer(park);
+        
+        request.setFormat("image/gif");
+        
+        request.setWidth("50");
+        request.setHeight("50");
+        
+        System.out.println(request.getFinalURL());
+        
+        GetLegendGraphicResponse response = (GetLegendGraphicResponse) wms.issueRequest(request);
+        assertNotNull(response);
+        
+        assertEquals(response.getContentType(), "image/gif");
+
+        BufferedImage image = ImageIO.read(response.getInputStream());
+        assertEquals(image.getHeight(), 50);
         
     }
     

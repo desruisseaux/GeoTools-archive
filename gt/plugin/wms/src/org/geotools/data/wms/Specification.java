@@ -23,6 +23,7 @@ import java.util.Set;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 
 
@@ -120,4 +121,17 @@ public abstract class Specification {
      * @throws UnsupportedOperationException if the version of the specification doesn't support this request
      */
     public abstract DescribeLayerRequest createDescribeLayerRequest( URL onlineResource ) throws UnsupportedOperationException;
+
+    /**
+     * Creates a GetLegendGraphicRequest which can be used to retrieve legend
+     * graphics from the WebMapServer
+     * 
+     * @param onlineResource the location where the request can be made
+     * @param layers all the layers that can be queried
+     * @param formats the formats that the graphic can be return in
+     * @param exceptions the formats that any thrown exceptions can be returned in
+     * @return a GetLegendGraphicRequest to be configured and passed to the WMS
+     * @throws UnsupportedOperationException if the version of the specification doesn't support this request
+     */
+    public abstract GetLegendGraphicRequest createGetLegendGraphicRequest(URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) throws UnsupportedOperationException;
 }

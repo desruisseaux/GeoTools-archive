@@ -13,8 +13,10 @@ import java.util.Set;
 
 import org.geotools.data.wms.request.AbstractDescribeLayerRequest;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetLegendGraphicRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 
 /**
@@ -61,6 +63,10 @@ public class WMS1_1_0 extends WMS1_0_0 {
      */
     public DescribeLayerRequest createDescribeLayerRequest( URL onlineResource ) throws UnsupportedOperationException {
         return new InternalDescribeLayerRequest(onlineResource, null);
+    }
+    
+    public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions) {
+        return new InternalGetLegendGraphicRequest(onlineResource, layers, formats, exceptions);
     }
     
 	public static class GetCapsRequest extends WMS1_0_0.GetCapsRequest {
@@ -141,6 +147,17 @@ public class WMS1_1_0 extends WMS1_0_0 {
 
         protected void initVersion() {
             setProperty(VERSION, "1.1.0");
+        }
+	}
+	
+	public static class InternalGetLegendGraphicRequest extends AbstractGetLegendGraphicRequest {
+
+        public InternalGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) {
+            super(onlineResource, layers, formats, exceptions);
+        }
+
+        protected void initVersion() {
+            setProperty(VERSION, "1.0.0");
         }
 	    
 	}

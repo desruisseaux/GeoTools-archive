@@ -22,6 +22,7 @@ import org.geotools.data.wms.request.AbstractGetMapRequest;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 
 /**
@@ -261,5 +262,13 @@ public class WMS1_0_0 extends Specification {
      */
     public DescribeLayerRequest createDescribeLayerRequest( URL onlineResource ) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("WMS 1.0.0 does not support DescribeLayer");
+    }
+
+    /**
+     * Note that WMS 1.0.0 does not support this method.
+     * @see org.geotools.data.wms.Specification#createGetLegendGraphicRequest(java.net.URL, org.geotools.data.wms.SimpleLayer[], java.lang.String[], java.lang.String[])
+     */
+    public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("WMS 1.0.0 does not support GetLegendGraphic");
     }
 }
