@@ -28,8 +28,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -40,9 +40,6 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @version $Id$
  */
 class LiteShape implements Shape {
-    /** The floating precision model */
-    private static final PrecisionModel FLOATING_PM = new PrecisionModel();
-
     /** The wrapped JTS geometry */
     private Geometry geometry;
 
@@ -58,7 +55,6 @@ class LiteShape implements Shape {
      * @param g the wrapped geometry
      */
     public LiteShape(Geometry g) {
-        //System.out.println("Shape created");
         geometry = g;
     }
 
@@ -85,6 +81,15 @@ class LiteShape implements Shape {
     public LiteShape(Geometry g, boolean generalize, double maxDistance) {
         this(g, generalize);
         this.maxDistance = maxDistance;
+    }
+    
+    /**
+     * Sets the geometry contained in this lite shape. Convenient to reuse
+     * this object instead of creating it again and again during rendering
+     * @param g
+     */
+    public void setGeometry(Geometry g) {
+        this.geometry = g;
     }
 
     /**
@@ -369,9 +374,10 @@ class LiteShape implements Shape {
     public PathIterator getPathIterator(AffineTransform at) {
         PathIterator pi = null;
 
-        //System.out.println("Path iterator");
         // return iterator according to the kind of geometry we include
-        if (this.geometry instanceof Polygon) {
+        if (this.geometry instanceof Point) {
+            pi = new PointIterator((Point) geometry, at);
+        } if (this.geometry instanceof Polygon) {
             pi = new PolygonIterator(
                     (Polygon) geometry, at, generalize, maxDistance);
         } else if (this.geometry instanceof LinearRing) {
