@@ -63,25 +63,40 @@ public class Citation extends MetadataEntity
     
     /**
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#OPEN_GIS
      */
     public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
     static {
+        OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
+        OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
+                 org.geotools.metadata.citation.ResponsibleParty.OPEN_GIS));
         OPEN_GIS.freeze();
     }
 
     /**
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#EPSG
      */
     public static final Citation EPSG = new Citation("European Petroleum Survey Group");
     static {
+        EPSG.setPresentationForm(Collections.singleton(PresentationForm.TABLE_DIGITAL));
+        EPSG.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("EPSG")));
+        EPSG.setCitedResponsibleParties(Collections.singleton(
+             org.geotools.metadata.citation.ResponsibleParty.EPSG));
         EPSG.freeze();
     }
 
     /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#GEOTOOLS
      */
     public static final Citation GEOTOOLS = new Citation("Geotools");
     static {
+        GEOTOOLS.setCitedResponsibleParties(Collections.singleton(
+                 org.geotools.metadata.citation.ResponsibleParty.GEOTOOLS));
         GEOTOOLS.freeze();
     }
 

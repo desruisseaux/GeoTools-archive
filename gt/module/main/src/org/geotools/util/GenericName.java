@@ -58,12 +58,20 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
     /**
      * The default separator character.
      */
-    static final char DEFAULT_SEPARATOR = ':';
+    public static final char DEFAULT_SEPARATOR = ':';
 
     /**
      * Creates a new instance of generic name.
      */
     protected GenericName() {
+    }
+
+    /**
+     * Ensures that the given name is a {@link String} or an {@link InternationalString}.
+     * This is used for subclass constructors.
+     */
+    static CharSequence validate(final CharSequence name) {
+        return (name==null || name instanceof InternationalString) ? name : name.toString();
     }
     
     /**

@@ -42,9 +42,6 @@ import org.geotools.resources.Utilities;
  * which may be a {@link LocalName} or an other {@link org.opengis.util.ScopedName},
  * as {@linkplain #getScope tail}.
  *
- * <P>Instances of this objects are usually not created directly.
- *    Use one of {@linkplain NameFactory factory methods} instead.</P>
- *
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -79,30 +76,35 @@ public class ScopedName extends org.geotools.util.GenericName
     private transient List parsedNames;
 
     /**
-     * Constructs a scoped name from the specified string.
+     * Constructs a scoped name from the specified international string.
+     * If the specified name is an {@link InternationalString}, then the
+     * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
+     * method will be used in order to fetch an unlocalized name. Otherwise, the
+     * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
-     * @param scope     The scope (or "tail") of the variable.
-     * @param separator The separator character (usually <code>':'</code> or <code>'/'</code>).
-     * @param name      The head (never <code>null</code>).
+     * @param scope The scope (or "tail") of the variable.
+     * @param name  The head (never <code>null</code>).
      */
-    public ScopedName(final GenericName scope, final char separator, final String name) {
-        org.geotools.util.InternationalString.ensureNonNull("scope", scope);
-        org.geotools.util.InternationalString.ensureNonNull("name",  name);
-        this.scope     = scope;
-        this.separator = separator;
-        this.name      = new org.geotools.util.LocalName(this, name);
+    public ScopedName(final GenericName scope,
+                      final CharSequence name)
+    {
+        this(scope, DEFAULT_SEPARATOR, name);
     }
 
     /**
      * Constructs a scoped name from the specified international string.
+     * If the specified name is an {@link InternationalString}, then the
+     * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
+     * method will be used in order to fetch an unlocalized name. Otherwise, the
+     * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
      * @param scope     The scope (or "tail") of the variable.
      * @param separator The separator character (usually <code>':'</code> or <code>'/'</code>).
      * @param name      The head (never <code>null</code>).
      */
-    public ScopedName(final GenericName        scope,
-                      final char           separator,
-                      final InternationalString name)
+    public ScopedName(final GenericName scope,
+                      final char    separator,
+                      final CharSequence name)
     {
         org.geotools.util.InternationalString.ensureNonNull("scope", scope);
         org.geotools.util.InternationalString.ensureNonNull("name",  name);

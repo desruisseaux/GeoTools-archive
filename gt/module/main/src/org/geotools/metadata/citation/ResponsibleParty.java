@@ -28,6 +28,7 @@ import org.opengis.metadata.citation.Contact;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
 
@@ -47,6 +48,46 @@ public class ResponsibleParty extends MetadataEntity
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -2477962229031486552L;
+
+    /**
+     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> responsible party.
+     *
+     * @see org.geotools.metadata.citation.Contact#OPEN_GIS
+     *
+     * @todo Localize.
+     */
+    public static ResponsibleParty OPEN_GIS = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        OPEN_GIS.setOrganisationName(new SimpleInternationalString("OpenGIS consortium"));
+        OPEN_GIS.setContactInfo(org.geotools.metadata.citation.Contact.OPEN_GIS);
+        OPEN_GIS.freeze();
+    }
+    
+    /**
+     * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> responsible party.
+     *
+     * @see org.geotools.metadata.citation.Contact#EPSG
+     *
+     * @todo Localize.
+     */
+    public static ResponsibleParty EPSG = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        EPSG.setOrganisationName(new SimpleInternationalString("EPSG"));
+        EPSG.setContactInfo(org.geotools.metadata.citation.Contact.EPSG);
+        EPSG.freeze();
+    }
+    
+    /**
+     * The <A HREF="http://www.geotools.org">Geotools</A> project.
+     *
+     * @see org.geotools.metadata.citation.Contact#GEOTOOLS
+     */
+    public static ResponsibleParty GEOTOOLS = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        GEOTOOLS.setOrganisationName(new SimpleInternationalString("Geotools"));
+        GEOTOOLS.setContactInfo(org.geotools.metadata.citation.Contact.GEOTOOLS);
+        GEOTOOLS.freeze();
+    }
 
     /**
      * Name of the responsible person- surname, given name, title separated by a delimiter.

@@ -123,7 +123,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
-     * {@link org.geotools.metadata.citation.Citation#EPSG}.
+     * {@link org.geotools.metadata.citation.Citation#EPSG} for example.
      *
      * @param identifiers The operation identifiers. Should contains at least one identifier.
      * @param parameters The set of parameters, or <code>null</code> or an empty array if none.

@@ -25,6 +25,7 @@ package org.geotools.metadata.citation;
 // J2SE direct dependencies
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.MalformedURLException;
 import java.io.UnsupportedEncodingException;
 
 // OpenGIS dependencies
@@ -51,6 +52,39 @@ public class OnLineResource extends MetadataEntity
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5412370008274334799L;
+    
+    /**
+     * The online resources for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
+     */
+    public static final OnLineResource OPEN_GIS = new OnLineResource();
+    
+    /**
+     * The online resources for the
+     * <A HREF="http://www.epsg.org">European Petroleum Survey Group</A>.
+     */
+    public static final OnLineResource EPSG = new OnLineResource();
+    
+    /**
+     * The online resources for the <A HREF="http://www.geotools.org">Geotools</A> project.
+     */
+    public static final OnLineResource GEOTOOLS = new OnLineResource();
+    static {
+        try {
+            OPEN_GIS.setLinkage(new URL("http://www.opengis.org" ));
+            EPSG    .setLinkage(new URL("http://www.epsg.org"    ));
+            GEOTOOLS.setLinkage(new URL("http://www.geotools.org"));
+        } catch (MalformedURLException exception) {
+            // Should never happen.
+            throw new ExceptionInInitializerError(exception);
+        }
+        OPEN_GIS.setFunction(OnLineFunction.DOWNLOAD);
+        EPSG    .setFunction(OnLineFunction.DOWNLOAD);
+        GEOTOOLS.setFunction(OnLineFunction.DOWNLOAD);
+        
+        OPEN_GIS.freeze();
+        EPSG    .freeze();
+        GEOTOOLS.freeze();
+    }
     
     /**
      * Name of an application profile that can be used with the online resource.

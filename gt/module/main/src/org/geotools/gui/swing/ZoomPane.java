@@ -1716,8 +1716,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * button.  The default implementation displays a contextual menu 
      * containing navigation options.
      *
-     * @param  event Mouse event containing amongst others, the 
-     *         coordinates pointées???????????.
+     * @param  event Mouse event. This object contains the mouse coordinates
+     *         in geographic coordinates (as well as pixel coordinates).
      * @return The contextual menu, or <code>null</code> to avoid displaying
      *         the menu.
      */

@@ -241,8 +241,7 @@ public class WeakValueHashMap extends AbstractMap {
      *        for augmenting {@link #table}, or <code>false</code> if
      *        it is invoked for making the table smaller.
      */
-    private void rehash(final boolean augmentation)
-    {
+    private void rehash(final boolean augmentation) {
         assert Thread.holdsLock(this);
         assert valid();
         final long currentTime = System.currentTimeMillis();

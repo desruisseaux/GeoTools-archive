@@ -24,20 +24,26 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.List;
 import java.util.HashMap;
-import java.util.Locale;   // For javadoc
 import java.util.Iterator;
+import java.util.Locale;   // For javadoc
 import java.util.logging.Logger;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
 
 // OpenGIS dependencies
+import org.opengis.util.LocalName;
+import org.opengis.util.ScopedName;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
+import org.geotools.util.NameFactory;
 import org.geotools.util.WeakHashSet;
+import org.geotools.util.WeakValueHashMap;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -45,12 +51,28 @@ import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * An identification of a CRS object.
+ * An identification of a CRS object. The main interface implemented by this class
+ * is {@link org.opengis.metadata.Identifier}. However, this class also implements
+ * {@link GenericName} in order to make it possible to give identifiers in the list
+ * of {@linkplain IdentifiedObject#getAlias aliases}. Casting an alias's {@linkplain
+ * GenericName generic name} to an {@linkplain org.opengis.metadata.Identifier identifier}
+ * gives access to more informations, like the URL of the authority.
+ *
+ * <P>The {@linkplain GenericName generic name} will be infered from
+ * {@linkplain org.opengis.metadata.Identifier identifier} attributes.
+ * More specifically, a {@linkplain ScopedName scoped name} will be constructed using the
+ * the shortest {@linkplain Citation#getAlternateTitles alternate titles} (or the
+ * {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
+ * {@linkplain ScopedName#getScope scope}, and the {@linkplain #getCode code} as the
+ * {@linkplain ScopedName#asLocalName head}. This heuristic rule seems raisonable
+ * since, according ISO 19115, the {@linkplain Citation#getAlternateTitles alternate
+ * titles} often contains abreviation (for example "DCW" as an alternative title for
+ * "<cite>Digital Chart of the World</cite>").</P>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Identifier implements org.opengis.metadata.Identifier, Serializable {
+public class Identifier implements org.opengis.metadata.Identifier, GenericName, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -92,6 +114,12 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     static final WeakHashSet POOL = new WeakHashSet();
 
     /**
+     * A pool of {@link LocalName} values for given {@link InternationalString}.
+     * Will be constructed only when first needed.
+     */
+    private static Map SCOPES;
+
+    /**
      * Identifier code or name, optionally from a controlled list or pattern
      * defined by a code space.
      */
@@ -115,6 +143,12 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
      * Comments on or information about this identifier, or <code>null</code> if none.
      */
     private final InternationalString remarks;
+
+    /**
+     * The name of this identifier as a generic name.
+     * Will be constructed only when first needed.
+     */
+    private transient GenericName name;
 
     /**
      * Construct an identifier from a set of properties. Keys are strings from the table below.
@@ -386,26 +420,112 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     public InternationalString getRemarks() {
         return remarks;
     }
+    
+    /**
+     * Returns the generic name of this identifier. The name will be constructed
+     * automatically the first time it will be needed. The name's scope is infered
+     * from the shortest alternative title (if any). This heuristic rule seems raisonable
+     * since, according ISO 19115, the {@linkplain Citation#getAlternateTitles alternate
+     * titles} often contains abreviation (for example "DCW" as an alternative title for
+     * "Digital Chart of the World"). If no alternative title is found or if the main title
+     * is yet shorter, then it is used.
+     */
+    private GenericName getName() {
+        // No need to synchronize; this is not a big deal if the name is created twice.
+        if (name == null) {
+            if (authority == null) {
+                name = new org.geotools.util.LocalName(code);
+            } else {
+                InternationalString title = authority.getTitle();
+                int length = title.length();
+                final List alt = authority.getAlternateTitles();
+                if (alt != null) {
+                    for (final Iterator it=alt.iterator(); it.hasNext();) {
+                        final InternationalString candidate = (InternationalString) it.next();
+                        final int candidateLength = candidate.length();
+                        if (candidateLength>0 && candidateLength<length) {
+                            title = candidate;
+                            length = candidateLength;
+                        }
+                    }
+                }
+                GenericName scope;
+                synchronized (Identifier.class) {
+                    if (SCOPES == null) {
+                        SCOPES = new WeakValueHashMap();
+                    }
+                    scope = (GenericName) SCOPES.get(title);
+                    if (scope == null) {
+                        scope = new org.geotools.util.LocalName(title);
+                        SCOPES.put(title, scope);
+                    }
+                }
+                name = new org.geotools.util.ScopedName(scope, code);
+            }
+        }
+        return name;
+    }
+    
+    /**
+     * Returns the scope (name space) of this generic name. If this name has no scope
+     * (e.g. is the root), then this method returns <code>null</code>.
+     */
+    public GenericName getScope() {
+        return getName().getScope();
+    }
+    
+    /**
+     * Returns a view of this object as a scoped name,
+     * or <code>null</code> if this name has no scope.
+     */
+    public ScopedName asScopedName() {
+        return getName().asScopedName();
+    }
+    
+    /**
+     * Returns a view of this object as a local name. The local name returned by this method
+     * will have the same {@linkplain LocalName#getScope scope} than this generic name.
+     */
+    public LocalName asLocalName() {
+        return getName().asLocalName();
+    }
+    
+    /**
+     * Returns the sequence of {@linkplain LocalName local names} making this generic name.
+     * Each element in this list is like a directory name in a file path name.
+     * The length of this sequence is the generic name depth.
+     */
+    public List getParsedNames() {
+        return getName().getParsedNames();
+    }
+    
+    /**
+     * Returns a local-dependent string representation of this generic name. This string
+     * is similar to the one returned by {@link #toString} except that each element has
+     * been localized in the {@linkplain InternationalString#toString(Locale) specified locale}.
+     * If no international string is available, then this method returns an implementation mapping
+     * to {@link #toString} for all locales.
+     */
+    public InternationalString toInternationalString() {
+        return getName().toInternationalString();
+    }
 
     /**
-     * Returns a string representation of this identifier. This string is mostly for
-     * debugging purpose and is implementation-dependent.
+     * Returns a string representation of this generic name. This string representation
+     * is local-independant. It contains all elements listed by {@link #getParsedNames}
+     * separated by an arbitrary character (usually <code>:</code> or <code>/</code>).
      */
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
-        buffer.append("[\"");
-        if (authority != null) {
-            buffer.append(authority.getTitle());
-            buffer.append(':');
-        }
-        buffer.append(code);
-        buffer.append('"');
-        if (version != null) {
-            buffer.append(", version ");
-            buffer.append(version);
-        }
-        buffer.append(']');
-        return buffer.toString();
+        return getName().toString();
+    }
+
+    /**
+     * Compares this name with the specified object for order. Returns a negative integer,
+     * zero, or a positive integer as this name lexicographically precedes, is equals to,
+     * or follows the specified object.
+     */
+    public int compareTo(final Object object) {
+        return getName().compareTo(object);
     }
 
     /**

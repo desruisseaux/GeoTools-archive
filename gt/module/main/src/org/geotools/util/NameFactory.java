@@ -75,48 +75,31 @@ public final class NameFactory {
     }
 
     /**
-     * Constructs a generic name from an array of local names
-     * and the default separator character.
+     * Constructs a generic name from an array of local names and the default separator character.
+     * If any of the specified names is an {@link InternationalString}, then the
+     * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
+     * method will be used in order to fetch an unlocalized name. Otherwise, the
+     * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
-     * @param names The local names as an array of strings.
+     * @param names The local names as an array of strings or international strings.
      *              This array must contains at least one element.
      */
-    public static GenericName create(final String[] names) {
+    public static GenericName create(final CharSequence[] names) {
         return create(names, org.geotools.util.GenericName.DEFAULT_SEPARATOR);
     }
 
     /**
-     * Constructs a generic name from an array of local names
-     * and the default separator character.
-     *
-     * @param names The local names as an array of international strings.
-     *              This array must contains at least one element.
-     */
-    public static GenericName create(final InternationalString[] names) {
-        return create(names, org.geotools.util.GenericName.DEFAULT_SEPARATOR);
-    }
-
-    /**
-     * Constructs a generic name from an array of local names
-     * and the specified separator character.
+     * Constructs a generic name from an array of local names and the specified separator character.
+     * If any of the specified names is an {@link InternationalString}, then the
+     * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
+     * method will be used in order to fetch an unlocalized name. Otherwise, the
+     * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
      * @param names     The local names as an array of strings.
      *                  This array must contains at least one element.
      * @param separator The separator character to use.
      */
-    public static GenericName create(final String[] names, final char separator) {
-        return create(names, names.length, separator);
-    }
-
-    /**
-     * Constructs a generic name from an array of local names
-     * and the specified separator character.
-     *
-     * @param names     The local names as an array of international strings.
-     *                  This array must contains at least one element.
-     * @param separator The separator character to use.
-     */
-    public static GenericName create(final InternationalString[] names, final char separator) {
+    public static GenericName create(final CharSequence[] names, final char separator) {
         return create(names, names.length, separator);
     }
 
@@ -128,34 +111,15 @@ public final class NameFactory {
      * @param length    The valid length of <code>names</code> array.
      * @param separator The separator character to use.
      */
-    private static GenericName create(final String[] names, final int length,
+    private static GenericName create(final CharSequence[] names,
+                                      final int  length,
                                       final char separator)
     {
         if (length <= 0) {
             throw new IllegalArgumentException(String.valueOf(length));
         }
         if (length == 1) {
-            return new LocalName(null, names[0]);
-        }
-        return new ScopedName(create(names, length-1, separator), separator, names[length-1]);
-    }
-
-    /**
-     * Constructs a generic name from an array of local names
-     * and the specified separator character.
-     *
-     * @param names     The local names as an array of international strings.
-     * @param length    The valid length of <code>names</code> array.
-     * @param separator The separator character to use.
-     */
-    private static GenericName create(final InternationalString[] names,
-                                      final int length, final char separator)
-    {
-        if (length <= 0) {
-            throw new IllegalArgumentException(String.valueOf(length));
-        }
-        if (length == 1) {
-            return new LocalName(null, names[0]);
+            return new LocalName(names[0]);
         }
         return new ScopedName(create(names, length-1, separator), separator, names[length-1]);
     }

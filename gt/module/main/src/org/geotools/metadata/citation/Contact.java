@@ -49,6 +49,40 @@ public class Contact extends MetadataEntity
     private static final long serialVersionUID = 3283637180253117382L;
     
     /**
+     * Contact informations for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#OPEN_GIS
+     */
+    public static final Contact OPEN_GIS = new Contact();
+    static {
+        OPEN_GIS.setOnLineResource(org.geotools.metadata.citation.OnLineResource.OPEN_GIS);
+        OPEN_GIS.freeze();
+    }
+    
+    /**
+     * Contact informations for the
+     * <A HREF="http://www.epsg.org">European Petroleum Survey Group</A>.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#EPSG
+     */
+    public static final Contact EPSG = new Contact();
+    static {
+        EPSG.setOnLineResource(org.geotools.metadata.citation.OnLineResource.EPSG);
+        EPSG.freeze();
+    }
+    
+    /**
+     * Contact informations for the <A HREF="http://www.geotools.org">Geotools</A> project.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#GEOTOOLS
+     */
+    public static final Contact GEOTOOLS = new Contact();
+    static {
+        GEOTOOLS.setOnLineResource(org.geotools.metadata.citation.OnLineResource.GEOTOOLS);
+        GEOTOOLS.freeze();
+    }
+    
+    /**
      * Supplemental instructions on how or when to contact the individual or organization.
      */
     private InternationalString contactInstructions;

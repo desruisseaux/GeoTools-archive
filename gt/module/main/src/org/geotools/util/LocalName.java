@@ -41,9 +41,6 @@ import org.geotools.resources.Utilities;
  * {@link GenericName}, or a pointer to another name space (with a new {@link GenericName})
  * one step closer to the target of the identifier.
  *
- * <P>Instances of this objects are usually not created directly.
- *    Use one of {@linkplain NameFactory factory methods} instead.</P>
- *
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -86,42 +83,19 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
 
     /**
      * Constructs a local name from the specified string with no scope.
-     *
-     * @param name The local name (never <code>null</code>).
-     */
-    public LocalName(final String name) {
-        this(null, name);
-    }
-
-    /**
-     * Constructs a local name from the specified international string with no scope.
-     *
-     * @param name The local name (never <code>null</code>).
-     */
-    public LocalName(final InternationalString name) {
-        this(null, name);
-    }
-
-    /**
-     * Constructs a local name from the specified string.
-     *
-     * This constructor is not public since it can't be used from outside
-     * of {@link org.geotools.util.ScopedName} constructor (otherwise some
-     * methods in this class may have the wrong semantic).
-     *
-     * @param asScopedName The view of this object as a scoped name.
-     * @param name         The local name (never <code>null</code>).
-     */
-    LocalName(final ScopedName asScopedName, final String name) {
-        this.asScopedName = asScopedName;
-        this.name         = name;
-        org.geotools.util.InternationalString.ensureNonNull("name", name);
-    }
-
-    /**
-     * Constructs a local name from the specified international string. The
+     * If the specified name is an {@link InternationalString}, then the
      * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
-     * method will be used in order to fetch an unlocalized name.
+     * method will be used in order to fetch an unlocalized name. Otherwise, the
+     * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
+     *
+     * @param name The local name (never <code>null</code>).
+     */
+    public LocalName(final CharSequence name) {
+        this(null, name);
+    }
+
+    /**
+     * Constructs a local name from the specified international string.
      *
      * This constructor is not public since it can't be used from outside
      * of {@link org.geotools.util.ScopedName} constructor (otherwise some
@@ -130,9 +104,9 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * @param asScopedName The view of this object as a scoped name.
      * @param name         The local name (never <code>null</code>).
      */
-    LocalName(final ScopedName asScopedName, final InternationalString name) {
+    LocalName(final ScopedName asScopedName, final CharSequence name) {
         this.asScopedName = asScopedName;
-        this.name         = name;
+        this.name         = validate(name);
         org.geotools.util.InternationalString.ensureNonNull("name", name);
     }
 
@@ -178,7 +152,8 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     }
 
     /**
-     * Returns a view of this object as a scoped name.
+     * Returns a view of this object as a scoped name,
+     * or <code>null</code> if this name has no scope.
      */
     public ScopedName asScopedName() {
         return asScopedName;
