@@ -16,42 +16,27 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.gp;
+package org.geotools.coverage.grid;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
-
 import javax.media.jai.Interpolation;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.geotools.gc.GridCoverage;
-import org.geotools.gc.GridCoverageTest;
-import org.geotools.gc.GridRange;
-import org.geotools.pt.Envelope;
+// OpenGIS dependencies
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
- * Test the {@link Interpolator} implementation. This method inherit all
- * {@link GridCoverage} test. Because we override {@link #setUp}, tests
- * will be performed on {@link Interpolator} objects instead of default
- * {@link GridCoverage}.
+ * Tests the {@link Interpolator2D} implementation. This method inherit all tests from
+ * {@link GridCoverageTest}. Because we override {@link #transform}, tests will be performed
+ * on {@link Interpolator2D} objects instead of default {@link GridCoverage2D}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -63,17 +48,17 @@ public class InterpolatorTest extends GridCoverageTest {
     private Interpolation[] interpolations;
 
     /**
+     * Run the suite from the command line.
+     */
+    public static void main(final String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+
+    /**
      * Returns the test suite.
      */
     public static Test suite() {
         return new TestSuite(InterpolatorTest.class);
-    }
-
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
     }
 
     /**
@@ -93,28 +78,28 @@ public class InterpolatorTest extends GridCoverageTest {
     }
 
     /**
-     * Apply an operation on the specified coverage, if wanted.
-     * The default implementation apply a set of interpolations
+     * Applies an operation on the specified coverage, if wanted.
+     * The default implementation applies a set of interpolations
      * on <code>coverage</code>.
      */
-    protected GridCoverage transform(final GridCoverage coverage) {
-        return Interpolator.create(coverage, interpolations);
+    protected GridCoverage2D transform(final GridCoverage2D coverage) {
+        return Interpolator2D.create(coverage, interpolations);
     }
 
     /**
-     * Test the interpolations. Since <code>testGridCoverage()</code> tests value
+     * Tests the interpolations. Since <code>testGridCoverage()</code> tests value
      * at the center of pixels, all interpolations results should be identical to
      * a result without interpolation.
      */
     public void testGridCoverage() {
-        final GridCoverage coverage = getRandomCoverage();
-        assertTrue(coverage instanceof Interpolator);
-        assertTrue(coverage.geophysics(true)  instanceof Interpolator);
-        assertTrue(coverage.geophysics(false) instanceof Interpolator);
+        final GridCoverage2D coverage = getRandomCoverage();
+        assertTrue(coverage instanceof Interpolator2D);
+        assertTrue(coverage.geophysics(true)  instanceof Interpolator2D);
+        assertTrue(coverage.geophysics(false) instanceof Interpolator2D);
     }
 
     /**
-     * Test bilinear intersection at pixel edges. It should be equals
+     * Tests bilinear intersection at pixel edges. It should be equals
      * to the average of the four pixels around.
      */
     public void testInterpolationAtEdges() {
@@ -122,7 +107,7 @@ public class InterpolatorTest extends GridCoverageTest {
         // This constant must be identical to the one defined in 'getRandomCoverage()'
         final double PIXEL_SIZE = 0.25;
 
-        final GridCoverage coverage = Interpolator.create(getRandomCoverage().geophysics(true),
+        final GridCoverage2D coverage = Interpolator2D.create(getRandomCoverage().geophysics(true),
               new Interpolation[] {Interpolation.getInstance(Interpolation.INTERP_BILINEAR)});
 
         final int  band = 0; // Band to test.
@@ -140,7 +125,7 @@ public class InterpolatorTest extends GridCoverageTest {
                 buffer   = coverage.evaluate(point, buffer);
                 double t = buffer[band];
 
-                // Compute the expected value:
+                // Computes the expected value:
                 double r00 = data.getSampleDouble(i-0, j-0, band);
                 double r01 = data.getSampleDouble(i-0, j-1, band);
                 double r10 = data.getSampleDouble(i-1, j-0, band);

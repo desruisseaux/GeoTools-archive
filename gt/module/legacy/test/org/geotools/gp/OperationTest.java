@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gp;
 
@@ -50,6 +37,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterList;
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.cs.CompoundCoordinateSystem;
@@ -57,7 +45,7 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.TemporalCoordinateSystem;
 import org.geotools.gc.GridCoverage;
-import org.geotools.gc.GridCoverageTest;
+//import org.geotools.gc.GridCoverageTest;
 import org.geotools.image.jai.CombineDescriptor;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.Arguments;
@@ -69,7 +57,7 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class OperationTest extends GridCoverageTest {
+public class OperationTest extends TestCase { //GridCoverageTest {
     /**
      * The writer where to print diagnostic messages, or <code>null</code> if none.
      */
@@ -98,162 +86,162 @@ public class OperationTest extends GridCoverageTest {
     /**
      * Test a simple {@link OpenrationJAI}.
      */
-    public void testOperationJAI() {
-        if (true) return; // Disabled for now
-        final OperationJAI operation = new OperationJAI("addConst");
-        Writer output = out;
-        if (output == null) {
-            output = new StringWriter();
-        }
-        try {
-            operation.print(output, null);
-        } catch (IOException exception) {
-            if (out != null) {
-                exception.printStackTrace(out);
-            }
-            fail();
-        }
-        assertEquals("numSources",    1, operation.getNumSources());
-        assertEquals("numParameters", 2, operation.getNumParameters());
-    }
+//    public void testOperationJAI() {
+//        if (true) return; // Disabled for now
+//        final OperationJAI operation = new OperationJAI("addConst");
+//        Writer output = out;
+//        if (output == null) {
+//            output = new StringWriter();
+//        }
+//        try {
+//            operation.print(output, null);
+//        } catch (IOException exception) {
+//            if (out != null) {
+//                exception.printStackTrace(out);
+//            }
+//            fail();
+//        }
+//        assertEquals("numSources",    1, operation.getNumSources());
+//        assertEquals("numParameters", 2, operation.getNumParameters());
+//    }
 
     /**
      * Test the "Recolor" operation.
      */
-    public void testRecolor() {
-        if (true) return; // Disabled for now
-        final Operation   operation = new RecolorOperation();
-        final GridCoverage coverage = getRandomCoverage();
-        final ParameterList   param = operation.getParameterList().setParameter("Source", coverage);
-        final GridCoverage   result = operation.doOperation(param, null);
-        assertTrue(!Arrays.equals(getARGB(coverage), getARGB(result)));
-        assertTrue(!coverage.geophysics(true) .equals(result.geophysics(true )));
-        assertTrue(!coverage.geophysics(false).equals(result.geophysics(false)));
-    }
+//    public void testRecolor() {
+//        if (true) return; // Disabled for now
+//        final Operation   operation = new RecolorOperation();
+//        final GridCoverage coverage = getRandomCoverage();
+//        final ParameterList   param = operation.getParameterList().setParameter("Source", coverage);
+//        final GridCoverage   result = operation.doOperation(param, null);
+//        assertTrue(!Arrays.equals(getARGB(coverage), getARGB(result)));
+//        assertTrue(!coverage.geophysics(true) .equals(result.geophysics(true )));
+//        assertTrue(!coverage.geophysics(false).equals(result.geophysics(false)));
+//    }
 
     /**
      * Test the "Combine" operation.
      */
-    public void testCombine() {
-        if (true) return; // Disabled for now
-        final double value0 = 10,  scale0 = 0.50;
-        final double value1 = 35,  scale1 = 2.00;
-        final double value2 = 52,  scale2 = 0.25,  offset = 4;
-        final GridCoverage   src0 = getConstantCoverage((byte) value0, 200f);
-        final GridCoverage   src1 = getConstantCoverage((byte) value1, 200f);
-        final GridCoverage   src2 = getConstantCoverage((byte) value2, 200f);
-        final Operation operation = new PolyadicOperation(CombineDescriptor.OPERATION_NAME);
-        final ParameterList param = operation.getParameterList();
-        param.setParameter("source0", src0);
-        param.setParameter("source1", src1);
-        param.setParameter("source2", src2);
-        try {
-            // We are not allowed to skip a source.
-            param.setParameter("source4", src2);
-            fail();
-        } catch (IllegalArgumentException exception) {
-            // This is the expected exception. Continue...
-            if (out != null) {
-                out.println(exception.getLocalizedMessage());
-            }
-        }
-        /*
-         * Set an invalid matrix (missing offset coefficient).
-         * The operation should detect that the matrix is invalid.
-         */
-        param.setParameter("matrix", new double[][] {
-            {scale0, scale1, scale2, offset},
-            {scale0, 0,      scale2}
-        });
-        GridCoverage result;
-        try {
-            result = operation.doOperation(param, null);
-            fail();
-        } catch (IllegalArgumentException exception) {
-            // This is the expected exception. Continue...
-            if (out != null) {
-                out.println(exception.getLocalizedMessage());
-            }
-        }
-        /*
-         * Set a valid matrix and test the operation.
-         */
-        param.setParameter("matrix", new double[][] {
-            {scale0, scale1, scale2, offset}
-        });
-        result = operation.doOperation(param, null);
-        assertEquals(value0*scale0 + value1*scale1 + value2*scale2 + offset, result);
-        /*
-         * New test with one source image omited.
-         */
-        param.setParameter("matrix", new double[][] {
-            {scale0, 0, scale2, offset}
-        });
-        result = operation.doOperation(param, null);
-        assertEquals(value0*scale0 + 0 + value2*scale2 + offset, result);
-        /*
-         * Test the dyalic case.
-         */
-        param.setParameter("source2", null);
-        param.setParameter("matrix", new double[][] {
-            {scale0, scale1, offset}
-        });
-        result = operation.doOperation(param, null);
-        assertEquals(value0*scale0 + value1*scale1 + offset, result);
-        /*
-         * Test the combinaison with differents image size. The OperationJAI class
-         * should automatically ressample image before to apply the operation.
-         */
-        final GridCoverage src0x = getConstantCoverage((byte) value0, 100f);
-        final GridCoverage src1x = getConstantCoverage((byte) value1, 200f);
-        final GridCoverage src2x = getConstantCoverage((byte) value2,  75f);
-        param.setParameter("source0", src0x);
-        param.setParameter("source1", src1x);
-        param.setParameter("source2", src2x);
-        param.setParameter("matrix", new double[][] {
-            {scale0, scale1, scale2, offset}
-        });
-        result = operation.doOperation(param, null);
-        assertEquals(value0*scale0 + value1*scale1 + value2*scale2 + offset, result);
-    }
+//    public void testCombine() {
+//        if (true) return; // Disabled for now
+//        final double value0 = 10,  scale0 = 0.50;
+//        final double value1 = 35,  scale1 = 2.00;
+//        final double value2 = 52,  scale2 = 0.25,  offset = 4;
+//        final GridCoverage   src0 = getConstantCoverage((byte) value0, 200f);
+//        final GridCoverage   src1 = getConstantCoverage((byte) value1, 200f);
+//        final GridCoverage   src2 = getConstantCoverage((byte) value2, 200f);
+//        final Operation operation = new PolyadicOperation(CombineDescriptor.OPERATION_NAME);
+//        final ParameterList param = operation.getParameterList();
+//        param.setParameter("source0", src0);
+//        param.setParameter("source1", src1);
+//        param.setParameter("source2", src2);
+//        try {
+//            // We are not allowed to skip a source.
+//            param.setParameter("source4", src2);
+//            fail();
+//        } catch (IllegalArgumentException exception) {
+//            // This is the expected exception. Continue...
+//            if (out != null) {
+//                out.println(exception.getLocalizedMessage());
+//            }
+//        }
+//        /*
+//         * Set an invalid matrix (missing offset coefficient).
+//         * The operation should detect that the matrix is invalid.
+//         */
+//        param.setParameter("matrix", new double[][] {
+//            {scale0, scale1, scale2, offset},
+//            {scale0, 0,      scale2}
+//        });
+//        GridCoverage result;
+//        try {
+//            result = operation.doOperation(param, null);
+//            fail();
+//        } catch (IllegalArgumentException exception) {
+//            // This is the expected exception. Continue...
+//            if (out != null) {
+//                out.println(exception.getLocalizedMessage());
+//            }
+//        }
+//        /*
+//         * Set a valid matrix and test the operation.
+//         */
+//        param.setParameter("matrix", new double[][] {
+//            {scale0, scale1, scale2, offset}
+//        });
+//        result = operation.doOperation(param, null);
+//        assertEquals(value0*scale0 + value1*scale1 + value2*scale2 + offset, result);
+//        /*
+//         * New test with one source image omited.
+//         */
+//        param.setParameter("matrix", new double[][] {
+//            {scale0, 0, scale2, offset}
+//        });
+//        result = operation.doOperation(param, null);
+//        assertEquals(value0*scale0 + 0 + value2*scale2 + offset, result);
+//        /*
+//         * Test the dyalic case.
+//         */
+//        param.setParameter("source2", null);
+//        param.setParameter("matrix", new double[][] {
+//            {scale0, scale1, offset}
+//        });
+//        result = operation.doOperation(param, null);
+//        assertEquals(value0*scale0 + value1*scale1 + offset, result);
+//        /*
+//         * Test the combinaison with differents image size. The OperationJAI class
+//         * should automatically ressample image before to apply the operation.
+//         */
+//        final GridCoverage src0x = getConstantCoverage((byte) value0, 100f);
+//        final GridCoverage src1x = getConstantCoverage((byte) value1, 200f);
+//        final GridCoverage src2x = getConstantCoverage((byte) value2,  75f);
+//        param.setParameter("source0", src0x);
+//        param.setParameter("source1", src1x);
+//        param.setParameter("source2", src2x);
+//        param.setParameter("matrix", new double[][] {
+//            {scale0, scale1, scale2, offset}
+//        });
+//        result = operation.doOperation(param, null);
+//        assertEquals(value0*scale0 + value1*scale1 + value2*scale2 + offset, result);
+//    }
 
     /**
      * Test operations on an image using a 3D coordinate system. In this test, the extra
      * dimension is time. The operation should work on the two first dimensions only and
      * preserve the temporal dimension.
      */
-    public void testCoordinateSystem3D() {
-        if (true) return; // Disabled for now
-        final GridCoverageProcessor processor = GridCoverageProcessor.getDefault();
-        final CoordinateSystem cs = new CompoundCoordinateSystem("WGS84 with time",
-                                        GeographicCoordinateSystem.WGS84,
-                                        new TemporalCoordinateSystem("UTC", new Date(0)));
-
-        GridCoverage coverage = getRandomCoverage(cs);
-        Envelope     envelope = coverage.getEnvelope();
-        for (int i=0; i<4; i++) {
-            switch (i) {
-                case 0: {
-                    // Nothing to do
-                    break;
-                }
-                case 1: {
-                    coverage = processor.doOperation("Interpolate", coverage, "Type", "Bicubic");
-                    break;
-                }
-                case 2: {
-                    coverage = processor.doOperation("NodataFilter", coverage);
-                    break;
-                }
-                case 3: {
-                    coverage = processor.doOperation("GradientMagnitude", coverage);
-                    break;
-                }
-            }
-            assertEquals("CoordinateSystem lost", cs, coverage.getCoordinateSystem());
-            assertEquals("Envelope lost",   envelope, coverage.getEnvelope());
-        }
-    }
+//    public void testCoordinateSystem3D() {
+//        if (true) return; // Disabled for now
+//        final GridCoverageProcessor processor = GridCoverageProcessor.getDefault();
+//        final CoordinateSystem cs = new CompoundCoordinateSystem("WGS84 with time",
+//                                        GeographicCoordinateSystem.WGS84,
+//                                        new TemporalCoordinateSystem("UTC", new Date(0)));
+//
+//        GridCoverage coverage = getRandomCoverage(cs);
+//        Envelope     envelope = coverage.getEnvelope();
+//        for (int i=0; i<4; i++) {
+//            switch (i) {
+//                case 0: {
+//                    // Nothing to do
+//                    break;
+//                }
+//                case 1: {
+//                    coverage = processor.doOperation("Interpolate", coverage, "Type", "Bicubic");
+//                    break;
+//                }
+//                case 2: {
+//                    coverage = processor.doOperation("NodataFilter", coverage);
+//                    break;
+//                }
+//                case 3: {
+//                    coverage = processor.doOperation("GradientMagnitude", coverage);
+//                    break;
+//                }
+//            }
+//            assertEquals("CoordinateSystem lost", cs, coverage.getCoordinateSystem());
+//            assertEquals("Envelope lost",   envelope, coverage.getEnvelope());
+//        }
+//    }
 
 
 

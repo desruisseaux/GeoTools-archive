@@ -16,21 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE and JAI dependencies
 import java.awt.Transparency;
@@ -42,17 +29,19 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.gc.Viewer;
+// Geotools dependencies
+import org.geotools.coverage.grid.Viewer;
 import org.geotools.resources.XMath;
 
 
 /**
- * Test the {@link ScaledColorSpace} implementation.
- * This is a visual test.
+ * Tests the {@link ScaledColorSpace} implementation.
+ * This is a visual test when run on the command line.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -61,7 +50,7 @@ public class ScaledColorSpaceTest extends TestCase {
     /**
      * Random number generator for this test.
      */
-    private Random random;
+    private static final Random random = new Random(5078987324568283L);
 
     /**
      * The minimal and maximal values to renderer.
@@ -97,7 +86,6 @@ public class ScaledColorSpaceTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        random  = new Random();
         minimum = random.nextDouble()*100;
         maximum = random.nextDouble()*200 + minimum + 10;
         colors  = new ScaledColorSpace(0, 1, minimum, maximum);
@@ -139,6 +127,7 @@ public class ScaledColorSpaceTest extends TestCase {
     public static void main(final String[] args) throws Exception {
         final ScaledColorSpaceTest test = new ScaledColorSpaceTest(null);
         test.setUp();
+        test.testColorSpace();
         Viewer.show(test.image);
     }
 }

@@ -38,7 +38,7 @@ import org.geotools.parameter.Parameters;
 
 /**
  * An {@link Operation}-{@link ParameterValueGroup} pair, used by
- * {@link GridCoverageProcessor2D#doOperation(Operation,ParameterValueGroup}
+ * {@link GridCoverageProcessor2D#doOperation(Operation,ParameterValueGroup)}
  * for caching the result of operations. Reusing previous computation outputs
  * should be okay since grid coverage (both the sources and the result) are
  * immutable by default.
@@ -50,7 +50,7 @@ import org.geotools.parameter.Parameters;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CachedOperation {
+final class CachedOperation {
     /**
      * The operation to apply on grid coverages.
      */

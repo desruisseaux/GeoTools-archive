@@ -137,7 +137,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * Retrieve a grid processing operation information. The operation information
      * will contain the name of the operation as well as a list of its parameters.
      *
-     * @param  name Index of the operation.
+     * @param  index Index of the operation.
      * @return The operation for the given index.
      * @throws IndexOutOfBoundsException if the specified index is out of bounds.
      */

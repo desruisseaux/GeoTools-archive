@@ -17,9 +17,9 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -33,26 +33,30 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Random;
-
 import javax.imageio.ImageIO;
+import javax.units.SI;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.pt.Envelope;
+// OpenGIS dependencies
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
+
+// Geotools dependencies
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.TestData;
-import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 
 
 /**
- * Test the {@link GridCoverage} implementation. This class can also be used
- * as a factory for sample {@link GridCoverage}, which may be used for tests
+ * Tests the {@link GridCoverage2D} implementation. This class can also be used
+ * as a factory for sample {@link GridCoverage2D}, which may be used for tests
  * in other modules. The two following methods are for this purpose:
  *
  * <ul>
@@ -62,8 +66,6 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Move and rename this file as TestCoverageFactory.
  */
 public class GridCoverageTest extends TestCase {
     /**
@@ -76,7 +78,14 @@ public class GridCoverageTest extends TestCase {
     /**
      * Random number generator for this test.
      */
-    private static Random random = new Random();;
+    private static Random random = new Random(684673898634768L);
+
+    /**
+     * Run the suite from the command line.
+     */
+    public static void main(final String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
 
     /**
      * Returns the test suite.
@@ -93,31 +102,65 @@ public class GridCoverageTest extends TestCase {
     }
 
     /**
-     * Apply an operation on the specified coverage, if wanted.
+     * Tests the construction and access to a grid coverage.
+     *
+     * @throws IOException if an I/O operation was needed and failed.
+     */
+    public void testGridCoverage() throws IOException {
+        final GridCoverage2D coverage = getRandomCoverage();
+        assertNotNull(coverage);
+        // Not much more test to do here, since most tests has been done
+        // inside 'getRandomCoverage'.  This method will be overriden by
+        // 'InterpolatorTest', which will perform more tests.
+        for (int i=getNumExamples(); --i>=0;) {
+            assertNotNull(getExample(i));
+        }
+    }
+
+    /**
+     * Tests the serialization of a grid coverage.
+     *
+     * @throws IOException if an I/O operation was needed and failed.
+     */
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        final GridCoverage2D coverage = getRandomCoverage();
+        assertNotNull(coverage);
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final ObjectOutputStream out = new ObjectOutputStream(buffer);
+        out.writeObject(coverage);
+        out.close();
+
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        final GridCoverage2D read = (GridCoverage2D) in.readObject();
+        in.close();
+    }
+
+    /**
+     * Applies an operation on the specified coverage, if wanted.
      * The default implementation returns <code>coverage</code>
      * with no change.
      */
-    protected GridCoverage transform(final GridCoverage coverage) {
+    protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return coverage;
     }
 
     /**
      * Returns a grid coverage filled with random values. The coordinate
-     * system default to {@link GeographicCoordinateSystem#WGS84}.
+     * reference system default to {@link GeographicCRS#WGS84}.
      *
      * @return A random coverage.
      */
-    protected GridCoverage getRandomCoverage() {
-        return getRandomCoverage(GeographicCoordinateSystem.WGS84);
+    protected GridCoverage2D getRandomCoverage() {
+        return getRandomCoverage(GeographicCRS.WGS84);
     }
 
     /**
      * Returns a grid coverage filled with random values.
      *
-     * @param coordinateSystem The coverage coordinate system.
+     * @param coordinateSystem The coverage coordinate reference system.
      * @return A random coverage.
      */
-    protected GridCoverage getRandomCoverage(final CoordinateSystem coordinateSystem) {
+    protected GridCoverage2D getRandomCoverage(final CoordinateReferenceSystem crs) {
         /*
          * Some constants used for the construction and test of the grid coverage.
          */
@@ -126,22 +169,22 @@ public class GridCoverageTest extends TestCase {
         final double PIXEL_SIZE = .25; // Pixel size (in degrees). Used in transformations.
         final int   BEGIN_VALID = 3;   // The minimal valid index for quantative category.
         /*
-         * Construct the grid coverage. We will assume that the grid coverage use
+         * Constructs the grid coverage. We will assume that the grid coverage use
          * (longitude,latitude) coordinates, pixels of 0.25 degrees and a lower
          * left corner at 10°W 30°N.
          */
-        final GridCoverage coverage;  // The grid coverage.
-        final BufferedImage   image;  // The GridCoverage's data.
-        final WritableRaster raster;  // The image's data as a raster.
-        final Rectangle2D    bounds;  // The GridCoverage's envelope.
-        final SampleDimension  band;  // The only image's band.
+        final GridCoverage2D coverage;  // The grid coverage.
+        final BufferedImage     image;  // The GridCoverage's data.
+        final WritableRaster   raster;  // The image's data as a raster.
+        final Rectangle2D      bounds;  // The GridCoverage's envelope.
+        final SampleDimensionGT  band;  // The only image's band.
 
-        band = new SampleDimension(new Category[] {
+        band = new SampleDimensionGT(new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Cloud",       null, 2),
             new Category("Temperature", null, BEGIN_VALID, 256, SCALE, OFFSET)
-        }, Unit.get("°C"));
+        }, SI.CELSIUS);
         image  = new BufferedImage(120, 80, BufferedImage.TYPE_BYTE_INDEXED);
         raster = image.getRaster();
         for (int i=raster.getWidth(); --i>=0;) {
@@ -151,15 +194,14 @@ public class GridCoverageTest extends TestCase {
         }
         bounds = new Rectangle2D.Double(-10, 30, PIXEL_SIZE*image.getWidth(),
                                                  PIXEL_SIZE*image.getHeight());
-        final Envelope envelope = new Envelope(coordinateSystem.getDimension());
+        final GeneralEnvelope envelope = new GeneralEnvelope(crs.getCoordinateSystem().getDimension());
         envelope.setRange(0, bounds.getMinX(), bounds.getMaxX());
         envelope.setRange(1, bounds.getMinY(), bounds.getMaxY());
-        for (int i=coordinateSystem.getDimension(); --i>=2;) {
+        for (int i=envelope.getDimension(); --i>=2;) {
             envelope.setRange(i, 10*i, 10*i+5);
         }
-        coverage = transform(new GridCoverage("Test", image, coordinateSystem,
-                                              envelope, new SampleDimension[]{band},
-                                              null, null));
+        coverage = transform(new GridCoverage2D("Test", image, crs, envelope,
+                                                new SampleDimensionGT[]{band}, null, null));
 
         /* ----------------------------------------------------------------------------------------
          *
@@ -168,15 +210,15 @@ public class GridCoverageTest extends TestCase {
         assertSame(image.getTile(0,0), coverage.getRenderedImage().getTile(0,0));
 
         // Test the creation of a "geophysics" view.
-        GridCoverage geophysics= coverage.geophysics(true);
-        assertSame(coverage,     coverage.geophysics(false));
-        assertSame(coverage,   geophysics.geophysics(false));
-        assertSame(geophysics, geophysics.geophysics(true ));
+        GridCoverage2D geophysics= coverage.geophysics(true);
+        assertSame(coverage,       coverage.geophysics(false));
+        assertSame(coverage,     geophysics.geophysics(false));
+        assertSame(geophysics,   geophysics.geophysics(true ));
         assertTrue(!coverage.equals(geophysics));
 
         // Test sample dimensions.
-        assertTrue( !coverage.getSampleDimensions()[0].getSampleToGeophysics().isIdentity());
-        assertTrue(geophysics.getSampleDimensions()[0].getSampleToGeophysics().isIdentity());
+        assertTrue( !coverage.getSampleDimension(0).getSampleToGeophysics().isIdentity());
+        assertTrue(geophysics.getSampleDimension(0).getSampleToGeophysics().isIdentity());
 
         // Compare data.
         final int bandN = 0; // Band to test.
@@ -205,46 +247,6 @@ public class GridCoverageTest extends TestCase {
         return coverage;
     }
 
-    /**
-     * Test the construction and access to a grid coverage.
-     *
-     * @throws IOException if an I/O operation was needed and failed.
-     */
-    public void testGridCoverage() throws IOException {
-        final GridCoverage coverage = getRandomCoverage();
-        assertNotNull(coverage);
-        // Not much more test to do here, since most tests has been done
-        // inside 'getRandomCoverage'.  This method will be overriden by
-        // 'InterpolatorTest', which will perform more tests.
-        for (int i=getNumExamples(); --i>=0;) {
-            assertNotNull(getExample(i));
-        }
-    }
-
-    /**
-     * Test the serialization of a grid coverage.
-     *
-     * @throws IOException if an I/O operation was needed and failed.
-     *
-     * @todo: this test is not yet enabled.
-     */
-    private void serialization() throws IOException, ClassNotFoundException {
-        final GridCoverage coverage = getRandomCoverage();
-        assertNotNull(coverage);
-        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(buffer);
-        out.writeObject(coverage);
-        out.close();
-
-        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-        final GridCoverage read = (GridCoverage) in.readObject();
-        in.close();
-    }
-
-//    public static void main(String[] args) throws Exception {
-//        new GridCoverageTest(null).serialization();
-//    }
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                           ////////
@@ -268,14 +270,12 @@ public class GridCoverageTest extends TestCase {
      * @return The "real world" grid coverage.
      * @throws IOException if an I/O operation was needed and failed.
      */
-    public static GridCoverage getExample( final int number) throws IOException {
-        final String           path;
-        final String           unit;
-        final Category[] categories;
-        final CoordinateSystem   cs;
-        final Rectangle2D    bounds;
-
-
+    public static GridCoverage2D getExample( final int number) throws IOException {
+        final String                   path;
+        final String                   unit;
+        final Category[]         categories;
+        final CoordinateReferenceSystem crs;
+        final Rectangle2D            bounds;
         switch (number) {
             default: {
                 throw new IllegalArgumentException(String.valueOf(number));
@@ -283,7 +283,7 @@ public class GridCoverageTest extends TestCase {
             case 0: {
                 //unit = "°C";
                 path = "QL95209.png";
-                cs   = GeographicCoordinateSystem.WGS84;
+                crs  = GeographicCRS.WGS84;
                 categories = new Category[] {
                     new Category("Coast line", Color.decode("#000000"), new NumberRange(  0,   0)),
                     new Category("Cloud",      Color.decode("#C3C3C3"), new NumberRange(  1,   9)),
@@ -300,7 +300,7 @@ public class GridCoverageTest extends TestCase {
             case 1: {
                 //unit = "mg/m³";
                 path = "CHL01195.png";
-                cs   = GeographicCoordinateSystem.WGS84;
+                crs  = GeographicCRS.WGS84;
                 categories = new Category[] {
                     new Category("Land",       Color.decode("#000000"), new NumberRange(255, 255)),
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(  0,   0)),
@@ -311,13 +311,12 @@ public class GridCoverageTest extends TestCase {
                 break;
             }
         }
-
-        final SampleDimension[] bands = new SampleDimension[] {
-            new SampleDimension(categories, null)
+        final SampleDimensionGT[] bands = new SampleDimensionGT[] {
+            new SampleDimensionGT(categories, null)
         };
-        final Envelope   envelope = new Envelope(bounds);
+        final Envelope   envelope = new GeneralEnvelope(bounds);
         final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
         final String     filename = new File(path).getName();
-        return new GridCoverage(filename, image, cs, envelope, bands, null, null);
+        return new GridCoverage2D(filename, image, crs, envelope, bands, null, null);
     }
 }

@@ -104,7 +104,7 @@ public class Parameters {
      * {@code double[].class}) or a {@linkplain Collection collection} (like {@code List.class}),
      * the descriptor
      * {@linkplain ParameterDescriptor#getMinimumValue minimum value},
-     * {@linkplain ParameterDescriptor#getMaxiumValue maximum value} and
+     * {@linkplain ParameterDescriptor#getMaximumValue maximum value} and
      * {@linkplain ParameterDescriptor#getValidValues valid values}
      * will be used to check the elements.
      *
@@ -148,7 +148,7 @@ public class Parameters {
      * Called on a single {@linkplain ParameterValue parameter value}, or on elements of a
      * parameter value. This method ensures that
      * {@linkplain ParameterDescriptor#getMinimumValue minimum value},
-     * {@linkplain ParameterDescriptor#getMaxiumValue maximum value} and
+     * {@linkplain ParameterDescriptor#getMaximumValue maximum value} and
      * {@linkplain ParameterDescriptor#getValidValues valid values}
      * all think the provided value is okay.
      *
@@ -184,21 +184,21 @@ public class Parameters {
      * @param type GeneralParameterDescriptor to search for
      * @return List (possibly empty of GeneralParameter
      *
-     * @deprecated Use {@link ParameterValue#parameter} or {@link ParameterValue#groups} instead.
-     *  We would like to encourage peoples to use parameter name as key instead of parameter
-     *  descriptor, because the parameter descriptor may not be always available. For example
-     *  if a user know he is looking for the "semi_major" axis length (because it is documented
-     *  in OpenGIS specification under that name) but don't know and don't care about who is
-     *  providing the implementation, then he doesn't have the parameter descriptor; he only
-     *  have the parameter name. Furthermore, parameter descriptor is implementation dependent.
-     *  For example if we search for the "semi_major" axis length using the Geotools descriptor
-     *  for this parameter, we will fail to find this parameter in a {@link ParameterValueGroup}
-     *  provided by an other implementation. This is against GeoAPI goal, which is
-     *  inter-operability. This doesn't mean that parameter descriptor should not be used.
-     *  They are used for inspecting meta-data about parameters, not for searching parameters.
-     *  Since each parameter name should be unique in a given parameter group (because
-     *  {@link ParameterDescriptor#getMaximumOccurs} is always 1 for single parameter),
-     *  the parameter name is a suffisient key for searching.
+     * @deprecated Use {@link ParameterValueGroup#parameter} or {@link ParameterValueGroup#groups}
+     * instead. We would like to encourage peoples to use parameter name as key instead of parameter
+     * descriptor, because the parameter descriptor may not be always available. For example
+     * if a user know he is looking for the "semi_major" axis length (because it is documented
+     * in OpenGIS specification under that name) but don't know and don't care about who is
+     * providing the implementation, then he doesn't have the parameter descriptor; he only
+     * have the parameter name. Furthermore, parameter descriptor is implementation dependent.
+     * For example if we search for the "semi_major" axis length using the Geotools descriptor
+     * for this parameter, we will fail to find this parameter in a {@link ParameterValueGroup}
+     * provided by an other implementation. This is against GeoAPI goal, which is
+     * inter-operability. This doesn't mean that parameter descriptor should not be used.
+     * They are used for inspecting meta-data about parameters, not for searching parameters.
+     * Since each parameter name should be unique in a given parameter group (because
+     * {@link ParameterDescriptor#getMaximumOccurs} is always 1 for single parameter),
+     * the parameter name is a suffisient key for searching.
      */
     public static int indexOf(ParameterValueGroup group, GeneralParameterDescriptor type) {
         GeneralParameterValue[] params = array( group );

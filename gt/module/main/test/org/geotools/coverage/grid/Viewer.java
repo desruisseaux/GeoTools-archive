@@ -16,21 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.awt.Dimension;
@@ -43,21 +30,23 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Locale;
-
-import javax.media.jai.GraphicsJAI;
-import javax.media.jai.PlanarImage;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.geotools.cv.SampleDimension;
-import org.geotools.gp.GridCoverageProcessor;
+// JAI dependencies
+import javax.media.jai.GraphicsJAI;
+import javax.media.jai.PlanarImage;
+
+// Geotools dependencies
+import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
 
 /**
- * A very simple viewer for {@link GridCoverage}.   This viewer provides no zoom
+ * A very simple viewer for {@link GridCoverage2D}. This viewer provides no zoom
  * capability, no user interaction and ignores the coordinate system. It is just
  * for quick test of grid coverage.
  *
@@ -71,10 +60,10 @@ public class Viewer extends JPanel {
     private final RenderedImage image;
 
     /**
-     * The main sample dimension, or <code>null</code> if none.
+     * The main sample dimension, or {@code null} if none.
      * Used by {@link #printPalette} for printing categories.
      */
-    private SampleDimension categories;
+    private SampleDimensionGT categories;
 
     /**
      * The transform from grid to coordinate system.
@@ -88,24 +77,24 @@ public class Viewer extends JPanel {
     private static int location;
 
     /**
-     * Construct a viewer for the specified image.
+     * Constructs a viewer for the specified image.
      *
      * @param coverage The image to display.
      */
     public Viewer(RenderedImage image) {
-        this.image = PlanarImage.wrapRenderedImage(image);
+        image = this.image = PlanarImage.wrapRenderedImage(image);
         gridToCoordinateSystem.translate(-image.getMinX(), -image.getMinY());
         setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
     }
 
     /**
-     * Construct a viewer for the specified grid coverage.
+     * Constructs a viewer for the specified grid coverage.
      *
      * @param coverage The coverage to display.
      */
-    public Viewer(final GridCoverage coverage) {
+    public Viewer(final GridCoverage2D coverage) {
         this(coverage.getRenderedImage());
-        categories = coverage.getSampleDimensions()[0];
+        categories = (SampleDimensionGT) coverage.getSampleDimension(0);
     }
 
     /**
@@ -135,8 +124,8 @@ public class Viewer extends JPanel {
      * @param  coverage The coverage to display.
      * @return The viewer, for information.
      */
-    public static Viewer show(final GridCoverage coverage) {
-        return show(new Viewer(coverage), coverage.getName(JComponent.getDefaultLocale()));
+    public static Viewer show(final GridCoverage2D coverage) {
+        return show(new Viewer(coverage), coverage.getName().toString(JComponent.getDefaultLocale()));
     }
 
     /**
@@ -144,7 +133,7 @@ public class Viewer extends JPanel {
      * will be terminated when the user close the frame.
      *
      * @param  viewer The viewer to display.
-     * @param  title  The frame title, or <code>null</code> if none.
+     * @param  title  The frame title, or {@code null} if none.
      * @return The viewer, for convenience.
      */
     private static Viewer show(final Viewer viewer, final String title) {
@@ -153,13 +142,13 @@ public class Viewer extends JPanel {
         frame.setLocation(location, location);
         frame.getContentPane().add(viewer);
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
         location += 64;
         return viewer;
     }
 
     /**
-     * Print to the color palette to the specified output stream. First, the color model
+     * Prints the color palette to the specified output stream. First, the color model
      * name is displayed. Next, if the color model is an {@link IndexColorModel}, then the
      * RGB codes are written for all samples values. Category names or geophysics values,
      * if any are written after each sample values.
@@ -247,24 +236,24 @@ public class Viewer extends JPanel {
             out.println();
             out.println("  -operation=[s]  An operation name to apply (e.g. \"GradientMagniture\").");
             out.println("                  For a list of available operations, run the following:");
-            out.println("                  java org.geotools.gp.GridCoverageProcessor");
+            out.println("                  java org.geotools.coverage.processing.GridCoverageProcessor2D");
             out.println("  -geophysics=[b] Set to 'true' or 'false' for requesting a \"geophysics\"");
             out.println("                  version of data or an indexed version, respectively.");
             out.println("  -palette        Dumps RGB codes to standard output.");
             out.flush();
             return;
         }
-        GridCoverage coverage = GridCoverageTest.getExample(Integer.parseInt(args[0]));
+        GridCoverage2D coverage = GridCoverageTest.getExample(Integer.parseInt(args[0]));
         if (geophysics != null) {
             coverage = coverage.geophysics(geophysics.booleanValue());
         }
         if (operation != null) {
-            final GridCoverageProcessor processor = GridCoverageProcessor.getDefault();
-            coverage = processor.doOperation(operation, coverage);
+            final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
+            coverage = (GridCoverage2D) processor.doOperation(operation, coverage);
         }
         Viewer viewer = new Viewer(coverage);
         viewer.setLocale(locale);
-        viewer = show(viewer, coverage.getName(locale));
+        viewer = show(viewer, coverage.getName().toString(locale));
         if (palette) {
             viewer.printPalette(out);
         }

@@ -98,7 +98,7 @@ public abstract class Operation2D implements Operation, Serializable {
 
     /**
      * Returns the name of the processing operation. The default implementation
-     * returns the {@linkplain descriptor} code name.
+     * returns the {@linkplain #descriptor} code name.
      */
     public String getName() {
         return descriptor.getName().getCode();
@@ -106,7 +106,7 @@ public abstract class Operation2D implements Operation, Serializable {
 
     /**
      * Returns the description of the processing operation. If there is no description,
-     * returns {@code null}. The default implementation returns the {@linkplain descriptor}
+     * returns {@code null}. The default implementation returns the {@linkplain #descriptor}
      * remarks.
      */
     public String getDescription() {

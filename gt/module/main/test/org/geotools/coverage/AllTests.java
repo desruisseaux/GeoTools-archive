@@ -53,8 +53,11 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.coverage.     CategoryTest        .suite());
         suite.addTest(org.geotools.coverage.     CategoryListTest    .suite());
         suite.addTest(org.geotools.coverage.     SampleDimensionTest .suite());
+        suite.addTest(org.geotools.coverage.     ScaledColorSpaceTest.suite());
         suite.addTest(org.geotools.coverage.grid.GridGeometryTest    .suite());
         suite.addTest(org.geotools.coverage.grid.SampleTranscoderTest.suite());
+        suite.addTest(org.geotools.coverage.grid.GridCoverageTest    .suite());
+        suite.addTest(org.geotools.coverage.grid.InterpolatorTest    .suite());
         return suite;
     }
 }

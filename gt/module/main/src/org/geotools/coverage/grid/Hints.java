@@ -35,8 +35,9 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * A set of {@link RenderingHints} keys for grid coverage operations. Hints are memorized by
- * {@link GridCoverageProcessor}, which formard them to {@link Operation#doOperation} at
+ * A set of {@link RenderingHints} keys for grid coverage operations.
+ * Hints are memorized by {@link GridCoverageProcessor}, which formard them
+ * to {@link org.opengis.coverage.processing.Operation2D#doOperation} at
  * every invocation. Rendering hints can be used to control some low-level details, like
  * the {@link JAI} instance to use when performing operation. Operations may use the
  * hints or ignore them. Example:
