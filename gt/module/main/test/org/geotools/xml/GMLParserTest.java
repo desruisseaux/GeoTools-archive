@@ -275,7 +275,7 @@ public class GMLParserTest extends TestCase {
            checkFeatureCollection((FeatureCollection)doc);
            fail("Didn't catch an exception :(");
        } catch (Throwable e) {
-           e.printStackTrace();
+//           e.printStackTrace();
        }
    }
 }

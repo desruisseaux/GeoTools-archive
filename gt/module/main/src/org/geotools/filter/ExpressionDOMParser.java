@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -339,8 +340,8 @@ public final class ExpressionDOMParser {
             try {
                 //NodeList kids = child.getChildNodes();
                 AttributeExpression attribute = FILTER_FACT
-                    .createAttributeExpression((AttributeType)null);
-                attribute.setAttributePath(child.getFirstChild().getNodeValue());
+                    .createAttributeExpression((FeatureType)null,child.getFirstChild().getNodeValue());
+//                attribute.setAttributePath(child.getFirstChild().getNodeValue());
 
                 return attribute;
             } catch (IllegalFilterException ife) {

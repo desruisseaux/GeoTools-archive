@@ -4280,7 +4280,7 @@ public class GMLComplexTypes {
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((value == null) || (element == null)
-                    || !(value instanceof Feature)) {
+                    || value instanceof FeatureCollection || !(value instanceof Feature)) {
                 return false;
             }
 

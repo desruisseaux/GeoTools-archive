@@ -17,9 +17,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class GMLFeatureCollection extends DefaultFeatureCollection {
-
 	private Envelope bounds;
-	
+    
 	protected GMLFeatureCollection(String id, Envelope b){
 		super(id,null);
 		bounds = b;

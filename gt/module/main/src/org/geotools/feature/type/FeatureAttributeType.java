@@ -124,15 +124,26 @@ public class FeatureAttributeType implements AttributeType {
 	 * @see org.geotools.feature.AttributeType#validate(java.lang.Object)
 	 */
 	public void validate(Object obj) throws IllegalArgumentException {
-		if(obj instanceof Object[]){
-			try {
-				featureType.create((Object[])obj);
-			} catch (IllegalAttributeException e) {
-				IllegalArgumentException ee = new IllegalArgumentException(e.getMessage());
-				ee.initCause(e);
-				throw ee;
-			}
-		}
+        if(obj instanceof Feature){
+            try {
+                featureType.duplicate((Feature)obj);
+                return;
+            } catch (IllegalAttributeException e) {
+                IllegalArgumentException ee = new IllegalArgumentException(e.getMessage());
+                ee.initCause(e);
+                throw ee;
+            }
+        }
+        if(obj instanceof Object[]){
+            try {
+                featureType.create((Object[])obj);
+                return;
+            } catch (IllegalAttributeException e) {
+                IllegalArgumentException ee = new IllegalArgumentException(e.getMessage());
+                ee.initCause(e);
+                throw ee;
+            }
+        }
 		throw new IllegalArgumentException("Not an Object []");
 		
 	}
