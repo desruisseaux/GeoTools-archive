@@ -34,6 +34,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -132,12 +133,13 @@ public class WMSReader implements GridCoverageReader {
 
         GeneralParameterValue[] values = parameters.getValues();
         for (int i = 0; i < values.length; i++) {
-            WMSParameterValue value = (WMSParameterValue) values[i];
+            ParameterValue value = (ParameterValue) values[i];
 
             if ((value == null) || (value.getValue() == null)) {
+                System.out.println( "parameter "+i+" "+(value == null ? "null" : value.getDescriptor().getName(null) ));
                 continue;
             }
-
+            System.out.println( "parameter "+i+" "+value.getDescriptor().getName(null)+" : "+value.getValue() );
             if (value.getDescriptor().getName(null).equals("LAYERS")) {
                 String layers = "";
                 String styles = "";
@@ -206,12 +208,14 @@ public class WMSReader implements GridCoverageReader {
                 false);
 
         BufferedImage image = ImageIO.read(response.getInputStream());
+        if (image == null ){
+            throw new IOException("Image cannot be read from:"+response );
+        }
         Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
                 new double[] { 816000, 2460400 });
         CoordinateSystem cs = GeographicCoordinateSystem.WGS84;
 
-        hasNext = false;
-
+        hasNext = false;        
         GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
 
         return coverage;
