@@ -67,9 +67,9 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is "&phi;" (phi). This axis is usually part of a
      * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
-     * @see #LONGITUDE
      * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
+     * @see #LATITUDE
      */
     public static final CoordinateSystemAxis LONGITUDE = new CoordinateSystemAxis(
             ResourceKeys.LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
@@ -81,9 +81,9 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is "&lambda;" (lambda). This axis is usually part of a
      * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
-     * @see #LATITUDE
      * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
+     * @see #LONGITUDE
      */
     public static final CoordinateSystemAxis LATITUDE = new CoordinateSystemAxis(
             ResourceKeys.LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
@@ -95,7 +95,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is lower case "h". This axis is usually part of a
      * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
-     * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
      * @see #GEOCENTRIC_RADIUS
      * @see #GRAVITY_RELATED_HEIGHT
@@ -113,7 +112,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #ELLIPSOIDAL_HEIGHT
      * @see #GEOCENTRIC_RADIUS
      * @see #GRAVITY_RELATED_HEIGHT
-     * @see #DEPTH
      */
     public static final CoordinateSystemAxis DEPTH = new CoordinateSystemAxis(
             ResourceKeys.DEPTH, "d", AxisDirection.DOWN, SI.METER);
@@ -127,8 +125,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #LONGITUDE
-     * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
+     * @see #GEODETIC_LATITUDE
      */
     public static final CoordinateSystemAxis GEODETIC_LONGITUDE = new CoordinateSystemAxis(
             ResourceKeys.GEODETIC_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
@@ -142,8 +140,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #LATITUDE
-     * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
+     * @see #GEODETIC_LONGITUDE
      */
     public static final CoordinateSystemAxis GEODETIC_LATITUDE = new CoordinateSystemAxis(
             ResourceKeys.GEODETIC_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
@@ -157,7 +155,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #ALTITUDE
-     * @see #ELLIPSOIDAL_HEIGHT
      * @see #GEOCENTRIC_RADIUS
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
@@ -174,7 +171,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
      * @see #GEOCENTRIC_RADIUS
-     * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
     public static final CoordinateSystemAxis GRAVITY_RELATED_HEIGHT = new CoordinateSystemAxis(
@@ -191,7 +187,7 @@ public class CoordinateSystemAxis extends IdentifiedObject
      *
      * @see #LONGITUDE
      * @see #GEODETIC_LONGITUDE
-     * @see #SPHERICAL_LONGITUDE
+     * @see #SPHERICAL_LATITUDE
      */
     public static final CoordinateSystemAxis SPHERICAL_LONGITUDE = new CoordinateSystemAxis(
             ResourceKeys.SPHERICAL_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
@@ -207,7 +203,7 @@ public class CoordinateSystemAxis extends IdentifiedObject
      *
      * @see #LATITUDE
      * @see #GEODETIC_LATITUDE
-     * @see #SPHERICAL_LATITUDE
+     * @see #SPHERICAL_LONGITUDE
      */
     public static final CoordinateSystemAxis SPHERICAL_LATITUDE = new CoordinateSystemAxis(
             ResourceKeys.SPHERICAL_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
@@ -223,7 +219,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      *
      * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
-     * @see #GEOCENTRIC_RADIUS
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
@@ -237,8 +232,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is lower case "x". This axis is usually part of a
      * {@link #X}, {@link #Y}, {@link #Z} set.
      *
-     * @see #X
-     * @see #GEOCENTRIC_X
      * @see #EASTING
      * @see #WESTING
      */
@@ -252,8 +245,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is lower case "y". This axis is usually part of a
      * {@link #X}, {@link #Y}, {@link #Z} set.
      *
-     * @see #Y
-     * @see #GEOCENTRIC_Y
      * @see #NORTHING
      * @see #SOUTHING
      */
@@ -266,9 +257,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is lower case "z". This axis is usually part of a
      * {@link #X}, {@link #Y}, {@link #Z} set.
-     *
-     * @see #Z
-     * @see #GEOCENTRIC_Z
      */
     public static final CoordinateSystemAxis Z = new CoordinateSystemAxis(
                         "z", AxisDirection.UP, SI.METER);
@@ -277,50 +265,37 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * Default axis info for <var>x</var> values in a
      * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
      * {@linkplain CartesianCS cartesian CS}.
-     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
+     * Increasing ordinates values go toward prime meridian
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "X". This axis is usually part of a
      * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
-     *
-     * @see #X
-     * @see #GEOCENTRIC_X
-     * @see #EASTING
-     * @see #WESTING
      */
     public static final CoordinateSystemAxis GEOCENTRIC_X = new CoordinateSystemAxis(
-            ResourceKeys.GEOCENTRIC_X, "X", AxisDirection.EAST, SI.METER);
+            ResourceKeys.GEOCENTRIC_X, "X", AxisDirection.OTHER, SI.METER);
     
     /**
      * Default axis info for <var>y</var> values in a
      * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
      * {@linkplain CartesianCS cartesian CS}.
-     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
+     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "Y". This axis is usually part of a
      * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
-     *
-     * @see #Y
-     * @see #GEOCENTRIC_Y
-     * @see #NORTHING
-     * @see #SOUTHING
      */
     public static final CoordinateSystemAxis GEOCENTRIC_Y = new CoordinateSystemAxis(
-            ResourceKeys.GEOCENTRIC_Y, "Y", AxisDirection.NORTH, SI.METER);
+            ResourceKeys.GEOCENTRIC_Y, "Y", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for <var>z</var> values in a
      * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
      * {@linkplain CartesianCS cartesian CS}.
-     * Increasing ordinates values go {@linkplain AxisDirection#UP up}
+     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "Z". This axis is usually part of a
      * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
-     *
-     * @see #Z
-     * @see #GEOCENTRIC_Z
      */
     public static final CoordinateSystemAxis GEOCENTRIC_Z = new CoordinateSystemAxis(
-            ResourceKeys.GEOCENTRIC_Z, "Z", AxisDirection.UP, SI.METER);
+            ResourceKeys.GEOCENTRIC_Z, "Z", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for Easting values in a
@@ -331,7 +306,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #X
-     * @see #GEOCENTRIC_X
      * @see #EASTING
      * @see #WESTING
      */
@@ -346,7 +320,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is upper case "W".
      *
      * @see #X
-     * @see #GEOCENTRIC_X
      * @see #EASTING
      * @see #WESTING
      */
@@ -362,7 +335,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #Y
-     * @see #GEOCENTRIC_Y
      * @see #NORTHING
      * @see #SOUTHING
      */
@@ -377,7 +349,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * The abbreviation is upper case "S".
      *
      * @see #Y
-     * @see #GEOCENTRIC_Y
      * @see #NORTHING
      * @see #SOUTHING
      */
