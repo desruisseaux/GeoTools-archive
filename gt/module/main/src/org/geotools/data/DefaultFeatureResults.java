@@ -67,6 +67,8 @@ public class DefaultFeatureResults implements FeatureResults {
                 query.getPropertyNames(),
                 query.getHandle()
             );
+            ((DefaultQuery) this.query).setCoordinateSystem(query.getCoordinateSystem());
+            ((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
         }
     }
 
