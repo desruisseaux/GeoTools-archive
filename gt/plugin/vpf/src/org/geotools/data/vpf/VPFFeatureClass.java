@@ -43,6 +43,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -191,7 +192,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
             // File was not present 
             // which means it is for a geometry table
             // we can safely ignore it for now 
-            //			exc.printStackTrace();
+            //          exc.printStackTrace();
         }
     }
     /**
@@ -206,14 +207,20 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
         table = table.trim().toLowerCase();
 
         // Why would the fileList already contain a null?
-        //		if(!fileList.contains(null)){
-        result = AttributeTypeFactory.newAttributeType("GEOMETRY",
-                Geometry.class, true);
+        //      if(!fileList.contains(null)){
+        CoordinateReferenceSystem crs = getCoverage().getLibrary().getCoordinateReferenceSystem();
+        if(crs != null){
+            result = AttributeTypeFactory.newAttributeType("GEOMETRY",
+                               Geometry.class, true, -1, null, crs );
+        }else{
+            result = AttributeTypeFactory.newAttributeType("GEOMETRY",
+                               Geometry.class, true );
+        }
         columns.add(result);
 
         setGeometryFactory(table);
 
-        //		}
+        //      }
         return result;
     }
     /**
@@ -242,7 +249,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
      * @param vpfFile the <code>VPFFile</code> object to use
      */
     private void addFileToTable(VPFFile vpfFile) {
-        //		Class columnClass;
+        //      Class columnClass;
         boolean addPrimaryKey = fileList.isEmpty();
 
         // Check to see if we have already grabbed this file

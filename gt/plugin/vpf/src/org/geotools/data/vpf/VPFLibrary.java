@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.crs.CRSService;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
@@ -35,6 +36,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /*
  * A data store for a VPF library
@@ -76,6 +78,11 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      * The database containing the library
      */
     private final VPFDataBase base;
+    /**
+     * The coordinate reference system used through this library
+     */
+    private CoordinateReferenceSystem crs;
+    
     /**
      * Complete constructor
      * @param libraryFeature a feature from the library attribute table
@@ -139,7 +146,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
         if (!directory.getName().equals("rference")) {
             String vpfTableName = new File(directory, COVERAGE_ATTRIBUTE_TABLE).toString();
             VPFFile vpfFile = VPFFileFactory.getInstance().getFile(vpfTableName);
-//            TableInputStream vpfTable = new TableInputStream(vpfTableName);
+            //            TableInputStream vpfTable = new TableInputStream(vpfTableName);
             Iterator iter = vpfFile.readAllRows().iterator();
             while (iter.hasNext()){
                 feature = (Feature)iter.next();
@@ -198,8 +205,8 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      */
     public String toString() {
         return "Dette er library : " + libraryName + " with extensions:\n" + 
-               getXmin() + " " + getYmin() + " - " + getXmax() + " " + 
-               getYmax() + "\n";
+        getXmin() + " " + getYmin() + " - " + getXmax() + " " + 
+        getYmax() + "\n";
     }
     /**
      * A map containing the tiles used by this library
@@ -213,134 +220,166 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     public Map getTileMap() {
         return tileMap;
     }
-        /**
-         * Generates the tile map for this coverage
-         * @param coverage a <code>VPFCoverage</code> which happens to be a TILEREF 
-         * coverage
-         */
-        private void createTilingSchema(VPFCoverage coverage) throws IOException {
-//            File tilefile = new File(directory, "tilereft.tft");
+    /**
+     * Generates the tile map for this coverage
+     * @param coverage a <code>VPFCoverage</code> which happens to be a TILEREF 
+     * coverage
+     */
+    private void createTilingSchema(VPFCoverage coverage) throws IOException {
+        //            File tilefile = new File(directory, "tilereft.tft");
         
-            VPFFeatureType tileType = (VPFFeatureType)coverage.getFeatureTypes().get(0);
-            VPFFile tileFile = (VPFFile)tileType.getFeatureClass().getFileList().get(0);
-            Iterator rowsIter = tileFile.readAllRows().iterator();
-            while (rowsIter.hasNext())
-            {
-                Feature row = (Feature)rowsIter.next();
-                Short rowId = new Short(Short.parseShort(row.getAttribute("id").toString()));
-                String value = row.getAttribute(FIELD_TILE_NAME).toString();
-                tileMap.put(rowId, value);
+        VPFFeatureType tileType = (VPFFeatureType)coverage.getFeatureTypes().get(0);
+        VPFFile tileFile = (VPFFile)tileType.getFeatureClass().getFileList().get(0);
+        Iterator rowsIter = tileFile.readAllRows().iterator();
+        while (rowsIter.hasNext())
+        {
+            Feature row = (Feature)rowsIter.next();
+            Short rowId = new Short(Short.parseShort(row.getAttribute("id").toString()));
+            String value = row.getAttribute(FIELD_TILE_NAME).toString();
+            tileMap.put(rowId, value);
+        }
+    }
+    //            HashMap hm = new HashMap();
+    //        
+    //            TableInputStream testInput = new TableInputStream(
+    //                                                 tilefile.getAbsolutePath());
+    //            TableRow row = (TableRow) testInput.readRow();
+    //            String tmp = null;
+    //            StringBuffer buff = null;
+    //        
+    //            while (row != null) {
+    //                tmp = row.get().toString().trim();
+    //        
+    //                if ((tmp != null) && (tmp.length() > 0)) {
+    //                    tmp = tmp.toLowerCase();
+    //                    buff = new StringBuffer();
+    //                    buff.append(tmp.charAt(0));
+    //        
+    //                    for (int i = 1; i < tmp.length(); i++) {
+    //                        buff.append(File.separator);
+    //                        buff.append(tmp.charAt(i));
+    //                    }
+    //        
+    //                    hm.put(row.get(FIELD_TILE_ID).toString().trim(), 
+    //                           buff.toString());
+    //        
+    //        
+    //                    //System.out.println( new File( coverage, tmp.charAt(0) + File.separator + tmp.charAt(1) ).getAbsolutePath() );
+    //                    row = (TableRow) testInput.readRow();
+    //                }
+    //            }
+    //        
+    //            testInput.close();
+    //            base.setTileMap(hm);
+    //        }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.AbstractDataStore#getTypeNames()
+     */
+    public String[] getTypeNames() {
+        // Get the type names for each coverage
+        String[] result = null;
+        int coveragesCount = coverages.size();
+        int featureTypesCount = 0;
+        int index = 0;
+        List[] coverageTypes = new List[coveragesCount];
+        for(int inx = 0; inx < coveragesCount; inx++){
+            coverageTypes[inx] = ((VPFCoverage)coverages.get(inx)).getFeatureTypes();
+            featureTypesCount += coverageTypes[inx].size();
+        }
+        result = new String[featureTypesCount];
+        for(int inx = 0; inx < coveragesCount; inx++){
+            for(int jnx = 0; jnx < coverageTypes[inx].size(); jnx++){
+                result[index] = ((FeatureType)coverageTypes[inx].get(jnx)).getTypeName();
+                index++;
             }
         }
-//            HashMap hm = new HashMap();
-//        
-//            TableInputStream testInput = new TableInputStream(
-//                                                 tilefile.getAbsolutePath());
-//            TableRow row = (TableRow) testInput.readRow();
-//            String tmp = null;
-//            StringBuffer buff = null;
-//        
-//            while (row != null) {
-//                tmp = row.get().toString().trim();
-//        
-//                if ((tmp != null) && (tmp.length() > 0)) {
-//                    tmp = tmp.toLowerCase();
-//                    buff = new StringBuffer();
-//                    buff.append(tmp.charAt(0));
-//        
-//                    for (int i = 1; i < tmp.length(); i++) {
-//                        buff.append(File.separator);
-//                        buff.append(tmp.charAt(i));
-//                    }
-//        
-//                    hm.put(row.get(FIELD_TILE_ID).toString().trim(), 
-//                           buff.toString());
-//        
-//        
-//                    //System.out.println( new File( coverage, tmp.charAt(0) + File.separator + tmp.charAt(1) ).getAbsolutePath() );
-//                    row = (TableRow) testInput.readRow();
-//                }
-//            }
-//        
-//            testInput.close();
-//            base.setTileMap(hm);
-//        }
+        return result;
+    }
 
-        /* (non-Javadoc)
-         * @see org.geotools.data.AbstractDataStore#getTypeNames()
-         */
-        public String[] getTypeNames() {
-            // Get the type names for each coverage
-            String[] result = null;
-            int coveragesCount = coverages.size();
-            int featureTypesCount = 0;
-            int index = 0;
-            List[] coverageTypes = new List[coveragesCount];
-            for(int inx = 0; inx < coveragesCount; inx++){
-                coverageTypes[inx] = ((VPFCoverage)coverages.get(inx)).getFeatureTypes();
-                featureTypesCount += coverageTypes[inx].size();
-            }
-            result = new String[featureTypesCount];
-            for(int inx = 0; inx < coveragesCount; inx++){
-                for(int jnx = 0; jnx < coverageTypes[inx].size(); jnx++){
-                    result[index] = ((FeatureType)coverageTypes[inx].get(jnx)).getTypeName();
-                    index++;
+    /* (non-Javadoc)
+     * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
+     */
+    public FeatureType getSchema(String typeName) throws IOException {
+        // Look through all of the coverages to find a matching feature type
+        FeatureType result = null;
+        Iterator coverageIter = coverages.iterator();
+        Iterator featureTypesIter;
+        FeatureType temp;
+        boolean breakOut = false;
+        while(coverageIter.hasNext() && !breakOut){
+            featureTypesIter = ((VPFCoverage)coverageIter.next()).getFeatureTypes().iterator();
+            while(featureTypesIter.hasNext()){
+                temp = (FeatureType)featureTypesIter.next();
+                if(temp.getTypeName().equals(typeName)){
+                    result = temp;
+                    breakOut = true;
+                    break;
                 }
             }
-            return result;
         }
+        return result;
+    }
 
-        /* (non-Javadoc)
-         * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
-         */
-        public FeatureType getSchema(String typeName) throws IOException {
-            // Look through all of the coverages to find a matching feature type
-            FeatureType result = null;
-            Iterator coverageIter = coverages.iterator();
-            Iterator featureTypesIter;
-            FeatureType temp;
-            boolean breakOut = false;
-            while(coverageIter.hasNext() && !breakOut){
-                featureTypesIter = ((VPFCoverage)coverageIter.next()).getFeatureTypes().iterator();
-                while(featureTypesIter.hasNext()){
-                    temp = (FeatureType)featureTypesIter.next();
-                    if(temp.getTypeName().equals(typeName)){
-                        result = temp;
-                        breakOut = true;
-                        break;
+    /* (non-Javadoc)
+     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
+     */
+    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+        // Find the appropriate feature type, make a reader for it, and reset its stream
+        FeatureReader result = null;
+        VPFFeatureType featureType = (VPFFeatureType)getSchema(typeName);
+        ((VPFFile)featureType.getFileList().get(0)).reset();
+        result = new VPFFeatureReader(featureType);
+        return result;
+    }
+
+    /**
+     * Returns the coordinate reference system appropriate for this library.
+     * If the coordinate reference system cannot be determined null will be returned.  
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem()
+    {
+        if(crs == null) {
+            try{
+                // This is not really correct.  It does some basic sanity checks
+                // (for GEO data type and WGE datum code), but basically assumes
+                // WGS84 data ("EPSG:4326").
+                String vpfTableName = new File(directory, GEOGRAPHIC_REFERENCE_TABLE).toString();
+                VPFFile grtFile = VPFFileFactory.getInstance().getFile(vpfTableName);
+                Feature grt = grtFile.getRowFromId("id", 1);
+                String dataType = String.valueOf(grt.getAttribute("data_type"));
+
+                if("GEO".equalsIgnoreCase(dataType)){
+                    String geoDatumCode = String.valueOf(grt.getAttribute("geo_datum_code"));
+                    if ("WGE".equalsIgnoreCase(geoDatumCode)){
+                        CRSService crsService = new CRSService();
+                        crs = crsService.createCRS("EPSG:4326");
                     }
                 }
+            } catch(Exception ex){
+                // Don't know what else can be done here, just dump it
+                ex.printStackTrace();
             }
-            return result;
         }
+        return crs;
+    }
+    
 
-        /* (non-Javadoc)
-         * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
-         */
-        protected FeatureReader getFeatureReader(String typeName) throws IOException {
-            // Find the appropriate feature type, make a reader for it, and reset its stream
-            FeatureReader result = null;
-            VPFFeatureType featureType = (VPFFeatureType)getSchema(typeName);
-            ((VPFFile)featureType.getFileList().get(0)).reset();
-            result = new VPFFeatureReader(featureType);
-            return result;
-        }
-
-//    public VPFFeatureClass getFeatureClass(String typename) {
-//        VPFFeatureClass tmp = null;
-//
-//        if (coverages != null) {
-//            for (int i = 0; i < coverages.length; i++) {
-//                if (coverages[i] != null) {
-//                    tmp = coverages[i].getFeatureClass(typename);
-//
-//                    if (tmp != null) {
-//                        return tmp;
-//                    }
-//                }
-//            }
-//        }
-//
-//        return null;
-//    }
+    //    public VPFFeatureClass getFeatureClass(String typename) {
+    //        VPFFeatureClass tmp = null;
+    //
+    //        if (coverages != null) {
+    //            for (int i = 0; i < coverages.length; i++) {
+    //                if (coverages[i] != null) {
+    //                    tmp = coverages[i].getFeatureClass(typename);
+    //
+    //                    if (tmp != null) {
+    //                        return tmp;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //
+    //        return null;
+    //    }
 }
