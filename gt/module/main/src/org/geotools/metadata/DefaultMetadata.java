@@ -28,7 +28,7 @@ import java.util.List;
  *
  * A subclass implements *MUST* implement minimum one subinterface of the Metadata interface
  *
- * AbstractMetadata uses reflection to identify all the getXXX() methods.
+ * DefaultMetadata uses reflection to identify all the getXXX() methods.
  * The getXXX() are used to construct all the Metadata.Entity and Metadata.Element objects
  * The return type of each is used to determine whether the element is a simple element or an entity,
  * if the element is not a simple entity a entity for that class will can be created as well.
@@ -40,7 +40,7 @@ import java.util.List;
  * @author jeichar
  * @since 2.1
  */
-public abstract class AbstractMetadata implements Metadata {
+public class DefaultMetadata implements Metadata {
     EntityImpl entity;
 
     /**
