@@ -88,15 +88,15 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testGeoServer() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException{
-        URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
-        
-        System.out.println("\nGeoServer");
-        doFeatureType(url,true,true,1);
-        doFeatureReader(url,true,true,1);
-        doFeatureReaderWithFilter(url,true,true,1);
-        System.out.println("");
-    }
+//    public void testGeoServer() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException{
+//        URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
+//        
+//        System.out.println("\nGeoServer");
+//        doFeatureType(url,true,true,1);
+//        doFeatureReader(url,true,true,1);
+//        doFeatureReaderWithFilter(url,true,true,1);
+//        System.out.println("");
+//    }
     
 //    public void testLocalGeoServer() throws NoSuchElementException, IllegalAttributeException, IOException{
 //    	URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
@@ -165,6 +165,15 @@ public class WFSDataStoreReadTest extends TestCase {
         doFeatureReaderWithFilter(url,true,false,0);
         System.out.println("");
     }
+    
+    public void testIonic() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException{
+       URL url = new URL("http://webservices.ionicsoft.com/ionicweb/wfs/BOSTON_ORA?version=1.0.0&request=getcapabilities&service=WFS");
+       System.out.println("\nIonicWeb");
+       doFeatureType(url,true,false,0);
+       doFeatureReader(url,true,false,0);
+       doFeatureReaderWithFilter(url,true,false,0);
+       System.out.println("");
+   }
     
     public void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException{
         DataStore wfs = null;

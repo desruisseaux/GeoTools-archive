@@ -327,6 +327,10 @@ public class FilterComplexTypes {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
+        
+        public boolean isMixed(){
+            return true;
+        }
     }
 
     public static class Function_NamesType extends FilterComplexType {
