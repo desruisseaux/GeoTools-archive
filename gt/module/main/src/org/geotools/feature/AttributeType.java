@@ -18,6 +18,8 @@ package org.geotools.feature;
 
 import org.geotools.filter.Filter;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * <p>
  * Stores metadata about a single attribute object. 
@@ -133,7 +135,7 @@ public interface AttributeType{
      *
      * @return true if the attribute's type is a geometry.
      * 
-     * @deprecated Replaced with the use of instanceof or getType().isAssignableTo(Geometry.class)
+     * @deprecated Replaced with the use of instanceof or Geometry.class.isAssignableFrom(attributeTypes[j].getType())
      * @TODO check order for class check
      * @TODO refactor this method away before 2.1 final
      */
