@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>org.geotools.expr package</title>
+</head>
+<body bgcolor="white">
+
+Provides an Extended Expression/Filter syntax supporting experimentation with DataStore JOIN and FeatureType schema
+modification.
+<ul>
+<li>Expr is backwards compatable with existing Filter/Expression based code.
+<li>Supports chaining of method calls similar to the Collections API
+</ul>
+
+<h3>Comparison with FilterFactory</h3>
+
+<p>
+Example Expr:
+<pre></code>
+<code>Exprs.bbox( extent ).and( Exprs.attribute("cost").lt( 50 ) )</code>
+</code></pre>
+</p>
+<p>
+Example Filter:<br>
+<pre><code>
+Expression extentExpression =
+	factory.createBBoxExpression( bbox );
+
+String geomName = featureType.getDefaultGeometry().getName()
+Expression geomExpression =
+	factory.createAttributeExpression( featureType, geomName );	    
+
+GeometryFilter disjointExpression =
+	factory.createGeometryFilter( GeometryFilter.GEOMETRY_DISJOINT );
+disjointExpression.addLeftGeometry( geomExpression );
+disjointExpression.addRightGeometry( extentExpression );	    
+
+Filter bboxFilter = disjointExpression.not();	    
+
+AttributeExpression costExpression =
+	factory.createAttributeExpression( featureType, "cost" );
+	
+CompareFilter lessThanFilter =
+	factory.createCompareFilter( CompareFilter.COMPARE_LESS_THAN );
+lessThanFilter.addLeftValue( costExpression );
+lessThanFilter.addRightValue( factory.createLiteralExpression( 50 ) );	    
+
+LogicFilter filter = factory.createLogicFilter( bboxFilter, lessThanFilter, LogicFilter.LOGIC_AND);	    
+</code></pre>
+</p>
+
+<h2>Package Specification</h2>
+
+This package is based on the OGC Filter specification.
+
+<h2>Related Documentation </h2>
+
+The following classes are used by the java.text classes.
+<ul>
+   <li>{@link org.geotools.filter.Filter}
+   <li>{@link org.geotools.filter.Expresssion}
+   <li>{@link org.geotools.feature.FeatureType}
+   <li>{@link org.geotools.feature.Feature}
+</ul>
+
+
+For overviews, tutorials, examples, guides, and tool documentation, please see:
+<ul>
+  <li><a href="http://java.sun.com/products/jdk/1.1/docs/guide/intl/index.html">JDK 1.1.x Internationalization Documentation</a>
+
+  <li><a href="http://java.sun.com/products/jdk/1.2/docs/guide/intl/index.html">JDK 1.2.x Input Method Framework Documentation</a>
+</ul>
+<br>
+
+</body>
+</html>
+
+
