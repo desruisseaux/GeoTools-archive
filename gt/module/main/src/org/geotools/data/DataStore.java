@@ -16,15 +16,10 @@
  */
 package org.geotools.data;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.Discovery;
-import org.geotools.catalog.QueryRequest;
-import org.geotools.catalog.QueryResult;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Represents a Physical Store for FeatureTypes.
@@ -87,7 +82,7 @@ import java.util.List;
  * @author Jody Garnett, Refractions Research
  * @version $Id: DataStore.java,v 1.4 2004/01/11 02:31:07 jive Exp $
  */
-public interface DataStore extends Discovery {
+public interface DataStore{
 
     /**
      * Creates storage for a new <code>featureType</code>.
@@ -121,21 +116,7 @@ public interface DataStore extends Discovery {
      * @throws IOException
      */
     void updateSchema( String typeName, FeatureType featureType ) throws IOException;
-    
-    /**
-     * Entire contents.
-     * <p>
-     * Shortcut for query( QueryDefinition.ALL )
-     * <M/p>
-     *
-     * @return Traverse the entire catalog.
-     *
-     * @UML inferred from section 3.1.1.1.2 <i>Other Functions on Catalog </i> in the
-     *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
-     *      Catalog Services </A> Specification
-     */
-    List entries();
-    
+        
     /**
      * Retrieves a list of of the available FeatureTypes.
      * 
@@ -158,8 +139,7 @@ public interface DataStore extends Discovery {
      * 
      * @return typeNames for available FeatureTypes.
      */
-    String[] getTypeNames() throws IOException;    
-    // String[] getTypeNames( URI namespace );
+    String[] getTypeNames() throws IOException;
 
     /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
@@ -175,20 +155,6 @@ public interface DataStore extends Discovery {
      * @throws IOException If typeName cannot be found
      */
     FeatureType getSchema(String typeName) throws IOException;
-
-    /**
-     * Searches through the catalog and finds the entries that that match the query.
-     * 
-     * @param  query A {@linkplain QueryRequest query definition} used to select
-     *         {@linkplain CatalogEntry catalog entries}.
-     * @return {@linkplain QueryResult Query result} containing all matching
-     *         {@linkplain CatalogEntry catalog entries}.
-     *
-     * @UML inferred from section 3.1.1.1.1 <i>Query Functions </i> in the
-     *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
-     *      Catalog Services </A> Specification
-     */
-    List search(QueryRequest query); // really a List<TypeEntry> 
 
     /**
      * Access a FeatureSource for Query providing a high-level API.
