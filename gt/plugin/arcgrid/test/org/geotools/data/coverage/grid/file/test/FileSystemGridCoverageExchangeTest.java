@@ -49,13 +49,15 @@ public class FileSystemGridCoverageExchangeTest extends TestCaseSupport {
 	private void init(){
 		URL url=getTestResource("ArcGrid.asc");
 		root=new File(url.getFile()).getParentFile();
-		exchange=new FileSystemGridCoverageExchange(root,false);
+		exchange=new FileSystemGridCoverageExchange();
+		exchange.setRecursive(true);
+		exchange.setDataSource(root);
 	}
 	
 
 	public void testFileSystemGridCoverageExchange() {
 		URL url=getTestResource("ArcGrid.asc");
-		exchange= new FileSystemGridCoverageExchange(null, false);
+		exchange= new FileSystemGridCoverageExchange();
 		assertNotNull(exchange);
 		
 		exchange.add(new File(url.getFile()));
@@ -69,6 +71,7 @@ public class FileSystemGridCoverageExchangeTest extends TestCaseSupport {
 		assertTrue(iter.hasNext());
 		f= (CatalogEntry)iter.next();
 		assertTrue(f.getResource() instanceof File );
+
 	}
 
 

@@ -13,6 +13,7 @@ package org.geotools.data.coverage.grid;
 // J2SE direct dependencies
 import java.io.IOException;
 
+import org.geotools.factory.Factory;
 import org.opengis.coverage.grid.Format;
 
 
@@ -33,7 +34,7 @@ import org.opengis.coverage.grid.Format;
  * @see GridCoverageReader
  * @see GridCoverageWriter
  */
-public interface GridCoverageExchange {
+public interface GridCoverageExchange extends Factory{
     /**
      * Retrieve information on file formats or resources available with the
      * <code>GridCoverageExchange</code> implementation.
@@ -103,5 +104,15 @@ public interface GridCoverageExchange {
      * @return <tt>true</tt> if and only if this GridCoverageExchange has all the
      *         appropriate jars on the classpath
      */
-    public boolean isAvailable();
+    boolean isAvailable();
+
+    /**
+     * Returns true if the GridCoverageExchange knows how to communicate with
+     * the datasource. 
+     * 
+     * @param datasource a Source of gridcoverages.  Normally a Directory/Filesystem, or WMS
+     * @return true if GridCoverageEchange understands the datasource
+     * 		false otherwise
+     */
+    boolean setDataSource(Object datasource);
 }

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data;
+package org.geotools.data.coverage.grid;
 
 import org.geotools.factory.FactoryFinder;
 import java.util.HashSet;

@@ -174,4 +174,11 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
     public boolean isAvailable() {
         return true;
     }
+
+    /**
+     * @see org.geotools.data.coverage.grid.GridCoverageExchange#accepts(java.net.URL)
+     */
+    public boolean setDataSource(Object datasource) {
+        return isLegalSource(datasource);
+    }
 }

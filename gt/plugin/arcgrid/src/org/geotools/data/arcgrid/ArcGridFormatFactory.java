@@ -20,6 +20,7 @@ import java.net.URL;
 
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
 
@@ -29,7 +30,7 @@ import org.opengis.coverage.grid.Format;
  * @author aaime
  */
 public class ArcGridFormatFactory
-    implements org.geotools.data.GridFormatFactorySpi {
+    implements GridFormatFactorySpi {
     /**
      * DOCUMENT ME!
      *

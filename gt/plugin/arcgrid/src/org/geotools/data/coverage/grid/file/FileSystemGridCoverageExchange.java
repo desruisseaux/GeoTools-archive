@@ -12,15 +12,15 @@ import java.io.IOException;
 
 import org.geotools.catalog.AbstractCatalog;
 import org.geotools.catalog.CatalogEntry;
-import org.geotools.data.GridFormatFactorySpi;
-import org.geotools.data.GridFormatFinder;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -41,10 +41,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 
 	private Format[] formats;
 
-	public FileSystemGridCoverageExchange(File root, boolean recursive) {
-		this.root = root;
-		this.recursive = recursive;
-		refresh();
+	public FileSystemGridCoverageExchange() {
 	}
 
 	public void refresh() {
@@ -77,16 +74,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 	 */
 	public Format[] getFormats() {
 		ArrayList list = new ArrayList();
-		if (formats == null) {
-			Iterator iter = GridFormatFinder.getAvailableFormats();
-			while (iter.hasNext()) {
-				GridFormatFactorySpi f = (GridFormatFactorySpi) iter.next();
-				list.add(f.createFormat());
-			}//while
-			formats = new Format[list.size()];
-			list.toArray(formats);
-		}
-		return formats;
+		return formatManager.getFormats();
 	}
 
 	/*
@@ -163,6 +151,46 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.coverage.grid.GridCoverageExchange#accepts(java.net.URL)
+     */
+    public boolean setDataSource(Object datasource) {
+        URL url=null;
+        if(datasource instanceof String){
+            try{
+                url=new URL((String)datasource);
+            }catch(MalformedURLException e){}
+        }else
+        if (datasource instanceof URL) {
+            url= (URL) datasource;
+        }else if (datasource instanceof File){
+            root=(File)datasource;
+            refresh(root, recursive);            
+        }
+        
+        if( url != null && url.getFile().length()>0 ){
+            root=new File(url.getFile());
+            refresh(root, recursive);
+            return true;
+        }
+        return false;
+    }
 
 
+
+    /**
+     * @return true if the root and all subdirectories are searched for files
+     */
+    public boolean isRecursive() {
+        return recursive;
+    }
+    /**
+     * @param recursive True means that root and all subdirectories are searched files
+     * 		false means just the root is searched
+     */
+    public void setRecursive(boolean recursive) {
+        this.recursive = recursive;
+        if( root!=null)
+            refresh(root,recursive);
+    }
 }
