@@ -6434,8 +6434,6 @@ public class GMLComplexTypes {
     	AttributeType at = null;
 		if(eg.getType() instanceof ComplexType && eg.getType().getInstanceType().equals(Object[].class)){
 			ComplexType ct = (ComplexType)eg.getType();
-//System.out.println(ct.getChild());
-//System.out.println(ct.getParent());
 
 			switch(ct.getChild().getGrouping()){
 			case ElementGrouping.SEQUENCE:
@@ -6451,9 +6449,6 @@ public class GMLComplexTypes {
 
 		}}
 			// nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
-	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),(eg.isNillable()||eg.getMinOccurs() == 0));
-//	    	System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable()+" "+eg.getType().getInstanceType()+" "+eg.getType().getNamespace()+":"+eg.getType().getName());
-
-    	return at;
+        return AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),(eg.isNillable()||eg.getMinOccurs() == 0));
     }
 }
