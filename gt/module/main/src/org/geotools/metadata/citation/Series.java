@@ -63,6 +63,17 @@ public class Series extends MetadataEntity implements org.opengis.metadata.citat
     }
 
     /**
+     * Constructs a series with the specified name.
+     */
+    public Series(final CharSequence name) {
+        if (name instanceof InternationalString) {
+            this.name = (InternationalString) name;
+        } else {
+            this.name = new org.geotools.util.InternationalString(name.toString());
+        }
+    }
+
+    /**
      * Returne the name of the series, or aggregate dataset, of which the dataset is a part.
      */
     public InternationalString getName() {

@@ -93,7 +93,7 @@ public class Telephone extends MetadataEntity implements org.opengis.metadata.ci
      */
     protected void freeze() {
         super.freeze();
-        voice     = (String) unmodifiable(voice);
+        voice     = (String) unmodifiable(voice    );
         facsimile = (String) unmodifiable(facsimile);
     }
 
@@ -125,7 +125,17 @@ public class Telephone extends MetadataEntity implements org.opengis.metadata.ci
     /**
      * Returns a string representation of this telephone.
      */
-    public String toString() {
-        return String.valueOf(voice);
+    public synchronized String toString() {
+        final StringBuffer buffer = new StringBuffer();
+        if (voice != null) {
+            buffer.append("Tel: ");
+            buffer.append(voice);
+        }
+        if (facsimile != null) {
+            appendLineSeparator(buffer);
+            buffer.append("Fax: ");
+            buffer.append(facsimile);
+        }
+        return buffer.toString();
     }
 }

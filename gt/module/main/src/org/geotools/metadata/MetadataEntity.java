@@ -125,7 +125,7 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
             final Method method = ((PropertyDescriptor) iter.next()).getReadMethod();
             final Object value;
             try {
-                value = method.invoke(this, null);
+                value = method.invoke(this, (Object[]) null);
             } catch (IllegalAccessException exception) {
                 /*
                  * The method call failed because the method is not accessible.
@@ -182,7 +182,7 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
         final Method method = elemImpl.property.getReadMethod();
         final Object value;
         try {
-            value = method.invoke(this, null);
+            value = method.invoke(this, (Object[]) null);
         } catch (IllegalAccessException exception) {
             /*
              * The method call failed because the method is not accessible.
@@ -522,6 +522,9 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
          */
         if (object instanceof Collection) {
             Collection collection = (Collection) object;
+            if (collection.isEmpty()) {
+                return null;
+            }
             if (collection instanceof Cloneable) {
                 collection = (Collection) ((Cloneable) collection).clone();
                 final List buffer;
@@ -567,6 +570,9 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
          */
         if (object instanceof Map) {
             final Map map = (Map) object;
+            if (map.isEmpty()) {
+                return null;
+            }
             if (map instanceof Cloneable) {
                 final Map copy = (Map) ((Cloneable) map).clone();
                 copy.clear(); // The clone was for constructing an instance of the same class.
@@ -606,5 +612,15 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
             throw new UnsupportedOperationException("Unmodifiable metadata");
         }
         unmodifiable = null;
+    }
+
+    /**
+     * Add a line separator to the given buffer, except if the buffer is empty.
+     * This convenience method is used for {@link #toString} implementations.
+     */
+    protected static void appendLineSeparator(final StringBuffer buffer) {
+        if (buffer.length() != 0) {
+            buffer.append(System.getProperty("line.separator", "\n"));
+        }
     }
 }

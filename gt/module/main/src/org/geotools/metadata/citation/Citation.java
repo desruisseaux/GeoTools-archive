@@ -161,6 +161,12 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     private String ISSN;
 
     /**
+     * Constructs an initially empty citation.
+     */
+    public Citation() {
+    }
+
+    /**
      * Constructs a citation with the specified title.
      *
      * @param title The title, as a {@link String} or an {@link InternationalString} object.
@@ -503,8 +509,7 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     }
 
     /**
-     * Returns a string representation of this citation. The default implementation
-     * returns the title in the default locale.
+     * Returns a string representation of this citation.
      */
     public String toString() {
         return String.valueOf(title);
