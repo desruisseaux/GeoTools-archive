@@ -126,6 +126,38 @@ public class NumberParserTest extends TestCase {
             assertEquals(javaint, gtint, 0);
         }
     }
+    
+    private void testLong(String s) {
+        boolean javafail = false;
+        boolean gtfail = false;
+        long javaint = 0;
+        long gtint = 0;
+        try {
+            // Integer parse will not trim values...
+            javaint = Long.parseLong(s.trim());
+        } catch(NumberFormatException nfe) {
+            javafail = true;
+        }
+
+        try {
+            gtint = numberParser.parseLong(s);
+        } catch(NumberFormatException nfe) {
+            nfe.printStackTrace();
+            gtfail = true;
+        }
+
+        if (javafail) {
+            assertTrue("gtfailure '" + s + "' = " + gtint, gtfail);
+        }
+
+        if (gtfail) {
+            assertTrue("javafailure '" + s + "' = " + javaint, javafail);
+        }
+
+        if (!javafail && !gtfail) {
+            assertEquals(javaint, gtint, 0);
+        }
+    }
 
     /**
      * Test parsing of valid floating point numbers.
@@ -159,6 +191,18 @@ public class NumberParserTest extends TestCase {
         testInteger(" 400 ");
         testInteger("400 ");
         testInteger(" -2000 ");
+        testInteger(new String(new char[] {'0','1'}));
+    }
+    
+    public void testValidLongs() {
+        testLong("400");
+        testLong(" 400");
+        testLong(" 400 ");
+        testLong("400 ");
+        testLong(" -2000 ");
+        testLong(" 12345678901 ");
+        testLong("1111111111111111111");
+        testInteger(new String(new char[] {'0','1'}));
     }
 
 
