@@ -17,6 +17,7 @@
 package org.geotools.xml.transform;
 
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
@@ -54,6 +55,7 @@ public abstract class TransformerBase {
     private int indentation = -1;
     private boolean xmlDecl = false;
     private boolean nsDecl = true;
+    private Charset charset = Charset.forName("UTF-8");
 
     /**
      * Create a Translator to issue SAXEvents to a ContentHandler.
@@ -81,6 +83,8 @@ public abstract class TransformerBase {
         } else {
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         }
+
+	transformer.setOutputProperty(OutputKeys.ENCODING, charset.name());
 
         return transformer;
     }
@@ -168,6 +172,23 @@ public abstract class TransformerBase {
      */
     public void setIndentation(int amt) {
         indentation = amt;
+    }
+
+    /**
+     * Gets the charset to declare in the header of the response.
+     * @return the charset to encode with. 
+     */
+    public Charset getEncoding() {
+	return charset;
+    }
+
+    /**
+     * Sets the charset to declare in the xml header returned.
+     *
+     * @param charset A charset object of the desired encoding
+     */
+    public void setEncoding(Charset charset){
+	this.charset = charset;
     }
 
     /**
