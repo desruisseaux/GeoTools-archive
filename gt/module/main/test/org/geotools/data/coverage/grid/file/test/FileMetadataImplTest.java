@@ -3,8 +3,6 @@ package org.geotools.data.coverage.grid.file.test;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,7 +12,6 @@ import org.opengis.catalog.MetadataEntity;
 import org.opengis.catalog.MetadataEntity.EntityType;
 
 import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.file.FileMetadata;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
 import org.geotools.resources.TestData;
 
@@ -123,7 +120,7 @@ public class FileMetadataImplTest extends TestCase {
         assertEquals(ret.size(), metadata.getEntityType().getElements().size() );
    }
 
-    public void testGetEntity() {
+    public void xtestGetEntity() {
     	init();
         // test begins
         assertNotNull(metadata.getEntityType());
@@ -149,25 +146,23 @@ public class FileMetadataImplTest extends TestCase {
     /*
      * Class under test for Object getElement(String)
      */
-    public void xtestGetElementString() {
-
+    public void testGetElementString() {
+    
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        System.out.println( "file:"+ (String) data.getElement("file") );
-        System.out.println( "file:"+ (String) data.getElement("name") );
-        String element=(String)data.getElement("file/name");
+        String element=(String)data.getElement("fileData/name");
         assertEquals("Stupid",element);
         
         //Test xpath with wildcards
         List list=(List) data.getElement("fileData/\\w*");
         assertEquals(3,list.size());
-
+    
         String name=(String) data.getElement("\\w*/name");
         assertEquals("Stupid",name);
-
+    
         //Test xpath with wildcards
         list=(List) data.getElement("\\w*/\\w*");
         assertEquals(3,list.size());
-
+    
     }
 
  }

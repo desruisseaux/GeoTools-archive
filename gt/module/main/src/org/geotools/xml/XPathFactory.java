@@ -50,7 +50,9 @@ public class XPathFactory {
             return new DOMXPath(xpath);
         } //if		
 
-        if (MetadataEntity.class.isAssignableFrom(root)) {
+        if (MetadataEntity.class.isAssignableFrom(root)
+                || MetadataEntity.EntityType.class.isAssignableFrom(root) 
+                || MetadataEntity.Element.class.isAssignableFrom(root)) {
             return new MetadataXPath(xpath);
         } //if
 

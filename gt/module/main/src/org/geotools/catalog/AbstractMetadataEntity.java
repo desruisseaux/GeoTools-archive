@@ -47,7 +47,6 @@ import org.opengis.catalog.MetadataEntity;
  * @since 2.1
  */
 public abstract class AbstractMetadataEntity implements MetadataEntity {
-    static EntityImpl entity = null;
 
     /**
      * @see org.geotools.metadata.Metadata#elements()
@@ -77,13 +76,13 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
      */
     public final Object getElement(String xpath) {
-        for( Iterator i=getEntityType().getElements().iterator(); i.hasNext();){
-            Element element = (Element) i.next();
-            if( xpath.equals( element.getName() )){
-                return getElement( element );
-            }
-        }
-        // Did not find a direct match 
+//        for( Iterator i=getEntityType().getElements().iterator(); i.hasNext();){
+//            Element element = (Element) i.next();
+//            if( xpath.equals( element.getName() )){
+//                return getElement( element );
+//            }
+//        }
+        // TODO REmove above  
         //
         List elements = XPathFactory.value(xpath, this);
 
@@ -133,10 +132,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
      * @see org.geotools.metadata.Metadata#getEntity()
      */
     public EntityType getEntityType() {
-        if (entity == null) {
-            entity = EntityImpl.getEntity(getClass());
-        }
-        return entity;
+        return EntityImpl.getEntity(getClass());
     }
 
     /**
@@ -162,7 +158,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
         }
 
         /**
-         * Gets or creates the Enity instance that descibes the Class passed in
+         * Gets or creates the Entity instance that descibes the Class passed in
          * as an argument
          * 
          * @param clazz
@@ -192,7 +188,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
             for (int i = 0; i < methods.length; i++) {
                 Method method = methods[i];
 
-                if (method.getName().startsWith("get")) {
+                if (method.getName().startsWith("get") || method.getParameterTypes().length == 0) {
                     getMethods.add(method);
 
                     Class elementClass = method.getReturnType();
@@ -261,26 +257,17 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
         }
 
         public Object getElement(String xpath) {
-            // TODO: Jesse you don't have a factory for MetadataEntity.EntityTyp
-            //
+            if( elemMap.containsKey("xpath") )
+                return elemMap.get(xpath);
+            
             List result = XPathFactory.find(xpath, this);
-            if( result == null ){
-                for( Iterator i=getElements().iterator(); i.hasNext(); ){
-                    Element element = (Element) i.next();
-                    if( xpath.equals( element.getName() )){
-                        return element;
-                    }
-                }
-                return null;
-            }
-            if (result.isEmpty()) {
-                return null;
-            }
-            if (result.size() == 1) {
-                return result.get(0);
-            }
 
-            return result;
+            switch( result.size() ){
+            case 1: return result.get(0); 
+            case 0: return null;
+            default: return result;
+            }
+            
         }
 
         /**

@@ -48,11 +48,18 @@ public abstract class AbstractGridFormat implements Format {
     /**
      * The Map object is used by the information methods(such as getName()) as
      * a data source. The keys in the Map object (for the associated method)
-     * are as follows: getName()key = "name" value type=String
-     * getDescription() key = "description" value type=String getVendor()  key
-     * = "vendor" value type=String getDocURL()  key = "docURL" value
-     * type=String getVersion() key = "version" value type=String  Naturally,
-     * any methods that are overridden need not have an entry in the Map
+     * are as follows: 
+     * getName()		key = "name"  
+     * 					value type=String
+     * getDescription() key = "description" 
+     * 					value type=String 
+     * getVendor()  	key = "vendor" 
+     * 					value type=String 
+     * getDocURL()  	key = "docURL" 
+     * 					value type=String 
+     * getVersion() 	key = "version" 
+     * 					value type=String  
+     * Naturally, any methods that are overridden need not have an entry in the Map
      */
     protected Map mInfo;
     protected GeneralOperationParameter[] readParameters;
