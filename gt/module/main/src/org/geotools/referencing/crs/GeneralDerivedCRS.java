@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -220,18 +220,18 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                  * from the CoordinateOperation super-class) that is set to this GeneralDerivedCRS.
                  */
                 synchronized (GeneralDerivedCRS.class) {
-                    if (\u00A4COMPARING != null) {
+                    if (COMPARING != null) {
                         // NOTE: the following assertion fails for deserialized objects.
                         // assert \u00A4COMPARING == conversionFromBase;
                         return true;
                     }
                     try {
-                        \u00A4COMPARING = this;
+                        COMPARING = this;
                         return equals(this.conversionFromBase,
                                       that.conversionFromBase,
                                       compareMetadata);
                     } finally {
-                        \u00A4COMPARING = null;
+                        COMPARING = null;
                     }
                 }
             }
