@@ -468,7 +468,7 @@ public class ComplexElementHandler extends XMLElementHandler {
 
 //System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
-        System.out.println("findChildElement("+localName+") was " + (e==null?"null":e.getName()));
+//        System.out.println("findChildElement("+localName+") was " + (e==null?"null":e.getName()));
         if (e != null) {
             XMLElementHandler r = ehf.createElementHandler(e);
 
