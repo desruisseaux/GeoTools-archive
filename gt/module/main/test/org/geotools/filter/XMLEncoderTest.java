@@ -161,12 +161,25 @@ public class XMLEncoderTest extends FilterTestSupport {
 
         //LOGGER.fine("parsed filter is: " + test);
     }
+    
+     public void test27() throws Exception {
+        Filter test = parseDocument("test27.xml");
+
+        //LOGGER.fine("parsedfilter is: " + test);
+    }
+    
 
     public void test28() throws Exception {
         Filter test = parseDocument("test28.xml");
 
         //LOGGER.fine("parsedfilter is: " + test);
     }
+    
+  /*  public void test29() throws Exception {
+        Filter test = parseDocument("test29.xml");
+
+        //LOGGER.fine("parsed filter is: " + test);
+    }*/
 
     public Filter parseDocument(String uri) throws Exception {
         Filter filter = null;

@@ -204,7 +204,7 @@ public class FilterTransformer extends TransformerBase {
             String type = (String) expressions.get(new Integer(expression.getType()));
 
             AttributesImpl atts = new AttributesImpl();
-            atts.addAttribute("", "name", "", "", expression.getName());
+            atts.addAttribute("", "name", "name", "", expression.getName());
             start(type,atts);
 
             Expression[] args = expression.getArgs();
