@@ -96,7 +96,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </ul>
  * @author Jody Garnett, Refractions Research
  */
-public class CRSService {
+class CRSServiceDead {
 
     /**
      * GeoGraphicCoordinateSystem sutiable for distance on sphere calcualtions.
