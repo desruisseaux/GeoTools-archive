@@ -116,7 +116,7 @@ public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
      *                make this method public, change its return type to {@link HorizontalDatum}
      *                and deprecate the {@link #getHorizontalDatum} method.
      */
-    final Datum getDatum() {
+    final Datum getLegacyDatum() {
         return getHorizontalDatum();
     }
     

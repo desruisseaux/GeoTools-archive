@@ -17,7 +17,7 @@
 package org.geotools.data;
 
 import org.geotools.filter.Filter;
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.util.Arrays;
 import java.util.List;

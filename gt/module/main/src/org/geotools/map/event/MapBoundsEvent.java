@@ -23,7 +23,7 @@ package org.geotools.map.event;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.map.MapContext;
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.util.EventObject;
 
 

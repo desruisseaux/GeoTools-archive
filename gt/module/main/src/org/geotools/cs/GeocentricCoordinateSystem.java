@@ -189,13 +189,13 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
     }
     
     /**
-     * Overrides {@link CoordinateSystem#getDatum()}.
+     * Overrides {@link CoordinateSystem#getLegacyDatum()}.
      *
      * @task REVISIT: in a future version (when J2SE 1.5 will be available), we <em>may</em>
      *                make this method public, change its return type to {@link HorizontalDatum}
      *                and deprecate the {@link #getHorizontalDatum} method.
      */
-    final Datum getDatum() {
+    final Datum getLegacyDatum() {
         return getHorizontalDatum();
     }
     

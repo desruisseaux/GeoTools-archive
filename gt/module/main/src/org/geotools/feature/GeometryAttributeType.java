@@ -18,7 +18,7 @@ package org.geotools.feature;
 
 //import org.geotools.cs.CoordinateSystem;
 
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 

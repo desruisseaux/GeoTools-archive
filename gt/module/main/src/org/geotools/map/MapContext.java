@@ -25,7 +25,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.styling.Style;
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 

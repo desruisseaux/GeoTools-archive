@@ -187,9 +187,9 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
      * @task REVISIT: in a future version (when J2SE 1.5 will be available), we <em>may</em>
      *                make this method public.
      */
-    Datum getDatum() throws IllegalStateException {
-        final Datum head = getHeadCS().getDatum();
-        final Datum tail = getTailCS().getDatum();
+    Datum getLegacyDatum() throws IllegalStateException {
+        final Datum head = getHeadCS().getLegacyDatum();
+        final Datum tail = getTailCS().getLegacyDatum();
         if (tail == null) return head;
         if (head == null) return tail;
         if (head.equals(tail)) {

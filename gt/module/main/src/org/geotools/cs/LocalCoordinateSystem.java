@@ -206,7 +206,7 @@ public class LocalCoordinateSystem extends CoordinateSystem {
      *                make this method public, change its return type to {@link LocalDatum}
      *                and deprecate the {@link #getLocalDatum} method.
      */
-    final Datum getDatum() {
+    final Datum getLegacyDatum() {
         return getLocalDatum();
     }
     

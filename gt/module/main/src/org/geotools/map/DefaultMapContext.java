@@ -30,7 +30,7 @@ import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;

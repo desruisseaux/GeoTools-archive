@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.LocalCoordinateSystem;
-import org.opengis.sc.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.lang.reflect.Array;
 import java.math.*;

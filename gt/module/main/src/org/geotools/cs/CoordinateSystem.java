@@ -35,14 +35,14 @@
  */
 package org.geotools.cs;
 
-// OpenGIS 1.0 dependencies
+// OpenGIS legacy dependencies
 import org.opengis.cs.CS_Unit;
 import org.opengis.cs.CS_AxisInfo;
 import org.opengis.pt.PT_Envelope;
 import org.opengis.cs.CS_CoordinateSystem;
 
-// OpenGIS 2.0 dependencies
-import org.opengis.sc.CoordinateReferenceSystem;
+// OpenGIS dependencies
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
@@ -87,8 +87,8 @@ import java.rmi.RemoteException;
  *
  * @see org.opengis.cs.CS_CoordinateSystem
  */
-public abstract class CoordinateSystem extends Info implements Dimensioned,
-                                                               CoordinateReferenceSystem
+public abstract class CoordinateSystem extends Info
+                                    implements Dimensioned, CoordinateReferenceSystem
 {
     /**
      * Serial number for interoperability with different versions.
@@ -200,7 +200,7 @@ public abstract class CoordinateSystem extends Info implements Dimensioned,
      *                this method public. It should probably be abstract. This method would be
      *                usefull to <code>org.geotools.io.coverage.PropertyParser.DATUM</code>.
      */
-    Datum getDatum() throws IllegalStateException {
+    Datum getLegacyDatum() throws IllegalStateException {
         return null;
     }
     
@@ -238,8 +238,25 @@ public abstract class CoordinateSystem extends Info implements Dimensioned,
         return new Export(adapters);
     }
     
+    public org.opengis.referencing.cs.CoordinateSystem getCoordinateSystem() {
+        throw new UnsupportedOperationException();
+    }    
     
+    public org.opengis.referencing.datum.Datum getDatum() {
+        throw new UnsupportedOperationException();
+    }    
     
+    public org.opengis.referencing.Identifier[] getIdentifiers() {
+        throw new UnsupportedOperationException();
+    }    
+    
+    public String getScope(java.util.Locale locale) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public org.opengis.metadata.extent.Extent getValidArea() {
+        throw new UnsupportedOperationException();
+    }
     
     /////////////////////////////////////////////////////////////////////////
     ////////////////                                         ////////////////

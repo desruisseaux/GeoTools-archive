@@ -142,7 +142,7 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
      *                make this method public, change its return type to {@link VerticalDatum}
      *                and deprecate the {@link #getVerticalDatum} method.
      */
-    final Datum getDatum() {
+    final Datum getLegacyDatum() {
         return getVerticalDatum();
     }
     

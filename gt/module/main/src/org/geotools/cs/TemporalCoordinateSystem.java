@@ -128,7 +128,7 @@ public class TemporalCoordinateSystem extends CoordinateSystem {
      *                make this method public, change its return type to {@link TemporalDatum}
      *                and deprecate the {@link #getTemporalDatum} method.
      */
-    final Datum getDatum() {
+    final Datum getLegacyDatum() {
         return getTemporalDatum();
     }
     
