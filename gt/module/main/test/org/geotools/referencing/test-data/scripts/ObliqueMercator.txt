@@ -1,7 +1,8 @@
-// Tests for the oblique mercator projection, mostly calculated with ArcGIS 9.0.
+// Test points for the Oblique Mercator Projection
+//
+// Most of the following test points were calculated with ArcGIS 8.3 
 // Some test points comes from the proj4 email list, epsg guidebook 7 and Snyder.
-// The test for an azimuth of -90 was actually calculated for azimuth of -89.999999
-// Run with asserts enabled to test the inverse projection
+// The test with an azimuth of -90 was actually calculated for azimuth of -89.999999
 //
 // Rueben Schulz - Jan 2, 2005
 //
@@ -15,6 +16,7 @@
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
 // than the value specified in the last "test tolerance" statement, then a failure is reported.
+// Inverse transforms are tested if java assertions are enabled.
 // If some test fails, "print" statements can be added in this script for debugging purpose:
 //
 //    print crs            (prints the source and target CRS, and the transform between them)
@@ -826,12 +828,11 @@ set _RSO11_=PROJCS["rotation 250",GEOGCS["GCS_Kertau",DATUM["D_Kertau",SPHEROID[
 set _RSO12_=PROJCS["rotation 332.4",GEOGCS["GCS_Kertau",DATUM["D_Kertau",SPHEROID["Everest_1830_Modified",6377304.063,300.8017]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Rectified_Skew_Orthomorphic_Center"],PARAMETER["False_Easting",804671.299775],PARAMETER["False_Northing",0.0],PARAMETER["Scale_Factor",0.99984],PARAMETER["Azimuth",-36.97420943711801],PARAMETER["Longitude_Of_Center",102.25],PARAMETER["Latitude_Of_Center",4.0],PARAMETER["XY_Plane_Rotation",332.4],UNIT["Meter",1.0]]
 
 
-
+//test points from proj4 email list, http://xserve.flids.com/pipermail/proj/2004-February/001608.html
 source crs=_Borneo_
 target crs=_RSO1_
 test tolerance=(1e-2, 1e-2)
 
-//test points from proj4 email list, http://xserve.flids.com/pipermail/proj/2004-February/001608.html
 source pt=(115.046244361111, 5.010925777778)
 target pt=(2595244.677, 5554640.242)
 
