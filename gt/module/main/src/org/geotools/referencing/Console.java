@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
@@ -49,6 +50,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Parser;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -103,14 +105,14 @@ public class Console implements Runnable {
     private final Map definitions = new HashMap();
 
     /**
-     * The source CRS, or <code>null</code> if not yet determined.
+     * The source and target CRS, or <code>null</code> if not yet determined.
      */
-    private CoordinateReferenceSystem sourceCRS;
-
+    private CoordinateReferenceSystem sourceCRS, targetCRS;
+    
     /**
-     * The target CRS, or <code>null</code> if not yet determined.
+     * Source and target coordinate points, or <code>null</code> if not yet determined.
      */
-    private CoordinateReferenceSystem targetCRS;
+    private DirectPosition sourcePosition, targetPosition;
 
     /**
      * The math transform, or <code>null</code> if not yet determined.
@@ -261,6 +263,7 @@ public class Console implements Runnable {
      * Print the current console state.
      */
     private final void printStatus() throws FactoryException, IOException {
+        boolean hasOutput = false;
         final TableWriter table = new TableWriter(out, " \u2502 ");
         char separator = '\u2500';
         if (sourceCRS!=null || targetCRS!=null) {
@@ -280,6 +283,7 @@ public class Console implements Runnable {
             }
             table.nextLine();
             separator = '\u2550';
+            hasOutput = true;
         }
         update();
         if (transform != null) {
@@ -297,29 +301,35 @@ public class Console implements Runnable {
                 table.write(exception.getLocalizedMessage());
             }
             table.nextLine();
+            hasOutput = true;
         }
         table.writeHorizontalSeparator();
         table.flush();
+        if (!hasOutput) {
+            out.write("No CRS or transform specified.");
+            out.write(lineSeparator);
+            out.flush();
+        }
     }
     
     /**
      * Run an instruction. Instruction may be any of the following lines
      * (values listed here are just examples):
      * <pre>
-     *   crs_source     = _Wgs84NE_
-     *   crs_target     = _Wgs84SW_
+     *   source crs     = _Wgs84NE_
+     *   target crs     = _Wgs84SW_
      *   test_tolerance = 1e-6
-     *   pt_source      = (1, 2)
-     *   pt_target      = (-1, -2)
+     *   source pt      = (1, 2)
+     *   target pt      = (-1, -2)
      * </pre>
      *
      * or
      * 
      * <pre>
-     *   math_transform = _mt_merc1_
+     *   transform      = _mt_merc1_
      *   test_tolerance = 1e-6
-     *   pt_source      = (1, 2)
-     *   pt_target      = (-1, -2)
+     *   source pt      = (1, 2)
+     *   target pt      = (-1, -2)
      * </pre>
      *
      * The "<code>pt_target</code>" instruction triggers the computation.
@@ -345,20 +355,35 @@ public class Console implements Runnable {
             case 2: {
                 final String name  = st.nextToken().trim();
                 final String value = st.nextToken().trim();
-                if (name.equalsIgnoreCase("crs_source")) {
+                if (name.equalsIgnoreCase("source crs")) {
                     sourceCRS = getCoordinateReferenceSystem(value);
                     transform = null;
                     return;
                 }
-                if (name.equalsIgnoreCase("crs_target")) {
+                if (name.equalsIgnoreCase("target crs")) {
                     targetCRS = getCoordinateReferenceSystem(value);
                     transform = null;
                     return;
                 }
-                if (name.equalsIgnoreCase("math_transform")) {
+                if (name.equalsIgnoreCase("transform")) {
                     transform = getMathTransform(value);
                     sourceCRS = null;
                     targetCRS = null;
+                    return;
+                }
+                if (name.equalsIgnoreCase("source pt")) {
+                    sourcePosition = new GeneralDirectPosition(parseVector(value));
+                    out.write("source pt = ");
+                    out.write(String.valueOf(sourcePosition));
+                    out.write(lineSeparator);
+                    update();
+                    if (transform != null) {
+                        targetPosition = transform.transform(sourcePosition, null);
+                        out.write("target pt = ");
+                        out.write(String.valueOf(targetPosition));
+                        out.write(lineSeparator);
+                    }
+                    out.flush();
                     return;
                 }
                 break;
@@ -415,8 +440,11 @@ public class Console implements Runnable {
                 try {
                     out.flush();
                     err.write(Utilities.getShortClassName(exception));
-                    err.write(": ");
-                    err.write(exception.getLocalizedMessage());
+                    final String message = exception.getLocalizedMessage();
+                    if (message != null) {
+                        err.write(": ");
+                        err.write(message);
+                    }
                     err.write(lineSeparator);
                     err.flush();
                 } catch (IOException ignore) {
