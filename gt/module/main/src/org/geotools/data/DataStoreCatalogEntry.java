@@ -63,4 +63,12 @@ final class DataStoreCatalogEntry implements CatalogEntry {
     public Iterator iterator() {
         return Collections.singleton( this.store.metadata( typeName) ).iterator();                
     }
+
+    public boolean equals(Object obj){
+	if( !(obj instanceof DataStoreCatalogEntry) ){
+		return false;
+	}
+	DataStoreCatalogEntry entry=(DataStoreCatalogEntry) obj;
+	return typeName.equals(entry.typeName) && store==entry.store;
+    }
 }
