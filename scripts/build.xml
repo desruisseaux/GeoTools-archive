@@ -9,12 +9,12 @@ Target directory structure:
 * doc/ - Hand crafted documentation
 * doc/javadoc/ - generated javadoc code (which your docs can link to)
 * lib/ - imported Java libraries go in to this directory
-* build/classes/ - This is the tree for building; Ant creates it and can empty it in the 'clean' project.
-* build/tests/ - junit test cases are compiled in separate subdirectory
-* build/logs - logs for cruisecontrol go here
-* build/resutls - xml test results for cruisecontrol go here
-* build/dist/ - Distribution outputs go in here; the directory is created in Ant and clean empties it out
-* build/dist/lib/ - required runtime jars go here, including generated timestamped jar	
+* target/classes/ - This is the tree for building; Ant creates it and can empty it in the 'clean' project.
+* target/tests/ - junit test cases are compiled in separate subdirectory
+* target/logs - logs for cruisecontrol go here
+* target/resutls - xml test results for cruisecontrol go here
+* target/dist/ - Distribution outputs go in here; the directory is created in Ant and clean empties it out
+* target/dist/lib/ - required runtime jars go here, including generated timestamped jar	
 * dist/ - zipped distribution archives go here
 * build.xml - this file
     </description>
@@ -26,18 +26,18 @@ Target directory structure:
   
 	<!-- project directories -->
 	<property name="src"        location="src"/>
-	<property name="buildroot"  location="build"/>
-	<property name="build"      location="${buildroot}/classes"/>
-	<property name="testbuild"  location="${buildroot}/tests"/>  
-	<property name="distbuild"  location="${buildroot}/dist"/>  	
+	<property name="target"  location="target"/>
+	<property name="build"      location="${target}/classes"/>
+	<property name="testbuild"  location="${target}/tests"/>  
+	<property name="distbuild"  location="${target}/dist"/>  	
 	<property name="dist"       location="dist"/>
 	<property name="lib"        location="lib"/>
 	<property name="test"       location="test"/>
 	<property name="doc"        location="doc"/>
 	<property name="javadoc"    location="${doc}/javadoc"/>
 	<property name="bin"        location="bin"/>
-	<property name="results"    location="${buildroot}/results"/>	
-	<property name="logs"       location="${buildroot}/logs"/>
+	<property name="results"    location="${target}/results"/>	
+	<property name="logs"       location="${target}/logs"/>
 	
 	<!-- paths -->
 	<path id="buildpath" >
@@ -64,7 +64,7 @@ Target directory structure:
 	<target name="init">
 		<tstamp/>
 		<!-- Create the build directory structure used by build -->
-		<mkdir dir="${buildroot}"/>
+		<mkdir dir="${target}"/>
 		<mkdir dir="${build}"/>
 		<mkdir dir="${distbuild}"/>
 		<mkdir dir="${logs}"/>		
@@ -73,8 +73,8 @@ Target directory structure:
 
 	<target name="clean"
 			description="clean out the output directories" >
-		<!-- Delete the ${buildroot} and ${dist} directory trees -->
-		<delete dir="${buildroot}"/>
+		<!-- Delete the ${target} and ${dist} directory trees -->
+		<delete dir="${target}"/>
 		<delete dir="${dist}"/>
 		<delete dir="${javadoc}"/>
 		<delete file="${release}.zip"/>
