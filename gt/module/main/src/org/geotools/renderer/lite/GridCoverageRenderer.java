@@ -23,6 +23,7 @@ import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -92,6 +93,10 @@ public final class GridCoverageRenderer {
      */
     public GridCoverageRenderer(GridCoverage gridCoverage) {
         this.gridCoverage = gridCoverage;
+        
+        if (gridCoverage instanceof GridCoverageImpl) {
+        	image = ((GridCoverageImpl) gridCoverage).getRenderedImage();
+        }
 
 //  FIXME
 //        try {

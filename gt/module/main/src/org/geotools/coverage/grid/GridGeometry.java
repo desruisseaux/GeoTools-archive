@@ -58,7 +58,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometry implements Serializable {
+public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */

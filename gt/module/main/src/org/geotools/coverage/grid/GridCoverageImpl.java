@@ -119,8 +119,11 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	 * @see org.opengis.coverage.grid.GridCoverage#getGridGeometry()
 	 */
 	public GridGeometry getGridGeometry() {
-		// TODO Auto-generated method stub
-		return null;
+
+		GridRange range = new org.geotools.coverage.grid.GridRange(image);
+		boolean[] inverse = { false, false };
+		
+		return new org.geotools.coverage.grid.GridGeometry(range, envelope, inverse);
 	}
 
 	/* (non-Javadoc)
