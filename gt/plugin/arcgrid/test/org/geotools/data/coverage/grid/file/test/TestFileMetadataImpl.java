@@ -1,4 +1,4 @@
-package org.geotools.metadata;
+package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
 import java.net.URL;
@@ -7,9 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.data.arcgrid.ArcGridFormat;
+import org.geotools.data.arcgrid.test.TestCaseSupport;
+import org.geotools.data.coverage.grid.file.FileMetadata;
+import org.geotools.data.coverage.grid.file.FileMetadataImpl;
+import org.geotools.metadata.Metadata;
+import org.geotools.metadata.StupidNestedMetadataImpl;
 import org.geotools.metadata.Metadata.Entity;
-
-import junit.framework.TestCase;
 
 /**
  * TODO type description
@@ -17,7 +20,14 @@ import junit.framework.TestCase;
  * @author jeichar
  *
  */
-public class TestFileMetadataImpl extends TestCase {
+public class TestFileMetadataImpl extends TestCaseSupport {
+
+    /**
+     * @param name
+     */
+    public TestFileMetadataImpl(String name) {
+        super(name);
+     }
 
     URL resource;
     File f;
@@ -25,7 +35,7 @@ public class TestFileMetadataImpl extends TestCase {
     
     protected void setUp() throws Exception{
         super.setUp();
-        resource = TestFileMetadataImpl.class.getResource("testdata/ArcGrid.asc");
+        resource = getTestResource("ArcGrid.asc");
         assertNotNull(resource);
     }
 
@@ -161,18 +171,18 @@ public class TestFileMetadataImpl extends TestCase {
 
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         String element=(String)data.getElement("FileData/Name");
-        assertEquals("ArcGrid.asc",element);
+        assertEquals("Stupid",element);
         
         //Test xpath with wildcards
         List list=(List) data.getElement("FileData/\\w*");
-        assertEquals(5,list.size());
+        assertEquals(3,list.size());
 
         String name=(String) data.getElement("\\w*/Name");
-        assertEquals("ArcGrid.asc",name);
+        assertEquals("Stupid",name);
 
         //Test xpath with wildcards
         list=(List) data.getElement("\\w*/\\w*");
-        assertEquals(5,list.size());
+        assertEquals(3,list.size());
 
     }
 
