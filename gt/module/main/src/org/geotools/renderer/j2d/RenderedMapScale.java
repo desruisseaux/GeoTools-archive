@@ -386,7 +386,7 @@ public class RenderedMapScale extends RenderedLegend {
      * @return The title for the map scale, or <code>null</code> if none.
      */
     protected String getTitle(final CoordinateSystem cs) {
-        return (cs!=null) ? cs.getName().toString() : null;
+        return (cs!=null) ? cs.getName().getCode() : null;
     }
 
     /**
