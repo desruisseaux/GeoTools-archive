@@ -14,7 +14,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.data.DatasourceTest;
-import org.geotools.data.MemoryDataSourceTest;
 import org.geotools.feature.FeatureFlatTest;
 import org.geotools.filter.ExpressionTest;
 import org.geotools.filter.FilterEqualsTest;
@@ -41,8 +40,7 @@ public class DefaultCoreSuite extends TestCase {
        
         
         TestSuite suite = new TestSuite("All core tests");
-        suite.addTestSuite(DatasourceTest.class);
-        suite.addTestSuite(MemoryDataSourceTest.class);
+        suite.addTestSuite(DatasourceTest.class);        
         suite.addTestSuite(FeatureFlatTest.class);
         suite.addTestSuite(ExpressionTest.class);
         suite.addTestSuite(FilterEqualsTest.class);

@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 import java.util.Set;
-import org.geotools.data.LockingDataSourceFixture;
+
+import org.geotools.data.DataTestCase;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -32,7 +33,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author  en
  * @author jgarnett
  */
-public class FeatureTypeTest extends TestCase {
+public class FeatureTypeTest extends DataTestCase {
   
   public FeatureTypeTest(String testName){
     super(testName);
@@ -114,11 +115,8 @@ public class FeatureTypeTest extends TestCase {
   }
 
      public void testCopyFeature() throws Exception {
-        LockingDataSourceFixture fixture = new LockingDataSourceFixture();        
-        Feature feature = fixture.createFeature( "Feature", 1, 2 );
-        
-        assertDuplicate( "feature", feature, feature.getFeatureType().duplicate( feature  ) );
-        //TODO Implement copyFeature().
+        Feature feature = lakeFeatures[0];
+        assertDuplicate( "feature", feature, feature.getFeatureType().duplicate( feature  ) );        
     }
     public void testDeepCopy() throws Exception {
         // primative        
@@ -152,8 +150,7 @@ public class FeatureTypeTest extends TestCase {
         assertDuplicate( "map", map, testType.duplicate( map ) );
         
         // complex type
-        LockingDataSourceFixture fixture = new LockingDataSourceFixture();
-        Feature feature = fixture.createFeature( "Feature", 1, 2 );
+        Feature feature = lakeFeatures[0];
         
         PrecisionModel precisionModel = new PrecisionModel();
         Coordinate coords = new Coordinate(1, 3); 
