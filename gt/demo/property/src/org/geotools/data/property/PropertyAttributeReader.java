@@ -73,6 +73,10 @@ public class PropertyAttributeReader implements AttributeReader {
     /** DOCUMENT ME! */
     String next;
 
+	String[] text;
+	
+	String fid;
+	
     /**
      * Creates a new PropertyAttributeReader object.
      *
@@ -190,6 +194,14 @@ public class PropertyAttributeReader implements AttributeReader {
         if (hasNext()) {
             line = next;
             next = null;
+
+	        int split = line.indexOf('=');
+	        fid = line.substring(0, split);
+			text = line.substring(split + 1).split("\\|");
+			if(type.getAttributeCount() != text.length)
+				throw new DataSourceException("format error: expected " +
+						type.getAttributeCount() + " attributes, but found " +
+						text.length + ". [" + line + "]");
         } else {
             throw new NoSuchElementException();
         }
@@ -205,13 +217,7 @@ public class PropertyAttributeReader implements AttributeReader {
             return null;
         }
 
-        int split = line.indexOf('=');
-
-        if (split == -1) {
-            return null;
-        }
-
-        return line.substring(0, split);
+		return fid;
     }
 
     /**
@@ -232,13 +238,16 @@ public class PropertyAttributeReader implements AttributeReader {
                 "No content available - did you remeber to call next?");
         }
 
-        int split = line.indexOf('=');
-        String fid = line.substring(0, split);
-        String[] text = line.substring(split + 1).split("\\|");
-
         AttributeType attType = type.getAttributeType(index);
 
-        String stringValue = text[index];
+        String stringValue = null;
+		try {
+			stringValue = text[index];
+		} catch (RuntimeException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			stringValue = null;
+		}
 
         Object value = null;
 
@@ -256,3 +265,16 @@ public class PropertyAttributeReader implements AttributeReader {
         return value;
     }
 }
+
+/*
+POINT(529264 4801784)|
+038-54|
+48|
+041|
+106|
+Caser?o Zaldegietxebarrierdikoa (Txopenebenta)|
+Zaldegietxebarrierdikoa baserria (Txopebenta)|
+Zaldegietxebarrierdikoa (Txopebenta)|
+Zaldegietxebarrierdikoa, Caser?o (Txopebenta)|
+Zaldegietxebarrierdikoa bas
+*/
