@@ -53,6 +53,11 @@
       </properties>
     </dependency>
     <dependency>
+      <id>wms</id>
+      <version>2.1.x</version>
+      <groupId>gt2</groupId>
+    </dependency>
+    <dependency>
       <id>opengis+legacy</id>
       <version>0.1</version>
       <url>http://www.opengis.org</url>

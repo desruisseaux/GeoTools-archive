@@ -53,8 +53,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "ComparisonOpsType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -107,8 +106,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "SpatialOpsType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -161,8 +159,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "LogicOpsType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -215,8 +212,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "FilterType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -269,8 +265,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "FeatureIdType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -323,8 +318,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "BinaryComparisonOpType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -377,8 +371,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "PropertyIsLikeType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -431,8 +424,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "PropertyIsNullType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -485,8 +477,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "PropertyIsBetweenType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -539,8 +530,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "LowerBoundaryType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -593,8 +583,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "UpperBoundaryType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -647,8 +636,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "BinarySpatialOpType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -701,8 +689,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "BBOXType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -755,8 +742,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "DistanceBufferType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -809,8 +795,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "DistanceType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -863,8 +848,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "BinaryLogicOpType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -917,8 +901,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "UnaryLogicOpType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
