@@ -213,6 +213,15 @@ public class DataSourceMetadataEnity implements MetadataEntity {
             build.add( NAME );
             build.add( DESCRIPTION );
             ELEMENTS = Collections.unmodifiableList( build );
+        }
+        public Class getType() {
+            return DataSourceMetadataEnity.class;
+        }
+        public String getName() {
+            return null;            
+        }
+        public boolean isNillable() {
+            return false;
         }        
         public Object getElement( String  xpath ) {
             if( xpath == null ){
