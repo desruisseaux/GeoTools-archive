@@ -23,6 +23,7 @@ package org.geotools.referencing.operation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import javax.units.Unit;
 
@@ -31,6 +32,7 @@ import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
@@ -232,53 +234,71 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected ParameterValueGroup ensureValidValues(final ParameterValueGroup values)
             throws InvalidParameterNameException, InvalidParameterValueException
     {
-//TODO
-//System.out.println(values);
-//if (true) return values;
         final ParameterDescriptorGroup parameters = getParameters();
         final GeneralParameterDescriptor descriptor = values.getDescriptor();
         if (parameters.equals(descriptor)) {
             /*
              * Since the "official" parameter descriptor was used, the descriptor should
              * have already enforced argument validity. Concequently, there is no need to
-             * performs the check and we will avoid it as a performance enhancement,
-             * unless assertions are enabled.
+             * performs the check and we will avoid it as a performance enhancement.
              */
-            IllegalArgumentException e;
-            assert (e=assertValidValues(values.values(), parameters))==null : e;
             return values;
         }
-        if (values instanceof FallbackParameterValueGroup) {
-            if (parameters.equals(((FallbackParameterValueGroup) values).fallback)) {
-                return values;
-            }
-        }
-        final Collection asList = values.values();
-        ensureValidValues(asList, parameters);
-        return new FallbackParameterValueGroup(descriptor.getName(), parameters,
-               (GeneralParameterValue[]) asList.toArray(new GeneralParameterValue[asList.size()]));
+        /*
+         * Copy the all values from the user-supplied group to the provider-supplied group.
+         * The provider group should performs all needed checks. Furthermore, it is suppliers
+         * responsability to know about alias (e.g. OGC, EPSG, ESRI), while the user will
+         * probably use the name from only one authority. With a copy, we gives a chances to
+         * the provider-supplied parameters to uses its alias for understanding the user
+         * parameter names.
+         */
+        final ParameterValueGroup copy = (ParameterValueGroup) parameters.createValue();
+        copy(values, copy);
+        return copy;
     }
 
     /**
      * Implementation of <code>ensureValidValues</code>, to be invoked recursively
-     * if the specified values contains sub-groups of values.
+     * if the specified values contains sub-groups of values. This method copy all
+     * values from the user-supplied parameter values into the provider-supplied
+     * one. The provider one should understand alias, and performs name conversion
+     * as well as argument checking on the fly.
      *
-     * @param  values The parameters values to check.
-     * @param  parameters The <strong>expected</strong> parameter descriptor
-     *         (not the supplied values descriptor).
+     * @param  values The parameters values to copy.
+     * @param  copy   The parameters values where to put the copy.
      * @throws InvalidParameterNameException if a parameter name is unknow.
      * @throws InvalidParameterValueException if a parameter has an invalid value.
      */
-    private static void ensureValidValues(final Collection/*<GeneralParameterValue>*/ values,
-                                          final ParameterDescriptorGroup parameters)
+    private static void copy(final ParameterValueGroup values,
+                             final ParameterValueGroup copy)
             throws InvalidParameterNameException, InvalidParameterValueException
     {
-        for (final Iterator it=values.iterator(); it.hasNext();) {
+        for (final Iterator it=values.values().iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
             final String name = value.getDescriptor().getName().getCode();
-            final GeneralParameterDescriptor descriptor;
+            if (value instanceof ParameterValueGroup) {
+                /*
+                 * Contains sub-group - invokes 'copy' recursively.
+                 */
+                final GeneralParameterDescriptor descriptor;
+                descriptor = ((ParameterDescriptorGroup) copy.getDescriptor()).descriptor(name);
+                if (descriptor instanceof ParameterDescriptorGroup) {
+                    final ParameterValueGroup groups = (ParameterValueGroup) descriptor.createValue();
+                    copy((ParameterValueGroup) value, groups);
+                    values.groups(name).add(groups);
+                    continue;
+                } else {
+                    throw new InvalidParameterNameException(Resources.format(
+                              ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
+                }
+            }
+            /*
+             * Single parameter - copy the value, with special care for value with units.
+             */
+            final ParameterValue source = (ParameterValue) value;
+            final ParameterValue target;
             try {
-                descriptor = parameters.descriptor(name);
+                target = copy.parameter(name);
             } catch (ParameterNotFoundException cause) {
                 final InvalidParameterNameException exception =
                       new InvalidParameterNameException(Resources.format(
@@ -286,38 +306,19 @@ public abstract class MathTransformProvider extends OperationMethod {
                 exception.initCause(cause);
                 throw exception;
             }
-            if (value instanceof ParameterValueGroup) {
-                if (descriptor instanceof ParameterDescriptorGroup) {
-                    ensureValidValues(((ParameterValueGroup) value).values(),
-                                       (ParameterDescriptorGroup) descriptor);
-                    continue;
-                }
-                throw new InvalidParameterNameException(Resources.format(
-                          ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
-            }
-            if (value instanceof ParameterValue) {
-                org.geotools.parameter.Parameter.ensureValidValue(
-                        (ParameterDescriptor) descriptor, 
-                        ((ParameterValue) value).getValue());
+            final Object v  = source.getValue();
+            final Unit unit = source.getUnit();
+            if (unit == null) {
+                target.setValue(v);
+            } else if (v instanceof Number) {
+                target.setValue(((Number) v).doubleValue(), unit);
+            } else if (v instanceof double[]) {
+                target.setValue((double[]) v, unit);
+            } else {
+                throw new InvalidParameterValueException(Resources.format(
+                          ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, v), name, v);
             }
         }
-    }
-
-    /**
-     * If arguments are invalid, returns the exception instead of throwing it.
-     * This method is for internal use by assertions only; they will wrap the
-     * exception into an {@link AssertionError}.
-     */
-    private static IllegalArgumentException assertValidValues(
-            final Collection/*<GeneralParameterValue>*/ values,
-            final ParameterDescriptorGroup parameters)
-    {
-        try {
-            ensureValidValues(values, parameters);
-        } catch (IllegalArgumentException exception) {
-            return exception;
-        }
-        return null;
     }
 
     /**

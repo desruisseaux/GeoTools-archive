@@ -274,7 +274,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         double v;
         final Unit unit = param.getUnit();
         if (descriptors.contains(param)) {
-            v = AbstractProvider.doubleValue(group, param);
+            v = AbstractProvider.doubleValue(param, group);
             if (NonSI.DEGREE_ANGLE.equals(unit)) {
                 v = Math.toRadians(v);
             }
@@ -1164,13 +1164,24 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
 
         /**
-         * Gives to {@link MapProjection} an access to a protected method from
-         * {@link MathTransformProvider}.
+         * Returns the parameter value for the specified operation parameter.
+         * Values are automatically converted into the standard units specified
+         * by the supplied <code>param</code> argument.
+         *
+         * @param  param The parameter to look for.
+         * @param  group The parameter value group to search into.
+         * @return The requested parameter value.
+         * @throws ParameterNotFoundException if the parameter is not found.
          */
-        static double doubleValue(final ParameterValueGroup group,
-                                  final ParameterDescriptor param)
+        protected static double doubleValue(final ParameterDescriptor param,
+                                            final ParameterValueGroup group)
                 throws ParameterNotFoundException
         {
+            /*
+             * Just forward to the super-class method. This method is redefined
+             * here in order to gives to {@link MapProjection} an access to the
+             * protected method from {@link MathTransformProvider}.
+             */
             return MathTransformProvider.doubleValue(param, group);
         }
     }

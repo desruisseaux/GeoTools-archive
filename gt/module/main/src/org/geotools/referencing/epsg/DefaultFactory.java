@@ -304,12 +304,6 @@ public class DefaultFactory extends AuthorityFactory
     private final StringBuffer prefix = new StringBuffer();
 
     /**
-     * The set of alias for an object to construct.
-     * Reused every time {@link #createProperties} is invoked.
-     */
-    private final List alias = new ArrayList();
-
-    /**
      * A safety guard for preventing never-ending loops in recursive calls to
      * {@link #createDatum}. This is used by {@link #createBursaWolfParameters},
      * which need to create a target datum. The target datum could have its own
@@ -650,7 +644,7 @@ public class DefaultFactory extends AuthorityFactory
         /*
          * Search for alias.
          */
-        alias.clear();
+        List alias = null;
         final PreparedStatement stmt;
         stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME,"
                                        +       " ALIAS"
@@ -674,10 +668,13 @@ public class DefaultFactory extends AuthorityFactory
                 }
                 generic = new ScopedName(cached, local);
             }
+            if (alias == null) {
+                alias = new ArrayList();
+            }
             alias.add(generic);
         }
         result.close();
-        if (!alias.isEmpty()) {
+        if (alias != null) {
             properties.put(prepend(org.geotools.referencing.IdentifiedObject.ALIAS_PROPERTY),
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
         }
