@@ -56,6 +56,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Arguments;
 
@@ -105,9 +106,10 @@ public class CreationTest extends TestCase {
         out.println("---------------------");
         out.println();
         out.println("create Coodinate Reference System....1: ");
-        final DatumFactory datumFactory = FactoryFinder.getDatumFactory();
-        final    CSFactory    csFactory = FactoryFinder.getCSFactory();
-        final   CRSFactory   crsFactory = FactoryFinder.getCRSFactory();
+        final         DatumFactory datumFactory = FactoryFinder.getDatumFactory();
+        final            CSFactory    csFactory = FactoryFinder.getCSFactory();
+        final           CRSFactory   crsFactory = FactoryFinder.getCRSFactory();
+        final MathTransformFactory    mtFactory = FactoryFinder.getMathTransformFactory();
 
         final Ellipsoid airy1830;
         final Unit meters = SI.METER;
@@ -148,7 +150,7 @@ public class CreationTest extends TestCase {
         out.println(geogCRS.toWKT());
 
         final MathTransform p;
-        final ParameterValueGroup param = crsFactory.getDefaultParameters("Transverse_Mercator");
+        final ParameterValueGroup param = mtFactory.getDefaultParameters("Transverse_Mercator");
         param.parameter("semi_major")        .setValue(airy1830.getSemiMajorAxis());
         param.parameter("semi_minor")        .setValue(airy1830.getSemiMinorAxis());
         param.parameter("central_meridian")  .setValue(     49);
@@ -170,7 +172,8 @@ public class CreationTest extends TestCase {
         out.println(cartCS); // No WKT for coordinate systems
             
         final ProjectedCRS projCRS;
-        projCRS = crsFactory.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, param, cartCS);
+        projCRS = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory).
+             createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, null, param, cartCS);
         out.println();
         out.println("create Coodinate System....9: ");
         out.println(projCRS.toWKT());

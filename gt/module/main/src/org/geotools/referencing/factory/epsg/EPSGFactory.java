@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.referencing.factory.epsg;
 
@@ -28,8 +24,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,8 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.units.NonSI;
 import javax.units.Unit;
@@ -94,8 +86,8 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
@@ -105,29 +97,17 @@ import org.geotools.util.ScopedName;
  * Default implementation for a coordinate system factory backed by the EPSG database. The EPSG
  * database is freely available at <A HREF="http://www.epsg.org">http://www.epsg.org</a>. Current
  * version of this class requires EPSG database version 6.6.
- * <br>
- * <h2>EPSG database installation</h2>
- * The EPSG database is available in MS Access format. The <code>EPSG_v6.mdb</code> file can be
- * stored anywhere on yours system under any name, at your convenience. The database must be
- * declared as an ODBC data source. Steps to follow:
- *
- * <ul>
- *   <li>Open the <cite>ODBC data sources</cite> dialog box from the Windows's Control Panel.</li>
- *   <li>Click the "Add..." button an select <cite>Microsoft Access Driver (*.mdb)</cite>.</li>
- *   <li>Data source name should be "EPSG". Filename can be anything; click on the "Select..."
- *       button to select it.</li>
- * </ul>
  *
  * @version $Id$
- * @author Martin Desruisseaux
  * @author Yann Cézard
+ * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
 public class EPSGFactory extends AbstractAuthorityFactory {
     /**
-     * The logger for EPSG factory.
+     * The logger for EPSG factories.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.epsg");
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.epsg");
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                            ////////
@@ -301,32 +281,6 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     protected final Connection connection;
 
     /**
-     * Constructs an authority factory using the specified URL to an EPSG database.
-     *
-     * @param  factories The underlying factory used for objects creation.
-     * @param  url       The url to the EPSG database. For example, a connection
-     *                   using the ODBC-JDBC bridge may have an URL likes
-     *                   {@code "jdbc:odbc:EPSG"}.
-     * @param  driver    An optional driver to load, or <code>null</code> if none.
-     *                   This is a convenience argument for the following pseudo-code:
-     *                   <blockquote><code>
-     *                   Class.forName(driver).newInstance();
-     *                   </code></blockquote>
-     *                   A message is logged to {@code "org.geotools.referencing"} wether
-     *                   the loading sucseeds of fails. For JDBC-ODBC bridge, a typical value
-     *                   for this argument is {@code "sun.jdbc.odbc.JdbcOdbcDriver"}.
-     *                   This argument needs to be non-null only once for a specific driver.
-     *
-     * @throws SQLException if the constructor failed to connect to the EPSG database.
-     */
-    public EPSGFactory(final FactoryGroup factories, final String url, final String driver)
-            throws SQLException
-    {
-        this(factories, getConnection(url, driver));
-        LOGGER.config("Connection to EPSG database \""+url+"\" etablished."); // TODO: localize
-    }
-
-    /**
      * Constructs an authority factory using the specified connection.
      *
      * @param factories  The underlying factories used for objects creation.
@@ -336,40 +290,6 @@ public class EPSGFactory extends AbstractAuthorityFactory {
         super(factories, MAX_PRIORITY);
         this.connection = connection;
         ensureNonNull("connection", connection);
-    }
-
-    /**
-     * Get the connection to an URL.
-     *
-     * @param  url     The url to the EPSG database.
-     * @param  driver  The driver to load, or <code>null</code> if none.
-     * @return The connection to the EPSG database.
-     * @throws SQLException if the connection can't be etablished.
-     */
-    private static Connection getConnection(final String url, String driver) throws SQLException {
-        ensureNonNull("url", url);
-        if (driver != null) {
-            LogRecord record;
-            try {
-                final Driver drv = (Driver)Class.forName(driver).newInstance();
-                record = Resources.getResources(null).getLogRecord(Level.CONFIG,
-                                            ResourceKeys.LOADED_JDBC_DRIVER_$3);
-                record.setParameters(new Object[] {
-                    drv.getClass().getName(),
-                    new Integer(drv.getMajorVersion()),
-                    new Integer(drv.getMinorVersion())
-                });
-            } catch (Exception exception) {
-                record = new LogRecord(Level.WARNING, exception.getLocalizedMessage());
-                record.setThrown(exception);
-                // Try to connect anyway. It is possible that
-                // an other driver has already been loaded...
-            }
-            record.setSourceClassName("EPSGFactory");
-            record.setSourceMethodName("<init>");
-            LOGGER.log(record);
-        }
-        return DriverManager.getConnection(url);
     }
 
     /**
@@ -816,7 +736,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                 final double semiMinorAxis     = result.getDouble( 4);
                 final String unitCode          = getString(result, 5, code);
                 final String remarks           = result.getString( 6);
-                final Unit   unit              = createUnit(unitCode);
+                final Unit   unit              = buffered.createUnit(unitCode);
                 final Map    properties        = createProperties(name, code, remarks);
                 final Ellipsoid ellipsoid;
                 if (inverseFlattening == 0) {
@@ -884,7 +804,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                 final double longitude = getDouble(result, 2, code);
                 final String unit_code = getString(result, 3, code);
                 final String remarks   = result.getString( 4);
-                final Unit unit        = createUnit(unit_code);
+                final Unit unit        = buffered.createUnit(unit_code);
                 final Map properties   = createProperties(name, code, remarks);
                 PrimeMeridian primeMeridian = factories.getDatumFactory().createPrimeMeridian(
                                               properties, longitude, unit);
@@ -1061,7 +981,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                 setBursaWolfParameter(parameters,
                                       getInt   (result, 1, info.operation),
                                       getDouble(result, 2, info.operation),
-                           createUnit(getString(result, 3, info.operation)));
+                  buffered.createUnit(getString(result, 3, info.operation)));
             }
             result.close();
             if (info.method == 9607) {
@@ -1261,7 +1181,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
             }
             final Map properties = createProperties(name, code, description);
             axis[i++] = factory.createCoordinateSystemAxis(properties, abbreviation, direction,
-                                                           createUnit(unit));
+                                                           buffered.createUnit(unit));
         }
         result.close();
         if (i != axis.length) {
@@ -1595,7 +1515,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
             final String remarks = result.getString( 2);
             final double value   = result.getDouble( 3);
             if (!result.wasNull()) {
-                final Unit unit = createUnit(getString(result, 5, operation));
+                final Unit unit = buffered.createUnit(getString(result, 5, operation));
                 final Map properties = createProperties(name, null, remarks);
                 parameter = new org.geotools.parameter.ParameterDescriptor(properties,
                             value, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, unit, true);

@@ -16,55 +16,47 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.util.prefs.Preferences;
-import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.prefs.Preferences;
 import javax.imageio.spi.ServiceRegistry;
+import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+import javax.naming.NoInitialContextException;
+import javax.sql.DataSource;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
-import org.geotools.io.TableWriter;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.BufferedAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.util.MonolineFormatter;
 
 
 /**
- * The default EPSG factory to be registered in {@link FactoryFinder}. This factory work as a proxy
- * for 1) selecting an appropriate {@link EPSGFactory} subclass at runtime and 2) cache objects for
- * better performances. The database URL (as well as the JDBC driver to use) are stored in the
- * system preferences. The default values are:
+ * The default EPSG factory to be registered in {@link FactoryFinder}. This factory works as a
+ * proxy for 1) select an appropriate {@link EPSGFactory} subclass at runtime and 2) cache CRS
+ * objects for better performances. The database connection is specified through a
+ * {@link DataSource} binded to the <code>{@value #DATASOURCE_NAME}</code> name.
+ * If no binding is found under that name, a default binding using the JDBC-ODBC bridge
+ * is created. This default binding expects a "{@code EPSG}" database registered as an
+ * ODBC data source. See the package javadoc for installation instructions.
  *
- * <table>
- *   <tr><td>JDBC driver:&nbsp;</td><td><code>{@value #DEFAULT_DRIVER}</code></td></tr>
- *   <tr><td>URL:&nbsp;</td><td><code>{@value #DEFAULT_CONNECTION}</code></td></tr>
- * </table>
- *
- * <P>Those default connection parameters can be changed by invoking the {@link #main} method
- * from the command line. For example:</P>
- *
- * <blockquote><pre>
- * java org.geotools.referencing.espg.DefaultFactory -driver=[my driver] -connection=[my url]
- * </pre></blockquote>
- *
- * <P>The {@code EPSGFactory} subclass is selected on the basis of the URL:</P>
+ * <P>The {@code EPSGFactory} subclass is selected on the basis of the
+ * {@linkplain DatabaseMetaData#getDatabaseProductName database product name}:</P>
  *
  * <ul>
  *   <li>(...todo...)</li>
@@ -73,24 +65,22 @@ import org.geotools.util.MonolineFormatter;
  *       format, which is the primary format distributed by EPSG.</li>
  * </ul>
  *
- * Users should not creates instance of this class themself. It is public mainly for the purpose of
- * registering in {@link FactoryFinder}.
+ * <P>Users should not creates instance of this class directly. They should invokes one of
+ * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.</P>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class DefaultFactory extends BufferedAuthorityFactory {
-    /** Preference node for the JDBC driver class name. */
-    private static final String DRIVER = "JDBC driver";
+public class DefaultFactory extends BufferedAuthorityFactory {
+    /**
+     * Preference node for the {@linkplain DataSource data source} class name.
+     */
+    private static final String DATASOURCE_NODE = "DataSource";
 
-    /** Default value for the JDBC driver class name. */
-    public static final String DEFAULT_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
-
-    /** Preference node for the EPSG database connection string. */
-    private static final String CONNECTION = "EPSG connection";
-
-    /** Preference node for the EPSG database connection string. */
-    public static final String DEFAULT_CONNECTION = "jdbc:odbc:EPSG";
+    /**
+     * The JDBC {@linkplain DataSource data source} name in JNDI.
+     */
+    public static final String DATASOURCE_NAME = "jdbc/EPSG";
 
     /**
      * The shutdown hook, or <code>null</code> if none.
@@ -98,15 +88,8 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
     private Thread shutdown;
 
     /**
-     * <code>true</code> if system preferences was used (or is to be used) instead of user
-     * preferences.
-     */
-    private boolean system;
-
-    /**
      * Constructs an authority factory using the default set of
-     * {@linkplain org.opengis.referencing.ObjectFactory object factories} and the
-     * default connection parameters to the EPSG database.
+     * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
      */
     public DefaultFactory() {
         super(new FactoryGroup(), MAX_PRIORITY);
@@ -120,78 +103,127 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
     }
 
     /**
-     * Returns the URL to use for the connection to the EPSG database.
-     * Subclasses may override this method in order to specify a different URL.
-     */
-    protected String getURL() {
-        return getPreference(CONNECTION, DEFAULT_CONNECTION, system);
-    }
-
-    /**
-     * Returns the driver to load before any attempt to connect to the EPSG database,
-     * or <code>null</code> if none.
-     * Subclasses may override this method in order to specify a different driver.
-     */
-    protected String getDriver() {
-        return getPreference(DRIVER, DEFAULT_DRIVER, system);
-    }
-
-    /**
-     * Returns the value for the specified preference node. This method try on user preferences
-     * first, and on the system preferences next if no user preferences was set. If both of them
-     * fails, the default value is returned.
-     */
-    private static String getPreference(final String node, final String defaultValue, boolean system) {
-        do {
-            final Preferences prefs;
-            try {
-                prefs = getPreferences(system);
-            } catch (SecurityException exception) {
-                // We are not allowed to read those preferences.
-                // Try the other preference node or the default.
-                continue;
-            }
-            final String value = prefs.get(node, null);
-            if (value != null) {
-                return value;
-            }
-        } while ((system = !system) == true);
-        return defaultValue;
-    }
-
-    /**
-     * Returns the user or system preferences.
+     * Creates a new data source for etablishing a connection to the EPSG database. This method is
+     * invoked automatically by {@link #createBackingStore} if no data source were found in the
+     * naming directory for the <code>{@value #DATASOURCE_NAME}</code> name. The default
+     * implementation creates a data source for the JDBC-ODBC bridge. This data source
+     * implementation is available and documented in Sun's distribution since J2SE 1.4. See
      *
-     * @param  system <code>true</code> for returning {@linkplain Preferences#systemRoot system
-     *         preferences} instead of {@linkplain Preferences#userRoot user preferences}.
-     * @return The preferences.
+     * <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New data source
+     * implementations in the JDBC-ODBC bridge</A>.
+     *
+     * <br><br>
+     * Subclasses should override this method if they know a more appropriate default
+     * data source for their EPSG database.
+     *
+     * @throws FactoryException if this method failed to create a default data source.
+     * @return The data source for the EPSG database.
+     *
+     * @todo Should we allows to select an alternative implementation of
+     *       {@code "sun.jdbc.odbc.ee.DataSource"} through preference API?
      */
-    private static Preferences getPreferences(final boolean system) {
-        return system ? Preferences.systemNodeForPackage(DefaultFactory.class)
-                      : Preferences.  userNodeForPackage(DefaultFactory.class);
+    protected DataSource createDataSource() throws FactoryException {
+        /*
+         * Use reflection in order to avoid direct dependency to Sun's internal class.
+         * It also allows to select the default data source class as a user preference.
+         */
+        String implementation = "sun.jdbc.odbc.ee.DataSource";
+        try {
+            final Preferences prefs = Preferences.systemNodeForPackage(DefaultFactory.class);
+            implementation = prefs.get(DATASOURCE_NODE, implementation);
+        } catch (SecurityException exception) {
+            // We are not allowed to get preferences (for example we are
+            // running in an applet). Try with the default implementation.
+            final LogRecord record = new LogRecord(Level.WARNING,
+                    "Can't read preferences for \""+DATASOURCE_NODE+"\".");  // TODO: Localize
+            record.setThrown(exception);
+            record.setSourceClassName(DefaultFactory.class.getName());
+            record.setSourceMethodName("createDataSource");
+            EPSGFactory.LOGGER.log(record);
+        }
+        final DataSource source;
+        try {
+            final Class classe = Class.forName(implementation);
+            source = (DataSource) classe.newInstance();
+            classe.getMethod("setDatabaseName", new Class[] {String.class})
+                  .invoke(source, new Object[] {"EPSG"});
+        } catch (Exception exception) {
+            /*
+             * Catching all exceptions is not really recommended,
+             * but there is a lot of them to in the above lines:
+             *
+             *     ClassNotFoundException, InstantiationException, IllegalAccessException,
+             *     ClassCastException, NoSuchMethodException, SecurityException,
+             *     IllegalArgumentException and InvocationTargetException ...
+             */
+            throw new FactoryException("Can't create EPSG data source.", exception);
+        }
+        return source;
     }
 
     /**
-     * Returns the backing store authority factory. This method try to connect to the EPSG
-     * database using the default connection parameters the first time it is invoked.
+     * Creates the backing store authority factory. This method try to connect to the EPSG
+     * database from the <code>{@value #DATASOURCE_NAME}</code> data source. If no data
+     * source were found for that name, {@link #createDataSource} is invoked in order to
+     * get a default one.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the constructor failed to connect to the EPSG database.
      *         This exception usually has a {@link SQLException} as its cause.
+     *
+     * @todo Do may need some standard way (in Geotools) for fetching an {@link InitialContext}
+     *       for the whole Geotools library?
      */
-    protected AbstractAuthorityFactory getBackingStore() throws FactoryException {
-        if (backingStore == null) try {
-            /*
-             * TODO: Infer the EPSGFactory subclass from the URL here.
-             */
-            final EPSGFactory epsg = new EPSGFactory(factories, getURL(), getDriver());
-            epsg.buffered = this;
-            backingStore = epsg;
+    protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
+        DataSource source;
+        try {
+            final InitialContext context = new InitialContext();
+            try {
+                source = (DataSource) context.lookup(DATASOURCE_NAME);
+            } catch (NameNotFoundException exception) {
+                source = createDataSource();
+                context.bind(DATASOURCE_NAME, source);
+                EPSGFactory.LOGGER.info("Created a \"" + DATASOURCE_NAME +
+                                        "\" entry in the naming system."); // TODO: localize
+            }
+        } catch (NoInitialContextException exception) {
+            source = createDataSource();
+            // TODO: localize
+            EPSGFactory.LOGGER.config("Using default EPSG data source without naming system.");
+        } catch (NamingException exception) {
+            // TODO: localize
+            throw new FactoryException("Failed to get the data source for name \"" +
+                                       DATASOURCE_NAME + "\".", exception);
+        }
+        final Connection connection;
+        final DatabaseMetaData info;
+        final String product;
+        final String url;
+        try {
+            connection = source.getConnection();
+            info       = connection.getMetaData();
+            product    = info.getDatabaseProductName();
+            url        = info.getURL();
         } catch (SQLException exception) {
             // TODO: localize
             throw new FactoryException("Failed to connect to the EPSG database", exception);
         }
-        return backingStore;
+        // TODO: Provide a localized message including the database version.
+        EPSGFactory.LOGGER.config("Connected to EPSG database \"" + url + "\".");
+        final EPSGFactory epsg;
+        /*
+         * TODO: Hard-coded product names for now.
+         *       We will need to implement a better way later.
+         */
+        if (product.equalsIgnoreCase("PostgreSQL") ||
+            product.equalsIgnoreCase("MySQL"))
+        {
+            epsg = new FactoryForSQL(factories, connection);
+        } else {
+            epsg = new EPSGFactory(factories, connection);
+        }
+        epsg.buffered = this;
+        return epsg;
     }
 
     /**
@@ -242,7 +274,7 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
      * the standard output. This method can be invoked from the command line. For example:
      *
      * <blockquote><pre>
-     * java org.geotools.referencing.epsg.DefaultFactory 4181
+     * java org.geotools.referencing.factory.epsg.DefaultFactory 4181
      * </pre></blockquote>
      *
      * Should print:
@@ -253,111 +285,43 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
      *
      * The following optional arguments are supported:
      * <blockquote>
-     *   <strong>{@code -system}</strong><br>
-     *       Instructs that {@code -connection} and {@code -driver} arguments below should
-     *       set the {@linkplain Preferences#systemRoot system preferences} instead of the
-     *       {@linkplain Preferences#userRoot user preferences}. Use this flag if you are
-     *       a system administrator and want every users on a machine connect to the specified
-     *       EPSG database.
-     *       <br><br>
-     *
-     *   <strong>{@code -connection}</strong> <var>URL</var><br>
-     *       Set the EPSG database URL. The URL must conform to
-     *       {@link DriverManager#getConnection(String)} specification. The default value
-     *       is <code>{@value #DEFAULT_CONNECTION}</code>. The specified URL is stored in
-     *       system preferences and will become the default URL every time an EPSG
-     *       {@code DefaultFactory} is created without explicit URL. The
-     *       "{@code default}" string reset the default URL.
-     *       <br><br>
-     *
-     *   <strong>{@code -driver}</strong> <var>classname</var><br>
-     *       Set the driver class. The default value is <code>{@value #DEFAULT_DRIVER}</code>.
-     *       The specified classname is stored in system preferences and will become the default
-     *       driver every time an EPSG {@code DefaultFactory} is created without explicit
-     *       driver. The "{@code default}" string reset the default driver.
+     *   <strong>{@code -datasource}</strong> <var>classname</var><br>
+     *       Sets the default {@linkplain DataSource data source} class. This class is used for
+     *       {@linkplain #createDataSource creating a default data source} if no data source was
+     *       found in the naming system for the <code>{@value #DATASOURCE_NAME}</code> name. The
+     *       specified classname is stored in {@linkplain Preferences#systemRoot system preferences}
+     *       for future execution. The "{@code default}" string reset the default value, which is
+     *       "{@code sun.jdbc.odbc.ee.DataSource}".
      *       <br><br>
      *
      *   <strong>{@code -encoding} <var>charset</var></strong><br>
-     *       Set the console encoding for this application output. This value has
+     *       Sets the console encoding for this application output. This value has
      *       no impact on the data exchanged with the EPSG database.
      * </blockquote>
      *
-     * If this method is run without any EPSG code in argument, it prints the current configuration
-     * to the standard output.
-     *
      * @param args A list of EPSG code to display.
-     *             An arbitrary number of code can be specified on the command line.
+     *             An arbitrary number of codes can be specified on the command line.
      */
     public static void main(String[] args) {
         MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments arguments = new Arguments(args);
-        final String       driver = arguments.getOptionalString("-driver");
-        final String   connection = arguments.getOptionalString("-connection");
-        final boolean     system = arguments.getFlag("-system");
+        final String   datasource = arguments.getOptionalString("-datasource");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
-        /*
-         * If a driver or connection parameters were set, update the preferences.
-         */
-        Preferences prefs = getPreferences(system);
-        if (driver != null) {
-            if (driver.equalsIgnoreCase("default")) {
-                prefs.remove(DRIVER);
+        if (datasource != null) {
+            final Preferences prefs = Preferences.systemNodeForPackage(DefaultFactory.class);
+            if (datasource.equalsIgnoreCase("default")) {
+                prefs.remove(DATASOURCE_NODE);
             } else {
-                prefs.put(DRIVER, driver);
+                prefs.put(DATASOURCE_NODE, datasource);
             }
         }
-        if (connection != null) {
-            if (connection.equalsIgnoreCase("default")) {
-                prefs.remove(CONNECTION);
-            } else {
-                prefs.put(CONNECTION, connection);
-            }
-        }
-        /*
-         * Run without argument other than the above.
-         * Prints the current configuration and exit.
-         */
-        if (args.length == 0) try {
-            final Resources resources = Resources.getResources(arguments.locale);
-            final TableWriter table = new TableWriter(arguments.out, " \u2502 ");
-            table.writeHorizontalSeparator();
-            table.nextColumn(); table.write("URL");    // TODO: localize
-            table.nextColumn(); table.write("Driver"); // TODO: localize
-            table.nextLine();
-            table.writeHorizontalSeparator();
-            for (int i=0; i<=2; i++) {
-                final String title, url, pilote;
-                if (i != 2) {
-                    prefs  = getPreferences(i!=0);
-                    title  = (i!=0) ? "System preferences" : "User preferences"; // TODO: localize.
-                    url    = prefs.get(CONNECTION, null);
-                    pilote = prefs.get(DRIVER,     null);
-                } else {
-                    title  = resources.getString(ResourceKeys.DEFAULT_VALUE);
-                    url    = DEFAULT_CONNECTION;
-                    pilote = DEFAULT_DRIVER;
-                }
-                if (title  != null) table.write(title);  table.nextColumn();
-                if (url    != null) table.write(url);    table.nextColumn();
-                if (pilote != null) table.write(pilote); table.nextLine();
-            }
-            table.writeHorizontalSeparator();
-            table.flush();
-        } catch (IOException exception) {
-            // Should not happen, since we are writting to a PrintWriter.
-            exception.printStackTrace(arguments.err);
-            return;
-        }
-        /*
-         * Run with at least one EPSG code provided in argument.
-         * Fetch objects from the database and format as WKT.
-         */
         try {
             DefaultFactory factory = null;
             try {
-                factory = new DefaultFactory();
-                factory.system = system;
                 for (int i=0; i<args.length; i++) {
+                    if (factory == null) {
+                        factory = new DefaultFactory();
+                    }
                     arguments.out.println(factory.createObject(args[i]));
                 }
             } finally {

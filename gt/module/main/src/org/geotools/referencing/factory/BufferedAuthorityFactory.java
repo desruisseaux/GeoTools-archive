@@ -89,6 +89,11 @@ import org.geotools.referencing.factory.FactoryGroup;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Add a protected {@code setTimeout(long)} method which set a {@link java.util.Timer} for
+ *       dispoding the backing store after the specified amount of milliseconds of
+ *       inactivity. The {@link #createBackingStore} method is responsible for creating
+ *       a new backing store when needed.
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
@@ -99,12 +104,13 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The underlying authority factory. This field may be <code>null</code> if this object was
      * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected
-     * constructor}. This this case, the subclass is responsible for creating the backing store
-     * the first time {@link #getBackingStore} is invoked.
+     * constructor}. In this case, the subclass is responsible for creating the backing store
+     * when {@link #createBackingStore} is invoked.
      *
      * @see #getBackingStore
+     * @see #createBackingStore
      */
-    protected AbstractAuthorityFactory backingStore;
+    private AbstractAuthorityFactory backingStore;
 
     /**
      * The pool of cached objects.
@@ -150,16 +156,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
 
     /**
      * Constructs an instance without initial backing store. This constructor is for subclass
-     * constructors only. The {@link #backingStore} field is initially <code>null</code>, and the
-     * subclasses are responsible for creating an appropriate backing store the first time the
-     * {@link #getBackingStore} method is invoked.
+     * constructors only. Subclasses are responsible for creating an appropriate backing store
+     * when the {@link #createBackingStore} method is invoked.
      *
      * @param factories The factories to use.
      * @param priority The priority for this factory, as a number between
      *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
      *
-     * @see #backingStore
-     * @see #getBackingStore
+     * @see #createBackingStore
      */
     protected BufferedAuthorityFactory(final FactoryGroup factories,
                                        final int          priority)
@@ -169,17 +173,15 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
 
     /**
      * Constructs an instance without initial backing store. This constructor is for subclass
-     * constructors only. The {@link #backingStore} field is initially <code>null</code>, and the
-     * subclasses are responsible for creating an appropriate backing store the first time the
-     * {@link #getBackingStore} method is invoked.
+     * constructors only. Subclasses are responsible for creating an appropriate backing store
+     * when the {@link #createBackingStore} method is invoked.
      *
      * @param factories The factories to use.
      * @param priority The priority for this factory, as a number between
      *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      *
-     * @see #backingStore
-     * @see #getBackingStore
+     * @see #createBackingStore
      */
     protected BufferedAuthorityFactory(final FactoryGroup factories,
                                        final int          priority,
@@ -190,22 +192,36 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the backing store authority factory. The default implementation returns
-     * {@link #backingStore}. Subclass may override this method in order to initialize
-     * the backing store only the first time a {@code createXXX(...)} method is invoked.
-     * Note that in this case, subclasses may need to override {@link #getVendor} and
-     * {@link #getAuthority} as well.
+     * Returns the backing store authority factory.<
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the creation of backing store failed.
      */
-    protected AbstractAuthorityFactory getBackingStore() throws FactoryException {
+    private final AbstractAuthorityFactory getBackingStore() throws FactoryException {
+        if (backingStore == null) {
+            backingStore = createBackingStore();
+        }
         return backingStore;
     }
 
     /**
+     * Creates the backing store authority factory. Subclasses are required to override this
+     * method if they were constructed through one of the protected constructors. In this
+     * case, this method is invoked the first time a {@code createXXX(...)} method is invoked.
+     * Note that subclasses may need to override {@link #getVendor} and {@link #getAuthority}
+     * as well.
+     *
+     * @return The backing store to uses in {@code createXXX(...)} methods.
+     * @throws FactoryException if the creation of backing store failed.
+     */
+    protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
+        throw new FactoryException("Subclasses must override 'createBackingStore()'");
+    }
+
+    /**
      * Returns {@code true} if this factory is ready. The default implementation returns
-     * {@code false} if {@link #getBackingStore} throws an exception.
+     * {@code false} if no backing store were setup and {@link #createBackingStore} throws
+     * an exception.
      */
     public boolean isReady() {
         try {

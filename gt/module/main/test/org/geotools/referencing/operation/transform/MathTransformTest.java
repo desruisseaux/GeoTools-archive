@@ -19,9 +19,7 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -50,13 +48,6 @@ import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
-import org.geotools.renderer.lite.LiteShape;
-
-// JTS dependencies
-import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 
 /**

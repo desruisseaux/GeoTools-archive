@@ -7,5 +7,47 @@
   <BODY>
   {@linkplain org.opengis.referencing.AuthorityFactory Authority factories} for
   the <A HREF="http://www.epsg.org">EPSG</A> database.
+
+  <H2>Windows installation</H2>
+  <P ALIGN="justify">The EPSG database is available in MS-Access format. Installing this database
+  is the easiest way to get the EPSG factory running, since the MS-Access database can be copied
+  on yours local machine. You don't need the MS-Access software; only the ODBC driver for MS-Access
+  is required, and this driver is usually bundled with all Windows installation. Steps to follow:</P>
+  
+  <ul>
+    <li>Download the MS-Access EPSG database from <A HREF="http://www.epsg.org">http://www.epsg.org</A>
+        and copy the <code>EPSG_v6.mdb</code> anywhere in yours file system. You can rename it at yours
+        convenience.</li>
+    <li>Open the <cite>ODBC data sources</cite> dialog box from the Windows's Control Panel.</li>
+    <li>Click the <cite>Add...</cite> button and select <cite>Microsoft Access Driver (*.mdb)</cite>.</li>
+    <li>In the <cite>Data source</cite> field, enter <code>EPSG</code>.</li>
+    <li>Click on the <cite>Select...</cite> button and select yours (potentially renamed)
+        <code>EPSG_v6.mdb</code> file.</li>
+  </ul>
+
+  <h2>Other installation</h2>
+  <P ALIGN="justify">Installation on Unix systems typically has a database software running on some
+  server rather than the local machine. The administrator will probably have to download the SQL
+  scripts from <A HREF="http://www.epsg.org">http://www.epsg.org</A> and executes it in whatever database
+  software is in use (PostgreSQL, MySQL, Oracle, <cite>etc.</cite>). The connection parameters (server URL,
+  user name, <cite>etc.</cite>) can be specified as a {@link javax.sql.DataSource} registered with a naming
+  service based on Java Naming and Directory (JNDI) interfaces. Like the database, the naming service too
+  is typically located on some server. The data source name for the connection to the EPSG database is
+  {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.</P>
+
+  <UL>
+    <LI><P>For setting up a naming service (LDAP, NIS, <cite>etc.</cite>), see the
+        <A HREF="http://java.sun.com/products/jndi/tutorial/trailmap.html">JNDI tutorial</A>.</P></LI>
+        
+    <LI><P>For an example of {@link javax.sql.DataSource} creation with different connection parameters
+        than the default ones, see <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New
+        data source implementations in the JDBC-ODBC bridge</A>.</P></LI>
+        
+    <LI><P>For getting the EPSG factory to work without a naming directory, run
+        <code>java org.geotools.referencing.factory.epsg.DefaultFactory -datasource <var>classname</var></code>
+        once where <var>classname</var> is the class name of a {@link javax.sql.DataSource} implementation
+        to use. The default class name is "{@code sun.jdbc.odbc.ee.DataSource}". An example of alternative
+        implementation is "{@code org.postgresql.jdbc2.optional.SimpleDataSource}".</P>
+  </UL>
   </BODY>
 </HTML>
