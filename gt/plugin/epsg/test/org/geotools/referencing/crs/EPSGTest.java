@@ -109,4 +109,44 @@ public class EPSGTest extends TestCase {
         }
         System.out.println( "success:" + count + "/" + total );                
     }
+    
+
+    
+    /**
+     * A random CRS for fun.
+     */
+    public void test26910Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26910");
+        assertNotNull( crs );                
+    }
+    
+    /** wfs requires this to work */
+    public void test4326Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:4326");
+        assertNotNull( crs );
+    }
+    /** wfs requires this to work */
+    public void test26742Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26742");
+        assertNotNull( crs );
+    }
+    /** wfs requires this to work */
+    public void test4269Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:4269");
+        assertNotNull( crs );
+    }
+    /** wfs requires this to work */
+    public void test42304Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:42304");
+        assertNotNull( crs );
+    }
+    /** wfs requires this to work */
+    public void test42102Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:42102");
+        assertNotNull( crs );
+        assertNotNull(crs.getIdentifiers());
+        assertTrue(crs.getIdentifiers().length>0);
+        Identifier expected = new Identifier(org.geotools.metadata.citation.Citation.EPSG,"42102");
+        assertTrue( Arrays.asList( (Object[]) crs.getIdentifiers() ).contains( expected ));
+    }
 }
