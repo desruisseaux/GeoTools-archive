@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2003, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -116,10 +116,10 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Projï¿½te l'image dans le systeme de coordonnï¿½es
-     * spï¿½cifiï¿½ et affiche le rï¿½sultat ï¿½ l'ï¿½cran.
+     * Projète l'image dans le systeme de coordonnées
+     * spécifié et affiche le résultat à l'écran.
      *
-     * @param  cs Le systeme de coordonï¿½es de destination.
+     * @param  cs Le systeme de coordonées de destination.
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
     private String projectTo(final CoordinateSystem cs, final GridGeometry geometry) {
@@ -127,10 +127,10 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Projï¿½te l'image dans le systeme de coordonnï¿½es
-     * spï¿½cifiï¿½ et affiche le rï¿½sultat ï¿½ l'ï¿½cran.
+     * Projète l'image dans le systeme de coordonnées
+     * spécifié et affiche le résultat à l'écran.
      *
-     * @param  cs Le systeme de coordonï¿½es de destination.
+     * @param  cs Le systeme de coordonées de destination.
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
     private String projectTo(final CoordinateSystem   cs,
