@@ -1,0 +1,199 @@
+/*
+ *    Geotools - OpenSource mapping toolkit
+ *    (C) 2002, Centre for Computational Geography
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+package org.geotools.index.rtree;
+
+import org.geotools.index.DataDefinition;
+import org.geotools.index.Lock;
+import org.geotools.index.LockManager;
+import org.geotools.index.LockTimeoutException;
+import org.geotools.index.TreeException;
+
+
+/**
+ * @author Tommaso Nolli
+ */
+public abstract class PageStore {
+    
+    public static final short SPLIT_QUADRATIC = 1;
+    public static final short SPLIT_LINEAR = 2;
+    
+    protected DataDefinition def;
+    protected int maxNodeEntries;
+    protected int minNodeEntries;
+    protected short splitAlg;
+    
+    private LockManager lockManager;
+    
+    /**
+     *
+     */
+    public PageStore() {
+        this.lockManager = new LockManager();
+    }
+
+    /**
+     * 
+     * @param def
+     * @param maxNodeEntries
+     * @param minNodeEntries
+     * @param splitAlg
+     * @throws TreeException
+     */
+    public PageStore(DataDefinition def,
+                     int maxNodeEntries,
+                     int minNodeEntries,
+                     short splitAlg)
+    throws TreeException
+    {
+        this();
+        
+        if (minNodeEntries > maxNodeEntries / 2) {
+            throw new TreeException("minNodeEntries shoud be <= " +
+                                     "maxNodeEntries / 2");
+        }
+        
+        if (splitAlg != SPLIT_LINEAR && splitAlg != SPLIT_QUADRATIC) {
+            throw new TreeException("Split algorithm shoud be " +
+                                     "SPLIT_LINEAR or SPLIT_QUADRATIC");
+        }
+        if (!def.isValid()) {
+            throw new TreeException("Invalid DataDefinition");            
+        }
+        
+        //TODO: Remove when SPLIT_LINEAR is implemented
+        if (splitAlg != SPLIT_QUADRATIC) {
+            throw new UnsupportedOperationException(
+                "Only SPLIT_QUARDATIC is allowed by now...");
+        }
+        
+        this.def = def;
+        this.maxNodeEntries = maxNodeEntries;
+        this.minNodeEntries = minNodeEntries;
+        this.splitAlg = splitAlg;
+        
+    }
+
+    
+    /**
+     * 
+     * @return
+     */
+    public abstract Node getRoot();
+
+    /**
+     * 
+     * @param node
+     */
+    public abstract void setRoot(Node node) throws TreeException;
+    
+    /**
+     * 
+     * @param isLeaf
+     * @return
+     */
+    public abstract Node getEmptyNode(boolean isLeaf);
+    
+    /**
+     * Returns the Node pointed by this entry and having this Node as parent
+     * @param parentEntry
+     * @param parent
+     * @return
+     */
+    public abstract Node getNode(Entry parentEntry, Node parent)
+    throws TreeException;
+
+    /**
+     * 
+     * @param node
+     * @return
+     */
+    public abstract Entry createEntryPointingNode(Node node);
+    
+    /**
+     * 
+     * @return The maximum number of <code>Entry</code>s per page
+     */
+    public int getMaxNodeEntries() {
+        return this.maxNodeEntries;
+    }
+    
+    /**
+     * 
+     * @return The minimum number of <code>Entry</code>s per page
+     */
+    public int getMinNodeEntries() {
+        return this.minNodeEntries;
+    }
+    
+    /**
+     * 
+     * @return The split algorithm to use
+     */
+    public short getSplitAlgorithm() {
+        return this.splitAlg;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public DataDefinition getDataDefinition() {
+        return this.def;
+    }
+    
+    /**
+     * Frees resources used by this <code>Node</code>
+     * @param node The <code>Node</code> to free
+     */
+    public abstract void free(Node node);
+
+    /**
+     * Aquires a write lock to the store
+     * @return an Object rapresenting the lock
+     * @throws LockTimeoutException
+     */
+    public Lock getWriteLock() throws LockTimeoutException {
+        return this.lockManager.aquireExclusive();
+    }
+
+    /**
+     * Aquires a read lock to the store
+     * @return an Object rapresenting the lock
+     * @throws LockTimeoutException
+     */
+    public Lock getReadLock() throws LockTimeoutException {
+        return this.lockManager.aquireShared();
+    }
+    
+    /**
+     * 
+     * @param lock
+     */
+    public void releaseLock(Lock lock) {
+        this.lockManager.release(lock);
+    }
+    
+    /**
+     * 
+     * @throws TreeException
+     */
+    public abstract void close() throws TreeException;
+    
+}
