@@ -25,18 +25,16 @@ package org.geotools.coverage.grid;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.media.jai.PropertySource;
 
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.EngineeringCRS;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
@@ -51,9 +49,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.util.InternationalString;
 
 public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
@@ -67,6 +64,8 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 
 	private MathTransform transform;
 	
+	private Envelope envelope;
+	
 	/**
 	 * @param coverage
 	 * @throws FactoryException 
@@ -76,7 +75,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	public GridCoverageImpl(org.geotools.coverage.grid.GridCoverage coverage) throws OperationNotFoundException, NoSuchElementException, FactoryException {
 		super(coverage);
 
-		transform = createTransform(crs);
+//		transform = createTransform(crs);
 	}
 
 	/**
@@ -89,16 +88,17 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	 * @throws OperationNotFoundException 
 	 */
 	public GridCoverageImpl(String name, CoordinateReferenceSystem crs,
-			PropertySource source, Map properties, BufferedImage image) throws OperationNotFoundException, NoSuchElementException, FactoryException {
+			PropertySource source, Map properties, BufferedImage image, Envelope envelope) throws OperationNotFoundException, NoSuchElementException, FactoryException {
 		super(name, crs, source, properties);
 		this.image = image;
+		this.envelope = envelope;
 		
-		transform = createTransform(crs);		
+//		transform = createTransform(crs);		
 	}
 	
-	protected MathTransform createTransform(CoordinateReferenceSystem crs) throws OperationNotFoundException, NoSuchElementException, FactoryException {
-		return FactoryFinder.getCoordinateOperationFactory().createOperation(crs, EngineeringCRS.CARTESIAN_2D).getMathTransform();
-	}
+//	protected MathTransform createTransform(CoordinateReferenceSystem crs) throws OperationNotFoundException, NoSuchElementException, FactoryException {
+//		return FactoryFinder.getCoordinateOperationFactory().createOperation(crs, EngineeringCRS.CARTESIAN_2D).getMathTransform();
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#isDataEditable()
@@ -399,7 +399,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 		
 		try {
 			if (!point.getCoordinateReferenceSystem().equals(crs)) {
-				createTransform(point.getCoordinateReferenceSystem()).transform(point, transformedPoint);
+//				createTransform(point.getCoordinateReferenceSystem()).transform(point, transformedPoint);
 			} else {
 				transform.transform(point, transformedPoint);
 			}
@@ -409,5 +409,15 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 		image.getRaster().getPixel( (int) point.getCoordinates()[0], (int) point.getCoordinates()[1], results);
 		
 		return results;
+	}
+	
+	public RenderedImage getRenderedImage() {
+		return image;
+	}
+	public Envelope getEnvelope() {
+		return envelope;
+	}
+	public void setEnvelope(Envelope envelope) {
+		this.envelope = envelope;
 	}
 }
