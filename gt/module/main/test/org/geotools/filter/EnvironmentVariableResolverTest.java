@@ -17,6 +17,7 @@
 package org.geotools.filter;
 
 import java.io.StringWriter;
+import org.geotools.filter.visitor.EnvironmentVariableResolver;
 
 
 /**
