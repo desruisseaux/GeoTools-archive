@@ -86,6 +86,7 @@ public final class FactoryFinder {
      * Do not allows any instantiation of this class.
      */
     private FactoryFinder() {
+        // singleton
     }
 
     /**
@@ -98,11 +99,12 @@ public final class FactoryFinder {
         assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
             // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
-            registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
+            registry = new ServiceRegistry(Arrays.asList(new Class[] {
                                            DatumFactory.class,
                                            CSFactory.class,
                                            CRSFactory.class,
                                            MathTransformFactory.class,
+                                           AuthorityFactory.class,
                                            CoordinateOperationFactory.class}).iterator());
         }
         Iterator iterator = registry.getServiceProviders(category, false);
@@ -173,6 +175,25 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCRSFactories() {
         return new LazySet(getProviders(CRSFactory.class));
+    }
+
+    /**
+     * Returns the default implementation of {@link AuthorityFactory}. If no implementation is
+     * registered, then this method throws an exception. If more than one implementation is
+     * registered, an arbitrary one is selected.
+     *
+     * @throws NoSuchElementException if no implementation was found for the
+     *         {@link AuthorityFactory} interface.
+     */
+    public static synchronized AuthorityFactory getAuthorityFactory() throws NoSuchElementException {
+        return (AuthorityFactory) getProviders(AuthorityFactory.class).next();
+    }
+
+    /**
+     * Returns a set of all available implementations for the {@link AuthorityFactory} interface.
+     */
+    public static synchronized Set getAuthorityFactories() {
+        return new LazySet(getProviders(AuthorityFactory.class));
     }
 
     /**
@@ -288,7 +309,6 @@ public final class FactoryFinder {
             throws IOException
     {
         getProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         final TableWriter table  = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();

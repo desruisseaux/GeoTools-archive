@@ -254,10 +254,4 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     public boolean isAvailable() {
         return true;
     }
-    private static CRSService crsService;
-    public static CRSService getCRSService(){
-        if(crsService == null)
-            crsService = new CRSService();
-        return crsService;
-    }
 }
