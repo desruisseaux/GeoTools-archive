@@ -747,11 +747,11 @@ System.out.println(url);
                 crs = CRS.decode(fsd.getSRS());
                 maxbbox = JTS.toGeographic(maxbbox,crs);
             } catch (FactoryException e) {
-                e.printStackTrace();maxbbox = null;
+                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             } catch (MismatchedDimensionException e) {
-                e.printStackTrace();maxbbox = null;
+                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             } catch (TransformException e) {
-                e.printStackTrace();maxbbox = null;
+                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             }
         }
         if(maxbbox!=null){
