@@ -1,23 +1,21 @@
 /*
- * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2003, Geotools
+ * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2005, Geotools
  * Project Managment Committee (PMC)
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; version 2.1 of the License.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *  
  */
 package script;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -31,12 +29,27 @@ public class Header {
                 return name.endsWith(".java");
             }            
         });
-        for( int i=0; i < files.length; i++){
-            try {
-                java( files[i] );
+        if( files == null ){
+            System.err.println( "No java files "+directory );            
+        }
+        else {
+            for( int i=0; i < files.length; i++){
+                try {
+                    java( files[i] );
+                }
+                catch( Exception erp){
+                    System.err.println("Could not process "+files[i]+":"+erp);
+                }
             }
-            catch( Exception erp){
-                System.err.println("Could not process "+files[i]+":"+erp);
+        }
+        File subdirs[] = directory.listFiles( new FilenameFilter(){
+            public boolean accept( File dir, String name ) {
+                return dir.isDirectory() && !name.startsWith(".");
+            }            
+        });
+        if( subdirs != null ){
+            for( int i=0; i < subdirs.length; i++){
+                directory( subdirs[i] );
             }
         }
     }
@@ -53,6 +66,7 @@ public class Header {
             if( line.startsWith("package") ) break HEADER;            
         }
         if( line == null ){
+            System.err.println("Warning: "+file+"does not have 'package' ... skipping" );
             return; // this file does not even have pacakge?
         }
         header( writer );
@@ -60,17 +74,15 @@ public class Header {
             writer.write( line ); writer.write( "\n" );            
             line = reader.readLine();
         } while ( line != null );
+        reader.close();
+        writer.close();
         
+        System.out.println( "Processed "+file );
         file.delete();
         tmp.renameTo( file );
+        tmp.deleteOnExit();        
     }
     
-    /**
-     * TODO summary sentence for header ...
-     * 
-     * @param writer
-     * @throws IOException 
-     */
     private static void header( BufferedWriter w ) throws IOException {
         w.write("/*\n");
         w.write(" * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2005, Geotools\n" ); 
@@ -84,6 +96,7 @@ public class Header {
         w.write(" * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS\n" );
         w.write(" * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more\n" );
         w.write(" * details.\n");
+        w.write(" */\n");
     }
     public static void main( String[] args ){
         String path = null;
