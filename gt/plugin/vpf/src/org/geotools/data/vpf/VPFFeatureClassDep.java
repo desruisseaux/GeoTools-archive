@@ -39,8 +39,9 @@ import org.geotools.feature.FeatureTypeFactory;
  * Created on 21. april 2004, 15:33
  *
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
-public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
+public class VPFFeatureClassDep implements FeatureClassTypes, DataTypesDefinition {
     private AttributeType geometry = null;
     private FeatureType type = null;
     private VPFReader reader = null;
@@ -49,7 +50,7 @@ public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
     private String type_ext = null;
 
     /** Creates a new instance of VPFFeatureClass */
-    public VPFFeatureClass(TableRow tr, File directory, VPFDataBase base) throws IOException {
+    public VPFFeatureClassDep(TableRow tr, File directory, VPFDataBase base) throws IOException {
         //this.base = base;
         //this.directory = directory;
         classname = tr.get(FIELD_CLASS).toString();
@@ -60,19 +61,19 @@ public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
 
         // This really needs to be fixed!!!!! 
         if (featureType == FEATURE_POINT) {
-            reader = new VPFPointFeatureReader(directory, classname,base.getTilingSchema());
+//            reader = new VPFPointFeatureReader(directory, classname,base.getTilingSchema());
             geometry = AttributeTypeFactory.newAttributeType("geometry", Point.class);
             type_ext = ".pft";
         } else if (featureType == FEATURE_LINE) {
-            reader = new VPFLineFeatureReader(directory, classname, base.getTilingSchema());
+//            reader = new VPFLineFeatureReader(directory, classname, base.getTilingSchema());
             geometry = AttributeTypeFactory.newAttributeType("geometry", LineString.class);
             type_ext = ".lft";
         } else if (featureType == FEATURE_AREA) {
-            reader = new VPFAreaFeatureReader(directory, classname, base.getTilingSchema());
+//            reader = new VPFAreaFeatureReader(directory, classname, base.getTilingSchema());
             geometry = AttributeTypeFactory.newAttributeType("geometry", Polygon.class);
             type_ext = ".aft";
         } else if (featureType == FEATURE_TEXT) {
-            reader = new VPFTextFeatureReader(directory, classname, base.getTilingSchema());
+//            reader = new VPFTextFeatureReader(directory, classname, base.getTilingSchema());
             geometry = AttributeTypeFactory.newAttributeType("geometry", Point.class);
             type_ext = ".tft";
         } else {

@@ -25,6 +25,7 @@ import org.geotools.feature.*;
 /**
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
 public class VPFTextFeatureReader extends VPFReader {
     /** Creates a new instance of VPFTextFeatureReader */

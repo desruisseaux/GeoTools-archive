@@ -41,6 +41,4 @@ public interface VPFCoverageIfc {
      *
      */
     public static final String FIELD_LEVEL = "level";
-    public static final String FIELD_TILE_NAME = "tile_name";
-    public static final String FIELD_TILE_ID = "id";
 }

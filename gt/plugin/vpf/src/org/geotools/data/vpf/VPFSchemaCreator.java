@@ -17,29 +17,19 @@
 
 package org.geotools.data.vpf;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
-
 import java.util.HashMap;
 import java.util.Vector;
 
 import org.geotools.data.DataSourceException;
-
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SchemaException;
 
-/*
+/**
  * VPFSchemaCreator.java
  *
  * Created on 13. april 2004, 14:26
- *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
 public class VPFSchemaCreator {
     private static HashMap featureTypes = new HashMap();

@@ -55,4 +55,8 @@ public interface VPFLibraryIfc {
      *
      */
     public static final String FIELD_LIB_NAME = "library_name";
+
+    public static final String FIELD_TILE_NAME = "tile_name";
+
+    public static final String FIELD_TILE_ID = "id";
 } // VPFLibraryIfc

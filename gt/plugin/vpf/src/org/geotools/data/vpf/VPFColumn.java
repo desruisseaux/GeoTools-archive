@@ -36,31 +36,36 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class VPFColumn implements AttributeType, DataTypesDefinition {
     /**
+     * If the value is a short integer, that often means it has
+     * an accompanying value in a string lookup table.
+     */
+    private boolean attemptLookup = false;
+    /**
      * The contained attribute type. 
      * AttributeType operations are delegated to this object.
      */
     private final AttributeType attribute;
 
     /** Describe variable <code>elementsNumber</code> here. */
-    private int elementsNumber = 0;
+    private final int elementsNumber;
 
     /** Describe variable <code>narrTable</code> here. */
-    private String narrTable = null;
+    private final String narrTable;
 
     /** Describe variable <code>keyType</code> here. */
-    private char keyType = CHAR_NULL_VALUE;
+    private final char keyType;
 
     /** Describe variable <code>colDesc</code> here. */
-    private String colDesc = null;
+    private final String colDesc;
 
     /** Describe variable <code>thematicIdx</code> here. */
-    private String thematicIdx = null;
+    private final String thematicIdx;
 
     /** Describe variable <code>type</code> here. */
-    private char typeChar = CHAR_NULL_VALUE;
+    private final char typeChar;
 
     /** Describe variable <code>valDescTableName</code> here. */
-    private String valDescTableName = null;
+    private final String valDescTableName;
     /**
      * Constructor with all of the elements of a VPF column
      * @param name
@@ -122,14 +127,16 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
 
             break;
 
+            // Short integers are usually coded values
+        case DATA_SHORT_INTEGER:
+            attemptLookup = true;
+            // Fall through
         case DATA_TEXT:
         case DATA_NULL_FIELD:
         case DATA_LEVEL1_TEXT:
         case DATA_LEVEL2_TEXT:
         case DATA_LEVEL3_TEXT:
 
-        // Short integers are usually coded values
-        case DATA_SHORT_INTEGER:
         default:
             columnClass = String.class;
 
@@ -274,5 +281,11 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         }
 
         return result;
+    }
+    /**
+     * @return Returns the attemptLookup.
+     */
+    public boolean isAttemptLookup() {
+        return attemptLookup;
     }
 }

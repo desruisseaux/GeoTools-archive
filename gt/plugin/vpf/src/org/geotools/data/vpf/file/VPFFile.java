@@ -44,6 +44,7 @@ import java.io.RandomAccessFile;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 
@@ -75,7 +76,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     /**
      * The columns of the file. This list shall contain objects of type <code>VPFColumn</code>
      */
-    private final AbstractList columns = new Vector();
+    private final List columns = new Vector();
 
     /**
      * Variable <code>description</code> keeps value of text description of the
@@ -127,7 +128,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         VPFColumn geometryColumn = null;
 
         Iterator iter = columns.iterator();
-
         while (iter.hasNext()) {
             geometryColumn = (VPFColumn) iter.next();
 
@@ -494,7 +494,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *
      * @exception IOException if an error occurs
      */
-    protected AbstractList readAllRows() throws IOException {
+    public AbstractList readAllRows() throws IOException {
         AbstractList list = new LinkedList();
 
         try {
@@ -509,7 +509,11 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
             while (row != null) {
                 list.add(row);
-                row = readFeature();
+                if(hasNext()){
+                    row = readFeature();
+                }else{
+                    row = null;
+                }
             }
         } catch (IllegalAttributeException exc1) {
             throw new IOException(exc1.getMessage());

@@ -33,12 +33,13 @@ import org.geotools.data.vpf.util.*;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-/*
+/**
  * VPFAreaFeatureReader.java
  *
  * Created on 14. april 2004, 15:33
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
 public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
     private int calls = 0;
@@ -372,7 +373,8 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
 
         try {
             VPFDataStore data = new VPFDataStore( new File("C:\\data\\v0eur\\vmaplv0"));
-            VPFFeatureReader reader = data.getFeatureReader2("builtupa");
+            VPFFeatureReader reader = null;
+//            VPFFeatureReader reader = data.getFeatureReader("builtupa");
             System.out.println("Leseren er : " + reader);
 
             while (reader.hasNext()) {

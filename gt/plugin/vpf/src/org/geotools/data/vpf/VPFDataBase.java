@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,174 +14,198 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.data.vpf;
+
+import org.geotools.data.vpf.file.VPFFile;
+import org.geotools.data.vpf.file.VPFFileFactory;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.feature.Feature;
+import org.geotools.feature.SchemaException;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
-import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.data.vpf.ifc.VPFLibraryIfc;
-import org.geotools.data.vpf.io.TableInputStream;
-import org.geotools.data.vpf.io.TableRow;
+import java.util.Vector;
 
 
 /**
- * Class <code>VPFDataBase</code> is responsible for 
+ * This class is not completely implemented due to a decision that the 
+ * VPFDataStore shall correspond to the VPFLibrary class, not this class
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project
+ *         OneMap
  * @version $Id: VPFDataBase.java,v 1.1 2004/05/03 11:48:20 knutejoh Exp $
  */
 public class VPFDataBase implements FileConstants {
-    private VPFLibrary[] libraries = null;
-    private TableRow[][] coverages = null;
-    private HashMap tilingSchema = null;
-
-    public VPFDataBase(File directory) throws IOException {
-        // read data base header info
-        //this.directory = directory;
-        String vpfTableName = new File(directory, DATABASE_HEADER_TABLE).toString();
-        TableInputStream vpfTable = new TableInputStream(vpfTableName);
-        TableRow dataBaseInfo = (TableRow) vpfTable.readRow();
-        vpfTable.close();
-
+    /**
+     * The libraries in the database
+     */
+    private final List libraries = new Vector();
+    /**
+     * Constructor
+     * @param directory A <code>File</code> representing the base directory of the database
+     * @throws IOException
+     * @throws SchemaException
+     */
+    public VPFDataBase(File directory) throws IOException, SchemaException {
+        VPFFile vpfTable;
+        String vpfTableName;
+        Feature feature;
+        VPFLibrary library;
 
         // read libraries info
         vpfTableName = new File(directory, LIBRARY_ATTTIBUTE_TABLE).toString();
-        vpfTable = new TableInputStream(vpfTableName);
+        vpfTable = VPFFileFactory.getInstance().getFile(vpfTableName);
 
-        List list = vpfTable.readAllRows();
-        vpfTable.close();
+        Iterator iter = vpfTable.readAllRows().iterator();
 
-        TableRow[] libraries_tmp = (TableRow[]) list.toArray(new TableRow[list.size()]);
-        libraries = new VPFLibrary[libraries_tmp.length];
-
-        for (int i = 0; i < libraries_tmp.length; i++) {
-            libraries[i] = new VPFLibrary(libraries_tmp[i], directory, this);
-        }
-    }
-
-    public VPFCoverage[] getCoverages() {
-        ArrayList arr = new ArrayList();
-        VPFCoverage[] tmp = null;
-
-        for (int i = 0; i < libraries.length; i++) {
-            tmp = libraries[i].getCoverages();
-
-            for (int j = 0; j < tmp.length; j++) {
-                arr.add(tmp[j]);
-            }
+        while (iter.hasNext()) {
+            feature = (Feature) iter.next();
+            library = new VPFLibrary(feature, directory, this);
+            libraries.add(library);
         }
 
-        return (VPFCoverage[]) arr.toArray(tmp);
+        //        // read data base header info
+        //        //this.directory = directory;
+        //        String vpfTableName = new File(directory, DATABASE_HEADER_TABLE).toString();
+        //        VPFFile vpfTable = VPFFileFactory.getInstance().getFile(vpfTableName);
+        //        vpfTable.reset();
+        //        Feature dataBaseInfo = (Feature) vpfTable.readFeature();
+        ////        vpfTable.close();
+        //
+        //        // read libraries info
+        //        vpfTableName = new File(directory, LIBRARY_ATTTIBUTE_TABLE).toString();
+        //        vpfTable = VPFFileFactory.getInstance().getFile(vpfTableName);
+        //
+        //        Iterator iter = vpfTable.readAllRows().iterator();
+        //        while(iter.hasNext()){
+        //            
+        //        }
+        ////        vpfTable.close();
+        //
+        //        TableRow[] libraries_tmp = (TableRow[]) list.toArray(new TableRow[list.size()]);
+        //        libraries = new VPFLibrary[libraries_tmp.length];
+        //
+        //        for (int i = 0; i < libraries_tmp.length; i++) {
+        //            libraries[i] = new VPFLibrary(libraries_tmp[i], directory, this);
+        //        }
     }
-
-    public void setTilingSchema(HashMap schema) {
-        tilingSchema = schema;
-    }
-
-    public HashMap getTilingSchema() {
-        return tilingSchema;
-    }
-
-    public VPFFeatureClass[] getFeatureClasses() {
-        ArrayList arr = new ArrayList();
-        VPFFeatureClass[] tmp = null;
-
-        for (int i = 0; i < libraries.length; i++) {
-            tmp = libraries[i].getFeatureClasses();
-
-            if (tmp != null) {
-                for (int j = 0; j < tmp.length; j++) {
-                    arr.add(tmp[j]);
-                }
-            }
-        }
-
-        return (VPFFeatureClass[]) arr.toArray(tmp);
-    }
-
-    public VPFLibrary[] getLibraries() {
+    /**
+     * Returns the libraries that are in the database
+     * @return a <code>List</code> containing <code>VPFLibrary</code> objects
+     */
+    public List getLibraries() {
         return libraries;
     }
-
+    /**
+     * Returns the minimum X value of the database
+     * @return a <code>double</code> value
+     */
     public double getMinX() {
-        if (libraries.length > 0) {
-            double xmin = libraries[0].getXmin();
+        double result = Double.NaN;
+        Iterator iter = libraries.iterator();
+        VPFLibrary library;
 
-            for (int i = 1; i < libraries.length; i++) {
-                xmin = Math.min(xmin, libraries[i].getXmin());
-            }
-
-            return xmin;
+        if (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = library.getXmin();
         }
 
-        return 0d;
+        while (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = Math.min(result, library.getXmin());
+        }
+
+        return result;
     }
 
+    /**
+     * Returns the minimum X value of the database
+     * @return a <code>double</code> value
+     */
     public double getMinY() {
-        if (libraries.length > 0) {
-            double ymin = libraries[0].getYmin();
+        double result = Double.NaN;
+        Iterator iter = libraries.iterator();
+        VPFLibrary library;
 
-            for (int i = 1; i < libraries.length; i++) {
-                ymin = Math.min(ymin, libraries[i].getYmin());
-            }
-
-            return ymin;
+        if (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = library.getYmin();
         }
 
-        return 0d;
+        while (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = Math.min(result, library.getYmin());
+        }
+
+        return result;
     }
 
+    /**
+     * Returns the minimum X value of the database
+     * @return a <code>double</code> value
+     */
     public double getMaxX() {
-        if (libraries.length > 0) {
-            double xmax = libraries[0].getXmax();
+        double result = Double.NaN;
+        Iterator iter = libraries.iterator();
+        VPFLibrary library;
 
-            for (int i = 1; i < libraries.length; i++) {
-                xmax = Math.min(xmax, libraries[i].getXmax());
-            }
-
-            return xmax;
+        if (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = library.getXmax();
         }
 
-        return 0d;
+        while (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = Math.max(result, library.getXmax());
+        }
+
+        return result;
     }
 
+    /**
+     * Returns the minimum X value of the database
+     * @return a <code>double</code> value
+     */
     public double getMaxY() {
-        if (libraries.length > 0) {
-            double ymax = libraries[0].getYmax();
+        double result = Double.NaN;
+        Iterator iter = libraries.iterator();
+        VPFLibrary library;
 
-            for (int i = 1; i < libraries.length; i++) {
-                ymax = Math.min(ymax, libraries[i].getYmax());
-            }
-
-            return ymax;
+        if (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = library.getYmax();
         }
 
-        return 0d;
-    }
+        while (iter.hasNext()) {
+            library = (VPFLibrary) iter.next();
+            result = Math.max(result, library.getYmax());
+        }
 
+        return result;
+    }
+    /*
+     *  (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
-        return "This database has these extensions: \n" + getMinX() + " " + 
-               getMinY() + " - " + getMaxX() + " " + getMinY() + "\n";
+        return "VPF database with the following extents: \n" + getMinX() + " "
+        + getMinY() + " - " + getMaxX() + " " + getMinY() + "\n";
     }
 
-    public VPFFeatureClass getFeatureClass(String typename) {
-        VPFFeatureClass tmp = null;
-
-        for (int i = 0; i < libraries.length; i++) {
-            tmp = libraries[i].getFeatureClass(typename);
-
-            if (tmp != null) {
-                return tmp;
-            }
-        }
-
-        return null;
-    }
+    //    public VPFFeatureClass getFeatureClass(String typename) {
+    //        VPFFeatureClass tmp = null;
+    //
+    //        for (int i = 0; i < libraries.length; i++) {
+    //            tmp = libraries[i].getFeatureClass(typename);
+    //
+    //            if (tmp != null) {
+    //                return tmp;
+    //            }
+    //        }
+    //
+    //        return null;
+    //    }
 }

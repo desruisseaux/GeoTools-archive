@@ -19,84 +19,144 @@ package org.geotools.data.vpf;
 
 import java.io.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
+import org.geotools.data.AbstractDataStore;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.vpf.file.VPFFile;
+import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.*;
-import org.geotools.data.vpf.io.*;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 
 /*
- * VPFLibrary.java
+ * A data store for a VPF library
  *
  * Created on 19. april 2004, 14:53
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
-public class VPFLibrary implements FileConstants {
-    private double xmin;
-    private double ymin;
-    private double xmax;
-    private double ymax;
-    private File directory = null;
-    private String libCover = null;
-    private VPFCoverage[] coverages = null;
-    private VPFDataBase base = null;
-
-    /** Creates a new instance of VPFLibrary */
-    public VPFLibrary(TableRow tr, File dir, VPFDataBase base)
-               throws IOException {
+public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFLibraryIfc {
+    /**
+     * Part of bounding box.
+     */
+    private final double xmin;
+    /**
+     * Part of bounding box.
+     */
+    private final double ymin;
+    /**
+     * Part of bounding box.
+     */
+    private final double xmax;
+    /**
+     * Part of bounding box.
+     */
+    private final double ymax;
+    /**
+     * The directory containing the library
+     */
+    private final File directory;
+    /**
+     * The name of the library
+     */
+    private final String libraryName;
+    /**
+     * The coverages that are in the library
+     */
+    private final List coverages = new Vector();
+    /**
+     * The database containing the library
+     */
+    private final VPFDataBase base;
+    /**
+     * Complete constructor
+     * @param libraryFeature a feature from the library attribute table
+     * @param dir the containing directory
+     * @param base the containing database
+     * @throws IOException
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    public VPFLibrary(Feature libraryFeature, File dir, VPFDataBase base) throws IOException, SchemaException {
         this.base = base;
-        xmin = tr.get(VPFLibraryIfc.FIELD_XMIN).doubleValue();
-        ymin = tr.get(VPFLibraryIfc.FIELD_YMIN).doubleValue();
-        xmax = tr.get(VPFLibraryIfc.FIELD_XMAX).doubleValue();
-        ymax = tr.get(VPFLibraryIfc.FIELD_YMAX).doubleValue();
-        libCover = tr.get(VPFLibraryIfc.FIELD_LIB_NAME).toString();
-        this.directory = new File(dir, libCover);
+        xmin = ((Number)libraryFeature.getAttribute(FIELD_XMIN)).doubleValue();
+        ymin = ((Number)libraryFeature.getAttribute(FIELD_YMIN)).doubleValue();
+        xmax = ((Number)libraryFeature.getAttribute(FIELD_XMAX)).doubleValue();
+        ymax = ((Number)libraryFeature.getAttribute(FIELD_YMAX)).doubleValue();
+        libraryName = libraryFeature.getAttribute(FIELD_LIB_NAME).toString();
+        directory = new File(dir, libraryName);
         setCoverages();
     }
+    /**
+     * Constructor which defaults the containing database to null and looks up the first
+     * (and presumably only) entry in the library 
+     * attribute table
+     * @param dir the containing directory
+     * @throws IOException
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    public VPFLibrary(File dir) throws IOException, SchemaException {
+        // read libraries info
+        String vpfTableName = new File(dir, LIBRARY_HEADER_TABLE).toString();
+        VPFFile lhtFile = VPFFileFactory.getInstance().getFile(vpfTableName);
+        lhtFile.reset();
+        Feature libraryFeature = null;
+        base = null;
+        try {
+            libraryFeature = lhtFile.readFeature();
+        } catch (IllegalAttributeException exc) {
+            exc.printStackTrace();
+            throw new IOException("Illegal values in library attribute table");
+        }
+        xmin = -180;
+        ymin = -90;
+        xmax = 180;
+        ymax = 90;
+        directory = dir;
+        // What about looking up the LAT from the previous directory? Or, can you get what you need from the LHT?
+        String directoryName = directory.getPath();
+        libraryName = directoryName.substring(directoryName.lastIndexOf(File.separator) + 1);
+        setCoverages();
+    }
+    /**
+     * Determines the coverages contained by this library 
+     * @throws IOException
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    private void setCoverages() throws IOException, SchemaException {
+        VPFCoverage coverage;
+        Feature feature;
+        String directoryName;
 
-    private void setCoverages() throws IOException {
+        // I'd like to know why this if is here...
         if (!directory.getName().equals("rference")) {
             String vpfTableName = new File(directory, COVERAGE_ATTRIBUTE_TABLE).toString();
-            TableInputStream vpfTable = new TableInputStream(vpfTableName);
-            List list = vpfTable.readAllRows();
-            vpfTable.close();
-
-            TableRow[] coverages_tmp = (TableRow[]) list.toArray(
-                                                 new TableRow[list.size()]);
-            coverages = new VPFCoverage[coverages_tmp.length];
-
-            for (int i = 0; i < coverages_tmp.length; i++) {
-                coverages[i] = new VPFCoverage(coverages_tmp[i], directory, 
-                                               base);
-            }
-        }
-    }
-
-    public VPFFeatureClass[] getFeatureClasses() {
-        if (!directory.getName().equals("rference")) {
-            ArrayList arr = new ArrayList();
-            VPFFeatureClass[] tmp = null;
-
-            for (int i = 0; i < coverages.length; i++) {
-                if (coverages[i] != null) {
-                    tmp = coverages[i].getFeatureClasses();
-
-                    if (tmp != null) {
-                        for (int j = 0; j < tmp.length; j++) {
-                            arr.add(tmp[j]);
-                        }
-                    }
+            VPFFile vpfFile = VPFFileFactory.getInstance().getFile(vpfTableName);
+//            TableInputStream vpfTable = new TableInputStream(vpfTableName);
+            Iterator iter = vpfFile.readAllRows().iterator();
+            while (iter.hasNext()){
+                feature = (Feature)iter.next();
+                directoryName = directory.getPath();
+                coverage = new VPFCoverage(this, feature, directoryName);
+                coverages.add(coverage);
+                // Find the Tileref coverage, if any
+                if (coverage.getName().toLowerCase().equals("tileref")){
+                    createTilingSchema(coverage);
                 }
             }
-
-            return (VPFFeatureClass[]) arr.toArray(tmp);
         }
-
-        return null;
     }
-
-    public VPFCoverage[] getCoverages() {
+    /**
+     * Returns the coverages contained by the library
+     * @return a <code>List</code> value which contains VPFCoverage objects
+     */
+    public List getCoverages() {
         return coverages;
     }
 
@@ -131,28 +191,155 @@ public class VPFLibrary implements FileConstants {
     public double getYmin() {
         return ymin;
     }
-
+    /*
+     *  (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
-        return "Dette er library : " + libCover + " with extensions:\n" + 
+        return "Dette er library : " + libraryName + " with extensions:\n" + 
                getXmin() + " " + getYmin() + " - " + getXmax() + " " + 
                getYmax() + "\n";
     }
+    /**
+     * A map containing the tiles used by this library
+     */
+    private final Map tileMap = new HashMap();
+    /**
+     * Returns a map containing the tiles used by this library.
+     * The map has string keys and and string values. 
+     * @return a <code>Map</code> value
+     */
+    public Map getTileMap() {
+        return tileMap;
+    }
+        /**
+         * Generates the tile map for this coverage
+         * @param coverage a <code>VPFCoverage</code> which happens to be a TILEREF 
+         * coverage
+         */
+        private void createTilingSchema(VPFCoverage coverage) throws IOException {
+//            File tilefile = new File(directory, "tilereft.tft");
+        
+            VPFFeatureType tileType = (VPFFeatureType)coverage.getFeatureTypes().get(0);
+            VPFFile tileFile = (VPFFile)tileType.getFeatureClass().getFileList().get(0);
+            Iterator rowsIter = tileFile.readAllRows().iterator();
+            while (rowsIter.hasNext())
+            {
+                Feature row = (Feature)rowsIter.next();
+                Short rowId = new Short(Short.parseShort(row.getAttribute("id").toString()));
+                String value = row.getAttribute(FIELD_TILE_NAME).toString();
+                tileMap.put(rowId, value);
+            }
+        }
+//            HashMap hm = new HashMap();
+//        
+//            TableInputStream testInput = new TableInputStream(
+//                                                 tilefile.getAbsolutePath());
+//            TableRow row = (TableRow) testInput.readRow();
+//            String tmp = null;
+//            StringBuffer buff = null;
+//        
+//            while (row != null) {
+//                tmp = row.get().toString().trim();
+//        
+//                if ((tmp != null) && (tmp.length() > 0)) {
+//                    tmp = tmp.toLowerCase();
+//                    buff = new StringBuffer();
+//                    buff.append(tmp.charAt(0));
+//        
+//                    for (int i = 1; i < tmp.length(); i++) {
+//                        buff.append(File.separator);
+//                        buff.append(tmp.charAt(i));
+//                    }
+//        
+//                    hm.put(row.get(FIELD_TILE_ID).toString().trim(), 
+//                           buff.toString());
+//        
+//        
+//                    //System.out.println( new File( coverage, tmp.charAt(0) + File.separator + tmp.charAt(1) ).getAbsolutePath() );
+//                    row = (TableRow) testInput.readRow();
+//                }
+//            }
+//        
+//            testInput.close();
+//            base.setTileMap(hm);
+//        }
 
-    public VPFFeatureClass getFeatureClass(String typename) {
-        VPFFeatureClass tmp = null;
+        /* (non-Javadoc)
+         * @see org.geotools.data.AbstractDataStore#getTypeNames()
+         */
+        public String[] getTypeNames() {
+            // Get the type names for each coverage
+            String[] result = null;
+            int coveragesCount = coverages.size();
+            int featureTypesCount = 0;
+            int index = 0;
+            List[] coverageTypes = new List[coveragesCount];
+            for(int inx = 0; inx < coveragesCount; inx++){
+                coverageTypes[inx] = ((VPFCoverage)coverages.get(inx)).getFeatureTypes();
+                featureTypesCount += coverageTypes[inx].size();
+            }
+            result = new String[featureTypesCount];
+            for(int inx = 0; inx < coveragesCount; inx++){
+                for(int jnx = 0; jnx < coverageTypes[inx].size(); jnx++){
+                    result[index] = ((FeatureType)coverageTypes[inx].get(jnx)).getTypeName();
+                    index++;
+                }
+            }
+            return result;
+        }
 
-        if (coverages != null) {
-            for (int i = 0; i < coverages.length; i++) {
-                if (coverages[i] != null) {
-                    tmp = coverages[i].getFeatureClass(typename);
-
-                    if (tmp != null) {
-                        return tmp;
+        /* (non-Javadoc)
+         * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
+         */
+        public FeatureType getSchema(String typeName) throws IOException {
+            // Look through all of the coverages to find a matching feature type
+            FeatureType result = null;
+            Iterator coverageIter = coverages.iterator();
+            Iterator featureTypesIter;
+            FeatureType temp;
+            boolean breakOut = false;
+            while(coverageIter.hasNext() && !breakOut){
+                featureTypesIter = ((VPFCoverage)coverageIter.next()).getFeatureTypes().iterator();
+                while(featureTypesIter.hasNext()){
+                    temp = (FeatureType)featureTypesIter.next();
+                    if(temp.getTypeName().equals(typeName)){
+                        result = temp;
+                        breakOut = true;
+                        break;
                     }
                 }
             }
+            return result;
         }
 
-        return null;
-    }
+        /* (non-Javadoc)
+         * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
+         */
+        protected FeatureReader getFeatureReader(String typeName) throws IOException {
+            // Find the appropriate feature type, make a reader for it, and reset its stream
+            FeatureReader result = null;
+            VPFFeatureType featureType = (VPFFeatureType)getSchema(typeName);
+            ((VPFFile)featureType.getFileList().get(0)).reset();
+            result = new VPFFeatureReader(featureType);
+            return result;
+        }
+
+//    public VPFFeatureClass getFeatureClass(String typename) {
+//        VPFFeatureClass tmp = null;
+//
+//        if (coverages != null) {
+//            for (int i = 0; i < coverages.length; i++) {
+//                if (coverages[i] != null) {
+//                    tmp = coverages[i].getFeatureClass(typename);
+//
+//                    if (tmp != null) {
+//                        return tmp;
+//                    }
+//                }
+//            }
+//        }
+//
+//        return null;
+//    }
 }

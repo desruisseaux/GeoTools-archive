@@ -24,7 +24,9 @@ import java.util.Map;
 
 
 /**
- * A factory for VPFFileStore
+ * A factory for VPFFileStore.
+ * The file store is a singleton and the factory
+ * acts as the container.
  * This class does not do anything special at all
  * and could easily be circumvented, 
  * but is here for completeness.
@@ -32,20 +34,19 @@ import java.util.Map;
  * @author jeff yutzler
  */
 public class VPFFileFactory implements DataStoreFactorySpi {
-    //    private static VPFFileFactory instance = null;
+    private final DataStore store = new VPFFileStore();
+    private static VPFFileFactory instance = null;
     /**
      * Default constructor. Does nothing!
      */
-    public VPFFileFactory() {
+    private VPFFileFactory() {
     }
-
-    /* (non-Javadoc)
+    /*
+     *  (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
-        DataStore fileStore = new VPFFileStore();
-
-        return fileStore;
+        return store;
     }
 
     /* (non-Javadoc)
@@ -80,6 +81,7 @@ public class VPFFileFactory implements DataStoreFactorySpi {
         // TODO Auto-generated method stub
         return null;
     }
+    
 
     /* (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
@@ -116,5 +118,18 @@ public class VPFFileFactory implements DataStoreFactorySpi {
      */
     public boolean isAvailable() {
         return true;
+    }
+    /**
+     * Returns the singleton instance
+     * @return Returns the instance.
+     */
+    public static VPFFileFactory getInstance() {
+        if(instance == null){
+            instance = new VPFFileFactory();
+        }
+        return instance;
+    }
+    public VPFFile getFile(String pathName) throws IOException{
+        return (VPFFile)store.getSchema(pathName);
     }
 }

@@ -31,12 +31,13 @@ import org.geotools.data.vpf.util.*;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
-/*
+/**
  * VPFLineFeatureReader.java
  *
  * Created on 13. april 2004, 15:02
  *
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
 public class VPFLineFeatureReader extends VPFReader implements FileConstants {
     private File coverage = null;
@@ -155,7 +156,8 @@ public class VPFLineFeatureReader extends VPFReader implements FileConstants {
             long start = System.currentTimeMillis();
             VPFDataStore data = new VPFDataStore(
                                         new File("C:\\data\\v0eur\\vmaplv0"));
-            VPFFeatureReader reader = data.getFeatureReader2("roadl");
+            VPFFeatureReader reader = null;
+//            VPFFeatureReader reader = data.getFeatureReader2("roadl");
 
             //System.out.println( "Leseren er : " + reader );
             long after = System.currentTimeMillis();

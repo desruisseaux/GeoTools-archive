@@ -35,12 +35,13 @@ import org.geotools.data.vpf.util.PrimitiveDataFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
-/*
+/**
  * VPFPointFeatureReader.java
  *
  * Created on 22. april 2004, 14:49
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @deprecated
  */
 public class VPFPointFeatureReader extends VPFReader implements FileConstants {
     private File table = null;
@@ -143,7 +144,8 @@ public class VPFPointFeatureReader extends VPFReader implements FileConstants {
         try {
             VPFDataStore data = new VPFDataStore(
                                         new File("C:\\data\\v0eur\\vmaplv0"));
-            VPFFeatureReader reader = data.getFeatureReader2("dangerp");
+            VPFFeatureReader reader = null;
+//            VPFFeatureReader reader = data.getFeatureReader2("dangerp");
 
             System.out.println("Leseren er : " + reader);
 
