@@ -335,13 +335,18 @@ public class ComplexElementHandler extends XMLElementHandler {
                 && indexHandler.getName().equalsIgnoreCase(element.getName())) {
             return index + 1;
         }
-
+//try{
         if ((indexHandler.getElement().getType() != null)
                 && (indexHandler.getElement().getType().getName() != null)
                 && indexHandler.getElement().getType().getName()
                                    .equalsIgnoreCase(element.getType().getName())) {
             return index + 1;
         }
+//}catch(NullPointerException e){
+//    System.out.println("*** \n"+indexHandler.getName()+" "+element.getName());
+//    e.printStackTrace();
+//    throw e;
+//}
 
         if (indexHandler.getElement().getType() instanceof ComplexType) {
             ComplexType ct = (ComplexType) indexHandler.getElement().getType();

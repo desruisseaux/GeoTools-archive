@@ -33,7 +33,7 @@ import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
  */
 public class FilterComplexTypes {
     public static class Arithmetic_OperatorsType extends FilterComplexType{
-        private static final ComplexType instance = new Comparison_OperatorsType();
+        private static final ComplexType instance = new Arithmetic_OperatorsType();
         public static ComplexType getInstance(){return instance;}
         
         private static Element[] elements = {
@@ -383,7 +383,7 @@ public class FilterComplexTypes {
          */
         public String getName() {
 //            return "Filter_CapabilitiesType";
-            return null;
+            return "";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()

@@ -1,6 +1,7 @@
 
 package org.geotools.data.ows;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -29,6 +30,56 @@ public class FeatureSetDescription {
     private Envelope[] latLongBoundingBox;
     private int operations;
 //    private MetadataURL[] metadataURL;
+    
+    public static int findOperation(String s){
+        if("Query".equals(s))
+            return 1;
+        if("Insert".equals(s))
+            return 2;
+        if("Update".equals(s))
+            return 4;
+        if("Delete".equals(s))
+            return 8;
+        if("Lock".equals(s))
+            return 16;
+        return 0;
+    }
+    
+    public static String writeOperation(int i){
+        switch(i){
+        case 1:
+            return "Query";
+            case 2:
+                return "Insert";
+                case 4:
+                    return "Update";
+                    case 8:
+                        return "Delete";
+                        case 16:
+                            return "Lock";
+        }
+        return "";
+    }
+    public static String[] writeOperations(int i){
+        List l = new LinkedList();
+        if((i & 1) == 1){
+            l.add("Query");
+        }
+        if((i & 2) == 2){
+            l.add("Insert");
+        }
+        if((i & 4) == 4){
+            l.add("Update");
+        }
+        if((i & 8) == 8){
+            l.add("Delete");
+        }
+        if((i & 16) == 16){
+            l.add("Lock");
+        }
+        return (String[])l.toArray(new String[l.size()]);
+    }
+    
     /**
      * @return Returns the abstracT.
      */

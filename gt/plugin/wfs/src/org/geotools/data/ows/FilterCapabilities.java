@@ -36,7 +36,8 @@ public class FilterCapabilities {
     public static final int SIMPLE_ARITHMETIC = 32;
     public static final int FUNCTIONS = 64;
 
-    private static Map smap = {
+    private static Map smap = loadSMap();
+    private static Map loadSMap(){
             smap = new HashMap();
             smap.put("",new Integer(NO_OP));
             smap.put("BBOX",new Integer(BBOX));
@@ -50,8 +51,10 @@ public class FilterCapabilities {
             smap.put("Overlaps",new Integer(OVERLAPS));
             smap.put("Beyond",new Integer(BEYOND));
             smap.put("DWithin",new Integer(DWITHIN));
-    };
-    private static Map cmap = {
+            return smap;
+    }
+    private static Map cmap = loadCMap();
+    private static Map loadCMap(){
             cmap = new HashMap();
             cmap.put("",new Integer(NO_OP));
             cmap.put("Logical",new Integer(LOGICAL));
@@ -61,7 +64,8 @@ public class FilterCapabilities {
             cmap.put("NullCheck",new Integer(NULL_CHECK));
             cmap.put("Simple_Arithmetic",new Integer(SIMPLE_ARITHMETIC));
             cmap.put("Functions",new Integer(FUNCTIONS));
-    };
+            return cmap;
+    }
     public static int findOperation(String s){
         if(smap.containsKey(s))
             return ((Integer)smap.get(s)).intValue();

@@ -302,8 +302,10 @@ public class WFSCapabilitiesComplexTypes {
         private static final Element[] elements = {
                 new WFSElement("GML2", EmptyType.getInstance(), 1, 1, false,
                     null),
-                new WFSElement("GML2-GZIP", EmptyType.getInstance(), 0, 1,
-                    false, null)
+                    new WFSElement("GML2-GZIP", EmptyType.getInstance(), 0, 1,
+                            false, null),
+                            new WFSElement("GML2-ZIP", EmptyType.getInstance(), 0, 1,
+                                    false, null)
             };
 
         // static sequence
@@ -328,8 +330,22 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException("Method not completed yet.");
+
+            if ((element == null) || (value == null)) {
+                throw new SAXException(
+                    "Invalid inputs for parsing a GetCapabilitiesType");
+            }
+
+            if (value.length < 1) {
+                throw new SAXException(
+                    "Invalid number of inputs for parsing a GetCapabilitiesType");
+            }
+            List l = new LinkedList();
+            for(int i=0;i<value.length;i++){
+                if(value[i].getElement().getName()!=null)
+                    l.add(value[i].getElement().getName());
+            }
+            return l;
         }
 
         /**
@@ -345,8 +361,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return List.class;
         }
 
         /**
@@ -439,8 +454,19 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException("Method not completed yet.");
+
+            if(element == null || value == null)
+                throw new SAXException("missing inputs");
+            
+            if(value.length<1)
+                throw new SAXException("Too few children");
+            
+            int t = 0;
+            for(int i=0;i<value.length;i++){
+                t = t | FeatureSetDescription.findOperation(value[i].getElement().getName());
+            }
+            
+            return new Integer(t);
         }
 
         /**
@@ -456,7 +482,6 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -707,14 +732,13 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            int minx;
-            int miny;
-            int maxx;
-            int maxy;
+            double minx;
+            double miny;
+            double maxx;
+            double maxy;
             minx = miny = maxx = maxy = 0;
 
-            if ((element == null) || ((value != null) && (value.length != 0))
-                    || (attrs == null)) {
+            if ((element == null) || attrs == null) {
                 throw new SAXException(
                     "Invalid parameters for LatLongBoundingBoxType");
             }
@@ -727,7 +751,7 @@ public class WFSCapabilitiesComplexTypes {
                 t = attrs.getValue(WFSSchema.NAMESPACE, "minx");
             }
 
-            minx = Integer.parseInt(t);
+            minx = Double.parseDouble(t);
 
             t = attrs.getValue("", "maxx");
 
@@ -735,7 +759,7 @@ public class WFSCapabilitiesComplexTypes {
                 t = attrs.getValue(WFSSchema.NAMESPACE, "maxx");
             }
 
-            maxx = Integer.parseInt(t);
+            maxx = Double.parseDouble(t);
 
             t = attrs.getValue("", "miny");
 
@@ -743,7 +767,7 @@ public class WFSCapabilitiesComplexTypes {
                 t = attrs.getValue(WFSSchema.NAMESPACE, "miny");
             }
 
-            miny = Integer.parseInt(t);
+            miny = Double.parseDouble(t);
 
             t = attrs.getValue("", "maxy");
 
@@ -751,7 +775,7 @@ public class WFSCapabilitiesComplexTypes {
                 t = attrs.getValue(WFSSchema.NAMESPACE, "maxy");
             }
 
-            maxy = Integer.parseInt(t);
+            maxy = Double.parseDouble(t);
 
             return new Envelope(minx, maxx, miny, maxy);
         }
@@ -1445,6 +1469,11 @@ public class WFSCapabilitiesComplexTypes {
         // singleton instance
         private static final WFSComplexType instance = new LockFeatureTypeType();
 
+
+        public static WFSComplexType getInstance() {
+            return instance;
+        }
+        
         // static element list
         private static final Element[] elements = {
                 new WFSElement("DCPType", DCPTypeType.getInstance(), 1,
@@ -1496,7 +1525,7 @@ public class WFSCapabilitiesComplexTypes {
             OperationType[] c = new OperationType[value.length];
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (OperationType) value[i];
+                c[i] = (OperationType) value[i].getValue();
 //                c[i].setType(OperationType.LOCK_FEATURE);
             }
 
@@ -1636,18 +1665,14 @@ public class WFSCapabilitiesComplexTypes {
                             result[0].setGet(t[j].getGet());
                         if(result[0].getPost() == null && t[j].getPost()!=null)
                             result[0].setPost(t[j].getGet());
-                        if(t[j].getFormats()!=null){
-                            if(result[0].getFormats() == null){
-                                result[0].setFormats(t[j].getFormats());
-                        }else{
-                                String[] st = result[0].getFormats();
-                                String[] nstr = new String[st.length+t[j].getFormats().length];
-                                for(int k=0;k<st.length;k++)
-                                    nstr[k] = st[k];
-                                for(int k=0;k<t[j].getFormats().length;k++)
-                                    nstr[st.length+k] = t[j].getFormats()[k];
-                            }
-                        }
+//                        if(t[j].getFormats()!=null){
+//                            if(result[0].getFormats() == null){
+//                                result[0].setFormats(t[j].getFormats());
+//                        }else{
+//                                List st = (List)result[0].getFormats();
+//                                ((List)t[j].getFormats()).addAll(st);
+//                            }
+//                        }
                     }
                 }else{
                     if(elements[1].getName().equals(value[i].getElement().getName())){
@@ -1665,12 +1690,12 @@ public class WFSCapabilitiesComplexTypes {
                                 if(result[1].getFormats() == null){
                                     result[1].setFormats(t[j].getFormats());
                             }else{
-                                    String[] st = result[1].getFormats();
-                                    String[] nstr = new String[st.length+t[j].getFormats().length];
-                                    for(int k=0;k<st.length;k++)
-                                        nstr[k] = st[k];
-                                    for(int k=0;k<t[j].getFormats().length;k++)
-                                        nstr[st.length+k] = t[j].getFormats()[k];
+                                List st = (List)result[0].getFormats();
+                                if(t[j].getFormats() == null)
+                                    t[j].setFormats(st);
+                                    else
+                                        if(st!=null)
+                                ((List)t[j].getFormats()).addAll(st);
                                 }
                             }
                         }
@@ -1686,18 +1711,14 @@ public class WFSCapabilitiesComplexTypes {
                                     result[2].setGet(t[j].getGet());
                                 if(result[2].getPost() == null && t[j].getPost()!=null)
                                     result[2].setPost(t[j].getGet());
-                                if(t[j].getFormats()!=null){
-                                    if(result[2].getFormats() == null){
-                                        result[2].setFormats(t[j].getFormats());
-                                }else{
-                                        String[] st = result[2].getFormats();
-                                        String[] nstr = new String[st.length+t[j].getFormats().length];
-                                        for(int k=0;k<st.length;k++)
-                                            nstr[k] = st[k];
-                                        for(int k=0;k<t[j].getFormats().length;k++)
-                                            nstr[st.length+k] = t[j].getFormats()[k];
-                                    }
-                                }
+//                                if(t[j].getFormats()!=null){
+//                                    if(result[2].getFormats() == null){
+//                                        result[2].setFormats(t[j].getFormats());
+//                                }else{
+//                                    List st = (List)result[0].getFormats();
+//                                    ((List)t[j].getFormats()).addAll(st);
+//                                    }
+//                                }
                             }
                         }else{
                             if(elements[3].getName().equals(value[i].getElement().getName())){
@@ -1715,12 +1736,12 @@ public class WFSCapabilitiesComplexTypes {
                                         if(result[3].getFormats() == null){
                                             result[3].setFormats(t[j].getFormats());
                                     }else{
-                                            String[] st = result[3].getFormats();
-                                            String[] nstr = new String[st.length+t[j].getFormats().length];
-                                            for(int k=0;k<st.length;k++)
-                                                nstr[k] = st[k];
-                                            for(int k=0;k<t[j].getFormats().length;k++)
-                                                nstr[st.length+k] = t[j].getFormats()[k];
+                                        List st = (List)result[0].getFormats();
+                                        if(t[j].getFormats() == null)
+                                            t[j].setFormats(st);
+                                            else
+                                                if(st!=null)
+                                        ((List)t[j].getFormats()).addAll(st);
                                         }
                                     }
                                 }
@@ -1740,12 +1761,12 @@ public class WFSCapabilitiesComplexTypes {
                                             if(result[4].getFormats() == null){
                                                 result[4].setFormats(t[j].getFormats());
                                         }else{
-                                                String[] st = result[4].getFormats();
-                                                String[] nstr = new String[st.length+t[j].getFormats().length];
-                                                for(int k=0;k<st.length;k++)
-                                                    nstr[k] = st[k];
-                                                for(int k=0;k<t[j].getFormats().length;k++)
-                                                    nstr[st.length+k] = t[j].getFormats()[k];
+                                            List st = (List)result[0].getFormats();
+                                            if(t[j].getFormats() == null)
+                                                t[j].setFormats(st);
+                                                else
+                                                    if(st!=null)
+                                            ((List)t[j].getFormats()).addAll(st);
                                             }
                                         }
                                     }
@@ -1761,18 +1782,14 @@ public class WFSCapabilitiesComplexTypes {
                                                 result[5].setGet(t[j].getGet());
                                             if(result[5].getPost() == null && t[j].getPost()!=null)
                                                 result[5].setPost(t[j].getGet());
-                                            if(t[j].getFormats()!=null){
-                                                if(result[5].getFormats() == null){
-                                                    result[5].setFormats(t[j].getFormats());
-                                            }else{
-                                                    String[] st = result[5].getFormats();
-                                                    String[] nstr = new String[st.length+t[j].getFormats().length];
-                                                    for(int k=0;k<st.length;k++)
-                                                        nstr[k] = st[k];
-                                                    for(int k=0;k<t[j].getFormats().length;k++)
-                                                        nstr[st.length+k] = t[j].getFormats()[k];
-                                                }
-                                            }
+//                                            if(t[j].getFormats()!=null){
+//                                                if(result[5].getFormats() == null){
+//                                                    result[5].setFormats(t[j].getFormats());
+//                                            }else{
+//                                                List st = (List)result[0].getFormats();
+//                                                ((List)t[j].getFormats()).addAll(st);
+//                                                }
+//                                            }
                                         }
                                     }else{
                                         // error
@@ -2148,7 +2165,7 @@ public class WFSCapabilitiesComplexTypes {
             if (name == null) {
                 return null;
             }
-System.out.println("Looking for : "+name);
+//System.out.println("Looking for : "+name);
 //
 //            for (int i = 0; i < elements.length; i++)
 //                if (name.equals(elements[i].getName())) {
@@ -2197,22 +2214,20 @@ System.out.println("Looking for : "+name);
             Object[] capab = new Object[2];
 
             for (int i = 0; i < value.length; i++) {
-                if (elements[0].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[0].getName().equals(value[i].getElement().getName())) {
                     capab[1] = (OperationType[]) value[i].getValue();
                 }
 
-                if (elements[1].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[1].getName().equals(value[i].getElement().getName())) {
                     capab[0] = (String) value[i].getValue();
                 }
             }
 
             // check the required elements 
-            if ((capab[0] == null) || (capab[1] == null)) {
+            if (capab[1] == null) {
                 throw new SAXException(
-                    "Required Service Elements are missing, check"
-                    + " for the existence of Name, Title , or OnlineResource elements.");
+                    "Required Capability Element is missing, check"
+                    + " for the existence of the Request Element.");
             }
 
             return capab;
@@ -2368,8 +2383,8 @@ System.out.println("Looking for : "+name);
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
             if (element != null) {
-                if ((element.getType() != this)
-                        && !(element.getType() instanceof ComplexType)) {
+                if (element.getType() != this){
+                    if(!(element.getType() instanceof ComplexType)) {
                     ComplexType t = (ComplexType) element.getType();
 
                     // TODO use equals here
@@ -2386,7 +2401,7 @@ System.out.println("Looking for : "+name);
                     throw new SAXNotSupportedException(
                         "The specified element was not a declared as a WFS_Capabilities element, or derived element");
                 }
-            }
+            }}
 
             if ((value == null) || (value.length != 4)) {
                 throw new SAXException(
@@ -2871,20 +2886,26 @@ System.out.println("Looking for : "+name);
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-//            int t = OperationType.GET_FEATURE;
-
-//            if (element.getName().equals("GetFeatureWithLock")) {
-//                t = OperationType.GET_FEATURE_WITH_LOCK;
-//            }
-
             List l = new LinkedList();
+            List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
+                if ((sdl == null) && (value[i].getElement() != null)
+                        && elements[0].getName().equals(
+                            value[i].getElement().getName())) {
+                    sdl = (List) value[i].getValue();
+                } else {
                     OperationType t = (OperationType) value[i].getValue();
                     l.add(t);
-
+                }
             }
-            return l.toArray(new OperationType[l.size()]);
+
+            OperationType[] ot = new OperationType[l.size()];
+            for(int i=0;i<ot.length;i++){
+                ot[i] = (OperationType)l.get(i);
+                ot[i].setFormats(sdl);
+            }
+            return ot;
         }
 
         /**
