@@ -17,7 +17,17 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+
+import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.parameter.ParameterRealValue;
+import org.geotools.parameter.ParameterValue;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.OperationParameterGroup;
 
 
 /**
@@ -145,4 +155,40 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         return true;
     }
 
+    public OperationParameterGroup getParameters(){
+        Param params[] = getParametersInfo();
+        ParameterDescriptor parameters[] = new ParameterDescriptor[ params.length ];
+        for( int i=0; i<params.length; i++ ){
+            Param param = params[i];            
+            parameters[i] = new ParamDescriptor( params[i] );
+        }
+        
+        Map properties = new HashMap();
+        properties.put( "name", getDisplayName() );
+        properties.put( "remarks", getDescription() );        
+        return new ParameterGroupDescriptor( properties, parameters );        
+    }
 }
+
+class ParamDescriptor extends ParameterDescriptor {
+    private static final long serialVersionUID = 1L;
+    Param param;
+    public ParamDescriptor(Param param) {
+        super( param.key, param.description, param.sample, param.required );
+        this.param = param;
+    }
+    public GeneralParameterValue createValue() {
+        if (Double.TYPE.equals( getValueClass())) {
+            return new ParameterRealValue(this){
+                protected Object valueOf(String text) throws IOException {
+    	            return param.handle( text );
+    	        }
+            };
+        }
+        return new ParameterValue(this){
+	        protected Object valueOf(String text) throws IOException {
+	            return param.handle( text );
+	        }
+        };
+    }            
+};
