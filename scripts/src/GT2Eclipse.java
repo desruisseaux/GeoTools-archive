@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -68,46 +69,50 @@ import java.util.TreeSet;
  */
 public class GT2Eclipse {
 	static String buildlist;
-	/**
-	 * List of tagets based on ext
-	 */
-	public static Set ext(String path) {
-		Set set = new TreeSet();
-		File ext = new File(path, "ext");
-		String dir[] = ext.list();
+	
+	public static Set module( String root, String target ){
+	    Set set = new TreeSet();
+	    File module = new File(root, target );
+		String dir[] = module.list();
+		if( dir == null ){
+		    System.err.println("Could not locate "+module );
+		    return Collections.EMPTY_SET;
+		}
 		String src;
 		for (int i = 0; i < dir.length; i++) {
 		    src = dir[i];
-		    if (src.equals("CVS") || src.equals(".svn"))
-			continue;
-		    if (!set.contains(src)) {
-			System.out.println("target " + src + " was not built by maven");
+		    if (src.equals("CVS")||src.equals(".svn")){
+			    continue;		    		    
 		    }
-		    System.out.println("ext " + src + " not built by maven");
 		    set.add(src);
 		}
 		return set;
 	}
-	/**
-	 * List of targets based on plugin
-	 */
-	public static Set plugin(String path) {
-		Set set = new TreeSet();
-		File plugin = new File(path, "plugin");
-		String dir[] = plugin.list();
+	/** Set of modules for root/target. */	  
+	public static Set module( String root, String target, Set set ){
+	    File module = new File(root, target );
+		String dir[] = module.list();
+		if( dir == null ){
+		    System.err.println("Could not locate "+module );
+		    return Collections.EMPTY_SET;
+		}
 		String src;
 		for (int i = 0; i < dir.length; i++) {
 		    src = dir[i];
-		    if (src.equals("CVS")||src.equals(".svn"))
-			continue;
-		    if (!set.contains(src)) {
-			System.out.println("target " + src + " was not built by maven");
+		    if (src.equals("CVS")||src.equals(".svn")){
+			    continue;
 		    }
-		    System.out.println("plugin " + src + " not built by maven");
+		    if (!set.contains(src)) {
+			    System.out.println("target " + root+"/"+src + " was not built by maven");
+		    }
 		    set.add(src);
 		}
 		return set;
 	}
+	
+	/**
+	 * Generate build list for path.
+	 */
 	public static void generatebuildlist(String path ) {
 	    try {
 
@@ -142,6 +147,7 @@ public class GT2Eclipse {
 		System.exit(1);
 	    }
 	}
+	
 	/**
 	 * List of targets build by the last <code>maven build</code> command
 	 * <p>
@@ -190,8 +196,7 @@ public class GT2Eclipse {
 		}
 		// a few corrections
 		//
-		set.add("postgis");
-		set.add("j2se-demos");
+		set.add("postgis");		
 		return set;
 	    } catch (FileNotFoundException e) {
 		e.printStackTrace();
@@ -209,14 +214,12 @@ public class GT2Eclipse {
 	/**
 	 * Run through the repository and depending on everything.
 	 * <p>
-	 * This is *not* very sophisticated, we could run through all the
+	 * This is *not* very sophisticated, we should run through all the
 	 * project.xml files instead. This technique does work it just is not
 	 * pretty.
 	 * </p>
-	 * 
-	 * @param path
-	 * @param targets
-	 * @return
+	 * This method generates a set that will be turned into your classpath
+	 * dependencies. You will need to set the classpath variable MAVEN_REPO.
 	 */
 	static public Set dependencies(String path, Set targets) {
 		Set depends = new TreeSet();
@@ -358,17 +361,13 @@ public class GT2Eclipse {
 	if( msg != null ){
 	    System.out.println( msg );
 	}
-	System.out.println("use: java GT2Eclipse [OPTION] [geotools directory]");
+	System.out.println("use: java GT2Eclipse [geotools directory]");
 	System.out.println();
 	System.out.println("OPTIONS:");
-	System.out.println("\t-a, --all\tincludes all directories in classpath ");
-	System.out.println("\t\t\tregardless of whether they were correctly compiled");
-	System.out.println("\t-b, --built\tthis is the default option.");
-	System.out.println("\t\t\tincludes directories in classpath only ");
-	System.out.println("\t\t\tif they were correctly compiled");
 	System.out.println("\t-h, --help\tprints this help list");
 	System.out.println("\nNOTE:");
 	System.out.println("\tPlease run maven build prior to using this utility");
+	System.out.println("\tWe need it to populate your maven repository.");
 	System.exit( msg == null ? 0 : 1 );
     }
     
@@ -376,21 +375,6 @@ public class GT2Eclipse {
 		String dir = null;
 		if (args.length == 0 || args[0].equals("-h") || args[0].equals("--help")) {
 		    die( null );
-		} else if (args[0].equals("-all") || args[0].equals("-a")) {		    
-		    if( args.length == 2){
-			dir = args[1];
-		    }
-		    else {
-			die("Require geotools directory for "+args[0] );
-		    }
-		    generatebuildlist(dir);
-		} else if (args[0].equals("-built") || args[0].equals("-b")) {
-		    if (args.length == 2){
-			dir=args[1];
-		    }
-		    else {
-			die("Require geotools directory for "+args[0] );
-		    }
 		} else {
 			dir = args[0];
 		}
@@ -415,16 +399,22 @@ public class GT2Eclipse {
 		for (int t = 1; t < args.length; t++) {
 		    targets.add(args[t]);
 		}
+		targets = module(dir, "module", targets );
+		
 		for (Iterator i = targets.iterator(); i.hasNext();) {
 		    entry(classpath, dir, "module", (String) i.next());
-		}
-		Set plugin = plugin(dir);
+		}		
+		Set plugin = module( dir, "plugin" );
 		for (Iterator i = plugin.iterator(); i.hasNext();) {
 		    entry(classpath, dir, "plugin", (String) i.next());
 		}
-		Set ext = ext(dir);
+		Set ext = module(dir, "ext" );
 		for (Iterator i = ext.iterator(); i.hasNext();) {
 		    entry(classpath, dir, "ext", (String) i.next());
+		}
+		Set demo = module(dir, "demo" );
+		for (Iterator i = demo.iterator(); i.hasNext();) {
+		    entry(classpath, dir, "demo", (String) i.next());
 		}
 		classpath.println("");
 		//classpath.println(" <classpathentry kind=\"var\" path=\"JRE_LIB\"
