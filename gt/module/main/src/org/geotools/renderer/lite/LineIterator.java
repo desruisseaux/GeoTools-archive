@@ -50,7 +50,7 @@ class LineIterator extends AbstractLiteIterator {
     private boolean isClosed;
 
     /** If true, apply simple distance based generalization */
-    private boolean generalize = true;
+    private boolean generalize = false;
 
     /** Maximum distance for point elision when generalizing */
     private double maxDistance = 1.0;
