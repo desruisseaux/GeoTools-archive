@@ -34,6 +34,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -203,7 +204,7 @@ public class ArcGridReader implements GridCoverageReader {
 
     }
     boolean parseBoolean( ParameterValueGroup params, String name ){
-        ParameterGroupDescriptor info = getFormat().getReadParameters();        
+        OperationParameterGroup info = getFormat().getReadParameters();        
         if( params == null ){
             throw new InvalidParameterValueException(
                     "A Parameter group was expected",
