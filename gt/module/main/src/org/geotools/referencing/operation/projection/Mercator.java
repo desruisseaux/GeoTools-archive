@@ -105,7 +105,10 @@ public class Mercator extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Mercator_1SP"),
+                new Identifier(Citation.EPSG,     "Mercator (1SP)"),
                 new Identifier(Citation.EPSG,     "9804"),
+                new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
+                new Identifier(Citation.ESRI,     "Mercator"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
@@ -158,7 +161,8 @@ public class Mercator extends MapProjection {
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "standard_parallel_1"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Latitude of 1st standard parallel"),
+                    new Identifier(Citation.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -167,8 +171,10 @@ public class Mercator extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Mercator_2SP"),
+                new Identifier(Citation.EPSG,     "Mercator (2SP)"),
                 new Identifier(Citation.EPSG,     "9805"),
                 new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
+                new Identifier(Citation.ESRI,     "Mercator"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
@@ -388,7 +394,7 @@ public class Mercator extends MapProjection {
                 return ptDst;
             }
             return new Point2D.Double(x,y);
-	}
+	}      
     }
 
 
@@ -413,5 +419,5 @@ public class Mercator extends MapProjection {
             return equals(this.standardParallel,  that.standardParallel);
         }
         return false;
-    }
+    } 
 }

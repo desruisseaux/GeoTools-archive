@@ -1014,7 +1014,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "semi_major"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1027,7 +1027,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "semi_minor"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1038,7 +1038,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "central_meridian"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Longitude of natural origin"),
+                    new Identifier(Citation.EPSG,     "Longitude of false origin"),
                     new Identifier(Citation.GEOTIFF,  "NatOriginLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
@@ -1050,7 +1051,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "latitude_of_origin"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Latitude of false origin"),
+                    new Identifier(Citation.EPSG,     "Latitude of natural origin"),
                     new Identifier(Citation.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
@@ -1064,7 +1066,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "scale_factor"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Scale factor at natural origin"),
                     new Identifier(Citation.GEOTIFF,  "ScaleAtNatOrigin")
                 },
                 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
@@ -1076,7 +1078,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor FALSE_EASTING = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "false_easting"),
-// TODO                    new Identifier(Citation.EPSG,     ""),
+                    new Identifier(Citation.EPSG,     "False easting"),
+                    new Identifier(Citation.EPSG,     "Easting at false origin"),
                     new Identifier(Citation.GEOTIFF,  "FalseEasting")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
@@ -1088,7 +1091,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         public static final ParameterDescriptor FALSE_NORTHING = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "false_northing"),
-// TODO                    new Identifier(Citation.EPSG,     ""),
+                    new Identifier(Citation.EPSG,     "False northing"),
+                    new Identifier(Citation.EPSG,     "Northing at false origin"),
                     new Identifier(Citation.GEOTIFF,  "FalseNorthing")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);

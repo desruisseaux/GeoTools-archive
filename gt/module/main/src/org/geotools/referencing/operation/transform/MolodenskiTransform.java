@@ -314,6 +314,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
      * systems.
      *
+     * The EPSG does not use src_semi_major, etc. parameters and instead uses 
+     * "Semi-major axis length difference" and "Flattening difference".
+     *
      * @version $Id$
      * @author Rueben Schulz
      */
@@ -384,6 +387,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Molodenski"),
+                new Identifier(Citation.EPSG,     "Molodenski"),
                 new Identifier(Citation.EPSG,     "9604"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.MOLODENSKI_TRANSFORM))

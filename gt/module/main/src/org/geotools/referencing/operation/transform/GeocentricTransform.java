@@ -577,7 +577,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "semi_major"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -588,7 +588,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "semi_minor"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -606,18 +606,21 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                "Ellipsoid_To_Geocentric", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+                "Ellipsoid_To_Geocentric", "Geographic/geocentric conversions", 
+                "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Construct the parameters group.
          */
         static ParameterDescriptorGroup createDescriptorGroup(final String ogc,
-                                                              final String epsg,
+                                                              final String epsgName,
+                                                              final String epsgCode,
                                                               final int geotools)
         {
             return createDescriptorGroup(new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, ogc),
-                    new Identifier(Citation.EPSG,     epsg),
+                    new Identifier(Citation.EPSG,     epsgName),
+                    new Identifier(Citation.EPSG,     epsgCode),
                     new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
                 }, new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, DIM
@@ -676,7 +679,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * @todo The EPSG code seems to be the same than for the direct transform.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                "Geocentric_To_Ellipsoid", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
+                "Geocentric_To_Ellipsoid", "Geographic/geocentric conversions", 
+                "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Create a provider.

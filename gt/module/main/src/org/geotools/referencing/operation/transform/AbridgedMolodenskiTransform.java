@@ -352,7 +352,10 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
      * The provider for {@link AbridgedMolodenskiTransform}. This provider will construct transforms
      * from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
      * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
-     * systems.
+     * systems. 
+     *
+     * The EPSG does not use src_semi_major, etc. parameters and instead uses 
+     * "Semi-major axis length difference" and "Flattening difference".
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -381,7 +384,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         public static final ParameterDescriptor DX = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "dx"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "X-axis translation")
                 },
                 Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
@@ -392,7 +395,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         public static final ParameterDescriptor DY = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "dy"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Y-axis translation")
                 },
                 Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
@@ -403,7 +406,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         public static final ParameterDescriptor DZ = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "dz"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.EPSG,     "Z-axis translation")
                 },
                 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
@@ -413,8 +416,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          */
         public static final ParameterDescriptor SRC_SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "src_semi_major"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.OPEN_GIS, "src_semi_major")
                 },
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -425,7 +427,6 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         public static final ParameterDescriptor SRC_SEMI_MINOR = createDescriptor(
                 new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "src_semi_minor"),
-// TODO                    new Identifier(Citation.EPSG,     "")
                 },
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
@@ -435,8 +436,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          */
         public static final ParameterDescriptor TGT_SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "tgt_semi_major"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.OPEN_GIS, "tgt_semi_major")
                 },
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
@@ -446,8 +446,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          */
         public static final ParameterDescriptor TGT_SEMI_MINOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "tgt_semi_minor"),
-// TODO                    new Identifier(Citation.EPSG,     "")
+                    new Identifier(Citation.OPEN_GIS, "tgt_semi_minor")
                 },
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -456,6 +455,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
+                new Identifier(Citation.EPSG,     "Abridged Molodenski"),
                 new Identifier(Citation.EPSG,     "9605"),
                 new Identifier(Citation.GEOTOOLS, Resources.format(
                                                   ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
