@@ -26,29 +26,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.geotools.filter.parser.ParseException;
 
 
 /**
- * Encodes a filter into a SQL WHERE statement.  It should hopefully be generic
- * enough that any SQL database will work with it, though it has only been
- * tested with MySQL and Postgis.  This generic SQL encoder should eventually
- * be able to encode all filters except Geometry Filters (currently
- * LikeFilters are not yet fully implemented, but when they are they should be
- * generic enough). This is because the OGC's SFS for SQL document specifies
- * two ways of doing SQL databases, one with native geometry types and one
- * without.  To implement an encoder for one of the two types simply subclass
- * off of this encoder and put in the proper GeometryFilter visit method. Then
- * add the filter types supported to the capabilities in the static
- * capabilities.addType block.
  *
- * @author Chris Holmes, TOPP
- *
- * @task TODO: Implement LikeFilter encoding, need to figure out escape chars,
- *       the rest of the code should work right.  Once fixed be sure to add
- *       the LIKE type to capabilities, so others know that they can be
- *       encoded.
- * @task REVISIT: need to figure out exceptions, we're currently eating io
- *       errors, which is bad. Probably need a generic visitor exception.
  */
 public class EnvironmentVariableResolver implements org.geotools.filter.FilterVisitor {
    
@@ -56,7 +38,7 @@ public class EnvironmentVariableResolver implements org.geotools.filter.FilterVi
   
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
-
+   
   
     /**
      * Empty constructor
@@ -68,18 +50,32 @@ public class EnvironmentVariableResolver implements org.geotools.filter.FilterVi
 
    
 
+   
     /**
      *
      */
-    public void resolve(Filter filter, double mapScale) throws SQLEncoderException {     
-                filter.accept(this);
+    public void resolve(Filter filter, double mapScale) throws ParseException {  
+        
+         String input = filter.toString();
+        Filter output = (Filter)ExpressionBuilder.parse(input);
+        
+    
     }
     
+    
     /**
-     *
+     * 
      */
-    public void resolve(Expression exp, double mapScale) throws SQLEncoderException {     
-                exp.accept(this);
+    public Expression resolve(Expression exp, double mapScale) throws ParseException {     
+           
+                String input = exp.toString();
+                input = input.replaceAll("sld:MapScaleDenominator", ""+mapScale);
+                Expression output = (Expression)ExpressionBuilder.parse(input);
+                return output;
+    }
+    
+    public boolean needsResolving(Filter f){
+        return true;
     }
 
     /**

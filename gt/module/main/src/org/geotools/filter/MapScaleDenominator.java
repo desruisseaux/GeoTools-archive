@@ -11,5 +11,5 @@ package org.geotools.filter;
  * @author James
  */
 public interface MapScaleDenominator extends EnvironmentVariable {
-    
+    static final String EV_NAME = "sld:MapScaleDenominator";
 }

@@ -253,7 +253,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      * @return String representation of the logic filter.
      */
     public String toString() {
-        String returnString = "";
+        String returnString = "[";
         String operator = "";
         Iterator iterator = subFilters.iterator();
 
@@ -273,7 +273,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
             }
         }
 
-        return returnString;
+        return returnString + "]";
     }
 
     /**

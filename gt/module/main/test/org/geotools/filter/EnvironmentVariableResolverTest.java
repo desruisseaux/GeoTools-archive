@@ -30,7 +30,7 @@ import javax.xml.parsers.*;
  *
  * @task REVISIT: validate these so we know if they break.
  */
-public class EnvironmentVariableResolverTest extends SQLFilterTestSupport {
+public class EnvironmentVariableResolverTest extends FilterTestSupport {
     private FilterFactory filterFac = FilterFactory.createFilterFactory();
 //
 //    /** Test suite for this test case */
@@ -64,10 +64,11 @@ public class EnvironmentVariableResolverTest extends SQLFilterTestSupport {
         MathExpression add = filterFac.createMathExpression(MathExpression.MATH_ADD);
         add.addLeftValue(testInt);
         add.addRightValue(mapScale);
-
+        String in = add.toString();
         StringWriter output = new StringWriter();
         EnvironmentVariableResolver resolver = new EnvironmentVariableResolver();
-        resolver.resolve(add, 10);
+        Expression resolved = resolver.resolve(add, 10);
+        assertEquals(15,((Number)resolved.getValue(testFeature)).intValue());
     }
 
 }

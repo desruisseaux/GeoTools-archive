@@ -38,4 +38,8 @@ public class MapScaleDenominatorImpl extends DefaultExpression implements MapSca
     public void accept(FilterVisitor visitor) {
         visitor.visit(this);
     }
+    
+    public String toString(){
+        return MapScaleDenominator.EV_NAME;
+    }
 }
