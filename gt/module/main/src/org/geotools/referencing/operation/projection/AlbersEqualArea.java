@@ -73,6 +73,11 @@ import org.geotools.resources.cts.Resources;
  * angles. As the name implies, this projection minimizes distortion in areas.
  * <br><br>
  *
+ * The "standard_parallel_2" parameter is optional and will be given the 
+ * same value as "standard_parallel_1" if not set (creating a 1 standard parallel
+ * projection). 
+ * <br><br>
+ *
  * NOTE: formulae used below are from a port, to java, of the 
  *       'proj4' package of the USGS survey. USGS work is acknowledged here.
  * <br><br>
@@ -106,10 +111,14 @@ public class AlbersEqualArea extends MapProjection {
     private final double ec;
     
     /**
-     * Standards parallels in radians, for {@link #getParameterValues} implementation.
+     * Standards parallel 1 in radians, for {@link #getParameterValues} implementation.
      */
-    private final double phi1, phi2;
+    private final double phi1;
 
+    /**
+     * Standards parallel 2 in radians, for {@link #getParameterValues} implementation.
+     */
+    private double phi2;
     
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
@@ -145,7 +154,7 @@ public class AlbersEqualArea extends MapProjection {
                     new Identifier(Citation.EPSG,     "Latitude of 2nd standard parallel"),
                     new Identifier(Citation.GEOTIFF,  "StdParallel2")
                 },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
+                Double.NaN, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
          * The parameters group.
@@ -195,15 +204,20 @@ public class AlbersEqualArea extends MapProjection {
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
-     *
-     * @task REVISIT: set phi2 = phi1 if no SP2 param is given by user (a 1sp projection)
      */
-    public AlbersEqualArea(final ParameterValueGroup parameters, final Collection expected) {
+    AlbersEqualArea(final ParameterValueGroup parameters, final Collection expected) 
+            throws ParameterNotFoundException
+    {
         //Fetch parameters 
         super(parameters, expected);
 
         phi1 = doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters);
+        ensureLatitudeInRange(Provider.STANDARD_PARALLEL_1, phi1, true);
         phi2 = doubleValue(expected, Provider.STANDARD_PARALLEL_2, parameters);
+        if (Double.isNaN(phi2)) {
+            phi2 = phi1;
+        }
+        ensureLatitudeInRange(Provider.STANDARD_PARALLEL_2, phi2, true);
 
 	//Compute Constants
         if (Math.abs(phi1 + phi2) < EPS) 
