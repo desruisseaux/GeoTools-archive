@@ -263,7 +263,7 @@ public class WMSReader implements GridCoverageReader {
 
         GridCoverage coverage = null;
 		try {
-			coverage = new GridCoverageImpl("wmsMap", crs, null, null, image );
+			coverage = new GridCoverageImpl("wmsMap", crs, null, null, image, envelope );
 		} catch (OperationNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
