@@ -18,6 +18,8 @@ package org.geotools.data;
 
 import java.io.IOException;
 
+import org.geotools.gc.exchange.GridCoverageReader;
+import org.geotools.gc.exchange.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 
 
@@ -51,8 +53,8 @@ import org.opengis.coverage.grid.Format;
  * @author Jody Garnett, Refractions Research
  */
 public interface GridFormatFactorySpi extends org.geotools.factory.Factory {
-    /**
-     * Construct a live grid formatusing the params specifed.
+	/**
+     * Construct a live grid format using the params specifed.
      *
      * @param params The full set of information needed to construct a live
      *        data store. Typical key values for the map include: url -
@@ -67,7 +69,25 @@ public interface GridFormatFactorySpi extends org.geotools.factory.Factory {
      * @throws IOException if there were any problems creating or connecting
      *         the datasource.
      */
-    Format create();
+    Format createFormat();
+    
+    /**
+     * @todo javadoc
+     */
+    GridCoverageReader createReader(Object source);
+    
+    /**
+     * @todo javadoc
+     */
+    GridCoverageWriter createWriter(Object destination);
+    
+    /**
+     * @todo javadoc
+     * @param format
+     * @return
+     */
+    boolean canCreate( Format format );
+    
     /**
      * Test to see if this format is available, if it has all the
      * appropriate libraries to construct a format.

@@ -17,6 +17,8 @@
 package org.geotools.data.arcgrid;
 
 import org.geotools.data.gridcoverage.GenericGridFormat;
+import org.geotools.gc.exchange.GridCoverageReader;
+import org.geotools.gc.exchange.GridCoverageWriter;
 import org.opengis.parameter.GeneralOperationParameter;
 import java.util.HashMap;
 
@@ -54,4 +56,5 @@ public class ArcGridFormat extends GenericGridFormat {
         writeParameters[0] = ArcGridOperationParameter.getGRASSWriteParam();
         writeParameters[0] = ArcGridOperationParameter.getCompressWriteParam();
     }
+
 }

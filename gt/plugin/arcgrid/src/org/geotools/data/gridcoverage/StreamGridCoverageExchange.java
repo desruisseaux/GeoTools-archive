@@ -42,7 +42,7 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
     Format[] mFormats = new Format[1];
 
     public StreamGridCoverageExchange() {
-        mFormats[0] = (new ArcGridFormatFactory()).create();
+        mFormats[0] = (new ArcGridFormatFactory()).createFormat();
     }
 
     /**

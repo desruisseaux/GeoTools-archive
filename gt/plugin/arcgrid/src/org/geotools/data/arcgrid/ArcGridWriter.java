@@ -97,7 +97,7 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
      */
     public Format getFormat() {
-        return (new ArcGridFormatFactory()).create();
+        return (new ArcGridFormatFactory()).createFormat();
     }
 
     /**

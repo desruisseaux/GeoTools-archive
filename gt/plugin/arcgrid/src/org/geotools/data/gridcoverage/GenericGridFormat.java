@@ -44,7 +44,7 @@ import java.util.Map;
  *
  * @see AbstractFormatFactory
  */
-public abstract class GenericGridFormat implements Format {
+public class GenericGridFormat implements Format {
     /**
      * The Map object is used by the information methods(such as getName()) as
      * a data source. The keys in the Map object (for the associated method)

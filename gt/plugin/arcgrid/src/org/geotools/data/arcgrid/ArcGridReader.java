@@ -98,7 +98,7 @@ public class ArcGridReader implements GridCoverageReader {
      * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
      */
     public Format getFormat() {
-        return (new ArcGridFormatFactory()).create();
+        return (new ArcGridFormatFactory()).createFormat();
     }
 
     /**

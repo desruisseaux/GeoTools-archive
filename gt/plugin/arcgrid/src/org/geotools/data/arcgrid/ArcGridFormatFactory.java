@@ -16,6 +16,8 @@
  */
 package org.geotools.data.arcgrid;
 
+import org.geotools.gc.exchange.GridCoverageReader;
+import org.geotools.gc.exchange.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 
 
@@ -35,7 +37,32 @@ public class ArcGridFormatFactory implements org.geotools.data.GridFormatFactory
      * 
      * @return Format used to process ArcGridCoverage files
      */
-    public Format create(){
+    public Format createFormat(){
         return new ArcGridFormat();
     }
+
+	/*@todo
+	 *  (non-Javadoc)
+	 * @see org.geotools.data.GridFormatFactorySpi#createReader(java.lang.Object)
+	 */
+	public GridCoverageReader createReader(Object source) {
+		return new ArcGridReader(source);
+	}
+
+	/* @todo
+	 * (non-Javadoc)
+	 * @see org.geotools.data.GridFormatFactorySpi#createWriter(java.lang.Object)
+	 */
+	public GridCoverageWriter createWriter(Object destination) {
+		return new ArcGridWriter(destination);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.data.GridFormatFactorySpi#canCreate(org.opengis.coverage.grid.Format)
+	 */
+	public boolean canCreate(Format format) {
+		if( format instanceof ArcGridFormat )
+			return true;
+		return false;
+	}
 }
