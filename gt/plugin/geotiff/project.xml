@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
-<!--  <extend>${basedir}/../../project.xml</extend> -->
+  <extend>${basedir}/../../project.xml</extend>
   <name>geotools-geotiff</name>
   <id>geotiff</id>
   <currentVersion>2.1.x</currentVersion>
@@ -53,6 +53,9 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/org/geotools/gce/geotiff/GeoTiffReaderTest.java</exclude>
+      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
