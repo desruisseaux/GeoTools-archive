@@ -16,6 +16,7 @@
  */
 package org.geotools.data;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,10 +26,22 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.geotools.catalog.AbstractMetadataEntity;
+import org.geotools.cs.AxisInfo;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
+import org.geotools.ct.MathTransform;
 import org.geotools.feature.FeatureType;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
 import org.geotools.util.InternationalString;
+
 import org.opengis.catalog.MetadataEntity;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -103,22 +116,44 @@ public class FeatureSourceMetadataEnity extends AbstractMetadataEntity {
      */
     public synchronized Envelope getBounds() {        
         if( bounds != null ) return bounds;
-        FeatureType schema = source.getSchema();
-        CoordinateReferenceSystem cs = schema.getDefaultGeometry().getCoordinateSystem();
-        if ( cs == null ){
-            // Cannot convert to lat/long
-            bounds = new Envelope();
-        }
+        
         try {
             bounds = source.getBounds();
             if( bounds == null ){
                 bounds = source.getFeatures().getBounds();
             }
-            // reproject me :-)
-        } catch (IOException e) {
+            bounds = reBound( bounds );            
+        } catch (Exception e) {
             bounds = new Envelope();
         }        
         return bounds;
+    }
+    /** Reproject provided bound evelope to lat/long */
+    private Envelope reBound( Envelope env ) throws Exception {
+        FeatureType schema = source.getSchema();
+        CoordinateReferenceSystem crs = schema.getDefaultGeometry().getCoordinateSystem();
+        CoordinateSystem cs = crs.getCoordinateSystem();
+        String wkt = cs.toWKT();
+        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
+		org.geotools.cs.CoordinateSystem cs2 = csFactory.createFromWKT( wkt );
+		Unit       angularUnit = Unit.DEGREE;
+		HorizontalDatum  datum = HorizontalDatum.WGS84;
+		org.geotools.cs.PrimeMeridian meridian = org.geotools.cs.PrimeMeridian.GREENWICH;
+		GeographicCoordinateSystem geographic =
+		    csFactory.createGeographicCoordinateSystem("geographic", angularUnit, datum, meridian, AxisInfo.LONGITUDE, AxisInfo.LATITUDE );
+		CoordinateTransformationFactory trFactory = CoordinateTransformationFactory.getDefault();
+		CoordinateTransformation transformation = trFactory.createFromCoordinateSystems(cs2, geographic );
+		MathTransform transform = transformation.getMathTransform();
+		CoordinatePoint p1 = new CoordinatePoint( env.getMinX(), env.getMinY());
+		CoordinatePoint p2 = new CoordinatePoint( env.getMaxX(), env.getMaxY());
+		transform.transform( p1, p1 );
+		transform.transform( p2, p2 );
+		Envelope rebounds = new Envelope();
+		Point2D point = p1.toPoint2D();
+		rebounds.expandToInclude( point.getX(), point.getY() );
+		point = p2.toPoint2D();
+		rebounds.expandToInclude( point.getX(), point.getY() );		
+		return rebounds;
     }
     
     /** Number of features in associated Feature Collection, will be calcualted as needed */
