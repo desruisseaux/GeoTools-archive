@@ -48,18 +48,21 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore {
      * @see org.geotools.data.mysql.MySQLConnectionFactory
      */
     public JDBCDataStore(ConnectionPool connectionPool) throws IOException {
-        super(connectionPool);
+        super(connectionPool, new JDBCDataStoreConfig() );
     }
 
+    /** <code>DEFAULT_NAMESPACE</code> field */
+    public static String DEFAULT_NAMESPACE = "http://geotools.org/jdbc";
+    
     /**
      * Constructor for JDBCDataStore where the database schema name is provided.
      * @param connectionPool a MySQL {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
-    public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName)
+    public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName)        
         throws IOException {
-        super(connectionPool, databaseSchemaName);
+        this( connectionPool, databaseSchemaName, DEFAULT_NAMESPACE );        
     }
 
     /**
