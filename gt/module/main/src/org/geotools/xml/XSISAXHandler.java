@@ -69,7 +69,7 @@ public class XSISAXHandler extends DefaultHandler {
     private Locator locator;
 
     // the schema uri being parsed. This is important to resolve relative uris
-    private URI uri;
+//    private URI uri;
 
     /**
      * should never be called
@@ -84,7 +84,7 @@ public class XSISAXHandler extends DefaultHandler {
      * @param uri
      */
     public XSISAXHandler(URI uri) {
-        this.uri = uri;
+//        this.uri = uri;
         rootHandler = new RootHandler(uri);
     }
 

@@ -35,7 +35,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
@@ -448,9 +447,8 @@ public class SchemaFactory {
                         "cannot merge two target namespaces. "
                         + s1.getTargetNamespace() + " "
                         + s2.getTargetNamespace());
-                } else {
-                    targetNamespace = s1.getTargetNamespace();
                 }
+                targetNamespace = s1.getTargetNamespace();
             }
 
             aForm = s1.isAttributeFormDefault() || s2.isAttributeFormDefault();
@@ -655,8 +653,6 @@ public class SchemaFactory {
 
             for (int i = 0; i < obj.length; i++)
                 imports[i] = (Schema) (obj[i]);
-
-            HashSet hs = new HashSet();
 
             URI u1 = s1.getURI();
 

@@ -156,20 +156,89 @@ public class DocumentWriter {
         WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
         wch.startDocument();
 
-        Element e = null;
-        if(hints!=null && hints.containsKey(BASE_ELEMENT)){
-            e = (Element)hints.get(BASE_ELEMENT);
-            if(e!=null && e.getType()!=null)
-                e = e.getType().canEncode(e,value,hints)?e:null;
-        }
-        if(e==null)
-            e = wch.findElement(value);
-        if(e!=null)
-            e.getType().encode(e,value,wch,hints);
-        else
-            throw new OperationNotSupportedException("Could not find an appropriate Element to use for encoding of a "+(value==null?null:value.getClass().getName()));
+        writeFragment(value,wch);
+        
         wch.endDocument();
         w.flush();
+    }
+
+    /**
+     * Write value to file using provided schema.
+     * <p>
+     * Hints:
+     * <ul>
+     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
+     * <li>USE_NEAREST - (Boolean) not implemented
+     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </ul>
+     * </p>
+     *
+     * @param value
+     * @param schema
+     * @param f
+     * @param hints
+     * @throws OperationNotSupportedException
+     * @throws IOException
+     * @throws SAXException
+     *
+     * @see WRITE_SCHEMA
+     */
+    public static void writeFragment(Object value, Schema schema, File f,
+            Map hints) throws OperationNotSupportedException, IOException, SAXException {
+        if ((f == null) || (!f.canWrite())) {
+            throw new IOException("Cannot write to " + f);
+        }
+        FileWriter wf = new FileWriter(f);
+        writeFragment(value,schema,wf,hints);
+        wf.close();
+    }
+    /**
+     * Entry Point to Document writer.
+     * <p>
+     * Hints:
+     * <ul>
+     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
+     * <li>USE_NEAREST - (Boolean) not implemented
+     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </ul>
+     * </p>
+     * @param value
+     * @param schema
+     * @param w
+     * @param hints optional hints for writing
+     * @throws OperationNotSupportedException
+     * @throws IOException
+     * @throws SAXException
+     * 
+     * @see BASE_ELEMENT
+     * @see USE_NEAREST
+     * @see WRITE_SCHEMA
+     * @see SCHEMA_ORDER
+     */
+    public static void writeFragment(Object value, Schema schema, Writer w,
+                Map hints) throws OperationNotSupportedException, IOException, SAXException {
+        WriterContentHandler wch = new WriterContentHandler(schema, w,hints); // should deal with xmlns declarations
+
+        writeFragment(value,wch);
+        
+        w.flush();
+    }
+    
+    private static void writeFragment(Object value, WriterContentHandler wch) throws OperationNotSupportedException, IOException, SAXException {
+    Map hints = wch.hints;
+
+    Element e = null;
+    if(hints!=null && hints.containsKey(BASE_ELEMENT)){
+        e = (Element)hints.get(BASE_ELEMENT);
+        if(e!=null && e.getType()!=null)
+            e = e.getType().canEncode(e,value,hints)?e:null;
+    }
+    if(e==null)
+        e = wch.findElement(value);
+    if(e!=null)
+        e.getType().encode(e,value,wch,hints);
+    else
+        throw new OperationNotSupportedException("Could not find an appropriate Element to use for encoding of a "+(value==null?null:value.getClass().getName()));
     }
 
     /**
@@ -1136,7 +1205,7 @@ public class DocumentWriter {
             Attribute[] attrs = complexType.getAttributes();
 
             for (int i = 0; i < attrs.length; i++)
-                writeAttribute((Attribute) attrs[i], schema, ph, hints);
+                writeAttribute(attrs[i], schema, ph, hints);
         }
 
         ph.endElement(XSISimpleTypes.NAMESPACE, "complexType");
