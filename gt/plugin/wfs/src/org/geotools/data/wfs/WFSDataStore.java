@@ -67,6 +67,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    if(username!=null && password!=null)
  	        auth = new WFSAuthenticator(username,password,host);
  	    
+ 	    // TODO support using POST for getCapabilities
  	    HttpURLConnection hc = (HttpURLConnection)host.openConnection();
  	    InputStream is = getInputStream(hc,auth);
  	    Object t = DocumentFactory.getInstance(is,null,logger.getLevel());

@@ -859,22 +859,19 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            return value==null?"":value[0].toString();
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -886,22 +883,38 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return String.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return value instanceof String && element.getType()!=null && getName().equals(element.getType().getName());
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(canEncode(element,value,hints)){
+                String name = (String)value;
+                output.startElement(element.getNamespace(),element.getName(),null);
+                output.characters(name);
+                output.endElement(element.getNamespace(),element.getName());
+            }else{
+                throw new OperationNotSupportedException("Cannot encode "+(element==null?"null":element.getName()));
+            }
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         */
+        public boolean isMixed() {
+            return true;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getParent()
+         */
+        public Type getParent() {
+            return ExpressionType.getInstance();
         }
     }
     public static class ServiceExceptionType extends FilterComplexType{

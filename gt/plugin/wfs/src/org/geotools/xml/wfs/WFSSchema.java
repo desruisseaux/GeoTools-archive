@@ -502,7 +502,7 @@ public class WFSSchema implements Schema {
          * @param min
          * @param max
          */
-        public WFSElement(WFSElement element, int min, int max) {
+        public WFSElement(Element element, int min, int max) {
             this.abstracT = element.isAbstract();
             this.max = max;
             this.min = min;

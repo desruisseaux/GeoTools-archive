@@ -87,11 +87,11 @@ public class FilterSchema implements Schema {
         };
         elements = new Element[] {
             // filterCapabilities -- many labels have been excluded here
-            new DefaultElement("Filter_Capabilities",Filter_CapabilitiesType.getInstance()),
+            new DefaultElement("Filter_Capabilities",Filter_CapabilitiesType.getInstance()), // 0
             
             // filter
             new DefaultElement("FeatureId",FeatureIdType.getInstance(),comparisonOps),
-            new DefaultElement("Filter",FilterType.getInstance(),comparisonOps),
+            new DefaultElement("Filter",FilterType.getInstance(),comparisonOps), //2
             
             // COMPARISON OPERATORS
             comparisonOps,
@@ -103,7 +103,7 @@ public class FilterSchema implements Schema {
             new DefaultElement("PropertyIsGreaterThanOrEqualTo",BinaryComparisonOpType.getInstance(),comparisonOps),
             new DefaultElement("PropertyIsLike",PropertyIsLikeType.getInstance(),comparisonOps),
             new DefaultElement("PropertyIsNull",PropertyIsNullType.getInstance(),comparisonOps),
-            new DefaultElement("PropertyIsBetween",PropertyIsBetweenType.getInstance(),comparisonOps),
+            new DefaultElement("PropertyIsBetween",PropertyIsBetweenType.getInstance(),comparisonOps), //12
             
             // SPATIAL OPERATORS
             spatialOps,
@@ -117,13 +117,13 @@ public class FilterSchema implements Schema {
             new DefaultElement("Contains",BinarySpatialOpType.getInstance(),spatialOps),
             new DefaultElement("DWithin",DistanceBufferType.getInstance(),spatialOps),
             new DefaultElement("Beyond",DistanceBufferType.getInstance(),spatialOps),
-            new DefaultElement("BBOX",BBOXType.getInstance(),spatialOps),
+            new DefaultElement("BBOX",BBOXType.getInstance(),spatialOps), // 24
             
             // LOGICAL OPERATORS
             logicOps,
             new DefaultElement("And",BinaryLogicOpType.getInstance(),logicOps),
             new DefaultElement("Or",BinaryLogicOpType.getInstance(),logicOps),
-            new DefaultElement("Not",UnaryLogicOpType.getInstance(),logicOps),
+            new DefaultElement("Not",UnaryLogicOpType.getInstance(),logicOps), // 28
             
             // expr
             expression,
@@ -133,7 +133,7 @@ public class FilterSchema implements Schema {
             new DefaultElement("Div",BinaryOperatorType.getInstance(),expression),
             new DefaultElement("PropertyName",PropertyNameType.getInstance(),expression),
             new DefaultElement("Function",FunctionType.getInstance(),expression),
-            new DefaultElement("Literal",LiteralType.getInstance(),expression),
+            new DefaultElement("Literal",LiteralType.getInstance(),expression), // 36
             
             // exception
             new DefaultElement("ServiceExceptionReport",ServiceExceptionReportType.getInstance())

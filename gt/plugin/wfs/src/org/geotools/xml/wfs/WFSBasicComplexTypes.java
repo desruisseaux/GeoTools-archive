@@ -16,20 +16,28 @@
  */
 package org.geotools.xml.wfs;
 
+import org.geotools.data.Query;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.gml.GMLComplexTypes;
+import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultAttribute;
+import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
+import org.geotools.xml.wfs.WFSSchema.WFSElement;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.helpers.AttributesImpl;
+
 import java.io.IOException;
 import java.util.Map;
 import javax.naming.OperationNotSupportedException;
@@ -61,29 +69,51 @@ public class WFSBasicComplexTypes {
         public static WFSComplexType getInstance() {
             return instance;
         }
+        
+        private static Element[] elems = new Element[] {
+                new WFSElement("Query",QueryType.getInstance(),1,Integer.MAX_VALUE,false,null),
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new WFSAttribute("version",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "1.0.0";
+                    }
+                },
+                new WFSAttribute("service",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "WFS";
+                    }
+                },
+                new WFSAttribute("outputFormat",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "GML2";
+                    }
+                },
+                new WFSAttribute("maxFeatures",XSISimpleTypes.PositiveInteger.getInstance(),Attribute.OPTIONAL)
+        };
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
+            return attrs;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
 
         /**
@@ -109,8 +139,7 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Query.class;
         }
 
         /**
@@ -118,7 +147,9 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            if(element.getType()!=null && getName().equals(element.getType().getName())){
+                return value == null || value instanceof Query;
+            }
             return false;
         }
 
@@ -129,7 +160,21 @@ public class WFSBasicComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(canEncode(element,value,hints)){
+                AttributesImpl attributes = new AttributesImpl();
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",attrs[2].getFixed());
+                Query query = (Query)value;
+                if(query.getMaxFeatures()!=Query.DEFAULT_MAX)
+                    attributes.addAttribute(WFSSchema.NAMESPACE,elems[3].getName(),null,"integer",""+query.getMaxFeatures());
+                
+                output.startElement(element.getNamespace(),element.getName(),attributes);
+                elems[0].getType().encode(elems[0],value,output,hints);
+                output.endElement(element.getNamespace(),element.getName());
+            }else{
+                throw new OperationNotSupportedException("not a valid value/element for a DescribeFeatureTypeType.");
+            }
         }
     }
 
@@ -149,29 +194,50 @@ public class WFSBasicComplexTypes {
         public static WFSComplexType getInstance() {
             return instance;
         }
+        
+        private static Element[] elems = new Element[] {
+                new WFSElement("TypeName",XSISimpleTypes.QName.getInstance(),0,Integer.MAX_VALUE,false,null),
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new WFSAttribute("version",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "1.0.0";
+                    }
+                },
+                new WFSAttribute("service",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "WFS";
+                    }
+                },
+                new WFSAttribute("outputFormat",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "XMLSCHEMA";
+                    }
+                },
+        };
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
+            return attrs;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
 
         /**
@@ -197,8 +263,7 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return String[].class;
         }
 
         /**
@@ -206,7 +271,9 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            if(element.getType()!=null && getName().equals(element.getType().getName())){
+                return value instanceof String[];
+            }
             return false;
         }
 
@@ -217,7 +284,20 @@ public class WFSBasicComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(canEncode(element,value,hints)){
+                AttributesImpl attributes = new AttributesImpl();
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",attrs[2].getFixed());
+                
+                output.startElement(element.getNamespace(),element.getName(),attributes);
+                String[] strs = (String[])value;
+                for(int i=0;i<strs.length;i++)
+                    XSISimpleTypes.QName.getInstance().encode(elems[0],strs[i],output,hints);
+                output.endElement(element.getNamespace(),element.getName());
+            }else{
+                throw new OperationNotSupportedException("not a valid value/element for a DescribeFeatureTypeType.");
+            }
         }
     }
 
@@ -237,20 +317,31 @@ public class WFSBasicComplexTypes {
         public static WFSComplexType getInstance() {
             return instance;
         }
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new WFSAttribute("version",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "1.0.0";
+                    }
+                },
+                new WFSAttribute("service",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED){
+                    public String getFixed() {
+                        return "WFS";
+                    }
+                }
+        };
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
+            return attrs;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -258,7 +349,6 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -285,7 +375,6 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -294,8 +383,7 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return true;
         }
 
         /**
@@ -305,7 +393,12 @@ public class WFSBasicComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+
+                AttributesImpl attributes = new AttributesImpl();
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
+                
+                output.element(element.getNamespace(),element.getName(),attributes);
         }
     }
 
@@ -316,29 +409,49 @@ public class WFSBasicComplexTypes {
         public static WFSComplexType getInstance() {
             return instance;
         }
+        
+        private static Element[] elems = new Element[]{
+                // PropertyName -- used to limit attributes
+                new WFSElement(FilterSchema.getInstance().getElements()[34],0,Integer.MAX_VALUE){
+                    public String getNamespace(){
+                        return FilterSchema.NAMESPACE;
+                    }
+                },
+                // Filter -- used to limit features
+                new WFSElement(FilterSchema.getInstance().getElements()[2],0,Integer.MAX_VALUE){
+                    public String getNamespace(){
+                        return FilterSchema.NAMESPACE;
+                    }
+                }
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new WFSAttribute("handle",XSISimpleTypes.String.getInstance(),Attribute.OPTIONAL),
+                new WFSAttribute("typeName",XSISimpleTypes.QName.getInstance(),Attribute.REQUIRED),
+                new WFSAttribute("featureVersion",XSISimpleTypes.String.getInstance(),Attribute.OPTIONAL)
+                };
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
+            return attrs;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
 
         /**
@@ -364,8 +477,7 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Query.class;
         }
 
         /**
@@ -373,7 +485,9 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            if(element.getType()!=null && getName().equals(element.getType().getName())){
+                return value == null || value instanceof Query;
+            }
             return false;
         }
 
@@ -384,7 +498,33 @@ public class WFSBasicComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(canEncode(element,value,hints)){
+                Query query = (Query)value;
+                
+                AttributesImpl attributes = new AttributesImpl();
+                
+                if(query.getHandle()!=null && !"".equals(query.getHandle()))
+                    attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",query.getHandle());
+                
+                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",query.getTypeName());
+                
+                if(query.getVersion()!=null && !"".equals(query.getVersion()))
+                    attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",query.getVersion());
+                
+                
+                output.startElement(element.getNamespace(),element.getName(),attributes);
+                
+                String[] propNames = query.getPropertyNames();
+                if(propNames!=null)
+                    for(int i=0;i<propNames.length;i++)
+                        elems[0].getType().encode(elems[0],propNames[i],output,hints);
+                if(query.getFilter()!=null)
+                    elems[1].getType().encode(elems[1],query.getFilter(),output,hints);
+                
+                output.endElement(element.getNamespace(),element.getName());
+            }else{
+                throw new OperationNotSupportedException("not a valid value/element for a DescribeFeatureTypeType.");
+            }
         }
     }
 
