@@ -26,7 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.data.MemoryDataSource;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -80,7 +80,7 @@ public class TextSymbolTest extends TestCase {
 
         // Request extent
         GeometryFactory geomFac = new GeometryFactory();
-        MemoryDataSource datasource = new MemoryDataSource();
+        MemoryDataStore data = new MemoryDataStore();
         AttributeType[] pointAttribute = new AttributeType[4];
         pointAttribute[0] = AttributeTypeFactory.newAttributeType("centre",
                 com.vividsolutions.jts.geom.Point.class);
@@ -114,14 +114,14 @@ public class TextSymbolTest extends TestCase {
                             point, new Double(size), new Double(rotation),
                             symbol[i]
                         });
-                datasource.addFeature(pointFeature);
+                data.addFeature(pointFeature);
             }
 
             size += 2;
             rotation += 45;
         }
-
-        FeatureCollection ft = datasource.getFeatures();
+        String typeName = data.getTypeNames()[0];
+        FeatureCollection ft = data.getFeatureSource( typeName ).getFeatures().collection();
 
         //REVISIT: Removed since it is deprecated, not sure what this test is
         //is doing, what should replace it.  If someone with more knowledge of
