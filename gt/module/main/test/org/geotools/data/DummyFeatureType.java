@@ -6,6 +6,8 @@
 
 package org.geotools.data;
 
+import java.net.URI;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 
@@ -60,7 +62,7 @@ public class DummyFeatureType implements FeatureType {
         return null;
     }
     
-    public String getNamespace() {
+    public URI getNamespace() {
         return null;
     }
     
@@ -80,7 +82,7 @@ public class DummyFeatureType implements FeatureType {
         return false;
     }
     
-    public boolean isDescendedFrom(String nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName) {
         return false;
     }
     

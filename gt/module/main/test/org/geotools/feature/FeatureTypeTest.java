@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.reflect.Array;
+import java.net.URI;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -52,7 +54,7 @@ public class FeatureTypeTest extends DataTestCase {
     
     FeatureTypeFactory at = FeatureTypeFactory.newInstance("AbstractThing");
     at.setAbstract(true);
-    at.setNamespace("http://www.nowhereinparticular.net");
+    at.setNamespace( new URI("http://www.nowhereinparticular.net"));
     
     FeatureType type1 = at.getFeatureType();
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
@@ -63,8 +65,8 @@ public class FeatureTypeTest extends DataTestCase {
     assertTrue(type1.isAbstract());
     assertTrue(type2.isAbstract());
     
-    assertTrue(type1.isDescendedFrom("http://www.opengis.net/gml","Feature"));
-    assertTrue(type2.isDescendedFrom("http://www.opengis.net/gml","Feature"));
+    assertTrue(type1.isDescendedFrom(new URI("http://www.opengis.net/gml"),"Feature"));
+    assertTrue(type2.isDescendedFrom(new URI("http://www.opengis.net/gml"),"Feature"));
     assertTrue(type2.isDescendedFrom(type1));
     assertTrue(!type1.isDescendedFrom(type2));
     
@@ -88,28 +90,28 @@ public class FeatureTypeTest extends DataTestCase {
     // with non-abstract super
     try {
       FeatureType[] supers = new FeatureType[1];
-      supers[0] = FeatureTypeFactory.newFeatureType(null,"SillyThing","",false);
-      FeatureTypeFactory.newFeatureType(null,"BadFeature","",true,supers);
+      supers[0] = FeatureTypeFactory.newFeatureType(null,"SillyThing",null,false);
+      FeatureTypeFactory.newFeatureType(null,"BadFeature",null,true,supers);
       fail("allowed bad super");
     } catch (SchemaException se) {
       
     }
   }
   
-  public void testEquals() throws SchemaException {
+  public void testEquals() throws Exception {
     FeatureTypeFactory at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace("http://www.nowhereinparticular.net");
+    at.setNamespace(new URI("http://www.nowhereinparticular.net"));
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
     final FeatureType ft = at.getFeatureType();
     at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace("http://www.nowhereinparticular.net");
+    at.setNamespace( new URI("http://www.nowhereinparticular.net"));
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
     FeatureType ft2 = at.getFeatureType();
     assertEquals(ft,ft2);
     at.setName("Thingee");
     assertTrue(! ft.equals(at.getFeatureType()));
     at = FeatureTypeFactory.createTemplate(ft);
-    at.setNamespace("http://www.somewhereelse.net");
+    at.setNamespace( new URI("http://www.somewhereelse.net"));
     assertTrue(! ft.equals(at.getFeatureType()));
     assertTrue(! ft.equals(null));
   }
