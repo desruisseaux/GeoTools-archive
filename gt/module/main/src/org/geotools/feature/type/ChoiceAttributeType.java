@@ -67,9 +67,9 @@ public class ChoiceAttributeType implements AttributeType {
     }
 
     // The field for 'Class type' should be added when GT has moved to java 1.5
-    public ChoiceAttributeType(String name, boolean nillable, int min, int max,
+    public ChoiceAttributeType(String name, int min, int max,
         AttributeType[] children, Filter restriction) {
-        nill = nillable;
+        nill = calculateNillable(children);
         this.min = min;
         this.max = max;
         this.name = name;
@@ -77,9 +77,8 @@ public class ChoiceAttributeType implements AttributeType {
         this.restriction = restriction;
     }
 
-    public ChoiceAttributeType(String name, boolean nillable,
-        AttributeType[] children) {
-        this(name, nillable, 1, 1, children, Filter.ALL);
+    public ChoiceAttributeType(String name, AttributeType[] children) {
+        this(name, 1, 1, children, Filter.ALL);
     }
 
     public Filter getRestriction() {
@@ -118,6 +117,17 @@ public class ChoiceAttributeType implements AttributeType {
      */
     public boolean isNillable() {
         return nill;
+    }
+
+    public boolean calculateNillable(AttributeType[] children) {
+        for (int i = 0, ii = children.length; i < ii; i++) {
+            if (children[i].isNillable()) {
+                return true;
+            }
+        }
+
+        //none of the children can take a null, so no nulls are allowed.
+        return false;
     }
 
     /* (non-Javadoc)
@@ -404,14 +414,13 @@ public class ChoiceAttributeType implements AttributeType {
         }
 
         // The field for 'Class type' should be added when GT has moved to java 1.5
-        public Geometric(String name, boolean nillable, int min, int max,
+        public Geometric(String name, int min, int max,
             GeometryAttributeType[] children, Filter restriction) {
-            super(name, nillable, min, max, children, restriction);
+            super(name, min, max, children, restriction);
         }
 
-        public Geometric(String name, boolean nillable,
-            GeometryAttributeType[] children) {
-            super(name, nillable, children);
+        public Geometric(String name, GeometryAttributeType[] children) {
+            super(name, children);
         }
 
         public CoordinateReferenceSystem getCoordinateSystem() {
