@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.geotools.data.coverage.grid.TestCaseSupport;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
+import org.geotools.metadata.Query;
 
 
 /**

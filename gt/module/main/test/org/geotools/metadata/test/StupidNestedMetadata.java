@@ -16,6 +16,8 @@
  */
 package org.geotools.metadata.test;
 
+import org.geotools.metadata.Metadata;
+
 /**
  * TODO type description
  * 

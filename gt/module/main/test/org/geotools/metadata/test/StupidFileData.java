@@ -6,6 +6,8 @@
  */
 package org.geotools.metadata.test;
 
+import org.geotools.metadata.Metadata;
+
 /**
  * @author jeichar
  *
