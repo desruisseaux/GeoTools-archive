@@ -134,6 +134,16 @@ import org.geotools.filter.SQLEncoderException;
  * </li>
  * </ul>
  * </p>
+ * <p>
+ * Additionally subclasses may want to set the value of:
+ * 
+ * <ul>
+ * <li>
+ * sqlNameEscape - character (String) to surround names of SQL objects to support
+ * mixed-case and non-English names.
+ * </li>
+ * </ul>
+ * </p>
  * <h2>
  * 
 
@@ -197,6 +207,11 @@ public abstract class JDBCDataStore implements DataStore {
 
     protected FeatureTypeHandler typeHandler = null;
 
+	/** The character(s) to surround schema, table and column names 
+	    an SQL query to support mixed-case and non-English names 
+	    */    
+    protected String sqlNameEscape = "";
+
     /**
      * When true, writes are allowed also on tables with volatile FID mappers. False by default
      * @see FIDMapper#isVolatile()
@@ -209,6 +224,34 @@ public abstract class JDBCDataStore implements DataStore {
      */
     private List contents = null;    
 
+/**
+  * Gets the SQL name escape string.
+  * <p>
+  * The value of this string is prefixed and appended to table schema names,
+  * table names and column names in an SQL statement to support
+  * mixed-case and non-English names.
+  * 
+ * @return the value of the SQL name escape string.
+ */
+public String getSqlNameEscape() {
+	return sqlNameEscape;
+}
+
+/**
+ * Sets the SQL name escape string.
+ * <p>
+ * The value of this string is prefixed and appended to table schema names,
+ * table names and column names in an SQL statement to support
+ * mixed-case and non-English names.
+ * <p>
+ * This value is typically only set once when the DataStore implementation class is constructed.
+ * 
+ * @param sqlNameEscape the name escape character
+ */
+
+protected void setSqlNameEscape(String sqlNameEscape) {
+	this.sqlNameEscape = sqlNameEscape;
+}
     /**
      * DOCUMENT ME!
      *
@@ -938,7 +981,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         Transaction transaction,
         boolean forWrite)
         throws IOException {
-        LOGGER.fine("About to execure query: " + sqlQuery);
+        LOGGER.fine("About to execute query: " + sqlQuery);
 
         Connection conn = null;
         Statement statement = null;
@@ -957,7 +1000,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             return new QueryData(featureTypeInfo, this, conn, statement, rs, transaction);
         } catch (SQLException e) {
             // if an error occurred we close the resources
-            String msg = "Error Performing SQL query";
+            String msg = "Error Performing SQL query: " + sqlQuery;
             LOGGER.log(Level.SEVERE, msg, e);
             JDBCUtils.close(rs);
             JDBCUtils.close(statement);
@@ -1004,7 +1047,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      */
     protected final Connection getConnection(Transaction transaction) throws IOException {
         if (transaction != Transaction.AUTO_COMMIT) {
-            // we will need to save a JDBC connenction is
+            // we will need to save a JDBC connection is
             // transaction.putState( connectionPool, JDBCState )
             //throw new UnsupportedOperationException("Transactions not supported yet");
             JDBCTransactionState state =
