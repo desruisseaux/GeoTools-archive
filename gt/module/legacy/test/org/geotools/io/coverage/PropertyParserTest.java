@@ -40,10 +40,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.coverage.io.AmbiguousPropertyException;
-import org.geotools.coverage.io.MissingPropertyException;
-import org.geotools.coverage.io.PropertyException;
-import org.geotools.coverage.io.PropertyParser;
 import org.geotools.gc.GridCoverageTest;
 import org.geotools.resources.Arguments;
 

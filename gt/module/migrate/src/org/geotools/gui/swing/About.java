@@ -353,7 +353,7 @@ public class About extends JPanel {
                         title = null;
                     }
                 }
-            } while ((writer = !writer));
+            } while ((writer = !writer) == true);
             final String title = buffer.toString();
             final DefaultMutableTreeNode root = new DefaultMutableTreeNode(title);
             for (final Iterator it=mimes.values().iterator(); it.hasNext();) {
