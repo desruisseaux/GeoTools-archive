@@ -14,102 +14,120 @@
  *    Lesser General Public License for more details.
  *
  */
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
-/*
- * Created on Jun 28, 2004
- *
- */
 package org.geotools.validation;
+
+import junit.framework.TestCase;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultRepository;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.*;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DefaultRepository;
-
-import junit.framework.TestCase;
 
 /**
  * ValidatorTest<br>
- * @author bowens<br>
- * Created Jun 28, 2004<br>
- * @version <br>
- * 
- * <b>Puropse:</b><br>
- * <p>
- * DOCUMENT ME!!
- * </p>
- * 
- * <b>Description:</b><br>
- * <p>
- * DOCUMENT ME!!
- * </p>
- * 
- * <b>Usage:</b><br>
- * <p>
- * DOCUMENT ME!!
- * </p>
+ *
+ * @author bowens<br> Created Jun 28, 2004<br>
+ * @version <br><b>Puropse:</b><br><p><b>Description:</b><br><p><b>Usage:</b><br><p>
  */
-public class ValidatorTest extends TestCase 
-{
-	
-	TestFixture fixture;
-	
-	/*
-	 * @see TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		fixture = new TestFixture();
-	}
+public class ValidatorTest extends TestCase {
+    TestFixture fixture;
 
-	/*
-	 * @see TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		fixture = null;
-	}
+    /*
+     * @see TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+        fixture = new TestFixture();
+    }
 
-	public void testRepositoryGeneration()
-	{
-		//DefaultRepository dataRepository = new DefaultRepository();
-		DefaultRepository repo = fixture.repository;
-		Set ds = repo.getDataStores();
-		assertTrue(ds!=null);
-		assertTrue(ds.size() > 0);
-		System.out.println("num datasotres = " + ds.size());
-		assertNotNull(repo.datastore("cite"));			// fails
-		Iterator it = ds.iterator();
-		while (it.hasNext())
-		{
-			Object o = it.next();
-			assertNotNull(o);							// fails
-			System.out.println(o.getClass());
-			DataStore d = (DataStore) o;
-			String[] typeNames = null;
-			try {
-				typeNames = d.getTypeNames();
-				System.out.println(typeNames.length);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			for (int i=0; i<typeNames.length; i++)
-			{
-				if (typeNames != null)
-					System.out.println(typeNames[i]);
-			}
-		}
-	}
-	
-	public void testFeatureValidation() {
-	}
+    /*
+     * @see TestCase#tearDown()
+     */
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        fixture = null;
+    }
 
-	public void testIntegrityValidation() {
-	}
+    public void testRepositoryGeneration() throws Exception {
+        //DefaultRepository dataRepository = new DefaultRepository();               
+        assertNotNull(fixture.repository.datastore("LAKES"));
+        assertNotNull(fixture.repository.datastore("STREAMS"));
+        assertNotNull(fixture.repository.datastore("SWAMPS"));
+        assertNotNull(fixture.repository.datastore("RIVERS"));
 
+        Map types = fixture.repository.types();
+        assertTrue( types.containsKey( "LAKES:lakes" ) );
+        assertTrue( types.containsKey( "STREAMS:streams" ) );
+        assertTrue( types.containsKey( "SWAMPS:swamps" ) );
+        assertTrue( types.containsKey( "RIVERS:rivers" ) );        
+    }
+
+    public void testFeatureValidation() throws Exception {
+    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureReader reader = lakes.getFeatures().reader();
+		DefaultFeatureResults results = new DefaultFeatureResults();    	
+    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), reader, results );
+    	reader.close();    	
+    	assertEquals( "lakes test", 0, results.error.size() );
+    	
+
+    }
+    public Feature invalidLake() throws Exception {
+    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	
+    	FeatureReader reader = lakes.getFeatures( new DefaultQuery("lakes", Filter.NONE, 1, null, null) ).reader();
+    	Feature feature = reader.next();
+    	reader.close();
+    	
+    	FeatureType LAKE = lakes.getSchema();
+    	Object array[] = new Object[ LAKE.getAttributeCount() ];
+    	for( int i=0; i<LAKE.getAttributeCount(); i++){
+    		AttributeType attr = LAKE.getAttributeType( i );
+    		// System.out.println( i+" "+attr.getType()+":"+attr.getName()+"="+feature.getAttribute( i )  );
+    		if( LAKE.getDefaultGeometry() == attr ){
+    			GeometryFactory factory = new GeometryFactory();
+    			Coordinate coords[] = new Coordinate[]{
+    					new Coordinate( 1, 1 ),new Coordinate( 2, 2 ),
+						new Coordinate( 2, 1 ),new Coordinate( 1, 2 ),
+						new Coordinate( 1, 1 ),
+    			};
+    			LinearRing ring = factory.createLinearRing( coords );
+    			Polygon poly = factory.createPolygon( ring, null );
+    			array[i] = factory.createMultiPolygon( new Polygon[]{ poly, } ); 
+    		}
+    		else {
+    			array[i] = feature.getAttribute( i );
+    		}
+    	}
+    	return LAKE.create( array, "splash" );
+    }
+    public void testFeatureValidation2() throws Exception {
+    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	Feature newFeature = invalidLake();
+    	    	
+    	FeatureReader add = DataUtilities.reader( new Feature[]{ newFeature, } );
+    	
+    	DefaultFeatureResults results = new DefaultFeatureResults();    	
+    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), add, results );
+    	add.close();
+    	assertEquals( "lakes test", 2, results.error.size() );
+    }
+
+    public void testIntegrityValidation() {
+    }
 }
