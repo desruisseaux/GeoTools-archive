@@ -26,6 +26,7 @@ import java.awt.geom.AffineTransform;
 import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -49,7 +50,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://math.nist.gov/javanumerics/jama/">Jama matrix</A>
  * @see <A HREF="http://jcp.org/jsr/detail/83.jsp">JSR-83 Multiarray package</A>
  */
-public class Matrix extends GMatrix implements org.opengis.referencing.operation.Matrix {
+public class GeneralMatrix extends GMatrix implements Matrix {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -59,7 +60,7 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * Construct a square identity matrix of size
      * <code>size</code>&nbsp;&times;&nbsp;<code>size</code>.
      */
-    public Matrix(final int size) {
+    public GeneralMatrix(final int size) {
         super(size,size);
     }
     
@@ -68,7 +69,7 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code>.
      * Elements on the diagonal <var>j==i</var> are set to 1.
      */
-    public Matrix(final int numRow, final int numCol) {
+    public GeneralMatrix(final int numRow, final int numCol) {
         super(numRow, numCol);
     }
     
@@ -80,7 +81,7 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * numbering begins with zero, <code>row</code> and <code>numCol</code> will be
      * one larger than the maximum possible matrix index values.
      */
-    public Matrix(final int numRow, final int numCol, final double[] matrix) {
+    public GeneralMatrix(final int numRow, final int numCol, final double[] matrix) {
         super(numRow, numCol, matrix);
         if (numRow*numCol != matrix.length) {
             throw new IllegalArgumentException(String.valueOf(matrix.length));
@@ -94,7 +95,7 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * @throws IllegalArgumentException if the specified matrix is not regular
      *         (i.e. if all rows doesn't have the same length).
      */
-    public Matrix(final double[][] matrix) throws IllegalArgumentException {
+    public GeneralMatrix(final double[][] matrix) throws IllegalArgumentException {
         super(matrix.length, (matrix.length!=0) ? matrix[0].length : 0);
         final int numRow = getNumRow();
         final int numCol = getNumCol();
@@ -109,7 +110,7 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
     /**
      * Constructs a new matrix and copies the initial values from the parameter matrix.
      */
-    public Matrix(final org.opengis.referencing.operation.Matrix matrix) {
+    public GeneralMatrix(final Matrix matrix) {
         this(matrix.getNumRow(), matrix.getNumCol());
         final int height = getNumRow();
         final int width  = getNumCol();
@@ -123,14 +124,14 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
     /**
      * Constructs a new matrix and copies the initial values from the parameter matrix.
      */
-    public Matrix(final GMatrix matrix) {
+    public GeneralMatrix(final GMatrix matrix) {
         super(matrix);
     }
     
     /**
      * Construct a 3&times;3 matrix from the specified affine transform.
      */
-    public Matrix(final AffineTransform transform) {
+    public GeneralMatrix(final AffineTransform transform) {
         super(3,3, new double[] {
             transform.getScaleX(), transform.getShearX(), transform.getTranslateX(),
             transform.getShearY(), transform.getScaleY(), transform.getTranslateY(),
@@ -152,9 +153,9 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      *        be taken in account. If <code>false</code>, then source and destination
      *        regions will be ignored and may be null.
      */
-    private Matrix(final Envelope srcRegion, final AxisDirection[] srcAxis,
-                   final Envelope dstRegion, final AxisDirection[] dstAxis,
-                   final boolean validRegions)
+    private GeneralMatrix(final Envelope srcRegion, final AxisDirection[] srcAxis,
+                          final Envelope dstRegion, final AxisDirection[] dstAxis,
+                          final boolean validRegions)
     {
         this(srcAxis.length+1);
         /*
@@ -234,10 +235,10 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * @throws IllegalArgumentException if the affine transform can't
      *         be created for some other raison.
      */
-    public static Matrix createAffineTransform(final AxisDirection[] srcAxis,
-                                               final AxisDirection[] dstAxis)
+    public static GeneralMatrix createAffineTransform(final AxisDirection[] srcAxis,
+                                                      final AxisDirection[] dstAxis)
     {
-        return new Matrix(null, srcAxis, null, dstAxis, false);
+        return new GeneralMatrix(null, srcAxis, null, dstAxis, false);
     }
     
     /**
@@ -249,12 +250,12 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * @param  dstRegion The destination region.
      * @throws MismatchedDimensionException if regions don't have the same dimension.
      */
-    public static Matrix createAffineTransform(final Envelope srcRegion,
-                                               final Envelope dstRegion)
+    public static GeneralMatrix createAffineTransform(final Envelope srcRegion,
+                                                      final Envelope dstRegion)
     {
         final int dimension = srcRegion.getDimension();
         ensureDimensionMatch("dstRegion", dstRegion, dimension);
-        final Matrix matrix = new Matrix(dimension+1);
+        final GeneralMatrix matrix = new GeneralMatrix(dimension+1);
         for (int i=0; i<dimension; i++) {
             final double scale     = dstRegion.getLength (i) / srcRegion.getLength (i);
             final double translate = dstRegion.getMinimum(i) - srcRegion.getMinimum(i)*scale;
@@ -281,10 +282,10 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
      * @throws IllegalArgumentException if the affine transform can't be created
      *         for some other raison.
      */
-    public static Matrix createAffineTransform(Envelope srcRegion, AxisDirection[] srcAxis,
-                                               Envelope dstRegion, AxisDirection[] dstAxis)
+    public static GeneralMatrix createAffineTransform(Envelope srcRegion, AxisDirection[] srcAxis,
+                                                      Envelope dstRegion, AxisDirection[] dstAxis)
     {
-        return new Matrix(srcRegion, srcAxis, dstRegion, dstAxis, true);
+        return new GeneralMatrix(srcRegion, srcAxis, dstRegion, dstAxis, true);
     }
     
     /**

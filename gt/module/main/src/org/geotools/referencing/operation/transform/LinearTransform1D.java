@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
@@ -125,7 +126,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * Returns this transform as an affine transform matrix.
      */
     public Matrix getMatrix() {
-        return new org.geotools.referencing.operation.Matrix(2, 2, new double[] {scale, offset, 0, 1});
+        return new GeneralMatrix(2, 2, new double[] {scale, offset, 0, 1});
     }
     
     /**
@@ -161,7 +162,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * some users.
      */
     public Matrix derivative(final DirectPosition point) throws TransformException {
-        return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {scale});
+        return new GeneralMatrix(1, 1, new double[] {scale});
     }
     
     /**

@@ -24,11 +24,12 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.referencing.operation.Matrix;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
@@ -102,9 +103,9 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * @return The derivative at the specified point (never <code>null</code>).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
-    public org.opengis.referencing.operation.Matrix derivative(final Point2D point) throws TransformException {
-        final Matrix matrix1 = wrap(transform1.derivative(point));
-        final Matrix matrix2 = wrap(transform2.derivative(transform1.transform(point, null)));
+    public Matrix derivative(final Point2D point) throws TransformException {
+        final GeneralMatrix matrix1 = wrap(transform1.derivative(point));
+        final GeneralMatrix matrix2 = wrap(transform2.derivative(transform1.transform(point, null)));
         matrix2.mul(matrix1);
         return matrix2;
     }

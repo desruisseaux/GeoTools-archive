@@ -39,6 +39,7 @@ import javax.media.jai.IntegerSequence;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
@@ -48,9 +49,10 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.Matrix;
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.MatrixTransform;
 
 // Resources
@@ -186,7 +188,7 @@ public class GridGeometry implements Serializable {
          * According OpenGIS specification, transforms must map pixel center.
          * This is done by adding 0.5 to grid coordinates.
          */
-        final Matrix matrix = new Matrix(dimension+1);
+        final GeneralMatrix matrix = new GeneralMatrix(dimension+1);
         matrix.setElement(dimension, dimension, 1);
         for (int i=0; i<dimension; i++) {
             double scale = userRange.getLength(i) / gridRange.getLength(i);
@@ -301,7 +303,7 @@ public class GridGeometry implements Serializable {
      */
     public Envelope getEnvelope() throws InvalidGridGeometryException {
         final int dimension = getDimension();
-        final org.geotools.geometry.Envelope envelope = new org.geotools.geometry.Envelope(dimension);
+        final GeneralEnvelope envelope = new GeneralEnvelope(dimension);
         for (int i=0; i<dimension; i++) {
             // According OpenGIS specification, GridGeometry maps pixel's center.
             // We want a bounding box for all pixels, not pixel's centers. Offset by
@@ -477,7 +479,7 @@ public class GridGeometry implements Serializable {
      *         if this array can't be deduced.
      */
     final boolean[] areAxisInverted() {
-        final org.opengis.referencing.operation.Matrix matrix;
+        final Matrix matrix;
         try {
             // Try to get the affine transform, assuming it is
             // insensitive to location (thus the 'null' argument).
@@ -501,8 +503,7 @@ public class GridGeometry implements Serializable {
                 if (i==j) {
                     inverse[j] = (value < 0);
                 } else if (value!=0) {
-                    // Matrix is not diagonal.
-                    // Can't guess axis direction.
+                    // Matrix is not diagonal. Can't guess axis direction.
                     return null;
                 }
             }

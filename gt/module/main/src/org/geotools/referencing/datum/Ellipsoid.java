@@ -35,7 +35,7 @@ import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.XMath;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
 
 
@@ -425,8 +425,8 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
         // Other cases: no solution for this algorithm.
         final CoordinateFormat format = new CoordinateFormat();
         throw new ArithmeticException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
-                    format.format(new DirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
-                    format.format(new DirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
+                  format.format(new GeneralDirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
+                  format.format(new GeneralDirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
     }
     
     /**

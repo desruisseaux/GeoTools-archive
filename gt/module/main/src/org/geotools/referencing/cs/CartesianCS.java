@@ -50,8 +50,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * @author Martin Desruisseaux
  *
  * @see ObliqueCartesianCS
- *
- * @todo Localize constant names.
  */
 public class CartesianCS extends ObliqueCartesianCS implements org.opengis.referencing.cs.CartesianCS {
     /**
@@ -64,6 +62,8 @@ public class CartesianCS extends ObliqueCartesianCS implements org.opengis.refer
      * <var>{@linkplain CoordinateSystemAxis#EASTING Easting,}</var>,
      * <var>{@linkplain CoordinateSystemAxis#NORTHING Northing}</var>
      * axis in metres.
+     *
+     * @todo Localize name.
      */
     public static CartesianCS PROJECTED = new CartesianCS("Projected",
                     org.geotools.referencing.cs.CoordinateSystemAxis.EASTING,
@@ -77,6 +77,8 @@ public class CartesianCS extends ObliqueCartesianCS implements org.opengis.refer
      * axis in metres.
      *
      * @see org.geotools.referencing.cs.SphericalCS#GEOCENTRIC
+     *
+     * @todo Localize name.
      */
     public static CartesianCS GEOCENTRIC = new CartesianCS("Geocentric",
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,
@@ -88,6 +90,8 @@ public class CartesianCS extends ObliqueCartesianCS implements org.opengis.refer
      * <var>{@linkplain CoordinateSystemAxis#X x}</var>,
      * <var>{@linkplain CoordinateSystemAxis#Y y}</var>
      * axis in metres.
+     *
+     * @todo Localize name.
      */
     public static CartesianCS GENERIC_2D = new CartesianCS("Cartesian",
                     org.geotools.referencing.cs.CoordinateSystemAxis.X,
@@ -99,6 +103,8 @@ public class CartesianCS extends ObliqueCartesianCS implements org.opengis.refer
      * <var>{@linkplain CoordinateSystemAxis#Y y}</var>,
      * <var>{@linkplain CoordinateSystemAxis#Z z}</var>
      * axis in metres.
+     *
+     * @todo Localize name.
      */
     public static CartesianCS GENERIC_3D = new CartesianCS("Cartesian",
                     org.geotools.referencing.cs.CoordinateSystemAxis.X,

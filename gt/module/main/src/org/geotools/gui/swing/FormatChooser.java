@@ -50,7 +50,7 @@ import java.awt.event.ActionListener;
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.measure.CoordinateFormat;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
@@ -267,7 +267,7 @@ public class FormatChooser extends JPanel {
         if (format instanceof CoordinateFormat) {
             final int dimension = ((CoordinateFormat) format)
                             .getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
-            final DirectPosition point = new DirectPosition(dimension);
+            final GeneralDirectPosition point = new GeneralDirectPosition(dimension);
             for (int i=0; i<dimension; i++) {
                 point.setOrdinate(i, (i&1)==0 ? 39.3 : 27.9); // Could be any random value.
             }

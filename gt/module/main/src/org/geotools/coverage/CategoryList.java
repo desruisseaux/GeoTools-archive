@@ -48,11 +48,13 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-// Resources
+// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
@@ -863,7 +865,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     {
         checkDimension(ptSrc);
         if (ptDst==null) {
-            ptDst = new org.geotools.geometry.DirectPosition(1);
+            ptDst = new GeneralDirectPosition(1);
         } else {
             checkDimension(ptDst);
         }
@@ -876,7 +878,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      */
     public final Matrix derivative(final DirectPosition point) throws TransformException {
         checkDimension(point);
-        return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {
+        return new GeneralMatrix(1, 1, new double[] {
             derivative(point.getOrdinate(0))
         });
     }

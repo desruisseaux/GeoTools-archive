@@ -76,6 +76,10 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
 
     /**
      * A cartesian local coordinate system.
+     *
+     * @todo In current implementation, CARTESIAN_xD and GENERIC_xD would be considered
+     *       equals when metadata are ignored...  A possible fix is to attach different
+     *       ResourceKeys to them.
      */
     private static final class Cartesian extends EngineeringCRS {
         /** Serial number for interoperability with different versions. */
@@ -90,10 +94,6 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
         public String getName(final Locale locale) {
             return Resources.getResources(locale).getString(ResourceKeys.CARTESIAN);
         }
-
-        // TODO: in current implementation, CARTESIAN_xD and GENERIC_xD would be considered
-        //       equals when metadata are ignored...  A possible fix is to attach different
-        //       ResourceKeys to them.
     }
 
     /**

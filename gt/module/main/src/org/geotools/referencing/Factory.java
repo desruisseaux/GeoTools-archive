@@ -829,9 +829,10 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      *
      * @param  xml Coordinate reference system encoded in XML format.
      * @throws FactoryException if the object creation failed.
+     *
+     * @todo Not yet implemented.
      */
     public CoordinateReferenceSystem createFromXML(String xml) throws FactoryException {
-        // TODO: Not yet implemented.
         throw new FactoryException("Not yet implemented");
     }
 
@@ -842,9 +843,10 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      *
      * @param  wkt Coordinate system encoded in Well-Known Text format.
      * @throws FactoryException if the object creation failed.
+     *
+     * @todo Code not yet ported from legacy CTS code.
      */
     public CoordinateReferenceSystem createFromWKT(String wkt) throws FactoryException {
-        // TODO: Code not yet ported from legact CTS code.
         throw new FactoryException("Not yet implemented");
     }
 

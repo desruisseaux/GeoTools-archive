@@ -41,7 +41,7 @@ import org.geotools.cs.Ellipsoid;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.CoordinateFormat;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.ShapeUtilities;
@@ -60,7 +60,7 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * environment, create one instance of <code>GeodeticCalculator</code> for each thread even
  * if the computations are performed with the same ellipsoid.
  *
- * @version $Id: GeodeticCalculator.java,v 1.1 2004/03/08 17:48:27 desruisseaux Exp $
+ * @version $Id$
  * @author Daniele Franzoni
  * @author Martin Desruisseaux
  */
@@ -266,8 +266,8 @@ public class GeodeticCalculator {
     private String getNoConvergenceErrorMessage() {
         final CoordinateFormat format = new CoordinateFormat();
         return Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
-               format.format(new DirectPosition(Math.toDegrees(long1), Math.toDegrees(lat1))),
-               format.format(new DirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
+               format.format(new GeneralDirectPosition(Math.toDegrees(long1), Math.toDegrees(lat1))),
+               format.format(new GeneralDirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
     }
 
     /**

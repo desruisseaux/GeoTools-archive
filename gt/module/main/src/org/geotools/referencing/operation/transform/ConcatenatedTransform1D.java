@@ -26,7 +26,7 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.DirectPosition1D;
 
 
 /**
@@ -72,8 +72,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      * Gets the derivative of this function at a value.
      */
     public double derivative(final double value) throws TransformException {
-        final DirectPosition p = new DirectPosition(1);
-        p.ordinates[0] = value;
+        final DirectPosition1D p = new DirectPosition1D(value);
         final Matrix m = derivative(p);
         assert m.getNumRow()==1 && m.getNumCol()==1;
         return m.getElement(0,0);

@@ -64,7 +64,7 @@ public class VerticalCRS extends CoordinateReferenceSystem
      * Ellipsoidal heights are measured along the normal to the ellipsoid
      * used in the definition of horizontal datum.
      *
-     * @todo Localize.
+     * @todo Localize name.
      */
     public static final VerticalCRS ELLIPSOIDAL_HEIGHT = new VerticalCRS("Ellipsoidal height",
                         org.geotools.referencing.datum.VerticalDatum.ELLIPSOIDAL,

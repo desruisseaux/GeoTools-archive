@@ -27,7 +27,7 @@ import java.text.FieldPosition;
 // Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -105,7 +105,7 @@ public class CoordinateFormat extends org.geotools.measure.CoordinateFormat {
      *         cannot format the given object.
      */
     public String format(final CoordinatePoint point) {
-        return super.format(new DirectPosition(point.ord));
+        return super.format(new GeneralDirectPosition(point.ord));
     }
     
     /**
@@ -127,7 +127,7 @@ public class CoordinateFormat extends org.geotools.measure.CoordinateFormat {
                                final FieldPosition   position)
             throws IllegalArgumentException
     {
-        return super.format(new DirectPosition(point.ord), toAppendTo, position);
+        return super.format(new GeneralDirectPosition(point.ord), toAppendTo, position);
     }
 
     /**

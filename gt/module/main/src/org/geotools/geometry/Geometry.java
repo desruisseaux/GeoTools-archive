@@ -53,7 +53,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     private static CoordinateOperationFactory coordinateOperationFactory;
 
     /**
-     * The coordinate reference system used in {@linkplain DirectPosition direct position}
+     * The coordinate reference system used in {@linkplain GeneralDirectPosition direct position}
      * coordinates.
      */
     protected final CoordinateReferenceSystem crs;
@@ -62,18 +62,18 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
      * Construct a geometry with the specified coordinate reference system.
      *
      * @param crs The coordinate reference system used in
-     *            {@linkplain DirectPosition direct position} coordinates.
+     *            {@linkplain GeneralDirectPosition direct position} coordinates.
      */
     public Geometry(final CoordinateReferenceSystem crs) {
         this.crs = crs;
     }
 
     /**
-     * Returns the coordinate reference system used in {@linkplain DirectPosition direct position}
-     * coordinates.
+     * Returns the coordinate reference system used in {@linkplain GeneralDirectPosition
+     * direct position} coordinates.
      *
-     * @return The coordinate reference system used in {@linkplain DirectPosition direct position}
-     *         coordinates.
+     * @return The coordinate reference system used in {@linkplain GeneralDirectPosition
+     *         direct position} coordinates.
      *
      * @see #getCoordinateDimension
      */

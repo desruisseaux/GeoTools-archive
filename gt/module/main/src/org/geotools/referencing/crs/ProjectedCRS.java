@@ -126,6 +126,8 @@ public class ProjectedCRS extends GeneralDerivedCRS
      *         "false_northing" and any other parameters specific to the projection.
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @todo Not yet implemented.
      */
     public ProjectedCRS(final Map                          properties,
                         final GeographicCRS                    geoCRS,
@@ -133,7 +135,6 @@ public class ProjectedCRS extends GeneralDerivedCRS
                         final GeneralParameterValue[] parameterValues,
                         final CartesianCS                          cs)
     {
-        // TODO: Not yet implemented
         super(properties, geoCRS, null, cs);
         throw new UnsupportedOperationException();
     }

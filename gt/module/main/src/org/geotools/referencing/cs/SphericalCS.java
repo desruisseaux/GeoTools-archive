@@ -45,8 +45,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Localize constant names.
  */
 public class SphericalCS extends CoordinateSystem implements org.opengis.referencing.cs.SphericalCS {
     /**
@@ -62,6 +60,8 @@ public class SphericalCS extends CoordinateSystem implements org.opengis.referen
      * axis.
      *
      * @see org.geotools.referencing.cs.CartesianCS#GEOCENTRIC
+     *
+     * @todo Localize name.
      */
     public static SphericalCS GEOCENTRIC = new SphericalCS("Geocentric",
                     org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LONGITUDE,

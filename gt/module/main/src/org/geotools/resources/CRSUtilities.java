@@ -34,10 +34,11 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.geometry.Envelope;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -358,7 +359,7 @@ public final class CRSUtilities {
      * @param  crs The coordinate reference system, or <code>null</code>.
      * @return The envelope, or <code>null</code> if none.
      */
-    public static org.opengis.spatialschema.geometry.Envelope getEnvelope(final CoordinateReferenceSystem crs) {
+    public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
         if (crs != null) {
             final Datum datum = crs.getDatum();
             if (datum != null) {
@@ -367,10 +368,10 @@ public final class CRSUtilities {
                     GeographicExtent geo = validArea.getGeographicElement();
                     if (geo instanceof GeographicBoundingBox) {
                         final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        return new Envelope(new double[] {bounds.getEastBoundLongitude(),
-                                                          bounds.getWestBoundLongitude()},
-                                            new double[] {bounds.getSouthBoundLatitude(),
-                                                          bounds.getNorthBoundLatitude()});
+                        return new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
+                                                                 bounds.getWestBoundLongitude()},
+                                                   new double[] {bounds.getSouthBoundLatitude(),
+                                                                 bounds.getNorthBoundLatitude()});
                     }
                     if (geo instanceof BoundingPolygon) {
                         return ((BoundingPolygon) geo).getPolygon().getEnvelope();
@@ -390,7 +391,7 @@ public final class CRSUtilities {
      *         than the original envelope.
      * @throws TransformException if a transform failed.
      */
-    public static Envelope transform(final MathTransform transform, final Envelope envelope)
+    public static Envelope transform(final MathTransform transform, final GeneralEnvelope envelope)
             throws TransformException
     {
         final int sourceDim = transform.getDimSource();
@@ -401,9 +402,9 @@ public final class CRSUtilities {
                       new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
         int          coordinateNumber = 0;
-        Envelope          transformed = null;
-        final DirectPosition sourcePt = new DirectPosition(sourceDim);
-        final DirectPosition targetPt = new DirectPosition(targetDim);
+        GeneralEnvelope   transformed = null;
+        final GeneralDirectPosition sourcePt = new GeneralDirectPosition(sourceDim);
+        final GeneralDirectPosition targetPt = new GeneralDirectPosition(targetDim);
         for (int i=sourceDim; --i>=0;) {
             sourcePt.setOrdinate(i, envelope.getMinimum(i));
         }
@@ -415,7 +416,7 @@ public final class CRSUtilities {
             if (transformed != null) {
                 transformed.add(targetPt);
             } else {
-                transformed = new Envelope(targetPt, targetPt);
+                transformed = new GeneralEnvelope(targetPt, targetPt);
             }
             // Get the next point's coordinate.   The 'coordinateNumber' variable should
             // be seen as a number in base 3 where the number of digits is equals to the
@@ -439,7 +440,7 @@ public final class CRSUtilities {
      * Transform an envelope. The transformation is only approximative.
      * Invoking this method is equivalent to invoking the following:
      * <br>
-     * <pre>transform(transform, new Envelope(source)).toRectangle2D()</pre>
+     * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
      *
      * @param  transform The transform to use. Source and target dimension must be 2.
      * @param  source The rectangle to transform (may be <code>null</code>).

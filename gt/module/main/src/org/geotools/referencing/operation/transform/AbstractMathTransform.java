@@ -42,16 +42,18 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
-// Resources
+// Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.wkt.Formattable;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.geometry.ShapeUtilities;
-import org.geotools.referencing.wkt.Formattable;
-import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -188,8 +190,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
              * that the destination will be the Geotools implementation, write directly into the
              * 'ordinates' array.
              */
-            final org.geotools.geometry.DirectPosition destination;
-            ptDst = destination = new org.geotools.geometry.DirectPosition(dimTarget);
+            final GeneralDirectPosition destination;
+            ptDst = destination = new GeneralDirectPosition(dimTarget);
             final double[] source;
             if (dimSource <= dimTarget) {
                 source = destination.ordinates;
@@ -465,7 +467,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             return derivative((Point2D)null);
         }
         if (this instanceof MathTransform1D) {
-            return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {
+            return new GeneralMatrix(1, 1, new double[] {
                        ((MathTransform1D) this).derivative(point.getOrdinate(0))});
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
@@ -474,11 +476,11 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
      */
-    static org.geotools.referencing.operation.Matrix wrap(final Matrix matrix) {
-        if (matrix instanceof org.geotools.referencing.operation.Matrix) {
-            return (org.geotools.referencing.operation.Matrix) matrix;
+    static GeneralMatrix wrap(final Matrix matrix) {
+        if (matrix instanceof GeneralMatrix) {
+            return (GeneralMatrix) matrix;
         } else {
-            return new org.geotools.referencing.operation.Matrix(matrix);
+            return new GeneralMatrix(matrix);
         }
     }
     

@@ -51,7 +51,7 @@ import org.geotools.resources.geometry.XRectangle2D;
  * @see org.opengis.pt.PT_Envelope
  * @see java.awt.geom.Rectangle2D
  *
- * @deprecated Replaced by {@link org.geotools.geometry.Envelope}
+ * @deprecated Replaced by {@link org.geotools.geometry.GeneralEnvelope}
  *             in the <code>org.geotools.geometry</code> package.
  */
 public class Envelope implements org.opengis.spatialschema.geometry.Envelope,

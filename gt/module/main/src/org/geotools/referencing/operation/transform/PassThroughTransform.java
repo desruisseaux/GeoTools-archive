@@ -19,7 +19,11 @@
  */
 package org.geotools.referencing.operation.transform;
 
+// J2SE dependencies
+import java.io.Serializable;
+
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -30,10 +34,9 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.referencing.operation.Matrix;
-
-// J2SE dependencies
-import java.io.Serializable;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -46,7 +49,7 @@ import java.io.Serializable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class PassThroughTransform extends AbstractMathTransform implements Serializable {
+public class PassThroughTransform extends AbstractMathTransform implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -70,20 +73,21 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     
     /**
      * The inverse transform. This field will be computed only when needed.
+     * But it is serialized in order to avoid rounding error.
      */
-    private transient PassThroughTransform inverse;
+    private PassThroughTransform inverse;
     
     /**
      * Create a pass through transform.
      *
-     * @param firstAffectedOrdinate Index of the first affected ordinate.
      * @param transform The sub transform.
+     * @param firstAffectedOrdinate Index of the first affected ordinate.
      * @param numTrailingOrdinates Number of trailing ordinates to pass through.
      *        Affected ordinates will range from <code>firstAffectedOrdinate</code>
      *        inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
      */
-    public PassThroughTransform(final int firstAffectedOrdinate,
-                                final MathTransform transform,
+    public PassThroughTransform(final MathTransform transform,
+                                final int firstAffectedOrdinate,
                                 final int numTrailingOrdinates)
     {
         if (transform instanceof PassThroughTransform) {
@@ -96,6 +100,21 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
             this.numTrailingOrdinates  = numTrailingOrdinates;
             this.transform             = transform;
         }
+    }
+
+    /**
+     * Ordered sequence of positive integers defining the positions in a coordinate
+     * tuple of the coordinates affected by this pass-through transform. The returned
+     * index are for source coordinates.
+     *
+     * @return The modified coordinates.
+     */
+    public int[] getModifiedCoordinates() {
+        final int[] index = new int[transform.getDimSource()];
+        for (int i=0; i<index.length; i++) {
+            index[i] = i + firstAffectedOrdinate;
+        }
+        return index;
     }
     
     /**
@@ -178,7 +197,7 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     /**
      * Gets the derivative of this transform at a point.
      */
-    public org.opengis.referencing.operation.Matrix derivative(final DirectPosition point) throws TransformException {
+    public Matrix derivative(final DirectPosition point) throws TransformException {
         final int nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
         final int transDim = transform.getDimSource();
         final int pointDim = point.getDimension();
@@ -187,9 +206,10 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, "point",
                         new Integer(pointDim), new Integer(transDim+nSkipped)));
         }
-        final org.geotools.geometry.DirectPosition subPoint;
-        subPoint = new org.geotools.geometry.DirectPosition(transDim);
-//TODO  System.arraycopy(point.ord, firstAffectedOrdinate, subPoint.ordinates, 0, transDim);
+        final GeneralDirectPosition subPoint = new GeneralDirectPosition(transDim);
+        for (int i=0; i<transDim; i++) {
+            subPoint.ordinates[i] = point.getOrdinate(i + firstAffectedOrdinate);
+        }
         return expand(wrap(transform.derivative(subPoint)),
                       firstAffectedOrdinate, numTrailingOrdinates, 0);
     }
@@ -205,16 +225,16 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
      * @param affine 0 if the matrix do not contains translation terms, or 1 if
      *        the matrix is an affine transform with translation terms.
      */
-    static org.opengis.referencing.operation.Matrix expand(final Matrix subMatrix,
-                                                           final int firstAffectedOrdinate,
-                                                           final int numTrailingOrdinates,
-                                                           final int affine)
+    static Matrix expand(final GeneralMatrix subMatrix,
+                         final int firstAffectedOrdinate,
+                         final int numTrailingOrdinates,
+                         final int affine)
     {
-        final int  nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
-        final int    numRow = subMatrix.getNumRow() - affine;
-        final int    numCol = subMatrix.getNumCol() - affine;
-        final Matrix matrix = new Matrix(numRow + nSkipped + affine,
-                                         numCol + nSkipped + affine);
+        final int         nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
+        final int           numRow = subMatrix.getNumRow() - affine;
+        final int           numCol = subMatrix.getNumCol() - affine;
+        final GeneralMatrix matrix = new GeneralMatrix(numRow + nSkipped + affine,
+                                                       numCol + nSkipped + affine);
         matrix.setZero();
 
         //  Set UL part to 1:   [ 1  0             ]
@@ -260,10 +280,11 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     /**
      * Creates the inverse transform of this object.
      */
-    public synchronized MathTransform inverse() throws NoninvertibleTransformException {
-        if (inverse==null) {
-            inverse = new PassThroughTransform(firstAffectedOrdinate,
-                                               transform.inverse(),
+    public MathTransform inverse() throws NoninvertibleTransformException {
+        // No need to synchronize. Not a big deal if two objects are created.
+        if (inverse == null) {
+            inverse = new PassThroughTransform(transform.inverse(),
+                                               firstAffectedOrdinate,
                                                numTrailingOrdinates);
             inverse.inverse = this;
         }
@@ -271,12 +292,23 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Compares the specified object with
-     * this math transform for equality.
+     * Returns a hash value for this transform.
+     * This value need not remain consistent between
+     * different implementations of the same class.
      */
-// TODO
+    public int hashCode() {
+        int code = (int)serialVersionUID + firstAffectedOrdinate + 37*numTrailingOrdinates;
+        if (transform != null) {
+            code ^= transform.hashCode();
+        }
+        return code;
+    }
+    
+    /**
+     * Compares the specified object with this math transform for equality.
+     */
     public boolean equals(final Object object) {
-        if (object==this) {
+        if (object == this) {
             return true;
         }
         if (super.equals(object)) {
@@ -289,22 +321,23 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
+     *
+     * @todo The {@link #numTrailingOrdinates} parameter is not part of OpenGIS specification.
+     *       We should returns a more complex WKT when <code>numTrailingOrdinates != 0</code>,
+     *       using an affine transform to change the coordinates order.
      */
-// TODO
-    public String toString() {
-        final StringBuffer buffer = new StringBuffer("PASSTHROUGH_MT[");
-        buffer.append(firstAffectedOrdinate);
-        buffer.append(',');
-        if (numTrailingOrdinates!=0) {
-            // TODO: This parameter is not part of OpenGIS specification!
-            //       We should returns a more complex WKT here, using an
-            //       affine transform to change the coordinates order.
-            buffer.append(numTrailingOrdinates);
-            buffer.append(',');
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append(firstAffectedOrdinate);
+        if (numTrailingOrdinates != 0) {
+            formatter.append(numTrailingOrdinates);
         }
-        buffer.append(transform);
-        buffer.append(']');
-        return buffer.toString();
+        formatter.append(transform);
+        return "PASSTHROUGH_MT";
     }
 }

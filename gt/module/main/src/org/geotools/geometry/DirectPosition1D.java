@@ -20,7 +20,7 @@
 package org.geotools.geometry;
 
 // J2SE dependencies
-import java.awt.geom.Point2D;
+import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -29,51 +29,52 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
- * Holds the coordinates for a two-dimensional position within some coordinate reference system.
+ * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Make this implementation serializable.
  */
-public class DirectPosition2D extends Point2D.Double implements DirectPosition {
+public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 3235094562875693710L;
+
     /**
      * The coordinate reference system for this position;
      */
     private CoordinateReferenceSystem crs;
+
+    /**
+     * The ordinate value.
+     */
+    public double ordinate;
     
     /**
-     * Construct a position initialized to (0,0) with a <code>null</code>
+     * Construct a position initialized to (0) with a <code>null</code>
      * coordinate reference system.
      */
-    public DirectPosition2D() {
+    public DirectPosition1D() {
     }
     
     /**
      * Construct a position with the specified coordinate reference system.
      */
-    public DirectPosition2D(final CoordinateReferenceSystem crs) {
+    public DirectPosition1D(final CoordinateReferenceSystem crs) {
         setCoordinateReferenceSystem(crs);
     }
     
     /**
-     * Construct a 2D position from the specified ordinates.
+     * Construct a 1D position from the specified ordinate.
      */
-    public DirectPosition2D(final double x, final double y) {
-        super(x,y);
-    }
-    
-    /**
-     * Construct a position from the specified {@link Point2D}.
-     */
-    public DirectPosition2D(final Point2D point) {
-        this(point.getX(), point.getY());
+    public DirectPosition1D(final double ordinate) {
+        this.ordinate = ordinate;
     }
     
     /**
      * Construct a position initialized to the same values than the specified point.
      */
-    public DirectPosition2D(final DirectPosition point) {
+    public DirectPosition1D(final DirectPosition point) {
         setLocation(point);
     }
 
@@ -95,18 +96,18 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
      * @param crs The new coordinate reference system, or <code>null</code>.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 2);
+        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 1);
         this.crs = crs;
     }
 
     /**
      * The length of coordinate sequence (the number of entries).
-     * This is always 2 for <code>DirectPosition2D</code> objects.
+     * This is always 1 for <code>DirectPosition1D</code> objects.
      *
      * @return The dimensionality of this position.
      */
     public final int getDimension() {
-        return 2;
+        return 1;
     }
 
     /**
@@ -116,40 +117,40 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
      * @return The coordinates
      */
     public double[] getCoordinates() {
-        return new double[] {x,y};
+        return new double[] {ordinate};
     }
 
     /**
      * Returns the ordinate at the specified dimension.
      *
-     * @param  dimension The dimension in the range 0 to 1 inclusive.
-     * @return The coordinate at the specified dimension.
+     * @param  dimension The dimension, which must be 0.
+     * @return The {@linkplain #ordinate}.
      * @throws IndexOutOfBoundsException if the specified dimension is out of bounds.
      *
      * @todo Provides a more detailled error message.
      */
     public final double getOrdinate(final int dimension) throws IndexOutOfBoundsException {
-        switch (dimension) {
-            case 0:  return x;
-            case 1:  return y;
-            default: throw new IndexOutOfBoundsException(String.valueOf(dimension));
+        if (dimension == 0) {
+            return ordinate;
+        } else {
+            throw new IndexOutOfBoundsException(String.valueOf(dimension));
         }
     }
 
     /**
      * Sets the ordinate value along the specified dimension.
      *
-     * @param  dimension the dimension for the ordinate of interest.
-     * @param  value the ordinate value of interest.
+     * @param  dimension The dimension, which must be 0.
+     * @param  value the ordinate value.
      * @throws IndexOutOfBoundsException if the specified dimension is out of bounds.
      *
      * @todo Provides a more detailled error message.
      */
     public final void setOrdinate(int dimension, double value) throws IndexOutOfBoundsException {
-        switch (dimension) {
-            case 0:  x=value; break;
-            case 1:  y=value; break;
-            default: throw new IndexOutOfBoundsException(String.valueOf(dimension));
+        if (dimension == 0) {
+            ordinate = value;
+        } else {
+            throw new IndexOutOfBoundsException(String.valueOf(dimension));
         }
     }
 
@@ -162,17 +163,9 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
      * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
      */
     public void setLocation(final DirectPosition position) throws MismatchedDimensionException {
-        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), 2);
+        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), 1);
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
-        x = position.getOrdinate(0);
-        y = position.getOrdinate(1);
-    }
-    
-    /**
-     * Returns a {@link Point2D} with the same coordinate as this direct position.
-     */
-    public Point2D toPoint2D() {
-        return new Point2D.Double(x,y);
+        ordinate = position.getOrdinate(0);
     }
     
     /**
@@ -188,10 +181,23 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
      * different implementations of the same class.
      */
     public int hashCode() {
-        int code = super.hashCode();
+        final long value = Double.doubleToLongBits(ordinate);
+        int code = (int)value ^ (int)(value >>> 32);
         if (crs != null) {
             code ^= crs.hashCode();
         }
         return code;
+    }
+
+    /**
+     * Returns a copy of this position.
+     */
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException exception) {
+            // Should not happen, since we are cloneable.
+            throw new AssertionError(exception);
+        }
     }
 }

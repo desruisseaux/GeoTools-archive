@@ -30,6 +30,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 
 
@@ -113,7 +114,7 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * Returns a copy of the identity matrix.
      */
     public Matrix getMatrix() {
-        return new org.geotools.referencing.operation.Matrix(dimension+1);
+        return new GeneralMatrix(dimension+1);
     }
     
     /**
@@ -122,7 +123,7 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * same everywhere.
      */
     public Matrix derivative(final DirectPosition point) {
-        return new org.geotools.referencing.operation.Matrix(dimension);
+        return new GeneralMatrix(dimension);
     }
     
     /**

@@ -37,7 +37,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.measure.CoordinateFormat;
-import org.geotools.geometry.DirectPosition;
+import org.geotools.geometry.GeneralDirectPosition;
 
 // J2SE dependencies
 import java.lang.Double; // For JavaDoc
@@ -388,8 +388,8 @@ public class Ellipsoid extends Info {
         // Other cases: no solution for this algorithm.
         final CoordinateFormat format = new CoordinateFormat();
         throw new ArithmeticException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
-                    format.format(new DirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
-                    format.format(new DirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
+                  format.format(new GeneralDirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
+                  format.format(new GeneralDirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
     }
     
     /**

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Collections;
 
 // OpenGIS direct dependencies
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.Conversion;
@@ -113,11 +114,16 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
                              final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        super(properties, base.getDatum(), derivedCS);
-        ensureNonNull("base",          base); // TODO: useless test, because of 'base.getDatum()' above...
+        super(properties, getDatum(base), derivedCS);
         ensureNonNull("baseToDerived", baseToDerived);
-        this.baseCRS            = base;
-        this.conversionFromBase = null; // TODO
+        this.baseCRS = base;
+        this.conversionFromBase = new org.geotools.referencing.operation.Conversion(
+                                      /* properties */ properties,
+                                      /* sourceCRS  */ base,
+                                      /* targetCRS  */ this,
+                                      /* transform  */ baseToDerived,
+                                      /* method     */ null,
+                                      /* parameters */ null);
         int dim1, dim2;
         if ((dim1=baseToDerived.getDimSource()) != (dim2=base.getCoordinateSystem().getDimension()) ||
             (dim1=baseToDerived.getDimTarget()) != (dim2=derivedCS.getDimension()))
@@ -126,6 +132,15 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                         new Integer(dim1), new Integer(dim2)));
         }
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static Datum getDatum(final CoordinateReferenceSystem base) {
+        ensureNonNull("base",  base);
+        return base.getDatum();
     }
 
     /**

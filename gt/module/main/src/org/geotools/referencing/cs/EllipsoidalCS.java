@@ -45,8 +45,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Localize constant names.
  */
 public class EllipsoidalCS extends org.geotools.referencing.cs.CoordinateSystem
                         implements org.opengis.referencing.cs.EllipsoidalCS
@@ -61,6 +59,8 @@ public class EllipsoidalCS extends org.geotools.referencing.cs.CoordinateSystem
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#GEODETIC_LONGITUDE longitude}</var>,
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#GEODETIC_LATITUDE latitude}</var>
      * axis in degrees.
+     *
+     * @todo Localize name.
      */
     public static EllipsoidalCS GEODETIC_2D = new EllipsoidalCS("Geodetic 2D",
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,
@@ -72,6 +72,8 @@ public class EllipsoidalCS extends org.geotools.referencing.cs.CoordinateSystem
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#GEODETIC_LATITUDE latitude}</var>,
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#ELLIPSOIDAL_HEIGHT height}</var>
      * axis.
+     *
+     * @todo Localize name.
      */
     public static EllipsoidalCS GEODETIC_3D = new EllipsoidalCS("Geodetic 3D",
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,

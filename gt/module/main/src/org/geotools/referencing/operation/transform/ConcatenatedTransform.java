@@ -32,11 +32,13 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
-// Resources
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -242,7 +244,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
     public Matrix derivative(final Point2D point) throws TransformException {
-        return derivative(new org.geotools.geometry.DirectPosition(point));
+        return derivative(new GeneralDirectPosition(point));
     }
     
     /**
@@ -259,12 +261,12 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         // if possible, which is always the case when both matrix are square.
         final int numRow = matrix2.getNumRow();
         final int numCol = matrix1.getNumCol();
-        final org.geotools.referencing.operation.Matrix matrix;
+        final GeneralMatrix matrix;
         if (numCol == matrix2.getNumCol()) {
             matrix = wrap(matrix2);
             matrix.mul(wrap(matrix1));
         } else {
-            matrix = new org.geotools.referencing.operation.Matrix(numRow, numCol);
+            matrix = new GeneralMatrix(numRow, numCol);
             matrix.mul(wrap(matrix2), wrap(matrix1));
         }
         return matrix;

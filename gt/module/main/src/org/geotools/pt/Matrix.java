@@ -38,10 +38,10 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.Matrix}
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.GeneralMatrix}
  *             in the <code>org.geotools.referencing.operation</code> package.
  */
-public class Matrix extends org.geotools.referencing.operation.Matrix {
+public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
     /**
      * Serial number for interoperability with different versions.
      */

@@ -38,15 +38,16 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies and resources
+import org.geotools.parameter.ParameterValue;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.parameter.ParameterValue;
-import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
- * Transforms multi-dimensional coordinate points using a {@link Matrix}.
+ * Transforms multi-dimensional coordinate points using a {@linkplain GeneralMatrix matrix}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -100,15 +101,11 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
             if (matrix.isIdentity()) {
                 return IdentityTransform.create(dimension);
             }
-            if (dimension == 3) {
-                final org.geotools.referencing.operation.Matrix m;
-                if (matrix instanceof org.geotools.referencing.operation.Matrix) {
-                    m = (org.geotools.referencing.operation.Matrix) matrix;
-                } else {
-                    m = new org.geotools.referencing.operation.Matrix(matrix);
-                }
-                if (m.isAffine()) {
-                    return create(m.toAffineTransform2D());
+            final GeneralMatrix m = wrap(matrix);
+            if (m.isAffine()) {
+                switch (dimension) {
+                    case 2: return LinearTransform1D.create(m.getElement(0,0), m.getElement(0,1));
+                    case 3: return create(m.toAffineTransform2D());
                 }
             }
         }
@@ -281,7 +278,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * same everywhere.
      */
     public Matrix derivative(final DirectPosition point) {
-        final org.geotools.referencing.operation.Matrix matrix = getGMatrix();
+        final GeneralMatrix matrix = getGeneralMatrix();
         matrix.setSize(numRow-1, numCol-1);
         return matrix;
     }
@@ -290,14 +287,14 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * Returns a copy of the matrix.
      */
     public Matrix getMatrix() {
-        return getGMatrix();
+        return getGeneralMatrix();
     }
     
     /**
      * Returns a copy of the matrix.
      */
-    private org.geotools.referencing.operation.Matrix getGMatrix() {
-        return new org.geotools.referencing.operation.Matrix(numRow, numCol, elt);
+    private GeneralMatrix getGeneralMatrix() {
+        return new GeneralMatrix(numRow, numCol, elt);
     }
     
     /**
@@ -339,7 +336,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
         if (isIdentity()) {
             return this;
         }
-        final org.geotools.referencing.operation.Matrix matrix = getGMatrix();
+        final GeneralMatrix matrix = getGeneralMatrix();
         try {
             matrix.invert();
         } catch (SingularMatrixException exception) {
@@ -357,7 +354,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * different implementations of the same class.
      */
     public int hashCode() {
-        long code = (int)serialVersionUID;
+        long code = serialVersionUID;
         for (int i=elt.length; --i>=0;) {
             code = code*37 + Double.doubleToLongBits(elt[i]);
         }

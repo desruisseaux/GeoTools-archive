@@ -32,8 +32,7 @@ import org.geotools.resources.cts.ResourceKeys;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -46,15 +45,18 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
  * coordinate reference system}. In this case, the cordinate reference system is implicitly
  * assumed to take on the value of the containing object's {@link CoordinateReferenceSystem}.
+ * <br><br>
+ * This particular implementation of <code>DirectPosition</code> is said "General" because it
+ * uses an {@linkplain #ordinates array of ordinates} of an arbitrary length. If the direct
+ * position is know to be always two-dimensional, then {@link DirectPosition2D} may provides
+ * a more efficient implementation.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see java.awt.geom.Point2D
  */
-public final class DirectPosition implements org.opengis.spatialschema.geometry.DirectPosition,
-                                             Position, Serializable
-{
+public final class GeneralDirectPosition implements DirectPosition, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -76,7 +78,7 @@ public final class DirectPosition implements org.opengis.spatialschema.geometry.
      * @param  numDim Number of dimensions.
      * @throws NegativeArraySizeException if <code>numDim</code> is negative.
      */
-    public DirectPosition(final int numDim) throws NegativeArraySizeException {
+    public GeneralDirectPosition(final int numDim) throws NegativeArraySizeException {
         ordinates = new double[numDim];
     }
     
@@ -84,35 +86,35 @@ public final class DirectPosition implements org.opengis.spatialschema.geometry.
      * Construct a position with the specified ordinates.
      * The <code>ordinates</code> array will be copied.
      */
-    public DirectPosition(final double[] ordinates) {
+    public GeneralDirectPosition(final double[] ordinates) {
         this.ordinates = (double[]) ordinates.clone();
     }
     
     /**
      * Construct a 2D position from the specified ordinates.
      */
-    public DirectPosition(final double x, final double y) {
+    public GeneralDirectPosition(final double x, final double y) {
         ordinates = new double[] {x,y};
     }
     
     /**
      * Construct a 3D position from the specified ordinates.
      */
-    public DirectPosition(final double x, final double y, final double z) {
+    public GeneralDirectPosition(final double x, final double y, final double z) {
         ordinates = new double[] {x,y,z};
     }
     
     /**
      * Construct a position from the specified {@link Point2D}.
      */
-    public DirectPosition(final Point2D point) {
+    public GeneralDirectPosition(final Point2D point) {
         this(point.getX(), point.getY());
     }
     
     /**
      * Construct a position initialized to the same values than the specified point.
      */
-    public DirectPosition(final DirectPosition point) {
+    public GeneralDirectPosition(final GeneralDirectPosition point) {
         ordinates = (double[]) point.ordinates.clone();
     }
 
@@ -230,7 +232,7 @@ public final class DirectPosition implements org.opengis.spatialschema.geometry.
      * @param  position The new position for this point.
      * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
      */
-    public void setLocation(final DirectPosition position) throws MismatchedDimensionException {
+    public void setLocation(final GeneralDirectPosition position) throws MismatchedDimensionException {
         ensureDimensionMatch("position", position.ordinates.length, getDimension());
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
         System.arraycopy(position.ordinates, 0, ordinates, 0, ordinates.length);
@@ -252,26 +254,6 @@ public final class DirectPosition implements org.opengis.spatialschema.geometry.
         }
         ordinates[0] = point.getX();
         ordinates[1] = point.getY();
-    }
-
-    /**
-     * Returns the direct position, which is always <code>this</code>.
-     * This method is implemented in order to meet the {@link Position} contract.
-     *
-     * @return Always <code>this</code>.
-     */
-    public org.opengis.spatialschema.geometry.DirectPosition getDirect() {
-        return this;
-    }
-    
-    /**
-     * Returns the point, which is <code>null</code>.
-     * This method is implemented in order to meet the {@link Position} contract.
-     *
-     * @return Always <code>null</code>.
-     */
-    public Point getIndirect() {
-        return null;
     }
     
     /**
@@ -345,6 +327,6 @@ public final class DirectPosition implements org.opengis.spatialschema.geometry.
      * Returns a deep copy of this position.
      */
     public Object clone() {
-        return new DirectPosition(ordinates);
+        return new GeneralDirectPosition(ordinates);
     }
 }

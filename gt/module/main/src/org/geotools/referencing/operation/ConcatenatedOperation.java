@@ -174,7 +174,6 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
                 if (transform == null) {
                     transform = step;
                 } else {
-                    // TODO: use factory.
                     transform = ConcatenatedTransform.create(transform, step);
                 }
             }

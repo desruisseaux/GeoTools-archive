@@ -31,6 +31,9 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+// Geotools dependencies
+import org.geotools.referencing.operation.transform.PassThroughTransform;
+
 
 /**
  * A pass-through operation specifies that a subset of a coordinate tuple is subject to a specific
@@ -45,7 +48,7 @@ public class PassThroughOperation extends SingleOperation
     /**
      * Serial number for interoperability with different versions.
      */
-//    private static final long serialVersionUID = 672935231344137185L;
+    private static final long serialVersionUID = 4308173919747248695L;
 
     /**
      * The operation to apply on the subset of a coordinate tuple.
@@ -55,21 +58,40 @@ public class PassThroughOperation extends SingleOperation
     /**
      * Construct a single operation from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
+     * Affected ordinates will range from <code>firstAffectedOrdinate</code>
+     * inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param The operation to apply on the subset of a coordinate tuple.
+     * @param firstAffectedOrdinate Index of the first affected ordinate.
+     * @param numTrailingOrdinates Number of trailing ordinates to pass through.
      */
     public PassThroughOperation(final Map                      properties,
                                 final CoordinateReferenceSystem sourceCRS,
                                 final CoordinateReferenceSystem targetCRS,
-                                final MathTransform             transform)
+                                final Operation                 operation,
+                                final int           firstAffectedOrdinate,
+                                final int            numTrailingOrdinates)
     {
-        super(properties, sourceCRS, targetCRS, transform);
-        operation = null; // TODO
+        super(properties, sourceCRS, targetCRS,
+              createTransform(operation, firstAffectedOrdinate, numTrailingOrdinates));
+        this.operation = operation;
+    }
+
+    /**
+     * Create the math transform to use for this operation.
+     * This is a work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static MathTransform createTransform(final Operation       operation,
+                                                 final int firstAffectedOrdinate,
+                                                 final int  numTrailingOrdinates)
+    {
+        ensureNonNull("operation", operation);
+        return new PassThroughTransform(operation.getMathTransform(),
+                        firstAffectedOrdinate, numTrailingOrdinates);
     }
 
     /**
@@ -83,11 +105,12 @@ public class PassThroughOperation extends SingleOperation
 
     /**
      * Ordered sequence of positive integers defining the positions in a coordinate
-     * tuple of the coordinates affected by this pass-through operation.
+     * tuple of the coordinates affected by this pass-through operation. The returned
+     * index are for source coordinates.
      *
      * @return The modified coordinates.
      */
     public int[] getModifiedCoordinates() {
-        return null; // TODO
+        return ((PassThroughTransform) transform).getModifiedCoordinates();
     }
 }

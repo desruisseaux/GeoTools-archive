@@ -31,8 +31,10 @@ import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 
 // OpenGIS dependencies
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -41,11 +43,14 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * <code>Envelope</code>, it is sufficient to encode these two points. This is consistent with
  * all of the data types in this specification, their state is represented by their publicly
  * accessible attributes.
+ * <br><br>
+ * This particular implementation of <code>Envelope</code> is said "General" because it
+ * uses coordinates of an arbitrary dimension.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Serializable {
+public class GeneralEnvelope implements Envelope, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -66,14 +71,14 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
     /**
      * Construct a new envelope with the same data than the specified envelope.
      */
-    public Envelope(final org.opengis.spatialschema.geometry.Envelope envelope) {
-        if (envelope instanceof Envelope) {
-            final Envelope e = (Envelope) envelope;
+    public GeneralEnvelope(final Envelope envelope) {
+        if (envelope instanceof GeneralEnvelope) {
+            final GeneralEnvelope e = (GeneralEnvelope) envelope;
             ordinates = (double[]) e.ordinates.clone();
             crs = e.crs;
         } else {
             // TODO: See if we can simplify this code with GeoAPI 1.1
-            final org.opengis.spatialschema.geometry.DirectPosition lower, upper;
+            final DirectPosition lower, upper;
             lower = envelope.getLowerCorner();
             upper = envelope.getUpperCorner();
             crs   = lower.getCoordinateReferenceSystem();
@@ -97,7 +102,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * Construct an empty envelope of the specified dimension.
      * All ordinates are initialized to 0.
      */
-    public Envelope(final int dimension) {
+    public GeneralEnvelope(final int dimension) {
         ordinates = new double[dimension*2];
     }
     
@@ -107,7 +112,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @param min The minimal value.
      * @param max The maximal value.
      */
-    public Envelope(final double min, final double max) {
+    public GeneralEnvelope(final double min, final double max) {
         ordinates = new double[] {min, max};
         checkCoherence();
     }
@@ -121,7 +126,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws IllegalArgumentException if an ordinate value in the minimum point is not
      *         less than or equal to the corresponding ordinate value in the maximum point.
      */
-    public Envelope(final double[] minCP, final double[] maxCP)
+    public GeneralEnvelope(final double[] minCP, final double[] maxCP)
         throws MismatchedDimensionException
     {
         if (minCP.length != maxCP.length) {
@@ -144,7 +149,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws IllegalArgumentException if an ordinate value in the minimum point is not
      *         less than or equal to the corresponding ordinate value in the maximum point.
      */
-    public Envelope(final DirectPosition minCP, final DirectPosition maxCP)
+    public GeneralEnvelope(final GeneralDirectPosition minCP, final GeneralDirectPosition maxCP)
             throws MismatchedDimensionException
     {
         this(minCP.ordinates, maxCP.ordinates);
@@ -153,7 +158,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
     /**
      * Construct two-dimensional envelope defined by a {@link Rectangle2D}.
      */
-    public Envelope(final Rectangle2D rect) {
+    public GeneralEnvelope(final Rectangle2D rect) {
         ordinates = new double[] {
             rect.getMinX(), rect.getMinY(),
             rect.getMaxX(), rect.getMaxY()
@@ -194,7 +199,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @param crs The new coordinate reference system, or <code>null</code>.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        DirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
+        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
     
@@ -211,9 +216,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      *
      * @return The upper corner.
      */
-    public org.opengis.spatialschema.geometry.DirectPosition getUpperCorner() {
+    public DirectPosition getUpperCorner() {
         final int dim = ordinates.length/2;
-        final DirectPosition position = new DirectPosition(dim);
+        final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, dim, position.ordinates, 0, dim);
         position.setCoordinateReferenceSystem(crs);
         return position;
@@ -225,9 +230,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      *
      * @return The lower corner.
      */
-    public org.opengis.spatialschema.geometry.DirectPosition getLowerCorner() {
+    public DirectPosition getLowerCorner() {
         final int dim = ordinates.length/2;
-        final DirectPosition position = new DirectPosition(dim);
+        final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, 0, position.ordinates, 0, dim);
         position.setCoordinateReferenceSystem(crs);
         return position;
@@ -305,9 +310,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws MismatchedDimensionException if the specified point doesn't have
      *         the expected dimension.
      */
-    public void add(final DirectPosition position) throws MismatchedDimensionException {
+    public void add(final GeneralDirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
-        DirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
+        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
             if (value < ordinates[i    ]) ordinates[i    ]=value;
@@ -324,9 +329,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
-    public void add(final Envelope envelope) throws MismatchedDimensionException {
+    public void add(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
-        DirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         for (int i=0; i<dim; i++) {
             final double min = envelope.ordinates[i    ];
             final double max = envelope.ordinates[i+dim];
@@ -344,9 +349,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws MismatchedDimensionException if the specified point doesn't have
      *         the expected dimension.
      */
-    public boolean contains(final DirectPosition position) throws MismatchedDimensionException {
+    public boolean contains(final GeneralDirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
-        DirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
+        GeneralDirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
             if (!(value >= ordinates[i    ])) return false;
@@ -363,9 +368,9 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
-    public void intersect(final Envelope envelope) throws MismatchedDimensionException {
+    public void intersect(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
-        DirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         for (int i=0; i<dim; i++) {
             double min = Math.max(ordinates[i    ], envelope.ordinates[i    ]);
             double max = Math.min(ordinates[i+dim], envelope.ordinates[i+dim]);
@@ -405,7 +410,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @return The subenvelope.
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
-    public Envelope getSubEnvelope(final int lower, final int upper)
+    public GeneralEnvelope getSubEnvelope(final int lower, final int upper)
             throws IndexOutOfBoundsException
     {
         final int curDim = ordinates.length/2;
@@ -418,7 +423,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
             throw new IndexOutOfBoundsException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
-        final Envelope envelope = new Envelope(newDim);
+        final GeneralEnvelope envelope = new GeneralEnvelope(newDim);
         System.arraycopy(ordinates, lower,        envelope.ordinates, 0,      newDim);
         System.arraycopy(ordinates, lower+curDim, envelope.ordinates, newDim, newDim);
         return envelope;
@@ -433,7 +438,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * @return The subenvelope.
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
-    public Envelope getReducedEnvelope(final int lower, final int upper)
+    public GeneralEnvelope getReducedEnvelope(final int lower, final int upper)
             throws IndexOutOfBoundsException
     {
         final int curDim = ordinates.length/2;
@@ -446,7 +451,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
             throw new IndexOutOfBoundsException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
-        final Envelope envelope = new Envelope(curDim - rmvDim);
+        final GeneralEnvelope envelope = new GeneralEnvelope(curDim - rmvDim);
         System.arraycopy(ordinates, 0,     envelope.ordinates, 0,            lower);
         System.arraycopy(ordinates, lower, envelope.ordinates, upper, curDim-upper);
         return envelope;
@@ -474,7 +479,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * It is usually provided for debugging purposes.
      */
     public String toString() {
-        return DirectPosition.toString(this, ordinates);
+        return GeneralDirectPosition.toString(this, ordinates);
     }
     
     /**
@@ -483,7 +488,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      * different implementations of the same class.
      */
     public int hashCode() {
-        return DirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
+        return GeneralDirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
     }
     
     /**
@@ -492,7 +497,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final Envelope that = (Envelope) object;
+            final GeneralEnvelope that = (GeneralEnvelope) object;
             return Arrays.equals(this.ordinates, that.ordinates);
         }
         return false;
@@ -503,7 +508,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
      */
     public Object clone() {
         try {
-            Envelope e = (Envelope) super.clone();
+            GeneralEnvelope e = (GeneralEnvelope) super.clone();
             e.ordinates = (double[]) e.ordinates.clone();
             return e;
         } catch (CloneNotSupportedException exception) {

@@ -36,6 +36,8 @@ import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -91,7 +93,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst) {
         if (ptDst == null) {
-            ptDst = new org.geotools.geometry.DirectPosition(2);
+            ptDst = new GeneralDirectPosition(2);
         }
         final double[] array = ptSrc.getCoordinates();
         transform(array, 0, array, 0, 1);
@@ -104,7 +106,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * Returns this transform as an affine transform matrix.
      */
     public Matrix getMatrix() {
-        return new org.geotools.referencing.operation.Matrix(this);
+        return new GeneralMatrix(this);
     }
     
     /**
@@ -113,7 +115,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * same everywhere.
      */
     public Matrix derivative(final Point2D point) {
-        final Matrix matrix = new org.geotools.referencing.operation.Matrix(2);
+        final Matrix matrix = new GeneralMatrix(2);
         matrix.setElement(0,0, getScaleX());
         matrix.setElement(1,1, getScaleY());
         matrix.setElement(0,1, getShearX());

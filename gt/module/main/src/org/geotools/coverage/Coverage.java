@@ -67,12 +67,14 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.MetadataNameNotFoundException;
 
 // Geotools dependencies (CRS)
-import org.geotools.geometry.Envelope;
-import org.geotools.referencing.operation.Matrix;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 // Resources
 import org.geotools.resources.XArray;
@@ -248,7 +250,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      *
      * @return The bounding box for the coverage domain in coordinate system coordinates.
      */
-    public org.opengis.spatialschema.geometry.Envelope getEnvelope() {
+    public Envelope getEnvelope() {
         return CRSUtilities.getEnvelope(crs);
     }
     
@@ -550,8 +552,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * to evaluate the coverage. By default, all ordinates are initialized to 0. Subclasses
          * should set the desired values in their constructor if needed.
          */
-        protected final org.geotools.geometry.DirectPosition coordinate =
-                    new org.geotools.geometry.DirectPosition(getDimension());
+        protected final GeneralDirectPosition coordinate = new GeneralDirectPosition(getDimension());
 
         /**
          * Construct a renderable image.
@@ -563,7 +564,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             super(null, Coverage.this);
             this.xAxis = xAxis;
             this.yAxis = yAxis;
-            final org.opengis.spatialschema.geometry.Envelope envelope = getEnvelope();
+            final Envelope envelope = getEnvelope();
             bounds = new Rectangle2D.Double(envelope.getMinimum(xAxis),
                                             envelope.getMinimum(yAxis),
                                             envelope.getLength (xAxis),
@@ -746,8 +747,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
                  * interest.
                  */
                 // Clones the coordinate point in order to allow multi-thread invocation.
-                final org.geotools.geometry.DirectPosition coordinate =
-                  new org.geotools.geometry.DirectPosition(this.coordinate);
+                final GeneralDirectPosition coordinate = new GeneralDirectPosition(this.coordinate);
                 final TiledImage tiled = new TiledImage(gridBounds.x, gridBounds.y,
                                                         gridBounds.width, gridBounds.height,
                                                         0, 0, sampleModel, colorModel);
@@ -821,9 +821,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         protected RenderContext createRenderContext(final Rectangle2D gridBounds,
                                                     final RenderingHints hints)
         {
-            final Matrix matrix;
-            final Envelope srcEnvelope = new Envelope(bounds);
-            final Envelope dstEnvelope = new Envelope(gridBounds);
+            final GeneralMatrix matrix;
+            final GeneralEnvelope srcEnvelope = new GeneralEnvelope(bounds);
+            final GeneralEnvelope dstEnvelope = new GeneralEnvelope(gridBounds);
             if (crs != null) {
                 final CoordinateSystem cs = crs.getCoordinateSystem();
                 final AxisDirection[] axis = new AxisDirection[] {
@@ -840,9 +840,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
                     }
                 }
                 normalized[1] = normalized[1].inverse(); // Image's Y axis is downward.
-                matrix = Matrix.createAffineTransform(srcEnvelope, axis, dstEnvelope, normalized);
+                matrix = GeneralMatrix.createAffineTransform(srcEnvelope, axis, dstEnvelope, normalized);
             } else {
-                matrix = Matrix.createAffineTransform(srcEnvelope, dstEnvelope);
+                matrix = GeneralMatrix.createAffineTransform(srcEnvelope, dstEnvelope);
             }
             return new RenderContext(matrix.toAffineTransform2D(), hints);
         }
@@ -872,8 +872,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             int index = 0;
             float[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
-            final org.geotools.geometry.DirectPosition coordinate =
-                    new org.geotools.geometry.DirectPosition(this.coordinate);
+            final GeneralDirectPosition coordinate = new GeneralDirectPosition(this.coordinate);
             coordinate.ordinates[1] = startY;
             for (int j=0; j<countY; j++) {
                 coordinate.ordinates[0] = startX;
@@ -902,8 +901,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             int index = 0;
             double[] buffer = null;
             // Clones the coordinate point in order to allow multi-thread invocation.
-            final org.geotools.geometry.DirectPosition coordinate =
-                    new org.geotools.geometry.DirectPosition(this.coordinate);
+            final GeneralDirectPosition coordinate =  new GeneralDirectPosition(this.coordinate);
             coordinate.ordinates[1] = startY;
             for (int j=0; j<countY; j++) {
                 coordinate.ordinates[0] = startX;
@@ -975,7 +973,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         buffer.append("[\"");
         buffer.append(getName(locale));
         buffer.append('"');
-        final org.opengis.spatialschema.geometry.Envelope envelope = getEnvelope();
+        final Envelope envelope = getEnvelope();
         if (envelope != null) {
             buffer.append(", ");
             buffer.append(envelope);

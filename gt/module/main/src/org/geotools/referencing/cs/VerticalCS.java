@@ -46,8 +46,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Localize constant names.
  */
 public class VerticalCS extends CoordinateSystem implements org.opengis.referencing.cs.VerticalCS {
     /**
@@ -59,6 +57,8 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
      * A one-dimensional vertical CS with
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#ELLIPSOIDAL_HEIGHT
      * ellipsoidal height}</var> axis in metres.
+     *
+     * @todo Localize name.
      */
     public static VerticalCS ELLIPSOIDAL_HEIGHT = new VerticalCS("Ellipsoidal height",
                     org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
@@ -67,6 +67,8 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
      * A one-dimensional vertical CS with
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#GRAVITY_RELATED_HEIGHT
      * gravity-related height}</var> axis in metres.
+     *
+     * @todo Localize name.
      */
     public static VerticalCS GRAVITY_RELATED = new VerticalCS("Gravity-related",
                     org.geotools.referencing.cs.CoordinateSystemAxis.GRAVITY_RELATED_HEIGHT);
@@ -75,6 +77,8 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
      * A one-dimensional vertical CS with
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#DEPTH depth}</var>
      * axis in metres.
+     *
+     * @todo Localize name.
      */
     public static VerticalCS DEPTH = new VerticalCS("Depth",
                     org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH);

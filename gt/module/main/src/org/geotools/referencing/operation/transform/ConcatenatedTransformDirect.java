@@ -62,9 +62,8 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**
      * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
      */
-    public DirectPosition transform(final DirectPosition ptSrc,
-                                          DirectPosition ptDst)
-        throws TransformException
+    public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
+            throws TransformException
     {
         assert isValid();
         ptDst = transform1.transform(ptSrc, ptDst);
@@ -76,7 +75,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
      */
     public void transform(final double[] srcPts, final int srcOff,
                           final double[] dstPts, final int dstOff, final int numPts)
-        throws TransformException
+            throws TransformException
     {
         assert isValid();
         transform1.transform(srcPts, srcOff, dstPts, dstOff, numPts);
@@ -88,7 +87,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
      */
     public void transform(final float[] srcPts, final int srcOff,
                           final float[] dstPts, final int dstOff, final int numPts)
-        throws TransformException
+            throws TransformException
     {
         assert isValid();
         transform1.transform(srcPts, srcOff, dstPts, dstOff, numPts);
