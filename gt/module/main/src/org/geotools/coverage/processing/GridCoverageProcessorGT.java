@@ -50,6 +50,7 @@ import org.opengis.coverage.Coverage;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.Hints;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.jai.HysteresisDescriptor;
 import org.geotools.coverage.processing.jai.NodataFilterDescriptor;
@@ -178,7 +179,7 @@ public class GridCoverageProcessorGT {
 //            // OpenGIS operations
 //            //
 //            DEFAULT.addOperation(new Resampler.Operation());
-//            DEFAULT.addOperation(new Interpolator.Operation());
+//            DEFAULT.addOperation(new Interpolator2D.Operation());
 //            DEFAULT.addOperation(new SelectSampleDimension.Operation());
 //            DEFAULT.addOperation(new MaskFilterOperation("MinFilter"));
 //            DEFAULT.addOperation(new MaskFilterOperation("MaxFilter"));
@@ -449,11 +450,11 @@ public class GridCoverageProcessorGT {
 //            final String[] paramNames = parameters.getParameterListDescriptor().getParamNames();
 //            for (int i=0; i<paramNames.length; i++) {
 //                final Object param = parameters.getObjectParameter(paramNames[i]);
-//                if (param instanceof Interpolator) {
+//                if (param instanceof Interpolator2D) {
 //                    // If all sources use the same interpolation,  preserve the
 //                    // interpolation for the resulting coverage. Otherwise, use
 //                    // the default interpolation (nearest neighbor).
-//                    final Interpolation[] interp = ((Interpolator) param).getInterpolations();
+//                    final Interpolation[] interp = ((Interpolator2D) param).getInterpolations();
 //                    if (interpolations == null) {
 //                        interpolations = interp;
 //                    } else if (!Arrays.equals(interpolations, interp)) {
@@ -468,8 +469,8 @@ public class GridCoverageProcessorGT {
 //         * Apply the operation, apply the same interpolation and log a message.
 //         */
 //        coverage = operation.doOperation(parameters, hints);
-//        if (interpolations!=null && coverage!=null && !(coverage instanceof Interpolator)) {
-//            coverage = Interpolator.create(coverage, interpolations);
+//        if (interpolations!=null && coverage!=null && !(coverage instanceof Interpolator2D)) {
+//            coverage = Interpolator2D.create(coverage, interpolations);
 //        }
 //        if (coverage != source) {
 //            log(source, coverage, operationName, false);
@@ -494,8 +495,8 @@ public class GridCoverageProcessorGT {
     {
         if (source != result) {
             String interp = "Nearest";
-            if (result instanceof Interpolator) {
-                interp = ((Interpolator)result).getInterpolationName();
+            if (result instanceof Interpolator2D) {
+                interp = ((Interpolator2D)result).getInterpolationName();
             }
             final Locale locale = null; // Set locale here (if any).
             final LogRecord record = Resources.getResources(locale).getLogRecord(
