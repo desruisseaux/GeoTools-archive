@@ -68,11 +68,11 @@ public class BBOXAttributeIO implements AttributeIO {
 
           //+1 is safe, since the sql builder specifies the x and y columns
             //right next to eachother.
-            Number maxx = (Number) rs.getObject(position + 1);
+            Number maxx = (Number) rs.getObject(position + 2);
 
           //+1 is safe, since the sql builder specifies the x and y columns
             //right next to eachother.
-            Number maxy = (Number) rs.getObject(position + 1);
+            Number maxy = (Number) rs.getObject(position + 3);
 
 
             return gFactory.toGeometry( new Envelope(minx.doubleValue(),maxx.doubleValue(),miny.doubleValue(),maxy.doubleValue()));
