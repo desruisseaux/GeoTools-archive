@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import oracle.jdbc.OracleConnection;
-import oracle.sdoapi.OraSpatialManager;
-import oracle.sdoapi.util.GeometryMetaData;
+//import oracle.sdoapi.OraSpatialManager;
+//import oracle.sdoapi.util.GeometryMetaData;
 
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
@@ -128,8 +128,9 @@ public class OracleDataStore extends JDBCDataStore {
         OracleConnection conn = null;        
         try {        
             conn = (OracleConnection) getConnection(Transaction.AUTO_COMMIT);
-            GeometryMetaData gMetaData = OraSpatialManager.getGeometryMetaData(conn, tableName, geometryColumnName);
-            return gMetaData.getSpatialReferenceID();            
+            //GeometryMetaData gMetaData = OraSpatialManager.getGeometryMetaData(conn, tableName, geometryColumnName);
+            //return gMetaData.getSpatialReferenceID();
+            return -1;            
         }
         finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);            
