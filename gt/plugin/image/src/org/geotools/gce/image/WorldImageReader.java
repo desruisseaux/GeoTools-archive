@@ -23,17 +23,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.gc.GridCoverage;
-import org.geotools.pt.Envelope;
+import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.spatialschema.geometry.Envelope;
 
 /**
  * @author rgould
@@ -147,7 +153,7 @@ public class WorldImageReader implements GridCoverageReader {
 	 * @param parameters WorldImage supports no parameters, it ignores this param
 	 * @return a new GridCoverage read from the source
 	 */
-	public GridCoverage read( ParameterValueGroup parameters)
+	public GridCoverage read( GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
 		
 		URL sourceURL = null;
@@ -215,7 +221,7 @@ public class WorldImageReader implements GridCoverageReader {
 		BufferedImage image = null;
 		image = ImageIO.read(sourceURL);
 		
-		CoordinateSystem cs = GeographicCoordinateSystem.WGS84;
+		CoordinateReferenceSystem crs = GeographicCRS.WGS84;
 		Envelope envelope = null;
 		
 		double xMin = xLoc;
@@ -223,11 +229,24 @@ public class WorldImageReader implements GridCoverageReader {
 		double xMax = xLoc + (image.getWidth()*xPixelSize);
 		double yMin = yLoc + (image.getHeight()*yPixelSize);
 
-		envelope = new Envelope(new double[] {xMin, yMin}, new double[] {xMax, yMax});
+		envelope = new GeneralEnvelope(new double[] {xMin, yMin}, new double[] {xMax, yMax});
 
 		gridLeft = false;
 		
-		GridCoverage coverage = new GridCoverage(sourceURL.getFile(), image, cs, envelope);
+		GridCoverage coverage = null;
+		try {
+			coverage = new GridCoverageImpl(
+					sourceURL.getFile(), crs, null, null, image);
+		} catch (OperationNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NoSuchElementException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FactoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		return coverage;
 	}
 

@@ -26,12 +26,14 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.FileFormatNotCompatibleWithGridCoverageException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.spatialschema.geometry.Envelope;
 
 /**
  * @author rgould
@@ -117,16 +119,16 @@ public class WorldImageWriter implements GridCoverageWriter {
 	 * @param coverage the GridCoverage to write.
 	 * @param parameters no parameters are accepted. Currently ignored.
 	 */
-	public void write(GridCoverage coverage, ParameterValueGroup parameters)
+	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
 		
 		RenderedImage image = coverage.getRenderedImage();
 		
-		Rectangle2D box = coverage.getEnvelope().toRectangle2D();
-		double xMin = box.getMinX();
-		double yMin = box.getMinY();
-		double xMax = box.getMaxX();
-		double yMax = box.getMaxY();
+		Envelope env = coverage.getEnvelope();
+		double xMin = env.getMinimum(0);
+		double yMin = env.getMinimum(1);
+		double xMax = env.getMaximum(0);
+		double yMax = env.getMaximum(1);
 		
 		double xPixelSize = (xMax-xMin)/image.getWidth();
 		double rotation1 = 0;

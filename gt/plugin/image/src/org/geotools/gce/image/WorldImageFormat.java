@@ -19,9 +19,10 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.net.URL;
 
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author rgould
@@ -34,7 +35,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
  * 
  * Designed to be used with GridCoverageExchange. 
  */
-public class WorldImageFormat extends AbstractGridFormat {
+public class WorldImageFormat implements Format {
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
@@ -117,6 +118,60 @@ public class WorldImageFormat extends AbstractGridFormat {
 			return ".jgw";
 		if (fileExtension.equals(".tif") || fileExtension.equals(".tiff")) 
 			return ".tfw";
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getName()
+	 */
+	public String getName() {
+		return "World Image";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDescription()
+	 */
+	public String getDescription() {
+		return "A raster file accompanied by a spatial data file";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVendor()
+	 */
+	public String getVendor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDocURL()
+	 */
+	public String getDocURL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVersion()
+	 */
+	public String getVersion() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getReadParameters()
+	 */
+	public ParameterValueGroup getReadParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
+	 */
+	public ParameterValueGroup getWriteParameters() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
