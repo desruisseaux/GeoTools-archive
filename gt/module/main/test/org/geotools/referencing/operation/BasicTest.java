@@ -22,21 +22,25 @@ package org.geotools.referencing.operation;
 // J2SE and JUnit dependencies
 import javax.units.SI;
 import javax.units.Unit;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Matrix;
+
+// Geotools dependencies
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.crs.ProjectedCRS;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.cs.CoordinateSystem;
 import org.geotools.referencing.cs.CoordinateSystemAxis;
 import org.geotools.referencing.datum.Ellipsoid;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.operation.Matrix;
+import org.geotools.referencing.operation.OperationMethod;
 
 
 /**
@@ -154,17 +158,20 @@ public class BasicTest extends TestCase {
         final MathTransformFactory   factory = new MathTransformFactory();
         final ParameterValueGroup parameters = factory.getDefaultParameters("Mercator_1SP");
         ProjectedCRS sourceCRS, targetCRS;
+        MathTransform transform;
         Matrix conversion;
 
         parameters.parameter("semi_major").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
         parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMinorAxis());
-        sourceCRS = new ProjectedCRS("source", GeographicCRS.WGS84,
-                    factory.createParameterizedTransform(parameters), CartesianCS.PROJECTED);
+        transform = factory.createParameterizedTransform(parameters);
+        sourceCRS = new ProjectedCRS("source", new OperationMethod(transform),
+                    GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
         parameters.parameter("false_easting" ).setValue(1000);
         parameters.parameter("false_northing").setValue(2000);
-        targetCRS = new ProjectedCRS("source", GeographicCRS.WGS84,
-                    factory.createParameterizedTransform(parameters), CartesianCS.PROJECTED);
+        transform = factory.createParameterizedTransform(parameters);
+        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
+                    GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
         conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new GeneralMatrix(new double[][] {
@@ -174,8 +181,9 @@ public class BasicTest extends TestCase {
         }), conversion);
 
         parameters.parameter("scale_factor").setValue(2);
-        targetCRS = new ProjectedCRS("source", GeographicCRS.WGS84,
-                    factory.createParameterizedTransform(parameters), CartesianCS.PROJECTED);
+        transform = factory.createParameterizedTransform(parameters);
+        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
+                    GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
         conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new GeneralMatrix(new double[][] {
@@ -185,8 +193,9 @@ public class BasicTest extends TestCase {
         }), conversion);
 
         parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
-        targetCRS = new ProjectedCRS("source", GeographicCRS.WGS84,
-                    factory.createParameterizedTransform(parameters), CartesianCS.PROJECTED);
+        transform = factory.createParameterizedTransform(parameters);
+        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
+                    GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
         conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertNull(conversion);
     }

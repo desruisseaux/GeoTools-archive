@@ -24,20 +24,25 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.parameter.Parameters;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.parameter.Parameters;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -84,6 +89,52 @@ public class OperationMethod extends IdentifiedObject
      * The set of parameters, or <code>null</code> if none.
      */
     private final ParameterDescriptorGroup parameters;
+
+    /**
+     * Convenience constructor that creates an operation method from a math transform.
+     * The information provided in the newly created object are approximative, and
+     * usually acceptable only as a fallback when no other information are available.
+     *
+     * @param transform The math transform to describe.
+     */
+    public OperationMethod(final MathTransform transform) {
+        this(getProperties(transform),
+             transform.getSourceDimensions(),
+             transform.getTargetDimensions(),
+             getDescriptor(transform));
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static Map getProperties(final MathTransform transform) {
+        ensureNonNull("transform", transform);
+        final Map properties;
+        ParameterDescriptorGroup descriptor;
+        if (transform instanceof AbstractMathTransform) {
+            descriptor = ((AbstractMathTransform) transform).getParameterDescriptors();
+            properties = new HashMap(getProperties(descriptor));
+            properties.put(NAME_PROPERTY, descriptor.getName().getCode());
+        } else {
+            properties = Collections.singletonMap(NAME_PROPERTY,
+                                                  Resources.format(ResourceKeys.UNKNOW));
+        }
+        return properties;
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     * This code should have been merged with <code>getProperties</code> above.
+     */
+    private static ParameterDescriptorGroup getDescriptor(final MathTransform transform) {
+        ParameterDescriptorGroup descriptor = null;
+        if (transform instanceof AbstractMathTransform) {
+            descriptor = ((AbstractMathTransform) transform).getParameterDescriptors();
+        }
+        return descriptor;
+    }
 
     /**
      * Construct an operation method from a set of properties and an array of parameter

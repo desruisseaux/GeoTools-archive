@@ -209,7 +209,7 @@ public class CreationTest extends TestCase {
                 out.println(classification);
                 assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
                 final ProjectedCRS projCRS =
-                        new org.geotools.referencing.crs.ProjectedCRS("Test",
+                        new org.geotools.referencing.crs.ProjectedCRS("Test", method,
                             org.geotools.referencing.crs.GeographicCRS.WGS84, mt,
                             org.geotools.referencing.cs.CartesianCS.PROJECTED);
                 final Conversion conversion = projCRS.getConversionFromBase();

@@ -25,6 +25,7 @@ package org.geotools.referencing;
 // J2SE dependencies and extensions
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.units.ConversionException;
@@ -73,14 +74,18 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.geotools.util.Singleton;
 
 
 /**
@@ -856,22 +861,56 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      *         of axes must match the target dimension of the transform
      *         <code>baseToDerived</code>.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Use the method with an {@link OperationMethod} argument instead.
      */
     public DerivedCRS createDerivedCRS(Map                 properties,
                                        CoordinateReferenceSystem base,
                                        MathTransform    baseToDerived,
                                        CoordinateSystem     derivedCS) throws FactoryException
     {
+        return createDerivedCRS(properties,
+                    new org.geotools.referencing.operation.OperationMethod(baseToDerived),
+                    base, baseToDerived, derivedCS);
+    }
+
+    /**
+     * Creates a derived coordinate reference system. If the transformation is an affine
+     * map performing a rotation, then any mixed axes must have identical units.
+     * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
+     * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
+     * affected axes are in degrees.  But you should not rotate this coordinate system
+     * in any other plane.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
+     *         be created can be specified with the <code>"conversion."</code> prefix added in
+     *         front of property names (example: <code>"conversion.name"</code>).
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
+     * @param  base Coordinate reference system to base the derived CRS on.
+     * @param  baseToDerived The transform from the base CRS to returned CRS.
+     * @param  derivedCS The coordinate system for the derived CRS. The number
+     *         of axes must match the target dimension of the transform
+     *         <code>baseToDerived</code>.
+     * @throws FactoryException if the object creation failed.
+     */
+    public DerivedCRS createDerivedCRS(Map                 properties,
+                                       OperationMethod         method,
+                                       CoordinateReferenceSystem base,
+                                       MathTransform    baseToDerived,
+                                       CoordinateSystem     derivedCS) throws FactoryException
+    {
         DerivedCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.DerivedCRS(properties, base, baseToDerived, derivedCS);
+            crs = new org.geotools.referencing.crs.DerivedCRS(properties, method,
+                                                              base, baseToDerived, derivedCS);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
         crs = (DerivedCRS) canonicalize(crs);
         return crs;
     }
-                                       
     
     /**
      * Creates a projected coordinate reference system from a transform.
@@ -884,15 +923,43 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @param  toProjected The transform from the geographic to the projected CRS.
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Use the method with an {@link OperationMethod} argument instead.
      */
     public ProjectedCRS createProjectedCRS(Map            properties,
                                            GeographicCRS      geoCRS,
                                            MathTransform toProjected,
                                            CartesianCS            cs) throws FactoryException
     {
+        return createProjectedCRS(properties,
+                    new org.geotools.referencing.operation.OperationMethod(toProjected),
+                    geoCRS, toProjected, cs);
+    }
+    
+    /**
+     * Creates a projected coordinate reference system from a transform.
+     * 
+     * @param  properties Name and other properties to give to the new object.
+     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
+     *         be created can be specified with the <code>"conversion."</code> prefix added in
+     *         front of property names (example: <code>"conversion.name"</code>).
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
+     * @param  geoCRS Geographic coordinate reference system to base projection on.
+     * @param  toProjected The transform from the geographic to the projected CRS.
+     * @param  cs The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ProjectedCRS createProjectedCRS(Map            properties,
+                                           OperationMethod    method,
+                                           GeographicCRS      geoCRS,
+                                           MathTransform toProjected,
+                                           CartesianCS            cs) throws FactoryException
+    {
         ProjectedCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, geoCRS, toProjected, cs);
+            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, method,
+                                                                geoCRS, toProjected, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -973,6 +1040,12 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
                                            CartesianCS                 cs)
             throws FactoryException
     {
+        /*
+         * Computes matrix for swapping axis and performing units conversion.
+         * There is one matrix to apply before projection on (longitude,latitude)
+         * coordinates, and one matrix to apply after projection on (easting,northing)
+         * coordinates.
+         */
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
         final EllipsoidalCS geoCS = (EllipsoidalCS) geoCRS.getCoordinateSystem();
         final Matrix swap1, swap3;
@@ -988,15 +1061,51 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
             // A Unit conversion is non-linear.
             throw new FactoryException(cause);
         }
+        /*
+         * Find the operation method. The math transform factory is likely to know that.
+         * Unfortunatly, there is not a very clear way to get this information in current
+         * GeoAPI. If the math transform factory is the Geotools implementation, we will
+         * use a custom method. Otherwise, a more generic (and slower) algorithm will be used.
+         */
         if (mtFactory == null) {
             mtFactory = FactoryFinder.getMathTransformFactory();
         }
+        OperationMethod method = null;
+        final MathTransform step2;
+        if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
+            /*
+             * Geotools implementation : The MathTransformFactory knows which operation method
+             * it used, and add this information for us in the optional collection supplied.
+             */
+            final Singleton methods = new Singleton();
+            step2 = ((org.geotools.referencing.operation.MathTransformFactory)mtFactory)
+                    .createParameterizedTransform(parameters, methods);
+            method = (OperationMethod) methods.get();
+        } else {
+            /*
+             * Non-geotools implementation : iterate over all methods know to the factory.
+             * This is slower and less robust, since we assume that the parameter group
+             * name is the classification name, which is not garantee.
+             */
+            step2 = mtFactory.createParameterizedTransform(parameters);
+            final String classification = parameters.getDescriptor().getName().getCode();
+            for (final Iterator it=mtFactory.getAvailableTransforms().iterator(); it.hasNext();) {
+                final OperationMethod candidate = (OperationMethod) it.next();
+                if (IdentifiedObject.nameMatches(candidate, classification)) {
+                    method = candidate;
+                    break;
+                }
+            }
+        }
+        /*
+         * Create a concatenation of the matrix computed above and the projection.
+         * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
+         */
         final MathTransform step1 = mtFactory.createAffineTransform(swap1);
-        final MathTransform step2 = mtFactory.createParameterizedTransform(parameters);
         final MathTransform step3 = mtFactory.createAffineTransform(swap3);
         final MathTransform mt    = mtFactory.createConcatenatedTransform(
                                     mtFactory.createConcatenatedTransform(step1, step2), step3);
-        return createProjectedCRS(properties, geoCRS, mt, cs);
+        return createProjectedCRS(properties, method, geoCRS, mt, cs);
     }
 
     /**

@@ -33,6 +33,7 @@ import javax.units.Unit;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -48,11 +49,11 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -82,6 +83,8 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      * Constructs a projected CRS from a name.
      *
      * @param  name The name.
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -92,12 +95,13 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *         and <code>derivedCS</code> respectively.
      */
     public ProjectedCRS(final String                 name,
+                        final OperationMethod      method,
                         final GeographicCRS          base,
                         final MathTransform baseToDerived,
                         final CartesianCS       derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), base, baseToDerived, derivedCS);
+        this(Collections.singletonMap(NAME_PROPERTY, name), method, base, baseToDerived, derivedCS);
     }
 
     /**
@@ -107,6 +111,8 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -117,12 +123,13 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *         and <code>derivedCS</code> respectively.
      */
     public ProjectedCRS(final Map              properties,
+                        final OperationMethod      method,
                         final GeographicCRS          base,
                         final MathTransform baseToDerived,
                         final CartesianCS       derivedCS)
             throws MismatchedDimensionException
     {
-        super(properties, base, baseToDerived, derivedCS);
+        super(properties, method, base, baseToDerived, derivedCS);
     }
 
     /**
@@ -354,43 +361,31 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
      * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
     public ParameterValueGroup getParameterValues() {
-        try {
-            return conversionFromBase.getParameterValues();
-        } catch (UnsupportedOperationException exception) {
-            /*
-             * HACK: A special processing is performed for concatenated transforms. Some steps may
-             *       be affine transforms added for swapping axis or unit conversions. They will be
-             *       ignored, since this method is about projection parameters only. This check will
-             *       work for Geotools implementation only. If the transforms are not recognized,
-             *       then the above exception will be thrown as if this test were never performed.
-             */
-            return getParameterValues(conversionFromBase.getMathTransform(), exception);
-        }
+        return getParameterValues(conversionFromBase.getMathTransform(),
+                                  conversionFromBase.getMethod().getParameters(), true);
     }
 
     /**
-     * Returns the parameter values for the specified math transform, ignoring parameters
-     * for linear transforms. This method invokes itself recursively in order to inspect
-     * concatenated transforms.
+     * Returns the parameter values for the math transform that use the specified descriptor.
      *
-     * @param  mt        The math transform to check.
-     * @param  exception The exception to throws in case of failure.
-     * @return The parameter values.
-     * @throws UnsupportedOperationException if the parameters can't be fetched.
-     *         This is usually the <code>exception</code> specified in argument.
+     * @param  mt The math transform for which parameters are desired.
+     * @param  descriptor The descriptor to search for.
+     * @param  required <code>true</code> if an exception must be thrown if parameters are unknow.
+     * @return The parameter values, or null.
+     * @throws UnsupportedImplementationException if the math transform implementation do not
+     *         provide information about parameters.
      */
     private static ParameterValueGroup getParameterValues(final MathTransform mt,
-                                                          final UnsupportedOperationException exception)
+                                                          final ParameterDescriptorGroup descriptor,
+                                                          boolean required)
     {
-        if (mt instanceof LinearTransform) {
-            return null;
-        }
         if (mt instanceof ConcatenatedTransform) {
             final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
-            final ParameterValueGroup param1 = getParameterValues(ct.transform1, exception);
-            final ParameterValueGroup param2 = getParameterValues(ct.transform2, exception);
-            if (param1 == null) return param2;
-            if (param2 == null) return param1;
+            final ParameterValueGroup param1 = getParameterValues(ct.transform1, descriptor, false);
+            final ParameterValueGroup param2 = getParameterValues(ct.transform2, descriptor, false);
+            if (param1==null && param2!=null) return param2;
+            if (param2==null && param1!=null) return param1;
+            required = true;
         }
         if (mt instanceof AbstractMathTransform) {
             final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
@@ -398,7 +393,10 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
                 return param;
             }
         }
-        throw exception;
+        if (required) {
+            throw new UnsupportedImplementationException(mt.getClass());
+        }
+        return null;
     }
     
     /**

@@ -42,8 +42,6 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -101,28 +99,6 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
     protected final Conversion conversionFromBase;
 
     /**
-     * Constructs a derived CRS from a name.
-     *
-     * @param name The name.
-     * @param  base Coordinate reference system to base the derived CRS on.
-     * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
-     * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
-     */
-    public GeneralDerivedCRS(final String                    name,
-                             final CoordinateReferenceSystem base,
-                             final MathTransform    baseToDerived,
-                             final CoordinateSystem     derivedCS)
-            throws MismatchedDimensionException
-    {
-        this(Collections.singletonMap(NAME_PROPERTY, name), base, baseToDerived, derivedCS);
-    }
-
-    /**
      * Constructs a derived CRS from a set of properties. The properties are given unchanged to
      * the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
      * constructor}. The following optional properties are also understood:
@@ -132,11 +108,6 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *     <th nowrap>Property name</th>
      *     <th nowrap>Value type</th>
      *     <th nowrap>Value given to</th>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"method.name"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;<code>{@linkplain Conversion#getMethod}.getName()</code></td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;<code>"conversion.name"</code>&nbsp;</td>
@@ -152,6 +123,8 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -162,12 +135,14 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *         and <code>derivedCS</code> respectively.
      */
     public GeneralDerivedCRS(final Map                 properties,
+                             final OperationMethod         method,
                              final CoordinateReferenceSystem base,
                              final MathTransform    baseToDerived,
                              final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
         super(properties, getDatum(base), derivedCS);
+        ensureNonNull("method",        method);
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS = base;
         final int dimSource = baseToDerived.getSourceDimensions();
@@ -180,41 +155,14 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                         new Integer(dim1), new Integer(dim2)));
         }
-        OperationMethod method = (OperationMethod) properties.get("method");
-        if (method != null) {
-            /*
-             * A method was explicitly specified. Make sure that the source and target
-             * dimensions match. We do not check parameters in current version of this
-             * implementation (we may add this check in a future version), since the
-             * descriptors provided in this user-supplied OperationMethod may be more
-             * accurate than the one inferred from the MathTransform.
-             */
-            org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
-        } else {
-            /*
-             * No OperationMethod were explicitly set (which is the default, documented
-             * behavior). Constructs a default OperationMethod using the descriptors
-             * inferred from the MathTransform. This work for Geotools implementation,
-             * but is likely to fails to infer parameters for other implementations.
-             */
-            method = getMethod(baseToDerived, null);
-            if (method == null) {
-                Map inherit = properties;
-                ParameterDescriptorGroup descriptors = null;
-                if (baseToDerived instanceof AbstractMathTransform) {
-                    descriptors = ((AbstractMathTransform) baseToDerived).getParameterDescriptors();
-                    if (descriptors != null) {
-                        inherit = new HashMap(properties);
-                        inherit.putAll(getProperties(descriptors));
-                    }
-                }
-                method = new org.geotools.referencing.operation.OperationMethod(
-                        /* properties       */ new UnprefixedMap(inherit, "method."),
-                        /* sourceDimensions */ dimSource,
-                        /* targetDimensions */ dimTarget,
-                        /* parameters       */ descriptors);
-            }
-        }
+        /*
+         * A method was explicitly specified. Make sure that the source and target
+         * dimensions match. We do not check parameters in current version of this
+         * implementation (we may add this check in a future version), since the
+         * descriptors provided in this user-supplied OperationMethod may be more
+         * accurate than the one inferred from the MathTransform.
+         */
+        org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
         /*
          * Constructs the conversion from all the information above. The ProjectedCRS subclass
          * will overrides the createConversion method in order to create a projection instead.
@@ -225,36 +173,6 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                 /* targetCRS  */ this,
                 /* transform  */ baseToDerived,
                 /* method     */ method);
-    }
-
-    /**
-     * Returns the operation method for the specified math transform, or <code>null</code> if
-     * unknow. If the math transform is a concatenated math transform, then this method looks
-     * for one and only one math transform created by
-     * {@link org.geotools.referencing.operation.MathTransformFactory#createParameterizedTransform}.
-     * We do that in order to ignore affine transform concatenated for axis switching or units
-     * conversion, e.g. a map projection using (latitude,longitude) axis order instead of
-     * (longitude,latitude); they do not fundamentally change the operation method.
-     */
-    private static OperationMethod getMethod(final MathTransform tr, boolean[] foundMany) {
-        if (tr instanceof ConcatenatedTransform) {
-            if (foundMany == null) {
-                foundMany = new boolean[1];
-            }
-            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr;
-            final OperationMethod o1 = getMethod(ctr.transform1, foundMany);
-            final OperationMethod o2 = getMethod(ctr.transform2, foundMany);
-            if (!foundMany[0]) {
-                if (o1 == null) return o2;
-                if (o2 == null) return o1;
-                foundMany[0] = true;
-            }
-            return null;
-        }
-        if (tr instanceof AbstractMathTransform) {
-            return ((AbstractMathTransform) tr).getMethod();
-        }
-        return null;
     }
 
     /**

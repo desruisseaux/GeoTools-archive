@@ -75,14 +75,6 @@ import org.geotools.resources.cts.ResourceKeys;
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**
-     * The operation method for this math transform. This is usually the
-     * {@link MathTransformProvider} that constructed this math transform.
-     *
-     * @todo Move this class one level up, and make this field package-privated.
-     */
-    public OperationMethod method;
-
-    /**
      * Construct a math transform.
      */
     protected AbstractMathTransform() {
@@ -117,20 +109,6 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Gets the dimension of output points.
      */
     public abstract int getTargetDimensions();
-
-    /**
-     * The method for this math transform, or <code>null</code> if unknow. This information is
-     * automatically set to the {@linkplain MathTransformProvider math transform provider} if
-     * this math transform was constructed through
-     * {@link MathTransformFactory#createParameterizedTransform}. It is null in all other cases.
-     * This behavior is used in order to separate main transforms (e.g.
-     * {@linkplain org.geotools.referencing.operation.projection.MapProjection map projections})
-     * from secondary transforms (e.g. axis swapping or unit conversions created with
-     * {@link MathTransformFactory#createAffineTransform}).
-     */
-    public final OperationMethod getMethod() {
-        return method;
-    }
     
     /**
      * Returns the parameter descriptors for this math transform,
@@ -615,8 +593,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         // optimization is usually done in subclasses.
         if (object!=null && getClass().equals(object.getClass())) {
             final AbstractMathTransform that = (AbstractMathTransform) object;
-            return Utilities.equals(this.method, that.method) &&
-                   Utilities.equals(this.getParameterDescriptors(),
+            return Utilities.equals(this.getParameterDescriptors(),
                                     that.getParameterDescriptors());
         }
         return false;

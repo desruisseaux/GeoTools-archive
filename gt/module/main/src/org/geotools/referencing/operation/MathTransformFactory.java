@@ -26,6 +26,7 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -102,6 +103,12 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * Will be created only when first needed.
      */
     private transient MathTransformParser parser;
+
+    /**
+     * The last value returned by {@link #getProvider}. Stored as an
+     * optimization since the same provider is often asked many times.
+     */
+    private transient MathTransformProvider last;
 
     /**
      * A pool of math transform. This pool is used in order to
@@ -190,11 +197,15 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     private MathTransformProvider getProvider(final String classification)
             throws NoSuchIdentifierException
     {
+        MathTransformProvider provider = last; // Avoid synchronization
+        if (provider!=null && provider.nameMatches(classification)) {
+            return provider;
+        }
         final Iterator providers = getProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
-            final MathTransformProvider provider = (MathTransformProvider) providers.next();            
+            provider = (MathTransformProvider) providers.next();            
             if (provider.nameMatches(classification)) {
-                return provider;
+                return last = provider;
             }
         }
         throw new NoSuchIdentifierException(Resources.format(
@@ -257,6 +268,27 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws FactoryException
     {
+        return createParameterizedTransform(parameters, null);
+    }
+
+    /**
+     * Creates a transform from a group of parameters and add the method used to a list.
+     * This variant of <code>createParameterizedTransform(...)</code> provide a way for
+     * the client to keep trace of any {@linkplain OperationMethod operation method}
+     * used by this factory. 
+     *
+     * @param  parameters The parameter values.
+     * @param  methods A collection where to add the operation method that apply to the transform,
+     *                 or <code>null</code> if none.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the classification.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     */
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
+                                                      Collection          methods)
+            throws FactoryException
+    {
         final String classification = parameters.getDescriptor().getName().getCode();
         final MathTransformProvider provider = getProvider(classification);
         MathTransform tr;
@@ -271,8 +303,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
              */
             throw new FactoryException(exception);
         }
-        if (tr instanceof AbstractMathTransform) {
-            ((AbstractMathTransform) tr).method = provider;
+        if (methods != null) {
+            methods.add(provider);
         }
         tr = (MathTransform) pool.canonicalize(tr);
         return tr;
@@ -420,6 +452,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
                 registry.registerServiceProvider(providers.next(), category);
             }
         }
+        last = null;
     }
 
     /**

@@ -26,9 +26,12 @@ package org.geotools.referencing.crs;
 import java.util.Collections;
 import java.util.Map;
 
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -53,6 +56,8 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      * Constructs a derived CRS from a name.
      *
      * @param  name The name.
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -63,12 +68,13 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *         and <code>derivedCS</code> respectively.
      */
     public DerivedCRS(final String                    name,
+                      final OperationMethod         method,
                       final CoordinateReferenceSystem base,
                       final MathTransform    baseToDerived,
                       final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), base, baseToDerived, derivedCS);
+        this(Collections.singletonMap(NAME_PROPERTY, name), method, base, baseToDerived, derivedCS);
     }
 
     /**
@@ -78,6 +84,8 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@linkplain org.geotools.referencing.operation.Conversion conversion}.
+     * @param  method A description of the {@linkplain Conversion#getMethod method for the
+     *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -88,12 +96,13 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      *         and <code>derivedCS</code> respectively.
      */
     public DerivedCRS(final Map                 properties,
+                      final OperationMethod         method,
                       final CoordinateReferenceSystem base,
                       final MathTransform    baseToDerived,
                       final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        super(properties, base, baseToDerived, derivedCS);
+        super(properties, method, base, baseToDerived, derivedCS);
     }
     
     /**
