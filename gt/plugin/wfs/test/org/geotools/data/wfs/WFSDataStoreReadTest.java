@@ -98,19 +98,19 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testLocalGeoServer() throws NoSuchElementException, IllegalAttributeException, IOException{
-    	URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
-    	try{
-    		url.openConnection();
-    	}catch(Exception e){
-    		return; // server not around
-    	}
-        System.out.println("\nLocal GeoServer");
-        doFeatureType(url,true,true,1);
-        doFeatureReader(url,true,true,0);
-        doFeatureReader(url,true,true,1);
-        System.out.println("");
-    }
+//    public void testLocalGeoServer() throws NoSuchElementException, IllegalAttributeException, IOException{
+//    	URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
+//    	try{
+//    		url.openConnection();
+//    	}catch(Exception e){
+//    		return; // server not around
+//    	}
+//        System.out.println("\nLocal GeoServer");
+//        doFeatureType(url,true,true,1);
+//        doFeatureReader(url,true,true,0);
+//        doFeatureReader(url,true,true,1);
+//        System.out.println("");
+//    }
     
     public void testESRI() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException{
         URL url = new URL("http://dev.geographynetwork.ca/ogcwfs/servlet/com.esri.ogc.wfs.WFSServlet?Request=GetCapabilities");

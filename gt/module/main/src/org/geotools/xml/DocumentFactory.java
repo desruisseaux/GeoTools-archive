@@ -68,11 +68,11 @@ public class DocumentFactory {
      * @param desiredDocument
      * @param hints May be null.
      *
-     * @return
+     * @return Object
      *
      * @throws SAXException
      *
-     * @see DocumentFactory#getInstance(URI, Level)
+     * @see DocumentFactory#getInstance(URI, Map, Level)
      */
     public static Object getInstance(URI desiredDocument, Map hints)
         throws SAXException {
@@ -90,7 +90,7 @@ public class DocumentFactory {
      * @param hints May be null.
      * @param level
      *
-     * @return
+     * @return Object
      *
      * @throws SAXException
      */
@@ -122,7 +122,7 @@ public class DocumentFactory {
      * @param hints May be null.
      * @param level
      *
-     * @return
+     * @return Object
      *
      * @throws SAXException
      */

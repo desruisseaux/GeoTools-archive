@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.xml.handlers;
 
@@ -84,13 +83,6 @@ public class ComplexElementHandler extends XMLElementHandler {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-
-        // TODO check if this is needed
-        //        if ((type.getChild() == null) && (type.getParent() == null)) {
-        //            logger.warning("ComplexType's Child provided was null");
-        //            throw new SAXException(new NullPointerException(
-        //                    "ComplexType's Child provided was null"));
-        //        }
     }
 
     /**

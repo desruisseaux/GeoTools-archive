@@ -111,8 +111,19 @@ public interface PrintHandler {
      */
     public void endDocument() throws IOException;
 
+    /**
+     * Returns the default Schema for the document being printed
+     * 
+     * @return Schema
+     */
     public Schema getDocumentSchema();
 
+    /**
+     * Tries to find an appropriate Element so represent the value. 
+     * 
+     * @param value The Object being attempted to write
+     * @return Element The element instance found, or null if not found.
+     */
     public Element findElement(Object value);
 
     public Element findElement(String name);
