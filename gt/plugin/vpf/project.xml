@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-vpf</name>
   <id>vpf</id>
-  <currentVersion>1.0.0</currentVersion>
+  <currentVersion>1.9.0</currentVersion>
   <package>org.geotools.vpf</package>
   <shortDescription>VPF Plugin</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
@@ -27,7 +27,6 @@
       <email>knuterik@onemap.org</email>
       <organization>Project OneMap</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -36,6 +35,15 @@
       <id>kobit</id>
       <email>kobit@users.sourceforge.net</email>
       <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>John Meagher</name>
+      <id></id>
+      <email>john.meagher@solipsys.com</email>
+      <organization>Solipsys</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
