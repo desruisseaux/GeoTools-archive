@@ -137,8 +137,6 @@ public class VPFFeatureReader implements FeatureReader {
         boolean result = true;
     	VPFFile file = (VPFFile) featureType.getFeatureClass().getFileList().get(0);
     	hasNext = false;
-        VPFFile secondFile = null;
-    
 		Feature row = null;
         try {
             if(file.hasNext()){
@@ -156,80 +154,94 @@ public class VPFFeatureReader implements FeatureReader {
             result = false;
 		}
 		// Exclude objects with a different FACC Code
-		else if ((featureType.getFaccCode() == null)
-				|| featureType.getFaccCode().equals(
-						row.getAttribute("f_code").toString().trim())) {
-
-			// Get the values from all of the columns
-			// based on their presence (or absense) in the rows
-
-			// Potential cases:
-			// simple column
-			// join column
-			// non-matching join
-		    // null value
-			// geometry 
-			Map rows = generateFileRowMap(file, row);
-            AttributeType[] attributes = featureType.getFeatureClass()
-					.getAttributeTypes();
-            Object[] values = new Object[attributes.length];
-            for(int inx = 0; inx < attributes.length; inx++){
-				VPFColumn column = null;
-                try {
-                    column = (VPFColumn) attributes[inx];
-                    Object value = null;
-                    secondFile = getVPFFile(column); 
-                    Feature tempRow = (Feature) rows.get(secondFile);
-                    if(tempRow != null){
-                        value = tempRow.getAttribute(column.getName());
-                        if (column.isAttemptLookup()){
-                            try {
-                                // Attempt to perform a lookup and conversion
-                                String featureClassName = getVPFFile(column).getFileName();
-                                String intVdtFileName = featureType.getFeatureClass().getDirectoryName().concat(File.separator).concat("int.vdt");
-                                VPFFile intVdtFile = VPFFileFactory.getInstance().getFile(intVdtFileName);
-                                Iterator intVdtIter = intVdtFile.readAllRows().iterator();
-                                while(intVdtIter.hasNext()){
-                                    Feature intVdtRow = (Feature)intVdtIter.next();
-                                    if(intVdtRow.getAttribute("table").toString().trim().equals(featureClassName) && 
-                                            (Short.parseShort(intVdtRow.getAttribute("value").toString()) == Short.parseShort(value.toString()) &&
-                                            (intVdtRow.getAttribute("attribute").toString().trim().equals(column.getName())))){
-                                        value = intVdtRow.getAttribute("description").toString().trim();
-                                        break;
-                                    }
-                                }
-                            // If there is a problem, forget about mapping and continue
-                            } catch (IOException exc) {
-                            } catch (RuntimeException exc) {
-                            }
-                        }
-                    }
-                    try {
-                        currentFeature.setAttribute(inx, value);
-                    } catch (ArrayIndexOutOfBoundsException exc) {
-                        // TODO Auto-generated catch block
-                        exc.printStackTrace();
-                    } catch (IllegalAttributeException exc) {
-                        // TODO Auto-generated catch block
-                        exc.printStackTrace();
-                    }
-                } catch (ClassCastException exc2) {
-                    try {
-                        // This is the area geometry case
-                        featureType.getFeatureClass().getGeometryFactory().createGeometry(featureType, currentFeature);
-                    } catch (IllegalAttributeException exc) {
-                        // TODO Auto-generated catch block
-                        exc.printStackTrace();
-                    } catch (SQLException exc) {
-                        // TODO Auto-generated catch block
-                        exc.printStackTrace();
-                    }
+		else if (featureType.getFaccCode() == null){
+		    try {
+                String faccCode = row.getAttribute("f_code").toString().trim(); 
+                if(featureType.getFaccCode().equals(faccCode)){
+                    retrieveObject(file, row);
+                    hasNext = true;
+                    result = false;
                 }
-			}
-            hasNext = true;
-            result = false;
+            } catch (RuntimeException exc) {
+                // Ignore this case because it typically means the f_code is invalid
+            }
 		} 
         return result;
+    }
+    /** 
+     * Get the values from all of the columns
+     * based on their presence (or absense) in the rows
+     *
+     * Potential cases:
+     * simple column
+     * join column
+     * non-matching join
+     * null value
+     * geometry
+     * 
+     * @param file the file
+     * @param row the row
+     *
+     */ 
+    private void retrieveObject(VPFFile file, Feature row) throws IOException{
+        VPFFile secondFile = null;
+        Map rows = generateFileRowMap(file, row);
+        AttributeType[] attributes = featureType.getFeatureClass()
+                .getAttributeTypes();
+        Object[] values = new Object[attributes.length];
+        for(int inx = 0; inx < attributes.length; inx++){
+            VPFColumn column = null;
+            try {
+                column = (VPFColumn) attributes[inx];
+                Object value = null;
+                secondFile = getVPFFile(column); 
+                Feature tempRow = (Feature) rows.get(secondFile);
+                if(tempRow != null){
+                    value = tempRow.getAttribute(column.getName());
+                    if (column.isAttemptLookup()){
+                        try {
+                            // Attempt to perform a lookup and conversion
+                            String featureClassName = getVPFFile(column).getFileName();
+                            String intVdtFileName = featureType.getFeatureClass().getDirectoryName().concat(File.separator).concat("int.vdt");
+                            VPFFile intVdtFile = VPFFileFactory.getInstance().getFile(intVdtFileName);
+                            Iterator intVdtIter = intVdtFile.readAllRows().iterator();
+                            while(intVdtIter.hasNext()){
+                                Feature intVdtRow = (Feature)intVdtIter.next();
+                                if(intVdtRow.getAttribute("table").toString().trim().equals(featureClassName) && 
+                                        (Short.parseShort(intVdtRow.getAttribute("value").toString()) == Short.parseShort(value.toString()) &&
+                                        (intVdtRow.getAttribute("attribute").toString().trim().equals(column.getName())))){
+                                    value = intVdtRow.getAttribute("description").toString().trim();
+                                    break;
+                                }
+                            }
+                        // If there is a problem, forget about mapping and continue
+                        } catch (IOException exc) {
+                        } catch (RuntimeException exc) {
+                        }
+                    }
+                }
+                try {
+                    currentFeature.setAttribute(inx, value);
+                } catch (ArrayIndexOutOfBoundsException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                } catch (IllegalAttributeException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                }
+            } catch (ClassCastException exc2) {
+                try {
+                    // This is the area geometry case
+                    featureType.getFeatureClass().getGeometryFactory().createGeometry(featureType, currentFeature);
+                } catch (IllegalAttributeException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                } catch (SQLException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                }
+            }
+        }
     }
     /**
      * Returns the VPFFile for a particular column.
