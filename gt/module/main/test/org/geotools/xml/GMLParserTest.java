@@ -58,7 +58,7 @@ public class GMLParserTest extends TestCase {
 
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
-            System.out.println(doc);
+//            System.out.println(doc);
             
             checkFeatureCollection((FeatureCollection)doc);
             
@@ -89,7 +89,7 @@ public class GMLParserTest extends TestCase {
 
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
-            System.out.println(doc);
+//            System.out.println(doc);
             
             checkFeatureCollection((FeatureCollection)doc);
             
@@ -121,7 +121,7 @@ public class GMLParserTest extends TestCase {
 
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
-            System.out.println(doc);
+//            System.out.println(doc);
 
             checkFeatureCollection((FeatureCollection)doc);
             
@@ -153,7 +153,7 @@ public class GMLParserTest extends TestCase {
 
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
-            System.out.println(doc);
+//            System.out.println(doc);
             
             checkFeatureCollection((FeatureCollection)doc);
             
@@ -172,9 +172,10 @@ public class GMLParserTest extends TestCase {
         while(i.hasNext()){
             Feature ft = (Feature)i.next();;
             assertNotNull("Feature #"+j+" is null",ft);
-            System.out.println("Feature "+j+" : "+ft);
+//            System.out.println("Feature "+j+" : "+ft);
             j++;
         }
+        System.out.println("Found "+j+" Features");
     }
     public void testOneFeatureWrite(){
 
