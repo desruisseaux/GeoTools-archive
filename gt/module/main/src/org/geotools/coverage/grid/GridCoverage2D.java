@@ -120,6 +120,14 @@ import org.geotools.util.WeakHashSet;
  * observed area). Envelope for such grid coverage may have three dimensions:
  * the two usual ones (horizontal extends along <var>x</var> and <var>y</var>),
  * and a third one for start time and end time (time extends along <var>t</var>).
+ * <br><br>
+ * <strong>Serialization note:</strong><br>
+ * Because it is serializable, {@code GridCoverage2D} can be included as method argument or as
+ * return type in <cite>Remote Method Invocation</cite> (RMI). However, the pixel data are not
+ * sent during serialization. Instead, the image data are transmitted "on-demand" using socket
+ * communications. This mechanism is implemented using JAI {@link SerializableRenderedImage}
+ * class. While serialization (usually on server side) should work on J2SE 1.4 and above,
+ * deserialization (usually on client side) of {@code GridCoverage2D} instances requires J2SE 1.5.
  *
  * @version $Id$
  * @author Martin Desruisseaux

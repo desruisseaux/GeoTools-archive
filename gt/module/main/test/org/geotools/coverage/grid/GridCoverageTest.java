@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Random;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.units.SI;
 
@@ -129,10 +130,17 @@ public class GridCoverageTest extends TestCase {
         final ObjectOutputStream out = new ObjectOutputStream(buffer);
         out.writeObject(coverage);
         out.close();
-
-        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-        final GridCoverage2D read = (GridCoverage2D) in.readObject();
-        in.close();
+        /*
+         * Deserialization requires J2SE 1.5 or above.
+         */
+        if (System.getProperty("java.version").compareTo("1.5") >= 0) {
+            final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+            final GridCoverage2D read = (GridCoverage2D) in.readObject();
+            in.close();
+        } else {
+            Logger.getLogger("org.geotools.coverage.grid")
+                  .fine("Deserialization test skipped for pre-1.5 Java version.");
+        }
     }
 
     /**
