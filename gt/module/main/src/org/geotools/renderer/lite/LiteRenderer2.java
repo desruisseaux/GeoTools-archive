@@ -454,11 +454,21 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 q.setPropertyNames(attributes);
                 query = q;
             } catch (Exception e) {
-                LOGGER.severe("Got a tranform exception while trying to de-project the current "
-                        + "envelope, falling back on full data loading (no bbox query)");
+
                 canTransform = false;
                 DefaultQuery q = new DefaultQuery(schema.getTypeName());
                 q.setPropertyNames(attributes);
+                if( envelope.intersects(featureSource.getBounds())){
+                    LOGGER.severe("Got a tranform exception while trying to de-project the current "
+                            + "envelope, bboxs intersect therfore using envelope)");
+                    Filter filter = null;
+                    BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
+                    filter = createBBoxFilters(schema, attributes, rightBBox);
+                    q.setFilter(filter);
+                }else{
+                    LOGGER.severe("Got a tranform exception while trying to de-project the current "
+                            + "envelope, falling back on full data loading (no bbox query)");
+                }
                 query = q;
             }
         }
