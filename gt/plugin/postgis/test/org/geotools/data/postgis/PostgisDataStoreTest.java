@@ -41,6 +41,7 @@ import java.util.logging.Logger;
  * @author Chris Holmes, TOPP
  */
 public class PostgisDataStoreTest extends TestCase {
+    private static final boolean WKB_ENABLED = true;
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.postgis");
@@ -93,6 +94,7 @@ public class PostgisDataStoreTest extends TestCase {
             // LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
             dstore = new PostgisDataStore(connPool, TEST_NS);
+            dstore.setWKBEnabled(WKB_ENABLED);
             
 	   		dstore.setFIDMapper("testset", new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
 

@@ -58,7 +58,8 @@ public class SQLEncoderPostgis extends SQLEncoder
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
     private boolean useGeos;
-
+    
+   
     /**
      * Empty constructor TODO: rethink empty constructor, as BBOXes _need_ an
      * SRID, must make client set it somehow.  Maybe detect when encode is
@@ -209,4 +210,6 @@ public class SQLEncoderPostgis extends SQLEncoder
         String geomText = wkt.write(bbox);
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
+    
+    
 }

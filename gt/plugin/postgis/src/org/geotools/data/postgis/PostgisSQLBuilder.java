@@ -24,12 +24,19 @@ import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 
+
 /**
  * Builds sql for postgis.
  *
  * @author Chris Holmes
  */
 public class PostgisSQLBuilder extends DefaultSQLBuilder {
+    /** If true, WKB format is used instead of WKT */
+    protected boolean WKBEnabled = false;
+    
+    /** If true, ByteA function is used to transfer WKB data*/
+    protected boolean byteaEnabled = false;
+
     /**
      *
      */
@@ -63,14 +70,16 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      * </p>
      *
      * @param sql
-     * @param fidColumnName
+     * @param mapper
      * @param attributes
      */
-    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper,
+        AttributeType[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             sql.append(mapper.getColumnName(i));
-            if(attributes.length > 0 || i < (mapper.getColumnCount() - 1)) {
-				sql.append(", ");
+
+            if ((attributes.length > 0) || (i < (mapper.getColumnCount() - 1))) {
+                sql.append(", ");
             }
         }
 
@@ -78,13 +87,22 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
             String colName = attributes[i].getName();
 
             if (attributes[i].isGeometry()) {
-                sql.append("AsText(force_2d(\"" + colName + "\"))");
+                
+                if (WKBEnabled) {
+                    if(byteaEnabled) {
+                        sql.append("bytea(AsBinary(force_2d(\"" + colName + "\"), 'XDR'))");
+                    } else {
+                        sql.append("AsBinary(force_2d(\"" + colName + "\"), 'XDR')");
+                    }
+                } else {
+                    sql.append("AsText(force_2d(\"" + colName + "\"))");
+                }
             } else {
                 sql.append("\"" + colName + "\"");
             }
 
             if (i < (attributes.length - 1)) {
-              sql.append(", ");
+                sql.append(", ");
             }
         }
     }
@@ -116,11 +134,46 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      *
      * @throws SQLEncoderException DOCUMENT ME!
      */
-    public void sqlWhere(StringBuffer sql, Filter preFilter) throws SQLEncoderException {
+    public void sqlWhere(StringBuffer sql, Filter preFilter)
+        throws SQLEncoderException {
         if ((preFilter != null) || (preFilter == Filter.NONE)) {
             String where = encoder.encode(preFilter);
             sql.append(" ");
             sql.append(where);
         }
+    }
+
+    /**
+     * Returns true if the WKB format is used to transfer geometries, false
+     * otherwise
+     *
+     * @return
+     */
+    public boolean isWKBEnabled() {
+        return WKBEnabled;
+    }
+
+    /**
+     * If turned on, WKB will be used to transfer geometry data instead of  WKT
+     *
+     * @param enabled
+     */
+    public void setWKBEnabled(boolean enabled) {
+        WKBEnabled = enabled;
+    }
+    
+    /**
+     * Enables the use of the bytea function to transfer faster WKB geometries
+     * @return
+     */
+    public boolean isByteaEnabled() {
+        return byteaEnabled;
+    }
+    /**
+     * Enables/disables the use of the bytea function
+     * @param byteaEnable
+     */
+    public void setByteaEnabled(boolean byteaEnable) {
+        byteaEnabled = byteaEnable;
     }
 }

@@ -50,13 +50,13 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.postgis.attributeio.PgWKBAttributeIO;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
-import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -75,23 +75,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 /**
  * Postgis DataStore implementation.
+ * 
+ * <p>
+ * This datastore by default will read/write geometries in WKT format.<br>
+ * Optionally use of WKB can be turned on, in this case you may want to turn
+ * on also the use of the bytea function, that fasten the data trasfer, but
+ * that it's available only from version 0.7.2 onwards.
+ * </p>
  *
- * @author Chris Holmes
+ * @author Chris Holmes, Andrea Aime
  * @version $Id: PostgisDataStore.java,v 1.18.2.3 2004/05/02 15:31:43 aaime Exp $
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** The logger for the postgis module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.postgis");
-
-    /** The invisible column to use as the fid if no primary key is set */
-
-    // public static final String DEFAULT_FID_COLUMN = "oid";
 
     /** Map of postgis geometries to jts geometries */
     private static Map GEOM_TYPE_MAP = new HashMap();
@@ -139,12 +143,27 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
+    /** OPTIMIZE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
+
+    /** The lock manager */
     private LockingManager lockingManager = createLockingManager();
-    protected SQLEncoder encoder = new SQLEncoderPostgis();
-    protected final boolean useGeos;
+
+    /** Enables the use of geos operators */
+    protected boolean useGeos;
+
+    /** Current optimize mode */
     public final int OPTIMIZE_MODE;
+
+    /** If true, WKB format is used instead of WKT */
+    protected boolean WKBEnabled = false;
+
+    /**
+     * If true, the bytea function will be used to optimize even further data
+     * loading when using WKB format
+     */
+    protected boolean byteaEnabled = false;
 
     protected PostgisDataStore(ConnectionPool connPool)
         throws IOException {
@@ -174,8 +193,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         JDBCDataStoreConfig config, int optimizeMode) throws IOException {
         super(connectionPool, config);
 
-        useGeos = getUseGeos();
+        guessDataStoreOptions();
         OPTIMIZE_MODE = optimizeMode;
+
         // use the specific postgis fid mapper factory
         setFIDMapperFactory(new PostgisFIDMapperFactory());
     }
@@ -189,7 +209,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return new InProcessLockingManager();
     }
 
-    protected boolean getUseGeos() throws IOException {
+    protected void guessDataStoreOptions() throws IOException {
         Connection dbConnection = null;
 
         try {
@@ -204,12 +224,33 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 String version = result.getString(1);
                 LOGGER.fine("version is " + version);
 
+                int[] versionNumbers;
+
+                try {
+                    String[] values = version.trim().split(" ");
+                    String[] versionNumbersStr = values[0].trim().split("\\.");
+                    versionNumbers = new int[versionNumbersStr.length];
+
+                    for (int i = 0; i < versionNumbers.length; i++) {
+                        versionNumbers[i] = Integer.parseInt(versionNumbersStr[i]);
+                    }
+
+                    // bytea function has been introduced in 0.7.2
+                    if ((versionNumbers[0] > 0) || (versionNumbers[1] > 7)
+                            || ((versionNumbers.length > 2)
+                            && (versionNumbers[2] >= 2))) {
+                        byteaEnabled = true;
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING,
+                        "Exception occurred while parsing the version number.",
+                        e);
+                }
+
                 if (version.indexOf("USE_GEOS=1") != -1) {
-                    retValue = true;
+                    this.useGeos = true;
                 }
             }
-
-            return retValue;
         } catch (SQLException sqle) {
             String message = sqle.getMessage();
             LOGGER.warning(message);
@@ -219,7 +260,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.geotools.data.DataStore#getTypeNames()
      */
     public String[] getTypeNames() throws IOException {
@@ -267,8 +310,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
+     *      org.geotools.data.Transaction)
      */
 
     /**
@@ -392,7 +438,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
         int srid = -1;
 
-        // HACK: geos should be integrated with the sql encoder, not a 
+        // HACK: geos should be integrated with the sql encoder, not a
         // seperate class.
         SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos()
                                             : new SQLEncoderPostgis();
@@ -406,7 +452,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         encoder.setSRID(srid);
 
-        return new PostgisSQLBuilder(encoder);
+        PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder);
+        builder.setWKBEnabled(WKBEnabled);
+
+        return builder;
     }
 
     /**
@@ -457,14 +506,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * 
      * <p>
      * The default implementation of determining the FID column name is to use
-     * the primary key as the FID column.  If no primary key is present, null
-     * will be returned.  Sub classes can override this behaviour to define
+     * the primary key as the FID column. If no primary key is present, null
+     * will be returned. Sub classes can override this behaviour to define
      * primary keys for vendor specific cases.
      * </p>
      * 
      * <p>
      * There is an unresolved issue as to what to do when there are multiple
-     * primary keys.  Maybe a restriction that table much have a single column
+     * primary keys. Maybe a restriction that table much have a single column
      * primary key is appropriate.
      * </p>
      * 
@@ -511,15 +560,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     /**
      * Constructs an AttributeType from a row in a ResultSet. The ResultSet
-     * contains the information retrieved by a call to  getColumns() on the
-     * DatabaseMetaData object.  This information  can be used to construct an
+     * contains the information retrieved by a call to getColumns() on the
+     * DatabaseMetaData object. This information can be used to construct an
      * Attribute Type.
      * 
      * <p>
      * This implementation construct an AttributeType using the default JDBC
-     * type mappings defined in JDBCDataStore.  These type mappings only
-     * handle native Java classes and SQL standard column types.  If a
-     * geometry type is found then getGeometryAttribute is called.
+     * type mappings defined in JDBCDataStore. These type mappings only handle
+     * native Java classes and SQL standard column types. If a geometry type
+     * is found then getGeometryAttribute is called.
      * </p>
      * 
      * <p>
@@ -614,7 +663,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
     public void createSchema(FeatureType featureType) throws IOException {
@@ -701,63 +752,41 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 //"CREATE TABLE "+tableName+" ( )";
 
                 /*
-                   Statement st=con.createStatement();
-                   String statementSQL="CREATE TABLE "+tableName+" ( )";
-                   System.out.println(statementSQL);
-                   st.execute(statementSQL);
-                
-                   for (int i = 0; i < attributeType.length; i++) {
-                           String typeName = null;
-                           if ((typeName =(String) TYPE_MAP.get(attributeType[i].getType()))!= null) {
-                                   if (attributeType[i].isGeometry()) {
-                                           GeometryAttributeType geomAttribute=(GeometryAttributeType)attributeType[i];
-                                           CoordinateReferenceSystem ref=geomAttribute.getCoordinateSystem();
-                                           int SRID;
-                                           if (ref==null)
-                                                            SRID=-1;
-                                                   else SRID=-1;
-                                           statementSQL="SELECT AddGeometryColumn("
-                                                        +"'"+this.config.getNamespace()+"',"
-                                                        +"'"+tableName+"',"
-                                                        +"'"+geomAttribute.getName()+"',"
-                                                        +SRID+","
-                                                        +"'"+typeName+"',"
-                                                        +"2)";
-                                           System.out.println(statementSQL);
-                                           st.executeQuery(statementSQL);
-                                   } else {
-                                           if (typeName.equals("VARCHAR"))
-                                                   typeName = typeName
-                                                                           + "("
-                                                                           + attributeType[i].getFieldLength()
-                                                                           + ")";
-                
-                
-                                           System.out.println(typeName);
-                
-                
-                                           statementSQL = "ALTER TABLE "
-                                                                           + tableName
-                                                                           + " ADD COLUMN "
-                                                                           + attributeType[i].getName()+" "
-                                                                           + typeName;
-                                           System.out.println(statementSQL);
-                                           st.execute(statementSQL);
-                
-                                           if (!attributeType[i].isNillable()) {
-                                                   statementSQL="ALTER TABLE "+tableName
-                                     +" ALTER COLUMN "+attributeType[i].getName()
-                                     +" SET NOT NULL" ;
-                         System.out.println(statementSQL);
-                         st.execute(statementSQL);
-                                           }
-                
-                                   }
-                           } else        throw (new IOException("Type not supported!"));
-                   }
-                   con.commit();
-                   st.close();
-                   con.close();*/
+                 * Statement st=con.createStatement(); String
+                 * statementSQL="CREATE TABLE "+tableName+" ( )";
+                 * System.out.println(statementSQL); st.execute(statementSQL);
+                 *
+                 * for (int i = 0; i < attributeType.length; i++) { String
+                 * typeName = null; if ((typeName =(String)
+                 * TYPE_MAP.get(attributeType[i].getType()))!= null) { if
+                 * (attributeType[i].isGeometry()) { GeometryAttributeType
+                 * geomAttribute=(GeometryAttributeType)attributeType[i];
+                 * CoordinateReferenceSystem
+                 * ref=geomAttribute.getCoordinateSystem(); int SRID; if
+                 * (ref==null) SRID=-1; else SRID=-1; statementSQL="SELECT
+                 * AddGeometryColumn(" +"'"+this.config.getNamespace()+"',"
+                 * +"'"+tableName+"'," +"'"+geomAttribute.getName()+"',"
+                 * +SRID+"," +"'"+typeName+"'," +"2)";
+                 * System.out.println(statementSQL);
+                 * st.executeQuery(statementSQL); } else { if
+                 * (typeName.equals("VARCHAR")) typeName = typeName + "(" +
+                 * attributeType[i].getFieldLength() + ")";
+                 *
+                 *
+                 * System.out.println(typeName);
+                 *
+                 *
+                 * statementSQL = "ALTER TABLE " + tableName + " ADD COLUMN " +
+                 * attributeType[i].getName()+" " + typeName;
+                 * System.out.println(statementSQL); st.execute(statementSQL);
+                 *
+                 * if (!attributeType[i].isNillable()) { statementSQL="ALTER
+                 * TABLE "+tableName +" ALTER COLUMN
+                 * "+attributeType[i].getName() +" SET NOT NULL" ;
+                 * System.out.println(statementSQL); st.execute(statementSQL); }
+                 *  } } else throw (new IOException("Type not supported!")); }
+                 * con.commit(); st.close(); con.close();
+                 */
             } catch (SQLException e) {
                 try {
                     if (con != null) {
@@ -936,8 +965,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return names;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#updateSchema(java.lang.String, org.geotools.feature.FeatureType)
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
+     *      org.geotools.feature.FeatureType)
      */
     public void updateSchema(String typeName, FeatureType featureType)
         throws IOException {
@@ -963,7 +995,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             return new PostgisFeatureLocking(this, getSchema(typeName));
         }
 
-        // default 
+        // default
         if (getLockingManager() != null) {
             // Use default JDBCFeatureLocking that delegates all locking
             // the getLockingManager
@@ -1032,8 +1064,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return getFeatureWriter(typeName, Filter.NONE, transaction);
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String, org.geotools.data.Transaction)
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String,
+     *      org.geotools.data.Transaction)
      */
 
     /**
@@ -1086,7 +1121,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected AttributeIO getGeometryAttributeIO(AttributeType type,
         QueryData queryData) {
-        return new WKTAttributeIO();
+        if (WKBEnabled) {
+            return new PgWKBAttributeIO(byteaEnabled);
+        } else {
+            return new WKTAttributeIO();
+        }
     }
 
     protected int getResultSetType(boolean forWrite) {
@@ -1095,5 +1134,44 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     protected int getConcurrency(boolean forWrite) {
         return ResultSet.CONCUR_READ_ONLY;
+    }
+
+    /**
+     * Returns true if the WKB format is used to transfer geometries, false
+     * otherwise
+     *
+     * @return
+     */
+    public boolean isWKBEnabled() {
+        return WKBEnabled;
+    }
+
+    /**
+     * If turned on, WKB will be used to transfer geometry data instead of  WKT
+     *
+     * @param enabled
+     */
+    public void setWKBEnabled(boolean enabled) {
+        WKBEnabled = enabled;
+    }
+
+    /**
+     * Returns true if the data store is using the bytea function to fasten WKB
+     * data transfer, false otherwise
+     *
+     * @return
+     */
+    public boolean isByteaEnabled() {
+        return byteaEnabled;
+    }
+
+    /**
+     * Enables the use of bytea function for WKB data transfer (will improve
+     * performance)
+     *
+     * @param byteaEnabled
+     */
+    public void setByteaEnabled(boolean byteaEnabled) {
+        this.byteaEnabled = byteaEnabled;
     }
 }

@@ -64,6 +64,14 @@ freely available.</description>
       </properties>
     </dependency>
     <dependency>
+      <id>wkb4j</id>
+      <version>0.5</version>
+      <url>http://wkb4j.sf.net/</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <id>JTS</id>
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>

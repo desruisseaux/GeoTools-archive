@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.LineString;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.AttributeType;
@@ -61,6 +60,7 @@ public class SQLEncoderPostgisTest extends TestCase {
     /** folder where test data is stored.. */
     String dataFolder = "";
     protected boolean setup = false;
+    
 
     public SQLEncoderPostgisTest(String testName) {
         super(testName);
@@ -117,10 +117,10 @@ public class SQLEncoderPostgisTest extends TestCase {
                 String.class);
 
         AttributeType[] types = {
-            geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-            shortAttribute, intAttribute, longAttribute, floatAttribute,
-            doubleAttribute, stringAttribute
-        };
+                geometryAttribute, booleanAttribute, charAttribute,
+                byteAttribute, shortAttribute, intAttribute, longAttribute,
+                floatAttribute, doubleAttribute, stringAttribute
+            };
 
         // Builds the schema
         testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
@@ -214,7 +214,8 @@ public class SQLEncoderPostgisTest extends TestCase {
 
         FidFilter fidFilter = filterFac.createFidFilter("road.345");
         SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos();
-        encoder.setFIDMapper(new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "road"));
+        encoder.setFIDMapper(new TypedFIDMapper(
+                new BasicFIDMapper("gid", 255, true), "road"));
 
         String out = encoder.encode((AbstractFilterImpl) fidFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
@@ -255,4 +256,6 @@ public class SQLEncoderPostgisTest extends TestCase {
             assertEquals("Filter type not supported", e.getMessage());
         }
     }
+
+    
 }

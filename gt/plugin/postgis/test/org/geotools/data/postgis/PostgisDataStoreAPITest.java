@@ -93,6 +93,7 @@ import java.util.logging.Logger;
  * @author Jody Garnett, Refractions Research
  */
 public class PostgisDataStoreAPITest extends DataTestCase {
+    private static final boolean WKB_ENABLED = true;
     private static final int LOCK_DURATION = 3600 * 1000; // one hour
 
     /** The logger for the filter module. */
@@ -158,6 +159,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
 
         data = new PostgisDataStore(pool, "public", getName(),
                 PostgisDataStore.OPTIMIZE_SAFE);
+        data.setWKBEnabled(WKB_ENABLED);
         data.setFIDMapper("road",
             new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
         data.setFIDMapper("river",
