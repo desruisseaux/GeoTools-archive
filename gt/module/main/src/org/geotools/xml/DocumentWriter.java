@@ -80,6 +80,9 @@ public class DocumentWriter {
     // TODO implement this searchOrder
     /** boolean ... include the key to use the "nearest" strategy for searching schemas. This will be ignored if a schema order was set. When not included the schema order as they appear in the orginal schema will be used.*/
     public static final String USE_NEAREST = "DocumentWriter_USE_NEAREST";
+    
+    /** a map of URI->URI representing targetNamespace->Location */
+    public static final String SCHEMA_LOCATION_HINT = "DocumentWriter_SCHEMA_LOCATION_HINT";
 
     /**
      * Write value to file using provided schema.
@@ -1312,28 +1315,35 @@ public class DocumentWriter {
             }
         }
 
-        private void printXMLNSDecs() throws IOException {
+        private void printXMLNSDecs(Map hints) throws IOException {
 
             Schema[] imports = getSchemaOrdering();
             String s = "";
-
+            Map schemaLocs = (Map)(hints==null?null:hints.get(SCHEMA_LOCATION_HINT));
+            schemaLocs = schemaLocs==null?new HashMap():schemaLocs;
+			
                 for (int i = 0; i < imports.length; i++) {
                     if(imports[i]==schema){
                         writer.write(" xmlns=\"" + schema.getTargetNamespace() + "\"");
                         if(schema.getURI()!=null && !schema.getTargetNamespace().equals(schema.getURI()))
                             s = schema.getTargetNamespace()+" "+schema.getURI();
                     }else{
-                    writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
-                        + imports[i].getTargetNamespace() + "\"");
-
-                    if ((imports[i].getURI() != null)
-                            && imports[i].getURI().isAbsolute()
-                            && imports[i].includesURI(imports[i].getURI())) {
-                    	if(!imports[i].getURI().equals(imports[i].getTargetNamespace()))
-                    		s += (" " + imports[i].getTargetNamespace() + " "
-                    				+ imports[i].getURI());
+                    	writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
+                    		+ imports[i].getTargetNamespace() + "\"");
                     }
-                }}
+
+                    URI location = imports[i].getURI();
+                    boolean forced = false;
+                    if(schemaLocs.containsKey(imports[i].getTargetNamespace())){
+                    	location = (URI)schemaLocs.get(imports[i].getTargetNamespace());
+                    	forced = true;
+                    }
+                    if (location != null && location.isAbsolute())
+                    	if(imports[i].includesURI(location) || forced)
+                    		if(location!=null && !location.equals(imports[i].getTargetNamespace()))
+                    			s += (" " + imports[i].getTargetNamespace() + " "
+                    				+ location);
+                }
 
             s = s.trim();
 
@@ -1367,7 +1377,7 @@ public class DocumentWriter {
             writer.write("<");
             writer.write(prefix + localName);
             if (firstElement) {
-                printXMLNSDecs();
+                printXMLNSDecs(hints);
                 firstElement = false;
             }
 
@@ -1412,7 +1422,7 @@ public class DocumentWriter {
             writer.write(prefix + localName);
 
             if (firstElement) {
-                printXMLNSDecs();
+                printXMLNSDecs(hints);
                 firstElement = false;
             }
 

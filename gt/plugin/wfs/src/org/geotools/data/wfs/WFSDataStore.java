@@ -658,7 +658,7 @@ public class WFSDataStore extends AbstractDataStore{
 		return new WFSFeatureSource(this,getSchema(typeName));
 	}
 	
-    private static class WFSFilterVisitor implements FilterVisitor{
+    public static class WFSFilterVisitor implements FilterVisitor{
     	private Stack stack = new Stack();
     	
     	Filter getFilter(){

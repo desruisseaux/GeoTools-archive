@@ -298,6 +298,7 @@ public class FilterOpsComplexTypes {
             	BinaryLogicOpType.getInstance().encode(new FilterElement("And",BinaryLogicOpType.getInstance(),element),value,output,hints);
             	return;
             case LOGIC_OR:
+            	// TODO simplify this here?
             	BinaryLogicOpType.getInstance().encode(new FilterElement("Or",BinaryLogicOpType.getInstance(),element),value,output,hints);
             	return;
             case LOGIC_NOT:
