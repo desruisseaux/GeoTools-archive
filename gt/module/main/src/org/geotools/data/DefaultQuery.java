@@ -384,10 +384,9 @@ public class DefaultQuery implements Query {
         if ((obj == null) || !(obj instanceof Query)) {
             return false;
         }
+        if (this == obj) return true;        
         Query other = (Query) obj;
-        if( obj == other ){
-            return true;
-        }
+        
         return Arrays.equals(getPropertyNames(), other.getPropertyNames())
         && (retrieveAllProperties() == other.retrieveAllProperties())
         && (getMaxFeatures() == other.getMaxFeatures())
