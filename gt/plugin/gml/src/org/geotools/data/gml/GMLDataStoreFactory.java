@@ -15,7 +15,7 @@ import org.geotools.data.DataStoreFactorySpi;
  * </p>
  * @author dzwiers
  */
-public class GMLDataStoreFactory implements DataStoreFactorySpi{
+public class GMLDataStoreFactory implements DataStoreFactorySpi {
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
