@@ -281,9 +281,7 @@ public class CRSService {
 	 * @throws FactoryException
 	 */	
 	public CoordinateReferenceSystem createCRS( String code ) throws FactoryException {
-	    CRSFactory fc=org.geotools.referencing.FactoryFinder.getCRSFactory();
-	    return fc.createFromWKT(code);
-//	    return createCoordinateSystem( code );
+	    return createCoordinateSystem( code );
 	}
 	/** 
 	 * A "safe" cast to the old CoordinateSystem class.
@@ -451,54 +449,12 @@ public class CRSService {
     /** Reproject provided bound evelope to lat/long */
     public static Envelope toGeographic( Envelope env, CoordinateReferenceSystem crs ) throws Exception {
         MathTransform transform = reproject( crs, GEOGRAPHIC, false );
-        return transform( env, transform );
-        
-        /*
-        CoordinateSystem cs = cs( crs );         
-        String wkt = cs.toWKT();
-        
-        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
-        org.geotools.cs.CoordinateSystem cs2 = csFactory.createFromWKT( wkt );
-        Unit       angularUnit = Unit.DEGREE;
-        HorizontalDatum  datum = HorizontalDatum.WGS84;
-        org.geotools.cs.PrimeMeridian meridian = org.geotools.cs.PrimeMeridian.GREENWICH;
-        GeographicCoordinateSystem geographic =
-            csFactory.createGeographicCoordinateSystem("geographic", angularUnit, datum, meridian, AxisInfo.LONGITUDE, AxisInfo.LATITUDE );
-        CoordinateTransformationFactory trFactory = CoordinateTransformationFactory.getDefault();
-        CoordinateTransformation transformation = trFactory.createFromCoordinateSystems(cs2, geographic );
-        MathTransform transform = transformation.getMathTransform();
-        CoordinatePoint p1 = new CoordinatePoint( env.getMinX(), env.getMinY());
-        CoordinatePoint p2 = new CoordinatePoint( env.getMaxX(), env.getMaxY());
-        transform.transform( p1, p1 );
-        transform.transform( p2, p2 );
-        Envelope rebounds = new Envelope();
-        Point2D point = p1.toPoint2D();
-        rebounds.expandToInclude( point.getX(), point.getY() );
-        point = p2.toPoint2D();
-        rebounds.expandToInclude( point.getX(), point.getY() );     
-        return rebounds;
-        */
+        return transform( env, transform );        
     }
     
 	public static Envelope transform( Envelope envelope, MathTransform transform ) throws MismatchedDimensionException, TransformException {
 		// This code does not provide an exact transform, since the transformed envelope may not
 		// be a rectangle
-//	    CoordinatePoint pt;
-//	    Envelope bbox = new Envelope();
-//	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMinY() ), null );
-//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-//	    
-//	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMinY() ), null );
-//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-//	    
-//	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMaxY() ), null );
-//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-//	    
-//	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMaxY() ), null );
-//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-//	    
-//	    return bbox;	 
-		
 		Rectangle2D rect = new Rectangle2D.Double(envelope.getMinX(), envelope.getMinY(), envelope.getWidth(), envelope.getHeight());
         Shape s = ((MathTransform2D) transform).createTransformedShape(rect);
         Rectangle2D tb = s.getBounds2D();
