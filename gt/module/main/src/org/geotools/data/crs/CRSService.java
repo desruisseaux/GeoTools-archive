@@ -18,36 +18,18 @@
  */
 package org.geotools.data.crs;
 
-import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.CSAUTOFactory;
-import org.geotools.cs.CSEPSGFactory;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.NoSuchAuthorityCodeException;
-import org.geotools.cs.PrimeMeridian;
-import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.factory.FactoryFinder;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Utility method isolating data source providers from CRS production.
