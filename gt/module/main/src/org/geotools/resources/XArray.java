@@ -46,7 +46,7 @@ import java.text.NumberFormat;
  * This class may be removed if JavaSoft provide some language construct
  * functionally equivalent to C/C++'s <code>realloc</code>.
  *
- * @version $Id: XArray.java,v 1.7 2003/11/15 16:01:32 aaime Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class XArray {

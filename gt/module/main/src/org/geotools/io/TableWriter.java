@@ -81,7 +81,7 @@ import org.geotools.resources.Utilities;
  *      Yvan        Dubois
  * </pre></blockquote>
  *
- * @version $Id: TableWriter.java,v 1.5 2003/08/04 18:21:32 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class TableWriter extends FilterWriter {
@@ -940,7 +940,7 @@ public class TableWriter extends FilterWriter {
      * A class wrapping a cell's content and its text's alignment.
      * This class if for internal use only.
      *
-     * @version $Id: TableWriter.java,v 1.5 2003/08/04 18:21:32 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Cell {

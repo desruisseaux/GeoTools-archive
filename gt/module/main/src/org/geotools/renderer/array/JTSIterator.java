@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * Itérateur balayant les données d'un tableau {@link JTSArray}.
  *
- * @version $Id: JTSIterator.java,v 1.3 2003/05/23 17:58:59 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class JTSIterator extends PointIterator {

@@ -34,7 +34,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @author Martin Desruisseaux
  * @author Andrea Aime
- * @version $Id: GridCoverageRenderer.java,v 1.5 2004/03/14 18:44:27 aaime Exp $
+ * @version $Id$
  *
  * @task Add support for SLD stylers
  */

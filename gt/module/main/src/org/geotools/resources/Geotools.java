@@ -41,7 +41,7 @@ import org.geotools.util.MonolineFormatter;
  * initialization. Current implementation just setup a custom logger for the
  * <code>"org.geotools"</code> package.
  *
- * @version $Id: Geotools.java,v 1.7 2004/02/03 15:51:28 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Invoke {@link MonolineFormatter#initGeotools} instead.

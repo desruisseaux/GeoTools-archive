@@ -32,7 +32,7 @@ import org.geotools.resources.Utilities;
  * A style that contains the specification to renderer both the contour and the interior of a shape
  *
  * @author Andrea Aime
- * @version $Id: PolygonStyle2D.java,v 1.4 2003/11/28 23:32:32 desruisseaux Exp $
+ * @version $Id$
  */
 public class PolygonStyle2D extends LineStyle2D {
     protected Paint fill;

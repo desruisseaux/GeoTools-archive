@@ -70,7 +70,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://mathworld.wolfram.com/OrthographicProjection.html">Orthographic projection on mathworld.wolfram.com</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/orthographic.html">"Orthographic" on www.remotesensing.org</A>
  *
- * @version $Id: Orthographic.java,v 1.1 2004/01/11 17:11:55 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  */
 public abstract class Orthographic extends PlanarProjection {
@@ -79,7 +79,7 @@ public abstract class Orthographic extends PlanarProjection {
      * the type of projection ({@link PolarOrthographic} or {@link ObliqueOrthographic}
      * or {@link EquatorialOrthographic}) from the latitude of origin. 
      *
-     * @version $Id: Orthographic.java,v 1.1 2004/01/11 17:11:55 desruisseaux Exp $
+     * @version $Id$
      * @author Rueben Schulz
      */
     static final class Provider extends org.geotools.ct.proj.Provider {

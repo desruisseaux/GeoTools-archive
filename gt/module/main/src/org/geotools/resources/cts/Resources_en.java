@@ -37,7 +37,7 @@ package org.geotools.resources.cts;
  * English language resource. This is the default language,
  * in Geotools, which is why the "_en" suffix is ommited.
  *
- * @version $Id: Resources_en.java,v 1.3 2003/08/28 17:17:30 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_en extends Resources {

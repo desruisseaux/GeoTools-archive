@@ -49,7 +49,7 @@ import javax.media.jai.iterator.WritableRectIter;
  * {@link WritableRectIter}. This class is useful for implementing {@link OpImage#computeRect}
  * methods.
  *
- * @version $Id: DualRectIter.java,v 1.2 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @task REVISIT: This implementation is referenced in a public API.

@@ -42,7 +42,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * thrown when a property is defined twice with different values.  It may also be thrown
  * if a property can be computed from other properties, but their values are inconsistent.
  *
- * @version $Id: AmbiguousPropertyException.java,v 1.3 2003/05/13 10:59:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class AmbiguousPropertyException extends PropertyException {

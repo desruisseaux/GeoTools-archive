@@ -70,7 +70,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  * The default implementation print the localized error message to standard output {@link #out}
  * and exits the virtual machine with a call to {@link System#exit} with error code 1.
  *
- * @version $Id: Arguments.java,v 1.6 2003/08/04 18:21:32 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Arguments {

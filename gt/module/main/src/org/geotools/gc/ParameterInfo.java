@@ -60,7 +60,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * OpenGIS specification and its API is significantly different from Java
  * Advanced Imaging.
  *
- * @version $Id: ParameterInfo.java,v 1.5 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *

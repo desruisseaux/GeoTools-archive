@@ -62,7 +62,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * width and height. The <code>RawBinaryImageReadParam</code> gives a chance
  * to specify those missing informations.
  *
- * @version $Id: RawBinaryImageReadParam.java,v 1.7 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Use Sun's RAW decoder provided with "Java Advanced Imaging Image I/O Tools"

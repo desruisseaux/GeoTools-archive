@@ -53,7 +53,7 @@ import org.geotools.renderer.array.ArrayData;
  * There is at most one instance of this class for each instance of {@link Polyline}. This
  * class is strictly for internal use by {@link PolygonPathIterator}.
  *
- * @version $Id: PolylineCache.java,v 1.2 2003/05/30 18:20:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class PolylineCache {

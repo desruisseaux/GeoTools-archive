@@ -46,7 +46,7 @@ import javax.media.jai.CRIFImpl;
 /**
  * The image factory for the {@link Combine} operation.
  *
- * @version $Id: CombineCRIF.java,v 1.2 2003/07/22 15:24:54 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

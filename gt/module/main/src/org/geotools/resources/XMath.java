@@ -51,7 +51,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4461243.html">Math.acos is very slow</a></li>
  * </ul>
  *
- * @version $Id: XMath.java,v 1.9 2003/07/29 15:39:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class XMath {

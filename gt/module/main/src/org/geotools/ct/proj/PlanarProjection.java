@@ -44,7 +44,7 @@ import org.geotools.ct.MissingParameterException;
  * <p>&nbsp;</p>
  * <p align="center"><img src="../doc-files/PlanarProjection.png"></p>
  *
- * @version $Id: PlanarProjection.java,v 1.3 2003/05/13 10:58:49 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/AzimuthalProjection.html">Azimuthal projection on MathWorld</A>

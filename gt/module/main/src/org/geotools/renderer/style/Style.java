@@ -22,7 +22,7 @@ package org.geotools.renderer.style;
  * particular output device may need to be choosen for concrete subclasses, for example {@link
  * Style2D} for targeting <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>.
  *
- * @version $Id: Style.java,v 1.2 2003/06/13 18:21:45 aaime Exp $
+ * @version $Id$
  */
 public abstract class Style {
     /** Maximum scale at which the geometry has to be painted with this style */

@@ -36,7 +36,7 @@ import java.awt.image.ComponentSampleModel;
 /**
  * An {@link IndexColorModel} tolerant with image having more than one band.
  *
- * @version $Id: MultiBandsIndexColorModel.java,v 1.4 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime
  */

@@ -53,7 +53,7 @@ import org.geotools.resources.XMath;
  * than <code>validityThreshold</code>, then the center <code>NaN</code> is replaced
  * by the computed average. Otherwise, the <code>NaN</code> value is left unchanged.
  * 
- * @version $Id: NodataFilter.java,v 1.2 2003/07/30 17:45:22 desruisseaux Exp $
+ * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
  */

@@ -54,7 +54,7 @@ import java.util.logging.LogRecord;
  * declarative interface is never loaded at run time. This class also
  * provides facilities for string formatting using {@link MessageFormat}.
  *
- * @version $Id: ResourceBundle.java,v 1.8 2003/08/09 22:11:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ResourceBundle extends java.util.ResourceBundle {

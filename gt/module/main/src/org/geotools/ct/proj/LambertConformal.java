@@ -82,7 +82,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html">lambert_conic_conformal_2sp</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp_belgium.html">lambert_conic_conformal_2sp_belgium</A>
  *
- * @version $Id: LambertConformal.java,v 1.6 2004/02/23 12:28:22 desruisseaux Exp $
+ * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
@@ -116,7 +116,7 @@ public class LambertConformal extends ConicProjection {
     /**
      * Informations about a {@link LambertConformalProjection}.
      *
-     * @version $Id: LambertConformal.java,v 1.6 2004/02/23 12:28:22 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */

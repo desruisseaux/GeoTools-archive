@@ -62,7 +62,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * text file. The text file is parsed by a {@link PropertyParser} object, while the pixel
  * values are read by a {@link ImageReader} object.
  *
- * @version $Id: ExoreferencedGridCoverageReader.java,v 1.6 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ExoreferencedGridCoverageReader extends GridCoverageReader {

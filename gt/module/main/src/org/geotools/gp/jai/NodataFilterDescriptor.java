@@ -37,7 +37,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
 /**
  * The descriptor for the {@link NodataFilter} operation.
  *
- * @version $Id: NodataFilterDescriptor.java,v 1.3 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Lionel Flahaut 
  */
 public class NodataFilterDescriptor extends OperationDescriptorImpl {

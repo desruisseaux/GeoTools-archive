@@ -50,7 +50,7 @@ import org.geotools.ct.MissingParameterException;
  * <p>&nbsp;</p>
  * <p align="center"><img src="../doc-files/ConicProjection.png"></p>
  *
- * @version $Id: ConicProjection.java,v 1.3 2003/05/13 10:58:48 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/ConicProjection.html">Conic projection on MathWorld</A>

@@ -75,7 +75,7 @@ import java.lang.reflect.Field;
  * don't need to be included in the final JAR file. They are used at
  * compile time only and no other classes should keep reference to them.
  *
- * @version $Id: ResourceCompiler.java,v 1.7 2003/08/19 15:05:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class ResourceCompiler implements Comparator {

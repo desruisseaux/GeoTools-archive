@@ -52,7 +52,7 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * Base class for graduation.
  *
- * @version $Id: AbstractGraduation.java,v 1.5 2004/02/12 20:45:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class AbstractGraduation implements Graduation, Serializable {

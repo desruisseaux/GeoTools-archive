@@ -34,7 +34,7 @@ import org.geotools.resources.XArray;
  * as temporary. They will be removed if Sun extends their class with the fonctionality
  * provided here.
  *
- * @version $Id: JAIUtilities.java,v 1.2 2003/05/13 10:58:49 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class JAIUtilities {

@@ -27,7 +27,7 @@ package org.geotools.resources.gui;
 /**
  * Brazil Portuguese language resource.
  *
- * @version $Id: Resources_pt_BR.java,v 1.2 2003/08/22 14:23:59 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_pt_BR extends Resources {

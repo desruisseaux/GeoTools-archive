@@ -60,7 +60,7 @@ import org.geotools.ct.CoordinateTransformationFactory;
  * Rendering hints can be used to control some low-level details, like the expected
  * resolution.
  *
- * @version $Id: Hints.java,v 1.14 2003/05/27 18:22:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Hints extends RenderingHints.Key {

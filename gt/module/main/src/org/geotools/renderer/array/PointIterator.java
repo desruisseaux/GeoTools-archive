@@ -49,7 +49,7 @@ import org.geotools.util.Cloneable;
  * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement à cette règle (par
  * exemple appeller {@link #nextX} deux fois de suite) peut produire des résultats erronées.
  *
- * @version $Id: PointIterator.java,v 1.5 2003/08/28 15:42:13 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @task TODO: Once J2SE 1.5 will be available, this class should implements

@@ -81,7 +81,7 @@ import java.awt.geom.Point2D;
  * from -1000 to 3000. Outside of this range, results will be given, but the
  * potential for error is higher.
  *
- * @version $Id: SunRelativePosition.java,v 1.5 2003/05/13 10:58:03 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

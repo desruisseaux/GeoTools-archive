@@ -81,7 +81,7 @@ import org.geotools.gp.jai.NodataFilterDescriptor;
  * should not affect the number of sample dimensions currently being
  * accessed or value sequence.
  *
- * @version $Id: GridCoverageProcessor.java,v 1.38 2003/11/22 13:09:18 desruisseaux Exp $
+ * @version $Id$
  * @author <a href="www.opengis.org">OpenGIS</a>
  * @author Martin Desruisseaux
  */
@@ -550,7 +550,7 @@ public class GridCoverageProcessor {
      *                image. The OpenGIS specification allows to change sample values.  What
      *                should be the semantic for operation using those images as sources?
      *
-     * @version $Id: GridCoverageProcessor.java,v 1.38 2003/11/22 13:09:18 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class CacheKey {

@@ -47,7 +47,7 @@ import org.geotools.units.UnitException;
 /**
  * A graduation using numbers on a linear axis.
  *
- * @version $Id: NumberGraduation.java,v 1.4 2003/07/24 08:42:28 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class NumberGraduation extends AbstractGraduation {

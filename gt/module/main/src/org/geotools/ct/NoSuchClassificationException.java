@@ -51,7 +51,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * exception may be thrown when the projection is given to
  * {@link MathTransformFactory#createParameterizedTransform(Projection)}.
  *
- * @version $Id: NoSuchClassificationException.java,v 1.3 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Projection#getClassName

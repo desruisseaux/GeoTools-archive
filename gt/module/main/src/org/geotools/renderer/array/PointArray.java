@@ -63,7 +63,7 @@ import org.geotools.renderer.geom.CompressionLevel;
  * Pour un point situé à l'index <code>i</code>, les coordonnées <var>x</var> et <var>y</var>
  * correspondantes se trouvent aux index <code>2*i</code> et <code>2*i+1</code> respectivement.
  *
- * @version $Id: PointArray.java,v 1.11 2003/05/27 18:22:43 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see DefaultArray

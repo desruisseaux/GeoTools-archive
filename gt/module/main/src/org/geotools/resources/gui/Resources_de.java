@@ -36,7 +36,7 @@ package org.geotools.resources.gui;
 /**
  * German language resource.
  *
- * @version $Id: Resources_de.java,v 1.1 2003/08/22 14:23:59 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_de extends Resources {

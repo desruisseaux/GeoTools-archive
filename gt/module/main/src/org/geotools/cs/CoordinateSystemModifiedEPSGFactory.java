@@ -62,7 +62,7 @@ import java.sql.SQLException;
  *   </li>
  * </ul>
  *
- * @version $Id: CoordinateSystemModifiedEPSGFactory.java,v 1.4 2004/02/04 11:50:14 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  */

@@ -53,7 +53,7 @@ import java.util.NoSuchElementException;
  * <p align="center">The <code>Arrow2D</code> shape</p>
  * <p>&nbsp;</p>
  *
- * @version $Id: Arrow2D.java,v 1.3 2003/05/13 11:00:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Arrow2D extends RectangularShape {

@@ -45,7 +45,7 @@ public class ReprojectionServiceTest extends TestCase {
 		assertNotNull( "bc", bc );		
 	}
 	public void testCreateCoodinateSystemEPSG() throws FactoryException {
-		assertNotNull( "bv", service.createCoodinateSystem("EPSG:42102") );
+		assertNotNull( "bv", service.createCoordinateSystem("EPSG:42102") );
 	}
 	public void testAUTOAuthority() throws FactoryException {	
 		CoordinateSystemAuthorityFactory auto = service.authority("AUTO");
@@ -55,7 +55,7 @@ public class ReprojectionServiceTest extends TestCase {
 		assertNotNull( "auto-utm", utm );		
 	}
 	public void testCreateCoodinateSystemAUTO() throws FactoryException {
-		assertNotNull( "auto-utm", service.createCoodinateSystem("AUTO:42001,0.0,0.0") );
+		assertNotNull( "auto-utm", service.createCoordinateSystem("AUTO:42001,0.0,0.0") );
 	}
 
 }

@@ -53,7 +53,7 @@ import org.geotools.units.Unit;
  * For example a graduation for dates is handled in a different way than a
  * graduation for numbers.
  *
- * @version $Id: Graduation.java,v 1.3 2003/05/13 10:58:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Graduation {

@@ -54,7 +54,7 @@ import org.geotools.cv.SampleDimension;
  * The implementation of JAI's {@link MinFilterDescriptor MinFilter},
  * {@link MaxFilterDescriptor MaxFilter} and {@link MedianFilterDescriptor MedianFilter}.
  *
- * @version $Id: MaskFilterOperation.java,v 1.2 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class MaskFilterOperation extends FilterOperation {

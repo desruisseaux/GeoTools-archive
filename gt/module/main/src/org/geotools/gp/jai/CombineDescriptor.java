@@ -51,7 +51,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * to support 0 {@link RenderedImage} sources, an arbitrary amount of sources can really be
  * specified. The "0" should be understood as the <em>minimal</em> number of sources required.
  *
- * @version $Id: CombineDescriptor.java,v 1.6 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

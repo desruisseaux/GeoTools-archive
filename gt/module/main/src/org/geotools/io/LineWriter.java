@@ -49,7 +49,7 @@ import org.geotools.resources.XArray;
  * explicitly set at construction time. This writer also remove trailing blanks
  * before end of lines.
  *
- * @version $Id: LineWriter.java,v 1.4 2003/07/11 16:56:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LineWriter extends FilterWriter {

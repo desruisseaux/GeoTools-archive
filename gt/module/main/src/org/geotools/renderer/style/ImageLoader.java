@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 
 /**
- * $Id: ImageLoader.java,v 1.3 2004/02/12 11:19:18 aaime Exp $
+ * $Id$
  *
  * @author Ian Turton
  */

@@ -48,7 +48,7 @@ import org.geotools.resources.cts.Resources;
 /**
  * Base class for {@link MapProjection} provider.
  *
- * @version $Id: Provider.java,v 1.11 2004/05/03 07:36:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class Provider extends MathTransformProvider {

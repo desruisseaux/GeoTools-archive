@@ -40,7 +40,7 @@ import org.geotools.renderer.geom.CompressionLevel;
 /**
  * Enveloppe un tableau <code>float[]</code> dans lequel des données pourront être ajoutées.
  *
- * @version $Id: DynamicArray.java,v 1.10 2003/05/28 10:21:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class DynamicArray extends SubArray {

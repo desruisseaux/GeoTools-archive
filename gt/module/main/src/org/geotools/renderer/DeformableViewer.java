@@ -46,7 +46,7 @@ import java.awt.geom.Point2D;
  * for corrections of apparent pixel position in order to get the position we would
  * have if no deformations existed.
  *
- * @version $Id: DeformableViewer.java,v 1.2 2003/05/13 11:00:45 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface DeformableViewer {

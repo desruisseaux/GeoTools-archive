@@ -36,7 +36,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
 /**
  * The descriptor for the {@link Hysteresis} operation.
  *
- * @version $Id: HysteresisDescriptor.java,v 1.4 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Lionel Flahaut
  */
 public class HysteresisDescriptor extends OperationDescriptorImpl {

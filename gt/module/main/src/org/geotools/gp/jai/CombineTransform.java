@@ -40,7 +40,7 @@ package org.geotools.gp.jai;
  * linear one. For example, the <code>transformSamples</code> method could substitutes some
  * values by their logarithm.
  *
- * @version $Id: CombineTransform.java,v 1.2 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface CombineTransform {

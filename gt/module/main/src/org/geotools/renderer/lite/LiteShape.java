@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * geometry can be used by java2d without coordinate cloning
  *
  * @author Andrea Aime
- * @version $Id: LiteShape.java,v 1.8 2004/04/15 17:13:26 aaime Exp $
+ * @version $Id$
  */
 class LiteShape implements Shape {
     /** The floating precision model */

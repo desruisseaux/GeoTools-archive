@@ -75,7 +75,7 @@ import org.geotools.resources.gcs.Resources;
  * name of the operation, operation description, and number of source grid
  * coverages required for the operation.
  *
- * @version $Id: Operation.java,v 1.18 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author <a href="www.opengis.org">OpenGIS</a>
  * @author Martin Desruisseaux
  *

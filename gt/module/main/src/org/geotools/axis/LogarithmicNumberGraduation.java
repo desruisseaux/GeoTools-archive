@@ -41,7 +41,7 @@ import org.geotools.units.Unit;
 /**
  * A graduation using numbers on a logarithmic axis.
  *
- * @version $Id: LogarithmicNumberGraduation.java,v 1.2 2003/05/13 10:58:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LogarithmicNumberGraduation extends NumberGraduation {

@@ -41,7 +41,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 /**
  * Immutable version of a serializable, high-performance double-precision rectangle.
  *
- * @version $Id: UnmodifiableRectangle.java,v 1.1 2003/05/28 18:06:27 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class UnmodifiableRectangle extends XRectangle2D {

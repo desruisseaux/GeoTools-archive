@@ -48,7 +48,7 @@ import javax.swing.JInternalFrame;
  * by {@link SwingUtilities} in order to have the same methods working seemless on both
  * {@link Frame} and {@link JInternalFrame}.
  *
- * @version $Id: InternalWindowListener.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class InternalWindowListener implements InternalFrameListener {

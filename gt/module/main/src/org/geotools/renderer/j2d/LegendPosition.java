@@ -54,7 +54,7 @@ import javax.media.jai.EnumeratedParameter;
  * <tr><td>{@link #SOUTH_WEST}</td>  <td>{@link  #SOUTH}</td>  <td>{@link #SOUTH_EAST}</td></tr>
  * </table>
  *
- * @version $Id: LegendPosition.java,v 1.5 2003/08/11 20:04:15 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class LegendPosition extends EnumeratedParameter {

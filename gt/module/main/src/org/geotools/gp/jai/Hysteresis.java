@@ -55,7 +55,7 @@ import javax.media.jai.iterator.RandomIterFactory;
  * de valeur supérieure à <var>sh</var>. Cette recherche se fait de manière itérative,
  * jusqu'à ce que le point indéterminé n'est plus de voisins satisfaisants.
  * 
- * @version $Id: Hysteresis.java,v 1.2 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
  */

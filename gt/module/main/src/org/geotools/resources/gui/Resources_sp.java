@@ -36,7 +36,7 @@ package org.geotools.resources.gui;
 /**
  * Spanich language resource.
  *
- * @version $Id: Resources_sp.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_sp extends Resources {

@@ -36,7 +36,7 @@ package org.geotools.resources.gui;
 /**
  * Greek language resource.
  *
- * @version $Id: Resources_el.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_el extends Resources {

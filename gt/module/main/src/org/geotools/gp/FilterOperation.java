@@ -65,7 +65,7 @@ import org.geotools.cv.SampleDimension;
  * duplicated to fill a complete kernel.
  * </blockquote>
  *
- * @version $Id: FilterOperation.java,v 1.8 2003/11/22 13:09:18 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 class FilterOperation extends OperationJAI {

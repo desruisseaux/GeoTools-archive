@@ -56,7 +56,7 @@ import org.opengis.cv.CV_Coverage;
  * If a checked {@link RemoteException} is thrown, it is wrapped in an unchecked
  * {@link CannotEvaluateException}.
  *
- * @version $Id: CoverageProperties.java,v 1.2 2003/05/13 10:59:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class CoverageProperties implements PropertySource, Serializable {

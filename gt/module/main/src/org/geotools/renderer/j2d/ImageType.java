@@ -45,7 +45,7 @@ import javax.media.jai.EnumeratedParameter;
  * {@link VolatileImage} for fast rendering, or by a {@link BufferedImage} for
  * longer persistence.
  *
- * @version $Id: ImageType.java,v 1.3 2003/08/18 16:33:42 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Renderer#setOffscreenBuffered

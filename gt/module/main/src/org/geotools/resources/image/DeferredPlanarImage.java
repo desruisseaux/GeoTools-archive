@@ -77,7 +77,7 @@ import org.geotools.util.WeakValueHashMap;
  * prête, il lui suffit d'appeler une méthode <CODE>repaint(...)</CODE> pour mettre à
  * jour cette tuile.
  *
- * @version $Id: DeferredPlanarImage.java,v 1.3 2003/11/12 14:14:08 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

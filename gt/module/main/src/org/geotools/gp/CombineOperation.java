@@ -47,7 +47,7 @@ import org.geotools.gp.jai.CombineDescriptor;
  * "{@linkplain BandCombineDescriptor BandCombine}" if the operation has
  * only one source.
  *
- * @version $Id: CombineOperation.java,v 1.4 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class CombineOperation extends PolyadicOperation {

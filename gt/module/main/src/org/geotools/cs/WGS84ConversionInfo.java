@@ -51,7 +51,7 @@ import org.geotools.resources.Utilities;
  * where the X axis points towards the Greenwich Prime Meridian, the Y axis
  * points East, and the Z axis points North.
  *
- * @version $Id: WGS84ConversionInfo.java,v 1.8 2004/04/10 02:08:41 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *

@@ -90,7 +90,7 @@ import org.geotools.resources.image.ImageUtilities;
  * In the special case where there is only one source, this method is equivalent to JAI's
  * "{@link BandCombineDescriptor BandCombine}" operation.
  *
- * @version $Id: Combine.java,v 1.5 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  * @author Remi Eve
  */
@@ -319,7 +319,7 @@ public class Combine extends PointOpImage {
      * value = src0[x][y]*scale0 + src1[x][y]*scale1 + offset
      * </pre></blockquote>
      *
-     * @version $Id: Combine.java,v 1.5 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Remi Eve
      * @author Martin Desruisseaux
      */

@@ -43,7 +43,7 @@ import org.geotools.cv.SampleDimension;
  * Wraps any JAI operation producing a bilevel image. An example of such operation is
  * {@link BinarizeDescriptor Binarize}.
  *
- * @version $Id: BilevelOperation.java,v 1.5 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class BilevelOperation extends OperationJAI {

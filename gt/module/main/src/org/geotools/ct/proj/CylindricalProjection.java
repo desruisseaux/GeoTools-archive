@@ -46,7 +46,7 @@ import org.geotools.ct.MissingParameterException;
  * <p>&nbsp;</p>
  * <p align="center"><img src="../doc-files/CylindricalProjection.png"></p>
  *
- * @version $Id: CylindricalProjection.java,v 1.3 2003/05/13 10:58:49 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/CylindricalProjection.html">Cylindrical projection on MathWorld</A>

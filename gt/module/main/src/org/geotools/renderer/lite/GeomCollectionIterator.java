@@ -31,7 +31,7 @@ import java.awt.geom.PathIterator;
  * other, simpler iterator to carry on its duties.
  *
  * @author Andrea Aime
- * @version $Id: GeomCollectionIterator.java,v 1.6 2003/07/27 15:29:47 aaime Exp $
+ * @version $Id$
  */
 class GeomCollectionIterator implements PathIterator {
     /** Transform applied on the coordinates during iteration */

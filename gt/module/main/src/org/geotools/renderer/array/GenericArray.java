@@ -60,7 +60,7 @@ import org.geotools.resources.geometry.XRectangle2D;
  * Note: this implementation is not the fastest one. For maximal performance, consider using
  * {@link DefaultArray} instead.
  *
- * @version $Id: GenericArray.java,v 1.7 2003/07/23 14:17:32 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see DefaultArray
@@ -393,7 +393,7 @@ public class GenericArray extends PointArray implements RandomAccess {
     /**
      * A path iterator for the data.
      *
-     * @version $Id: GenericArray.java,v 1.7 2003/07/23 14:17:32 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Iterator implements PathIterator {
@@ -463,7 +463,7 @@ public class GenericArray extends PointArray implements RandomAccess {
      * Wrap an array of <code>double</code>, <code>float</code>, <code>long</code>,
      * <code>int</code>, <code>short</code> or <code>byte</code> data.
      *
-     * @version $Id: GenericArray.java,v 1.7 2003/07/23 14:17:32 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static abstract class Vector implements Serializable {

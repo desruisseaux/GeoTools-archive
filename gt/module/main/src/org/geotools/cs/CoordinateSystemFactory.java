@@ -95,7 +95,7 @@ import org.geotools.ct.MathTransformFactory;
  * that use feet units.  This factory lets an application create such a hybrid
  * coordinate system.
  *
- * @version $Id: CoordinateSystemFactory.java,v 1.17 2003/08/04 17:11:16 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *

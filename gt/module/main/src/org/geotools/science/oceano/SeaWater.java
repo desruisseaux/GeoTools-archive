@@ -45,7 +45,7 @@ package org.geotools.science.oceano;
  *   <li>Pressure: decibars (1 dbar = 10 kPa).
  * </ul>
  *
- * @version $Id: SeaWater.java,v 1.3 2003/07/31 17:07:54 desruisseaux Exp $
+ * @version $Id$
  * @author Bernard Pelchat
  * @author Martin Desruisseux
  */

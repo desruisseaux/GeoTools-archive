@@ -41,7 +41,7 @@ import org.geotools.resources.renderer.ResourceKeys;
 /**
  * Classe enveloppant une portion seulement d'un tableau {@link CompressedArray}.
  *
- * @version $Id: SubCompressedArray.java,v 1.5 2003/05/13 11:00:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class SubCompressedArray extends CompressedArray {

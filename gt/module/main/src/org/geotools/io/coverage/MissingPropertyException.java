@@ -42,7 +42,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * when a raster is being read but the file doesn't contains enough information for
  * constructing the raster's coordinate system.
  *
- * @version $Id: MissingPropertyException.java,v 1.3 2003/05/13 10:59:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MissingPropertyException extends PropertyException {

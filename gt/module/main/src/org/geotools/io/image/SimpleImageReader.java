@@ -84,7 +84,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
  * operators after reading.
  *
- * @version $Id: SimpleImageReader.java,v 1.4 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see RawBinaryImageReader

@@ -46,7 +46,7 @@ package org.geotools.renderer.geom;
  * avec le même spin, on ne doit pas avoir nulle part dans la liste deux pointeurs
  * <code>[i/j].path</code> identiques associés à la même valeur booléenne <code>[i/j].mergeEnd</code>.
  *
- * @version $Id: FermionPair.java,v 1.3 2003/05/27 18:22:43 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class FermionPair {

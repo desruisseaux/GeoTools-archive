@@ -51,7 +51,7 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * A graduation using dates on a linear axis.
  *
- * @version $Id: DateGraduation.java,v 1.4 2004/02/12 20:45:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DateGraduation extends AbstractGraduation {

@@ -28,7 +28,7 @@ import java.awt.geom.PathIterator;
  * LineString object.
  *
  * @author Andrea Aime
- * @version $Id: LineIterator.java,v 1.7 2003/08/05 05:11:48 aaime Exp $
+ * @version $Id$
  */
 class LineIterator implements PathIterator {
     /** Transform applied on the coordinates during iteration */

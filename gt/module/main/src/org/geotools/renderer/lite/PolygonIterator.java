@@ -27,7 +27,7 @@ import java.awt.geom.PathIterator;
  * A path iterator for the LiteShape class, specialized to iterate over Polygon objects.
  *
  * @author Andrea Aime
- * @version $Id: PolygonIterator.java,v 1.6 2003/08/10 15:18:17 aaime Exp $
+ * @version $Id$
  */
 class PolygonIterator implements PathIterator {
     /** Transform applied on the coordinates during iteration */

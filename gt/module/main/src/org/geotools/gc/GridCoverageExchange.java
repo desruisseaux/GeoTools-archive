@@ -56,7 +56,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * Support for creation of grid coverages from persistent formats as well
  * as exporting a grid coverage to a persistent formats.
  *
- * @version $Id: GridCoverageExchange.java,v 1.4 2003/05/13 10:59:51 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *

@@ -104,7 +104,7 @@ import org.geotools.io.image.RawBinaryImageReadParam;
  * However, other methods may be overriden too in order to get finner control
  * on the result.
  *
- * @version $Id: GridCoverageReader.java,v 1.11 2004/03/14 15:59:17 aaime Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class GridCoverageReader {

@@ -63,7 +63,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * to "geophysics" measurements. The normalization include dividing
  * by the distance between pixels.
  *
- * @version $Id: GradientMagnitudeOperation.java,v 1.4 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class GradientMagnitudeOperation extends OperationJAI {

@@ -42,7 +42,7 @@ import javax.media.jai.ImageLayout;
 /**
  * The factory for the {@link Hysteresis} operation.
  *
- * @version $Id: HysteresisCRIF.java,v 1.1 2003/07/18 13:49:56 desruisseaux Exp $
+ * @version $Id$
  * @author Lionel Flahaut
  */
 public class HysteresisCRIF extends CRIFImpl {

@@ -57,7 +57,7 @@ import org.geotools.io.ExpandedTabWriter;
  * We had to extract them in a separated class in order to avoid dependencies of renderer
  * module toward the GUI one, especially since the extracted methods are not Swing specific.
  *
- * @version $Id: GraphicsUtilities.java,v 1.2 2003/05/13 11:00:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class GraphicsUtilities {

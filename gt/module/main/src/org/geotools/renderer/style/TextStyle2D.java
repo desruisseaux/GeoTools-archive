@@ -33,7 +33,7 @@ import org.geotools.resources.Utilities;
  * Style used to represent labels over lines, polygons and points
  *
  * @author Andrea Aime
- * @version $Id: TextStyle2D.java,v 1.3 2003/11/28 23:32:32 desruisseaux Exp $
+ * @version $Id$
  */
 public class TextStyle2D extends Style2D {
     GlyphVector textGlyphVector;

@@ -134,7 +134,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author James Macgill
  * @author Andrea Aime
- * @version $Id: LiteRenderer.java,v 1.43 2004/04/18 05:08:54 groldan Exp $
+ * @version $Id$
  */
 public class LiteRenderer implements Renderer, Renderer2D {
     /** The logger for the rendering module. */

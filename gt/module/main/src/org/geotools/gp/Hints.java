@@ -66,7 +66,7 @@ import org.geotools.ct.CoordinateTransformationFactory; // For Javadoc
  * GridCoverageProcessor processor = new GridCoverageProcessor(hints);
  * </pre></blockquote>
  *
- * @version $Id: Hints.java,v 1.7 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Hints extends RenderingHints.Key {

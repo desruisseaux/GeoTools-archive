@@ -40,7 +40,7 @@ import java.awt.geom.Point2D;
 /**
  * Itérateur balayant les données d'un tableau {@link DefaultArray}.
  *
- * @version $Id: DefaultIterator.java,v 1.4 2003/05/23 17:58:59 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class DefaultIterator extends PointIterator {

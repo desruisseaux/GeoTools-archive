@@ -63,7 +63,7 @@ import javax.media.jai.ParameterListDescriptorImpl;
  * <strong>Note: this class is not part of OpenGIS specification and
  * may change in a future version. Do not rely strongly on it.</strong>
  *
- * @version $Id: MathTransformProvider.java,v 1.7 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class MathTransformProvider {

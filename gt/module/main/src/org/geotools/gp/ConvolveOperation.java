@@ -51,7 +51,7 @@ import org.geotools.resources.Utilities;
  * "Convolve". It includes the OpenGIS "LaplaceType1Filter" and "LaplaceType2Filter"
  * operations.
  *
- * @version $Id: ConvolveOperation.java,v 1.5 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class ConvolveOperation extends OperationJAI {

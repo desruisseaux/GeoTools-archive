@@ -59,7 +59,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  *
  * It may change in incompatible way in any future version.
  *
- * @version $Id: ImageUtilities.java,v 1.12 2003/11/12 14:13:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class ImageUtilities {

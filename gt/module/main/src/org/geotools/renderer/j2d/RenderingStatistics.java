@@ -52,7 +52,7 @@ import org.geotools.renderer.geom.Geometry; // For Javadoc
  * painting is in process. They are used for logging messages and have no impact
  * on future rendering.
  *
- * @version $Id: RenderingStatistics.java,v 1.10 2003/05/31 12:41:28 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class RenderingStatistics {

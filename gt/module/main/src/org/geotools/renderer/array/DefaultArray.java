@@ -50,7 +50,7 @@ import org.geotools.renderer.geom.CompressionLevel;
  * doesn't use any compression technic. However, subclasses may be mutable (i.e. support the
  * {@link #insertAt insertAt(...)} method) or compress data.
  *
- * @version $Id: DefaultArray.java,v 1.10 2003/05/28 10:21:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see #getInstance

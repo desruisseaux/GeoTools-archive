@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 /**
  * An EPSG factory suitable for Oracle SQL syntax.
  *
- * @version $Id: CoordinateSystemOracleEPSGFactory.java,v 1.2 2004/02/06 15:52:57 desruisseaux Exp $
+ * @version $Id$
  * @author John Grange
  */
 public class CoordinateSystemOracleEPSGFactory extends CoordinateSystemModifiedEPSGFactory {

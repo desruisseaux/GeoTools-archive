@@ -43,7 +43,7 @@ import org.geotools.cs.CoordinateSystem; // For Javadoc
  * Thrown by {@link MapProjection} when a map projection failed because the point is
  * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
  *
- * @version $Id: PointOutsideEnvelopeException.java,v 1.3 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see CoordinateSystem#getDefaultEnvelope

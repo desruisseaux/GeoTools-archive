@@ -36,7 +36,7 @@ package org.geotools.resources.renderer;
 /**
  * French language resource.
  *
- * @version $Id: Resources_fr.java,v 1.2 2003/05/13 11:00:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources_fr extends Resources {

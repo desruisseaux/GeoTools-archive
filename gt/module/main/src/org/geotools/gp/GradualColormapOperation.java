@@ -70,7 +70,7 @@ import org.geotools.cv.SampleDimension;
  *     08    0000FF        0000FF
  * </pre></blockquote>
  *
- * @version $Id: GradualColormapOperation.java,v 1.6 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class GradualColormapOperation extends IndexColorOperation {

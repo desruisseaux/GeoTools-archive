@@ -65,7 +65,7 @@ import org.geotools.resources.Utilities;
  *
  * operation.
  *
- * @version $Id: RangeSpecifier.java,v 1.5 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RangeSpecifier implements Serializable, Cloneable {

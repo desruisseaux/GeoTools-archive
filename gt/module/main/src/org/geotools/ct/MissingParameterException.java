@@ -47,7 +47,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * For example, this exception may be thrown when a map projection
  * was requested but the "semi_major" parameter was not specified.
  *
- * @version $Id: MissingParameterException.java,v 1.5 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Projection#getValue

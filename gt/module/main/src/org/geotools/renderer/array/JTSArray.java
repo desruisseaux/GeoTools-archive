@@ -51,7 +51,7 @@ import org.geotools.renderer.geom.CompressionLevel;
  * class wrap directly this {@link LineString} internal array,  in order to avoid object creation
  * and copies.
  *
- * @version $Id: JTSArray.java,v 1.7 2003/05/29 18:11:26 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see DefaultArray

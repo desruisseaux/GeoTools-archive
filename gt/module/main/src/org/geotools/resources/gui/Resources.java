@@ -30,7 +30,7 @@ import org.geotools.resources.ResourceBundle;
  * never been created directly. Use the factory method {@link #getResources}
  * or use static methods instead.
  *
- * @version $Id: Resources.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Resources extends ResourceBundle {

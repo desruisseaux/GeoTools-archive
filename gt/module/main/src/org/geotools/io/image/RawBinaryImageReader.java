@@ -107,7 +107,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  *       subclass setting the <code>padValue</code> field.</li>
  * </ul>
  *
- * @version $Id: RawBinaryImageReader.java,v 1.6 2003/08/04 19:07:23 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Use Sun's RAW decoder provided with "Java Advanced Imaging Image I/O Tools"

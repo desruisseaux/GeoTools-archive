@@ -30,7 +30,7 @@ import org.geotools.renderer.j2d.TransformedShape;
  * Style to represent points as small filled and stroked shapes
  *
  * @author Andrea Aime
- * @version $Id: MarkStyle2D.java,v 1.4 2004/04/12 16:51:27 aaime Exp $
+ * @version $Id$
  */
 public class MarkStyle2D extends PolygonStyle2D {
     Shape shape;
