@@ -16,10 +16,12 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.rmi.server.UID;
 import java.sql.Connection;
+import java.sql.Statement;
+
+import org.geotools.feature.Feature;
 
 
 /**
@@ -52,9 +54,9 @@ public class NullFIDMapper extends AbstractFIDMapper {
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
-     *      org.geotools.feature.Feature)
+     *      org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature)
+    public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
         return getID(null);
     }

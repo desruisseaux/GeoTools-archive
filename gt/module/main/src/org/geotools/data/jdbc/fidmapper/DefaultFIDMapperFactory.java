@@ -16,11 +16,6 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.SchemaNotFoundException;
-import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.JDBCUtils;
-import org.geotools.feature.FeatureType;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -34,6 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.feature.FeatureType;
 
 
 /**

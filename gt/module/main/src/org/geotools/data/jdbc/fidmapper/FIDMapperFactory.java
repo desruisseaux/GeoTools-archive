@@ -16,9 +16,10 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.FeatureType;
 import java.io.IOException;
 import java.sql.Connection;
+
+import org.geotools.feature.FeatureType;
 
 
 /**

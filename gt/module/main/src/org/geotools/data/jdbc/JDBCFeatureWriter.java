@@ -19,11 +19,7 @@
  */
 package org.geotools.data.jdbc;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureListenerManager;
@@ -35,8 +31,10 @@ import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -45,16 +43,16 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author aaime
  */
 public class JDBCFeatureWriter implements FeatureWriter {
-    protected QueryData queryData;
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.jdbc");
+    protected QueryData queryData;
     protected FeatureReader reader;
     protected Feature live; // current for FeatureWriter
     protected Feature current; // copy of live returned to user
-    private FeatureListenerManager listenerManager = new FeatureListenerManager();
-    private boolean closed;
-    private Object[] fidAttributes;
+    protected FeatureListenerManager listenerManager = new FeatureListenerManager();
+    protected boolean closed;
+    protected Object[] fidAttributes;
 
     public JDBCFeatureWriter(FeatureReader reader, QueryData queryData) {
         this.reader = reader;
@@ -109,8 +107,9 @@ public class JDBCFeatureWriter implements FeatureWriter {
                         temp.getAttributes(
                             new Object[temp.getNumberOfAttributes()]), null);
 
-                if(useQueryDataForInsert())
+                if (useQueryDataForInsert()) {
                     queryData.startInsert();
+                }
             } catch (IllegalAttributeException e) {
                 throw new DataSourceException(
                     "Unable to add additional Features of "
@@ -125,13 +124,15 @@ public class JDBCFeatureWriter implements FeatureWriter {
     }
 
     /**
-     * Returns true if QueryData is used to insert rows, false if some other means is used
+     * Returns true if QueryData is used to insert rows, false if some other
+     * means is used
+     *
      * @return
      */
     protected boolean useQueryDataForInsert() {
         return true;
     }
-    
+
     /**
      * @see org.geotools.data.FeatureWriter#remove()
      */
@@ -160,7 +161,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 String message = "problem deleting row";
 
                 if (queryData.getTransaction() != Transaction.AUTO_COMMIT) {
-					queryData.getTransaction().rollback();
+                    queryData.getTransaction().rollback();
                     message += "(transaction canceled)";
                 }
 
@@ -195,8 +196,9 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 try {
                     doUpdate(live, current);
                 } catch (SQLException sqlException) {
-					queryData.close(sqlException);
-					throw new DataSourceException("Error updating row", sqlException);
+                    queryData.close(sqlException);
+                    throw new DataSourceException("Error updating row",
+                        sqlException);
                 }
 
                 Envelope bounds = new Envelope();
@@ -204,7 +206,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 bounds.expandToInclude(current.getBounds());
                 listenerManager.fireFeaturesChanged(getFeatureType()
                                                         .getTypeName(),
-				queryData.getTransaction(), bounds);
+                    queryData.getTransaction(), bounds);
                 live = null;
                 current = null;
             }
@@ -218,7 +220,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             }
 
             listenerManager.fireFeaturesAdded(getFeatureType().getTypeName(),
-			queryData.getTransaction(), current.getBounds());
+                queryData.getTransaction(), current.getBounds());
             current = null;
         }
     }
@@ -237,14 +239,14 @@ public class JDBCFeatureWriter implements FeatureWriter {
                         LOGGER.info("modifying att# " + i + " to " + currAtt);
                     }
 
-					queryData.write(i, currAtt);
+                    queryData.write(i, currAtt);
                 }
             }
         } catch (IOException ioe) {
             String message = "problem modifying row";
 
             if (queryData.getTransaction() != Transaction.AUTO_COMMIT) {
-				queryData.getTransaction().rollback();
+                queryData.getTransaction().rollback();
                 message += "(transaction canceled)";
             }
 
@@ -255,17 +257,27 @@ public class JDBCFeatureWriter implements FeatureWriter {
     }
 
     /**
-     * Protected method to perform an insert. Postgis needs to do this
-     * seperately.  With updates it can just override the geometry stuff,
-     * using a direct sql update statement, but for inserts it can't update a
-     * row that doesn't exist yet.
+     * Inserts a feature into the database.
+     * 
+     * <p>
+     * This method should both insert a Feature, and update its FID in case the
+     * FIDMapper works over database generated ids like  autoincrement fields,
+     * sequences, and object ids.
+     * </p>
+     * 
+     * <p>
+     * Postgis needs to do this seperately.  With updates it can just override
+     * the geometry stuff, using a direct sql update statement, but for
+     * inserts it can't update a row that doesn't exist yet.
+     * </p>
      *
-     * @param current DOCUMENT ME!
+     * @param mutable
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws SQLException DOCUMENT ME!
+     * @throws IOException
+     * @throws SQLException
      */
-    protected void doInsert(MutableFIDFeature mutable) throws IOException, SQLException {
+    protected void doInsert(MutableFIDFeature mutable)
+        throws IOException, SQLException {
         queryData.startInsert();
 
         // primary key generation            
@@ -274,11 +286,12 @@ public class JDBCFeatureWriter implements FeatureWriter {
         // read the new fid into the Feature 
         if ((mapper.getColumnCount() > 0)
                 && !mapper.returnFIDColumnsAsAttributes()) {
-            String ID = mapper.createID(queryData.getConnection(), mutable); 
+            String ID = mapper.createID(queryData.getConnection(), mutable, null);
             fidAttributes = mapper.getPKAttributes(ID);
 
             if (fidAttributes != null) {
                 mutable.setID(ID);
+
                 for (int i = 0; i < fidAttributes.length; i++) {
                     Object fidAttribute = fidAttributes[i];
 
@@ -297,7 +310,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             queryData.write(i, currAtt);
         }
 
-		queryData.doInsert();
+        queryData.doInsert();
 
         // should the ID be generated during an insert, we need to read it back
         // and set it into the feature
@@ -307,6 +320,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             for (int i = 0; i < fidAttributes.length; i++) {
                 fidAttributes[i] = queryData.readFidColumn(i);
             }
+
             mutable.setID(mapper.getID(fidAttributes));
         }
     }
@@ -315,9 +329,10 @@ public class JDBCFeatureWriter implements FeatureWriter {
      * @see org.geotools.data.FeatureWriter#hasNext()
      */
     public boolean hasNext() throws IOException {
-    	if(queryData.isClosed())
-    		throw new IOException("Feature writer is closed");
-    		
+        if (queryData.isClosed()) {
+            throw new IOException("Feature writer is closed");
+        }
+
         return reader.hasNext();
     }
 
@@ -325,9 +340,10 @@ public class JDBCFeatureWriter implements FeatureWriter {
      * @see org.geotools.data.FeatureWriter#close()
      */
     public void close() throws IOException {
-    	if(queryData.isClosed())
-    		throw new IOException("Feature writer already closed");
-    		
+        if (queryData.isClosed()) {
+            throw new IOException("Feature writer already closed");
+        }
+
         reader.close();
     }
 }

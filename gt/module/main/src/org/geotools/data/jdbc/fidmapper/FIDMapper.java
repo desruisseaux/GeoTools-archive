@@ -16,10 +16,12 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.Statement;
+
+import org.geotools.feature.Feature;
 
 
 /**
@@ -93,7 +95,7 @@ public interface FIDMapper extends Serializable {
      *
      * @return
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException
      */
     public Object[] getPKAttributes(String FID) throws IOException;
 
@@ -104,14 +106,16 @@ public interface FIDMapper extends Serializable {
      * example, for primary keys with business meaning that whose attributes
      * are included in the Feature ones).
      *
-     * @param conn
-     * @param feature DOCUMENT ME!
+     * @param conn - the database connection
+     * @param feature - the feature that needs the new FID
+     * @param statement - the statement used to insert the feature into the
+     *        database
      *
      * @return
      *
      * @throws IOException
      */
-    public String createID(Connection conn, Feature feature)
+    public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException;
 
     /**
@@ -125,7 +129,7 @@ public interface FIDMapper extends Serializable {
     /**
      * Returns the number of columns in the primary keys handled by this mapper
      *
-     * @return DOCUMENT ME!
+     * @return
      */
     public int getColumnCount();
 

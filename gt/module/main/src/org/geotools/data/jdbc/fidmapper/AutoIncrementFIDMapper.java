@@ -19,10 +19,12 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.sql.Types;
+
+import org.geotools.feature.Feature;
 
 
 /**
@@ -87,9 +89,9 @@ public class AutoIncrementFIDMapper implements FIDMapper {
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
-     *      org.geotools.feature.Feature)
+     *      org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature)
+    public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
         return null;
     }

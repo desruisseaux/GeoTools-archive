@@ -16,13 +16,7 @@
  */
 package org.geotools.data.jdbc;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
@@ -30,22 +24,48 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * An abstract class that uses sql statements to insert, update and delete
+ * features from the database. Useful when the resultset got from the database
+ * is not updatable, for example.
+ *
+ * @author Andrea Aime
+ */
 public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
-
-    
+    private static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.data.jdbc");
     FIDMapper mapper = null;
 
-    public JDBCTextFeatureWriter(FeatureReader fReader, QueryData queryData) throws IOException {
+    /**
+     * Creates a new instance of JDBCFeatureWriter
+     *
+     * @param fReader
+     * @param queryData
+     *
+     * @throws IOException
+     */
+    public JDBCTextFeatureWriter(FeatureReader fReader, QueryData queryData)
+        throws IOException {
         super(fReader, queryData);
         mapper = queryData.getMapper();
     }
 
-    protected void doInsert(MutableFIDFeature current) throws IOException, SQLException {
+    /**
+     * Override that uses sql statements to perform the operation.
+     *
+     * @see org.geotools.data.jdbc.JDBCFeatureWriter#doInsert(org.geotools.data.jdbc.MutableFIDFeature)
+     */
+    protected void doInsert(MutableFIDFeature current)
+        throws IOException, SQLException {
         LOGGER.fine("inserting into postgis feature " + current);
 
         Statement statement = null;
@@ -58,6 +78,13 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             String sql = makeInsertSql(current);
             LOGGER.info(sql);
             statement.executeUpdate(sql);
+
+            // should the ID be generated during an insert, we need to read it back
+            // and set it into the feature
+            if (((mapper.getColumnCount() > 0)
+                    && mapper.hasAutoIncrementColumns())) {
+                current.setID(mapper.createID(conn, current, statement));
+            }
         } catch (SQLException sqle) {
             String msg = "SQL Exception writing geometry column";
             LOGGER.log(Level.SEVERE, msg, sqle);
@@ -75,10 +102,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
     }
 
-    public void close() throws IOException {
-        super.close();
-    }
-
     /**
      * Creates a sql insert statement.  Uses each feature's schema, which makes
      * it possible to insert out of order, as well as inserting less than all
@@ -88,9 +111,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @return an insert sql statement.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException
      */
-    private String makeInsertSql(Feature feature) throws IOException {
+    protected String makeInsertSql(Feature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
         FeatureType fetureType = ftInfo.getSchema();
 
@@ -99,7 +122,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
         String attrValue;
 
-        StringBuffer statementSQL = new StringBuffer("INSERT INTO " + tableName + "(");
+        StringBuffer statementSQL = new StringBuffer("INSERT INTO " + tableName
+                + "(");
 
         if (!mapper.returnFIDColumnsAsAttributes()) {
             for (int i = 0; i < mapper.getColumnCount(); i++) {
@@ -116,8 +140,10 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         statementSQL.setCharAt(statementSQL.length() - 1, ')');
         statementSQL.append(" VALUES (");
 
-        if (!mapper.returnFIDColumnsAsAttributes()) {
-            String FID = mapper.createID(queryData.getConnection(), feature);
+        if (!mapper.returnFIDColumnsAsAttributes()
+                && !mapper.hasAutoIncrementColumns()) {
+            String FID = mapper.createID(queryData.getConnection(), feature,
+                    null);
             Object[] primaryKey = mapper.getPKAttributes(FID);
 
             for (int i = 0; i < primaryKey.length; i++) {
@@ -157,7 +183,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @return a string representation of the object with quotes.
      */
-    private String addQuotes(Object value) {
+    protected String addQuotes(Object value) {
         String retString;
 
         if (value != null) {
@@ -173,9 +199,19 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         return obj.toString().replaceAll("'", "''");
     }
 
-    protected abstract String getGeometryInsertText(Geometry geom, int srid);
-    
     /**
+     * Turns a geometry into the textual version needed for the sql statement
+     *
+     * @param geom
+     * @param srid
+     *
+     * @return
+     */
+    protected abstract String getGeometryInsertText(Geometry geom, int srid);
+
+    /**
+     * Override that uses sql statements to perform the operation.
+     *
      * @see org.geotools.data.FeatureWriter#remove()
      */
     public void remove() throws IOException {
@@ -209,29 +245,45 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
     }
 
-    private String makeDeleteSql(Feature feature) throws IOException {
+    /**
+     * Generates the query for the sql delete statement
+     *
+     * @param feature
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    protected String makeDeleteSql(Feature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
         FeatureType fetureType = ftInfo.getSchema();
 
         String tableName = fetureType.getTypeName();
 
-        StringBuffer statementSQL = new StringBuffer("DELETE FROM " + tableName + " WHERE ");
+        StringBuffer statementSQL = new StringBuffer("DELETE FROM " + tableName
+                + " WHERE ");
         Object[] pkValues = mapper.getPKAttributes(feature.getID());
 
         for (int i = 0; i < mapper.getColumnCount(); i++) {
-            statementSQL.append(mapper.getColumnName(i)).append(" = ").append(
-                addQuotes(pkValues[i]));
-            if (i < (mapper.getColumnCount() - 1))
+            statementSQL.append(mapper.getColumnName(i)).append(" = ").append(addQuotes(
+                    pkValues[i]));
+
+            if (i < (mapper.getColumnCount() - 1)) {
                 statementSQL.append(" AND ");
+            }
         }
 
         return (statementSQL.toString());
     }
 
     /**
-     * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature, org.geotools.feature.Feature)
+     * Override that uses sql statements to perform the operation.
+     *
+     * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature,
+     *      org.geotools.feature.Feature)
      */
-    protected void doUpdate(Feature live, Feature current) throws IOException, SQLException {
+    protected void doUpdate(Feature live, Feature current)
+        throws IOException, SQLException {
         LOGGER.fine("updating postgis feature " + current);
 
         Statement statement = null;
@@ -262,15 +314,26 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
     }
 
-    private String makeUpdateSql(Feature live, Feature current) throws IOException {
-
+    /**
+     * Generate the update sql statement
+     *
+     * @param live
+     * @param current
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    protected String makeUpdateSql(Feature live, Feature current)
+        throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
         FeatureType featureType = ftInfo.getSchema();
         AttributeType[] attributes = featureType.getAttributeTypes();
 
         String tableName = featureType.getTypeName();
 
-        StringBuffer statementSQL = new StringBuffer("UPDATE " + tableName + " SET ");
+        StringBuffer statementSQL = new StringBuffer("UPDATE " + tableName
+                + " SET ");
 
         for (int i = 0; i < current.getNumberOfAttributes(); i++) {
             Object currAtt = current.getAttribute(i);
@@ -280,31 +343,36 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 if (LOGGER.isLoggable(Level.INFO)) {
                     LOGGER.info("modifying att# " + i + " to " + currAtt);
                 }
-                
-                statementSQL.append(attributes[i].getName()).append(" = ").append(addQuotes(currAtt)).append(", ");
+
+                statementSQL.append(attributes[i].getName()).append(" = ")
+                            .append(addQuotes(currAtt)).append(", ");
             }
         }
-        statementSQL.setLength(statementSQL.length() - 2); 
+
+        statementSQL.setLength(statementSQL.length() - 2);
         statementSQL.append(" WHERE ");
 
         Object[] pkValues = mapper.getPKAttributes(current.getID());
 
         for (int i = 0; i < mapper.getColumnCount(); i++) {
-            statementSQL.append(mapper.getColumnName(i)).append(" = ").append(
-                addQuotes(pkValues[i]));
-            if (i < (mapper.getColumnCount() - 1))
+            statementSQL.append(mapper.getColumnName(i)).append(" = ").append(addQuotes(
+                    pkValues[i]));
+
+            if (i < (mapper.getColumnCount() - 1)) {
                 statementSQL.append(" AND ");
+            }
         }
 
         return (statementSQL.toString());
     }
-    
-    
+
     /**
+     * This version does not use QueryData udpate/insert/remove methods, but
+     * uses separate queries instead
+     *
      * @see org.geotools.data.jdbc.JDBCFeatureWriter#useQueryDataForInsert()
      */
     protected boolean useQueryDataForInsert() {
         return false;
     }
-
 }
