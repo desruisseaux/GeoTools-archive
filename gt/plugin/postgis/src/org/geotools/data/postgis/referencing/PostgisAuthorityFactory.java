@@ -68,8 +68,8 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
 
                 return crs;
             } else {
-                String mesg = "No row found for srid in table: " + TABLE_NAME;
-                throw new DataSourceException(mesg);
+                String mesg = "No row found for "+srid+" in table: " + TABLE_NAME;
+                throw new FactoryException(mesg);
             }
         } catch (SQLException sqle) {
             String message = sqle.getMessage();

@@ -500,7 +500,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         Connection dbConnection = null;
 
         try {
-            String sqlStatement = "SELECT srid FROM GEOMETRY_COLUMNS WHERE "
+            String sqlStatement = "SELECT * FROM GEOMETRY_COLUMNS WHERE "
                 + "f_table_name='" + tableName + "' AND f_geometry_column='"
                 + geometryColumnName + "';";
             dbConnection = getConnection(Transaction.AUTO_COMMIT);

@@ -95,8 +95,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
             // should the ID be generated during an insert, we need to read it back
             // and set it into the feature
-            if (((mapper.getColumnCount() > 0)
-                    && mapper.hasAutoIncrementColumns())) {
+          if (((mapper.getColumnCount() > 0)
+          && mapper.hasAutoIncrementColumns())) {
+//          if (((mapper.getColumnCount() > 0))) {
                 current.setID(mapper.createID(conn, current, statement));
             }
         } catch (SQLException sqle) {
@@ -159,6 +160,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 && !mapper.hasAutoIncrementColumns()) {
             String FID = mapper.createID(queryData.getConnection(), feature,
                     null);
+            if( current instanceof MutableFIDFeature ){
+                ((MutableFIDFeature)current).setID(FID);
+            }
             Object[] primaryKey = mapper.getPKAttributes(FID);
 
             for (int i = 0; i < primaryKey.length; i++) {
