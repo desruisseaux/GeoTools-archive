@@ -34,6 +34,7 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.PropertySource;
 
+import org.geotools.coverage.SampleDimensionGT;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
@@ -52,7 +53,9 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.util.InternationalString;
 
-public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
+public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage
+                            implements RenderedCoverage
+{
 
 	/**
 	 * Comment for <code>serialVersionUID</code>
@@ -119,14 +122,18 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	 */
 	public GridGeometry getGridGeometry() {
 
-		GridRange range = new org.geotools.coverage.grid.GridRange(image);
+		GridRange range = new GridRangeGT(image);
 		boolean[] inverse = { false, false };
 		
-		return new org.geotools.coverage.grid.GridGeometry(range, envelope, inverse);
+		return new GridGeometryGT(range, envelope, inverse);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.grid.GridCoverage#getOptimalDataBlockSizes()
+         *
+         * @deprecated This method returns a wrong value. It returns the sample size in bits for
+         *             all bands (sample dimensions) while it was supposed to returns the tile
+         *             size in pixels for all spatial dimensions (not sample dimensions).
 	 */
 	public int[] getOptimalDataBlockSizes() {
 		return image.getRaster().getSampleModel().getSampleSize();
@@ -157,7 +164,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, boolean[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, boolean[])
 	 */
 	public boolean[] getDataBlock(GridRange range, boolean[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -176,7 +183,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, byte[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, byte[])
 	 */
 	public byte[] getDataBlock(GridRange range, byte[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -195,7 +202,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, short[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, short[])
 	 */
 	public short[] getDataBlock(GridRange range, short[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -214,7 +221,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, int[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, int[])
 	 */
 	public int[] getDataBlock(GridRange range, int[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -233,7 +240,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, float[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, float[])
 	 */
 	public float[] getDataBlock(GridRange range, float[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -252,7 +259,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(org.opengis.coverage.grid.GridRange, double[])
+	 * @see org.opengis.coverage.grid.GridCoverage#getDataBlock(GridRange, double[])
 	 */
 	public double[] getDataBlock(GridRange range, double[] destination) throws InvalidRangeException, ArrayIndexOutOfBoundsException {
 		if (destination == null) {
@@ -271,7 +278,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#getPackedDataBlock(org.opengis.coverage.grid.GridRange)
+	 * @see org.opengis.coverage.grid.GridCoverage#getPackedDataBlock(GridRange)
 	 */
 	public byte[] getPackedDataBlock(GridRange arg0) throws InvalidRangeException {
 		// TODO Auto-generated method stub
@@ -279,7 +286,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, boolean[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, boolean[])
 	 */
 	public void setDataBlock(GridRange range, boolean[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		int[] temp = new int[values.length];
@@ -292,7 +299,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, byte[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, byte[])
 	 */
 	public void setDataBlock(GridRange range, byte[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		int[] temp = new int[values.length];
@@ -305,7 +312,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, short[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, short[])
 	 */
 	public void setDataBlock(GridRange range, short[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		int[] temp = new int[values.length];
@@ -318,7 +325,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, int[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, int[])
 	 */
 	public void setDataBlock(GridRange range, int[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
@@ -326,7 +333,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, float[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, float[])
 	 */
 	public void setDataBlock(GridRange range, float[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
@@ -334,7 +341,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(org.opengis.coverage.grid.GridRange, double[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setDataBlock(GridRange, double[])
 	 */
 	public void setDataBlock(GridRange range, double[] values) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		image.getRaster().setPixels(range.getLower(0), range.getLower(1), 
@@ -342,7 +349,7 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.coverage.grid.GridCoverage#setPackedDataBlock(org.opengis.coverage.grid.GridRange, byte[])
+	 * @see org.opengis.coverage.grid.GridCoverage#setPackedDataBlock(GridRange, byte[])
 	 */
 	public void setPackedDataBlock(GridRange arg0, byte[] arg1) throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException {
 		// TODO Auto-generated method stub
@@ -377,10 +384,12 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
 
 	/* (non-Javadoc)
 	 * @see org.opengis.coverage.Coverage#getSampleDimension(int)
+         *
+         * @deprecated This method returns a completly wrong sample dimension.
 	 */
 	public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
 		//TODO this is not right.
-		return new org.geotools.coverage.SampleDimension(new String[] { "Alpha", "Red", "Green", "Blue" },
+		return new SampleDimensionGT(new String[] { "Alpha", "Red", "Green", "Blue" },
 				new Color[] { new Color(0,0,0,0), Color.RED, Color.GREEN, Color.BLUE });
 	}
 

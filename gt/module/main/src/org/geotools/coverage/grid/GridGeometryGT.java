@@ -29,6 +29,7 @@ import java.awt.image.RenderedImage;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
@@ -53,7 +54,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Serializable {
+public class GridGeometryGT implements GridGeometry, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -88,7 +89,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      * @param gridToCoordinateSystem The math transform which allows for the transformations
      *        from grid coordinates (pixel's <em>center</em>) to real world earth coordinates.
      */
-    public GridGeometry(final GridRange gridRange, final MathTransform gridToCoordinateSystem) {
+    public GridGeometryGT(final GridRange gridRange, final MathTransform gridToCoordinateSystem) {
         this.gridRange              = gridRange;
         this.gridToCoordinateSystem = gridToCoordinateSystem;
         if (gridRange!=null && gridToCoordinateSystem!=null) {
@@ -119,9 +120,9 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      *                  of the last pixel.
      * @param reverse   Tells whatever or not reverse axis. A {@code null} value reverse no axis.
      */
-    public GridGeometry(final GridRange gridRange,
-                        final Envelope  userRange,
-                        final boolean[] reverse)
+    public GridGeometryGT(final GridRange gridRange,
+                          final Envelope  userRange,
+                          final boolean[] reverse)
     {
         this.gridRange = gridRange;
         /*
@@ -308,7 +309,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final GridGeometry that = (GridGeometry) object;
+            final GridGeometryGT that = (GridGeometryGT) object;
             return Utilities.equals(this.gridRange,              that.gridRange) &&
                    Utilities.equals(this.gridToCoordinateSystem, that.gridToCoordinateSystem);
         }

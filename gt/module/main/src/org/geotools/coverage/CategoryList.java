@@ -79,7 +79,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private static final long serialVersionUID = 2647846361059903365L;
 
     /**
-     * The inverse transform, never <code>null</code>.
+     * The inverse transform, never {@code null}.
      * The following rule must hold:
      *
      * <ul>
@@ -114,13 +114,13 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private final Category[] categories;
 
     /**
-     * The "main" category, or <code>null</code> if there is none. The main category
+     * The "main" category, or {@code null} if there is none. The main category
      * is the quantitative category with the widest range of sample values.
      */
     private final Category main;
 
     /**
-     * The "nodata" category (never <code>null</code>). The "nodata" category is a
+     * The "nodata" category (never {@code null}). The "nodata" category is a
      * category mapping the geophysics {@link Double#NaN} value.  If none has been
      * found, a default "nodata" category is used. This category is used to transform
      * geophysics values to sample values into rasters when no suitable category has
@@ -131,9 +131,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     /**
      * The category to use if {@link #getCategory(double)} is invoked  with  a sample value
      * greater than all sample ranges in this category list. This is usually a reference to
-     * the last category to have a range of real values.    A <code>null</code> value means
-     * that no fallback should be used.  By extension, a <code>null</code> value also means
-     * that {@link #getCategory} should not try to find any fallback at all if the requested
+     * the last category to have a range of real values. A {@code null} value means that no
+     * fallback should be used. By extension, a {@code null} value also means that
+     * {@link #getCategory} should not try to find any fallback at all if the requested
      * sample value do not falls in a category range.
      */
     private final Category overflowFallback;
@@ -162,7 +162,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * Construct a category list using the specified array of categories.
      *
      * @param  categories The list of categories.
-     * @param  units The geophysics unit, or <code>null</code> if none.
+     * @param  units The geophysics unit, or {@code null} if none.
      * @throws IllegalArgumentException if two or more categories
      *         have overlapping sample value range.
      */
@@ -181,11 +181,11 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * It is not private only because {@link GeophysicsCategoryList} need this constructor.
      *
      * @param  categories The list of categories.
-     * @param  units The geophysics unit, or <code>null</code> if none.
+     * @param  units The geophysics unit, or {@code null} if none.
      * @param  searchNearest The policy when {@link #getCategory} doesn't find an exact match
      *         for a sample value. <code>true</code> means that it should search for the nearest
-     *         category, while <code>false</code> means that it should returns <code>null</code>.
-     * @param  inverse The inverse transform, or <code>null</code> to build it automatically.
+     *         category, while <code>false</code> means that it should returns {@code null}.
+     * @param  inverse The inverse transform, or {@code null} to build it automatically.
      *         <STRONG>This argument can be non-null only if invoked from
      *         {@link GeophysicsCategoryList} constructor</STRONG>.
      * @throws IllegalArgumentException if two or more categories have overlapping sample value
@@ -493,15 +493,14 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Returns the unit information for quantitative categories in this list.
-     * May returns <code>null</code>  if there is no quantitative categories
-     * in this list, or if there is no unit information.
+     * Returns the unit information for quantitative categories in this list. May returns
+     * {@code null} if there is no quantitative categories in this list, or if there is no
+     * unit information.
      * <br><br>
-     * This method is to be overriden by {@link GeophysicsCategoryList}.   The default
-     * implementation returns <code>null</code> since sample values are not geophysics
-     * values as long as they have not been transformed.   The {@link SampleDimension}
-     * class will invoke <code>geophysics(true).getUnits()</code> in order to get a
-     * non-null unit.
+     * This method is to be overriden by {@link GeophysicsCategoryList}. The default implementation
+     * returns {@code null} since sample values are not geophysics values as long as they have not
+     * been transformed. The {@link SampleDimensionGT} class will invoke
+     * {@code geophysics(true).getUnits()} in order to get a non-null unit.
      */
     public Unit getUnits() {
         return null;
@@ -514,7 +513,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * and {@link org.opengis.CV_SampleDimension#getMaximum} since it contains also the
      * type (integer, float, etc.) and inclusion/exclusion informations.
      *
-     * @return The range of values. May be <code>null</code> if this category list has no
+     * @return The range of values. May be {@code null} if this category list has no
      *         quantitative category.
      *
      * @see Category#getRange
@@ -571,7 +570,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @param  value The value to format.
      * @param  writeUnit <code>true</code> if unit symbol should be formatted after the number.
      *         Ignored if this category list has no unit.
-     * @param  locale The locale, or <code>null</code> for a default one.
+     * @param  locale The locale, or {@code null} for a default one.
      * @param  buffer The buffer where to format.
      * @return The buffer <code>buffer</code> for convenience.
      */
@@ -638,10 +637,10 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     
     /**
      * Returns the category of the specified sample value.
-     * If no category fits, then this method returns <code>null</code>.
+     * If no category fits, then this method returns {@code null}.
      *
      * @param  sample The value.
-     * @return The category of the supplied value, or <code>null</code>.
+     * @return The category of the supplied value, or {@code null}.
      */
     public final Category getCategory(final double sample) {
         /*
@@ -704,7 +703,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * if <code>value</code> is <code>NaN</code>, then the category name is returned.
      *
      * @param  value  The sample value (may be <code>NaN</code>).
-     * @param  locale Locale to use for formatting, or <code>null</code> for the default locale.
+     * @param  locale Locale to use for formatting, or {@code null} for the default locale.
      * @return A string representation of the sample value.
      */
     public final String format(final double value, final Locale locale) {

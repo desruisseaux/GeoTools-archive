@@ -68,7 +68,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @see GC_GridGeometry
  *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.GridGeometry}.
+ * @deprecated Replaced by {@link org.geotools.coverage.grid.GridGeometryGT}.
  */
 public class GridGeometry implements Dimensioned, Serializable {
     /**

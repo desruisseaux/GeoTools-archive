@@ -27,11 +27,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 
-import org.geotools.coverage.grid.GridGeometry;
+// OpenGIS dependencies
+import org.opengis.coverage.grid.GridGeometry; // For javadoc
+import org.opengis.referencing.operation.MathTransform2D;
+
+// Geotools dependencies
 import org.geotools.referencing.crs.DerivedCRS;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.operation.MathTransform2D;
 
 
 /**

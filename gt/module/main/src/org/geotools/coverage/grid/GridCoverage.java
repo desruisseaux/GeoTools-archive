@@ -51,14 +51,8 @@ public abstract class GridCoverage extends AbstractGridCoverage {
      *        system used when accessing a coverage or grid coverage with the
      *        <code>evaluate(...)</code> methods.
      * @param source The source for this coverage, or <code>null</code> if none.
-     *        Source may be (but is not limited to) a {@link PlanarImage} or an
-     *        other <code>AbstractCoverage</code> object.
      * @param properties The set of properties for this coverage, or <code>null</code> if
-     *        there is none. "Properties" in <cite>Java Advanced Imaging</cite> is what
-     *        OpenGIS calls "Metadata".  There is no <code>getMetadataValue(...)</code>
-     *        method in this implementation. Use {@link #getProperty} instead. Keys may
-     *        be {@link String} or {@link CaselessStringKey} objects,  while values may
-     *        be any {@link Object}.
+     *        there is none.
      */
     protected GridCoverage(final String                   name,
                            final CoordinateReferenceSystem crs,

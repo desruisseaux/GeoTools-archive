@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 // Geotools dependencies
+import org.opengis.coverage.grid.GridRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
@@ -42,7 +43,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridRange implements org.opengis.coverage.grid.GridRange, Serializable {
+public class GridRangeGT implements GridRange, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -77,7 +78,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     /**
      * Constructs an initially empty grid range of the specified dimension.
      */
-    private GridRange(final int dimension) {
+    private GridRangeGT(final int dimension) {
         index = new int[dimension*2];
     }
     
@@ -87,7 +88,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
      * @param lower The minimal inclusive value.
      * @param upper The maximal exclusive value.
      */
-    public GridRange(final int lower, final int upper) {
+    public GridRangeGT(final int lower, final int upper) {
         index = new int[] {lower, upper};
         checkCoherence();
     }
@@ -106,7 +107,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
      * @see #getLowers
      * @see #getUppers
      */
-    public GridRange(final int[] lower, final int[] upper) {
+    public GridRangeGT(final int[] lower, final int[] upper) {
         if (lower.length != upper.length) {
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
@@ -121,7 +122,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     /**
      * Constructs two-dimensional range defined by a {@link Rectangle}.
      */
-    public GridRange(final Rectangle rect) {
+    public GridRangeGT(final Rectangle rect) {
         index = new int[] {
             rect.x,            rect.y,
             rect.x+rect.width, rect.y+rect.height
@@ -132,7 +133,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     /**
      * Constructs two-dimensional range defined by a {@link Raster}.
      */
-    public GridRange(final Raster raster) {
+    public GridRangeGT(final Raster raster) {
         final int x = raster.getMinX();
         final int y = raster.getMinY();
         index = new int[] {
@@ -145,7 +146,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     /**
      * Constructs two-dimensional range defined by a {@link RenderedImage}.
      */
-    public GridRange(final RenderedImage image) {
+    public GridRangeGT(final RenderedImage image) {
         this(image, 2);
     }
     
@@ -156,7 +157,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
      * @param dimension Number of dimensions for this grid range.
      *        Dimensions over 2 will be set to the [0..1] range.
      */
-    GridRange(final RenderedImage image, final int dimension) {
+    GridRangeGT(final RenderedImage image, final int dimension) {
         index = new int[dimension*2];
         final int x = image.getMinX();
         final int y = image.getMinY();
@@ -238,7 +239,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
      * @return The subgrid range.
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
-    public GridRange getSubGridRange(final int lower, final int upper) {
+    public GridRangeGT getSubGridRange(final int lower, final int upper) {
         final int curDim = index.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
@@ -251,14 +252,14 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
                     org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
                     "upper", new Integer(upper)));
         }
-        final GridRange gridRange = new GridRange(newDim);
+        final GridRangeGT gridRange = new GridRangeGT(newDim);
         System.arraycopy(index, lower,        gridRange.index, 0,      newDim);
         System.arraycopy(index, lower+curDim, gridRange.index, newDim, newDim);
         return gridRange;
     }
     
     /**
-     * Returns a {@link Rectangle} with the same bounds as this <code>GridRange</code>.
+     * Returns a {@link Rectangle} with the same bounds as this {@code GridRangeGT}.
      * This is a convenience method for interoperability with Java2D.
      *
      * @throws IllegalStateException if this grid range is not two-dimensional.
@@ -293,8 +294,8 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
      * this grid range for equality.
      */
     public boolean equals(final Object object) {
-        if (object instanceof GridRange) {
-            final GridRange that = (GridRange) object;
+        if (object instanceof GridRangeGT) {
+            final GridRangeGT that = (GridRangeGT) object;
             return Arrays.equals(this.index, that.index);
         }
         return false;

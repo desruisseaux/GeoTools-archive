@@ -45,7 +45,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.coverage.Category;
-import org.geotools.coverage.SampleDimension;
+import org.geotools.coverage.SampleDimensionGT;
 import org.geotools.coverage.TypeMap;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
@@ -61,7 +61,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class GridSampleDimension extends SampleDimension {
+final class GridSampleDimension extends SampleDimensionGT {
     /**
      * The range of sample values after a transformation from
      * integer geophysics value to 8 bits indexed image.
@@ -120,9 +120,9 @@ final class GridSampleDimension extends SampleDimension {
      * @param image The image to be wrapped by {@link GridCoverage}.
      * @param bandNumber The band number.
      */
-    private GridSampleDimension(final SampleDimension band,
-                                final RenderedImage   image,
-                                final int             bandNumber)
+    private GridSampleDimension(final SampleDimensionGT band,
+                                final RenderedImage    image,
+                                final int         bandNumber)
     {
         super(band);
         final SampleModel model = image.getSampleModel();
@@ -143,10 +143,10 @@ final class GridSampleDimension extends SampleDimension {
      *         {@code false} if all sample dimensions are non-geophysics (qualitative).
      * @throws IllegalArgumentException if geophysics and non-geophysics dimensions are mixed.
      */
-    static boolean create(final String          name,
-                          final RenderedImage   image,
-                          final SampleDimension[] src,
-                          final SampleDimension[] dst)
+    static boolean create(final CharSequence      name,
+                          final RenderedImage     image,
+                          final SampleDimensionGT[] src,
+                          final SampleDimensionGT[] dst)
     {
         final int numBands = image.getSampleModel().getNumBands();
         if (src!=null && src.length!=numBands) {
@@ -161,12 +161,12 @@ final class GridSampleDimension extends SampleDimension {
         }
         int nGeo = 0;
         int nInt = 0;
-        SampleDimension[] defaultSD = null;
+        SampleDimensionGT[] defaultSD = null;
         for (int i=0; i<numBands; i++) {
-            SampleDimension sd = (src!=null) ? src[i] : null;
+            SampleDimensionGT sd = (src!=null) ? src[i] : null;
             if (sd == null) {
                 if (defaultSD == null) {
-                    defaultSD = new SampleDimension[numBands];
+                    defaultSD = new SampleDimensionGT[numBands];
                     create(name, RectIterFactory.create(image, null),
                            image.getSampleModel().getDataType(),
                            null, null, null, null, defaultSD, null);
@@ -212,15 +212,15 @@ final class GridSampleDimension extends SampleDimension {
      *         {@link SampleDimensionType#USHORT USHORT}.
      * @return The sample dimension for the given raster.
      */
-    static SampleDimension[] create(final String         name,
-                                    final Raster         raster,
-                                    final double[]       min,
-                                    final double[]       max,
-                                    final Unit           units,
-                                    final Color[][]      colors,
-                                    final RenderingHints hints)
+    static SampleDimensionGT[] create(final CharSequence   name,
+                                      final Raster         raster,
+                                      final double[]       min,
+                                      final double[]       max,
+                                      final Unit           units,
+                                      final Color[][]      colors,
+                                      final RenderingHints hints)
     {
-        final SampleDimension[] dst = new SampleDimension[raster.getNumBands()];
+        final SampleDimensionGT[] dst = new SampleDimensionGT[raster.getNumBands()];
         create(name, (min==null || max==null) ? RectIterFactory.create(raster, null) : null,
                raster.getDataBuffer().getDataType(), min, max, units, colors, dst, hints);
         return dst;
@@ -251,15 +251,15 @@ final class GridSampleDimension extends SampleDimension {
      *         {@link SampleDimensionType#UBYTE UBYTE} or
      *         {@link SampleDimensionType#USHORT USHORT}.
      */
-    private static void create(final String            name,
-                               final RectIter          iterator,
-                               final int               rasterType,
-                                     double[]          min,
-                                     double[]          max,
-                               final Unit              units,
-                               final Color[][]         colors,
-                               final SampleDimension[] dst,
-                               final RenderingHints    hints)
+    private static void create(final CharSequence        name,
+                               final RectIter            iterator,
+                               final int                 rasterType,
+                               double[]                  min,
+                               double[]                  max,
+                               final Unit                units,
+                               final Color[][]           colors,
+                               final SampleDimensionGT[] dst,
+                               final RenderingHints      hints)
     {
         final int     numBands   = dst.length;
         final boolean computeMin = (min == null);
@@ -389,13 +389,13 @@ final class GridSampleDimension extends SampleDimension {
         for (int b=0; b<numBands; b++) {
             NumberRange geophysicsValueRange = new NumberRange(min[b], max[b]).castTo(classe);
             final Color[] c = colors!=null ? colors[b] : null;
-            final InternationalString n = new SimpleInternationalString(name);
+            final InternationalString n = SimpleInternationalString.wrap(name);
             if (needScaling) {
                 categories[0] = new Category(n, c, sampleValueRange, geophysicsValueRange);
             } else {
                 categories[0] = new Category(n, c, sampleValueRange, LinearTransform1D.IDENTITY);
             }
-            dst[b] = new SampleDimension(categories, units).geophysics(true);
+            dst[b] = new SampleDimensionGT(categories, units).geophysics(true);
         }
     }
 

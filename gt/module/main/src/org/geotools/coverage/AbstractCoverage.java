@@ -47,6 +47,8 @@ import java.util.Vector;
 import java.util.Arrays;
 import java.util.Locale;
 import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.StringWriter;
 
 // JAI dependencies
 import javax.media.jai.JAI;
@@ -56,13 +58,15 @@ import javax.media.jai.ImageLayout;
 import javax.media.jai.ImageFunction;
 import javax.media.jai.PropertySource;
 import javax.media.jai.PropertySourceImpl;
-import javax.media.jai.util.CaselessStringKey; // For Javadoc
+import javax.media.jai.util.CaselessStringKey;           // For Javadoc
 import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridGeometry;                // For javadoc
+import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -80,6 +84,7 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.util.SimpleInternationalString;
 
 // Resources
+import org.geotools.io.LineWriter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
@@ -165,10 +170,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @param source The source for this coverage, or {@code null} if none.
      *        Source may be (but is not limited to) a {@link PlanarImage} or an
      *        other {@code AbstractCoverage} object.
-     * @param properties The set of properties for this coverage, or {@code null} if
-     *        there is none. "Properties" in <cite>Java Advanced Imaging</cite> is what
-     *        OpenGIS calls "Metadata". Keys may be {@link String} or
-     *        {@link CaselessStringKey} objects, while values may be any {@link Object}.
+     * @param properties The set of properties for this coverage, or {@code null} if there is none.
+     *        "Properties" in <cite>Java Advanced Imaging</cite> is what OpenGIS calls "Metadata".
+     *        Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well),
+     *        while values may be any {@link Object}.
      */
     protected AbstractCoverage(final CharSequence             name,
                                final CoordinateReferenceSystem crs,
@@ -203,23 +208,21 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
     
     /**
-     * Returns the coordinate reference system. This specifies the CRS used when
-     * accessing a coverage or grid coverage with the {@code evaluate(...)} methods.
-     * It is also the coordinate reference system of the coordinates used with the math transform
-     * {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem}. A grid coverage
-     * can be accessed (re-projected) with new coordinate reference system with the
-     * {@link org.geotools.coverage.processing.GridCoverageProcessor} component.
-     * In this case, a new instance of a grid coverage is created.
+     * Returns the coordinate reference system. This specifies the CRS used when accessing a
+     * coverage or grid coverage with the {@code evaluate(...)} methods. It is also the coordinate
+     * reference system of the coordinates used with the math transform
+     * {@link GridGeometry#getGridToCoordinateSystem}. A grid coverage can be accessed
+     * (re-projected) with new coordinate reference system with the {@link GridCoverageProcessor}
+     * component. In this case, a new instance of a grid coverage is created.
      * <br><br>
-     * Note: If a coverage does not have an associated coordinate reference system,
-     * the returned value will be {@code null}.
-     * The {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem}) attribute
+     * Note: If a coverage does not have an associated coordinate reference system, the returned
+     * value will be {@code null}. The {@link GridGeometry#getGridToCoordinateSystem}) attribute
      * should also be {@code null} if the coordinate reference system is {@code null}.
      *
      * @return The coordinate reference system, or {@code null} if this coverage
      *         does not have an associated CRS.
      *
-     * @see org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem
+     * @see GridGeometry#getGridToCoordinateSystem
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -573,8 +576,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         }
 
         /**
-         * Returns <code>true</code> if successive renderings with the same arguments may
-         * produce different results. The default implementation returns <code>false</code>.
+         * Returns {@code true} if successive renderings with the same arguments may
+         * produce different results. The default implementation returns {@code false}.
          *
          * @see org.geotools.coverage.grid.GridCoverage2D#isDataEditable
          */
@@ -583,7 +586,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         }
 
         /**
-         * Returns <code>false</code> since values are not complex.
+         * Returns {@code false} since values are not complex.
          */
         public boolean isComplex() {
             return false;
@@ -705,7 +708,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
              * Compute some properties of the image to be created.
              */
             final Dimension      tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
-            final SampleDimension    band = SampleDimension.wrap(getSampleDimension(VISIBLE_BAND));
+            final SampleDimensionGT  band = SampleDimensionGT.wrap(getSampleDimension(VISIBLE_BAND));
             final ColorModel   colorModel = band.getColorModel(VISIBLE_BAND, getNumSampleDimensions());
             final SampleModel sampleModel = colorModel.createCompatibleSampleModel(
                                                            tileSize.width, tileSize.height);
@@ -939,6 +942,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
 
     /**
+     * Returns the default locale for logging, error messages, <cite>etc.</cite>.
+     */
+    public Locale getLocale() {
+        return Locale.getDefault();
+    }
+
+    /**
      * Provides a hint that a coverage will no longer be accessed from a reference in user space.
      * The results are equivalent to those that occur when the program loses its last reference to
      * this coverage, the garbage collector discovers this, and finalize is called. This can be
@@ -962,23 +972,38 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * for debugging purpose only and may change in future version.
      */
     public String toString() {
-        final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
-        buffer.append("[\"");
-        buffer.append(getName());
-        buffer.append('"');
+        final StringWriter buffer = new StringWriter();
+        buffer.write(Utilities.getShortClassName(this));
+        buffer.write("[\"");
+        buffer.write(String.valueOf(getName()));
+        buffer.write('"');
         final Envelope envelope = getEnvelope();
         if (envelope != null) {
-            buffer.append(", ");
-            buffer.append(envelope);
+            buffer.write(", ");
+            buffer.write(envelope.toString());
         }
         if (crs != null) {
-            buffer.append(", ");
-            buffer.append(Utilities.getShortClassName(crs));
-            buffer.append("[\"");
-            buffer.append(crs.getName().getCode());
-            buffer.append("\"]");
+            buffer.write(", ");
+            buffer.write(Utilities.getShortClassName(crs));
+            buffer.write("[\"");
+            buffer.write(crs.getName().getCode());
+            buffer.write("\"]");
         }
-        buffer.append(']');
+        buffer.write(']');
+        buffer.write(buffer.toString());
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final LineWriter filter = new LineWriter(buffer, lineSeparator+"    ");
+        final int n = getNumSampleDimensions();
+        try {
+            filter.write(lineSeparator);
+            for (int i=0; i<n; i++) {
+                filter.write(getSampleDimension(i).toString());
+            }
+            filter.flush();
+        } catch (IOException exception) {
+            // Should not happen
+            throw new AssertionError(exception);
+        }
         return buffer.toString();
     }
 }

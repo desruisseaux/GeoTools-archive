@@ -33,7 +33,10 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.grid.GridRangeGT;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
+import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.geometry.GeneralEnvelope;
 
 
@@ -123,7 +126,7 @@ public final class GCSUtilities {
             lower[i] = (int)Math.round(envelope.getMinimum(i));
             upper[i] = (int)Math.round(envelope.getMaximum(i));
         }
-        return new org.geotools.coverage.grid.GridRange(lower, upper);
+        return new GridRangeGT(lower, upper);
     }
 
 
@@ -143,8 +146,8 @@ public final class GCSUtilities {
     public static boolean hasTransform(final SampleDimension[] sampleDimensions) {
         for (int i=sampleDimensions.length; --i>=0;) {
             SampleDimension sd = sampleDimensions[i];
-            if (sd instanceof org.geotools.coverage.SampleDimension) {
-                sd = ((org.geotools.coverage.SampleDimension) sd).geophysics(false);
+            if (sd instanceof SampleDimensionGT) {
+                sd = ((SampleDimensionGT) sd).geophysics(false);
             }
             MathTransform1D tr = sd.getSampleToGeophysics();
             return tr!=null && !tr.isIdentity();
@@ -158,10 +161,11 @@ public final class GCSUtilities {
      */
     public static boolean uses(final GridCoverage coverage, final RenderedImage image) {
         if (coverage != null) {
-// TODO
-//            if (coverage.getRenderedImage() == image) {
-//                return true;
-//            }
+            if (coverage instanceof RenderedCoverage) {
+                if (((RenderedCoverage) coverage).getRenderedImage() == image) {
+                    return true;
+                }
+            }
             final Collection sources = coverage.getSources();
             if (sources != null) {
                 for (final Iterator it=sources.iterator(); it.hasNext();) {

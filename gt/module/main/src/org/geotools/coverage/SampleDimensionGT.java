@@ -45,6 +45,7 @@ import javax.media.jai.util.Range;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.PaletteInterpretation;
+import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
@@ -63,11 +64,11 @@ import org.geotools.util.NumberRange;
 
 
 /**
- * Describes the data values for a coverage. For a grid coverage a sample dimension is a band.
- * Sample values in a band may be organized in categories.  This <code>SampleDimension</code>
- * implementation is capable to differenciate <em>qualitative</em> and <em>quantitative</em>
- * categories. For example an image of sea surface temperature (SST) could very well defines
- * the following categories:
+ * Describes the data values for a coverage as a list of {@linkplain Category categories}. For
+ * a grid coverage a sample dimension is a band. Sample values in a band may be organized in
+ * categories. This {@code SampleDimensionGT} implementation is capable to
+ * differenciate <em>qualitative</em> and <em>quantitative</em> categories. For example
+ * an image of sea surface temperature (SST) could very well defines the following categories:
  *
  * <blockquote><pre>
  *   [0]       : no data
@@ -85,7 +86,7 @@ import org.geotools.util.NumberRange;
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
-public class SampleDimension implements org.opengis.coverage.SampleDimension, Serializable {
+public class SampleDimensionGT implements SampleDimension, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -101,20 +102,20 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * This object is constructed and returned by {@link #geophysics}. Constructed when first
      * needed, but serialized anyway because it may be a user-supplied object.
      */
-    private SampleDimension inverse;
+    private SampleDimensionGT inverse;
 
     /**
-     * The category list for this sample dimension, or <code>null</code> if this sample
+     * The category list for this sample dimension, or {@code null} if this sample
      * dimension has no category. This field is read by <code>SampleTranscoder</code> only.
      */
     final CategoryList categories;
 
     /**
-     * <code>true</code> if all categories in this sample dimension have been already scaled
-     * to geophysics ranges. If <code>true</code>, then the {@link #getSampleToGeophysics()}
+     * {@code true} if all categories in this sample dimension have been already scaled
+     * to geophysics ranges. If {@code true}, then the {@link #getSampleToGeophysics()}
      * method should returns an identity transform. Note that the opposite do not always hold:
      * an identity transform doesn't means that all categories are geophysics. For example,
-     * some qualitative categories may map to some values differents than <code>NaN</code>.
+     * some qualitative categories may map to some values differents than {@code NaN}.
      * <br><br>
      * Assertions:
      *  <ul>
@@ -126,7 +127,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     private final boolean isGeophysics;
 
     /**
-     * <code>true</code> if this sample dimension has at least one qualitative category.
+     * {@code true} if this sample dimension has at least one qualitative category.
      * An arbitrary number of qualitative categories is allowed, providing their sample
      * value ranges do not overlap. A sample dimension can have both qualitative and
      * quantitative categories.
@@ -134,20 +135,20 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     private final boolean hasQualitative;
 
     /**
-     * <code>true</code> if this sample dimension has at least one quantitative category.
+     * {@code true} if this sample dimension has at least one quantitative category.
      * An arbitrary number of quantitative categories is allowed, providing their sample
      * value ranges do not overlap.
      * <br><br>
      * If <code>sampleToGeophysics</code> is non-null, then <code>hasQuantitative</code>
      * <strong>must</strong> be true.  However, the opposite do not hold in all cases: a
-     * <code>true</code> value doesn't means that <code>sampleToGeophysics</code> should
+     * {@code true} value doesn't means that <code>sampleToGeophysics</code> should
      * be non-null.
      */
     private final boolean hasQuantitative;
 
     /**
      * The {@link Category#getSampleToGeophysics sampleToGeophysics} transform used by every
-     * quantitative {@link Category}, or <code>null</code>. This field may be null for two
+     * quantitative {@link Category}, or {@code null}. This field may be null for two
      * reasons:
      *
      * <ul>
@@ -164,9 +165,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     private final MathTransform1D sampleToGeophysics;
 
     /**
-     * Construct a sample dimension with no category.
+     * Constructs a sample dimension with no category.
      */
-    public SampleDimension() {
+    public SampleDimensionGT() {
         this((CategoryList) null);
     }
     
@@ -181,7 +182,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @param names Sequence of category names for the values contained in a sample dimension,
      *              as {@link String} or {@link InternationalString} objects.
      */
-    public SampleDimension(final CharSequence[] names) {
+    public SampleDimensionGT(final CharSequence[] names) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names));
@@ -211,7 +212,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @param colors Color to assign to each category. This array must have the same
      *               length than <code>names</code>.
      */
-    public SampleDimension(final CharSequence[] names, final Color[] colors) {
+    public SampleDimensionGT(final CharSequence[] names, final Color[] colors) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names, colors));
@@ -235,11 +236,11 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * which is not a {@code double} primitive can be {@code null}, and any {@linkplain CharSequence
      * char sequence} can be either a {@link String} or {@link InternationalString} object.
      * 
-     * This constructor allows the construction of a {@code SampleDimension} without explicit
-     * construction of {@link Category} objects. An heuristic approach is used for dispatching
-     * the informations into a set of {@link Category} objects. However, this constructor still
-     * less general and provides less fine-grain control than the constructor expecting an array
-     * of {@link Category} objects.
+     * This constructor allows the construction of a {@code SampleDimensionGT} without
+     * explicit construction of {@link Category} objects. An heuristic approach is used for
+     * dispatching the informations into a set of {@link Category} objects. However, this
+     * constructor still less general and provides less fine-grain control than the constructor
+     * expecting an array of {@link Category} objects.
      *
      * @param  description The sample dimension title or description, or {@code null} if none.
      *         This is the value to be returned by {@link #getDescription}.
@@ -278,17 +279,17 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *
      * @throws IllegalArgumentException if the range {@code [minimum..maximum]} is not valid.
      */
-    public SampleDimension(final CharSequence  description,
-                           final SampleDimensionType  type,
-                           final ColorInterpretation color,
-                           final Color[]           palette,
-                           final CharSequence[] categories,
-                           final double[]           nodata,
-                           final double            minimum,
-                           final double            maximum,
-                           final double              scale,
-                           final double             offset,
-                           final Unit                 unit)
+    public SampleDimensionGT(final CharSequence  description,
+                             final SampleDimensionType  type,
+                             final ColorInterpretation color,
+                             final Color[]           palette,
+                             final CharSequence[] categories,
+                             final double[]           nodata,
+                             final double            minimum,
+                             final double            maximum,
+                             final double              scale,
+                             final double             offset,
+                             final Unit                 unit)
     {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").        
@@ -499,14 +500,14 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *
      * @param  categories The list of categories.
      * @param  units      The unit information for this sample dimension.
-     *                    May be <code>null</code> if no category has units.
+     *                    May be {@code null} if no category has units.
      *                    This unit apply to values obtained after the
      *                    {@link #getSampleToGeophysics sampleToGeophysics} transformation.
      * @throws IllegalArgumentException if <code>categories</code> contains incompatible
      *         categories. If may be the case for example if two or more categories have
      *         overlapping ranges of sample values.
      */
-    public SampleDimension(Category[] categories, Unit units) throws IllegalArgumentException {
+    public SampleDimensionGT(Category[] categories, Unit units) throws IllegalArgumentException {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(categories, units));
@@ -527,9 +528,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     /**
      * Constructs a sample dimension with the specified list of categories.
      *
-     * @param list The list of categories, or <code>null</code>.
+     * @param list The list of categories, or {@code null}.
      */
-    private SampleDimension(final CategoryList list) {
+    private SampleDimensionGT(final CategoryList list) {
         MathTransform1D main = null;
         boolean  isMainValid = true;
         boolean  qualitative = false;
@@ -559,9 +560,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * Constructs a new sample dimension with the same categories and
      * units than the specified sample dimension.
      *
-     * @param other The other sample dimension, or <code>null</code>.
+     * @param other The other sample dimension, or {@code null}.
      */
-    protected SampleDimension(final SampleDimension other) {
+    protected SampleDimensionGT(final SampleDimensionGT other) {
         if (other != null) {
             inverse            = other.inverse;
             categories         = other.categories;
@@ -581,13 +582,13 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
 
     /**
      * Wrap the specified OpenGIS's sample dimension into a Geotools's implementation
-     * of {@code SampleDimension}.
+     * of {@code SampleDimensionGT}.
      *
      * @param sd The sample dimension to wrap into a Geotools implementation.
      */
-    public static SampleDimension wrap(final org.opengis.coverage.SampleDimension sd) {
-        if (sd instanceof SampleDimension) {
-            return (SampleDimension) sd;
+    public static SampleDimensionGT wrap(final SampleDimension sd) {
+        if (sd instanceof SampleDimensionGT) {
+            return (SampleDimensionGT) sd;
         }
         final int[][] palette = sd.getPalette();
         final Color[] colors;
@@ -601,17 +602,17 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         } else {
             colors = null;
         }
-        return new SampleDimension(sd.getDescription(),
-                                   sd.getSampleDimensionType(),
-                                   sd.getColorInterpretation(),
-                                   colors,
-                                   sd.getCategoryNames(),
-                                   sd.getNoDataValues(),
-                                   sd.getMinimumValue(),
-                                   sd.getMaximumValue(),
-                                   sd.getScale(),
-                                   sd.getOffset(),
-                                   sd.getUnits());
+        return new SampleDimensionGT(sd.getDescription(),
+                                     sd.getSampleDimensionType(),
+                                     sd.getColorInterpretation(),
+                                     colors,
+                                     sd.getCategoryNames(),
+                                     sd.getNoDataValues(),
+                                     sd.getMinimumValue(),
+                                     sd.getMaximumValue(),
+                                     sd.getScale(),
+                                     sd.getOffset(),
+                                     sd.getUnits());
     }
 
     /**
@@ -708,7 +709,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * apply to an arbitrary range of sample values.    Consequently, the first element in this
      * collection may not be directly related to the sample value <code>0</code>.
      *
-     * @return The list of categories in this sample dimension, or <code>null</code> if none.
+     * @return The list of categories in this sample dimension, or {@code null} if none.
      *
      * @see #getCategoryNames
      * @see #getCategory
@@ -719,10 +720,10 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     
     /**
      * Returns the category for the specified sample value. If this method can't maps
-     * a category to the specified value, then it returns <code>null</code>.
+     * a category to the specified value, then it returns {@code null}.
      *
-     * @param  sample The value (can be one of <code>NaN</code> values).
-     * @return The category for the supplied value, or <code>null</code> if none.
+     * @param  sample The value (can be one of {@code NaN} values).
+     * @return The category for the supplied value, or {@code null} if none.
      *
      * @see #getCategories
      * @see #getCategoryNames
@@ -740,8 +741,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * of the {@linkplain #getNoDataValues no data values}. If no suitable category is found,
      * then a {@linkplain Category#NODATA default} one is returned.
      *
-     * @return A category to use as background for the "Resample" operation.
-     *         Never <code>null</code>.
+     * @return A category to use as background for the "Resample" operation. Never {@code null}.
      */
     public Category getBackground() {
         return (categories!=null) ? categories.nodata : Category.NODATA;
@@ -753,31 +753,31 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * at construction time. The rules are:
      *
      * <ul>
-     *   <li>If {@link #getSampleToGeophysics} returns <code>null</code>, then
-     *       <code>getNoDataValues()</code> returns <code>null</code> as well.
+     *   <li>If {@link #getSampleToGeophysics} returns {@code null}, then
+     *       <code>getNoDataValues()</code> returns {@code null} as well.
      *       This means that this sample dimension contains no category or contains
      *       only qualitative categories (e.g. a band from a classified image).</li>
      *
      *   <li>If {@link #getSampleToGeophysics} returns an identity transform,
-     *       then <code>getNoDataValues()</code> returns <code>null</code>.
+     *       then <code>getNoDataValues()</code> returns {@code null}.
      *       This means that sample value in this sample dimension are already
      *       expressed in geophysics values and that all "no data" values (if any)
-     *       have already been converted into <code>NaN</code> values.</li>
+     *       have already been converted into {@code NaN} values.</li>
      *
      *   <li>Otherwise, if there is at least one quantitative category, returns the sample values
      *       of all non-quantitative categories. For example if "Temperature" is a quantitative
      *       category and "Land" and "Cloud" are two qualitative categories, then sample values
      *       for "Land" and "Cloud" will be considered as "no data" values. "No data" values
-     *       that are already <code>NaN</code> will be ignored.</li>
+     *       that are already {@code NaN} will be ignored.</li>
      * </ul>
      *
      * Together with {@link #getOffset()} and {@link #getScale()}, this method provides a limited
      * way to transform sample values into geophysics values. However, the recommended way is to
      * use the {@link #getSampleToGeophysics sampleToGeophysics} transform instead, which is more
-     * general and take care of converting automatically "no data" values into <code>NaN</code>.
+     * general and take care of converting automatically "no data" values into {@code NaN}.
      *
      * @return The values to indicate no data values for this sample dimension,
-     *         or <code>null</code> if not applicable.
+     *         or {@code null} if not applicable.
      * @throws IllegalStateException if some qualitative categories use a range of
      *         non-integer values.
      *
@@ -875,12 +875,12 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     
     /**
      * Returns the range of values in this sample dimension. This is the union of the range of
-     * values of every categories, excluding <code>NaN</code> values. A {@link NumberRange} object
+     * values of every categories, excluding {@code NaN} values. A {@link NumberRange} object
      * gives more informations than {@link #getMinimumValue} and {@link #getMaximumValue} methods
      * since it contains also the data type (integer, float, etc.) and inclusion/exclusion
      * informations.
      *
-     * @return The range of values. May be <code>null</code> if this sample dimension has no
+     * @return The range of values. May be {@code null} if this sample dimension has no
      *         quantitative category.
      *
      * @see Category#getRange
@@ -896,8 +896,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     }
 
     /**
-     * Returns <code>true</code> if at least one value of <code>values</code> is
-     * in the range <code>lower</code> inclusive to <code>upper</code> exclusive.
+     * Returns {@code true} if at least one value of {@code values} is
+     * in the range {@code lower} inclusive to {@code upper} exclusive.
      */
     private static boolean rangeContains(final double   lower,
                                          final double   upper,
@@ -929,14 +929,14 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *       symbol is appened.</li>
      * </ul>
      *
-     * @param  value  The sample value (can be one of <code>NaN</code> values).
-     * @param  locale Locale to use for formatting, or <code>null</code> for the default locale.
-     * @return A string representation of the geophysics value, or <code>null</code> if there is
+     * @param  value  The sample value (can be one of {@code NaN} values).
+     * @param  locale Locale to use for formatting, or {@code null} for the default locale.
+     * @return A string representation of the geophysics value, or {@code null} if there is
      *         none.
      *
      * @todo What should we do when the value can't be formatted?
-     *       <code>SampleDimension</code> returns <code>null</code> if there is no
-     *       category or if an exception is thrown, but <code>CategoryList</code>
+     *       {@code SampleDimensionGT} returns {@code null} if there is no
+     *       category or if an exception is thrown, but {@code CategoryList}
      *       returns "Untitled" if the value is an unknow NaN, and try to format
      *       the number anyway in other cases.
      */
@@ -955,7 +955,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     
     /**
      * Returns the unit information for this sample dimension.
-     * May returns <code>null</code> if this dimension has no units.
+     * May returns {@code null} if this dimension has no units.
      * This unit apply to values obtained after the {@link #getSampleToGeophysics
      * sampleToGeophysics} transformation.
      *
@@ -976,7 +976,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * limited way to transform sample values into geophysics values. However, the recommended
      * way is to use the {@link #getSampleToGeophysics sampleToGeophysics} transform instead,
      * which is more general and take care of converting automatically "no data" values
-     * into <code>NaN</code>.
+     * into {@code NaN}.
      *
      * @return The offset to add to grid values.
      * @throws IllegalStateException if the transform from sample to geophysics values
@@ -1000,7 +1000,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * limited way to transform sample values into geophysics values. However, the recommended
      * way is to use the {@link #getSampleToGeophysics sampleToGeophysics} transform instead,
      * which is more general and take care of converting automatically "no data" values
-     * into <code>NaN</code>.
+     * into {@code NaN}.
      *
      * @return The scale to multiply to grid value.
      * @throws IllegalStateException if the transform from sample to geophysics values
@@ -1050,17 +1050,17 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
 
     /**
      * Returns a transform from sample values to geophysics values. If this sample dimension
-     * has no category, then this method returns <code>null</code>. If all sample values are
-     * already geophysics values (including <code>NaN</code> for "no data" values), then this
+     * has no category, then this method returns {@code null}. If all sample values are
+     * already geophysics values (including {@code NaN} for "no data" values), then this
      * method returns an identity transform. Otherwise, this method returns a transform expecting
      * sample values as input and computing geophysics value as output. This transform will take
      * care of converting all "{@linkplain #getNoDataValues() no data values}" into
-     * <code>NaN</code> values.
+     * {@code NaN} values.
      * The <code>sampleToGeophysics.{@linkplain MathTransform1D#inverse() inverse()}</code>
-     * transform is capable to differenciate <code>NaN</code> values to get back the original
+     * transform is capable to differenciate {@code NaN} values to get back the original
      * sample value.
      *
-     * @return The transform from sample to geophysics values, or <code>null</code> if this
+     * @return The transform from sample to geophysics values, or {@code null} if this
      *         sample dimension do not defines any transform (which is not the same that
      *         defining an identity transform).
      *
@@ -1083,37 +1083,37 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     }
 
     /**
-     * If <code>true</code>, returns the geophysics companion of this sample dimension. By
+     * If {@code true}, returns the geophysics companion of this sample dimension. By
      * definition, a <cite>geophysics sample dimension</cite> is a sample dimension with a
      * {@linkplain #getRange range of sample values} transformed in such a way that the
      * {@link #getSampleToGeophysics sampleToGeophysics} transform is always the identity
-     * transform, or <code>null</code> if no such transform existed in the first place. In
+     * transform, or {@code null} if no such transform existed in the first place. In
      * other words, the range of sample values in all category maps directly the "real world"
      * values without the need for any transformation.
      * <br><br>
-     * <code>SampleDimension</code> objects live by pair: a <cite>geophysics</cite> one (used for
-     * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
-     * integers). The <code>geo</code> argument specifies which object from the pair is wanted,
+     * {@code SampleDimensionGT} objects live by pair: a <cite>geophysics</cite> one
+     * (used for computation) and a <cite>non-geophysics</cite> one (used for packing data, usually
+     * as integers). The {@code geo} argument specifies which object from the pair is wanted,
      * regardless if this method is invoked on the geophysics or non-geophysics instance of the
-     * pair. In other words, the result of <code>geophysics(b1).geophysics(b2).geophysics(b3)</code>
-     * depends only on the value in the last call (<code>b3</code>).
+     * pair. In other words, the result of {@code geophysics(b1).geophysics(b2).geophysics(b3)}
+     * depends only on the value in the last call ({@code b3}).
      *
-     * @param  geo <code>true</code> to get a sample dimension with an identity
+     * @param  geo {@code true} to get a sample dimension with an identity
      *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or <code>false</code> to get back the
+     *         sample values} matching the geophysics values, or {@code false} to get back the
      *         original sample dimension.
-     * @return The sample dimension. Never <code>null</code>, but may be <code>this</code>.
+     * @return The sample dimension. Never {@code null}, but may be {@code this}.
      *
      * @see Category#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
      */
-    public SampleDimension geophysics(final boolean geo) {
+    public SampleDimensionGT geophysics(final boolean geo) {
         if (geo == isGeophysics) {
             return this;
         }
         if (inverse == null) {
             if (categories != null) {
-                inverse = new SampleDimension(categories.inverse);
+                inverse = new SampleDimensionGT(categories.inverse);
                 inverse.inverse = this;
             } else {
                 /*
@@ -1132,7 +1132,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * Color palette associated with the sample dimension.
      * A color palette can have any number of colors.
      * See palette interpretation for meaning of the palette entries.
-     * If the grid coverage has no color palette, <code>null</code> will be returned.
+     * If the grid coverage has no color palette, {@code null} will be returned.
      *
      * @return The color palette associated with the sample dimension.
      *
@@ -1184,15 +1184,16 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * Returns a color model for this sample dimension. The default implementation create a color
      * model with 1 band using each category's colors as returned by {@link Category#getColors}.
      * The returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * <code>SampleDimension</code> instance is "geophysics", or an integer data type otherwise.
+     * {@code SampleDimensionGT} instance is "geophysics", or an integer data type
+     * otherwise.
      * <br><br>
      * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
-     * special implementations of {@code SampleDimension}. In this particular case, the color model
-     * created by this {@code getColorModel()} method will have the same number of bands
-     * than the grid coverage's {@link RenderedImage}.
+     * special implementations of {@code SampleDimensionGT}. In this particular case,
+     * the color model created by this {@code getColorModel()} method will have the same number of
+     * bands than the grid coverage's {@link RenderedImage}.
      *
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be <code>null</code> if this
+     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      */
     public ColorModel getColorModel() {
@@ -1207,7 +1208,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * Returns a color model for this sample dimension. The default implementation create the
      * color model using each category's colors as returned by {@link Category#getColors}. The
      * returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * <code>SampleDimension</code> instance is "geophysics", or an integer data type otherwise.
+     * {@code SampleDimensionGT} instance is "geophysics", or an integer data type
+     * otherwise.
      *
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
@@ -1216,13 +1218,12 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be <code>null</code> if this
+     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      *
      * @todo This method may be deprecated in a future version. It it strange to use
-     *       only one <code>SampleDimension</code>  for creating a multi-bands color
-     *       model. Logically, we would expect as many <code>SampleDimension</code>s
-     *       as bands.
+     *       only one {@code SampleDimension} object for creating a multi-bands color
+     *       model. Logically, we would expect as many {@code SampleDimension}s as bands.
      */
     public ColorModel getColorModel(final int visibleBand, final int numBands) {
         if (categories != null) {
@@ -1243,13 +1244,12 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @param  type The data type that has to be used for the sample model
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be <code>null</code> if this
+     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      *
      * @todo This method may be deprecated in a future version. It it strange to use
-     *       only one <code>SampleDimension</code>  for creating a multi-bands color
-     *       model. Logically, we would expect as many <code>SampleDimension</code>s
-     *       as bands.
+     *       only one {@code SampleDimension} object for creating a multi-bands color
+     *       model. Logically, we would expect as many {@code SampleDimension}s as bands.
      */
     public ColorModel getColorModel(final int visibleBand, final int numBands, final int type) {
         if (categories != null) {
@@ -1271,7 +1271,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @see #getOffset
      * @see Category#rescale
      */
-    public SampleDimension rescale(final double scale, final double offset) {
+    public SampleDimensionGT rescale(final double scale, final double offset) {
         final MathTransform1D sampleToGeophysics = Category.createLinearTransform(scale, offset);
         final Category[] categories = (Category[]) getCategories().toArray();
         final Category[] reference  = (Category[]) categories.clone();
@@ -1284,7 +1284,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         if (Arrays.equals(categories, reference)) {
             return this;
         }
-        return new SampleDimension(categories, getUnits());
+        return new SampleDimensionGT(categories, getUnits());
     }
 
     /**
@@ -1331,8 +1331,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
             // Slight optimization
             return true;
         }
-        if (object instanceof SampleDimension) {
-            final SampleDimension that = (SampleDimension) object;
+        if (object instanceof SampleDimensionGT) {
+            final SampleDimensionGT that = (SampleDimensionGT) object;
             return Utilities.equals(this.categories, that.categories);
             // Since everything is deduced from CategoryList, two sample dimensions
             // should be equal if they have the same list of categories.
@@ -1377,9 +1377,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *       with {@link org.geotools.coverage.grid.GridCoverage2D}, which make extensive
      *       use of JAI. Peoples just working with {@link org.geotools.coverage.Coverage} are
      *       stuck with the overhead. Note that we register the image operation here because
-     *       the only operation's argument is of type {@code SampleDimension[]}.
+     *       the only operation's argument is of type {@code SampleDimensionGT[]}.
      *       Consequently, the image operation may be invoked at any time after class
-     *       loading of {@link SampleDimension}.
+     *       loading of {@link SampleDimensionGT}.
      *       <br><br>
      *       Additional note: moving the initialization into the
      *       {@code META-INF/registryFile.jai} file may not be the best idea neithter,

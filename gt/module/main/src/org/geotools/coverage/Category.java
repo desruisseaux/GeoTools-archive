@@ -73,8 +73,8 @@ import org.geotools.util.SimpleInternationalString;
  * and geophysics values <var>x</var>.   This transformation is usually (but
  * not always) a linear equation of the form:
  *
- * <P align="center"><var>x</var><code>&nbsp;=&nbsp;{@link SampleDimension#getOffset()
- * offset}&nbsp;+&nbsp;{@link SampleDimension#getScale()
+ * <P align="center"><var>x</var><code>&nbsp;=&nbsp;{@linkplain SampleDimensionGT#getOffset()
+ * offset}&nbsp;+&nbsp;{@linkplain SampleDimensionGT#getScale()
  * scale}&times;</code><var>s</var></P>
  *
  * More general equation are allowed. For example, <cite>SeaWiFS</cite> images
@@ -89,7 +89,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see SampleDimension
+ * @see SampleDimensionGT
  * @see PiecewiseDescriptor
  */
 public class Category implements Serializable {
@@ -188,8 +188,8 @@ public class Category implements Serializable {
      * categories. Since {@link #getSampleToGeophysics} returns {@code null} for
      * qualitative categories, this difference is not visible to the user.
      *
-     * @see SampleDimension#getScale()
-     * @see SampleDimension#getOffset()
+     * @see SampleDimensionGT#getScale()
+     * @see SampleDimensionGT#getOffset()
      */
     final MathTransform1D transform;
 
@@ -299,8 +299,8 @@ public class Category implements Serializable {
      * inclusive to {@code upper} exclusive. Sample values are converted into geophysics
      * values using the following linear equation:
      *
-     * <center><var>x</var><code>&nbsp;=&nbsp;{@link SampleDimension#getOffset()
-     * offset}&nbsp;+&nbsp;{@link SampleDimension#getScale()
+     * <center><var>x</var><code>&nbsp;=&nbsp;{@linkplain SampleDimensionGT#getOffset()
+     * offset}&nbsp;+&nbsp;{@linkplain SampleDimensionGT#getScale()
      * scale}&times;</code><var>s</var></center>
      *
      * @param  name    The category name as a {@link String} or {@link InternationalString} object.
@@ -311,10 +311,10 @@ public class Category implements Serializable {
      *                 should be used (usually a gradient from opaque black to opaque white).
      * @param  lower   The lower sample value, inclusive.
      * @param  upper   The upper sample value, exclusive.
-     * @param  scale   The {@link SampleDimension#getScale() scale} value which is multiplied
+     * @param  scale   The {@link SampleDimensionGT#getScale() scale} value which is
+     *                 multiplied to sample values for this category.
+     * @param  offset  The {@link SampleDimensionGT#getOffset() offset} value to add
      *                 to sample values for this category.
-     * @param  offset  The {@link SampleDimension#getOffset() offset} value to add to sample
-     *                 values for this category.
      *
      * @throws IllegalArgumentException if {@code lower} is not smaller than {@code upper}.
      * @throws IllegalArgumentException if {@code scale} or {@code offset} are not real numbers.
@@ -336,8 +336,8 @@ public class Category implements Serializable {
      * Sample values are converted into geophysics values using the following linear
      * equation:
      *
-     * <center><var>x</var><code>&nbsp;=&nbsp;{@link SampleDimension#getOffset()
-     * offset}&nbsp;+&nbsp;{@link SampleDimension#getScale()
+     * <center><var>x</var><code>&nbsp;=&nbsp;{@linkplain SampleDimensionGT#getOffset()
+     * offset}&nbsp;+&nbsp;{@linkplain SampleDimensionGT#getScale()
      * scale}&times;</code><var>s</var></center>
      *
      * @param  name    The category name as a {@link String} or {@link InternationalString} object.
@@ -349,10 +349,10 @@ public class Category implements Serializable {
      * @param  sampleValueRange The range of sample values for this category. Element class
      *                 is usually {@link Integer}, but {@link Float} and {@link Double} are
      *                 accepted as well.
-     * @param  scale   The {@link SampleDimension#getScale() scale} value which is multiplied
+     * @param  scale   The {@link SampleDimensionGT#getScale() scale} value which is
+     *                 multiplied to sample values for this category.
+     * @param  offset  The {@link SampleDimensionGT#getOffset() offset} value to add
      *                 to sample values for this category.
-     * @param  offset  The {@link SampleDimension#getOffset() offset} value to add to sample
-     *                 values for this category.
      *
      * @throws IllegalArgumentException if {@code lower} is not smaller than {@code upper}.
      * @throws IllegalArgumentException if {@code scale} or {@code offset} are not real numbers.
@@ -385,8 +385,8 @@ public class Category implements Serializable {
      * range. Sample values in the {@code sampleValueRange} will be mapped to geophysics
      * values in the {@code geophysicsValueRange} through a linear equation of the form:
      *
-     * <center><var>x</var><code>&nbsp;=&nbsp;{@link SampleDimension#getOffset()
-     * offset}&nbsp;+&nbsp;{@link SampleDimension#getScale()
+     * <center><var>x</var><code>&nbsp;=&nbsp;{@linkplain SampleDimensionGT#getOffset()
+     * offset}&nbsp;+&nbsp;{@linkplain SampleDimensionGT#getScale()
      * scale}&times;</code><var>s</var></center>
      *
      * {@code scale} and {@code offset} coefficients are computed from the ranges supplied in
@@ -711,7 +711,7 @@ public class Category implements Serializable {
      * Change to the returned array will not affect
      * this category.
      *
-     * @see SampleDimension#getColorModel
+     * @see SampleDimensionGT#getColorModel
      */
     public Color[] getColors() {
         final Color[] colors = new Color[ARGB.length];
@@ -729,8 +729,8 @@ public class Category implements Serializable {
      *
      * @see NumberRange#getMinimum(boolean)
      * @see NumberRange#getMaximum(boolean)
-     * @see SampleDimension#getMinimumValue()
-     * @see SampleDimension#getMaximumValue()
+     * @see SampleDimensionGT#getMinimumValue()
+     * @see SampleDimensionGT#getMaximumValue()
      */
     public NumberRange getRange() {
         assert range != null;
@@ -800,7 +800,7 @@ public class Category implements Serializable {
      * @return A category using the specified transform.
      *
      * @see #getSampleToGeophysics
-     * @see SampleDimension#rescale
+     * @see SampleDimensionGT#rescale
      */
     public Category rescale(final MathTransform1D sampleToGeophysics) {
         if (Utilities.equals(sampleToGeophysics, transform)) {
@@ -833,7 +833,7 @@ public class Category implements Serializable {
      *         original category (the one constructed with <code>new Category(...)</code>).
      * @return The category. Never {@code null}, but may be <code>this</code>.
      *
-     * @see SampleDimension#geophysics
+     * @see SampleDimensionGT#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
      */
     public Category geophysics(final boolean geo) {

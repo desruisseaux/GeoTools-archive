@@ -63,7 +63,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometry2D extends GridGeometry {
+public class GridGeometry2D extends GridGeometryGT {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -89,8 +89,8 @@ public class GridGeometry2D extends GridGeometry {
     private final MathTransform2D gridFromCoordinateSystem2D;
 
     /**
-     * Constructs a new grid geometry from a math transform. The argument are passed unchanged to
-     * the {@linkplain GridGeometry#GridGeometry(GridRange,MathTransform) super-class constructor}.
+     * Constructs a new grid geometry from a math transform. The argument are passed unchanged to the
+     * {@linkplain GridGeometryGT#GridGeometryGT(GridRange,MathTransform) super-class constructor}.
      * However, they must obey to one additional constraint: only two dimensions in the grid range
      * can have a width larger than 1.
      *
@@ -118,7 +118,7 @@ public class GridGeometry2D extends GridGeometry {
     
     /**
      * Constructs a new grid geometry. The argument are passed unchanged to the
-     * {@linkplain GridGeometry#GridGeometry(GridRange,Envelope,boolean[]) super-class constructor}.
+     * {@linkplain GridGeometryGT#GridGeometryGT(GridRange,Envelope,boolean[]) super-class constructor}.
      * However, they must obey to one additional constraint: only two dimensions in the grid range
      * can have a width larger than 1.
      *
@@ -156,8 +156,7 @@ public class GridGeometry2D extends GridGeometry {
      *                  of the last pixel.
      */
     public GridGeometry2D(final Rectangle gridRange, final Rectangle2D userRange) {
-        this(new org.geotools.coverage.grid.GridRange(gridRange),
-             getMathTransform(gridRange, userRange));
+        this(new GridRangeGT(gridRange), getMathTransform(gridRange, userRange));
     }
 
     /**
@@ -319,5 +318,17 @@ public class GridGeometry2D extends GridGeometry {
             }
         }
         return null;
+    }
+
+    /**
+     * Compares the specified object with this grid geometry for equality.
+     */
+    public boolean equals(final Object object) {
+        if (super.equals(object)) {
+            final GridGeometry2D that = (GridGeometry2D) object;
+            return this.xAxis == that.xAxis &&
+                   this.yAxis == that.yAxis;
+        }
+        return false;
     }
 }

@@ -21,9 +21,9 @@ package org.geotools.coverage.grid;
 
 
 /**
- * Thrown by {@link GridGeometry} when a grid geometry is in an invalid state. For example
- * this exception is thrown when {@link GridGeometry#getGridRange() getGridRange()} is
- * invoked while the grid geometry were built with a null {@link GridRange}.
+ * Thrown by {@link GridGeometryGT} when a grid geometry is in an invalid state. For example
+ * this exception is thrown when {@link GridGeometryGT#getGridRange() getGridRange()} is invoked
+ * while the grid geometry were built with a null {@link org.opengis.coverage.grid.GridRange}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
