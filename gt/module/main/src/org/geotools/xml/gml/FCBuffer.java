@@ -45,7 +45,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     public static final int STOP = -2;
 
     /** DOCUMENT ME!  */
-    protected Logger logger = Logger.getLogger("org.geotools.xml.gml");
+    protected static Logger logger = Logger.getLogger("org.geotools.xml.gml");
 
     // positive number is the number of feature to parse before yield
 
@@ -57,7 +57,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     private int head;
     private URI document; // for run
     private FeatureType featureType;
-    private SAXException exception = null;
+    protected SAXException exception = null;
 
     /*
      * Should not be called
@@ -236,17 +236,17 @@ public class FCBuffer extends Thread implements FeatureReader {
             state = STOP;
         }
     }
-}
 
-
-/**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.9 $
- */
-class StopException extends SAXException {
-    StopException() {
-        super("Stopping");
+    /**
+     * DOCUMENT ME!
+     *
+     * @author $author$
+     * @version $Revision: 1.9 $
+     */
+    public static class StopException extends SAXException {
+        StopException() {
+            super("Stopping");
+        }
     }
 }
+

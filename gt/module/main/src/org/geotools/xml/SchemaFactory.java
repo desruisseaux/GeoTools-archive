@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -169,9 +170,13 @@ public class SchemaFactory {
      * @throws SAXException
      */
     public static Schema getInstance(String targetNamespace, URI desiredSchema)
-        throws SAXException {
-        return getInstance(targetNamespace, desiredSchema, Level.WARNING);
-    }
+    throws SAXException {
+    return getInstance(targetNamespace, desiredSchema, Level.WARNING);
+}
+    public static Schema getInstance(String targetNamespace, InputStream is)
+    throws SAXException {
+    return getInstance(targetNamespace, is, Level.WARNING);
+}
 
     /**
      * Returns an instance of the targetNamespace if it can be found ... null
@@ -223,60 +228,113 @@ public class SchemaFactory {
      * @throws SAXException When something goes wrong
      */
     public synchronized static Schema getInstance(String targetNamespace,
-        URI desiredSchema, Level level) throws SAXException {
-        if ((targetNamespace == null) || "".equals(targetNamespace)
-                || (schemas.get(targetNamespace) == null)) {
-//            if (mappings.containsKey(targetNamespace)) {
-//                ClassLoader cl = SchemaFactory.class.getClassLoader();
-//
-//                try {
-//                    Class c = cl.loadClass((String) mappings.get(
-//                                targetNamespace));
-//                    schemas.put(targetNamespace,
-//                        c.getConstructor(new Class[0]).newInstance(new Object[0]));
-//                } catch (Exception e) {
-//                    throw new SAXException(e);
+            URI desiredSchema, Level level) throws SAXException {
+            if ((targetNamespace == null) || "".equals(targetNamespace)
+                    || (schemas.get(targetNamespace) == null)) {
+//                if (mappings.containsKey(targetNamespace)) {
+//                    ClassLoader cl = SchemaFactory.class.getClassLoader();
+    //
+//                    try {
+//                        Class c = cl.loadClass((String) mappings.get(
+//                                    targetNamespace));
+//                        schemas.put(targetNamespace,
+//                            c.getConstructor(new Class[0]).newInstance(new Object[0]));
+//                    } catch (Exception e) {
+//                        throw new SAXException(e);
+//                    }
+//                } else {
+                    setParser();
+
+                    XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
+                    XSISAXHandler.setLogLevel(level);
+
+                    try {
+                        parser.parse(desiredSchema.toString(), contentHandler);
+                    } catch (IOException e) {
+                        throw new SAXException(e);
+                    }
+
+                    if ((targetNamespace == null) || "".equals(targetNamespace)) {
+                        return contentHandler.getSchema();
+                    }
+
+                    schemas.put(targetNamespace, contentHandler.getSchema());
 //                }
-//            } else {
-                setParser();
+            } else {
+                if (!((Schema) schemas.get(targetNamespace)).includesURI(
+                            desiredSchema)) {
+                    Schema sh = (Schema) schemas.get(targetNamespace);
+                    setParser();
 
-                XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
-                XSISAXHandler.setLogLevel(level);
+                    XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
+                    XSISAXHandler.setLogLevel(level);
 
-                try {
-                    parser.parse(desiredSchema.toString(), contentHandler);
-                } catch (IOException e) {
-                    throw new SAXException(e);
+                    try {
+                        parser.parse(desiredSchema.toString(), contentHandler);
+                    } catch (IOException e) {
+                        throw new SAXException(e);
+                    }
+
+                    sh = merge(sh, contentHandler.getSchema());
+                    schemas.put(targetNamespace, sh); // over-write
                 }
-
-                if ((targetNamespace == null) || "".equals(targetNamespace)) {
-                    return contentHandler.getSchema();
-                }
-
-                schemas.put(targetNamespace, contentHandler.getSchema());
-//            }
-        } else {
-            if (!((Schema) schemas.get(targetNamespace)).includesURI(
-                        desiredSchema)) {
-                Schema sh = (Schema) schemas.get(targetNamespace);
-                setParser();
-
-                XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
-                XSISAXHandler.setLogLevel(level);
-
-                try {
-                    parser.parse(desiredSchema.toString(), contentHandler);
-                } catch (IOException e) {
-                    throw new SAXException(e);
-                }
-
-                sh = merge(sh, contentHandler.getSchema());
-                schemas.put(targetNamespace, sh); // over-write
             }
-        }
 
-        return (Schema) schemas.get(targetNamespace);
-    }
+            return (Schema) schemas.get(targetNamespace);
+        }
+    public synchronized static Schema getInstance(String targetNamespace,
+            InputStream is, Level level) throws SAXException {
+            if ((targetNamespace == null) || "".equals(targetNamespace)
+                    || (schemas.get(targetNamespace) == null)) {
+//                if (mappings.containsKey(targetNamespace)) {
+//                    ClassLoader cl = SchemaFactory.class.getClassLoader();
+    //
+//                    try {
+//                        Class c = cl.loadClass((String) mappings.get(
+//                                    targetNamespace));
+//                        schemas.put(targetNamespace,
+//                            c.getConstructor(new Class[0]).newInstance(new Object[0]));
+//                    } catch (Exception e) {
+//                        throw new SAXException(e);
+//                    }
+//                } else {
+                    setParser();
+
+                    XSISAXHandler contentHandler = new XSISAXHandler(null); // no uri
+                    XSISAXHandler.setLogLevel(level);
+
+                    try {
+                        parser.parse(is, contentHandler);
+                    } catch (IOException e) {
+                        throw new SAXException(e);
+                    }
+
+                    if ((targetNamespace == null) || "".equals(targetNamespace)) {
+                        return contentHandler.getSchema();
+                    }
+
+                    schemas.put(targetNamespace, contentHandler.getSchema());
+//                }
+            } else {
+                // no way to test is it's already part ... so assume it's not already included
+                    Schema sh = (Schema) schemas.get(targetNamespace);
+                    setParser();
+
+                    XSISAXHandler contentHandler = new XSISAXHandler(null); // no uri
+                    XSISAXHandler.setLogLevel(level);
+
+                    try {
+                        parser.parse(is, contentHandler);
+                    } catch (IOException e) {
+                        throw new SAXException(e);
+                    }
+
+                    sh = merge(sh, contentHandler.getSchema());
+                    schemas.put(targetNamespace, sh); // over-write
+            }
+
+            return (Schema) schemas.get(targetNamespace);
+        }
 
     /*
      * Creates a new Schema from merging the two schemas passed in. for instance

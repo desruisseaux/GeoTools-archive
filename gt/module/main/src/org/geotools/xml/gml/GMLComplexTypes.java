@@ -41,6 +41,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.gml.FCBuffer.StopException;
 import org.geotools.xml.gml.GMLSchema.AttributeList;
 import org.geotools.xml.gml.GMLSchema.GMLAttribute;
 import org.geotools.xml.gml.GMLSchema.GMLComplexType;
@@ -4078,49 +4079,12 @@ public class GMLComplexTypes {
          */
         private FeatureType loadFeatureType(Element element,
             ElementValue[] value, Attributes attrs) throws SAXException {
-            String ftName = element.getName();
-            String ftNS = element.getType().getNamespace();
-            logger.finest("Creating feature type for " + ftName + ":" + ftNS);
-
-            FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
-            typeFactory.setNamespace(ftNS);
-            typeFactory.setName(ftName);
-
-            GeometryAttributeType geometryAttribute = null;
-
-            for (int i = 0; i < value.length; i++) {
-                String name = value[i].getElement().getName();
-                Class type = value[i].getElement().getType().getInstanceType(); //value[i].getValue().getClass();
-                boolean nillable = value[i].getElement().isNillable();
-
-                AttributeType attributeType = AttributeTypeFactory
-                    .newAttributeType(name, type, nillable);
-                typeFactory.addType(attributeType);
-
-                if ((geometryAttribute == null)
-                        && attributeType instanceof GeometryAttributeType) {
-                    if (!value[i].getElement().getType().getName()
-                                     .equalsIgnoreCase(BoxType.getInstance()
-                                                                  .getName())) {
-                        geometryAttribute = (GeometryAttributeType) attributeType;
-                    }
-                }
-            }
-
-            if (geometryAttribute != null) {
-                typeFactory.setDefaultGeometry(geometryAttribute);
-            }
-
-            try {
-                FeatureType ft = typeFactory.getFeatureType();
+            
+            FeatureType ft = createFeatureType(element);
                 featureTypeMappings.put(element.getType().getNamespace() + "#"
                     + element.getName(), ft);
 
                 return ft;
-            } catch (SchemaException e) {
-                logger.warning(e.toString());
-                throw new SAXException(e);
-            }
         }
 
         /**
@@ -6208,6 +6172,56 @@ public class GMLComplexTypes {
                 GMLComplexTypes.encode(null, (GeometryCollection) value, output);
                 output.endElement(element.getNamespace(), element.getName());
             }
+        }
+    }
+
+
+    /*
+     * Creates a FT from the information provided
+     */
+    public static FeatureType createFeatureType(Element element) throws SAXException {
+        String ftName = element.getName();
+        String ftNS = element.getType().getNamespace();
+        logger.finest("Creating feature type for " + ftName + ":" + ftNS);
+
+        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
+        typeFactory.setNamespace(ftNS);
+        typeFactory.setName(ftName);
+
+        GeometryAttributeType geometryAttribute = null;
+
+        Element[] children = ((ComplexType)element.getType()).getChildElements();
+        
+        for(int i=0;i<children.length;i++){
+            String name = children[i].getName();
+            Class type = children[i].getType().getInstanceType();
+            boolean nillable = children[i].isNillable();
+
+            AttributeType attributeType = AttributeTypeFactory
+                .newAttributeType(name, type, nillable);
+            typeFactory.addType(attributeType);
+
+            if ((geometryAttribute == null)
+                    && attributeType instanceof GeometryAttributeType) {
+                if (!children[i].getType().getName()
+                                 .equalsIgnoreCase(BoxType.getInstance()
+                                                              .getName())) {
+                    geometryAttribute = (GeometryAttributeType) attributeType;
+                }
+            }
+        }
+
+        if (geometryAttribute != null) {
+            typeFactory.setDefaultGeometry(geometryAttribute);
+        }
+
+        try {
+            FeatureType ft = typeFactory.getFeatureType();
+
+            return ft;
+        } catch (SchemaException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
         }
     }
 }
