@@ -46,6 +46,7 @@ import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
+import org.opengis.filter.expression.PropertyName;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -1903,7 +1904,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return null;
+            return PropertyName[].class;
         }
 
         /**
