@@ -403,10 +403,21 @@ public class SchemaHandler extends XSIElementHandler {
                     ImportHandler imp = (ImportHandler) obj;
                     URI incURI = null;
 
-                    if ((imp.getSchemaLocation() != null) && (thisURI != null)) {
-                        incURI = thisURI.normalize().resolve(imp
-                                .getSchemaLocation());
-                    }
+//                    if ((imp.getSchemaLocation() != null) && (thisURI != null)) {
+//                        incURI = thisURI.normalize().resolve(imp
+//                                .getSchemaLocation());
+//                    }
+		// fix from chris dillard
+		if (imp.getSchemaLocation() != null) {
+		  if (thisURI != null) {
+		    // For resolving relative URIs
+		    incURI = thisURI.normalize().resolve(imp.getSchemaLocation());
+		  } else {
+		    // If thisURI is null, we have to assume the
+		    // URI is absolute.
+		    incURI = imp.getSchemaLocation();
+		  }
+		}
 
                     Schema cs = SchemaFactory.getInstance(imp.getNamespace(),
                             incURI, logger.getLevel());
