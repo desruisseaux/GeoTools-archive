@@ -212,7 +212,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      */
     public String toString() {
         final StringBuffer buffer=new StringBuffer("AXIS[\"");
-        buffer.append(name);
+        buffer.append(getName().getCode());
         buffer.append('"');
         if (orientation!=null) {
             buffer.append(',');
