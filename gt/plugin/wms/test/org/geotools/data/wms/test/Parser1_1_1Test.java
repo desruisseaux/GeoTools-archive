@@ -47,12 +47,10 @@ public class Parser1_1_1Test extends TestCase {
 	public void testConstructCapabilities() throws Exception {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(getCapsURL);
-
-		Element root = document.getRootElement(); //Root = "WMT_MS_Capabilities"
 		
 		Parser1_1_1 parser = new Parser1_1_1();
 		
-		Capabilities capabilities = parser.constructCapabilities(root);
+		Capabilities capabilities = parser.constructCapabilities( document );
 		assertNotNull(capabilities);
 		assertEquals(capabilities.getService().getName(), "OGC:WMS");
 		assertEquals(capabilities.getService().getKeywordList().length, 6);
