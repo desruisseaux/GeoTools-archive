@@ -90,10 +90,16 @@ public class CapabilitiesParser {
 		    
 			capabilities = new WMT_MS_Capabilities(service, capability);
 			
+			String version = wmt_ms_capabilities.getAttributeValue("version");
+			capabilities.setVersion(version);
+			
+			String updateSequence = wmt_ms_capabilities.getAttributeValue("updateSequence");
+			capabilities.setUpdateSequence(updateSequence);
+			
 		} catch (MalformedURLException exception) {
 		    throw new ParseCapabilitiesException("Unable to parse URL properly", exception);
 		} catch (NullPointerException exception) {
-		    throw new ParseCapabilitiesException("Element not specified.", exception);
+		    throw new ParseCapabilitiesException("XML does not conform to the WMS Specification.", exception);
 		}		
 		
 		return capabilities;
@@ -711,7 +717,7 @@ public class CapabilitiesParser {
 	    
 		service.set_abstract(serviceElement.getChildText("Abstract"));
 		service.setFees(serviceElement.getChildText("Fees"));
-		service.setAccessConstraints(serviceElement.getChildText("Access Constraints"));
+		service.setAccessConstraints(serviceElement.getChildText("AccessConstraints"));
 		
 		Element keywordListElement = serviceElement.getChild("KeywordList");
 		if (keywordListElement != null) {
@@ -722,7 +728,7 @@ public class CapabilitiesParser {
 		    service.setKeywordList(keywords);
 		}
 		
-		Element contactInformation = serviceElement.getChild("Contact Information");
+		Element contactInformation = serviceElement.getChild("ContactInformation");
 		if (contactInformation != null) {
 		    service.setContactInformation(parseContactInformation(contactInformation));
 		}

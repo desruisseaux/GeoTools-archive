@@ -33,7 +33,7 @@ public class WMT_MS_Capabilities {
 	 */
 	private Capability capability;
 	
-	private String version = "1.1.1";
+	private String version;
 	private String updateSequence;
 	
 	
