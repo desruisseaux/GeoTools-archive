@@ -33,16 +33,13 @@ import org.geotools.data.wms.request.GetMapRequest;
  * 
  * <ul>
  * <li>
- * WMSParser - a WMSParser capable of parsing a Get Capabilities Document
+ * GetCapabilitiesRequest
  * </li>
  * <li>
- * WMSFormat - a WMSFormat describing required parameters
+ * GetMapRequest
  * </li>
  * <li>
- * GetCapabilities - a GetCapabilities request
- * </li>
- * <li>
- * MapRequest - a MapRequest specific to the current specification
+ * GetFeatureInfoRequest
  * </li>
  * </ul>
  * </p>
@@ -54,14 +51,7 @@ import org.geotools.data.wms.request.GetMapRequest;
  * 
  * <ul>
  * <li>
- * WebMapServer - uses a WMSParser to derive a Capabilities object
- * </li>
- * <li>
  * WebMapServer - uses a GetCapabilitiesRequest during version negotiation.
- * </li>
- * <li>
- * WMSGridCoverageExchange - uses a WMSFormatFactory to generate the correct
- * WMSFormat
  * </li>
  * </ul>
  * </p>

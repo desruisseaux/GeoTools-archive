@@ -69,7 +69,7 @@ public class WMSSchema implements Schema {
         new WMSElement("PostCode", XSISimpleTypes.String.getInstance()),
         new WMSElement("Country", XSISimpleTypes.String.getInstance()),
         new WMSElement("ContactVoiceTelephone", XSISimpleTypes.String.getInstance()),
-        new WMSElement("ContactFascimileTelephone", XSISimpleTypes.String.getInstance()),
+        new WMSElement("ContactFacsimileTelephone", XSISimpleTypes.String.getInstance()),
         new WMSElement("ContactElectronicMailAddress", XSISimpleTypes.String.getInstance()),
         
         new WMSElement("Fees", XSISimpleTypes.String.getInstance()),
@@ -127,6 +127,7 @@ public class WMSSchema implements Schema {
         new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance()),
         new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance()),
         new WMSElement("ScaleHint", _ScaleHintType.getInstance()),
+//        new WMSElement("SRS", XSISimpleTypes.String.getInstance()),
         
         //1.0.0 format elements
         new WMSElement("GIF", _GIFType.getInstance()),

@@ -1481,7 +1481,7 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            return "_ExtendedCapabilities";
+            return null;
         }
 
         /*
