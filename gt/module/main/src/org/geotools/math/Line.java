@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.math;
 
@@ -54,7 +41,7 @@ import org.geotools.util.Cloneable;
  * can be computed for a given <var>x</var> value using the {@link #y} method. Method
  * {@link #x} compute the converse and should work even if the line is vertical.
  *
- * @version $Id: Line.java,v 1.8 2003/08/28 15:41:18 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Point2D
@@ -83,8 +70,8 @@ public class Line implements Cloneable, Serializable {
     private double y0;
 
     /**
-     * Valeur de <var>x</var> à <var>y</var>==0. Cette
-     * valeur est utilisée pour les droites verticales.
+     * Value of <var>x</var> at <var>y</var>==0.
+     * This value is used for vertical lines.
      */
     private double x0;
 
@@ -128,11 +115,10 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Définie une droite passant par le segment de droite spécifié.
-     * La droite sera prolongée à l'infini au delà des extrémités du
-     * segment.
+     * Set a line colinear with the specified line segment. The line will continues
+     * toward infinity after the line segment extremities.
      *
-     * @param line ligne dont on veut l'équation.
+     * @param line The line segment.
      *
      * @see #setLine(Point2D,Point2D)
      */
@@ -141,11 +127,11 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Définie une droite passant par les deux points spécifiés.
-     * La droite sera prolongée à l'infini au delà des deux points.
+     * Set a line through the specified point. The line will continues
+     * toward infinity after the point.
      *
-     * @param p1 Coordonnées du premier point.
-     * @param p2 Coordonnées du deuxième point.
+     * @param p1 Coordinate of the first point.
+     * @param p2 Coordinate of the second point.
      *
      * @see #setLine(Line2D)
      */
@@ -154,13 +140,13 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Définie une droite passant par les coordonnées spécifiées.
-     * La droite sera prolongée à l'infini au delà des deux points.
+     * Set a line through the specified point. The line will continues
+     * toward infinity after the point.
      *
-     * @param x1 Coordonnée <var>x</var> du premier point.
-     * @param y1 Coordonnée <var>y</var> du premier point.
-     * @param x2 Coordonnée <var>x</var> du deuxième point.
-     * @param y2 Coordonnée <var>y</var> du deuxième point.
+     * @param x1 Ordinate <var>x</var> of the first point.
+     * @param y1 Ordinate <var>y</var> of the first point.
+     * @param x2 Ordinate <var>x</var> of the second point.
+     * @param y2 Ordinate <var>y</var> of the second point.
      *
      * @see #setLine(Point2D,Point2D)
      * @see #setLine(Line2D)
@@ -169,6 +155,14 @@ public class Line implements Cloneable, Serializable {
         this.slope = (y2-y1)/(x2-x1);
         this.x0    = x2 - y2/slope;
         this.y0    = y2 - slope*x2;
+        if (Double.isNaN(x0) && slope==0) {
+            // Occurs for horizontal lines right on the x axis.
+            x0 = Double.POSITIVE_INFINITY;
+        }
+        if (Double.isNaN(y0) && Double.isInfinite(slope)) {
+            // Occurs for vertical lines right on the y axis.
+            y0 = Double.POSITIVE_INFINITY;
+        }
     }
 
     /**

@@ -17,25 +17,14 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.math;
 
 // J2SE dependencies
+import java.util.Random;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import javax.vecmath.Point3d;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -46,7 +35,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link Line} class.
  *
- * @version $Id: LineTest.java,v 1.3 2003/05/13 10:58:21 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class LineTest extends TestCase {
@@ -77,6 +66,41 @@ public final class LineTest extends TestCase {
     }
 
     /**
+     * Test {@link Line#setLine}.
+     */
+    public void testLine() {
+        final Line line = new Line();
+        line.setLine(new Point2D.Double(-2, 2), new Point2D.Double(8, 22));
+        assertEquals("slope", 2, line.getSlope(), EPS);
+        assertEquals("x0",   -3, line.getX0(),    EPS);
+        assertEquals("y0",    6, line.getY0(),    EPS);
+
+        // Horizontal line
+        line.setLine(new Point2D.Double(-2, 2), new Point2D.Double(8, 2));
+        assertEquals("slope", 0, line.getSlope(), EPS);
+        assertTrue  ("x0", Double.isInfinite(line.getX0()));
+        assertEquals("y0",    2, line.getY0(),    EPS);
+
+        // Vertical line
+        line.setLine(new Point2D.Double(-2, 2), new Point2D.Double(-2, 22));
+        assertTrue  ("slope", Double.isInfinite(line.getSlope()));
+        assertEquals("x0", -2, line.getX0(), EPS);
+        assertTrue  ("y0", Double.isInfinite(line.getY0()));
+
+        // Horizontal line on the x axis
+        line.setLine(new Point2D.Double(-2, 0), new Point2D.Double(8, 0));
+        assertEquals("slope", 0, line.getSlope(), EPS);
+        assertTrue  ("x0", Double.isInfinite(line.getX0()));
+        assertEquals("y0", 0, line.getY0(), EPS);
+
+        // Vertical line on the y axis
+        line.setLine(new Point2D.Double(0, 2), new Point2D.Double(0, 22));
+        assertTrue  ("slope", Double.isInfinite(line.getSlope()));
+        assertEquals("x0", 0, line.getX0(), EPS);
+        assertTrue  ("y0", Double.isInfinite(line.getY0()));
+    }
+
+    /**
      * Test {@link Line#isoscelesTriangleBase}.
      */
     public void testIsoscelesTriangleBase() {
@@ -95,5 +119,34 @@ public final class LineTest extends TestCase {
         final double y=8;
         assertEquals("nearest colinear point", base.ptLineDist(x,y),
                      test.nearestColinearPoint(new Point2D.Double(x,y)).distance(x,y), EPS);
+    }
+
+    /**
+     * Test {@link Plane#setPlane} methods.
+     */
+    public void testPlaneFit() {
+        final Random  rd = new Random(457821698762354L);
+        final Plane plan = new Plane();
+        final Point3d P1 = new Point3d(100*rd.nextDouble()+25, 100*rd.nextDouble()+25, Math.rint(100*rd.nextDouble()+40));
+        final Point3d P2 = new Point3d(100*rd.nextDouble()+25, 100*rd.nextDouble()+25, Math.rint(100*rd.nextDouble()+40));
+        final Point3d P3 = new Point3d(100*rd.nextDouble()+25, 100*rd.nextDouble()+25, Math.rint(100*rd.nextDouble()+40));
+        plan.setPlane(P1, P2, P3);
+        assertEquals("P1", P1.z, plan.z(P1.x,P1.y), EPS);
+        assertEquals("P2", P2.z, plan.z(P2.x,P2.y), EPS);
+        assertEquals("P3", P3.z, plan.z(P3.x,P3.y), EPS);
+
+        final double[] x = new double[4000];
+        final double[] y = new double[4000];
+        final double[] z = new double[4000];
+        for (int i=0; i<z.length; i++) {
+            x[i] = 40 + 100*rd.nextDouble();
+            y[i] = 40 + 100*rd.nextDouble();
+            z[i] = plan.z(x[i], y[i]) + 10*rd.nextDouble()-5;
+        }
+        final Plane copy = (Plane) plan.clone();
+        final double eps = 1E-2; // We do expect some difference, but not much more than that.
+        assertEquals("c",  copy.c,  plan.c,  eps);
+        assertEquals("cx", copy.cx, plan.cx, eps);
+        assertEquals("cy", copy.cy, plan.cy, eps);
     }
 }

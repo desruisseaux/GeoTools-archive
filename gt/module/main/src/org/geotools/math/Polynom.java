@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.math;
 
@@ -49,7 +40,7 @@ import org.geotools.resources.Utilities;
  * The static method {@link #roots(double[])} can be used for computing the root of a polynomial
  * equation without creating a <code>Polygon</code> object.
  *
- * @version $Id: Polynom.java,v 1.2 2003/05/15 08:45:46 desruisseaux Exp $
+ * @version $Id$
  * @author Ken Turkiwski
  * @author Martin Desruisseaux
  */

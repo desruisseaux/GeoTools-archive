@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.math;
 
@@ -67,7 +54,7 @@ import org.geotools.resources.rsc.ResourceKeys;
  * System.out.println(stats);
  * </pre></blockquote>
  *
- * @version $Id: Statistics.java,v 1.6 2003/08/28 15:41:18 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Statistics implements Cloneable, Serializable {
@@ -381,7 +368,7 @@ public class Statistics implements Cloneable, Serializable {
      * <var>s<sub>3</sub></var>-<var>s<sub>2</sub></var>...,
      * which are stored in a {@link #getDeltaStatistics delta} statistics object.
      *
-     * @version $Id: Statistics.java,v 1.6 2003/08/28 15:41:18 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Delta extends Statistics {
