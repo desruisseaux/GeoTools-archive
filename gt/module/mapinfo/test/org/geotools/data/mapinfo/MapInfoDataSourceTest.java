@@ -7,25 +7,17 @@
 
 package org.geotools.data.mapinfo;
 
-import junit.framework.*;
-import org.geotools.data.mapinfo.*;
-import org.geotools.data.DataSource;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.Extent;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.Feature;
-import org.geotools.filter.Filter;
-import org.geotools.feature.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import com.vividsolutions.jts.geom.*;
 import java.net.URL;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.Filter;
+import org.geotools.resources.TestData;
 
 /**
  *
@@ -49,16 +41,18 @@ public class MapInfoDataSourceTest extends TestCase {
     }
    
     String dataFolder;
-    public void testGetFeatures(){
+    public void testGetFeatures() throws Exception{
+    	URL url;
         String dataFolder = System.getProperty("dataFolder");
-        if(dataFolder==null){
-            //then we are being run by maven
-            dataFolder = System.getProperty("basedir");
-            dataFolder+="/tests/unit/testData";
+        if(dataFolder!=null){
+        	url = new URL("file:////"+dataFolder+"/statepop.mif"); 
+        }
+        else {
+            // then we are being run by maven
+        	url = TestData.getResource( this, "statepop.mif" );
         }
         try{
-            URL url = new URL("file:////"+dataFolder+"/statepop.mif");
-            System.out.println("Testing ability to load "+url);
+        	System.out.println("Testing ability to load "+url);
             MapInfoDataSource datasource = new MapInfoDataSource(url);
 	
             FeatureCollection collection = datasource.getFeatures(Filter.NONE);

@@ -7,26 +7,14 @@
 
 package org.geotools.data.mapinfo;
 
-import junit.framework.*;
-import org.geotools.data.mapinfo.*;
-import org.geotools.data.DataSource;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.Extent;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.Feature;
-import org.geotools.filter.Filter;
-import org.geotools.feature.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import com.vividsolutions.jts.geom.*;
 import java.net.URL;
+import java.util.Vector;
 import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.geotools.feature.Feature;
 
 /**
  *
@@ -40,10 +28,6 @@ public class LoadTest extends TestCaseSupport {
     String dataFolder;
     public LoadTest(java.lang.String testName) {
         super(testName);
-        
-        
-        
-        
     }
     
     public static void main(java.lang.String[] args) {
@@ -62,8 +46,7 @@ public class LoadTest extends TestCaseSupport {
         dsMapInfo = new MapInfoDataSource(url);
     }
     
-    public void testLoad() throws Exception{
-        
+    public void testLoad() throws Exception{        
         // Load file
         Vector objects = dsMapInfo.readMifMid();
         System.out.println("Read "+objects.size()+" features");

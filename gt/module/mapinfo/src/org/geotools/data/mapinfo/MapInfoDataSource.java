@@ -188,11 +188,29 @@ public class MapInfoDataSource extends AbstractDataSource implements DataSource 
      * @throws MalformedURLException invalid URL was used
      */
     public MapInfoDataSource(URL url) throws java.net.MalformedURLException {
-        filename = java.net.URLDecoder.decode(url.getFile());
+        filename = java.net.URLDecoder.decode( url.getFile() );
         geomFactory = new GeometryFactory();
     }
     
-    
+    protected File file( String filename, String ext ) throws FileNotFoundException{
+    	File file = new File(filename);
+    	if( file.exists() ) return file;
+    	
+    	file = new File( setExtension( filename, ext.toUpperCase() ));
+    	if( file.exists() ) return file;
+    	
+    	file = new File( setExtension( filename, ext.toLowerCase() ));
+    	if( file.exists() ) return file;
+    	
+    	file = new File( setExtension( filename.toLowerCase(), ext.toLowerCase() ));
+    	if( file.exists() ) return file;
+    	
+    	file = new File( setExtension( filename.toUpperCase(), ext.toUpperCase() ));
+    	if( file.exists() ) return file;
+    	
+    	// that is it I'm out of guesses
+    	throw new FileNotFoundException( "Could not locate '"+filename+"."+ext+"'");
+    }
     /** Reads the MIF and MID files and returns a Vector of the Features they contain
      * @return a vector of features
      * @throws DataSourceException if file doesn't exist or is not readable etc
@@ -200,42 +218,16 @@ public class MapInfoDataSource extends AbstractDataSource implements DataSource 
     protected Vector readMifMid() throws DataSourceException {
         if (filename == null) {
             throw new DataSourceException("Invalid filename passed to readMifMid");
-        }
-        
-        String mifFile = setExtension(filename, "MIF");
-        String midFile = setExtension(filename, "MID");
-        
+        }        
         // Read files
         try {
-            File mif = new File(mifFile);
-            if(!mif.exists()){
-                mifFile = setExtension(filename, "mif");
-                mif = new File(mifFile);
-                if(!mif.exists()){
-                    mifFile = setExtension(filename.toLowerCase(), "mif");
-                    mif = new File(mifFile);
-                    if(!mif.exists()){
-                        mifFile = setExtension(filename.toUpperCase(), "MIF");
-                        mif = new File(mifFile);
-                    } // and at that I'm out of guesses
-                }
-            }
-            File mid = new File(midFile);
-            if(!mid.exists()){
-                midFile = setExtension(filename, "mid");
-                mid = new File(midFile);
-                if(!mid.exists()){
-                    midFile = setExtension(filename.toLowerCase(), "mid");
-                    mid = new File(midFile);
-                    if(!mid.exists()){
-                        midFile = setExtension(filename.toUpperCase(), "MID");
-                        mid = new File(midFile);
-                    } // and at that I'm out of guesses
-                }
-            }
-            Vector features = readMifMid(new BufferedReader(new FileReader(mif)),
-            new BufferedReader(new FileReader(mid)));
-            
+        	File mif = file( filename, "MIF" );
+        	File mid = file( filename, "MID" );
+                
+            Vector features = readMifMid(
+            		new BufferedReader(new FileReader(mif)),
+					new BufferedReader(new FileReader(mid))
+			);
             return features;
         } catch (FileNotFoundException fnfexp) {
             throw new DataSourceException("FileNotFoundException trying to read mif file : ",

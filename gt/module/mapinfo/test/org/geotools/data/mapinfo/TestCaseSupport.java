@@ -3,7 +3,6 @@
  *
  * Created on April 30, 2003, 12:16 PM
  */
-
 package org.geotools.data.mapinfo;
 
 import java.io.InputStream;
@@ -23,14 +22,14 @@ public abstract class TestCaseSupport extends TestCase {
   }
   
   protected URL getTestResource(String name) {
-    URL r = getClass().getResource("/testData/" + name);
+    URL r = getClass().getResource("test-data/" + name);
     if (r == null)
       throw new RuntimeException("Could not locate resource : " + name);
     return r;
   }
   
   protected InputStream getTestResourceAsStream(String name) {
-    InputStream in = getClass().getResourceAsStream("/testData/" + name);
+    InputStream in = getClass().getResourceAsStream("test-data/" + name);
     if (in == null)
       throw new RuntimeException("Could not locate resource : " + name);
     return in;
