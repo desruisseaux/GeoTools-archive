@@ -229,20 +229,9 @@ public class SchemaFactory {
      */
     public synchronized static Schema getInstance(URI targetNamespace,
             URI desiredSchema, Level level) throws SAXException {
-            if ((targetNamespace == null) || "".equals(targetNamespace)
+            if (targetNamespace == null
                     || (schemas.get(targetNamespace) == null)) {
-//                if (mappings.containsKey(targetNamespace)) {
-//                    ClassLoader cl = SchemaFactory.class.getClassLoader();
-    //
-//                    try {
-//                        Class c = cl.loadClass((String) mappings.get(
-//                                    targetNamespace));
-//                        schemas.put(targetNamespace,
-//                            c.getConstructor(new Class[0]).newInstance(new Object[0]));
-//                    } catch (Exception e) {
-//                        throw new SAXException(e);
-//                    }
-//                } else {
+
                     setParser();
 
                     XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);

@@ -396,7 +396,7 @@ public class SchemaHandler extends XSIElementHandler {
                 if (obj instanceof ImportHandler) {
                     ImportHandler imp = (ImportHandler) obj;
                     URI incURI = null;
-                    if(imp.getSchemaLocation()!= null && incURI!=null)
+                    if(imp.getSchemaLocation()!= null && thisURI!=null)
                         incURI = thisURI.normalize().resolve(imp
                             .getSchemaLocation());
                     Schema cs = SchemaFactory.getInstance(imp.getNamespace(),
