@@ -142,10 +142,10 @@ public abstract class AbstractWMSParser implements WMSParser {
         } catch (MalformedURLException exception) {
             throw new ParseCapabilitiesException("Unable to parse URL properly",
                 null, exception);
-        } catch (NullPointerException exception) {
+        } /*catch (NullPointerException exception) {
             throw new ParseCapabilitiesException("XML does not conform to the WMS Specification.",
                 null, exception);
-        }
+        }*/
 
         return builder.finish();
     }
@@ -166,7 +166,7 @@ public abstract class AbstractWMSParser implements WMSParser {
         List styleElements = queryStyles(layerElement);
         
         String queryAttribute = layerElement.getAttributeValue(
-                "queryable", defaultNamespace);
+                "queryable");
 
         boolean queryable = false; 
         if (queryAttribute != null && queryAttribute.length() != 0) {
@@ -188,7 +188,7 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
 	protected void parseLatLonBoundingBox(Element layerElement, WMSBuilder builder) {
-		Element latLonBboxElement = layerElement.getChild("LatLonBoundingBox"); 
+		Element latLonBboxElement = layerElement.getChild("LatLonBoundingBox", defaultNamespace); 
 		
 		if (latLonBboxElement == null) {
 			return;

@@ -6,10 +6,8 @@
  */
 package org.geotools.data.wms;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.geotools.data.wms.WMS1_0_0.Parser;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -84,6 +82,20 @@ public class WMS1_3_0 extends WMS1_1_1 {
 		}
 		protected String getBBoxCRSName() {
 			return "CRS";
+		}
+		protected void parseLatLonBoundingBox(Element layerElement,
+				WMSBuilder builder) {
+			Element geoBboxElement = layerElement.getChild("EX_GeographicBoundingBox", defaultNamespace);
+			if (geoBboxElement == null) {
+				return;
+			}
+			
+			double minX = Double.parseDouble(geoBboxElement.getChildText("westBoundLongitude", defaultNamespace));
+			double maxX = Double.parseDouble(geoBboxElement.getChildText("eastBoundLongitude", defaultNamespace));
+			double minY = Double.parseDouble(geoBboxElement.getChildText("southBoundLatitude", defaultNamespace));
+			double maxY = Double.parseDouble(geoBboxElement.getChildText("northBoundLatitude", defaultNamespace));
+			
+			builder.buildLatLonBoundingBox(minX, minY, maxX, maxY);
 		}
 	}
 }

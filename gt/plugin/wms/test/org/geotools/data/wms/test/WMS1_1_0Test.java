@@ -9,9 +9,9 @@ package org.geotools.data.wms.test;
 import java.net.URL;
 import java.util.Properties;
 
+import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMSParser;
 
@@ -79,7 +79,11 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertTrue(layer.getSrs().contains("EPSG:42101"));
 		assertTrue(layer.getSrs().contains("EPSG:4269"));
 		assertTrue(layer.getSrs().contains("EPSG:4326"));
-		//TODO LatLonBoundingBox testing
+		
+		LatLonBoundingBox llbbox = layer.getLatLonBoundingBox();
+		validateLatLonBoundingBox(llbbox, -172.367, 35.6673, -11.5624, 83.8293);
+		
+		
 		assertEquals(layer.getBoundingBoxes().size(), 1);
 		assertNotNull(layer.getBoundingBoxes().get("EPSG:42304"));
 		
@@ -94,7 +98,10 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "land_fn");
 		assertEquals(layer2.getTitle(), "Foreign Lands");
-		//TODO LatLonBoundingBox testing
+
+		validateLatLonBoundingBox(layer2.getLatLonBoundingBox(),
+				-178.838, 31.8844, 179.94, 89.8254);
+		
 		assertTrue(layer2.getSrs().contains("EPSG:42304"));
 		assertFalse(layer2.isQueryable());
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
@@ -103,7 +110,10 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "park");
 		assertEquals(layer2.getTitle(), "Parks");
-		//TODO LatLonBoundingBox testing
+		
+		validateLatLonBoundingBox(layer2.getLatLonBoundingBox(),
+				-173.433, 41.4271, -13.3643, 83.7466);
+		
 		assertTrue(layer2.getSrs().contains("EPSG:42304"));
 		assertTrue(layer2.isQueryable());
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
@@ -112,11 +122,24 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(layer2.getParent(), layer);
 		assertEquals(layer2.getName(), "grid");
 		assertEquals(layer2.getTitle(), "Grid");
-		//TODO LatLonBoundingBox testing
+
+		llbbox = layer2.getLatLonBoundingBox();
+		validateLatLonBoundingBox(llbbox, -178.838, 31.8844, 179.94, 89.8254);
+		
 		assertTrue(layer2.getSrs().contains("EPSG:42304"));
 		assertFalse(layer2.isQueryable());
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
 	}
+
+	protected void validateLatLonBoundingBox(LatLonBoundingBox llbbox,
+			double minX, double minY, double maxX, double maxY) {
+		assertNotNull(llbbox);
+		assertEquals(llbbox.getMinX(), minX, 0.0);
+		assertEquals(llbbox.getMinY(), minY, 0.0);
+		assertEquals(llbbox.getMaxX(), maxX, 0.0);
+		assertEquals(llbbox.getMaxY(), maxY, 0.0);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.geotools.data.wms.test.WMS1_0_0Test#parserCheck(org.geotools.data.wms.WMSParser)
 	 */

@@ -6,26 +6,14 @@
  */
 package org.geotools.data.wms.test;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WMS1_1_1;
-import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
-import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.geotools.resources.TestData;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-
-import junit.framework.TestCase;
 
 /**
  * @author Kefka
@@ -77,7 +65,9 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         assertEquals(layer.getTitle(), "Microsoft TerraServer Map Server");
         assertEquals(layer.getSrs().size(), 1);
         assertTrue(layer.getSrs().contains("EPSG:4326" ));
-        //TODO Test that latlonBoundingBox works when fixed
+
+        validateLatLonBoundingBox(layer.getLatLonBoundingBox(), 
+        		-168.67, 17.84, -65.15, 71.55);
         
         assertNull(layer.getParent());
         assertEquals(layer.getBoundingBoxes().size(), 0);
