@@ -52,11 +52,12 @@ public class WFSDataStore extends AbstractDataStore{
  	}
  	
  	private static synchronized InputStream getInputStream(URL url, Authenticator auth){
- 	    
+ 	    return null;
  	}
  	
  	static URL createGetCapabilitiesRequest(URL host){
  	    // TODO fill me in
+ 	    return null;
  	}
 
     /**
