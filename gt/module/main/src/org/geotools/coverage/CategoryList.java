@@ -1196,4 +1196,17 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             throw exception;
         }
     }
+
+    /**
+     * Returns a Well Known Text</cite> (WKT) for this object. This operation
+     * may fails if an object is too complex for the WKT format capability.
+     *
+     * @return The Well Know Text for this object.
+     * @throws UnsupportedOperationException If this object can't be formatted as WKT.
+     *
+     * @todo Not yet implemented.
+     */
+    public String toWKT() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
 }
