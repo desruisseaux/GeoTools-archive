@@ -18,9 +18,11 @@ package org.geotools.xml.wfs;
 
 import org.geotools.data.Query;
 import org.geotools.data.wfs.LockRequest;
+import org.geotools.data.wfs.LockResult;
 import org.geotools.data.wfs.TransactionRequest;
 import org.geotools.data.wfs.Action;
 import org.geotools.feature.Feature;
+import org.geotools.filter.FidFilter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema;
@@ -1381,8 +1383,24 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException();
+        	
+        	if(element == null || value == null ||element.getType()==null)
+        		throw new SAXException("Invalid parameters : null found");
+        	if(value.length<1 || value.length >3)
+        		throw new SAXException("Invalid children: too few or too many");
+        	if(!getName().equals(element.getType().getName()))
+        		throw new SAXException("Invalid type name for element provided");
+        	
+        	String lockId = (String)value[0].getValue();
+        	FidFilter in = null;
+        	FidFilter out = null;
+        	int i=1;
+
+        	if(i<value.length && elems[1].getType().getName().equals(value[i].getElement().getType().getName()))
+        		in = (FidFilter)value[i++];
+        	if(i<value.length && elems[2].getType().getName().equals(value[i].getElement().getType().getName()))
+        		out = (FidFilter)value[i++];
+        	return new LockResult(lockId,in,out);
         }
 
         /**
@@ -1396,8 +1414,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return LockResult.class;
         }
 
         /**
