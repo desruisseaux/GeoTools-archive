@@ -32,7 +32,7 @@ import org.geotools.resources.Utilities;
  */
 public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
     private java.util.List ruleList = new java.util.ArrayList();
-    private String featureTypeName = "feature";
+    private String featureTypeName = "Feature";
     private String name = "name";
     private String title = "title";
     private String abstractStr = "abstract";
