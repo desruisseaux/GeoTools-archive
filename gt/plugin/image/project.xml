@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-image</name>
-  <id>arcgrid</id>
+  <id>image</id>
   <currentVersion>2.1.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>WorldImage datasource module</shortDescription>
