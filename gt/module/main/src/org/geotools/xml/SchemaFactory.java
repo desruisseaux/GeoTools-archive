@@ -34,6 +34,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
@@ -208,6 +211,21 @@ public class SchemaFactory {
      */
     public synchronized static Schema getInstance(URI targetNamespace) {
         return getInstance().getRealInstance(targetNamespace);
+    }
+    
+    //TODO cache this on schema registry
+    public synchronized static Schema[] getSchemas(String prefix){
+        if(prefix == null)
+            return null;
+        SchemaFactory sf = getInstance();
+        Iterator i = sf.schemas.values().iterator();
+        List l = new LinkedList();
+        while(i.hasNext()){
+            Schema s = (Schema)i.next();
+            if(prefix.equals(s.getPrefix()))
+                l.add(s);
+        }
+        return (Schema[])l.toArray(new Schema[l.size()]);
     }
 
     private synchronized Schema getRealInstance(URI targetNamespace) {

@@ -60,32 +60,39 @@ public class FCBuffer extends Thread implements FeatureReader {
     private int head;
     private int timeout = 1000;
     private URI document; // for run
-    private FeatureType featureType;
     protected SAXException exception = null;
 
-    /*
-     * Should not be called
-     */
     private FCBuffer() {
+        // should not be called
     }
 
     /**
      * Creates a new FCBuffer object.
      *
-     * @param document DOCUMENT ME!
+     * @param document
      * @param capacity buffer feature capacity
+     * @param ft Nullable
      */
-    protected FCBuffer(URI document, int capacity) {
+    protected FCBuffer(URI document, int capacity, FeatureType ft) {
         features = new Feature[capacity];
         this.document = document;
         end = size = head = 0;
+        this.ft = ft;
     }
 
-    protected FCBuffer(URI document, int capacity, int timeout) {
+    /**
+     * 
+     * @param document
+     * @param capacity
+     * @param timeout
+     * @param ft Nullable
+     */
+    protected FCBuffer(URI document, int capacity, int timeout, FeatureType ft) {
         features = new Feature[capacity];
         this.timeout = timeout;
         this.document = document;
         end = size = head = 0;
+        this.ft = ft;
     }
 
     private static final Logger getLogger() {
@@ -132,8 +139,8 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @return false if unable to add the feature
      */
     protected boolean addFeature(Feature f) {
-        if (featureType == null) {
-            featureType = f.getFeatureType();
+        if (ft == null) {
+            ft = f.getFeatureType();
         }
 
         if (size >= features.length) {
@@ -167,7 +174,31 @@ public class FCBuffer extends Thread implements FeatureReader {
      */
     public static FeatureReader getFeatureReader(URI document, int capacity)
         throws SAXException {
-        FCBuffer fc = new FCBuffer(document, capacity);
+        FCBuffer fc = new FCBuffer(document, capacity,null);
+        fc.start(); // calls run
+
+        if (fc.exception != null) {
+            throw fc.exception;
+        }
+
+        return fc;
+    }
+    
+    public static FeatureReader getFeatureReader(URI document, int capacity, FeatureType ft)
+    throws SAXException {
+    FCBuffer fc = new FCBuffer(document, capacity,ft);
+    fc.start(); // calls run
+
+    if (fc.exception != null) {
+        throw fc.exception;
+    }
+
+    return fc;
+}
+
+    public static FeatureReader getFeatureReader(URI document, int capacity,
+        int timeout) throws SAXException {
+        FCBuffer fc = new FCBuffer(document, capacity, timeout,null);
         fc.start(); // calls run
 
         if (fc.exception != null) {
@@ -178,8 +209,8 @@ public class FCBuffer extends Thread implements FeatureReader {
     }
 
     public static FeatureReader getFeatureReader(URI document, int capacity,
-        int timeout) throws SAXException {
-        FCBuffer fc = new FCBuffer(document, capacity, timeout);
+        int timeout, FeatureType ft) throws SAXException {
+        FCBuffer fc = new FCBuffer(document, capacity, timeout,ft);
         fc.start(); // calls run
 
         if (fc.exception != null) {
@@ -189,6 +220,7 @@ public class FCBuffer extends Thread implements FeatureReader {
         return fc;
     }
 
+    private FeatureType ft = null;
     /**
      * DOCUMENT ME!
      *
@@ -197,9 +229,11 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
+        if(ft != null)
+            return ft;
         Date d = new Date(Calendar.getInstance().getTimeInMillis() + timeout);
 
-        while ((featureType == null) && ((state != FINISH) && (state != STOP))) {
+        while ((ft == null) && ((state != FINISH) && (state != STOP))) {
             yield(); // let the parser run ... this is being called from 
 
             if (d.before(Calendar.getInstance().getTime())) {
@@ -210,10 +244,10 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         // the original thread
         if ((state == FINISH) || (state == STOP)) {
-            return null;
+            return ft;
         }
 
-        return featureType;
+        return ft;
     }
 
     /**

@@ -51,9 +51,9 @@ public class WFSFeatureReader extends FCBuffer {
     private int insertSearchIndex = -1;
 
     private WFSFeatureReader(InputStream is, int capacity, int timeout,
-        WFSTransactionState trans) {
+        WFSTransactionState trans, FeatureType ft) {
         //document may be null
-        super(null, capacity, timeout);
+        super(null, capacity, timeout,ft);
         this.is = is;
         ts = trans;
     }
@@ -64,18 +64,19 @@ public class WFSFeatureReader extends FCBuffer {
      * @param capacity
      * @param timeout
      * @param transaction
+     * @param ft
      * @return WFSFeatureReader
      * @throws SAXException
      */
     public static FeatureReader getFeatureReader(URI document, int capacity,
-        int timeout, WFSTransactionState transaction) throws SAXException {
+        int timeout, WFSTransactionState transaction, FeatureType ft) throws SAXException {
         HttpURLConnection hc;
 
         try {
             hc = (HttpURLConnection) document.toURL().openConnection();
 
             return getFeatureReader(hc.getInputStream(), capacity, timeout,
-                transaction);
+                transaction,ft);
         } catch (MalformedURLException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
@@ -91,14 +92,15 @@ public class WFSFeatureReader extends FCBuffer {
      * @param capacity
      * @param timeout
      * @param transaction
+     * @param ft
      * @return WFSFeatureReader
      * @throws SAXException
      */
     public static WFSFeatureReader getFeatureReader(InputStream is,
-        int capacity, int timeout, WFSTransactionState transaction)
+        int capacity, int timeout, WFSTransactionState transaction, FeatureType ft)
         throws SAXException {
         WFSFeatureReader fc = new WFSFeatureReader(is, capacity, timeout,
-                transaction);
+                transaction,ft);
         fc.start(); // calls run
 
         if (fc.exception != null) {
@@ -261,20 +263,5 @@ public class WFSFeatureReader extends FCBuffer {
         next = null;
 
         return r;
-    }
-    
-    private FeatureType ft = null;
-    /**
-     * 
-     * @see org.geotools.data.FeatureReader#getFeatureType()
-     */
-    public FeatureType getFeatureType() {
-        if(ft!=null)
-            return ft;
-        if(next!=null){
-            ft = next.getFeatureType();
-            return ft;
-        }
-        return super.getFeatureType();
     }
 }

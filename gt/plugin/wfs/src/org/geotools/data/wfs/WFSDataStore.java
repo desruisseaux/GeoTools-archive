@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
@@ -36,6 +37,7 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
+import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Element;
@@ -55,6 +57,7 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -328,7 +331,7 @@ public class WFSDataStore extends AbstractDataStore {
         hc.setRequestMethod("GET");
 
         InputStream is = getInputStream(hc, auth);
-        Schema schema = WFSSchemaFactory.getInstance(null, is);
+        Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
         Element element = null;
 
@@ -372,7 +375,25 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
+        List l = capabilities.getFeatureTypes();
+        Iterator it = l.iterator();
+        URI uri = null;
+        while(it.hasNext() && uri == null){
+            FeatureSetDescription fsd = (FeatureSetDescription)it.next();
+            if(typeName.equals(fsd.getName()))
+                uri = fsd.getNamespace();
+        }
+        if(uri!=null)
+            hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
 
+        try {
+            DocumentWriter.writeDocument(new String[] { typeName },
+                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
+        } catch (OperationNotSupportedException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        }
+        
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
                 WFSSchema.getInstance(), w, hints);
@@ -380,12 +401,10 @@ public class WFSDataStore extends AbstractDataStore {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-
         os.flush();
-        os.close();
 
         InputStream is = getInputStream(hc, auth);
-        Schema schema = WFSSchemaFactory.getInstance(null, is);
+        Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
 
         if (elements == null) {
@@ -409,6 +428,8 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         FeatureType ft = GMLComplexTypes.createFeatureType(element);
+
+        os.close();
         is.close();
 
         return ft;
@@ -498,7 +519,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts);
+                timeout, ts, getSchema(request.getTypeName()));
 
         return ft;
     }
@@ -597,7 +618,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts);
+                timeout, ts, getSchema(query.getTypeName()));
 
         return ft;
     }
@@ -680,7 +701,7 @@ public class WFSDataStore extends AbstractDataStore {
                 "There are features but no feature type ... odd");
         }
 
-        return null;
+        return new EmptyFeatureReader(getSchema(query.getTypeName()));
     }
 
     /* (non-Javadoc)

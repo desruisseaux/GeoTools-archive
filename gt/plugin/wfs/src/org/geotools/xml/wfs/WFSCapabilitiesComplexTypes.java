@@ -23,6 +23,8 @@ import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
@@ -35,6 +37,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
+import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
@@ -1251,6 +1254,19 @@ public class WFSCapabilitiesComplexTypes {
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     // Name
                     fsd.setName((String) value[i].getValue());
+                    if(fsd.getName()!=null){
+                        int j = fsd.getName().indexOf(":");
+                        if(j>0){
+                            // we have a ns prefix
+                            String prefix = fsd.getName().substring(0,j);
+//System.out.println("PREFIX FOR FT = "+prefix+ " -- " + fsd.getName());
+                            if(hints != null && hints.containsKey(ElementHandlerFactory.KEY)){
+                                ElementHandlerFactory ehf = (ElementHandlerFactory)hints.get(ElementHandlerFactory.KEY);
+                                fsd.setNamespace(ehf.getNamespace(prefix));
+                            }
+//System.out.println("NS FOR FT = "+(fsd.getNamespace()==null?"null":fsd.getNamespace().toString()));
+                        }
+                    }
                 } else {
                     if (elements[1].getName().equals(value[i].getElement()
                                                                  .getName())) {

@@ -30,6 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +123,14 @@ public class ComplexElementHandler extends XMLElementHandler {
     public void endElement(URI namespaceURI, String localName, Map hints)
         throws SAXException {
         text = (text == null) ? null : text.trim();
+        
+        if(hints == null){
+            hints = new HashMap();
+            hints.put(ElementHandlerFactory.KEY,ehf);
+        }else{
+            if(!hints.containsKey(ElementHandlerFactory.KEY))
+                hints.put(ElementHandlerFactory.KEY,ehf);
+        }
 
         if (elements == null) {
             if (type != null) {

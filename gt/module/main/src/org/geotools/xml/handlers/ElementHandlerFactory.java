@@ -44,9 +44,10 @@ import java.util.logging.Logger;
  * @see Schema
  */
 public class ElementHandlerFactory {
+    public static final String KEY = "org.geotools.xml.handlers.ElementHandlerFactory_KEY";
     private Logger logger;
     private Map targSchemas = new HashMap(); // maps prefix -->> Schema
-    private Map prefixSchemas = new HashMap(); // maps prefix -->> Schema
+    private Map prefixURIs = new HashMap(); // maps prefix -->> URI
     private URI defaultNS = null;
 
     /**
@@ -62,10 +63,10 @@ public class ElementHandlerFactory {
      * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
      */
     public void endPrefixMapping(String prefix) {
-        Schema s = (Schema) prefixSchemas.remove(prefix);
+        URI s = (URI) prefixURIs.remove(prefix);
 
         if (s != null) {
-            targSchemas.remove(s.getTargetNamespace());
+            targSchemas.remove(s);
         }
     }
 
@@ -88,7 +89,9 @@ public class ElementHandlerFactory {
                 }
 
                 targSchemas.put(s.getTargetNamespace(), s);
-                prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+                prefixURIs.put(prefix, tns); 
+            }else{
+                prefixURIs.put(prefix, tns); 
             }
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
@@ -109,6 +112,7 @@ public class ElementHandlerFactory {
             Schema s = SchemaFactory.getInstance(tns);
 
             if (s == null) {
+                prefixURIs.put(prefix, tns); 
                 return;
             }
 
@@ -117,7 +121,7 @@ public class ElementHandlerFactory {
             }
 
             targSchemas.put(s.getTargetNamespace(), s);
-            prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+            prefixURIs.put(prefix, tns); 
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
@@ -202,5 +206,10 @@ public class ElementHandlerFactory {
         }
 
         return new IgnoreHandler();
+    }
+    
+    public URI getNamespace(String prefix){
+        URI s = (URI)prefixURIs.get(prefix);
+        return s;
     }
 }

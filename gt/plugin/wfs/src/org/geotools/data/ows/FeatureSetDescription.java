@@ -17,6 +17,8 @@
 package org.geotools.data.ows;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,8 +56,9 @@ public class FeatureSetDescription {
 	 * Mask for lock operation allowed on the FeatureType
 	 */
     public static final int LOCK_OPERATION = 16;
-    
+
     private String name;
+    private URI namespace;
     private String title;
     private String _abstract;
     private String SRS;
@@ -314,5 +317,17 @@ public class FeatureSetDescription {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+    /**
+     * @return Returns the namespace.
+     */
+    public URI getNamespace() {
+        return namespace;
+    }
+    /**
+     * @param namespace The namespace to set.
+     */
+    public void setNamespace(URI namespace) {
+        this.namespace = namespace;
     }
 }
