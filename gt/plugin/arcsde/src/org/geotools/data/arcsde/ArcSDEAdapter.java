@@ -16,16 +16,21 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeFilter;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeTable;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
@@ -47,22 +52,15 @@ import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeCoordinateReference;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeFilter;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeTable;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -184,63 +182,16 @@ public class ArcSDEAdapter {
     }
 
     /**
+     * Creates the column definition as used by the ArcSDE Java API, for the
+     * given AttributeType.
      *
-     */
-    public static SeColumnDefinition[] createSeColDefs(FeatureType featureType)
-        throws DataSourceException {
-        int nCols = featureType.getAttributeCount();
-        AttributeType[] atts = featureType.getAttributeTypes();
-        AttributeType currAtt;
-        List coldefs = new ArrayList(nCols - 1);
-
-        //new SeColumnDefinition( "Integer_Val", SeColumnDefinition.TYPE_INTEGER, 10, 0, isNullable);
-        for (int i = 0; i < nCols; i++) {
-            if (atts[i].isGeometry()) {
-                continue;
-            }
-
-            currAtt = atts[i];
-
-            /*
-               String attName = currAtt.getName();
-               Class attClass = currAtt.getType();
-               LOGGER.info("Creating SeColumnDefinition for field "
-                   + currAtt.getName());
-               SdeTypeDef sdeType = getSdeType(attClass);
-               LOGGER.fine("Java type is " + attClass
-                   + ", SeColumnDefinition type is " + sdeType.colDefType);
-               if (currAtt.getFieldLength() != 0) {
-                   LOGGER.fine("Setting field length to "
-                       + currAtt.getFieldLength());
-                   sdeType.size = currAtt.getFieldLength();
-               }
-               boolean nillable = currAtt.isNillable();
-               LOGGER.fine("Nillable: " + nillable);
-               LOGGER.info("SeColumnDefinition  params: " + sdeType);
-             */
-            try {
-                SeColumnDefinition colDef = createSeColumnDefinition(currAtt);
-                coldefs.add(colDef);
-            } catch (SeException ex) {
-                throw new DataSourceException(
-                    "Cannot create the column definition named "
-                    + currAtt.getName() + ": " + ex.getSeError().getSdeErrMsg(),
-                    ex);
-            }
-        }
-
-        return (SeColumnDefinition[]) coldefs.toArray(new SeColumnDefinition[coldefs
-            .size()]);
-    }
-
-    /**
-     * DOCUMENT ME!
+     * @param type the source attribute definition.
      *
-     * @param type DOCUMENT ME!
+     * @return an <code>SeColumnDefinition</code> object matching the
+     *         properties of the source AttributeType.
      *
-     * @return DOCUMENT ME!
-     *
-     * @throws SeException DOCUMENT ME!
+     * @throws SeException if the SeColumnDefinition constructor throws it due
+     *         to some invalid parameter
      */
     public static SeColumnDefinition createSeColumnDefinition(
         AttributeType type) throws SeException {
