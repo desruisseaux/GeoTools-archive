@@ -22,17 +22,14 @@ package org.geotools.data.arcsde;
  * <code>SdeConnectionPool instance's getMaxWaitTime()</code> milliseconds
  *
  * @author Gabriel Roldán
- * @version $Id: UnavailableConnectionException.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @author Gabriel Roldán
+ * @version $Id: UnavailableConnectionException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  *
  * @task REVISIT: sure there are a better exception to use in somewhere... just
  *       take a look since it seems not very wise to have it here... may be in
  *       current jdbc package.
- *
- * @author Gabriel Roldán
- * @version $Id: UnavailableConnectionException.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
  */
-public class UnavailableConnectionException extends Exception
-{
+public class UnavailableConnectionException extends Exception {
     /**
      * Creates a new UnavailableConnectionException object.
      *
@@ -40,8 +37,7 @@ public class UnavailableConnectionException extends Exception
      * @param config DOCUMENT ME!
      */
     public UnavailableConnectionException(int usedConnections,
-        ConnectionConfig config)
-    {
+        ConnectionConfig config) {
         super("The maximun of " + usedConnections + " to " + config.toString()
             + " has been reached");
     }

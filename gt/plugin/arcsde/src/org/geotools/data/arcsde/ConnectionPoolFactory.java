@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -20,18 +16,19 @@
  */
 package org.geotools.data.arcsde;
 
-import org.geotools.data.DataSourceException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
 
 
 /**
  * DOCUMENT ME!
  *
  * @author Gabriel Rold?n
- * @version $Id: ConnectionPoolFactory.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @version $Id: ConnectionPoolFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ConnectionPoolFactory {
     /** DOCUMENT ME! */

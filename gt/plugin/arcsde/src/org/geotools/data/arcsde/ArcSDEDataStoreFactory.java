@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -20,17 +16,18 @@
  */
 package org.geotools.data.arcsde;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 
 
 /**
  * DOCUMENT ME!
  *
- * @author Gabriel Rold?n
- * @version $Id: ArcSDEDataStoreFactory.java,v 1.2 2004/04/20 04:45:16 cholmesny Exp $
+ * @author Gabriel Roldán
+ * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /** package's logger */
@@ -39,6 +36,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x";
+
+    /** DOCUMENT ME!  */
     private static Param[] paramMetadata = new Param[11];
 
     static {
@@ -89,6 +88,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      * @param map DOCUMENT ME!
      *
      * @return DOCUMENT ME!
+     *
+     * @throws UnsupportedOperationException DOCUMENT ME!
      */
     public DataStore createNewDataStore(java.util.Map map) {
         throw new UnsupportedOperationException(
@@ -172,22 +173,22 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         return canProcess;
     }
 
-	/**
-	 * Test to see if this datastore is available, if it has all the
-	 * appropriate libraries to construct a datastore.  This datastore just
-	 * returns true for now.  This method is used for gui apps, so as to
-	 * not advertise data store capabilities they don't actually have.
-	 *
-	 * @return <tt>true</tt> if and only if this factory is available to create
-	 *         DataStores.
-	 *
-	 * @task REVISIT: I'm just adding this method to compile, maintainer should
-	 *       revisit to check for any libraries that may be necessary for
-	 *       datastore creations. ch.
-	 */
-	public boolean isAvailable() {
-		return true;
-	}
+    /**
+     * Test to see if this datastore is available, if it has all the
+     * appropriate libraries to construct a datastore.  This datastore just
+     * returns true for now.  This method is used for gui apps, so as to not
+     * advertise data store capabilities they don't actually have.
+     *
+     * @return <tt>true</tt> if and only if this factory is available to create
+     *         DataStores.
+     *
+     * @task REVISIT: I'm just adding this method to compile, maintainer should
+     *       revisit to check for any libraries that may be necessary for
+     *       datastore creations. ch.
+     */
+    public boolean isAvailable() {
+        return true;
+    }
 
     /**
      * DOCUMENT ME!

@@ -16,15 +16,17 @@
  */
 package org.geotools.filter;
 
-import java.io.*;
-import java.util.logging.*;
+import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.esri.sde.sdk.client.*;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeLayer;
 
 
 /**
  * Encodes an attribute filter into a SQL WHERE statement for arcsde.
- *
+ * 
  * <p>
  * Although not all filters support is coded yet, the strategy to filtering
  * queries for ArcSDE datasources is separated in two parts, the SQL where
@@ -36,38 +38,72 @@ import com.esri.sde.sdk.client.*;
  *
  * @author Chris Holmes, TOPP
  * @author Gabriel Roldán
+ *
  * @see org.geotools.data.sde.GeometryEncoderSDE
  */
 public class SQLEncoderSDE extends SQLEncoder
-    implements org.geotools.filter.FilterVisitor
-{
+    implements org.geotools.filter.FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
-
 
     /** DOCUMENT ME! */
     private SeLayer sdeLayer;
 
-    public SQLEncoderSDE()
-    {
+    /**
+     * Creates a new SQLEncoderSDE object.
+     */
+    public SQLEncoderSDE() {
     }
 
     /**
      */
-    public SQLEncoderSDE(SeLayer layer)
-    {
+    public SQLEncoderSDE(SeLayer layer) {
         this.sdeLayer = layer;
     }
 
     /**
-     * @deprecated remove when the old data api dissapear
+     * Overrides the superclass implementation to fully qualify
+     *
+     * @param expression DOCUMENT ME!
+     *
+     * @throws RuntimeException DOCUMENT ME!
+     */
+    public void visit(AttributeExpression expression) throws RuntimeException {
+        try {
+            out.write(sdeLayer.getQualifiedName());
+            out.write('.');
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException("IO problems writing attribute exp", ioe);
+        } catch (SeException see) {
+            throw new RuntimeException("SDE problems writing attribute exp", see);
+        }
+
+        super.visit(expression);
+    }
+
+    /**
+     * Overrides the superclass implementation to indicate that we support
+     * pushing FeatureId filters down into the data store.
+     *
+     * @return DOCUMENT ME!
+     */
+    protected FilterCapabilities createFilterCapabilities() {
+        FilterCapabilities result = super.createFilterCapabilities();
+        result.addType(FilterType.FID);
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param layer DOCUMENT ME!
+     *
+     * @deprecated remove when the old data api dissapear
      */
-    public void setLayer(SeLayer layer)
-    {
+    public void setLayer(SeLayer layer) {
         this.sdeLayer = layer;
     }
-
 
     /**
      * overriden just to avoid the "WHERE" keyword
@@ -77,16 +113,11 @@ public class SQLEncoderSDE extends SQLEncoder
      *
      * @throws SQLEncoderException DOCUMENT ME!
      */
-    public void encode(Writer out, Filter filter) throws SQLEncoderException
-    {
-
-        if (getCapabilities().fullySupports(filter))
-        {
+    public void encode(Writer out, Filter filter) throws SQLEncoderException {
+        if (getCapabilities().fullySupports(filter)) {
             this.out = out;
             filter.accept(this);
-        }
-        else
-        {
+        } else {
             throw new SQLEncoderException("Filter type not supported");
         }
     }
@@ -99,38 +130,37 @@ public class SQLEncoderSDE extends SQLEncoder
      *
      * @throws RuntimeException DOCUMENT ME!
      */
-    public void visit(FidFilter filter)
-    {
+    public void visit(FidFilter filter) {
         long[] fids = getNumericFids(filter.getFids());
         int nFids = fids.length;
 
-        if (nFids == 0)
+        if (nFids == 0) {
             return;
+        }
 
         String fidField = sdeLayer.getSpatialColumn();
 
-        try
-        {
+        try {
             StringBuffer sb = new StringBuffer();
             sb.append(fidField + " IN(");
 
-            for (int i = 0; i < nFids; i++)
-            {
+            for (int i = 0; i < nFids; i++) {
                 sb.append(fids[i]);
 
-                if (i < nFids - 1)
+                if (i < (nFids - 1)) {
                     sb.append(", ");
+                }
             }
 
             sb.append(')');
 
-            if (LOGGER.isLoggable(Level.FINER))
+            if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("added fid filter: " + sb.toString());
+            }
 
+            System.err.println("QUERY: " + sb.toString());
             out.write(sb.toString());
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
@@ -143,19 +173,17 @@ public class SQLEncoderSDE extends SQLEncoder
      * @return DOCUMENT ME!
      *
      * @throws IllegalArgumentException DOCUMENT ME!
-     *
      */
     public static long[] getNumericFids(String[] stringFids)
-        throws IllegalArgumentException
-    {
-      int nfids = stringFids.length;
-      long[] fids = new long[nfids];
+        throws IllegalArgumentException {
+        int nfids = stringFids.length;
+        long[] fids = new long[nfids];
 
-      for (int i = 0; i < nfids; i++) {
-        fids[i] = getNumericFid(stringFids[i]);
-      }
+        for (int i = 0; i < nfids; i++) {
+            fids[i] = getNumericFid(stringFids[i]);
+        }
 
-      return fids;
+        return fids;
     }
 
     /**
@@ -167,20 +195,18 @@ public class SQLEncoderSDE extends SQLEncoder
      *
      * @return an ArcSDE feature ID
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IllegalArgumentException If the given string is not properly
+     *         formatted [anystring].[long value]
      */
     public static long getNumericFid(String fid)
-        throws IllegalArgumentException
-    {
-      int dotIndex = fid.lastIndexOf('.');
+        throws IllegalArgumentException {
+        int dotIndex = fid.lastIndexOf('.');
 
-      try {
-        return Long.decode(fid.substring(++dotIndex)).longValue();
-      }
-      catch (Exception ex) {
-        throw new IllegalArgumentException("FeatureID " + fid
-                                           +
-            " does not seems as a valid ArcSDE FID");
-      }
+        try {
+            return Long.decode(fid.substring(++dotIndex)).longValue();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("FeatureID " + fid
+                + " does not seems as a valid ArcSDE FID");
+        }
     }
 }

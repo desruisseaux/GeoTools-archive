@@ -1,17 +1,56 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.*;
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import org.geotools.filter.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.AbstractDataStore;
+import org.geotools.data.AttributeReader;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DefaultFeatureReader;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeLayer;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -32,13 +71,15 @@ import java.util.logging.Logger;
  * JDBCDataStore).
  * </p>
  *
- * @author Gabriel Rold?n
- * @version $Id: ArcSDEDataStore.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @author Gabriel Roldán
+ * @version $Id: ArcSDEDataStore.java,v 1.8 2004/06/28 10:24:32 jfear Exp $
  */
 public class ArcSDEDataStore extends AbstractDataStore {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getPackage()
                                                                                .getName());
+
+    /** DOCUMENT ME!  */
     private ArcSDEConnectionPool connectionPool;
 
     /** <code>Map&lt;typeName/FeatureType&gt;</code> of feature type schemas */
@@ -91,9 +132,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 featureTypesNames[i] = typeName;
             }
         } catch (SeException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new RuntimeException("Exception while fetching layer name: "
                 + ex.getMessage(), ex);
         } catch (DataSourceException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new RuntimeException("Exception while getting layers list: "
                 + ex.getMessage(), ex);
         }
@@ -110,7 +153,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
      *
      * @throws java.io.IOException DOCUMENT ME!
      */
-    public FeatureType getSchema(String typeName) throws java.io.IOException {
+    public synchronized FeatureType getSchema(String typeName)
+        throws java.io.IOException {
         FeatureType schema = (FeatureType) schemasCache.get(typeName);
 
         if (schema == null) {
@@ -119,6 +163,24 @@ public class ArcSDEDataStore extends AbstractDataStore {
         }
 
         return schema;
+    }
+
+    /**
+     *
+     */
+    public void createSchema(FeatureType featureType) throws IOException {
+        SeConnection connection = null;
+
+        // Create a new SeTable/SeLayer with the specified attributes....
+        try {
+            connection = connectionPool.getConnection();
+        } catch (DataSourceException dse) {
+            LOGGER.log(Level.WARNING, dse.getMessage(), dse);
+        } catch (UnavailableConnectionException uce) {
+            LOGGER.log(Level.WARNING, uce.getMessage(), uce);
+        } finally {
+            connectionPool.release(connection);
+        }
     }
 
     /**
@@ -183,15 +245,30 @@ public class ArcSDEDataStore extends AbstractDataStore {
                         }
                     };
         } catch (SchemaException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Types do not match: "
                 + ex.getMessage(), ex);
         } catch (Throwable t) {
+            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+
             if (sdeQuery != null) {
                 sdeQuery.close();
             }
+
+            throw new IOException(t.getMessage());
         }
 
         return reader;
+    }
+
+    /**
+     *
+     */
+    public FeatureReader getFeatureReader(Query query, Transaction transaction)
+        throws IOException {
+        String typeName = query.getTypeName();
+
+        return getFeatureReader(typeName, query);
     }
 
     /**
@@ -215,9 +292,15 @@ public class ArcSDEDataStore extends AbstractDataStore {
             FilterSet filters = ArcSDEAdapter.computeFilters(this, typeName,
                     filter);
 
-            return filters.getUnsupportedFilter();
+            Filter result = filters.getUnsupportedFilter();
+
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Unsupported filter: " + result.toString());
+            }
+
+            return result;
         } catch (IOException ex) {
-            LOGGER.warning(ex.getMessage());
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
         return filter;
@@ -236,7 +319,138 @@ public class ArcSDEDataStore extends AbstractDataStore {
         throws IOException {
         SeLayer layer = connectionPool.getSdeLayer(typeName);
 
-        return new ArcSDEFeatureWriter(this, layer);
+        return new ArcSDEFeatureWriter(this, null, layer);
+    }
+
+    /**
+     * Provides a writer that iterates over all of the features.
+     *
+     * @param typeName
+     * @param transaction
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public FeatureWriter getFeatureWriter(String typeName,
+        Transaction transaction) throws IOException {
+        FeatureWriter featureWriter = super.getFeatureWriter(typeName,
+                transaction);
+
+        return featureWriter;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param typeName
+     * @param filter
+     * @param transaction
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+        Transaction transaction) throws IOException {
+        FeatureType featureType = getSchema(typeName);
+        AttributeType[] attributes = featureType.getAttributeTypes();
+        String[] names = new String[attributes.length];
+
+        // Extract the attribute names for the query, we want them all...
+        for (int i = 0; i < names.length; i++) {
+            names[i] = attributes[i].getName();
+        }
+
+        DefaultQuery query = new DefaultQuery(typeName, filter, 100, names,
+                "handle");
+        ArrayList list = new ArrayList();
+
+        // We really don't need any transaction handling here, just keep it simple as
+        // we are going to exhaust this feature reader immediately.  Really, this could
+        // consume a great deal of memory based on the query.  
+        // PENDING Jake Fear: Optimize this operation, exhausting the reader in this
+        // case could be a cause of real trouble later on.  I need to think through 
+        // the consequences of all of this.  Really the feature writer should 
+        // delegate to a FeatureReader for the features that are queried.  That way
+        // we can stream all of these goodies instead of having big fat chunks...
+        //
+        // All that said, this works until I get everything else completed....
+        FeatureReader featureReader = getFeatureReader(query,
+                Transaction.AUTO_COMMIT);
+
+        while (featureReader.hasNext()) {
+            try {
+                list.add(featureReader.next());
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+
+                break;
+            }
+        }
+
+        // Well, this seems to come prepopulated with a state object, 
+        // but I can't seem to figure out why.  As such we check for
+        // and existing state, and check that states class as well. If
+        // it is a state we already provided (or at least of a workable
+        // type) then we will proceed with it.  Otherwise, we must remove
+        // the state and replace it with an appropriate transaction
+        // state object that we understand.  This should not present any
+        // danger as the default state could not possibly have come from
+        // us, and as such, no uncommitted changes could be lost.
+        // Jake Fear 6/25/2004
+        ArcTransactionState state = null;
+
+        synchronized (this) {
+            Transaction.State s = transaction.getState(this);
+
+            if (!(s instanceof ArcTransactionState)) {
+                if (s != null) {
+                    transaction.removeState(this);
+                }
+
+                state = new ArcTransactionState(this);
+                transaction.putState(this, state);
+            } else {
+                state = (ArcTransactionState) s;
+            }
+        }
+
+        SeLayer layer = connectionPool.getSdeLayer(typeName);
+        FeatureWriter writer = new ArcSDEFeatureWriter(this, state, layer, list);
+
+        return writer;
+    }
+
+    /**
+     * Provides a <code>FeatureWriter</code> in an appropriate state for
+     * immediately adding new <code>Feature</code> instances to  the specified
+     * layer.
+     *
+     * @param typeName
+     * @param transaction
+     *
+     * @return FeatureWriter whose hasNext() call will return false.
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public FeatureWriter getFeatureWriterAppend(String typeName,
+        Transaction transaction) throws IOException {
+        ArcTransactionState state = null;
+
+        synchronized (this) {
+            state = (ArcTransactionState) transaction.getState(this);
+
+            if (state == null) {
+                state = new ArcTransactionState(this);
+                transaction.putState(this, state);
+            }
+        }
+
+        SeLayer layer = connectionPool.getSdeLayer(typeName);
+        FeatureWriter writer = new ArcSDEFeatureWriter(this, state, layer);
+
+        return writer;
     }
 
     /**
@@ -321,7 +535,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
             System.out.println("BBOX=" + fs.getBounds());
             System.out.println("COUNT=" + fs.getCount(Query.ALL));
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
 
             return;
         }
@@ -354,16 +568,16 @@ public class ArcSDEDataStore extends AbstractDataStore {
             t = System.currentTimeMillis() - t;
             System.out.println(count + " features obtenidas en " + t + "ms");
         } catch (NoSuchElementException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } catch (IllegalAttributeException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } finally {
             try {
                 r.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             }
         }
     }

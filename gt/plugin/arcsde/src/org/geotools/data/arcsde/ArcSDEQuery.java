@@ -1,3 +1,19 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.arcsde;
 
 import java.io.IOException;
@@ -28,10 +44,10 @@ import com.vividsolutions.jts.geom.Envelope;
  * called.
  *
  * @author Gabriel Roldán
- * @version $Id: ArcSDEQuery.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @version $Id: ArcSDEQuery.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEQuery {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEQuery.class.getPackage()
                                                                            .getName());
 
@@ -181,6 +197,16 @@ public class ArcSDEQuery {
         return count;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param connection DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws SeException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
+     */
     private int countResults(SeConnection connection)
         throws SeException, DataSourceException {
         SeQuery countQuery = null;
@@ -262,6 +288,7 @@ public class ArcSDEQuery {
 
                 SeQueryInfo sdeQueryInfo = new SeQueryInfo();
                 sdeQueryInfo.setConstruct(sqlConstruct);
+
                 extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
             } catch (GeometryEncoderException ex) {
                 throw new DataSourceException(
@@ -379,10 +406,10 @@ public class ArcSDEQuery {
      * Sets state constraints for input and output stream operations. If a
      * differenct type is specified, then only features different in the way
      * supplied are returned.
-     *
+     * 
      * <p>
      * differencesType:
-     *
+     * 
      * <ul>
      * <li>
      * SeState.SE_STATE_DIFF_NOCHECK Returns all features in the source state.
@@ -434,7 +461,7 @@ public class ArcSDEQuery {
 
     /**
      * Sets a logfile for auto-logging.
-     *
+     * 
      * <p>
      * If The <code>logfileOnly</code> parameter is set to TRUE - results go to
      * the logfile only. The entire query will be processed at execute time
@@ -460,11 +487,11 @@ public class ArcSDEQuery {
 
     /**
      * Sets the row locking environment for a stream.
-     *
+     * 
      * <p>
      * The row locking environment remains in effect until the stream is closed
      * with reset TRUE or the stream is freed. The row lock types are:
-     *
+     * 
      * <ul>
      * <li>
      * SE_ROWLOCKING_LOCK_ON_QUERY - Rows selected by a query are locked.

@@ -21,17 +21,15 @@ package org.geotools.data.arcsde;
  * <code>Geometryy</code> from a <code>SeShape</code> or viceversa
  *
  * @author Gabriel Roldán
- * @version $Id: GeometryBuildingException.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @version $Id: GeometryBuildingException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
-public class GeometryBuildingException extends Exception
-{
+public class GeometryBuildingException extends Exception {
     /**
      * Creates a new GeometryBuildingException object.
      *
      * @param msg DOCUMENT ME!
      */
-    public GeometryBuildingException(String msg)
-    {
+    public GeometryBuildingException(String msg) {
         this(msg, null);
     }
 
@@ -41,8 +39,7 @@ public class GeometryBuildingException extends Exception
      * @param msg DOCUMENT ME!
      * @param cause DOCUMENT ME!
      */
-    public GeometryBuildingException(String msg, Throwable cause)
-    {
+    public GeometryBuildingException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

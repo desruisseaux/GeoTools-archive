@@ -21,17 +21,15 @@ package org.geotools.filter;
  * the GeometryEncoderSDE being used.
  *
  * @author Gabriel Roldán
- * @version $Id: GeometryEncoderException.java,v 1.3 2003/11/14 17:21:05 groldan Exp $
+ * @version $Id: GeometryEncoderException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
-public class GeometryEncoderException extends Exception
-{
+public class GeometryEncoderException extends Exception {
     /**
      * Creates a new GeometryEncoderException object.
      *
      * @param msg DOCUMENT ME!
      */
-    public GeometryEncoderException(String msg)
-    {
+    public GeometryEncoderException(String msg) {
         this(msg, null);
     }
 
@@ -41,8 +39,7 @@ public class GeometryEncoderException extends Exception
      * @param msg DOCUMENT ME!
      * @param cause DOCUMENT ME!
      */
-    public GeometryEncoderException(String msg, Throwable cause)
-    {
+    public GeometryEncoderException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -32,7 +28,7 @@ import java.util.Map;
  * connection properties
  *
  * @author Gabriel Rold?n
- * @version $Id: ConnectionConfig.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
+ * @version $Id: ConnectionConfig.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ConnectionConfig {
     /**
@@ -66,16 +62,16 @@ public class ConnectionConfig {
     /** ArcSDE database user password parameter name */
     public static final String PASSWORD_PARAM = "password";
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static final String MIN_CONNECTIONS_PARAM = "pool.minConnections";
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static final String MAX_CONNECTIONS_PARAM = "pool.maxConnections";
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static final String CONNECTIONS_INCREMENT_PARAM = "pool.increment";
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     public static final String CONNECTION_TIMEOUT_PARAM = "pool.timeOut";
 
     /**
@@ -102,16 +98,16 @@ public class ConnectionConfig {
     /** database user password */
     String userPassword;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     Integer minConnections = null;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     Integer maxConnections = null;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     Integer connTimeOut = null;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     Integer increment = null;
 
     /**
@@ -155,6 +151,14 @@ public class ConnectionConfig {
         init(params);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param params DOCUMENT ME!
+     *
+     * @throws NumberFormatException DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
     private void init(Map params)
         throws NumberFormatException, IllegalArgumentException {
         String dbtype = (String) params.get(DBTYPE_PARAM);
@@ -172,6 +176,13 @@ public class ConnectionConfig {
         setUpOptionalParams(params);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param params DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
     private void setUpOptionalParams(Map params)
         throws IllegalArgumentException {
         String exceptionMsg = null;
