@@ -149,7 +149,6 @@ public class DbaseFileWriter  {
           o = formatter.getFieldString(
             fieldLen, 0, (Number) (obj == null ? NULL_NUMBER : obj)
           );
-            
           break;
         }
       case 'F':

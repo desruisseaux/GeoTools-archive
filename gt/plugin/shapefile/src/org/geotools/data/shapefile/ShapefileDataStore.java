@@ -326,28 +326,42 @@ public class ShapefileDataStore extends AbstractDataStore {
         ShapefileReader shp = openShapeReader();
         DbaseFileReader dbf = openDbfReader();
         
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType(
-        "the_geom",
-        JTSUtilities.findBestGeometryClass(shp.getHeader().getShapeType())
-        );
+        try {
         
-        AttributeType[] atts;
-        
-        // take care of the case where no dbf and query wants all => geometry only
-        if (dbf != null) {
-            DbaseFileHeader header = dbf.getHeader();
-            atts = new AttributeType[header.getNumFields() + 1];
-            atts[0] = geometryAttribute;
-            
-            for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
-                Class clazz = header.getFieldClass(i);
-                atts[i + 1] = AttributeTypeFactory.newAttributeType(header.getFieldName(i), clazz, true, header.getFieldLength(i));
+            AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType(
+            "the_geom",
+            JTSUtilities.findBestGeometryClass(shp.getHeader().getShapeType())
+            );
+
+            AttributeType[] atts;
+
+            // take care of the case where no dbf and query wants all => geometry only
+            if (dbf != null) {
+                DbaseFileHeader header = dbf.getHeader();
+                atts = new AttributeType[header.getNumFields() + 1];
+                atts[0] = geometryAttribute;
+
+                for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
+                    Class clazz = header.getFieldClass(i);
+                    atts[i + 1] = AttributeTypeFactory.newAttributeType(header.getFieldName(i), clazz, true, header.getFieldLength(i));
+
+                }
+            } else {
+                atts = new AttributeType[] {geometryAttribute};
+            }
+            return atts;
+        } finally {
+            try {
+                shp.close();
+            } catch (IOException ioe) {
                 
             }
-        } else {
-            atts = new AttributeType[] {geometryAttribute};
+            try {
+                dbf.close();
+            } catch (IOException ioe) {
+                
+            }
         }
-        return atts;
     }
     
     /** Set the FeatureType of this DataStore. This method will delete any existing
@@ -549,7 +563,9 @@ public class ShapefileDataStore extends AbstractDataStore {
                 
                 // @todo respect field length
                 if((colType == Integer.class) || (colType == Short.class) || (colType == Byte.class)) {
-                    header.addColumn(colName, 'N', Math.min(fieldLen,16), 0);
+                    header.addColumn(colName, 'N', Math.min(fieldLen,10), 0);
+                } else if (colType == Long.class) {
+                    header.addColumn(colName, 'N', Math.min(fieldLen,19), 0);
                 } else if((colType == Double.class) || (colType == Float.class) || colType == Number.class) {
                     int l = Math.min(fieldLen,33);
                     header.addColumn(colName, 'N', l, l / 2);
@@ -783,9 +799,10 @@ public class ShapefileDataStore extends AbstractDataStore {
      */
     private Envelope getBounds() throws DataSourceException {
     	// This is way quick!!!
+        ReadableByteChannel in = null;
     	try {
-    		ByteBuffer buffer = ByteBuffer.allocateDirect(100);
-    		ReadableByteChannel in = getReadChannel(shpURL);
+    		ByteBuffer buffer = ByteBuffer.allocate(100);
+    		in = getReadChannel(shpURL);
     		in.read(buffer);
     		buffer.flip();
     		ShapefileHeader header = new ShapefileHeader();
@@ -794,7 +811,14 @@ public class ShapefileDataStore extends AbstractDataStore {
     	} catch (IOException ioe) {
     		// What now? This seems arbitrarily appropriate !
     		throw new DataSourceException("Problem getting Bbox",ioe);
-    	}
+    	} finally {
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException ioe) {
+                
+            }
+        }
     }
     
     protected Envelope getBounds(Query query) throws IOException {

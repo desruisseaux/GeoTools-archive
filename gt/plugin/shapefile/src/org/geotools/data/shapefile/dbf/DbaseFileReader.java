@@ -402,11 +402,20 @@ public class DbaseFileReader {
             }
             // else will fall through to the floating point number
           } catch (NumberFormatException e) {
+              
             // todo: use progresslistener, this isn't a grave error.
 
             // don't do this!!! the Double parse will be attemted as we fall
             // through, so no need to create a new Object. -IanS
             //object = new Integer(0);
+              
+            // Lets try parsing a long instead...
+            try {
+                object = new Long(numberParser.parseLong(charBuffer,fieldOffset,fieldOffset + fieldLen - 1));
+                break;
+            } catch (NumberFormatException e2) {
+                
+            }
           }
           
         case 'f':
