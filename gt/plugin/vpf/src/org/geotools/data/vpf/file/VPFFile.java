@@ -44,6 +44,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.AnnotationFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
@@ -144,7 +145,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         Vector superTypes = new Vector();
         // if it's a text geometry feature type add annotation as a super type
         if (pathName.endsWith(TEXT_PRIMITIVE)) {
-            superTypes.add( org.geotools.data.vpf.AnnotationFeatureType.ANNOTATION );
+            superTypes.add( AnnotationFeatureType.ANNOTATION );
         }
           
         featureType = new DefaultFeatureType(cPathName, "VPF", columns,
