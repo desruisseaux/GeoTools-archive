@@ -40,7 +40,6 @@ import java.util.Locale;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.units.Unit;
 
-import org.geotools.cv.CategoryTest;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.UnformattableObjectException;
@@ -54,6 +53,8 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+import com.thaiopensource.datatype.xsd.regex.test.CategoryTest;
 
 
 /**
