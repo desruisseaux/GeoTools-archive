@@ -1,9 +1,11 @@
-//
 // Test coordinate transformations for simple cases.
-// This is not the test provided by OpenGIS. This is
-// a set of simplier tests  focusing on one Geotools
-// class at time, which make debugging easier.
 //
+// The following test tranforms between different datums, using toWGS84 parameters,
+// to track down potential failures in the full test suite. Source to Target points 
+// were calculated with Arc/Info 8.2 using user defined datums shift parameters.
+//
+// Rueben Schulz - February 2003
+// 
 //
 // --------------------------------------------------------------------------
 // How to run this script:
@@ -14,14 +16,14 @@
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
 // than the value specified in the last "test tolerance" statement, then a failure is reported.
+// Inverse transforms are tested if java assertions are enabled.
 // If some test fails, "print" statements can be added in this script for debugging purpose:
 //
 //    print crs            (prints the source and target CRS, and the transform between them)
 //    print pts            (prints the source and target points, and their transformed points)
 
 
-
-// Coordinate systems
+// Coordinate reference systems
 set _WGS84_=GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
 set _EPSG:4210_=GEOGCS["Arc 1960",DATUM["Arc_1960",SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,AUTHORITY["EPSG","7012"]],TOWGS84[-160,-6,-302,0,0,0,0],AUTHORITY["EPSG","6210"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["DMSH",0.0174532925199433,AUTHORITY["EPSG","9108"]],AXIS["Lat",NORTH],AXIS["Long",EAST],AUTHORITY["EPSG","4210"]]
 set _Nad27_=GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.978698213901,AUTHORITY["EPSG","7008"]],TOWGS84[-3,142,183,0,0,0,0],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["DMSH",0.0174532925199433,AUTHORITY["EPSG","9108"]],AXIS["Lat",NORTH],AXIS["Long",EAST],AUTHORITY["EPSG","4267"]]
@@ -29,13 +31,6 @@ set _Osgb36_=GEOGCS["OSGB 1936",DATUM["OSGB_1936",SPHEROID["Airy 1830",6377563.3
 set _Osgb36rad_=GEOGCS["OSGB 1936 rad",DATUM["OSGB_1936",SPHEROID["Airy 1830",6377563.396,299.3249646,AUTHORITY["EPSG","7001"]],TOWGS84[375,-111,431,0,0,0,0],AUTHORITY["EPSG","6277"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["Radians",1.0],AXIS["Lat",NORTH],AXIS["Long",EAST],AUTHORITY["EPSG","4277"]]
 set _NtfParis_=GEOGCS["NTF (Paris)",DATUM["Nouvelle_Triangulation_Francaise",SPHEROID["Clarke 1880 (IGN)",6378249.2,293.466021293627,AUTHORITY["EPSG","7011"]],TOWGS84[-168,-60,320,0,0,0,0],AUTHORITY["EPSG","6275"]],PRIMEM["Paris",2.5969213,AUTHORITY["EPSG","8903"]],UNIT["grad",0.015707963267949,AUTHORITY["EPSG","9105"]],AXIS["Lat",NORTH],AXIS["Long",EAST],AUTHORITY["EPSG","4807"]]
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// More transforms (RS Feb 2003)
-// the following test tranforms between different datums (and a few other things) 
-// to track down potential failures in the full test suite. Source to Target points 
-// were calculated with arc/info using user defined datums shift parameters.
-// all coords are in decimal degrees unless stated otherwise
 
 /////////////////Nairobi Test//////////////////
 //lat, long

@@ -1,7 +1,10 @@
-// AbridgedMolodenskyTransformation tests
-// the following test points are outside of the valid regions for these datums
+// Test points for the AbridgedMolodensky Transformation
+//
 // Calculations were done with ArcGIS 8.3, calculations for Z were done
 // with a spreadsheet (OO.o)
+// Note: The following test points are outside of the valid regions for 
+//       these datum transformations.
+// Note: We are not testing inverse transforms yet (not implemented, see GEOT-410)
 //
 // Rueben Schulz - May 29, 2004
 //

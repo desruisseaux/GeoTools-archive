@@ -1,5 +1,6 @@
 // Parameterized math transform tests to test some map projections
-// These replace the hard coded tests in org.geotools.ct.ProjectionTest
+// These replace the hard coded tests in 
+// org.geotools.referencing.operation.transform.ProjectionTest
 //
 // Rueben Schulz - May 27, 2004
 //

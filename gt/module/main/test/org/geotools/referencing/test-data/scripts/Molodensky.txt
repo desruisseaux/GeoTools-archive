@@ -1,7 +1,10 @@
-// MolodenskyTransformation tests
-// the following test points are outside of the valid regions for these datums
-// Calculations were done with ArcGIS 8.3, calculations for 3d points were done
+// Test points for the Molodensky Transformation
+//
+// Calculations were done with ArcGIS 8.3, calculations for Z were done
 // with a spreadsheet (OO.o)
+// Note: The following test points are outside of the valid regions for 
+//       these datum transformations.
+// Note: We are not testing inverse transforms yet (not implemented, see GEOT-410)
 //
 // Rueben Schulz - June 11, 2004
 //
