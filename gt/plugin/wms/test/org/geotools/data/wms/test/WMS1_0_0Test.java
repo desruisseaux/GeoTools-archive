@@ -14,12 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on Aug 25, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package org.geotools.data.wms.test;
 
 import java.io.BufferedReader;

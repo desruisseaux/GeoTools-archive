@@ -19,6 +19,7 @@ package org.geotools.data.wms.request;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -118,7 +119,13 @@ public class AbstractRequest implements Request{
         while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
             
-            String param = entry.getKey() + "=" + entry.getValue();
+            String value = null;
+            try {
+                value = URLEncoder.encode((String) entry.getValue(), "UTF-8");
+            } catch (UnsupportedEncodingException e1) {
+                value = (String) entry.getValue();
+            }
+            String param = entry.getKey() + "=" + value;
 
             if (iter.hasNext()) {
                 param = param.concat("&"); //$NON-NLS-1$
@@ -126,15 +133,6 @@ public class AbstractRequest implements Request{
 
             url = url.concat(param);
         }
-
-        try {
-//        	System.out.println(url);
-			url = URLEncoder2.encode(url, "UTF-16");
-//			System.out.println(url);
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
         try {
             return new URL(url);
