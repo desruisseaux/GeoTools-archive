@@ -19,6 +19,7 @@ package org.geotools.data;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,6 +51,9 @@ public class DefaultQuery implements Query {
     /** The typeName to get */
     private String typeName;
 
+    /** The namespace to get */
+    private URI namespace;
+    
     /** The handle associated with this query. */
     private String handle;
 
@@ -264,43 +268,22 @@ public class DefaultQuery implements Query {
      * to be queried.
      * 
      * <p>
-     * All our datasources now assume one feature type per datasource, but it
-     * doesn't seem like we should constrain ourselves to that.  This field
-     * will allow us to create a postgis datasource that can make use of the
-     * whole db, specifying with each request which type to get.
-     * </p>
-     * 
-     * <p>
-     * Geotools currently limits datasources to a one to one relationship
-     * between featureType and datasource, so datasources can ignore this
-     * field of the query for now.
-     * </p>
-     *
-     * <p>
-     * Update for DataStore
-     * </p>
-     * <p>
      * The DataStore API does not assume one feature type per datastore.
      * It currently makes use of this field to to specify with each request
      * what type to get.
      * </p>
      * @return the name of the feature type to be returned with this query.
-     *
-     * @task REVISIT: the transaction methods do not work with different
-     *       typenames, so that will have to be resolved before typenames are
-     *       used. Perhaps a MultiType interface?  We will also need to
-     *       rethink the  getSchema, and probably schemas in general, as they
-     *       could be more than one FeatureType in datasources that support
-     *       multiple types.  If users wish to use more than one type in a
-     *       datasource whose backend naturally supports multiple types (like
-     *       postgis) they should just construct a datasource for each type,
-     *       generally on different connections so as to avoid
-     *       getFeature/multi-transaction confusion.
      */
     public String getTypeName() {
         return this.typeName;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.Query#getNamespace()
+     */
+    public URI getNamespace() {
+        return namespace;
+    }
     /**
      * Sets the typename.
      *

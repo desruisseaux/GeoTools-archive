@@ -18,6 +18,8 @@ package org.geotools.data.jdbc;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -1201,11 +1203,16 @@ public abstract class JDBCDataStore implements DataStore {
 
     /**
      * Gets the namespace of the data store.
-     *
+     * TODO: change config over to use URI
      * @return The namespace.
      */
-    public String getNameSpace() {
-        return config.getNamespace();
+    public URI getNameSpace() {
+        try {
+            return new URI( config.getNamespace() );
+        } catch (URISyntaxException e) {
+            LOGGER.warning( "Could not use namespace "+config.getNamespace()+" - "+e.getMessage() );
+            return null;
+        }
     }
 
     /**

@@ -284,11 +284,17 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
     // in order to support CS reprojection and override
     public FeatureSource getView(final Query query)
         throws IOException, SchemaException {
-        String typeName = query.getTypeName();
+        return null;
+    }
+        /*String typeName = query.getTypeName();
         FeatureType origionalType = getSchema( typeName );
-        //CoordinateSystem cs = query.getCoordinateSystem();
-        //final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs );
-        final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames() );
+        CoordinateSystem forceCs = (CoordinateSystem) query.getCoordianteSystem();
+        CoordinateSystem targetCs = (CoordinateSystem) query.getCoordianteSystemReproject();
+        CoordinateSystem cs = targetCs != null ? targetCs : forceCs;
+        
+        FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs );
+        
+        //final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames() );        
 
         return new AbstractFeatureSource() {
             public DataStore getDataStore() {
@@ -306,8 +312,12 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
             public FeatureType getSchema() {
                 return featureType;
             }
+            public FeatureResults getFeatures(Query query) {
+                // TODO Auto-generated method stub
+                return super.getFeatures(query);
+            }
         };
-    }
+    }*/
 
     /**
      * Default implementation based on getFeatureReader and getFeatureWriter.

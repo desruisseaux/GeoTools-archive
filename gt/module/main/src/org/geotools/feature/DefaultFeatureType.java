@@ -16,8 +16,12 @@
  */
 package org.geotools.feature;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.geotools.xml.gml.GMLSchema;
 
 /**
  * A basic implementation of FeatureType.
@@ -30,7 +34,7 @@ public class DefaultFeatureType implements FeatureType {
     private final String typeName;
 
     /** The namespace to uniquely identify this FeatureType. */
-    private final String namespace;
+    private final URI namespace;
 
     /** The array of types that this FeatureType can have as attributes. */
     private final AttributeType[] types;
@@ -54,6 +58,18 @@ public class DefaultFeatureType implements FeatureType {
     /** attname:string -> position:int */
     private final java.util.Map attLookup;
     
+    private final static URI toURI( String namespace ) throws SchemaException {
+        try {
+            return new URI( namespace );
+        } catch (URISyntaxException badNamespace ) {
+           throw new SchemaException( badNamespace );
+        }
+    }
+    public DefaultFeatureType(String typeName, String namespace,
+            Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
+            throws SchemaException, NullPointerException {
+        this( typeName, toURI(namespace ), types, superTypes, defaultGeom );
+    }
     /**
      * Constructs a new DefaultFeatureType.
      *
@@ -66,7 +82,7 @@ public class DefaultFeatureType implements FeatureType {
      * @throws SchemaException For problems making the FeatureType.
      * @throws NullPointerException If typeName is null.
      */
-    public DefaultFeatureType(String typeName, String namespace,
+    public DefaultFeatureType(String typeName, URI namespace,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws SchemaException, NullPointerException {
         if (typeName == null) {
@@ -74,7 +90,7 @@ public class DefaultFeatureType implements FeatureType {
         }
 
         this.typeName = typeName;
-        this.namespace = (namespace == null) ? "" : namespace;
+        this.namespace = namespace == null ? toURI(GMLSchema.NAMESPACE) : namespace;
         this.types = (AttributeType[]) types.toArray(new AttributeType[types
                 .size()]);
         this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
@@ -94,10 +110,16 @@ public class DefaultFeatureType implements FeatureType {
     
     /**
      * Builds an empty feature type, useful for testing
+     * @throws SchemaException
      */
     private DefaultFeatureType() {
         this.typeName = "emtpyFeatureType";
-        this.namespace = "";
+        URI namespace = null;
+        try {
+            namespace = toURI( GMLSchema.NAMESPACE );
+        } catch (SchemaException e) {            
+        }
+        this.namespace = namespace;
         this.types = new AttributeType[0];
         this.ancestors = new FeatureType[0];
         this.defaultGeomIdx = -1;
@@ -232,7 +254,7 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @return Namespace of schema.
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return namespace;
     }
 
@@ -382,20 +404,19 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @task HACK: if nsURI is null only typeName is tested.
      */
-    public boolean isDescendedFrom(String nsURI, String typeName) {
+    public boolean isDescendedFrom(URI nsURI, String typeName) {
         for (int i = 0, ii = ancestors.length; i < ii; i++) {
             if (((nsURI == null)
-                    || ancestors[i].getNamespace().equalsIgnoreCase(nsURI))
-                    && ancestors[i].getTypeName().equalsIgnoreCase(typeName)) {
+                    || ancestors[i].getNamespace().equals(nsURI))
+                    && ancestors[i].getTypeName().equals(typeName)) {
                 return true;
             }
-        }
-
+        }        
         return false;
     }
 
     static final class Abstract extends DefaultFeatureType {
-        public Abstract(String typeName, String namespace, Collection types,
+        public Abstract(String typeName, URI namespace, Collection types,
             Collection superTypes, GeometryAttributeType defaultGeom)
             throws SchemaException {
             super(typeName, namespace, types, superTypes, defaultGeom);

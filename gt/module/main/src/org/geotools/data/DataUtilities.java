@@ -55,6 +55,8 @@ import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -794,13 +796,22 @@ public class DataUtilities {
      * @throws SchemaException
      */
     public static FeatureType createSubType(FeatureType featureType,
-        String[] properties, CoordinateSystem override)
+            String[] properties, CoordinateSystem override)
+            throws SchemaException {
+        return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespace() );
+    }
+
+    public static FeatureType createSubType(FeatureType featureType,
+        String[] properties, CoordinateSystem override, String typeName, URI namespace )
         throws SchemaException {
+        
         if ((properties == null) && (override == null)) {
             return featureType;
         }
 
-        boolean same = featureType.getAttributeCount() == properties.length;
+        boolean same = featureType.getAttributeCount() == properties.length &&
+            featureType.getTypeName().equals( typeName ) &&
+            featureType.getNamespace().equals( namespace );
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
             AttributeType type = featureType.getAttributeType(i);
@@ -826,8 +837,10 @@ public class DataUtilities {
             }
         }
 
-        return FeatureTypeFactory.newFeatureType(types,
-            featureType.getTypeName(), featureType.getNamespace());
+        if( typeName == null ) typeName = featureType.getTypeName();
+        if( namespace == null ) namespace = featureType.getNamespace();
+        
+        return FeatureTypeFactory.newFeatureType(types, typeName, namespace);
     }
 
     /**
@@ -902,7 +915,11 @@ public class DataUtilities {
                                         : identification.substring(split + 1);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(typeName);
-        typeFactory.setNamespace(namespace);
+        try {
+            typeFactory.setNamespace( new URI(namespace));
+        } catch (URISyntaxException badNamespace ) {
+            throw new SchemaException( badNamespace );            
+        }
         typeFactory.setName(typeName);
 
         String[] types = typeSpec.split(",");

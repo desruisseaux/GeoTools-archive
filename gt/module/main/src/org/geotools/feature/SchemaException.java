@@ -32,6 +32,14 @@ public class SchemaException extends Exception {
 //    }
 
     /**
+     * SchemeException with cause.
+     *
+     * @param cause Cause of SchemaException
+     */
+    public SchemaException( Throwable cause ) {
+        super( cause);
+    }  
+    /**
      * Constructor with message argument.
      *
      * @param message Reason for the exception being thrown
@@ -39,4 +47,13 @@ public class SchemaException extends Exception {
     public SchemaException(String message) {
         super(message);
     }
+    /**
+     * Constructor with message argument and cause.
+     *
+     * @param message Reason for the exception being thrown
+     * @param cause Cause of SchemaException
+     */
+    public SchemaException(String message, Throwable cause ) {
+        super(message, cause );
+    }    
 }

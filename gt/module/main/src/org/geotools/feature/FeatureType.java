@@ -16,6 +16,8 @@
  */
 package org.geotools.feature;
 
+import java.net.URI;
+
 /**
  * <p>
  * A metadata template for a feature of arbitrary complexity.  Note that this
@@ -162,18 +164,19 @@ public interface FeatureType extends FeatureFactory {
      * Gets the global schema namespace.
      * <p>
      * This is often used to record the schema prefix (not the URI) required
-     * when writing out this Feature using GML. The supportin application
+     * when writing out this Feature using GML. The supporting application
      * will need to be able to start the GMLWriter off with the correct URI
      * information so everything makes sense.
      * </p>
      * <p>
-     * The Catalog interface provided by the data module provides an example
+     * The Registry interface provided by the data module provides an example
      * of how to store associate FeatureType and namespace information. Please
      * note that you may not have duplicate typeNames in the same Namespace.
      * </p>
      * @return Namespace of schema (usually namespace prefix)
+     * @TODO Change to use real URI rather than string
      */
-    String getNamespace();
+    URI getNamespace();
 
     /**
      * Put this functionality in the factory, produce only  immutable
@@ -189,7 +192,9 @@ public interface FeatureType extends FeatureFactory {
 
     /**
      * Gets the type name for this schema.
-     *
+     * <p>
+     * In GML this must element name of the Feature.
+     * </p>
      * @return Namespace of schema.
      */
     String getTypeName();
@@ -260,14 +265,16 @@ public interface FeatureType extends FeatureFactory {
      */
     AttributeType getAttributeType(int position);
     
-    /** Test to determine whether this FeatureType is descended from the given
+    /**
+     * Test to determine whether this FeatureType is descended from the given
      * FeatureType. Think of this relationship likes the "extends" relationship in
      * java.
+     * 
      * @param nsURI The namespace URI to use.
      * @param typeName The typeName.
      * @return true if descendant, false otherwise.
      */    
-    boolean isDescendedFrom(String nsURI, String typeName);
+    boolean isDescendedFrom(URI nsURI, String typeName);
     
     /** A convenience method for calling<br>
      * <code><pre>

@@ -19,6 +19,8 @@ package org.geotools.feature;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
+
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,7 +72,7 @@ public abstract class FeatureTypeFactory implements Factory {
     private String name;
 
     /** The namespace to give the FeatureType to be created. */
-    private String namespace;
+    private URI namespace;
 
     /** If something in the factory has changed. */
     private boolean dirty = true;
@@ -149,7 +151,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
-        String name, String ns, boolean isAbstract, FeatureType[] superTypes) 
+        String name, URI ns, boolean isAbstract, FeatureType[] superTypes) 
         throws FactoryConfigurationError, SchemaException { 
             return newFeatureType(types, name, ns, isAbstract, superTypes, null);
     }
@@ -173,7 +175,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
-        String name, String ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
+        String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
         throws FactoryConfigurationError, SchemaException {
         FeatureTypeFactory factory = newInstance(name);
         factory.addTypes(types);
@@ -208,7 +210,7 @@ public abstract class FeatureTypeFactory implements Factory {
          *         some way.
          */
         public static FeatureType newFeatureType(AttributeType[] types,
-            String name, String ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
+            String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
             throws FactoryConfigurationError, SchemaException {
             FeatureTypeFactory factory = newInstance(name);
             factory.addTypes(types);
@@ -243,7 +245,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
-        String name, String ns, boolean isAbstract)
+        String name, URI ns, boolean isAbstract)
         throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types, name, ns, isAbstract, null);
     }
@@ -264,7 +266,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
-        String name, String ns)
+        String name, URI ns)
         throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types, name, ns, false);
     }
@@ -406,7 +408,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *
      * @param namespace The new namespace. May be null.
      */
-    public void setNamespace(String namespace) {
+    public void setNamespace(URI namespace) {
         dirty |= isDifferent(namespace, this.namespace);
         this.namespace = namespace;
     }
@@ -416,7 +418,7 @@ public abstract class FeatureTypeFactory implements Factory {
      *
      * @return The current namespace. May be null.
      */
-    public final String getNamespace() {
+    public final URI getNamespace() {
         return namespace;
     }
 
@@ -450,7 +452,17 @@ public abstract class FeatureTypeFactory implements Factory {
 
         return s1 != s2;
     }
+    private boolean isDifferent(URI u1, URI u2) {
+        if (u1 != null) {
+            return !u1.equals(u2);
+        }
 
+        if (u2 != null) {
+            return !u2.equals(u1);
+        }
+
+        return u1 != u2;
+    }
     /**
      * Remove all the AttributeTypes in this factory.
      */
@@ -761,7 +773,7 @@ public abstract class FeatureTypeFactory implements Factory {
 
             try {
                 builtInTypes.add(newFeatureType(null, "Feature",
-                        "http://www.opengis.net/gml", true));
+                        new URI("http://www.opengis.net/gml"), true));
                 initialized = true;
             } catch (Exception e) {
                 throw new RuntimeException(e);
