@@ -172,9 +172,10 @@ public class TransverseMercator extends MapProjection {
     private static final double TOL = 1E-11;
 
     /**
-     * The {@link MathTransformProvider} for a {@link TransverseMercator} projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link TransverseMercator} projection.
      * 
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -234,7 +235,7 @@ public class TransverseMercator extends MapProjection {
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  The expected parameter descriptors.
+     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     public TransverseMercator(final ParameterValueGroup parameters, final Collection expected) {

@@ -186,11 +186,13 @@ public abstract class AbstractParser extends Format {
         String line = null;
         try {
             while ((line=in.readLine()) != null) {
-                out.write(lineSeparator);
-                out.write(format(parseObject(line)));
-                out.write(lineSeparator);
-                out.write(lineSeparator);
-                out.flush();
+                if ((line=line.trim()).length() != 0) {
+                    out.write(lineSeparator);
+                    out.write(format(parseObject(line)));
+                    out.write(lineSeparator);
+                    out.write(lineSeparator);
+                    out.flush();
+                }
             }
         } catch (ParseException exception) {
             err.println(exception.getLocalizedMessage());

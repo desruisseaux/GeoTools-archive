@@ -39,11 +39,13 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -63,6 +65,31 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -175151161496419854L;
+
+    /**
+     * A lock for avoiding never-ending recursivity in the <CODE>equals</CODE>
+     * method. This lock is necessary because <CODE>GeneralDerivedCRS</CODE>
+     * objects contain a {@link #conversionFromBase} field, which contains a
+     * {@link org.geotools.referencing.operation.Conversion#targetCRS} field
+     * set to this <CODE>GeneralDerivedCRS</CODE> object.
+     *
+     * <P>This field can be though as a <CODE>boolean</CODE> flag set to <CODE>true</CODE>
+     * when a comparaison is in progress. A null value means <CODE>false</CODE>, and a non-null
+     * value means <CODE>true</CODE>. The non-null value is used for assertion.</P>
+     *
+     * <P>When an <CODE>equals</CODE> method is invoked, this <CODE>\u00A4COMPARING</CODE>
+     * field is set to the originator (either the <CODE>GeneralDerivedCRS</CODE> or the
+     * {@link org.geotools.referencing.operation.CoordinateOperation} object where the
+     * comparaison begin).</P>
+     *
+     * <P><STRONG>DO NOT USE THIS FIELD. It is strictly for internal use by {@link #equals} and
+     * {@link org.geotools.referencing.operation.CoordinateOperation#equals} methods.</STRONG></P>
+     *
+     * @todo Hide this field from the javadoc. It is not possible to make it package-privated
+     *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
+     *       a different package.
+     */
+    public static IdentifiedObject \u00A4COMPARING;
 
     /**
      * The base coordinate reference system.
@@ -171,31 +198,35 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
              * inferred from the MathTransform. This work for Geotools implementation,
              * but is likely to fails to infer parameters for other implementations.
              */
+            Identifier classification = null;
             ParameterDescriptorGroup descriptors = null;
             if (baseToDerived instanceof AbstractMathTransform) {
+                // TODO: define a 'getParameterDescriptors' method in AbstractMathTransform
+                //       instead. Note that MapProjection already has such a method.
                 final ParameterValueGroup values =
                         ((AbstractMathTransform) baseToDerived).getParameterValues();
                 if (values != null) {
                     // TODO: remove cast once we will be allowed to use J2SE 1.5.
                     descriptors = (ParameterDescriptorGroup) values.getDescriptor();
+                    classification = descriptors.getName();
                 }
             }
             method = new org.geotools.referencing.operation.OperationMethod(
-                         /* properties       */ new UnprefixedMap(properties, "method."),
-                         /* sourceDimensions */ dimSource,
-                         /* targetDimensions */ dimTarget,
-                         /* parameters       */ descriptors);
+                    /* properties       */ new UnprefixedMap(classification, properties, "method."),
+                    /* sourceDimensions */ dimSource,
+                    /* targetDimensions */ dimTarget,
+                    /* parameters       */ descriptors);
         }
         /*
          * Constructs the conversion from all the information above. The ProjectedCRS subclass
          * will overrides the createConversion method in order to create a projection instead.
          */
         this.conversionFromBase = createConversion(
-                                  /* properties */ new UnprefixedMap(properties, "conversion."),
-                                  /* sourceCRS  */ base,
-                                  /* targetCRS  */ this,
-                                  /* transform  */ baseToDerived,
-                                  /* method     */ method);
+                /* properties */ new UnprefixedMap(null, properties, "conversion."),
+                /* sourceCRS  */ base,
+                /* targetCRS  */ this,
+                /* transform  */ baseToDerived,
+                /* method     */ method);
     }
 
     /**
@@ -258,14 +289,23 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
             final GeneralDerivedCRS that = (GeneralDerivedCRS) object;
             if (equals(this.baseCRS, that.baseCRS, compareMetadata)) {
                 /*
-                 * Avoid never-ending loop: Conversion has a 'sourceCRS' field (in the
-                 * CoordinateOperation super-class) that is set to this GeneralDerivedCRS.
-                 *
-                 * TODO
+                 * Avoid never-ending recursivity: Conversion has a 'targetCRS' field (inherited
+                 * from the CoordinateOperation super-class) that is set to this GeneralDerivedCRS.
                  */
-                return equals(this.conversionFromBase,
-                              that.conversionFromBase,
-                              compareMetadata);
+                synchronized (GeneralDerivedCRS.class) {
+                    if (\u00A4COMPARING != null) {
+                        assert \u00A4COMPARING == conversionFromBase;
+                        return true;
+                    }
+                    try {
+                        \u00A4COMPARING = this;
+                        return equals(this.conversionFromBase,
+                                      that.conversionFromBase,
+                                      compareMetadata);
+                    } finally {
+                        \u00A4COMPARING = null;
+                    }
+                }
             }
         }
         return false;

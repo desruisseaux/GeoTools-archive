@@ -149,15 +149,17 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
      */
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
-        final Unit oldUnit = formatter.getContextualUnit();
+        final Unit linearUnit  = formatter.getLinearUnit();
+        final Unit angularUnit = formatter.getAngularUnit();
+        formatter.setLinearUnit(unit);
+        formatter.setAngularUnit(org.geotools.referencing.crs.GeographicCRS.
+                                 getAngularUnit(baseCRS.getCoordinateSystem()));
         formatter.append(baseCRS);
         formatter.append(conversionFromBase.getMethod());
-        formatter.setContextualUnit(unit);
         final GeneralParameterValue[] parameters = conversionFromBase.getParameterValues();
         for (int i=0; i<parameters.length; i++) {
             formatter.append(parameters[i]);
         }
-        formatter.setContextualUnit(oldUnit);
         formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
@@ -166,6 +168,8 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
         if (unit == null) {
             formatter.setInvalidWKT();
         }
+        formatter.setAngularUnit(angularUnit);
+        formatter.setLinearUnit(linearUnit);
         return "PROJCS";
     }
 }

@@ -37,10 +37,12 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.referencing.crs.GeneralDerivedCRS;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 
 
@@ -301,7 +303,7 @@ public class CoordinateOperation extends IdentifiedObject
         }
         if (super.equals(object, compareMetadata)) {
             final CoordinateOperation that = (CoordinateOperation) object;
-            if (equals(this.targetCRS, that.targetCRS, compareMetadata) &&
+            if (equals(this.sourceCRS, that.sourceCRS, compareMetadata) &&
                 Utilities.equals(this.transform, that.transform))
             {
                 if (compareMetadata) {
@@ -313,8 +315,22 @@ public class CoordinateOperation extends IdentifiedObject
                         return false;
                     }
                 }
-                // TODO: the following may cause a never-ending loop.
-                return equals(this.sourceCRS, that.sourceCRS, compareMetadata);
+                /*
+                 * Avoid never-ending recursivity: GeneralDerivedCRS has a
+                 * 'conversionFromBase' field that is set to this CoordinateOperation.
+                 */
+                synchronized (GeneralDerivedCRS.class) {
+                    if (GeneralDerivedCRS.\u00A4COMPARING != null) {
+                        assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
+                        return true;
+                    }
+                    try {
+                        GeneralDerivedCRS.\u00A4COMPARING = this;
+                        return equals(this.targetCRS, that.targetCRS, compareMetadata);
+                    } finally {
+                        GeneralDerivedCRS.\u00A4COMPARING = null;
+                    }
+                }
             }
         }
         return false;

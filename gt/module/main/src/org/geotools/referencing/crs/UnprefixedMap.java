@@ -21,6 +21,11 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
+// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
 import org.geotools.util.DerivedMap;
@@ -49,19 +54,55 @@ final class UnprefixedMap extends DerivedMap {
 
     /**
      * <code>true</code> if the <code>{@linkplain #prefix}.name</code> property exists
+     * in the {@link #base} map.
      */
     private final boolean hasName;
 
     /**
-     * Creates a new unprefixed map from the specified base map and prefix to remove.
+     * Creates a new unprefixed map from the specified base map and prefix.
      *
+     * @param name   An explicit name to use if the <code>{@linkplain #prefix}.name</code>
+     *               property doesn't exist, or <code>null</code> to inherit it from the
+     *               <code>name</code> property in the base map.
      * @param base   The base map.
      * @param prefix The prefix to remove from the keys in the base map.
      */
-    public UnprefixedMap(final Map base, final String prefix) {
-        super(base);
-        this.prefix  = prefix.trim();
-        this.hasName = base.containsKey(this.prefix + NAME_PROPERTY);
+    public UnprefixedMap(final Identifier name, final Map base, final String prefix) {
+        super(replaceName(base, name));
+        this.prefix = prefix.trim();
+        final String key = this.prefix + NAME_PROPERTY;
+        for (final Iterator it=base.keySet().iterator(); it.hasNext();) {
+            final String candidate = it.next().toString().trim();
+            if (isName(key, candidate)) {
+                hasName = true;
+                return;
+            }
+        }
+        hasName = false;
+    }
+
+    /**
+     * Returns a copy of the specified map with the name properties replaced
+     * by the specified <code>name</code> identifier. If <code>name</code> is
+     * null, then the specified map is returned unchanged.
+     *
+     * This method is a workaroung for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static Map replaceName(final Map base, final Identifier name) {
+        if (name == null) {
+            return base;
+        }
+        final Map map = new HashMap(Math.round(base.size()/0.75f)+1, 0.75f);
+        for (final Iterator it=base.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry entry = (Map.Entry) it.next();
+            final String key = entry.getKey().toString().trim();
+            if (!isName(NAME_PROPERTY, key)) {
+                map.put(key, entry.getValue());
+            }
+        }
+        map.put(NAME_PROPERTY, name);
+        return map;
     }
 
     /**
@@ -75,10 +116,10 @@ final class UnprefixedMap extends DerivedMap {
     protected Object baseToDerived(final Object key) {
         final int length = prefix.length();
         final String textualKey = key.toString().trim();
-        if (prefix.regionMatches(true, 0, textualKey, 0, length)) {
+        if (textualKey.regionMatches(true, 0, prefix, 0, length)) {
             return textualKey.substring(length).trim();
         }
-        if (!hasName && isName(textualKey)) {
+        if (!hasName && isName(NAME_PROPERTY, textualKey)) {
             return textualKey;
         }
         return null;
@@ -92,19 +133,19 @@ final class UnprefixedMap extends DerivedMap {
      */
     protected Object derivedToBase(final Object key) {
         final String textualKey = key.toString().trim();
-        if (!hasName && isName(textualKey)) {
+        if (!hasName && isName(NAME_PROPERTY, textualKey)) {
             return textualKey;
         }
         return prefix + textualKey;
     }
 
     /**
-     * Returns <code>true</code> if the specified key is <code>"name"</code>
+     * Returns <code>true</code> if the specified candidate is <code>"name"</code>
      * or starts with <code>"name_"</code>
      */
-    private static boolean isName(final String key) {
-        final int length = NAME_PROPERTY.length();
-        return NAME_PROPERTY.regionMatches(true, 0, key, 0, length) &&
-               (key.length()==length || key.charAt(length)=='_');
+    private static boolean isName(final String key, final String candidate) {
+        final int length = key.length();
+        return candidate.regionMatches(true, 0, key, 0, length) &&
+               (candidate.length()==length || candidate.charAt(length)=='_');
     }
 }

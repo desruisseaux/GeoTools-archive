@@ -180,7 +180,7 @@ public class PrimeMeridian extends IdentifiedObject
      * @return The WKT element name, which is "PRIMEM"
      */
     protected String formatWKT(final Formatter formatter) {
-        Unit context = formatter.getContextualUnit();
+        Unit context = formatter.getAngularUnit();
         if (context == null) {
             // If the PrimeMeridian is written inside a "GEOGCS",
             // then OpenGIS say that it must be written into the

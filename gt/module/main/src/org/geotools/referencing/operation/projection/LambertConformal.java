@@ -43,6 +43,7 @@ import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
+
 /**
  * Lambert Conical Conformal Projection.  Areas and shapes are deformed
  * as one moves away from standard parallels.  The angles are true in
@@ -109,9 +110,10 @@ public class LambertConformal extends MapProjection{
     
     
     /**
-     * The {@link MathTransformProvider} for a {@link LambertConformal} 1SP projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link LambertConformal} 1SP projection.
      *
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -155,13 +157,14 @@ public class LambertConformal extends MapProjection{
             final Collection descriptors = PARAMETERS.descriptors();
             return new LambertConformal(parameters, descriptors, false, false);
         }
-        
     }
-    
+
+
     /**
-     * The {@link MathTransformProvider} for a {@link LambertConformal} 2SP projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link LambertConformal} 2SP projection.
      *
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -240,19 +243,19 @@ public class LambertConformal extends MapProjection{
             return new LambertConformal(parameters, descriptors, true, false);
         }
      }
-    
+
+
     /**
-     * The {@link MathTransformProvider} for a {@link LambertConformal} 2SP 
-     * Belgium projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link LambertConformal} 2SP Belgium projection.
      *
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
      */
      public static final class Provider2SP_Belgium extends Provider2SP {
-         
-         /**
+        /**
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
@@ -288,14 +291,14 @@ public class LambertConformal extends MapProjection{
             final Collection descriptors = PARAMETERS.descriptors();
             return new LambertConformal(parameters, descriptors, true, true);
         }
-     }
+    }
      
     
     /**
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  The expected parameter descriptors.
+     * @param  expected The expected parameter descriptors.
      * @param  sp2 <code>true</code> for 2SP, or <code>false</code> for 1SP.
      * @param  belgium <code>true</code> for the Belgium 2SP case.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.

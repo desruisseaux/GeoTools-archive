@@ -32,6 +32,7 @@ import javax.units.Unit;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
@@ -120,6 +121,25 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }
+
+    /**
+     * Returns the angular unit of the specified coordinate system.
+     * The preference will be given to the longitude axis, if found.
+     */
+    static Unit getAngularUnit(final CoordinateSystem coordinateSystem) {
+        Unit unit = NonSI.DEGREE_ANGLE;
+        for (int i=coordinateSystem.getDimension(); --i>=0;) {
+            final CoordinateSystemAxis axis = coordinateSystem.getAxis(i);
+            final Unit candidate = axis.getUnit();
+            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) {
+                unit = candidate;
+                if (AxisDirection.EAST.equals(axis.getDirection().absolute())) {
+                    break; // Found the longitude axis.
+                }
+            }
+        }
+        return unit;
+    }
     
     /**
      * Format the inner part of a
@@ -130,30 +150,20 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
      * @return The WKT element name, which is "GEOGCS"
      */
     protected String formatWKT(final Formatter formatter) {
-        Unit unit = NonSI.DEGREE_ANGLE;
-        final int dimension = coordinateSystem.getDimension();
-        for (int i=dimension; --i>=0;) {
-            final CoordinateSystemAxis axis = coordinateSystem.getAxis(i);
-            final Unit candidate = axis.getUnit();
-            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) {
-                unit = candidate;
-                if (AxisDirection.EAST.equals(axis.getDirection().absolute())) {
-                    break; // Found the longitude axis.
-                }
-            }
-        }
-        final Unit oldUnit = formatter.getContextualUnit();
+        final Unit oldUnit = formatter.getAngularUnit();
+        final Unit unit = getAngularUnit(coordinateSystem);
+        formatter.setAngularUnit(unit);
         formatter.append(datum);
-        formatter.setContextualUnit(unit);
         formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
-        formatter.setContextualUnit(oldUnit);
         formatter.append(unit);
+        final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));
         }
         if (!unit.equals(getUnit())) {
             formatter.setInvalidWKT();
         }
+        formatter.setAngularUnit(oldUnit);
         return "GEOGCS";
     }
 }

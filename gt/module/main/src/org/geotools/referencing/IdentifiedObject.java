@@ -491,6 +491,18 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     public InternationalString getRemarks(){       
         return remarks;
     }
+
+    /**
+     * Returns the informations provided in the specified indentified object as a map of
+     * properties. The returned map contains key such as {@link #NAME_PROPERTY}, and values
+     * from methods such as {@link org.opengis.referencing.IdentifiedObject#getName}.
+     *
+     * @param  info The identified object to view as a properties map.
+     * @return An view of the identified object as an immutable map.
+     */
+    public static Map getProperties(final org.opengis.referencing.IdentifiedObject info) {
+        return new Properties(info);
+    }
     
     /**
      * Returns a hash value for this identified object. {@linkplain #getName Name},

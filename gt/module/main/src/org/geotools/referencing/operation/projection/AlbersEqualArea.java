@@ -64,6 +64,7 @@ import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
+
 /**
  * Albers Equal Area Projection (EPSG code 9822). This is a conic projection
  * with parallels being unequally spaced arcs of concentric circles, more
@@ -111,9 +112,10 @@ public class AlbersEqualArea extends MapProjection {
 
     
     /**
-     * The {@link MathTransformProvider} for a {@link AlbersEqualArea} projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link AlbersEqualArea} projection.
      *
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -144,6 +146,7 @@ public class AlbersEqualArea extends MapProjection {
                     new Identifier(Citation.GEOTIFF,  "StdParallel2")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
+
         /**
          * The parameters group.
          */
@@ -190,7 +193,7 @@ public class AlbersEqualArea extends MapProjection {
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  The expected parameter descriptors.
+     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      *
      * @task REVISIT: set phi2 = phi1 if no SP2 param is given by user (a 1sp projection)
@@ -404,5 +407,4 @@ public class AlbersEqualArea extends MapProjection {
         }
         return false;
     }
-    
 }

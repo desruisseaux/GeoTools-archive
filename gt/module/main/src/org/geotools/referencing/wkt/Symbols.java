@@ -130,14 +130,9 @@ public class Symbols {
          * points (even in double precision), but this is because the above format
          * do not uses the scientific notation. For example 1E-5 is always formatted
          * as 0.00001, and 1E-340 would actually need a maximum fraction digits of
-         * 340. Whatever this behavior is wanted or not is data dependent. For most
-         * parameters, such low values should not occurs and may be rounding error.
-         * Rounding them to 0 (as the number format will do) may be okay.
-         *
-         * Note that in the special case where the number format is the one
-         * provided in Symbols.DEFAULT, the Formatter will fallback on the
-         * default String.valueOf(double) implementation, which switch
-         * automatically to scientific format when needed.
+         * 340. For most parameters, such low values should not occurs and may be
+         * rounding error for the 0 value. For semi-major and semi-minor axis, we
+         * often want to avoid exponential notation as well.
          */
         if (numberFormat instanceof DecimalFormat) {
             final char decimalSeparator = ((DecimalFormat) numberFormat)

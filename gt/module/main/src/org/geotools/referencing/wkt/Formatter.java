@@ -85,7 +85,7 @@ public class Formatter {
      * element. This value is set for example by "GEOGCS", which force its enclosing "PRIMEM" to
      * take the same units than itself.
      */
-    private Unit contextualUnit;
+    private Unit linearUnit, angularUnit;
 
     /**
      * The object to use for formatting numbers.
@@ -170,11 +170,7 @@ public class Formatter {
                                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
                                                "indentation", new Integer(indentation)));
         }
-        if (symbols.numberFormat != Symbols.DEFAULT.numberFormat) {
-            numberFormat = (NumberFormat) symbols.numberFormat.clone();
-        } else {
-            numberFormat = null;
-        }
+        numberFormat = (NumberFormat) symbols.numberFormat.clone();
         buffer = new StringBuffer();
     }
 
@@ -185,20 +181,24 @@ public class Formatter {
     Formatter(final Symbols symbols, final NumberFormat numberFormat) {
         this.symbols = symbols;
         indentation  = Formattable.getIndentation();
-        if (symbols.numberFormat != Symbols.DEFAULT.numberFormat) {
-            this.numberFormat = numberFormat;
-        } else {
-            this.numberFormat = null;
-        }
+        this.numberFormat = numberFormat; // No clone needed.
         // Do not set the buffer. It will be set by AbstractParser.format.
     }
 
     /**
      * Add a separator to the buffer, if needed.
-     *
-     * @param indent if <code>true</code>, add indentation too.
      */
-    private void appendSeparator(final boolean indent) {
+    private void appendSeparator() {
+        appendSeparator(false, false);
+    }
+
+    /**
+     * Add a separator to the buffer, if needed.
+     *
+     * @param newLine if <code>true</code>, add a line separator too.
+     * @param indent  <code>true</code> for increasing the indentation.
+     */
+    private void appendSeparator(final boolean newLine, final boolean indent) {
         int length = buffer.length();
         char c;
         do {
@@ -206,15 +206,27 @@ public class Formatter {
                 return;
             }
             c = buffer.charAt(--length);
-            if (c == symbols.open) {
+            if (c==symbols.open || c==symbols.openArray) {
                 return;
             }
-        } while (Character.isSpaceChar(c));
+        } while (Character.isWhitespace(c) || c==symbols.space);
         buffer.append(symbols.separator);
         buffer.append(symbols.space);
-        if (indent && indentation != 0) {
+        if (newLine && indentation != 0) {
+            if (indent) {
+                margin += indentation;
+            }
             buffer.append(System.getProperty("line.separator", "\n"));
-            buffer.append(Utilities.spaces(margin += indentation));
+            buffer.append(Utilities.spaces(margin));
+        }
+    }
+
+    /**
+     * Reduce the indentation after a call to <code>appendSeparator(true, true)</code>.
+     */
+    private void reduceIndentation() {
+        if (margin >= 0) {
+            margin -= indentation;
         }
     }
 
@@ -227,7 +239,7 @@ public class Formatter {
      * @param formattable The formattable object to append to the WKT.
      */
     public void append(final Formattable formattable) {
-        appendSeparator(true);
+        appendSeparator(true, true);
         final int base = buffer.length();
         buffer.append(symbols.open);
         final IdentifiedObject info = (formattable instanceof IdentifiedObject)
@@ -287,9 +299,7 @@ public class Formatter {
             }
         }
         buffer.append(symbols.close);
-        if (margin >= 0) {
-            margin -= indentation;
-        }
+        reduceIndentation();
     }
 
     /**
@@ -323,7 +333,7 @@ public class Formatter {
      */
     public void append(final CodeList code) {
         if (code != null) {
-            appendSeparator(false);
+            appendSeparator();
             buffer.append(code.name());
         }
     }
@@ -344,10 +354,14 @@ public class Formatter {
             // Covariance: Remove cast if covariance is allowed.
             final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
             Unit unit = descriptor.getUnit();
-            if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
-                unit = contextualUnit;
+            if (unit != null) {
+                if (linearUnit!=null && unit.isCompatible(linearUnit)) {
+                    unit = linearUnit;
+                } else if (angularUnit!=null && unit.isCompatible(angularUnit)) {
+                    unit = angularUnit;
+                }
             }
-            appendSeparator(false);
+            appendSeparator(true, false);
             buffer.append("PARAMETER");
             buffer.append(symbols.open);
             buffer.append(symbols.quote);
@@ -400,7 +414,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final int number) {
-        appendSeparator(false);
+        appendSeparator();
         format(number);
     }
 
@@ -409,7 +423,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final double number) {
-        appendSeparator(false);
+        appendSeparator();
         format(number);
     }
 
@@ -419,7 +433,7 @@ public class Formatter {
      */
     public void append(final Unit unit) {
         if (unit != null) {
-            appendSeparator(false);
+            appendSeparator();
             buffer.append(usesClassname ? "Unit" : "UNIT");
             buffer.append(symbols.open);
             buffer.append(symbols.quote);
@@ -449,7 +463,7 @@ public class Formatter {
      * A comma (or any other element separator) will be written before the string if needed.
      */
     public void append(final String text) {
-        appendSeparator(false);
+        appendSeparator();
         buffer.append(symbols.quote);
         buffer.append(text);
         buffer.append(symbols.quote);
@@ -459,17 +473,13 @@ public class Formatter {
      * Format an arbitrary number.
      */
     private void format(final Number number) {
-        if (numberFormat != null) {
-            if (number instanceof Byte  ||
-                number instanceof Short ||
-                number instanceof Integer)
-            {
-                format(number.intValue());
-            } else {
-                format(number.doubleValue());
-            }
+        if (number instanceof Byte  ||
+            number instanceof Short ||
+            number instanceof Integer)
+        {
+            format(number.intValue());
         } else {
-            buffer.append(number);
+            format(number.doubleValue());
         }
     }
 
@@ -477,25 +487,17 @@ public class Formatter {
      * Format an integer number.
      */
     private void format(final int number) {
-        if (numberFormat != null) {
-            final int fraction = numberFormat.getMinimumFractionDigits();
-            numberFormat.setMinimumFractionDigits(0);
-            numberFormat.format(number, buffer, dummy);
-            numberFormat.setMinimumFractionDigits(fraction);
-        } else {
-            buffer.append(number);
-        }
+        final int fraction = numberFormat.getMinimumFractionDigits();
+        numberFormat.setMinimumFractionDigits(0);
+        numberFormat.format(number, buffer, dummy);
+        numberFormat.setMinimumFractionDigits(fraction);
     }
 
     /**
      * Format a floating point number.
      */
     private void format(final double number) {
-        if (numberFormat != null) {
-            numberFormat.format(number, buffer, dummy);
-        } else {
-            buffer.append(number);
-        }
+        numberFormat.format(number, buffer, dummy);
     }
 
     /**
@@ -570,23 +572,50 @@ public class Formatter {
     }
 
     /**
-     * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
-     * element. This value is set for example by "GEOGCS", which force its enclosing "PRIMEM" to
-     * take the same units than itself.
+     * The linear unit for formatting measures, or <code>null</code> for the "natural" unit of each
+     * WKT element.
      *
      * @return The unit for measure. Default value is <code>null</code>.
      */
-    public Unit getContextualUnit() {
-        return contextualUnit;
+    public Unit getLinearUnit() {
+        return linearUnit;
     }
 
     /**
-     * Set the unit for formatting measures.
+     * Set the unit for formatting linear measures.
      *
      * @param unit The new unit, or <code>null</code>.
      */
-    public void setContextualUnit(final Unit unit) {
-        contextualUnit = unit;
+    public void setLinearUnit(final Unit unit) {
+        if (unit!=null && !SI.METER.isCompatible(unit)) {
+            throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_NON_LINEAR_UNIT_$1, unit));
+        }
+        linearUnit = unit;
+    }
+
+    /**
+     * The angular unit for formatting measures, or <code>null</code> for the "natural" unit of
+     * each WKT element. This value is set for example by "GEOGCS", which force its enclosing
+     * "PRIMEM" to take the same units than itself.
+     *
+     * @return The unit for measure. Default value is <code>null</code>.
+     */
+    public Unit getAngularUnit() {
+        return angularUnit;
+    }
+
+    /**
+     * Set the angular unit for formatting measures.
+     *
+     * @param unit The new unit, or <code>null</code>.
+     */
+    public void setAngularUnit(final Unit unit) {
+        if (unit!=null && !SI.RADIAN.isCompatible(unit)) {
+            throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
+        }
+        angularUnit = unit;
     }
 
     /**
@@ -623,18 +652,19 @@ public class Formatter {
     }
 
     /**
-     * Clear this formatter. All properties (including {@linkplain #getContextualUnit contextual
-     * unit} and {@linkplain #isInvalidWKT WKT validity flag} are reset to their default value.
-     * After this method call, this <code>Formatter</code> object is ready for formatting a new
-     * object.
+     * Clear this formatter. All properties (including {@linkplain #getLinearUnit unit}
+     * and {@linkplain #isInvalidWKT WKT validity flag} are reset to their default value.
+     * After this method call, this <code>Formatter</code> object is ready for formatting
+     * a new object.
      */
     public void clear() {
         if (buffer != null) {
             buffer.setLength(0);
         }
-        contextualUnit = null;
-        invalidWKT     = false;
-        margin         = 0;
+        linearUnit  = null;
+        angularUnit = null;
+        invalidWKT  = false;
+        margin      = 0;
     }
 
     /**
@@ -647,10 +677,10 @@ public class Formatter {
      * indentation&gt;</var>
      * </blockquote>
      */
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         final Arguments arguments = new Arguments(args);
         final int indentation = arguments.getRequiredInteger(Formattable.INDENTATION);
-        arguments.getRemainingArguments(0);
+        args = arguments.getRemainingArguments(0);
         Formattable.setIndentation(indentation);
     }
 }
