@@ -126,6 +126,11 @@ public class ScriptTest extends TestCase {
     private static final String MT_PROJ_SCRIPT = "MT_Projection_TestScript.txt";
     
     /**
+     * A test file to parse and execute for Abridged Molodensky math transforms.
+     */
+    private static final String MT_ABRIDGED_MOL_SCRIPT = "MT_AbridgedMolodensky_TestScript.txt";
+    
+    /**
      * The coordinate system factory to use for the test.
      * This is also the class used for parsing WKT texts.
      */
@@ -489,6 +494,10 @@ public class ScriptTest extends TestCase {
             out.println("pt_target = " + targetPT);
             out.println("computed  = " + computed);
             out.println();
+        } catch (AssertionError error) {
+            out.print("----AssertionError AT LINE ");
+            out.print(String.valueOf(lineNumber) + "\n");
+            error.printStackTrace();
         }
     }
     
@@ -655,6 +664,16 @@ public class ScriptTest extends TestCase {
         runScript(MT_PROJ_SCRIPT);
     }
     
+    /**
+     * Run the {@link #MT_ABRIDGED_MOL_SCRIPT}.
+     *
+     * @throws IOException If {@link #MT_ABRIDGED_MOL_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testMTAbridgedMol() throws IOException, FactoryException {
+        runScript(MT_ABRIDGED_MOL_SCRIPT);
+    }
     
     /**
      * Run the test from the command line. By default, this method run all tests. In order
@@ -712,6 +731,10 @@ public class ScriptTest extends TestCase {
         }
         if (script==null || script.equalsIgnoreCase("MT_Projection")) {
             test.testMTproj();
+            done = true;
+        }
+        if (script==null || script.equalsIgnoreCase("MT_AbridgedMolodensky")) {
+            test.testMTAbridgedMol();
             done = true;
         }
         if (script!=null && !done) {
