@@ -343,21 +343,21 @@ public class GT2Eclipse {
     }
     public static void entry(PrintStream classpath, String project,
 			     String path, String target) {
-	if (new File(project, path + "/" + target + "/src").exists()) {
-	    classpath.println("    <classpathentry kind=\"src\"");
-            classpath.println("        excluding=\"**/.svn/\"");
-	    // eclipse needs its own output directory so it does not trip on maven
-	    classpath.println("        output=\"" + path + "/" + target + "/target/eclipse\"");
-	    classpath.println("        path=\"" + path + "/" + target + "/src\"/>");
-	}
-	if (new File(project, path + "/" + target + "/test").exists()) {
-	    classpath.print("      <classpathentry");
-	    classpath.println(" kind=\"src\"");
-            classpath.println("        excluding=\"**/.svn/\"");
-	    // eclipse needs its own output directory so it does not trip on maven
-            classpath.println("        output=\"" + path + "/" + target + "/target/eclipse\"");
-	    classpath.println("        path=\"" + path + "/" + target + "/test\"/>");
-	}
+    	if (new File(project, path + "/" + target + "/src").exists()) {
+    	    classpath.println("    <classpathentry kind=\"src\"");
+                classpath.println("        excluding=\"**/.svn/\"");
+    	    // eclipse needs its own output directory so it does not trip on maven
+    	    classpath.println("        output=\"" + path + "/" + target + "/bin\"");
+    	    classpath.println("        path=\"" + path + "/" + target + "/src\"/>");
+    	}
+    	if (new File(project, path + "/" + target + "/test").exists()) {
+    	    classpath.print("      <classpathentry");
+    	    classpath.println(" kind=\"src\"");
+                classpath.println("        excluding=\"**/.svn/\"");
+    	    // eclipse needs its own output directory so it does not trip on maven
+                classpath.println("        output=\"" + path + "/" + target + "/bin\"");
+    	    classpath.println("        path=\"" + path + "/" + target + "/test\"/>");
+    	}
     }
     public static void die( String msg ){
 	if( msg != null ){
