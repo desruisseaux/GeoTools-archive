@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.*;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -115,97 +116,97 @@ public class ParserTest extends FilterTestSupport {
     }
 
     public void test1() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test1.xml");
+        Filter test = parseDocument("test1.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test2() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test2.xml");
+        Filter test = parseDocument("test2.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test3a() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test3a.xml");
+        Filter test = parseDocument("test3a.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test3b() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test3b.xml");
+        Filter test = parseDocument("test3b.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test4() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test4.xml");
+        Filter test = parseDocument("test4.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test5() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test5.xml");
+        Filter test = parseDocument("test5.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test6() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test6.xml");
+        Filter test = parseDocument("test6.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test8() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test8.xml");
+        Filter test = parseDocument("test8.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test9() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test9.xml");
+        Filter test = parseDocument("test9.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test11() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test11.xml");
+        Filter test = parseDocument("test11.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test12() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test12.xml");
+        Filter test = parseDocument("test12.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test13() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test13.xml");
+        Filter test = parseDocument( "test13.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test14() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test14.xml");
+        Filter test = parseDocument("test14.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test15() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test15.xml");
+        Filter test = parseDocument("test15.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test16() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test16.xml");
+        Filter test = parseDocument("test16.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test17() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test17.xml");
+        Filter test = parseDocument("test17.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
@@ -218,19 +219,19 @@ public class ParserTest extends FilterTestSupport {
        fail if things mess up?  I don't have time right now, but maybe
        some time soon...cholmes */
     public void test18() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test18.xml");
+        Filter test = parseDocument("test18.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test19() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test19.xml");
+        Filter test = parseDocument( "test19.xml");
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
     }
 
     public void test20() throws Exception {
-        Filter test = parseDocument(dataFolder + "/test20.xml");
+        Filter test = parseDocument("test20.xml");
 
         LOGGER.fine("filter: " + test.getClass().toString());
         LOGGER.fine("parsed: " + test.toString());
@@ -264,7 +265,7 @@ public class ParserTest extends FilterTestSupport {
         ParserAdapter p = new ParserAdapter(parser.getParser());
         p.setContentHandler(documentFilter);
         LOGGER.fine("just made parser, " + uri);
-        p.parse(uri);
+        p.parse(TestData.getResource(this, uri).toExternalForm());
         LOGGER.finest("just parsed: " + uri);
 
         return filterHandler.getFilter();
