@@ -35,7 +35,8 @@ public class TestFileMetadataImpl extends TestCase {
 
     URL resource;
     
-    protected void setUp(){
+    protected void setUp() throws Exception{
+        super.setUp();
         resource = TestFileMetadataImpl.class.getResource("testdata/ArcGrid.asc");
         assertNotNull(resource);
     }
@@ -213,7 +214,13 @@ public class TestFileMetadataImpl extends TestCase {
             String name=element.getName();
             Object value=metadata.getElement(name);
             assertEquals(value, values.get(i));
-        }
-    }
+        }//for
+        
+        
+ /*       StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
+        Metadata.Element element=(Metadata.Element)data.getElement("FileData/Name");
+        assertEquals(element.getType(), String.class);
+        assertEquals(element.getName(), "Name");
+*/    }
 
  }

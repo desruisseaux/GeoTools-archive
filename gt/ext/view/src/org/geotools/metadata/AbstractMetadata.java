@@ -17,7 +17,7 @@ public abstract class AbstractMetadata implements Metadata {
     EntityImpl type;
 
     public AbstractMetadata() {
-        type = new EntityImpl(getClass());
+        type = EntityImpl.getEntity(getClass());
     }
 
     /**
@@ -82,18 +82,27 @@ public abstract class AbstractMetadata implements Metadata {
         return type;
     }
 
-    private class EntityImpl implements Entity {
+    private static class EntityImpl implements Entity {
 
         ArrayList elemList = new ArrayList();
 
         HashMap elemMap = new HashMap();
 
         List getMethods;
+        
+        static HashMap entityMap=new HashMap();
 
-        public EntityImpl(Class clazz) {
+        private EntityImpl(Class clazz) {
             init(clazz);
         }
-
+        
+        public static EntityImpl getEntity(Class clazz){
+            if( !entityMap.containsKey(clazz) ){
+                entityMap.put(clazz,new EntityImpl(clazz));
+            }
+            return (EntityImpl) entityMap.get(clazz);
+        }
+        
         private void init(Class clazz) {
             getMethods = new ArrayList();
 
@@ -160,8 +169,8 @@ public abstract class AbstractMetadata implements Metadata {
         /**
          * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
          */
-        public Element getElement(String xpath) {
-            return (Element) elemMap.get(xpath);
+        public Object getElement(String xpath) {
+            return elemMap.get(xpath);
 
             //TODO implement for more complicated xpaths
         }
@@ -176,7 +185,7 @@ public abstract class AbstractMetadata implements Metadata {
 
     }
 
-    private class ElementImpl implements Element {
+    private static class ElementImpl implements Element {
 
         private Method getMethod;
 

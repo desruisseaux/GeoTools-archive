@@ -73,8 +73,8 @@ public interface Metadata {
      * @author jeichar
      *
      */
-    public interface Entity {
-        Element getElement( String xpath );
+    public static interface Entity {
+        Object getElement( String xpath );
         List getElements( );
     }
 
@@ -84,7 +84,7 @@ public interface Metadata {
      * @author jeichar
      *
      */
-    public interface Element {
+    public static interface Element {
         
         /**
          * Gets the type of this element.
