@@ -21,6 +21,7 @@ package org.geotools.data.vpf.ifc;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version $Id: Coordinate.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @deprecated
  */
 public interface Coordinate {
 } // Coordinate
