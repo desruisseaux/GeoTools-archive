@@ -8,7 +8,6 @@ import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
@@ -646,6 +645,9 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new ExpressionType();
         public static ComplexType getInstance(){return instance;}
         
+        public boolean isAbstract(){
+            return true;
+        }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
@@ -687,6 +689,9 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            Expression e = (Expression)value;
+            
+            
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }

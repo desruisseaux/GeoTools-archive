@@ -75,10 +75,7 @@ public class XLinkSchema implements Schema {
     private static final AttributeGroup[] attributeGroups = loadAttributeGroups();
 
     /** The full xLink namespace */
-    public static String NAMESPACE = "http://www.w3.org/1999/xlink";
-
-    // list or URIs supported bu this namespace
-    private URI uris = makeURI("xlinks.xsd");
+    public static final URI NAMESPACE = makeURI("http://www.w3.org/1999/xlink");
 
     /*
      * loads the list of attribute declarations for the XLink Schema
@@ -189,7 +186,10 @@ public class XLinkSchema implements Schema {
     /**
      * @see schema.Schema#getTargetNamespace()
      */
-    public String getTargetNamespace() {
+    public URI getTargetNamespace() {
+        return NAMESPACE;
+    }
+    public URI getURI() {
         return NAMESPACE;
     }
 
@@ -212,7 +212,7 @@ public class XLinkSchema implements Schema {
     }
 
     // convinience method to deal with the URISyntaxException
-    private URI makeURI(String s) {
+    private static URI makeURI(String s) {
         try {
             return new URI(s);
         } catch (URISyntaxException e) {
@@ -228,13 +228,6 @@ public class XLinkSchema implements Schema {
      */
     public String getPrefix() {
         return "xLink";
-    }
-
-    /**
-     * @see org.geotools.xml.xsi.Schema#getURI()
-     */
-    public URI getURI() {
-        return uris;
     }
 
     /**
@@ -306,7 +299,7 @@ public class XLinkSchema implements Schema {
         /**
          * @see schema.SimpleType#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return XLinkSchema.NAMESPACE;
         }
 
@@ -472,7 +465,7 @@ public class XLinkSchema implements Schema {
         /**
          * @see schema.SimpleType#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return XLinkSchema.NAMESPACE;
         }
 
@@ -592,7 +585,7 @@ public class XLinkSchema implements Schema {
         /**
          * @see schema.Attribute#getNameSpace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return XLinkSchema.NAMESPACE;
         }
 
@@ -1158,7 +1151,7 @@ public class XLinkSchema implements Schema {
         /**
          * @see schema.AttributeGroup#getNameSpace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return XLinkSchema.NAMESPACE;
         }
 

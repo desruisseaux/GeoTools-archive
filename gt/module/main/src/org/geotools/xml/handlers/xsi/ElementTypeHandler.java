@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -422,7 +424,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         String id;
         String defaulT;
         String fixed;
-        String namespace;
+        URI namespace;
         Element substitutionGroup;
         Type type;
 
@@ -537,7 +539,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         /**
          * @see org.geotools.xml.schema.Element#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return namespace;
         }
     }

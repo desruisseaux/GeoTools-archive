@@ -16,6 +16,9 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.geotools.xml.XSIElementHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -38,7 +41,7 @@ public class ImportHandler extends XSIElementHandler {
     private static int offset = 0;
 
     //    private String id;
-    private String namespace;
+    private URI namespace;
     private String schemaLocation;
     private int hashCodeOffset = getOffset();
 
@@ -84,10 +87,16 @@ public class ImportHandler extends XSIElementHandler {
             schemaLocation = atts.getValue(namespaceURI, "schemaLocation");
         }
 
-        namespace = atts.getValue("", "namespace");
+        String namespace = atts.getValue("", "namespace");
 
         if (namespace == null) {
             namespace = atts.getValue(namespaceURI, "namespace");
+        }
+        try {
+            this.namespace = new URI(namespace);
+        } catch (URISyntaxException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
         }
 
         if (namespaceURI.equalsIgnoreCase(namespace)) {
@@ -110,7 +119,7 @@ public class ImportHandler extends XSIElementHandler {
      *
      * @return
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return namespace;
     }
 

@@ -54,8 +54,17 @@ public class XSISimpleTypes {
     private static Map m;
 
     /** DOCUMENT ME!  */
-    public static final java.lang.String NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+    public static final URI NAMESPACE = makeURI("http://www.w3.org/2001/XMLSchema");
 
+    // convinience method to deal with the URISyntaxException
+    private static URI makeURI(java.lang.String s) {
+        try {
+            return new URI(s);
+        } catch (URISyntaxException e) {
+            // do nothing
+            return null;
+        }
+    }
     /**
      * <p>
      * Searches for the requested SimpleType, if not found this method returns
@@ -305,7 +314,7 @@ public class XSISimpleTypes {
         /**
          * @see org.geotools.xml.xsi.Type#getNamespace()
          */
-        public java.lang.String getNamespace() {
+        public URI getNamespace() {
             return NAMESPACE;
         }
 

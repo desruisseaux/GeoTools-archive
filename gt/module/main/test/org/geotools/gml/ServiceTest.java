@@ -6,21 +6,16 @@ package org.geotools.gml;
  *
  * Created on 04 March 2002, 16:09
  */
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.*;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-import junit.framework.*;
-import org.geotools.data.DataSourceFinder;
 import org.geotools.data.DataSource;
+import org.geotools.data.DataSourceFactorySpi;
+import org.geotools.data.DataSourceFinder;
 import org.geotools.data.gml.GMLDataSourceFactory;
 
 /**

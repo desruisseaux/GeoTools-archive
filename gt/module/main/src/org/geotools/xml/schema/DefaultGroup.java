@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
+
 /**
  * <p>
  * DOCUMENT ME!
@@ -27,7 +29,7 @@ public class DefaultGroup implements Group {
     private ElementGrouping child;
     private String id;
     private String name;
-    private String namespace;
+    private URI namespace;
     private int min;
     private int max;
 
@@ -44,7 +46,7 @@ public class DefaultGroup implements Group {
      * @param min DOCUMENT ME!
      * @param max DOCUMENT ME!
      */
-    public DefaultGroup(String id, String name, String namespace,
+    public DefaultGroup(String id, String name, URI namespace,
         ElementGrouping child, int min, int max) {
         this.id = id;
         this.name = name;
@@ -92,7 +94,7 @@ public class DefaultGroup implements Group {
     /**
      * @see org.geotools.xml.schema.Group#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return namespace;
     }
 

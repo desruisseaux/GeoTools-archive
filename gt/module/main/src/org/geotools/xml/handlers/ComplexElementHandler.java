@@ -29,6 +29,8 @@ import org.geotools.xml.schema.Sequence;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +127,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName, Map hints)
+    public void endElement(URI namespaceURI, String localName, Map hints)
         throws SAXException {
         text = (text == null) ? null : text.trim();
 
@@ -279,7 +281,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see valid(ElementGrouping)
      */
     private int valid(Any any, int index) {
-        if (any.getNamespace().equalsIgnoreCase(((XMLElementHandler) elements
+        if (any.getNamespace().equals(((XMLElementHandler) elements
                                                      .get(index)).getElement()
                                                      .getType().getNamespace())) {
             return index + 1;
@@ -413,7 +415,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see schema.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(String namespaceURI, String localName,
+    public void startElement(URI namespaceURI, String localName,
         Attributes attr) throws SAXException {
         this.attr = new AttributesImpl(attr);
     }
@@ -422,7 +424,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName,
+    public XMLElementHandler getHandler(URI namespaceURI, String localName,
         Map hints) throws SAXException {
         if (elements == null) {
             elements = new LinkedList();

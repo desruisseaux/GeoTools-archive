@@ -1,6 +1,11 @@
 
 package org.geotools.xml;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.logging.Level;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.FeatureReader;
@@ -8,11 +13,6 @@ import org.geotools.feature.Feature;
 import org.geotools.resources.TestData;
 import org.geotools.xml.gml.FCBuffer;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
 
 
 /**

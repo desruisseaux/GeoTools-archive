@@ -30,6 +30,7 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,7 +57,7 @@ public class SchemaHandler extends XSIElementHandler {
     public final static String LOCALNAME = "schema";
     private String id;
     private String prefix;
-    private String targetNamespace;
+    private URI targetNamespace;
     private String version;
     private boolean elementFormDefault;
     private boolean attributeFormDefault;
@@ -112,10 +113,16 @@ public class SchemaHandler extends XSIElementHandler {
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
         // targetNamespace
-        targetNamespace = atts.getValue("", "targetNamespace");
+        String targetNamespace = atts.getValue("", "targetNamespace");
 
         if (targetNamespace == null) {
             targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
+        }
+        try {
+            this.targetNamespace = new URI(targetNamespace);
+        } catch (URISyntaxException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
         }
 
         if ((prefixCache != null) && (targetNamespace != null)
@@ -1305,7 +1312,7 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @return Returns the targetNamespace.
      */
-    public String getTargetNamespace() {
+    public URI getTargetNamespace() {
         return targetNamespace;
     }
 
@@ -1338,7 +1345,7 @@ public class SchemaHandler extends XSIElementHandler {
         boolean attributeFormDefault;
         boolean elementFormDefault;
         String id;
-        String targetNamespace;
+        URI targetNamespace;
         String version;
         int finalDefault;
         int blockDefault;
@@ -1432,7 +1439,7 @@ public class SchemaHandler extends XSIElementHandler {
         /**
          * @see org.geotools.xml.xsi.Schema#getTargetNamespace()
          */
-        public String getTargetNamespace() {
+        public URI getTargetNamespace() {
             return targetNamespace;
         }
 

@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -918,7 +919,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         boolean isDerived = false;
         Type parent;
         String anyAttributeNameSpace;
-        String namespace;
+        URI namespace;
         String id;
         String name;
         int block;
@@ -976,7 +977,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         /**
          * @see org.geotools.xml.xsi.Type#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return namespace;
         }
 

@@ -22,6 +22,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,7 +86,7 @@ public abstract class XMLElementHandler implements Serializable {
      *
      * @see SchemaContentHandler#endElement
      */
-    public abstract void endElement(String namespaceURI, String localName,
+    public abstract void endElement(URI namespaceURI, String localName,
         Map hints) throws SAXException;
 
     /**
@@ -101,7 +102,7 @@ public abstract class XMLElementHandler implements Serializable {
      *
      * @see SchemaContentHandler#startElement
      */
-    public abstract void startElement(String namespaceURI, String localName,
+    public abstract void startElement(URI namespaceURI, String localName,
         Attributes attr) throws SAXException;
 
     /**
@@ -119,7 +120,7 @@ public abstract class XMLElementHandler implements Serializable {
      *
      * @throws SAXException
      */
-    public abstract XMLElementHandler getHandler(String namespaceURI,
+    public abstract XMLElementHandler getHandler(URI namespaceURI,
         String localName, Map hints) throws SAXException;
 
     /**

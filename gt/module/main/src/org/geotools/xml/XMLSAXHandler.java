@@ -180,7 +180,7 @@ public class XMLSAXHandler extends DefaultHandler {
         logger.info("END: " + qName);
 
         try {
-            ((XMLElementHandler) handlers.pop()).endElement(namespaceURI,
+            ((XMLElementHandler) handlers.pop()).endElement(new URI(namespaceURI),
                 localName, hints);
         } catch (Exception e) {
             logger.warning(e.getMessage());
@@ -268,7 +268,7 @@ e.printStackTrace();
             //                                ((Sequence)((ComplexType)parent.getType()).getChild()).getChildren().length)+"":"null"))));
             logger.finest("This Node = " + localName + " :: " + namespaceURI);
 
-            XMLElementHandler eh = parent.getHandler(namespaceURI, localName,
+            XMLElementHandler eh = parent.getHandler(new URI(namespaceURI), localName,
                     hints);
 
             if (eh == null) {
@@ -278,7 +278,7 @@ e.printStackTrace();
             logger.finest("This Node = " + eh.getClass().getName());
 
             handlers.push(eh);
-            eh.startElement(namespaceURI, localName, atts);
+            eh.startElement(new URI(namespaceURI), localName, atts);
         } catch (Exception e) {
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "

@@ -34,11 +34,14 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -87,14 +90,14 @@ public class DocumentWriter {
      * @param schema
      * @param f
      * @param hints
-     *
      * @throws OperationNotSupportedException
      * @throws IOException
+     * @throws SAXException
      *
      * @see WRITE_SCHEMA
      */
     public static void writeDocument(Object value, Schema schema, File f,
-            Map hints) throws OperationNotSupportedException, IOException {
+            Map hints) throws OperationNotSupportedException, IOException, SAXException {
         if ((f == null) || (!f.canWrite())) {
             throw new IOException("Cannot write to " + f);
         }
@@ -133,6 +136,7 @@ public class DocumentWriter {
      * @param hints optional hints for writing
      * @throws OperationNotSupportedException
      * @throws IOException
+     * @throws SAXException
      * 
      * @see BASE_ELEMENT
      * @see USE_NEAREST
@@ -140,7 +144,7 @@ public class DocumentWriter {
      * @see SCHEMA_ORDER
      */
     public static void writeDocument(Object value, Schema schema, Writer w,
-                Map hints) throws OperationNotSupportedException, IOException {
+                Map hints) throws OperationNotSupportedException, IOException, SAXException {
 
         if (hints!=null && hints.containsKey(WRITE_SCHEMA)) {
             Writer w2 = (Writer)hints.get(WRITE_SCHEMA);
@@ -202,16 +206,16 @@ public class DocumentWriter {
         AttributesImpl ai = new AttributesImpl();
 
         ai.addAttribute("", "targetNamespace", "", "anyUri",
-            schema.getTargetNamespace());
-        ai.addAttribute("", "xmlns", "", "anyUri", XSISimpleTypes.NAMESPACE);
+            schema.getTargetNamespace().toString());
+        ai.addAttribute("", "xmlns", "", "anyUri", XSISimpleTypes.NAMESPACE.toString());
         ai.addAttribute("", "xmlns:" + schema.getPrefix(), "", "anyUri",
-            schema.getTargetNamespace());
+            schema.getTargetNamespace().toString());
 
         Schema[] imports = schema.getImports();
 
         for (int i = 0; i < imports.length; i++) {
             ai.addAttribute("", "xmlns:" + imports[i].getPrefix(), "",
-                "anyUri", imports[i].getTargetNamespace());
+                "anyUri", imports[i].getTargetNamespace().toString());
         }
 
         if ((schema.getId() != null) && (schema.getId() != "")) {
@@ -300,7 +304,7 @@ public class DocumentWriter {
         }
 
         ai.addAttribute("", "namespace", "", "anyUri",
-            schema.getTargetNamespace());
+            schema.getTargetNamespace().toString());
 
         if (schema.getURI() != null) {
             ai.addAttribute("", "schemaLocation", "", "anyUri",
@@ -1043,7 +1047,7 @@ public class DocumentWriter {
             ai.addAttribute("", "minOccurs", "", "ID", "" + any.getMinOccurs());
         }
 
-        if ((any.getNamespace() != null) && (any.getNamespace() != "")) {
+        if (any.getNamespace() != null) {
             ai.addAttribute("", "namespace", "", "special",
                 "" + any.getNamespace());
         }
@@ -1261,7 +1265,7 @@ public class DocumentWriter {
             }
         }
 
-        public void startElement(String namespaceURI, String localName,
+        public void startElement(URI namespaceURI, String localName,
             Attributes attributes) throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
@@ -1305,7 +1309,7 @@ public class DocumentWriter {
             writer.write("\n");
         }
 
-        public void element(String namespaceURI, String localName,
+        public void element(URI namespaceURI, String localName,
             Attributes attributes) throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
@@ -1350,7 +1354,7 @@ public class DocumentWriter {
             writer.write("\n");
         }
 
-        public void endElement(String namespaceURI, String localName)
+        public void endElement(URI namespaceURI, String localName)
             throws IOException {
             String prefix = (String) prefixMappings.get(namespaceURI);
 
@@ -1419,7 +1423,13 @@ public class DocumentWriter {
         }
         
         public Element findElement(Object value){
-            Schema[] searchOrder = getSchemaOrdering();
+            Schema[] searchOrder;
+            try {
+                searchOrder = getSchemaOrdering();
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                return null;
+            }
             for(int i=0;i<searchOrder.length;i++){
                 Element[] elems = searchOrder[i].getElements();
                 if(elems!=null){
@@ -1432,7 +1442,13 @@ public class DocumentWriter {
         }
         
         public Element findElement(String name){
-            Schema[] searchOrder = getSchemaOrdering();
+            Schema[] searchOrder;
+            try {
+                searchOrder = getSchemaOrdering();
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                return null;
+            }
             for(int i=0;i<searchOrder.length;i++){
                 Element[] elems = searchOrder[i].getElements();
                 if(elems!=null)
@@ -1444,7 +1460,7 @@ public class DocumentWriter {
         }
         
         private Schema[] searchOrder = null;
-        private Schema[] getSchemaOrdering(){
+        private Schema[] getSchemaOrdering() throws IOException{
             if(searchOrder!=null)
                 return searchOrder;
             if(schema.getImports() == null || schema.getImports().length == 0){
@@ -1471,11 +1487,16 @@ public class DocumentWriter {
                     String[] stringOrder = (String[])order;
                     for(int i=0;i<stringOrder.length;i++){
                         int nsIndex = targNS.indexOf(stringOrder[i]);
+                        try{
                         if(nsIndex>=0){ // found
-                            so.add(SchemaFactory.getInstance(stringOrder[i])); 
+                            so.add(SchemaFactory.getInstance(new URI(stringOrder[i]))); 
                             targNS.remove(nsIndex);
                         }else{
-                            so.add(SchemaFactory.getInstance(stringOrder[i])); 
+                            so.add(SchemaFactory.getInstance(new URI(stringOrder[i]))); 
+                        }
+                        }catch(URISyntaxException e){
+                            logger.warning(e.toString());
+                            throw new IOException(e.toString());
                         }
                     }
                 }

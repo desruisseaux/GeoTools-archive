@@ -16,6 +16,9 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Any;
 import org.geotools.xml.schema.Element;
@@ -48,7 +51,7 @@ public class AnyHandler extends ElementGroupingHandler {
     /** skip */
     public static final int SKIP = 2;
     private String id;
-    private String namespace;
+    private URI namespace;
     private int minOccurs;
     private int maxOccurs;
 
@@ -96,19 +99,18 @@ public class AnyHandler extends ElementGroupingHandler {
             max = atts.getValue(namespaceURI, "maxOccurs");
         }
 
-        namespace = atts.getValue("", "namespace");
+        String namespace = atts.getValue("", "namespace");
 
         if (namespace == null) {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
+        try {
+            this.namespace = new URI(namespace);
+        } catch (URISyntaxException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        }
 
-        //        String processContents = atts.getValue("", "processContents");
-        //
-        //        if (processContents == null) {
-        //            processContents = atts.getValue(namespaceURI, "processContents");
-        //        }
-        //
-        //        this.processContents = findProcess(processContents);
         if ((null == min) || "".equalsIgnoreCase(min)) {
             minOccurs = 1;
         } else {
@@ -204,7 +206,7 @@ public class AnyHandler extends ElementGroupingHandler {
         da.maxOccurs = maxOccurs;
 
         cache = da;
-        id = namespace = null;
+        id = null; namespace = null;
 
         return da;
     }
@@ -235,7 +237,7 @@ public class AnyHandler extends ElementGroupingHandler {
      */
     private static class DefaultAny implements Any {
         String id;
-        String namespace;
+        URI namespace;
         int maxOccurs;
         int minOccurs;
 
@@ -268,7 +270,7 @@ public class AnyHandler extends ElementGroupingHandler {
         /**
          * @see org.geotools.xml.xsi.Any#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return namespace;
         }
 

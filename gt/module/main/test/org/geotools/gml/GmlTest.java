@@ -16,29 +16,22 @@
  */
 package org.geotools.gml;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.*;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
-/*
- * GmlSuite.java
- * JUnit based test
- *
- * Created on 04 March 2002, 16:09
- */
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.data.DataSource;
 import org.geotools.data.Query;
 import org.geotools.data.gml.GMLDataSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.logging.Logger;
 import org.geotools.resources.TestData;
+
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**

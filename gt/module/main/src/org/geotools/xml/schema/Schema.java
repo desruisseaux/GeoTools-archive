@@ -197,15 +197,6 @@ public interface Schema extends Factory{
 
     /**
      * <p>
-     * Gets the URI which is represented by this Schema.
-     * </p>
-     *
-     * @return
-     */
-    public URI getURI();
-
-    /**
-     * <p>
      * Gets the recommended prefix for this schema.
      * </p>
      *
@@ -235,7 +226,10 @@ public interface Schema extends Factory{
      *
      * @return
      */
-    public String getTargetNamespace();
+    public URI getTargetNamespace();
+    
+    // may be different than targNS
+    public URI getURI();
 
     /**
      * <p>

@@ -23,7 +23,6 @@ package org.geotools.gml.producer;
 
 import com.vividsolutions.jts.geom.*;
 import org.geotools.xml.transform.TransformerBase;
-import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;

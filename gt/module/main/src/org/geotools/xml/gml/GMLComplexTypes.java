@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -3763,7 +3764,7 @@ public class GMLComplexTypes {
             dec = attrs.getValue("", "decimal");
 
             if (dec == null) {
-                dec = attrs.getValue(GMLSchema.NAMESPACE, "decimal");
+                dec = attrs.getValue(GMLSchema.NAMESPACE.toString(), "decimal");
             }
 
             dec = ((dec == null) || (dec == "")) ? "." : dec;
@@ -3771,14 +3772,14 @@ public class GMLComplexTypes {
             cs = attrs.getValue("", "cs");
 
             if (cs == null) {
-                cs = attrs.getValue(GMLSchema.NAMESPACE, "cs");
+                cs = attrs.getValue(GMLSchema.NAMESPACE.toString(), "cs");
             }
 
             cs = ((cs == null) || (cs == "")) ? ",\\s*" : (cs + "\\s*");
             ts = attrs.getValue("", "ts");
 
             if (ts == null) {
-                ts = attrs.getValue(GMLSchema.NAMESPACE, "ts");
+                ts = attrs.getValue(GMLSchema.NAMESPACE.toString(), "ts");
             }
 
             ts = ((ts == null) || (ts == "") || ts.matches("\\s")) ? "\\s+"
@@ -4043,7 +4044,7 @@ public class GMLComplexTypes {
             String fid = attrs.getValue("", "fid");
 
             if ((fid == null) || "".equals(fid)) {
-                fid = attrs.getValue(GMLSchema.NAMESPACE, "fid");
+                fid = attrs.getValue(GMLSchema.NAMESPACE.toString(), "fid");
             }
 //System.out.println("\n"+values.length);
             if ((fid != null) || !"".equals(fid)) {
@@ -6210,7 +6211,7 @@ public class GMLComplexTypes {
      */
     public static FeatureType createFeatureType(Element element) throws SAXException {
         String ftName = element.getName();
-        String ftNS = element.getType().getNamespace();
+        URI ftNS = element.getType().getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
@@ -6259,7 +6260,7 @@ public class GMLComplexTypes {
     }
     public static FeatureType createFeatureType(ComplexType element) throws SAXException {
         String ftName = element.getName();
-        String ftNS = element.getNamespace();
+        URI ftNS = element.getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);

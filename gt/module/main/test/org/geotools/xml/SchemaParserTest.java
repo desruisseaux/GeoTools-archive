@@ -1,16 +1,17 @@
 
 package org.geotools.xml;
 
-import junit.framework.TestCase;
-
-import org.geotools.resources.TestData;
-import org.geotools.xml.XSISAXHandler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import junit.framework.TestCase;
+
+import org.geotools.resources.TestData;
 
 
 /**

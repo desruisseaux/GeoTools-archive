@@ -20,6 +20,7 @@ import org.geotools.xml.PrintHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.io.IOException;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -42,7 +43,7 @@ public class DefaultSimpleType implements SimpleType {
     private int finaL;
     private String id;
     private String name;
-    private String namespace;
+    private URI namespace;
     private SimpleType[] parents = null;
     private int type = 0;
     private Facet[] constraints;
@@ -61,7 +62,7 @@ public class DefaultSimpleType implements SimpleType {
      * @param constraints DOCUMENT ME!
      * @param finaL DOCUMENT ME!
      */
-    public DefaultSimpleType(String id, String name, String namespace,
+    public DefaultSimpleType(String id, String name, URI namespace,
         int type, SimpleType[] parents, Facet[] constraints, int finaL) {
         this.id = id;
         this.name = name;
@@ -110,8 +111,8 @@ public class DefaultSimpleType implements SimpleType {
     /**
      * @see org.geotools.xml.xsi.Type#getName()
      */
-    public String getNamespace() {
-        return name;
+    public URI getNamespace() {
+        return namespace;
     }
 
     /**

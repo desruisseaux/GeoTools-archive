@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
+
 /**
  * <p>
  * DOCUMENT ME!
@@ -28,7 +30,7 @@ public class DefaultAttribute implements Attribute {
     private String fixed;
     private String id;
     private String name;
-    private String namespace;
+    private URI namespace;
     private int use;
     private SimpleType type;
     private boolean form;
@@ -48,7 +50,7 @@ public class DefaultAttribute implements Attribute {
      * @param fixed DOCUMENT ME!
      * @param form DOCUMENT ME!
      */
-    public DefaultAttribute(String id, String name, String namespace,
+    public DefaultAttribute(String id, String name, URI namespace,
         SimpleType type, int use, String defaulT, String fixed, boolean form) {
         this.id = id;
         this.name = name;
@@ -112,7 +114,7 @@ public class DefaultAttribute implements Attribute {
     /**
      * @see org.geotools.xml.schema.Attribute#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return namespace;
     }
 }

@@ -23,6 +23,8 @@ import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.net.URI;
 import java.util.Map;
 
 
@@ -67,7 +69,7 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName,
+    public XMLElementHandler getHandler(URI namespaceURI, String localName,
         Map hints) throws SAXException {
         throw new SAXException(
             "Should not have any children - this is a simpleType");
@@ -102,7 +104,7 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName, Map hints)
+    public void endElement(URI namespaceURI, String localName, Map hints)
         throws SAXException {
         text = (text == null) ? null : text.trim();
 
@@ -117,7 +119,7 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(String namespaceURI, String localName,
+    public void startElement(URI namespaceURI, String localName,
         Attributes attr) throws SAXException {
         this.attr = new AttributesImpl(attr);
     }

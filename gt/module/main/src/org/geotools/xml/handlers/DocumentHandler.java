@@ -21,6 +21,8 @@ import org.geotools.xml.schema.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
+
+import java.net.URI;
 import java.util.Map;
 
 
@@ -57,7 +59,7 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName, Map hints)
+    public void endElement(URI namespaceURI, String localName, Map hints)
         throws SAXException {
     }
 
@@ -65,7 +67,7 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName,
+    public XMLElementHandler getHandler(URI namespaceURI, String localName,
         Map hints) throws SAXException {
         if (xeh != null) {
             throw new SAXNotRecognizedException(
@@ -81,7 +83,7 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(String namespaceURI, String localName,
+    public void startElement(URI namespaceURI, String localName,
         Attributes attr) throws SAXException {
     }
 

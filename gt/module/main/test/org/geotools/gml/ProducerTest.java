@@ -16,6 +16,36 @@
  */
 package org.geotools.gml;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.Date;
+import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataSource;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
+import org.geotools.data.gml.GMLDataSource;
+import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.gml.producer.FeatureTransformer;
+import org.geotools.gml.producer.FeatureTypeTransformer;
+import org.geotools.gml.producer.FeatureTransformer.FeatureTypeNamespaces;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -28,25 +58,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-import junit.framework.*;
-
-/*
- * ProducerTest.java
- * JUnit based test
- *
- */
-import org.geotools.data.*;
-import org.geotools.data.gml.GMLDataSource;
-import org.geotools.data.memory.*;
-import org.geotools.feature.*;
-import org.geotools.gml.producer.*;
-import org.geotools.gml.producer.FeatureTransformer.FeatureTypeNamespaces;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -112,7 +123,7 @@ public class ProducerTest extends TestCase {
 
         try {
             schema = FeatureTypeFactory.newFeatureType(atts, "rail",
-                    "http://www.openplans.org/data");
+                    new URI("http://www.openplans.org/data"));
         } catch (SchemaException e) {
             LOGGER.finer("problem with creating schema");
         }
@@ -315,7 +326,7 @@ public class ProducerTest extends TestCase {
 
         try {
             schema = FeatureTypeFactory.newFeatureType(atts, "rail",
-                    "http://www.openplans.org/data");
+                    new URI("http://www.openplans.org/data"));
         } catch (SchemaException e) {
             LOGGER.finer("problem with creating schema");
         }

@@ -90,7 +90,7 @@ public class DefaultFeatureType implements FeatureType {
         }
 
         this.typeName = typeName;
-        this.namespace = namespace == null ? toURI(GMLSchema.NAMESPACE) : namespace;
+        this.namespace = namespace == null ? GMLSchema.NAMESPACE : namespace;
         this.types = (AttributeType[]) types.toArray(new AttributeType[types
                 .size()]);
         this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
@@ -114,12 +114,7 @@ public class DefaultFeatureType implements FeatureType {
      */
     private DefaultFeatureType() {
         this.typeName = "emtpyFeatureType";
-        URI namespace = null;
-        try {
-            namespace = toURI( GMLSchema.NAMESPACE );
-        } catch (SchemaException e) {            
-        }
-        this.namespace = namespace;
+            namespace = GMLSchema.NAMESPACE;
         this.types = new AttributeType[0];
         this.ancestors = new FeatureType[0];
         this.defaultGeomIdx = -1;

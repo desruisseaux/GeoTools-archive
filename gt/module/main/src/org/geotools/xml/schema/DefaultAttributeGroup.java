@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
+
 /**
  * <p>
  * DOCUMENT ME!
@@ -28,7 +30,7 @@ public class DefaultAttributeGroup implements AttributeGroup {
     private Attribute[] attributes;
     private String id;
     private String name;
-    private String namespace;
+    private URI namespace;
 
     private DefaultAttributeGroup() {
     }
@@ -42,7 +44,7 @@ public class DefaultAttributeGroup implements AttributeGroup {
      * @param attributes DOCUMENT ME!
      * @param anyAttributeNamespace DOCUMENT ME!
      */
-    public DefaultAttributeGroup(String id, String name, String namespace,
+    public DefaultAttributeGroup(String id, String name, URI namespace,
         Attribute[] attributes, String anyAttributeNamespace) {
         this.id = id;
         this.name = name;
@@ -82,7 +84,7 @@ public class DefaultAttributeGroup implements AttributeGroup {
     /**
      * @see org.geotools.xml.xsi.AttributeGroup#getNamespace()
      */
-    public String getNamespace() {
+    public URI getNamespace() {
         return namespace;
     }
 }

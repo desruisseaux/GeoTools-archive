@@ -25,6 +25,7 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.SAXException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -46,7 +47,7 @@ public class ElementHandlerFactory {
     private Logger logger;
     private Map targSchemas = new HashMap(); // maps prefix -->> Schema
     private Map prefixSchemas = new HashMap(); // maps prefix -->> Schema
-    private String defaultNS = "";
+    private URI defaultNS = null;
 
     /**
      * Creates a new ElementHandlerFactory object.
@@ -77,7 +78,9 @@ public class ElementHandlerFactory {
         logger.finest("Target == '" + targ + "'");
         logger.finest("URI == '" + uri + "'");
 
-        Schema s = SchemaFactory.getInstance(targ, uri, logger.getLevel());
+        try{
+        URI tns = new URI(targ);
+        Schema s = SchemaFactory.getInstance(tns, uri, logger.getLevel());
 
         if(s!=null){
         if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
@@ -86,6 +89,10 @@ public class ElementHandlerFactory {
 
         targSchemas.put(s.getTargetNamespace(), s);
         prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+        }
+        }catch(URISyntaxException e){
+            logger.warning(e.toString());
+            throw new SAXException(e);
         }
     }
 
@@ -96,8 +103,9 @@ public class ElementHandlerFactory {
     public void startPrefixMapping(String prefix, String targ)
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
-
-        Schema s = SchemaFactory.getInstance(targ);
+        try{
+        URI tns = new URI(targ);
+        Schema s = SchemaFactory.getInstance(tns);
         if(s == null)
             return;
         
@@ -106,6 +114,10 @@ public class ElementHandlerFactory {
         }
         targSchemas.put(s.getTargetNamespace(), s);
         prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
+        }catch(URISyntaxException e){
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        }
     }
 
     /**
@@ -121,13 +133,13 @@ public class ElementHandlerFactory {
      *
      * @see ElementHandlerFactory#createElementHandler(Element)
      */
-    public XMLElementHandler createElementHandler(String namespaceURI,
+    public XMLElementHandler createElementHandler(URI namespaceURI,
         String localName) throws SAXException {
         if (localName == null) {
             return null;
         }
 
-        if ((namespaceURI == null) || "".equalsIgnoreCase(namespaceURI)) {
+        if (namespaceURI == null) {
             namespaceURI = defaultNS;
         }
 

@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -236,7 +237,7 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws SAXException
          */
-        protected void startSchemaType(String name, String namespace)
+        protected void startSchemaType(String name, URI namespace)
             throws SAXException {
             AttributesImpl atts = new AttributesImpl();
 

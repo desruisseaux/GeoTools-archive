@@ -11,6 +11,7 @@
 package org.geotools.xml.schema;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
@@ -76,7 +77,7 @@ public interface Type {
      * 
      * @return
      */
-    public String getNamespace();
+    public URI getNamespace();
 
     /**
      * <p>

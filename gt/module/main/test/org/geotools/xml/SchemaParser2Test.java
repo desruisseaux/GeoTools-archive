@@ -1,13 +1,15 @@
 
 package org.geotools.xml;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
-import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.schema.Schema;
-import java.io.File;
-import java.util.logging.Level;
 
 
 /**
@@ -22,23 +24,23 @@ public class SchemaParser2Test extends TestCase {
     //	public void testMail(){
     //		runit("","test/mails.xsd");
     //	}
-    public void testWFS() {
-        runit("http://www.opengis.net/wfs", "wfs/WFS-basic.xsd");
+    public void testWFS() throws URISyntaxException {
+        runit(new URI("http://www.opengis.net/wfs"), "wfs/WFS-basic.xsd");
     }
 
-    public void testGMLFeature() {
-        runit("http://www.opengis.net/gml", "gml/feature.xsd");
+    public void testGMLFeature() throws URISyntaxException {
+        runit(new URI("http://www.opengis.net/gml"), "gml/feature.xsd");
     }
 
-    public void testGMLGeometry() {
-        runit("http://www.opengis.net/gml", "gml/geometry.xsd");
+    public void testGMLGeometry() throws URISyntaxException {
+        runit(new URI("http://www.opengis.net/gml"), "gml/geometry.xsd");
     }
 
-    public void testGMLXLinks() {
-        runit("http://www.w3.org/1999/xlink", "gml/xlinks.xsd");
+    public void testGMLXLinks() throws URISyntaxException {
+        runit(new URI("http://www.w3.org/1999/xlink"), "gml/xlinks.xsd");
     }
 
-    private void runit(String targetNS, String path) {
+    private void runit(URI targetNS, String path) {
         Schema s = null;
 
         try {

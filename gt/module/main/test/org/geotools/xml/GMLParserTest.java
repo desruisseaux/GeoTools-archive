@@ -1,6 +1,15 @@
 
 package org.geotools.xml;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.logging.Level;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import junit.framework.TestCase;
 
 import org.geotools.feature.Feature;
@@ -10,15 +19,6 @@ import org.geotools.resources.TestData;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.logging.Level;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 
 /**
@@ -185,7 +185,7 @@ public class GMLParserTest extends TestCase {
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
 
-        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+        Schema s = SchemaFactory.getInstance(new URI("http://www.openplans.org/topp"));
                 
         path = "oneFeature_out.xml";
         f = new File(f.getParentFile(),path);
@@ -218,7 +218,7 @@ public class GMLParserTest extends TestCase {
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
 
-        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+        Schema s = SchemaFactory.getInstance(new URI("http://www.openplans.org/topp"));
                 
         path = "oneFeature_out_hints.xml";
         f = new File(f.getParentFile(),path);

@@ -169,11 +169,11 @@ public class SchemaFactory {
      *
      * @throws SAXException
      */
-    public static Schema getInstance(String targetNamespace, URI desiredSchema)
+    public static Schema getInstance(URI targetNamespace, URI desiredSchema)
     throws SAXException {
     return getInstance(targetNamespace, desiredSchema, Level.WARNING);
 }
-    public static Schema getInstance(String targetNamespace, InputStream is)
+    public static Schema getInstance(URI targetNamespace, InputStream is)
     throws SAXException {
     return getInstance(targetNamespace, is, Level.WARNING);
 }
@@ -190,7 +190,7 @@ public class SchemaFactory {
      *
      * @see registerSchema(Strin,Schema)
      */
-    public synchronized static Schema getInstance(String targetNamespace) {
+    public synchronized static Schema getInstance(URI targetNamespace) {
         Schema r = (Schema) schemas.get(targetNamespace);
 
         if (r != null) {
@@ -227,7 +227,7 @@ public class SchemaFactory {
      *
      * @throws SAXException When something goes wrong
      */
-    public synchronized static Schema getInstance(String targetNamespace,
+    public synchronized static Schema getInstance(URI targetNamespace,
             URI desiredSchema, Level level) throws SAXException {
             if ((targetNamespace == null) || "".equals(targetNamespace)
                     || (schemas.get(targetNamespace) == null)) {
@@ -282,22 +282,11 @@ public class SchemaFactory {
 
             return (Schema) schemas.get(targetNamespace);
         }
-    public synchronized static Schema getInstance(String targetNamespace,
+    public synchronized static Schema getInstance(URI targetNamespace,
             InputStream is, Level level) throws SAXException {
             if ((targetNamespace == null) || "".equals(targetNamespace)
                     || (schemas.get(targetNamespace) == null)) {
-//                if (mappings.containsKey(targetNamespace)) {
-//                    ClassLoader cl = SchemaFactory.class.getClassLoader();
-    //
-//                    try {
-//                        Class c = cl.loadClass((String) mappings.get(
-//                                    targetNamespace));
-//                        schemas.put(targetNamespace,
-//                            c.getConstructor(new Class[0]).newInstance(new Object[0]));
-//                    } catch (Exception e) {
-//                        throw new SAXException(e);
-//                    }
-//                } else {
+
                     setParser();
 
                     XSISAXHandler contentHandler = new XSISAXHandler(null); // no uri
@@ -356,7 +345,7 @@ public class SchemaFactory {
      * @param targetNamespace
      * @param schema
      */
-    public static void registerSchema(String targetNamespace, Schema schema) {
+    public static void registerSchema(URI targetNamespace, Schema schema) {
         schemas.put(targetNamespace, schema);
     }
 
@@ -405,7 +394,7 @@ public class SchemaFactory {
         private String id;
         private String version;
         private String prefix;
-        private String targetNamespace;
+        private URI targetNamespace;
         private Schema[] imports;
         private SimpleType[] simpleTypes;
         private boolean aForm;
@@ -751,7 +740,7 @@ public class SchemaFactory {
         /**
          * @see schema.Schema#getTargetNamespace()
          */
-        public String getTargetNamespace() {
+        public URI getTargetNamespace() {
             return targetNamespace;
         }
 

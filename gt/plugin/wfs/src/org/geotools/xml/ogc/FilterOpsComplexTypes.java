@@ -9,13 +9,16 @@ import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.NullFilter;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.ExpressionType;
 import org.geotools.xml.ogc.FilterComplexTypes.LiteralType;
 import org.geotools.xml.ogc.FilterComplexTypes.PropertyNameType;
@@ -37,6 +40,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * <p> 
@@ -813,19 +818,29 @@ public class FilterOpsComplexTypes {
         private static final ComplexType instance = new LowerBoundaryType();
         public static ComplexType getInstance(){return instance;}
         
+//      <xsd:complexType name="LowerBoundaryType">
+//		<xsd:choice>
+//			<xsd:element ref="ogc:expression"/>
+//		</xsd:choice>
+//		</xsd:complexType>
+        
+        private static Element[] elems = new Element[] {
+                new FilterElement("expression",ExpressionType.getInstance()),
+        };
+        
+        private static Choice choice = new DefaultChoice(elems);
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return choice;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -844,41 +859,51 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Expression.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            
+            if(!canEncode(element,value,hints))
+            	return;
+            Expression lf = (Expression)value;
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            elems[0].getType().encode(elems[0],lf,output,hints); // expression
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class UpperBoundaryType extends FilterComplexType{
         private static final ComplexType instance = new UpperBoundaryType();
         public static ComplexType getInstance(){return instance;}
         
+//    	<xsd:complexType name="UpperBoundaryType">
+//    		<xsd:sequence>
+//    			<xsd:element ref="ogc:expression"/>
+//    		</xsd:sequence>
+//    	</xsd:complexType>
+
+        private static Element[] elems = new Element[] {
+                new FilterElement("expression",ExpressionType.getInstance()),
+        };
+        
+        private static Sequence choice = new DefaultSequence(elems);
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return choice;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -897,41 +922,67 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Expression.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            
+            if(!canEncode(element,value,hints))
+            	return;
+            Expression lf = (Expression)value;
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            elems[0].getType().encode(elems[0],lf,output,hints); // expression
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class BinarySpatialOpType extends FilterComplexType{
         private static final ComplexType instance = new BinarySpatialOpType();
         public static ComplexType getInstance(){return instance;}
         
+//    	<xsd:complexType name="BinarySpatialOpType">
+//    		<xsd:complexContent>
+//    			<xsd:extension base="ogc:SpatialOpsType">
+//    				<xsd:sequence>
+//    					<xsd:element ref="ogc:PropertyName"/>
+//    					<xsd:choice>
+//    						<xsd:element ref="gml:_Geometry"/>
+//    						<xsd:element ref="gml:Box"/>
+//    					</xsd:choice>
+//    				</xsd:sequence>
+//    			</xsd:extension>
+//    		</xsd:complexContent>
+//    	</xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("PropertyName",PropertyNameType.getInstance()),
+                GMLSchema.getInstance().getElements()[29], // _Geometry
+                GMLSchema.getInstance().getElements()[41]  // Box
+        };
+        
+        private static Sequence child = new DefaultSequence(new ElementGrouping[]{
+                elems[0],new DefaultChoice(new Element[]{elems[1],elems[2]})
+        });
+        
+        public Type getParent(){
+            return SpatialOpsType.getInstance();
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return child;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -950,41 +1001,79 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return GeometryFilter.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryFilter;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(!canEncode(element,value,hints))
+            	return;
+            GeometryFilter lf = (GeometryFilter)value;
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
+                    elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+                else
+                    elems[2].getType().encode(elems[2],lf.getRightGeometry(),output,hints); // geom
+            }else{
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                    elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
+                    if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
+                        elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                    else
+                        elems[2].getType().encode(elems[2],lf.getLeftGeometry(),output,hints); // geom
+                }else{
+                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name");
+                }
+            }
             
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class BBOXType extends FilterComplexType{
         private static final ComplexType instance = new BBOXType();
         public static ComplexType getInstance(){return instance;}
         
+//    	<xsd:complexType name="BBOXType">
+//		<xsd:complexContent>
+//			<xsd:extension base="ogc:SpatialOpsType">
+//				<xsd:sequence>
+//					<xsd:element ref="ogc:PropertyName"/>
+//					<xsd:element ref="gml:Box"/>
+//				</xsd:sequence>
+//			</xsd:extension>
+//		</xsd:complexContent>
+//		</xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("PropertyName",PropertyNameType.getInstance()),
+                GMLSchema.getInstance().getElements()[41]  // Box
+        };
+        
+        private Sequence seq = new DefaultSequence(elems);
+
+        
+        public Type getParent(){
+            return SpatialOpsType.getInstance();
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -1003,41 +1092,75 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return GeometryFilter.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryFilter;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(!canEncode(element,value,hints))
+            	return;
+            GeometryFilter lf = (GeometryFilter)value;
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
+                elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+            }else{
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                    elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
+                    elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                }else{
+                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name");
+                }
+            }
             
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class DistanceBufferType extends FilterComplexType{
         private static final ComplexType instance = new DistanceBufferType();
         public static ComplexType getInstance(){return instance;}
+
+//    	<xsd:complexType name="DistanceBufferType">
+//    		<xsd:complexContent>
+//    			<xsd:extension base="ogc:SpatialOpsType">
+//    				<xsd:sequence>
+//    					<xsd:element ref="ogc:PropertyName"/>
+//    					<xsd:element ref="gml:_Geometry"/>
+//    					<xsd:element name="Distance" type="ogc:DistanceType"/>
+//    				</xsd:sequence>
+//    			</xsd:extension>
+//    		</xsd:complexContent>
+//    	</xsd:complexType>
+
+        private static Element[] elems = new Element[]{
+                new FilterElement("PropertyName",PropertyNameType.getInstance()),
+                GMLSchema.getInstance().getElements()[29], // _Geometry
+                new FilterElement("Distance",DistanceType.getInstance())
+        };
+        
+        private Sequence seq = new DefaultSequence(elems);
+
+        
+        public Type getParent(){
+            return SpatialOpsType.getInstance();
+        }
         
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -1056,40 +1179,67 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return GeometryDistanceFilter.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryDistanceFilter;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(!canEncode(element,value,hints))
+            	return;
+            GeometryDistanceFilter lf = (GeometryDistanceFilter)value;
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
+                elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+                elems[2].getType().encode(elems[2],lf,output,hints); // distancetype
+            }else{
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
+                    elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
+                    elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                    elems[2].getType().encode(elems[2],lf,output,hints); // distancetype
+                }else{
+                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name");
+                }
+            }
             
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class DistanceType extends FilterComplexType{
         private static final ComplexType instance = new DistanceType();
         public static ComplexType getInstance(){return instance;}
+
+//    	<xsd:complexType name="DistanceType" mixed="true">
+//    		<xsd:attribute name="units" type="xsd:string" use="required"/>
+//    	</xsd:complexType>
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("units",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED),
+        };
+        
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
         
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -1109,22 +1259,27 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return GeometryDistanceFilter.class;
         }
-        /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryDistanceFilter;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            if(!canEncode(element,value,hints))
+            	return;
+            GeometryDistanceFilter lf = (GeometryDistanceFilter)value;
             
+            AttributesImpl ai = new AttributesImpl();
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
+                ai.addAttribute(getNamespace(),attrs[0].getName(),null,"string", ((Geometry)lf.getLeftGeometry()).getUserData().toString());
+            else
+                ai.addAttribute(getNamespace(),attrs[0].getName(),null,"string", ((Geometry)lf.getRightGeometry()).getUserData().toString());
+            output.startElement(element.getNamespace(),element.getName(),null);
+            output.characters(""+lf.getDistance());
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class BinaryLogicOpType extends FilterComplexType{

@@ -20,6 +20,9 @@ import com.vividsolutions.jts.geom.*;
 import org.geotools.feature.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -297,7 +300,12 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
                         clazz));
             }
 
-            factory.setNamespace(namespaceURI);
+            try {
+                factory.setNamespace(new URI(namespaceURI));
+            } catch (URISyntaxException e) {
+                LOGGER.warning(e.toString());
+                throw new SAXException(e);
+            }
 
             try {
                 Feature feature = factory.getFeatureType().create(attributes

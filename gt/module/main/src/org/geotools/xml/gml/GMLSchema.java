@@ -56,7 +56,7 @@ import javax.naming.OperationNotSupportedException;
 public class GMLSchema implements Schema {
     
     /** GML target namespace */
-    public static String NAMESPACE = "http://www.opengis.net/gml";
+    public static final URI NAMESPACE = makeURI("http://www.opengis.net/gml");
 
     // static attribute set
     private static Attribute[] attributes = AttributeList.attributes;
@@ -77,9 +77,6 @@ public class GMLSchema implements Schema {
 
     // static simpleType set
     private static SimpleType[] simpleTypes = { new GMLNullType(), };
-
-    // this schema's set of supported uri's
-    private URI uri = makeURI(NAMESPACE);
 
     /**
      * Creates a new GMLSchema object.
@@ -377,7 +374,10 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getTargetNamespace()
      */
-    public String getTargetNamespace() {
+    public URI getTargetNamespace() {
+        return NAMESPACE;
+    }
+    public URI getURI() {
         return NAMESPACE;
     }
 
@@ -388,7 +388,7 @@ public class GMLSchema implements Schema {
         return "2.1.2";
     }
 
-    private URI makeURI(String s) {
+    private static URI makeURI(String s) {
         try {
             return new URI(s);
         } catch (URISyntaxException e) {
@@ -414,13 +414,6 @@ public class GMLSchema implements Schema {
      */
     public boolean isAttributeFormDefault() {
         return false;
-    }
-
-    /**
-     * @see schema.Schema#getURIs()
-     */
-    public URI getURI() {
-        return uri;
     }
 
     /**
@@ -617,7 +610,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Element#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
     }
@@ -664,7 +657,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.ComplexType#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 
@@ -767,7 +760,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Attribute#getNameSpace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 
@@ -842,16 +835,9 @@ public class GMLSchema implements Schema {
         static final AttributeGroup child = XLinkSchema.SimpleLink.getInstance();
 
         /**
-         * @see schema.AttributeGroup#getNameSpace()
-         */
-        public String getNameSpace() {
-            return GMLSchema.NAMESPACE;
-        }
-
-        /**
          * @see schema.Attribute#getNameSpace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 
@@ -897,7 +883,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.SimpleType#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
 

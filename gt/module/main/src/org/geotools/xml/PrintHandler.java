@@ -20,6 +20,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import java.io.IOException;
+import java.net.URI;
 
 
 /**
@@ -37,7 +38,7 @@ public interface PrintHandler {
      *
      * @throws IOException  
      */
-    public void startElement(String namespaceURI, String localName,
+    public void startElement(URI namespaceURI, String localName,
         Attributes attributes) throws IOException;
 
     /**
@@ -49,7 +50,7 @@ public interface PrintHandler {
      *
      * @throws IOException  
      */
-    public void element(String namespaceURI, String localName,
+    public void element(URI namespaceURI, String localName,
         Attributes attributes) throws IOException;
 
     /**
@@ -60,7 +61,7 @@ public interface PrintHandler {
      *
      * @throws IOException  
      */
-    public void endElement(String namespaceURI, String localName)
+    public void endElement(URI namespaceURI, String localName)
         throws IOException;
 
     /**

@@ -1,14 +1,15 @@
 
 package org.geotools.xml;
 
+import java.io.File;
+import java.net.URI;
+import java.util.logging.Level;
+
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
-import java.io.File;
-import java.net.URI;
-import java.util.logging.Level;
 
 
 /**
@@ -50,7 +51,7 @@ public class XMLParserTest extends TestCase {
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
 
-        Schema s = SchemaFactory.getInstance("http://mails/refractions/net");
+        Schema s = SchemaFactory.getInstance(new URI("http://mails/refractions/net"));
                 
         path = "mails_out.xml";
         f = new File(f.getParentFile(),path);

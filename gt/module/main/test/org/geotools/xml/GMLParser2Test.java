@@ -3,17 +3,6 @@ package org.geotools.xml;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
-import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 
 /**
  * <p>

@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
+
 /**
  * <p>
  * Instances of this interface are intended to represent the 'any' construct in
@@ -53,5 +55,5 @@ public interface Any extends ElementGrouping {
      *
      * @return
      */
-    public String getNamespace();
+    public URI getNamespace();
 }

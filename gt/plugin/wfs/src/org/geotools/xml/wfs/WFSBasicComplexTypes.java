@@ -506,6 +506,7 @@ public class WFSBasicComplexTypes {
                 if(query.getHandle()!=null && !"".equals(query.getHandle()))
                     attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",query.getHandle());
                 
+                // TODO this is a QName I think ... check it out
                 attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",query.getTypeName());
                 
                 if(query.getVersion()!=null && !"".equals(query.getVersion()))
