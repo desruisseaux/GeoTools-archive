@@ -120,6 +120,14 @@ public class EPSGTest extends TestCase {
         assertNotNull( crs );                
     }
     
+    /**
+     * A random CRS for fun.
+     */
+    public void test26986Lower() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26986");
+        assertNotNull( crs );                
+    }
+    
     /** wfs requires this to work */
     public void test4326Lower() throws Exception {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:4326");

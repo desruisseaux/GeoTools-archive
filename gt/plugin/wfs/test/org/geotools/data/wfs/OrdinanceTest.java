@@ -52,7 +52,8 @@ public class OrdinanceTest extends TestCase {
     private URL url = null;
     
     public OrdinanceTest() throws MalformedURLException{
-        url = new URL("http://cavalier.ordnancesurvey.co.uk/magnesium/wfs/OSNL?");
+        // 500 error
+//        url = new URL("http://cavalier.ordnancesurvey.co.uk/magnesium/wfs/OSNL?");
     }
     
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
