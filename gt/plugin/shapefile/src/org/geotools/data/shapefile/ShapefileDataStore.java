@@ -21,6 +21,12 @@ package org.geotools.data.shapefile;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AbstractFeatureLocking;
@@ -82,6 +88,7 @@ import java.util.Map;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.shapefile.prj.PrjFileReader;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.type.BasicFeatureTypes;
 import org.opengis.referencing.FactoryException;
 
 
@@ -160,30 +167,30 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * Create our own TypeEntry that will calculate BBox based on
      * available metadata.
      */
-    protected TypeEntry createTypeEntry( final String typeName ) {    
+    protected TypeEntry createTypeEntry( final String typeName ) {
         URI namespace;
         try {
             namespace = getSchema( typeName ).getNamespaceURI();
         } catch (IOException e) {
             namespace = null;
         }
-        return new DefaultTypeEntry( this, namespace, typeName ) {            
+        return new DefaultTypeEntry( this, namespace, typeName ) {
             /** Use ShapefileDataStore createMetadata method */
             protected Map createMetadata() {
                 return ShapefileDataStore.this.createMetadata( typeName );
             }
             /**
              * Grab bounds from metadata, if possible.
-             * 
+             *
              * @return geographic bounding box
              */
             protected Envelope createBounds() {
                 Envelope bbox = null;
                 Metadata meta = (Metadata) metadata().get( "shp.xml" );
-                if( meta != null ) {                    
+                if( meta != null ) {
                     bbox = meta.getIdinfo().getLbounding();
                     if( bbox != null ) {
-                        return bbox;                    
+                        return bbox;
                     }
                     bbox = meta.getIdinfo().getBounding();
                     // we would need to reproject this :-P
@@ -199,7 +206,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * <p>
      * This method is called by the createTypeEntry
      * anonymous inner class DefaultTypeEntry.
-     * </p> 
+     * </p>
      * @return Map with xmlURL parsed, or an EMPTY_MAP.
      */
     protected Map createMetadata( String typeName ) {
@@ -543,8 +550,26 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     public FeatureType getSchema() throws IOException {
         if (schema == null) {
             try {
-                schema = FeatureTypeFactory.newFeatureType(readAttributes(),
-                createFeatureTypeName());
+                AttributeType[] types = readAttributes();
+                FeatureType parent = null;
+                Class geomType = types[0].getType();
+                if(geomType == Point.class || geomType == MultiPoint.class){
+                    parent = BasicFeatureTypes.POINT;
+                }
+                else if(geomType == Polygon.class || geomType == MultiPolygon.class){
+                    parent = BasicFeatureTypes.POLYGON;
+                }
+                else if(geomType == LineString.class || geomType == MultiLineString.class){
+                    parent = BasicFeatureTypes.LINE;
+                }
+                if(parent != null){
+                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                    createFeatureTypeName(), null, false, new FeatureType[] {parent});
+                }
+                else {
+                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                    createFeatureTypeName());
+                }
             } catch (SchemaException se) {
                 throw new DataSourceException("Error creating FeatureType", se);
             }
