@@ -4122,8 +4122,19 @@ public class GMLComplexTypes {
                             ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
                         j = k;
                 }
-                if(j!=-1)
+                if(j!=-1){
                     values[j] = value[i].getValue();
+                }else{
+                    // HACK !!!
+                    
+                    // not found ... is it the same name as the FT 
+                    // (ie ... is this part of the consequences of GT's featureType model)?
+                    if(value[i].getValue()!=null)
+                    for(int k=0;k<ft.getAttributeCount();k++)
+                        if(ft.getAttributeType(k).getName().equals(ft.getTypeName()) 
+                                && ft.getAttributeType(k).getType().isAssignableFrom(value[i].getValue().getClass()))
+                                values[k] = value[i].getValue();
+                }
             }
 
             String fid = attrs.getValue("", "fid");
