@@ -128,8 +128,6 @@ public class WFSTransactionState implements State {
             }
         }
 
-        //	    if((ds.protos & WFSDataStore.GET_OK) == WFSDataStore.GET_OK && tr == null)
-        //	        tr = commitGet();
         if (tr == null) {
             throw new IOException("An error occured");
         }
@@ -150,8 +148,7 @@ public class WFSTransactionState implements State {
             return null;
         }
 
-        HttpURLConnection hc = (HttpURLConnection) postUrl.openConnection();
-        hc.setRequestMethod("POST");
+        HttpURLConnection hc = WFSDataStore.getConnection(postUrl,ds.auth,true);
 
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
@@ -170,19 +167,8 @@ public class WFSTransactionState implements State {
         }
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction
-
-//try{
-//StringWriter sw = new StringWriter();
-//
-//DocumentWriter.writeDocument(this, WFSSchema.getInstance(), sw, hints);
-//System.out.println(sw.toString());
-//sw.flush();
-//sw.close();
-//}catch(Exception e){
-//	e.printStackTrace();
-//}
         
-        OutputStream os = WFSDataStore.getOutputStream(hc, ds.auth);
+        OutputStream os = hc.getOutputStream();
 
         // write request
         Writer w = new OutputStreamWriter(os);
@@ -191,13 +177,12 @@ public class WFSTransactionState implements State {
         os.flush();
         os.close();
 
-        InputStream is = WFSDataStore.getInputStream(hc, ds.auth);
+        InputStream is = hc.getInputStream();
 
         hints = new HashMap();
 
         TransactionResult ft = (TransactionResult) DocumentFactory.getInstance(is,
                 hints, Level.WARNING);
-//System.out.println("RESULT IS NULL? "+(ft == null));
         return ft;
     }
 

@@ -57,8 +57,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -161,12 +159,12 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
         try{
-            HttpURLConnection hc = (HttpURLConnection) host.openConnection();
-            InputStream is = getInputStream(hc, auth);
+            HttpURLConnection hc = getConnection(host,auth,false);
+            InputStream is = hc.getInputStream();
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }catch(Throwable e){
-            HttpURLConnection hc = (HttpURLConnection) createGetCapabilitiesRequest(host).openConnection();
-            InputStream is = getInputStream(hc, auth);
+            HttpURLConnection hc = getConnection(createGetCapabilitiesRequest(host),auth,false);
+            InputStream is = hc.getInputStream();
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }
         if (t instanceof WFSCapabilities) {
@@ -178,6 +176,16 @@ public class WFSDataStore extends AbstractDataStore {
         }
     }
 
+<<<<<<< .mine
+    protected static HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost) throws IOException{
+
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        if(isPost){
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestProperty("Content-type", "application/xml");
+=======
     protected static InputStream getInputStream(HttpURLConnection url,
         Authenticator auth) throws IOException {
         // TODO ensure that we can sync using the class loader and not have concurent thread issues
@@ -187,39 +195,26 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(auth == null){
             url.connect();
+>>>>>>> .r10759
         }else{
-            synchronized (Authenticator.class) {
-                Authenticator.setDefault(auth);
-                url.connect();
-                Authenticator.setDefault(null);
-            }
+            connection.setRequestMethod("GET");
         }
+        synchronized (Authenticator.class) {
+                Authenticator.setDefault(auth);
+<<<<<<< .mine
+                connection.connect();
+=======
+                url.connect();
+>>>>>>> .r10759
+                Authenticator.setDefault(null);
+        }
+<<<<<<< .mine
+        return connection;
+=======
         result = url.getInputStream();
 
         return new BufferedInputStream(result);
-    }
-
-    protected static OutputStream getOutputStream(HttpURLConnection url,
-        Authenticator auth) throws IOException {
-        // TODO ensure that we can sync using the class loader and not have concurent thread issues
-        //
-        // should be ok, as we would only be playing with the classloader's allocated space
-        OutputStream result = null;
-        url.setDoOutput(true);
-
-        if(auth == null){
-            result = url.getOutputStream();
-        }else{
-        synchronized (Authenticator.class) {
-            Authenticator.setDefault(auth);
-
-            // 	      url.connect();
-            result = url.getOutputStream();
-
-            Authenticator.setDefault(null);
-        }}
-
-        return new BufferedOutputStream(result);
+>>>>>>> .r10759
     }
 
     private static URL createGetCapabilitiesRequest(URL host) {
@@ -397,10 +392,9 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + typeName);
 
         getUrl = new URL(url);
-        HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
-        hc.setRequestMethod("GET");
+        HttpURLConnection hc = getConnection(getUrl,auth,false);
 
-        InputStream is = getInputStream(hc, auth);
+        InputStream is = hc.getInputStream();
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
         Element element = null;
@@ -435,11 +429,9 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         //System.out.println(postUrl);
-        HttpURLConnection hc = (HttpURLConnection) postUrl.openConnection();
-        hc.setRequestMethod("POST");
-        hc.setDoInput(true);
+        HttpURLConnection hc = getConnection(postUrl,auth,true);
 
-        OutputStream os = getOutputStream(hc, auth);
+        OutputStream os = hc.getOutputStream();
 
         // write request
         Writer w = new OutputStreamWriter(os);
@@ -475,10 +467,8 @@ public class WFSDataStore extends AbstractDataStore {
         }
         w.flush();
         os.flush();
-        w.close();
-        os.close();
         
-        InputStream is = getInputStream(hc, auth);
+        InputStream is = hc.getInputStream();
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
 
@@ -504,6 +494,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         FeatureType ft = GMLComplexTypes.createFeatureType(element);
 
+        w.close();
         os.close();
         is.close();
 
@@ -576,13 +567,11 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
 
-//System.out.println("GET URL = "+url); // url to request
         getUrl = new URL(url);
 
-        HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
-        hc.setRequestMethod("GET");
+        HttpURLConnection hc = getConnection(getUrl,auth,false);
 
-        InputStream is = getInputStream(hc, auth);
+        InputStream is = hc.getInputStream();
 
         WFSTransactionState ts = null;
 
@@ -666,12 +655,9 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         
-        HttpURLConnection hc = (HttpURLConnection) postUrl.openConnection();
-        hc.setRequestMethod("POST");
-        hc.setDoInput(true);
-        hc.setDoOutput(true);
+        HttpURLConnection hc = getConnection(postUrl,auth,true);
 
-        OutputStream os = getOutputStream(hc, auth);
+        OutputStream os = hc.getOutputStream();
 
         // write request
         Writer w = new OutputStreamWriter(os);
@@ -702,7 +688,7 @@ public class WFSDataStore extends AbstractDataStore {
         os.flush();
         os.close();
 
-        InputStream is = getInputStream(hc, auth);
+        InputStream is = hc.getInputStream();
 
         // 	    System.out.println("ready?"+is.available());
         WFSTransactionState ts = null;
