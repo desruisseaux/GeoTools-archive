@@ -90,7 +90,7 @@ public class WMS1_3_0 extends WMS1_1_1 {
         }
 	}
 	
-    public GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
+    public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
             Set queryableLayers, String[] infoFormats ) {
         return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
     }

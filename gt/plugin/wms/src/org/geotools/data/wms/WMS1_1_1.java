@@ -102,7 +102,7 @@ public class WMS1_1_1 extends WMS1_1_0 {
         return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
     }
 
-    public GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
+    public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
             Set queryableLayers, String[] infoFormats ) {
         return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
     }
