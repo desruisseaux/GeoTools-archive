@@ -18,6 +18,7 @@
                implementations that are used by other GeoTools modules.
   </description>
   <url>http://www.geotools.org/</url>
+
   <developers>
     <developer>
       <name>James Macgill</name>
@@ -91,7 +92,39 @@
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Rueben Schulz</name>
+      <organization>University of British Columbia</organization>
+      <roles>
+        <role>Java developper / Tester</role>
+      </roles>
+    </developer>
   </developers>
+
+  <contributors>
+    <contributor>
+      <name>Rémi Eve</name>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Yann Cézard</name>
+      <organization>Université de Montpellier II</organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Daniele Franzoni</name>
+      <organization>SATA srl, Italy</organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
+  </contributors>
+
   <dependencies>
     <dependency>
       <id>JTS</id>
@@ -187,6 +220,7 @@
       <version>1.5</version>
     </dependency>
   </dependencies>
+
   <build>
     <unitTest>
       <includes>
