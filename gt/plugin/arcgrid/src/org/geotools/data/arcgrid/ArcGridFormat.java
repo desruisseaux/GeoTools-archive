@@ -19,7 +19,8 @@ package org.geotools.data.arcgrid;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.parameter.OperationParameter;
+import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.ParameterGroupDescriptor;
 import org.opengis.parameter.GeneralOperationParameter;
 
 import java.io.File;
@@ -51,14 +52,12 @@ public class ArcGridFormat extends AbstractGridFormat {
         info.put("docURL", "http://gdal.velocet.ca/projects/aigrid/index.html");
         info.put("version", "1.0");
         mInfo = info;
-
-        readParameters = new GeneralOperationParameter[2];
-        readParameters[0] = getGRASSParam();
-        readParameters[1] = getCompressParam();
-
-        writeParameters = new GeneralOperationParameter[2];
-        writeParameters[0] = getGRASSParam();
-        writeParameters[1] = getCompressParam();
+        
+        readParameters = new ParameterGroupDescriptor( mInfo, 1, 1,
+                new GeneralOperationParameter[]{ getGRASSParam(), getCompressParam()} );
+        
+        writeParameters = new ParameterGroupDescriptor( mInfo, 1, 1,
+                new GeneralOperationParameter[]{ getGRASSParam(), getCompressParam()} );        
     }
     /**
      * Creates a "Compress" Parameter.  Indicates whether the arcgrid data is
@@ -67,11 +66,7 @@ public class ArcGridFormat extends AbstractGridFormat {
      * @return a "Compress" Parameter.
      */
     public static GeneralOperationParameter getCompressParam() {
-
-        Boolean[] values=new Boolean[]{
-                new Boolean(true), new Boolean(false)};
-        
-        return new OperationParameter("Compressed", Boolean.class, values, new Boolean(false));
+        return new ParameterDescriptor( "Compressed", "Indicates whether the arcgrid data is compressed with GZIP", Boolean.FALSE, true );        
     }
     /**
      * Creates a "GRASS" Parameter.  Indicates whether the arcgrid is in GRASS
@@ -80,10 +75,7 @@ public class ArcGridFormat extends AbstractGridFormat {
      * @return a "GRASS" Parameter.
      */
     public static GeneralOperationParameter getGRASSParam() {
-        Boolean[] values=new Boolean[]{
-                new Boolean(true), new Boolean(false)};
-        
-        return new OperationParameter("GRASS", Boolean.class, values, new Boolean(false));
+        return new ParameterDescriptor( "GRASS", "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true );
     }
 
     /**

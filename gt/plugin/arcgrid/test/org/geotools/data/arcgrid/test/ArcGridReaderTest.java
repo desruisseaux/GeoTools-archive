@@ -3,17 +3,15 @@
  */
 package org.geotools.data.arcgrid.test;
 
-import java.io.InputStream;
 import java.net.URL;
-import java.util.Locale;
 
 import org.geotools.data.arcgrid.ArcGridFormatFactory;
-import org.geotools.data.arcgrid.ArcGridReader;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.opengis.parameter.GeneralOperationParameter;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * 
@@ -74,21 +72,19 @@ public class ArcGridReaderTest extends TestCaseSupport {
      */
     public void testGZIPReadStringParameterArray() throws Exception {
         reader=format.getReader(getTestResource(GZIP_TESTFILE));
-        GeneralOperationParameter[] params = format.getReadParameters();
-        GeneralParameterValue[] pvalues =new ParameterValue[2];
-        ParameterValue value;
-        for (int i = 0; i < params.length; i++) {
-            if( params[i].getName(Locale.ENGLISH).equalsIgnoreCase("GRASS")){
-                value=(ParameterValue)params[i].createValue();
-                value.setValue(true);
-                pvalues[0]=value;
-            }
-            if( params[i].getName(Locale.ENGLISH).equalsIgnoreCase("Compressed")){
-                value=(ParameterValue)params[i].createValue();
-                value.setValue(true);
-                pvalues[1]=value;
-            }
-        }
+        OperationParameterGroup params = format.getReadParameters();
+        ParameterValueGroup values = (ParameterValueGroup) params.createValue();
+        
+        OperationParameter grassInfo = params.getParameter( "GRASS" );
+        ParameterValue grass = values.getValue( "GRASS" );
+        grass.setValue( true );
+        
+        
+        OperationParameter compressInfo = params.getParameter( "Compressed" );
+        ParameterValue compress = values.getValue( "Compressed" );
+        compress.setValue( true );
+        
+        params.createValue();
     }
 
 }
