@@ -5,13 +5,6 @@
   <name>geotools-arcgrid</name>
   <id>arcgrid</id>
   <currentVersion>2.1.x</currentVersion>
-  <versions>
-    <version>
-      <id>b1</id>
-      <name>2.1.x</name>
-      <tag>GT_2_0_B6</tag>
-    </version>
-  </versions>
   <package>org.geotools</package>
   <shortDescription>ArcGrid datasource module</shortDescription>
   <description>Datasource created to read ArcGrid raster

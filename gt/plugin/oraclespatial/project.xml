@@ -5,13 +5,6 @@
   <name>geotools-oraclespatial</name>
   <id>oracle-spatial</id>
   <currentVersion>2.1.x</currentVersion>
-  <versions>
-    <version>
-      <id>b1</id>
-      <name>2.1.x</name>
-      <tag>GT_2_0_B6_DEV</tag>
-    </version>
-  </versions>
   <package>org.geotools</package>
   <shortDescription>Oracle Spatial Module</shortDescription>
   <description>Oracle Spatial Module</description>

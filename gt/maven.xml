@@ -1,6 +1,4 @@
-
-
-        <!-- ==================================================================== -->
+<!-- ==================================================================== -->
 <!-- R E A C T O R                                                        -->
 <!-- ==================================================================== -->
 <!-- This is a template for a reactor that will hopefully allow users     -->
@@ -130,7 +128,7 @@
                 <fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>
                 <j:set var="gt2home" value="${basedir}"/>
                 <echo>
-      looking for modules in: ${basedir}/module, ${basedir}/plugin, ${basedir}/ext
+      looking for modules in: ${basedir}/module, ${basedir}/plugin, ${basedir}/ext, ${basedir}/demo
       reporting progress to ${gt2home}
     </echo>
      <ant:delete dir="target/test-reports"/>
@@ -154,6 +152,13 @@
                        banner="Building"
                        postProcessing="true"
                        ignoreFailures="true"/>
+    <maven:reactor basedir="${basedir}/demo"
+                   includes="*/project.xml"
+                   goals="build:log,clean,jar:install,mergeTestReports"
+                   banner="Building"
+                   postProcessing="true"
+                   ignoreFailures="true"/>
+                   
     <loadfile property="build.report"
                srcFile="${basedir}/buildReport.txt"
                failonerror="false"/>
@@ -350,8 +355,7 @@ Module ${module} : ${status}
             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
             <echo message="release report is set to ${release.report}"/>
             <echo file="${release.report}" message="release is ${release.version}"/>
-            <!-- <loadfile property="release.required" srcFile="requiredList.txt"/> -->
-            <j:set var="release.required" value="main"/>
+            <loadfile property="release.required" srcFile="module/release.txt"/>            
             <u:tokenize var="list" delim=",">${release.required}</u:tokenize>
             <j:set var="todo" value=""/>
             <j:set var="required" value=""/>    
@@ -375,7 +379,7 @@ ${required}"/>
 
 
             <!-- add optional plugins seperatly -->
-            <loadfile property="release.optional" srcFile="optionalList.txt"/>
+            <loadfile property="release.optional" srcFile="plugin/release.txt"/>
             <u:tokenize var="list2" delim=",">${release.optional}</u:tokenize>
             <j:set var="todo" value=""/>        
             <j:forEach items="${list2}" var="item">
@@ -387,24 +391,28 @@ ${required}"/>
 
 
             <!-- add optional extensions seperatly -->
-            <loadfile property="release.optional" srcFile="ext/ReleaseList.txt"/>
-            <u:tokenize var="list2" delim=",">${release.optional}</u:tokenize>
+            <loadfile property="release.optional" srcFile="ext/release.txt"/>
+            <u:tokenize var="list3" delim=",">${release.optional}</u:tokenize>
             <j:set var="todo" value=""/>        
-            <j:forEach items="${list2}" var="item">
+            <j:forEach items="${list3}" var="item">
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
             </j:forEach>
             <echo message="extension reactor list = ${todo}"/>
             <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
 
-
+            <!-- add optional demos seperatly -->
+            <loadfile property="release.optional" srcFile="demo/release.txt"/>
+            <u:tokenize var="list4" delim=",">${release.optional}</u:tokenize>
+            <j:set var="todo" value=""/>        
+            <j:forEach items="${list4}" var="item">
+                <j:set var="todo" value="${item}/project.xml,${todo}"/>
+            </j:forEach>
+            <echo message="demo reactor list = ${todo}"/>
+            <maven:reactor basedir="${basedir}/demo" includes="${todo}" goals="moveDemoBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
 
             <echo message="dist directory is ${maven.dist.dir}"/>
             <ant:zip longfile="gnu" basedir="${basedir}/target/binRelease" destfile="${maven.dist.dir}/geotools-bin-${release.version}.zip"/>
             <ant:zip longfile="gnu" basedir="${basedir}/target/srcRelease" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip"/>
-
-
-
-
         </goal>
 
 
@@ -442,8 +450,6 @@ ${required}"/>
 
 
         <goal name="movePluginBin">
-
-
             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
             <echo file="../../${release.report}" append="true">
             add ${pom.id} jar - </echo>
@@ -525,6 +531,40 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                 </j:forEach>
         </goal>
 
+        <goal name="moveDemoBin">
+            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+            <echo file="../../${release.report}" append="true">
+            add ${pom.id} jar - </echo>
+                <echo message="working on ${pom.id} demo for binary release"/>
+                <attainGoal name="jar:jar"/>
+                <ant:copy tofile="../../target/binRelease/demo/${pom.artifactId}/gt2-${pom.artifactId}.jar">
+                   <ant:fileset dir="./target">
+                     <ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
+                   </ant:fileset>
+                </ant:copy>
+                 <echo file="../../${release.report}" append="true">  OK</echo>
+                 
+                  <echo message="working on ${pom.id} to find 3rd party jars to include"/>
+                <j:forEach var="lib" items="${pom.artifacts}">
+                      <j:set var="dep" value="${lib.dependency}"/>
+                    <!--  <j:if test="${dep.getProperty('release.bundle')=='true'}"> -->
+                        <j:if test="${dep.groupId !='gt2'}">
+                         <j:if test="${dep.type =='jar'}">
+                         <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
+                         <j:set var="shareddep" value=""/>
+                         <u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
+                           <j:set var="shareddep" value="found"/>
+                         </u:available>
+                             <j:if test="${shareddep != 'found'}">
+                              <echo message="copy plugin jar"/>
+                                  <ant:copy todir="../../target/binRelease/demo/${pom.artifactId}/lib" file="${lib.path}"/>
+                             </j:if>
+                              </j:if>
+                        </j:if>
+                  <!--  </j:if>  -->
+                </j:forEach>
+        </goal>
+        
 
         <goal name="moveBuildFiles">
 

@@ -25,11 +25,12 @@ import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
+
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.parameter.ParameterGroupDescriptor;
-import org.geotools.parameter.ParameterGroup;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.StyleBuilder;
@@ -41,8 +42,8 @@ import org.geotools.data.coverage.grid.Format;
 
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.GeneralOperationParameter;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.PrameterGroupDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import java.util.Collections;
@@ -88,7 +89,7 @@ public class ArcGridReader {
         GridCoverageReader reader = f.getReader(url);
         
         //get the parameters and set them
-        OperationParameterGroup paramDescriptor = f.getReadParameters();
+        PrameterGroupDescriptor paramDescriptor = f.getReadParameters();
         ParameterGroup params = (ParameterGroup) paramDescriptor.createValue();
         params.getValue( "Compressed" ).setValue( true );
         params.getValue( "GRASS" ).setValue( true );

@@ -5,13 +5,6 @@
   <name>geotools-gml</name>
   <id>gml</id>
   <currentVersion>2.1.x</currentVersion>
-  <versions>
-    <version>
-      <id>b1</id>
-      <name>2.1.x</name>
-      <tag>GT_2_0_B6_DEV</tag>
-    </version>
-  </versions>
   <package>org.geotools</package>
   <shortDescription>gml module</shortDescription>
   <description>Used extract features from a GML file. The GML parser was 

@@ -6,13 +6,6 @@
   <id>main</id>
   <currentVersion>2.1.x</currentVersion>
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
-  <versions>
-    <version>
-      <id>b1</id>
-      <name>2.1.x</name>
-      <tag>GT_2_0_B6</tag>
-    </version>
-  </versions>
   <shortDescription>Geotools</shortDescription>
   <description>The main module contains the key interfaces and default
                implementations that are used by other GeoTools modules.
