@@ -61,7 +61,6 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -156,7 +155,7 @@ public class Rendering2DTest extends TestCase {
 
     FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs ) throws Exception {
         // Request extent
-        Envelope ex = new Envelope(5, 15, 5, 15);
+//        Envelope ex = new Envelope(5, 15, 5, 15);
 
         AttributeType[] types = new AttributeType[2];
 
@@ -238,7 +237,9 @@ public class Rendering2DTest extends TestCase {
             MapContext map = new DefaultMapContext();
             map.addLayer(ft, style);
             LiteRenderer renderer = new LiteRenderer(map);
-            showRender(renderer, 1000);
+            Envelope env= map.getLayerBounds();
+            env=new Envelope( env.getMinX()-20, env.getMaxX()+20, env.getMinY()-20, env.getMaxY()+20 );
+            showRender(renderer, 1000, env);
         } catch (HeadlessException e) {
             // do nothing
         }
@@ -273,7 +274,7 @@ public class Rendering2DTest extends TestCase {
                 .getMathTransform();
                 
                 Envelope env=map.getLayerBounds();
-                
+
                 Envelope bounds = JTS.transform(env,t);
                 map.setAreaOfInterest(bounds, crs);
                 env=JTS.transform(bounds, t.inverse());
@@ -282,36 +283,17 @@ public class Rendering2DTest extends TestCase {
                 Rectangle rect = new Rectangle(400, 400);
                 renderer.setOptimizedDataLoadingEnabled(true);
                 
-                AffineTransform at=renderer.worldToScreenTransform(bounds,rect);
-//                Envelope tmp = JTS.transform(env,t );
-//                double[] ld=new double[]{tmp.getMinX(), tmp.getMaxX(), tmp.getM
-//                at.transform()                
-                t = FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
-                System.out.println( JTS.transform(env,t ));
+                showRender(renderer, 1000, env);
                 
-                renderer.paint(image.createGraphics(), rect, at);
-    
-                Frame frame= new Frame("image"){
-                    /** <code>serialVersionUID</code> field */
-                    private static final long serialVersionUID = 3258415049164011827L;
-    
-                    public void paint(Graphics g){
-                        g.drawImage(image, 0,0, this);
-                    }
-                };
-                
-                frame.setSize(400,400);
-                frame.setVisible(true);
-                System.in.read();
-                frame.setVisible(false);
-                java.io.File file = new java.io.File(base.getPath(), "Rendering2DTest"
-                        + renderer.getClass().getName().replace('.', '_') + ".png");
-                java.io.FileOutputStream out = new java.io.FileOutputStream(file);
-                boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
-                out.close();
-                if (!fred) {
-                    System.out.println("Failed to write image to " + file.toString());
-                }
+
+//                java.io.File file = new java.io.File(base.getPath(), "Rendering2DTest"
+//                        + renderer.getClass().getName().replace('.', '_') + ".png");
+//                java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+//                boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
+//                out.close();
+//                if (!fred) {
+//                    System.out.println("Failed to write image to " + file.toString());
+//                }
     
             } catch (HeadlessException e) {
                 // do nothing
@@ -358,7 +340,7 @@ public class Rendering2DTest extends TestCase {
             // just the 3 geometric atts should get be loaded
             assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender(renderer, 1000);
+            showRender(renderer, 1000, null);
 
             // test attribute based filter
             FeatureType schema = ft.features().next().getFeatureType();
@@ -383,7 +365,7 @@ public class Rendering2DTest extends TestCase {
             String val = (String) results.reader().next().getAttribute("id");
             assertEquals("ft1", val);
 
-            showRender(renderer, 1000);
+            showRender(renderer, 1000, null);
 
             // try a bbox filter as definition query for the layer
             filter = null;
@@ -415,66 +397,66 @@ public class Rendering2DTest extends TestCase {
             // the 4 atts should be loaded since the definition query includes "id"
             assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender(renderer, 1000);
+            showRender(renderer, 1000, null);
         } catch (HeadlessException e) {
             // do nothing
         }
     }
 
-    private void showRender( LiteRenderer renderer, long timeOut ) throws InterruptedException {
+    /**
+     * bounds may be null
+     */
+    private void showRender( Object renderer, long timeOut, Envelope bounds ) throws InterruptedException {
         Frame frame = new Frame();
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing( WindowEvent e ) {
                 e.getWindow().dispose();
             }
         });
-        Panel p = new Panel();
-        frame.add(p);
-        frame.setSize(300, 300);
-        frame.setVisible(true);
-        renderer.paint((Graphics2D) p.getGraphics(), p.getBounds(), new AffineTransform());
-        int w = 300, h = 600;
-        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        int w = 300, h = 300;
+        final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
         g.setColor(Color.white);
         g.fillRect(0, 0, w, h);
-        renderer.paint((Graphics2D) g, new Rectangle(0, 0, w, h), new AffineTransform());
-
+        render(renderer, g, new Rectangle(w, h), bounds);
+        if( System.getProperty("java.awt.headless")==null || 
+                !System.getProperty("java.awt.headless").equals("true") ){
+            Panel p = new Panel(){
+                public void paint(Graphics g){
+                    g.drawImage(image, 0,0,this);
+                }
+            };
+            frame.add(p);
+            frame.setSize(w, h);
+            frame.setVisible(true);
+        }
+        
+        
         Thread.sleep(timeOut);
         frame.dispose();
     }
 
-    public void testPixelToWorld() throws Exception {
-        try {
-            // same as the datasource test, load in some features into a table
-            // System.err.println("starting rendering2DTest");
-            // Request extent
-            Envelope ex = new Envelope(0, 10, 0, 10);
-
-            LiteRenderer renderer = new LiteRenderer();
-            Frame frame = new Frame();
-            frame.addWindowListener(new WindowAdapter(){
-                public void windowClosing( WindowEvent e ) {
-                    e.getWindow().dispose();
-                }
-            });
-            Panel p = new Panel();
-            frame.add(p);
-            frame.setSize(300, 300);
-            frame.setVisible(true);
-            renderer.setScreenSize(p.getBounds());
-
-            Coordinate c = renderer.pixelToWorld(150, 150, ex);
-            LOGGER.info("X Coordinate is " + c.x + " expected is 5 +/- 1.0");
-            LOGGER.info("Y Coordinate is " + c.y + " expected is 5 +/- 1.0");
-            assertEquals(5d, c.x, 1.0);
-            assertEquals(5d, c.y, 1.0);
-
-            frame.dispose();
-        } catch (HeadlessException e) {
-            // do nothing
-        }
-
+    /**
+     * TODO summary sentence for render ...
+     * 
+     * @param g
+     * @param bounds
+     */
+    private void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
+        if( obj instanceof LiteRenderer2 ){
+            LiteRenderer2 renderer=(LiteRenderer2) obj;
+        if( bounds==null )
+            renderer.paint((Graphics2D) g, rect, new AffineTransform());
+        else
+            renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
+        }        
+        if( obj instanceof LiteRenderer ){
+            LiteRenderer renderer=(LiteRenderer) obj;
+            if( bounds==null )
+                renderer.paint((Graphics2D) g, rect, new AffineTransform());
+            else
+                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
+            }
     }
 
     private FeatureCollection createTestDefQueryFeatureCollection() throws Exception {
@@ -568,7 +550,7 @@ public class Rendering2DTest extends TestCase {
         return gf.createLineString(coords);
     }
 
-    private int xCenter=-123, yCenter=60;
+    private int xCenter=-133, yCenter=60;
     
     public Point point( final GeometryFactory gf, int x, int y ) {
         Coordinate coord = new Coordinate(x, y);
@@ -576,20 +558,20 @@ public class Rendering2DTest extends TestCase {
     }
 
     private Point makeSamplePoint( final GeometryFactory geomFac ) {
-        Coordinate c = new Coordinate(xCenter+14.0d, yCenter+14.0d);
+        Coordinate c = new Coordinate(xCenter-14.0d, yCenter-14.0d);
         Point point = geomFac.createPoint(c);
         return point;
     }
 
     private LineString makeSampleLineString( final GeometryFactory geomFac ) {
         Coordinate[] linestringCoordinates = new Coordinate[7];
-        linestringCoordinates[0] = new Coordinate(xCenter+5.0d, yCenter+5.0d);
-        linestringCoordinates[1] = new Coordinate(xCenter+6.0d, yCenter+5.0d);
-        linestringCoordinates[2] = new Coordinate(xCenter+6.0d, yCenter+6.0d);
-        linestringCoordinates[3] = new Coordinate(xCenter+7.0d, yCenter+6.0d);
-        linestringCoordinates[4] = new Coordinate(xCenter+7.0d, yCenter+7.0d);
-        linestringCoordinates[5] = new Coordinate(xCenter+8.0d, yCenter+7.0d);
-        linestringCoordinates[6] = new Coordinate(xCenter+8.0d, yCenter+8.0d);
+        linestringCoordinates[0] = new Coordinate(xCenter-5.0d, yCenter-5.0d);
+        linestringCoordinates[1] = new Coordinate(xCenter-6.0d, yCenter-5.0d);
+        linestringCoordinates[2] = new Coordinate(xCenter-6.0d, yCenter-6.0d);
+        linestringCoordinates[3] = new Coordinate(xCenter-7.0d, yCenter-6.0d);
+        linestringCoordinates[4] = new Coordinate(xCenter-7.0d, yCenter-7.0d);
+        linestringCoordinates[5] = new Coordinate(xCenter-8.0d, yCenter-7.0d);
+        linestringCoordinates[6] = new Coordinate(xCenter-8.0d, yCenter-8.0d);
         LineString line = geomFac.createLineString(linestringCoordinates);
 
         return line;
@@ -597,16 +579,16 @@ public class Rendering2DTest extends TestCase {
 
     private Polygon makeSamplePolygon( final GeometryFactory geomFac ) {
         Coordinate[] polygonCoordinates = new Coordinate[10];
-        polygonCoordinates[0] = new Coordinate(xCenter+7, yCenter+7);
-        polygonCoordinates[1] = new Coordinate(xCenter+6, yCenter+9);
-        polygonCoordinates[2] = new Coordinate(xCenter+6, yCenter+11);
-        polygonCoordinates[3] = new Coordinate(xCenter+7, yCenter+12);
-        polygonCoordinates[4] = new Coordinate(xCenter+9, yCenter+11);
-        polygonCoordinates[5] = new Coordinate(xCenter+11, yCenter+12);
-        polygonCoordinates[6] = new Coordinate(xCenter+13, yCenter+11);
-        polygonCoordinates[7] = new Coordinate(xCenter+13, yCenter+9);
-        polygonCoordinates[8] = new Coordinate(xCenter+11, yCenter+7);
-        polygonCoordinates[9] = new Coordinate(xCenter+7, yCenter+7);
+        polygonCoordinates[0] = new Coordinate(xCenter-7, yCenter-7);
+        polygonCoordinates[1] = new Coordinate(xCenter-6, yCenter-9);
+        polygonCoordinates[2] = new Coordinate(xCenter-6, yCenter-11);
+        polygonCoordinates[3] = new Coordinate(xCenter-7, yCenter-12);
+        polygonCoordinates[4] = new Coordinate(xCenter-9, yCenter-11);
+        polygonCoordinates[5] = new Coordinate(xCenter-11, yCenter-12);
+        polygonCoordinates[6] = new Coordinate(xCenter-13, yCenter-11);
+        polygonCoordinates[7] = new Coordinate(xCenter-13, yCenter-9);
+        polygonCoordinates[8] = new Coordinate(xCenter-11, yCenter-7);
+        polygonCoordinates[9] = new Coordinate(xCenter-7, yCenter-7);
         try {
             LinearRing ring = geomFac.createLinearRing(polygonCoordinates);
             Polygon polyg = geomFac.createPolygon(ring, null);
