@@ -16,153 +16,68 @@
  */
 package org.geotools.data.postgis.referencing;
 
-import java.util.Set;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.geotools.referencing.FactoryFinder;
-import org.opengis.metadata.citation.Citation;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.data.jdbc.referencing.JDBCAuthorityFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.ObjectFactory;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.DerivedCRS;
-import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ImageCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.util.InternationalString;
 
 /**
  * @author jeichar
  */
-public class PostgisAuthorityFactory implements CRSAuthorityFactory {
+public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
 
-    CRSFactory factory;
-    
+    private String TABLE_NAME="SPATIAL_REF_SYS";
+    private String WKT_COLUMN="SRTEXT";
+    private String SRID_COLUMN="SRID";
+
     /**
      * Construct <code>PostgisAuthorityFactory</code>.
      *
+     * @param pool
      */
-    public PostgisAuthorityFactory() {
-        factory=FactoryFinder.getCRSFactory();
+    public PostgisAuthorityFactory( ConnectionPool pool ) {
+        super(pool);
     }
     
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCoordinateReferenceSystem(java.lang.String)
-     */
-    public CoordinateReferenceSystem createCoordinateReferenceSystem( String arg0 ) throws FactoryException {
-        return null;
-    }
+    CoordinateReferenceSystem createCRS(int srid) throws FactoryException{
+        Connection dbConnection = null;
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createCompoundCRS(java.lang.String)
-     */
-    public CompoundCRS createCompoundCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
+        try {
+            String sqlStatement = "SELECT "+WKT_COLUMN+" FROM "+TABLE_NAME+" WHERE "+SRID_COLUMN+" = "+srid;
+            dbConnection = getConnection(Transaction.AUTO_COMMIT);
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createDerivedCRS(java.lang.String)
-     */
-    public DerivedCRS createDerivedCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
+            Statement statement = dbConnection.createStatement();
+            ResultSet result = statement.executeQuery(sqlStatement);
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createEngineeringCRS(java.lang.String)
-     */
-    public EngineeringCRS createEngineeringCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
+            if (result.next()) {
+                String wkt = result.getString("srid");
+                JDBCUtils.close(statement);
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeographicCRS(java.lang.String)
-     */
-    public GeographicCRS createGeographicCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
+                return factory.createFromWKT(wkt);
+            } else {
+                String mesg = "No wkt column row for srid in table: "+ TABLE_NAME;
+                throw new FactoryException(mesg);
+            }
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createGeocentricCRS(java.lang.String)
-     */
-    public GeocentricCRS createGeocentricCRS( String arg0 ) throws FactoryException {
-        return null;
+            throw new FactoryException(message, sqle);
+        } catch (IOException e) {
+            throw new FactoryException(e.getMessage(), e);
+        } finally {
+            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
+        }
     }
+    
 
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createImageCRS(java.lang.String)
-     */
-    public ImageCRS createImageCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createProjectedCRS(java.lang.String)
-     */
-    public ProjectedCRS createProjectedCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createTemporalCRS(java.lang.String)
-     */
-    public TemporalCRS createTemporalCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.crs.CRSAuthorityFactory#createVerticalCRS(java.lang.String)
-     */
-    public VerticalCRS createVerticalCRS( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.AuthorityFactory#getObjectFactory()
-     */
-    public ObjectFactory getObjectFactory() {
-        return factory;
-    }
-
-    /**
-     * @see org.opengis.referencing.AuthorityFactory#getAuthority()
-     */
-    public Citation getAuthority() {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.AuthorityFactory#getAuthorityCodes(java.lang.Class)
-     */
-    public Set getAuthorityCodes( Class arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.AuthorityFactory#getDescriptionText(java.lang.String)
-     */
-    public InternationalString getDescriptionText( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.AuthorityFactory#createObject(java.lang.String)
-     */
-    public Object createObject( String arg0 ) throws FactoryException {
-        return null;
-    }
-
-    /**
-     * @see org.opengis.referencing.Factory#getVendor()
-     */
-    public Citation getVendor() {
-        return null;
-    }
-
-	
 
 }
