@@ -12,6 +12,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 
+import junit.framework.AssertionFailedError;
+
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
@@ -46,21 +49,31 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
       throw new Exception("Couldn't setup temp file");
   } 
   
-  public void testAll() {
+  public void testAll() throws Throwable {
     StringBuffer errors = new StringBuffer();
+    Exception bad = null;
     for (int i = 0, ii = files.length; i < ii; i++) {
       try {
         test(files[i]);
       } catch (Exception e) {
         e.printStackTrace();
         errors.append("\nFile " + files[i] + " : " + e.getMessage());
+        bad = e;
       }
     }
     if (errors.length() > 0) {
-      fail(errors.toString());
+        fail( errors.toString(), bad );      
     }
   }
   
+/**
+ * @param arg0
+ */
+public void fail(String message, Throwable cause ) throws Throwable {
+    Throwable fail = new AssertionFailedError( message );
+    fail.initCause( cause );
+    throw fail;
+}
   void test(String f) throws Exception {
     ShapefileDataStore s = new ShapefileDataStore(getTestResource(f));
     String typeName = s.getTypeNames()[0];
@@ -69,12 +82,13 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     FeatureResults one = source.getFeatures();
     File tmp = getTempFile();
     
-    ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
-    s = (ShapefileDataStore) maker.createDataStore( tmp.toURL() );
+    ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();    
+    s = (ShapefileDataStore) maker.createDataStore( tmp.toURL() );    
     
     s.createSchema( type );
     FeatureStore store = (FeatureStore) s.getFeatureSource( type.getTypeName() );
-    store.addFeatures( one.reader() );
+    FeatureReader reader = one.reader();
+    store.addFeatures( reader );
     
     s = new ShapefileDataStore( tmp.toURL() );
     typeName = s.getTypeNames()[0];
