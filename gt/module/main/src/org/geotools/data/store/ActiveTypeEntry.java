@@ -130,7 +130,7 @@ final class ActiveTypeEntry implements TypeEntry {
      * @return
      * @throws IOException
      */
-    public FeatureType getFeatureType() throws IOException {
+    public FeatureType getFeatureType() {
         return null;
     }
     /**

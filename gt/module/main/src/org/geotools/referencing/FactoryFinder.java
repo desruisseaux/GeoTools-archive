@@ -49,6 +49,8 @@ import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransformFactory;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 
 /**
  * Defines static methods used to access the application's default {@linkplain Factory
@@ -210,6 +212,11 @@ public final class FactoryFinder {
             }
         }
         throw new NoSuchAuthorityCodeException( "Unabled to locate definition of '"+code+"'"); //$NON-NLS-1$
+    }
+    
+    public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs){
+        // TODO fill me in
+        return null;
     }
     
     /**

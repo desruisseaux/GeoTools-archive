@@ -36,10 +36,7 @@ public class DefaultTypeEntry implements TypeEntry {
     private final URI namespace;
     private final String typeName;
     private Map metadata;
-    
-    /** Host or Server providing the information */
-    private String host;
-    
+        
     /** Name suitable for display to end user's */
     private InternationalString displayName;
     
@@ -69,7 +66,7 @@ public class DefaultTypeEntry implements TypeEntry {
                 }                
             });            
         } catch (IOException e) {
-            
+            // TODO Comment me
         }
     } 
 

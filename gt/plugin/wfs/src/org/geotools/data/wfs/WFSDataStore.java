@@ -63,6 +63,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
@@ -72,6 +73,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -309,6 +311,7 @@ public class WFSDataStore extends AbstractDataStore {
         CoordinateReferenceSystem crs;
         try {
             if(crsName!=null){
+                crs = FactoryFinder.getCRSFactory().createFromWKT(crsName);
                 crs = WFSDataStoreFactory.getCRSService().createCRS(crsName);
             	t = CRSService.transform(t,crs);
             }
