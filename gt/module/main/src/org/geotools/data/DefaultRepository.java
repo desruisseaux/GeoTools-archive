@@ -16,13 +16,18 @@
  */
 package org.geotools.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -30,11 +35,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Quick hack of a DataRepository allows me to bridge the existing DataStore
@@ -49,6 +49,45 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class DefaultRepository implements Repository {	    
 	
+	private static final Map definition( String definition ) throws ParseException{
+		Map map = new HashMap();
+		
+		String[] params = definition.split(",");
+		int offset = 0;
+        for (int i = 0; i < params.length; i++) 
+        {
+            String[] vals = params[i].split("=");
+            if (vals.length == 2) {
+                map.put(vals[0].trim(), vals[1].trim());
+            } else {
+            	throw new ParseException( "Could not interpret "+params[i], offset );
+            }
+            offset += params[i].length();
+        }
+		return map;
+	}
+	/**
+	 * Load a quick datastore definition from a properties file.
+	 * <p>
+	 * This is useful for test cases.
+	 * </p>
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */	
+	public void load( File propertiesFile ) throws Exception {
+		Properties properties = new Properties();
+		properties.load( new FileInputStream( propertiesFile ) );
+
+		for( Iterator i=properties.entrySet().iterator(); i.hasNext();){
+			Map.Entry entry = (Map.Entry) i.next();
+			String dataStoreId = (String) entry.getKey();
+			String definition = (String) entry.getValue();
+			Map params = definition( definition );
+			
+			DataStore dataStore = DataStoreFinder.getDataStore( params );
+            register( dataStoreId, dataStore);
+		}
+	}
 	/** Map of DataStore by dataStoreId */
     protected SortedMap datastores = new TreeMap();
     
