@@ -1,13 +1,14 @@
 package org.geotools.data.wfs;
 
+import java.io.File;
+import java.net.URI;
+import java.util.logging.Level;
+
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
-import java.io.File;
-import java.net.URI;
-import java.util.logging.Level;
 
 
 /**

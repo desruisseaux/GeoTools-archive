@@ -1251,7 +1251,14 @@ public class WFSCapabilitiesComplexTypes {
                 throw new SAXException("Missing params for FeatureTypeType");
             }
 
-            if (value.length < 3) {
+            boolean validation = true;
+            if(hints != null && hints.containsKey(DocumentFactory.VALIDATION_HINT)){
+                Boolean t = (Boolean)hints.get(DocumentFactory.VALIDATION_HINT);
+                if(t!=null)
+                    validation = t.booleanValue();
+            }
+            
+            if (validation && value.length < 2) {
                 throw new SAXException(
                     "Missing child element for FeatureTypeType");
             }

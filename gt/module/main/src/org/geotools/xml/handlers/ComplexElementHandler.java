@@ -51,6 +51,10 @@ import javax.naming.OperationNotSupportedException;
  * @see ComplexType
  */
 public class ComplexElementHandler extends XMLElementHandler {
+    
+    /** <code>serialVersionUID</code> field */
+    private static final long serialVersionUID = ComplexElementHandler.class.hashCode();
+    
     private ComplexType type; // saves casting all over
     private Element elem;
     private String text;
@@ -227,7 +231,6 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         if (i != elements.size()) {
-//System.out.println("Elements.size == "+elements.size());
             throw new SAXException("Invalid element order according: "
                 + type.getName() + "[" + i + "]");
         }
@@ -246,7 +249,6 @@ public class ComplexElementHandler extends XMLElementHandler {
         switch (eg.getGrouping()) {
         case ElementGrouping.SEQUENCE:
             int[] tmp = valid((Sequence) eg, index);
-//            System.out.println("TMP SEQ "+tmp[0]+" "+tmp[1]);
                         return tmp;
 
         case ElementGrouping.ALL:
@@ -263,7 +265,6 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         case ElementGrouping.ELEMENT:
             tmp = valid((Element) eg, index);
-//System.out.println("TMP ELE "+tmp[0]+" "+tmp[1]);
             return tmp;
         }
 
@@ -300,8 +301,6 @@ public class ComplexElementHandler extends XMLElementHandler {
         for (int i = 0; i < r.length; i++) {
             if ((r[i] < elems[i].getMinOccurs())
                     || (r[i] > elems[i].getMaxOccurs())) {
-//                throw new SAXException("Too many or too few "
-//                    + elems[i].getName());
                 return new int[]{index,0};
             }
         }
@@ -396,11 +395,9 @@ public class ComplexElementHandler extends XMLElementHandler {
             indexHandler = ((XMLElementHandler) elements.get(index));
         }else{
             // not found :)
-//System.out.println("Index is Size == "+index);
             return new int[]{index,0};
         }
         
-//System.out.println("Checking "+element.getName()+" "+index+"("+(indexHandler==null?"":indexHandler.getName())+")");
         if(r ==null && (indexHandler == null || indexHandler.getElement() == null))
         	return new int[]{index,0};
         
@@ -416,7 +413,6 @@ public class ComplexElementHandler extends XMLElementHandler {
         Element e = indexHandler.getElement();
         while(r == null && e != null){
         	if(element.getName().equalsIgnoreCase(e.getName())){
-//System.out.println("Found sub "+indexHandler.getName()+" "+index);
         		r =  new int[]{index+1,1};
         	}
         	e = e.getSubstitutionGroup();
@@ -424,12 +420,8 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
         
         if(r == null){
-//System.out.println("not found "+indexHandler.getName()+" "+index);
             r = new int[]{index,0};
         }
-//        else{
-//System.out.println("found "+indexHandler.getName());
-//        }
         return r;
     }
 
@@ -450,9 +442,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         int count = 0; // used for n-ary at a single spot
         int i2[] = new int[2];
         while(t<eg.length && tIndex<elements.size()){
-//System.out.println("Sequence #child="+eg.length+" child="+t+" tIndex ="+tIndex);
         	i2 = valid(eg[t],tIndex); // new top element
-//System.out.println("RESULTS - seq "+i2[0]+" "+i2[1]);
         	if(i2[1]==1){ // they matched
         	    if(tIndex==i2[0]){
         	        // didn't more ahead ...
@@ -466,7 +456,6 @@ public class ComplexElementHandler extends XMLElementHandler {
         	            // error, so redo
         	            if(eg[t].getMinOccurs()>count){
         	                // not good
-//System.out.println("Prob 1");
         	                return new int[]{index,0}; // not whole sequence
         	            }
         	            t++;
@@ -479,14 +468,12 @@ public class ComplexElementHandler extends XMLElementHandler {
     			// move along and retest that spot
     			if(eg[t].getMinOccurs()>count){
     				// not good
-//System.out.println("Prob 2");
 					return new int[]{index,0}; // not whole sequence
     			}
     			t++;
     			count=0; // next defined type
         	}
         }
-//System.out.println("RR");
         return new int[]{tIndex,1};
     }
 
@@ -523,14 +510,11 @@ public class ComplexElementHandler extends XMLElementHandler {
         logger.finest("Starting search for element handler " + localName
             + " :: " + namespaceURI);
 
-//System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
-//        System.out.println("findChildElement("+namespaceURI+","+localName+") was " + (e==null?"null":e.getName()));
-        if (e != null && namespaceURI.equals(e.getNamespace())){// || (ehf.defaultNS!=null && ehf.defaultNS.equals(e.getNamespace())))) {
+        if (e != null && namespaceURI.equals(e.getNamespace())){
             XMLElementHandler r = ehf.createElementHandler(e);
 
             if (type.cache(r.getElement(), hints)) {
-//System.out.println("Adding "+r.getName()+"["+r.getElement().getNamespace()+"]"+" to "+getName());
                 elements.add(r);
             }
 
@@ -543,13 +527,20 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         if (r != null) {
             if (type.cache(r.getElement(), hints)) {
-//System.out.println("Adding2 "+r.getName()+" to "+getName());
                 elements.add(r);
             }
 
             return r;
         }
 
+        // validation?
+        if(hints != null && hints.containsKey(DocumentFactory.VALIDATION_HINT)){
+            Boolean valid = (Boolean)hints.get(DocumentFactory.VALIDATION_HINT);
+            if(valid != null && !valid.booleanValue()){
+                return new IgnoreHandler();
+            }
+        }
+        
         throw new SAXException("Could not find element handler for "
             + namespaceURI + " : " + localName + " as a child of "
             + type.getName() + ".");

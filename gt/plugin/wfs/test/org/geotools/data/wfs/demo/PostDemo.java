@@ -57,7 +57,7 @@ public class PostDemo {
              "<TypeName>van:Airport</TypeName></DescribeFeatureType>";
         
         System.out.println(s+"\n\n\n");
-        URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
+        URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http");
 
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setRequestMethod("POST");
@@ -76,4 +76,31 @@ public class PostDemo {
         }
     }
 
+//    public static void main(String[] args) throws IOException{
+//        String s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+//             "<DescribeFeatureType xmlns=\"http://www.opengis.net/wfs\" " +
+//             "xmlns:gml=\"http://www.opengis.net/gml\" " +
+//             "xmlns:ogc=\"http://www.opengis.net/ogc\" version=\"1.0.0\" " +
+//             "service=\"WFS\" outputFormat=\"XMLSCHEMA\">" +
+//             "</DescribeFeatureType>";
+//        
+//        System.out.println(s+"\n\n\n");
+//        URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?");
+//
+//        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+//        connection.setRequestMethod("POST");
+//        connection.setDoOutput(true);
+//        connection.setDoInput(true);
+//        connection.setRequestProperty("Content-type", "application/xml");
+//        
+//        url.openConnection().connect();
+//        Writer w = new OutputStreamWriter(connection.getOutputStream());
+//        w.write(s);
+//        w.flush();
+//        w.close();
+//        BufferedReader r = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//        while(r.ready()){
+//            System.out.print((String)r.readLine());
+//        }
+//    }
 }

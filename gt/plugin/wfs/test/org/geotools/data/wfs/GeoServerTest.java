@@ -25,25 +25,8 @@ import javax.naming.OperationNotSupportedException;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.Transaction;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.IllegalFilterException;
 import org.xml.sax.SAXException;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *  summary sentence.

@@ -95,7 +95,7 @@ public class WFSSchema implements Schema {
             new WFSElement("GetCapabilities", GetCapabilitiesType.getInstance()),
             new WFSElement("DescribeFeatureType",
                 DescribeFeatureTypeType.getInstance()),
-            new WFSElement("GetFeature", GetFeatureType.getInstance()),
+            new WFSElement("GetFeature", GetFeatureType.getInstance()), // 2
             new WFSElement("FeatureCollection",
                 FeatureCollectionType.getInstance(), 1, 1, false,
                 findElement(GMLSchema.getInstance(), "_FeatureCollection")),

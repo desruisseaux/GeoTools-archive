@@ -1638,8 +1638,6 @@ public class DocumentWriter {
             // TODO format here
             writer.write("\n");
             writer.flush();
-
-            //            writer.close();
         }
 
         /**

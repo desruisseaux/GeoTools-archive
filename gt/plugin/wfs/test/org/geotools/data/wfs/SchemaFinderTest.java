@@ -1,12 +1,12 @@
 
 package org.geotools.data.wfs;
 
+import junit.framework.TestCase;
+
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.wfs.WFSSchema;
-
-import junit.framework.TestCase;
 
 /**
  * <p> 

@@ -679,8 +679,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         case ElementGrouping.CHOICE:
             logger.finest("ElementGrouping eg is CHOICE in loadNewEG");
 
-                return new DefaultSequence((Choice) extensionBaseType,
-                    ((ElementGroupingHandler) extensionChild).compress(parent));
+                return new DefaultSequence((Choice) extensionBaseType, extensionChild);
                 
         case ElementGrouping.GROUP:
             logger.finest("ElementGrouping eg is GROUP in loadNewEG");
@@ -694,8 +693,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
         case ElementGrouping.SEQUENCE:
             logger.finest("ElementGrouping eg is SEQUENCE");
-
-//System.out.println("ComplexTypeHandler name="+this.name);
                 return new DefaultSequence((Sequence) extensionBaseType,extensionChild);
 
         default:
