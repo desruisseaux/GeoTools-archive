@@ -118,7 +118,7 @@ import java.util.Set;
  * @version $Id: Transaction.java,v 1.3 2004/03/02 23:06:26 jive Exp $
  */
 public interface Transaction {
-    
+     
     /** Represents AUTO_COMMIT Mode */
     static final Transaction AUTO_COMMIT = new AutoCommitTransaction();
 
