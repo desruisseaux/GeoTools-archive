@@ -44,7 +44,7 @@ public class VPFLibrary implements FileConstants {
 
     /** Creates a new instance of VPFLibrary */
     public VPFLibrary(TableRow tr, File dir, VPFDataBase base)
-               throws IOException, Exception {
+               throws IOException {
         this.base = base;
         xmin = tr.get(VPFLibraryIfc.FIELD_XMIN).getAsDouble();
         ymin = tr.get(VPFLibraryIfc.FIELD_YMIN).getAsDouble();
@@ -55,7 +55,7 @@ public class VPFLibrary implements FileConstants {
         setCoverages();
     }
 
-    private void setCoverages() throws IOException, Exception {
+    private void setCoverages() throws IOException {
         if (!directory.getName().equals("rference")) {
             String vpfTableName = new File(directory, COVERAGE_ATTRIBUTE_TABLE).toString();
             TableInputStream vpfTable = new TableInputStream(vpfTableName);

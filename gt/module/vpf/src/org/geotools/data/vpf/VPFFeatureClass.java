@@ -49,8 +49,7 @@ public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
     private String type_ext = null;
 
     /** Creates a new instance of VPFFeatureClass */
-    public VPFFeatureClass(TableRow tr, File directory, VPFDataBase base)
-                    throws Exception {
+    public VPFFeatureClass(TableRow tr, File directory, VPFDataBase base) throws IOException {
         //this.base = base;
         //this.directory = directory;
         classname = tr.get(FIELD_CLASS).getAsString().trim();
@@ -77,7 +76,7 @@ public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
             geometry = AttributeTypeFactory.newAttributeType("geometry", Point.class);
             type_ext = ".tft";
         } else {
-            throw new Exception("Unrecognised featuretype");
+            throw new IOException("Unrecognised 'featuretype':"+featureType );
         }
 
         readHeader(directory);
