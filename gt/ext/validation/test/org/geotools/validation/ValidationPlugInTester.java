@@ -99,7 +99,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}
 		
 		try {
-			processor.runFeatureTests("road", this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests("road", this.roadType, DataUtilities.reader(this.roadFeatures), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -136,7 +136,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 		
 		try {
-			processor.runFeatureTests("road", this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests("road", this.roadType, DataUtilities.reader(new Feature[] {this.newRoad}), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -169,7 +169,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}
 	
 		try {
-			processor.runFeatureTests( "id", this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests( "id", this.roadType, DataUtilities.reader(this.roadFeatures), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -208,7 +208,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 	
 		try {
-			processor.runFeatureTests( "datastoreId", this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests( "datastoreId", this.roadType, DataUtilities.reader(new Feature[] {this.newRoad}), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -240,7 +240,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}*/
 	
 		try {
-			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.reader(new Feature[] {this.newRoad}), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -270,7 +270,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}*/
 	
 		try {
-			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.reader(this.roadFeatures), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
