@@ -26,8 +26,8 @@ import java.awt.geom.Point2D;
 import javax.vecmath.MismatchedSizeException;
 import java.io.Serializable;
 
-// Geotools dependencies
-import org.geotools.util.Cloneable;
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -355,17 +355,11 @@ public class Line implements Cloneable, Serializable {
         double x,y;
         double m = (y2-y1)/(x2-x1);
         if (Double.isInfinite(slope)) {
-            if (Double.isInfinite(m)) {
-                return null;
-            }
             x = x0;
             y = x*m + (y2-m*x2);
         } else {
             if (!Double.isInfinite(m)) {
                 x = (y0-(y2-m*x2)) / (m-slope);
-                if (Double.isInfinite(x)) {
-                    return null;
-                }
             } else {
                 x = 0.5*(x1+x2);
             }
@@ -373,30 +367,28 @@ public class Line implements Cloneable, Serializable {
         }
         double eps;
         /*
-         * Vérifie si l'intersection se trouve
-         * dans la plage permise pour <var>x</var>.
+         * Ensure that the intersection is in the range of valid x values.
          */
         eps = EPS*Math.abs(x);
         if (x1 <= x2) {
-            if (x<x1-eps || x>x2+eps) {
+            if (!(x>=x1-eps && x<=x2+eps)) {
                 return null;
             }
         } else {
-            if (x>x1+eps || x<x2-eps) {
+            if (!(x<=x1+eps && x>=x2-eps)) {
                 return null;
             }
         }
         /*
-         * Vérifie si l'intersection se trouve
-         * dans la plage permise pour <var>y</var>.
+         * Ensure that the intersection is in the range of valid y values.
          */
         eps = EPS*Math.abs(y);
         if (y1 <= y2) {
-            if (y<y1-eps || y>y2+eps) {
+            if (!(y>=y1-eps && y<=y2+eps)) {
                 return null;
             }
         } else {
-            if (y>y1-eps || y<y2+eps) {
+            if (!(y<=y1-eps && y>=y2+eps)) {
                 return null;
             }
         }
