@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.List;
+import java.util.Collections;
 import java.lang.reflect.Array;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -205,6 +207,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     public InternationalString getName() {
         return name;
+    }
+
+    /**
+     * Returns the source data for a coverage. The default implementation returns an empty list.
+     */
+    public List getSources() {
+        return Collections.EMPTY_LIST;
     }
     
     /**

@@ -39,9 +39,9 @@ import org.geotools.resources.Utilities;
 /**
  * Information about spatial, vertical, and temporal extent.
  * This interface has three optional attributes
- * ({@linkplain #getGeographicElement geographic element},
- *  {@linkplain #getTemporalElement temporal element}, and
- *  {@linkplain #getVerticalElement vertical element}) and an element called
+ * ({@linkplain #getGeographicElements geographic elements},
+ *  {@linkplain #getTemporalElements temporal elements}, and
+ *  {@linkplain #getVerticalElements vertical elements}) and an element called
  *  {@linkplain #getDescription description}.
  *  At least one of the four shall be used.
  *

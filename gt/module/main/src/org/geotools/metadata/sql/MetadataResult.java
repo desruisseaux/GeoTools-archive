@@ -60,7 +60,7 @@ final class MetadataResult {
      * If the record to fetch doesn't have the same identifier, then
      * the {@link #results} will need to be closed and reconstructed.
      */
-    private int identifier;
+    private String identifier;
     
     /**
      * Constructs a metadata result from the specified connection.
@@ -94,9 +94,9 @@ final class MetadataResult {
      * @return The result set.
      * @throws SQLException if an SQL operation failed.
      */
-    private ResultSet getResultSet(final int identifier) throws SQLException {
+    private ResultSet getResultSet(final String identifier) throws SQLException {
         if (results != null) {
-            if (identifier == this.identifier) {
+            if (this.identifier.equals(identifier)) {
                 return results;
             }
             if (results.next()) {
@@ -108,12 +108,12 @@ final class MetadataResult {
             results = null; // In case the 'results = ...' below will fails.
         }
         this.identifier = identifier;
-        statement.setInt(1, identifier);
+        statement.setString(1, identifier);
         results = statement.executeQuery();
         if (!results.next()) {
             results.close();
             results = null;
-            throw new SQLException("Metadata not found: "+identifier+" in table \""+tableName+'"');
+            throw new SQLException("Metadata not found: \""+identifier+"\" in table \""+tableName+'"');
             // TODO: localize
         }
         return results;
@@ -127,7 +127,7 @@ final class MetadataResult {
      * @return The attribute value.
      * @throws SQLException if an SQL operation failed.
      */
-    public Object getObject(final int identifier, final String columnName) throws SQLException {
+    public Object getObject(final String identifier, final String columnName) throws SQLException {
         return getResultSet(identifier).getObject(columnName);
     }
 
@@ -139,7 +139,7 @@ final class MetadataResult {
      * @return The attribute value.
      * @throws SQLException if an SQL operation failed.
      */
-    public Object getArray(final int identifier, final String columnName) throws SQLException {
+    public Object getArray(final String identifier, final String columnName) throws SQLException {
         final Array array = getResultSet(identifier).getArray(columnName);
         return (array!=null) ? array.getArray() : null;
     }
@@ -152,8 +152,20 @@ final class MetadataResult {
      * @return The attribute value.
      * @throws SQLException if an SQL operation failed.
      */
-    public int getInt(final int identifier, final String columnName) throws SQLException {
+    public int getInt(final String identifier, final String columnName) throws SQLException {
         return getResultSet(identifier).getInt(columnName);
+    }
+
+    /**
+     * Returns the attribute value in the given column for the given record.
+     *
+     * @param  identifier The object identifier, usually the primary key value.
+     * @param  columnName The column name of the attribute to search.
+     * @return The attribute value.
+     * @throws SQLException if an SQL operation failed.
+     */
+    public String getString(final String identifier, final String columnName) throws SQLException {
+        return getResultSet(identifier).getString(columnName);
     }
 
     /**
@@ -164,7 +176,7 @@ final class MetadataResult {
      * @return The string value found in the first column.
      * @throws SQLException if an SQL operation failed.
      */
-    public String getString(final int code) throws SQLException {
+    public String getString(final String code) throws SQLException {
         return getResultSet(code).getString(1);
     }
 

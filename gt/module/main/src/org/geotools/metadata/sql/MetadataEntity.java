@@ -47,7 +47,7 @@ final class MetadataEntity implements InvocationHandler {
      * this metadata entity in the database. This is usually
      * the primary key in the table which contains this entity.
      */
-    private final int identifier;
+    private final String identifier;
 
     /**
      * The connection to the database. All metadata entities
@@ -63,7 +63,7 @@ final class MetadataEntity implements InvocationHandler {
      *                   the primary key in the table which contains this entity.
      * @param source     The connection to the table which contains this entity.
      */
-    public MetadataEntity(final int identifier, final MetadataSource source) {
+    public MetadataEntity(final String identifier, final MetadataSource source) {
         this.identifier = identifier;
         this.source     = source;
     }

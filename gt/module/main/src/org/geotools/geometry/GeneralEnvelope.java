@@ -165,6 +165,18 @@ public class GeneralEnvelope implements Envelope, Serializable {
         };
         checkCoherence();
     }
+
+    /**
+     * If the specified object is already a {@code GeneralEnvelope}, returns it unchanged.
+     * Otherwise, converts it into a {@code GeneralEnvelope}. This method is usefull for
+     * accessing Geotools-specific methods.
+     */
+    public static GeneralEnvelope wrap(final Envelope envelope) {
+        if (envelope instanceof GeneralEnvelope) {
+            return (GeneralEnvelope) envelope;
+        }
+        return new GeneralEnvelope(envelope);
+    }
     
     /**
      * Checks if ordinate values in the minimum point are less than or

@@ -104,6 +104,20 @@ public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
+     * Wraps an arbitrary temporal CRS into a Geotools implementation. This method is usefull
+     * if the user wants to take advantage of {@link #toDate} and {@link #toValue} methods.
+     */
+    public static TemporalCRS wrap(final org.opengis.referencing.crs.TemporalCRS crs) {
+        if (crs instanceof TemporalCRS) {
+            return (TemporalCRS) crs;
+        }
+        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
+        return new TemporalCRS(getProperties(crs),
+                   (TemporalDatum) crs.getDatum(),
+                   (TimeCS) crs.getCoordinateSystem());
+    }
+
+    /**
      * Initialize the fields required for {@link #toDate} and {@link #toValue} operations.
      */
     private void initializeConverter() {

@@ -218,6 +218,28 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
                                  inverseFlattening, true, unit);
         }
     }
+
+    /**
+     * Wraps an arbitrary ellipsoid into a Geotools implementation. This method is
+     * usefull if {@link #orthodromicDistance orthodromic distance computation}
+     * (for example) are desired.
+     */
+    public static Ellipsoid wrap(final org.opengis.referencing.datum.Ellipsoid ellipsoid) {
+        if (ellipsoid instanceof Ellipsoid) {
+            return (Ellipsoid) ellipsoid;
+        }
+        if (ellipsoid.isIvfDefinitive()) {
+            return createFlattenedSphere(getProperties(ellipsoid),
+                                         ellipsoid.getSemiMajorAxis(),
+                                         ellipsoid.getInverseFlattening(),
+                                         ellipsoid.getAxisUnit());
+        } else {
+            return createEllipsoid(getProperties(ellipsoid),
+                                   ellipsoid.getSemiMajorAxis(),
+                                   ellipsoid.getSemiMinorAxis(),
+                                   ellipsoid.getAxisUnit());
+        }
+    }
     
     /**
      * Checks the argument validity. Argument <code>value</code> should be

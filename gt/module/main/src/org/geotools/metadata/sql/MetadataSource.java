@@ -165,7 +165,7 @@ public class MetadataSource {
      * @return An implementation of the required interface, or the code list element.
      * @throws SQLException if a SQL query failed.
      */
-    public synchronized Object getEntry(final Class type, final int identifier)
+    public synchronized Object getEntry(final Class type, final String identifier)
             throws SQLException
     {
         if (CodeList.class.isAssignableFrom(type)) {
@@ -184,7 +184,7 @@ public class MetadataSource {
      * @return The value of the requested attribute.
      * @throws SQLException if the SQL query failed.
      */
-    final synchronized Object getValue(final Class type, final Method method, final int identifier)
+    final synchronized Object getValue(final Class type, final Method method, final String identifier)
             throws SQLException
     {
         final String className = getClassName(type);
@@ -194,7 +194,7 @@ public class MetadataSource {
             statements.put(type, result);
         }
         final String columnName = getColumnName(className, method);
-        final Class valueType = method.getReturnType();
+        final Class  valueType  = method.getReturnType();
         /*
          * Process the ResultSet value according the expected return type. If a collection
          * is expected, then assumes that the ResultSet contains an array and invokes the
@@ -216,8 +216,8 @@ public class MetadataSource {
                 final boolean isMetadata = isMetadata(elementType);
                 final int         length = Array.getLength(elements);
                 for (int i=0; i<length; i++) {
-                    collection.add(isMetadata ? getEntry(elementType, Array.getInt(elements, i))
-                                              : convert (elementType, Array.get   (elements, i)));
+                    collection.add(isMetadata ? getEntry(elementType, Array.get(elements, i).toString())
+                                              : convert (elementType, Array.get(elements, i)));
                 }
             }
             return collection;
@@ -227,11 +227,11 @@ public class MetadataSource {
          * value is a foreigner key. Queries again the database in the foreigner table.
          */
         if (valueType.isInterface() && isMetadata(valueType)) {
-            final int foreigner = result.getInt(identifier, columnName);
+            final String foreigner = result.getString(identifier, columnName);
             return result.wasNull() ? null : getEntry(valueType, foreigner);
         }
         if (CodeList.class.isAssignableFrom(valueType)) {
-            final int foreigner = result.getInt(identifier, columnName);
+            final String foreigner = result.getString(identifier, columnName);
             return result.wasNull() ? null : getCodeList(valueType, foreigner);
         }
         /*
@@ -278,19 +278,34 @@ public class MetadataSource {
      * Returns a code list of the given type.
      *
      * @param  type The type, as a subclass of {@link CodeList}.
-     * @param  code The code to search for (usually the primary key).
+     * @param  identifier The identifier in the code list. This method accepts either The numerical
+     *         value of the code to search for (usually the primary key), or the code name.
      * @return The code list element.
      * @throws SQLException if a SQL query failed.
      */
-    private CodeList getCodeList(final Class type, final int code) throws SQLException {
+    private CodeList getCodeList(final Class type, String identifier) throws SQLException {
         assert Thread.holdsLock(this);
         final String className = getClassName(type);
-        MetadataResult result = (MetadataResult) statements.get(type);
-        if (result == null) {
-            result = new MetadataResult(connection, codeQuery, getTableName(className));
-            statements.put(type, result);
+        int     code;          // The identifier as an integer.
+        boolean isNumerical;   // 'true' if 'code' is valid.
+        try {
+            code = Integer.parseInt(identifier);
+            isNumerical = true;
+        } catch (NumberFormatException exception) {
+            code = 0;
+            isNumerical = false;
         }
-        final String name = result.getString(code);
+        /*
+         * Converts the numerical value into the code list name.
+         */
+        if (isNumerical) {
+            MetadataResult result = (MetadataResult) statements.get(type);
+            if (result == null) {
+                result = new MetadataResult(connection, codeQuery, getTableName(className));
+                statements.put(type, result);
+            }
+            identifier = result.getString(identifier);
+        }
         /*
          * Search a code list with the same name than the one declared
          * in the database. We will use name instead of code numerical
@@ -314,7 +329,7 @@ public class MetadataSource {
         if (code>=1 && code<values.length) {
             candidate = values[code-1];
             candidateName.append(candidate.name());
-            if (name.equals(geoApiToIso.getProperty(candidateName.toString()))) {
+            if (identifier.equals(geoApiToIso.getProperty(candidateName.toString()))) {
                 return candidate;
             }
         }
@@ -329,12 +344,12 @@ public class MetadataSource {
             candidate = values[i];
             candidateName.setLength(base);
             candidateName.append(candidate.name());
-            if (name.equals(geoApiToIso.getProperty(candidateName.toString()))) {
+            if (identifier.equals(geoApiToIso.getProperty(candidateName.toString()))) {
                 return candidate;
             }
         }
         // TODO: localize
-        throw new SQLException("Unknow code list: "+name+" in table \"" + 
+        throw new SQLException("Unknow code list: \""+identifier+"\" in table \"" + 
                                getTableName(className)+'"');
     }
 
