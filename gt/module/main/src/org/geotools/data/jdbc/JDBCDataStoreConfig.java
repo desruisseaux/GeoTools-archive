@@ -1,55 +1,76 @@
-/* $Id: JDBCDataStoreConfig.java,v 1.1 2004/01/08 04:28:18 seangeo Exp $
- * 
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/* $Id: JDBCDataStoreConfig.java,v 1.1.2.2 2004/04/18 09:19:43 aaime Exp $
+ *
  * Created on 8/01/2004
  */
 package org.geotools.data.jdbc;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
-/** Configuration object for JDBCDataStore. 
- * 
+
+/**
+ * Configuration object for JDBCDataStore.
+ *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
- * @author $Author: seangeo $
- * @version $Id: JDBCDataStoreConfig.java,v 1.1 2004/01/08 04:28:18 seangeo Exp $
- * Last Modified: $Date: 2004/01/08 04:28:18 $ 
+ * @author $Author: aaime $
+ * @version $Id: JDBCDataStoreConfig.java,v 1.1.2.2 2004/04/18 09:19:43 aaime Exp $ Last Modified: $Date: 2004/04/18 09:19:43 $
  */
 public class JDBCDataStoreConfig {
     public static final String FID_GEN_INSERT_NULL = "INSERT_NULL";
     public static final String FID_GEN_MANUAL_INC = "MANUAL_INC";
     public static final String DEFAULT_FID_GEN_KEY = "DEFAULT_GEN";
     public static final String DEFAULT_FID_GEN = FID_GEN_INSERT_NULL;
-            
     private final String namespace;
     private final String databaseSchemaName;
-    protected final Properties fidColumnOverrideMap = new Properties();
-    protected final Properties fidGenerationMap = new Properties(); 
-    
+    protected final long typeHandlerCacheTimout;
+
     public JDBCDataStoreConfig() {
-        this(null, null, Collections.EMPTY_MAP, Collections.EMPTY_MAP);        
+        this(null, null, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
     }
-    
-    /**
-     * 
-     */
-    public JDBCDataStoreConfig(String namespace, String databaseSchemaName, 
-                               Map fidColumnOverrideMap, Map fidGenerationMap) {
+
+    public JDBCDataStoreConfig(String namespace, String databaseSchemaName,
+        Map fidColumnOverrideMap, Map fidGenerationMap) {
+        this(namespace, databaseSchemaName, Long.MAX_VALUE);
+    }
+
+    public JDBCDataStoreConfig(String namespace, String databaseSchemaName,
+         long typeHandlerCacheTimeout) {
         this.namespace = namespace;
         this.databaseSchemaName = databaseSchemaName;
-        this.fidColumnOverrideMap.putAll(fidColumnOverrideMap);
-        this.fidGenerationMap.putAll(fidGenerationMap);
+        this.typeHandlerCacheTimout = typeHandlerCacheTimeout;
     }
-    
-    public static JDBCDataStoreConfig createWithNameSpaceAndSchemaName(String namespace, String schemaName) {
-        return new JDBCDataStoreConfig(namespace, schemaName, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
+
+    public static JDBCDataStoreConfig createWithNameSpaceAndSchemaName(
+        String namespace, String schemaName) {
+        return new JDBCDataStoreConfig(namespace, schemaName,
+            Collections.EMPTY_MAP, Collections.EMPTY_MAP);
     }
-    
-    public static JDBCDataStoreConfig createWithSchemaNameAndFIDGenMap(String schemaName, Map fidGenerationMap) {
-        return new JDBCDataStoreConfig(null, schemaName, Collections.EMPTY_MAP, fidGenerationMap);
+
+    public static JDBCDataStoreConfig createWithSchemaNameAndFIDGenMap(
+        String schemaName, Map fidGenerationMap) {
+        return new JDBCDataStoreConfig(null, schemaName, Collections.EMPTY_MAP,
+            fidGenerationMap);
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the databaseSchemaName.
      */
     public String getDatabaseSchemaName() {
@@ -57,42 +78,19 @@ public class JDBCDataStoreConfig {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the namespace.
      */
     public String getNamespace() {
         return namespace;
     }
 
-    /** Gets the FID Column name for the given feature type name.
-     *  
-     * @param typeName The name of the feature type.
-     * @return The name of the column to use for the FID. If no column has been
-     * defined for the type then null is returned.
+    /**
+     * @return
      */
-    public String getFidOverrideColumnFor(String typeName) {
-        return (String) fidColumnOverrideMap.get(typeName);
+    public long getTypeHandlerTimeout() {
+        return typeHandlerCacheTimout;
     }
-    
-    /** Gets the FID Generation Type ID for the given feature type name.
-     *  If no generation ID exists for the type name, it will check if a default
-     *  ID has been defined, if not default is defined it will use the system default
-     *  of INSERT_NULL. 
-     * 
-     * @param typeName The name of the feature type to get the generation id for.
-     * @return The FID generation type id. Could be either FID_GEN_INSERT_NULL,
-     * FID_GEN_MANUAL_INC or a data store specific id. 
-     */
-    public String getFidGenerationIdFor(String typeName) {
-        String strategy = fidGenerationMap.getProperty(typeName);
-        
-        if (strategy == null) {
-            strategy = fidGenerationMap.getProperty(DEFAULT_FID_GEN_KEY);
-            
-            if (strategy == null) {
-                strategy = DEFAULT_FID_GEN;
-            }
-        }
-        
-        return strategy;
-    }
+
 }

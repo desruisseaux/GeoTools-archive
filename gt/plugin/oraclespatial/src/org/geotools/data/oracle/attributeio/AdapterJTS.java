@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.oracle;
+package org.geotools.data.oracle.attributeio;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,7 +5,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.mysql;
 
@@ -36,12 +37,12 @@ import java.util.Map;
  * in the DataStoreFactorySpi file.
  * </p>
  *
- * @author Jody Garnett, Refractions Research
+ * @author Andrea Aime, University of Modena and Reggio Emilia
  */
 public class MySQLDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
-    /** Creates PostGIS-specific JDBC driver class. */
-    private static final String DRIVER_CLASS = "org.postgresql.Driver";
+    /** Creates MySQL JDBC driver class. */
+    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
@@ -57,7 +58,7 @@ public class MySQLDataStoreFactory
 
     /** Param, package visibiity for JUnit tests */
     static final Param DATABASE = new Param("database", String.class,
-            "mysql database");
+            "msyql database");
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
@@ -66,6 +67,39 @@ public class MySQLDataStoreFactory
     /** Param, package visibiity for JUnit tests */
     static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
+
+    /**
+     * Param, package visibiity for JUnit tests.
+     * 
+     * <p>
+     * Example of a non simple Param type where custom parse method is
+     * required.
+     * </p>
+     * 
+     * <p>
+     * When we convert to BeanInfo custom PropertyEditors will be required for
+     * this Param.
+     * </p>
+     */
+    static final Param CHARSET = new Param("charset", Charset.class,
+            "character set", false, Charset.forName("ISO-8859-1")) {
+            public Object parse(String text) throws IOException {
+                return Charset.forName(text);
+            }
+
+            public String text(Object value) {
+                return ((Charset) value).name();
+            }
+        };
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param NAMESPACE = new Param("namespace", String.class,
+            "namespace prefix used", false);
+
+    /** Array with all of the params */
+    static final Param[] arrayParameters = {
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
+    };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -110,27 +144,24 @@ public class MySQLDataStoreFactory
     public boolean canProcess(Map params) {
         Object value;
 
-        if (!params.containsKey("dbtype")) {
-            return false;
+        if (params != null) {
+            for (int i = 0; i < arrayParameters.length; i++) {
+                if (!(((value = params.get(arrayParameters[i].key)) != null)
+                        && (arrayParameters[i].type.isInstance(value)))) {
+                    if (arrayParameters[i].required) {
+                        return (false);
+                    }
+                }
+            }
+        } else {
+            return (false);
         }
 
-        if (!((String) params.get("dbtype")).equalsIgnoreCase("mysql")) {
-            return false;
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
+            return (false);
+        } else {
+            return (true);
         }
-
-        if (!params.containsKey("host")) {
-            return false;
-        }
-
-        if (!params.containsKey("user")) {
-            return false;
-        }
-
-        if (!params.containsKey("database")) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -150,22 +181,47 @@ public class MySQLDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
+        if (canProcess(params)) {
+        } else {
+            throw new IOException("The parameteres map isn't correct!!");
+        }
+
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
+        Charset charSet = (Charset) CHARSET.lookUp(params);
+        String namespace = (String) NAMESPACE.lookUp(params);
 
-        //Charset charSet = (Charset) CHARSET.lookUp(params);
-        //String namespace = (String) NAMESPACE.lookUp(params);
+        // Try processing params first so we can get an error message
+        // back to the user
+        //
         if (!canProcess(params)) {
             return null;
         }
 
+        MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,
+                port.intValue(), database);
+
+        connFact.setLogin(user, passwd);
+
+        if (charSet != null) {
+            connFact.setCharSet(charSet.name());
+        }
+
+        ConnectionPool pool;
+
         try {
-            return MySQLDataStore.getInstance(host, port, database, user, passwd);
+            pool = connFact.getConnectionPool();
         } catch (SQLException e) {
             throw new DataSourceException("Could not create connection", e);
+        }
+
+        if (namespace != null) {
+            return new MySQLDataStore(pool, namespace);
+        } else {
+            return new MySQLDataStore(pool);
         }
     }
 
@@ -181,7 +237,7 @@ public class MySQLDataStoreFactory
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         throw new UnsupportedOperationException(
-            "MySQL cannot create a new Database");
+            "Postgis cannot create a new Database");
     }
 
     /**
@@ -191,7 +247,7 @@ public class MySQLDataStoreFactory
      *         list of available datasources.
      */
     public String getDescription() {
-        return "MySQL (spatial) database";
+        return "PostGIS spatial database";
     }
 
     /**
@@ -202,12 +258,13 @@ public class MySQLDataStoreFactory
      *
      * @return <tt>true</tt> if and only if this factory is available to create
      *         DataStores.
-     *
-     * @task REVISIT: I'm just adding this method to compile, maintainer should
-     *       revisit to check for any libraries that may be necessary for
-     *       datastore creations. ch.
      */
     public boolean isAvailable() {
+        try {
+            Class.forName(DRIVER_CLASS);
+        } catch (ClassNotFoundException cnfe) {
+            return false;
+        }
         return true;
     }
 
@@ -219,6 +276,8 @@ public class MySQLDataStoreFactory
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD };
+        return new Param[] {
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
+        };
     }
 }

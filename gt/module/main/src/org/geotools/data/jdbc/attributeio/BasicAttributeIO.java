@@ -1,0 +1,64 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.data.jdbc.attributeio;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.geotools.data.DataSourceException;
+
+
+/**
+ * A basic attribute IO class, that will parse and write attributes
+ * as objects (using getObject, updateObject). This works usually with
+ * all primitives wrapped by an objects, and of course with every {@link Serializable}
+ * object.
+ *
+ * @author wolf
+ */
+public class BasicAttributeIO implements AttributeIO {
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#read(java.sql.ResultSet,
+     *      int)
+     */
+    public Object read(ResultSet rs, int position) throws IOException {
+        try {
+            return rs.getObject(position);
+        } catch (SQLException e) {
+            throw new DataSourceException("Sql problem.", e);
+        }
+    }
+
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#write(java.sql.ResultSet,
+     *      int, java.lang.Object)
+     */
+    public void write(ResultSet rs, int position, Object value)
+        throws IOException {
+        try {
+            if (value == null) {
+                rs.updateNull(position);
+            } else {
+                rs.updateObject(position, value);
+            }
+        } catch (Exception e) {
+            throw new DataSourceException("Sql problem.", e);
+        }
+    }
+}

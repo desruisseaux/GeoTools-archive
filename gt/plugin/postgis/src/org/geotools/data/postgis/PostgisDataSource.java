@@ -79,7 +79,7 @@ import java.util.logging.Logger;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @version $Id: PostgisDataSource.java,v 1.40 2003/12/12 21:26:13 cholmesny Exp $
+ * @version $Id: PostgisDataSource.java,v 1.40.2.1 2004/04/09 15:36:24 aaime Exp $
  */
 public class PostgisDataSource extends AbstractDataSource
     implements org.geotools.data.DataSource {
@@ -119,7 +119,7 @@ public class PostgisDataSource extends AbstractDataSource
     private int srid;
 
     /** To create the sql where statement */
-    protected SQLEncoderPostgis encoder = new SQLEncoderPostgis();
+    protected SQLEncoderPostgis encoder;
 
     /** the name of the column to use for the featureId */
     private String fidColumn;
@@ -164,6 +164,7 @@ public class PostgisDataSource extends AbstractDataSource
         //}
         this.tableName = tableName;
         this.fidColumn = getFidColumn(conn, tableName);
+        this.encoder = new SQLEncoderPostgis();
 
         //Could we statically hash these somehow?  I mean, making the schema
         //is a lot of work that much take place each time the datasource
@@ -492,7 +493,6 @@ public class PostgisDataSource extends AbstractDataSource
         throws DataSourceException {
         //one to one relationship for now, so typeName is not used.
         //String tableName = query.getTypeName();
-        tableName = this.tableName;
 
         boolean useLimit = (unpacker.getUnSupported() == null);
         Filter filter = unpacker.getSupported();

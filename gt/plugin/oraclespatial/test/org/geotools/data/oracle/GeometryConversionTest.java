@@ -4,6 +4,8 @@
  */
 package org.geotools.data.oracle;
 
+import org.geotools.data.oracle.attributeio.AdapterJTS;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;

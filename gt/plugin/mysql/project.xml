@@ -60,4 +60,22 @@
       <version>2.0-B6-DEV</version>
     </dependency>
   </dependencies>
+  <build>
+  <unitTest>
+    <!-- This section excludes the tests -->
+    <excludes>
+      <exclude>**/*.java</exclude>
+    </excludes>
+    <!-- End exclude tests -->
+     <resources>
+        <resource>
+            <directory>${basedir}/test</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.txt</include>
+            </includes>
+        </resource>
+    </resources>
+  </unitTest>
+  </build>
 </project>

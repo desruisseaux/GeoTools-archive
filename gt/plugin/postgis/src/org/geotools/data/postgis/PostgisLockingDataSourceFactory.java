@@ -113,7 +113,6 @@ public class PostgisLockingDataSourceFactory
         String port = (String) params.get("port");
         String database = (String) params.get("database");
         String table = (String) params.get("table");
-        String charSet = (String) params.get("charset");
         String locking = (String) params.get("locking");
 
         // I would love to be able to share connections with PostgisDataSource
@@ -122,7 +121,6 @@ public class PostgisLockingDataSourceFactory
 
         try {
             connFact.setLogin(user, passwd);
-            connFact.setCharSet(charSet);
 
             PostgisDataSource ds =
                 new PostgisLockingDataSource( connFact.getConnectionPool(), table);

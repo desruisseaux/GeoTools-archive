@@ -21,11 +21,14 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.SQLEncoder;
@@ -100,35 +103,25 @@ public class OracleDataStore extends JDBCDataStore {
      *  TODO: Determine the specific type of the geometry.
      * @see org.geotools.data.jdbc.JDBCDataStore#buildAttributeType(java.sql.ResultSet)
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws SQLException, DataSourceException {
+    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
         
-        if (rs.getString(TYPE_NAME).equals("SDO_GEOMETRY")) {
-            String columnName = rs.getString(COLUMN_NAME);
-            return AttributeTypeFactory.newAttributeType(columnName, Geometry.class);
-        } else  {
-            return super.buildAttributeType(rs);
-        }
+        try {
+			if (rs.getString(TYPE_NAME).equals("SDO_GEOMETRY")) {
+			    String columnName = rs.getString(COLUMN_NAME);
+			    return AttributeTypeFactory.newAttributeType(columnName, Geometry.class);
+			} else  {
+			    return super.buildAttributeType(rs);
+			}
+		} catch (SQLException e) {
+			throw new DataSourceException("Sql error occurred", e);
+		}
     }
+   
     
-    /* (non-Javadoc)
-     * @see org.geotools.data.jdbc.JDBCDataStore#createGeometryReader(org.geotools.feature.AttributeType, org.geotools.data.jdbc.JDBCDataStore.QueryData, int)
-     */
-    protected AttributeReader createGeometryReader(AttributeType attrType, QueryData queryData, int index) throws IOException {        
-        return new OracleSDOAttributeReader(attrType, queryData, index);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.geotools.data.jdbc.JDBCDataStore#createGeometryWriter(org.geotools.feature.AttributeType, org.geotools.data.jdbc.JDBCDataStore.QueryData, int)
-     */
-    protected AttributeWriter createGeometryWriter(AttributeType attrType, QueryData queryData, int index)
-                throws IOException {
-        return new OracleSDOAttributeReader(attrType, queryData, index);
-    }
-    
-    /* (non-Javadoc)
+    /**
      * @see org.geotools.data.jdbc.JDBCDataStore#determineSRID(java.lang.String, java.lang.String)
      */
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
@@ -143,13 +136,20 @@ public class OracleDataStore extends JDBCDataStore {
         }        
     }
     
-    /* (non-Javadoc)
+    /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getSqlBuilder(java.lang.String)
      */
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
-        FeatureTypeInfo info = getFeatureTypeInfo(typeName);
-        SQLEncoder encoder = new SQLEncoderOracle(info.getFidColumnName(), info.getSRIDs());
+    	FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
+        SQLEncoder encoder = new SQLEncoderOracle(info.getSRIDs());
         return new DefaultSQLBuilder(encoder);
     }
+
+	/**
+	 * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType, org.geotools.data.jdbc.QueryData)
+	 */
+	protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException {
+		return new SDOAttributeIO(type, queryData);
+	}
 
 }

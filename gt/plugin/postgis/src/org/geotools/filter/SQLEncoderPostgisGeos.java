@@ -16,9 +16,10 @@
  */
 package org.geotools.filter;
 
+import java.util.logging.Logger;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
-import java.util.logging.Logger;
 
 
 /**
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  * installed with GEOS support, to handle all the advanced spatial queries.
  *
  * @author Chris Holmes, TOPP
- * @version $Id: SQLEncoderPostgisGeos.java,v 1.3 2003/12/04 22:16:53 cholmesny Exp $
+ * @version $Id: SQLEncoderPostgisGeos.java,v 1.3.2.1 2004/05/02 15:27:02 aaime Exp $
  */
 public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
     implements org.geotools.filter.FilterVisitor {

@@ -64,6 +64,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.oracle.attributeio.AdapterJTS;
 import org.geotools.data.shapefile.shp.JTSUtilities;
 
 /**

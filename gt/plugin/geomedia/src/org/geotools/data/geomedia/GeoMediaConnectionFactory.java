@@ -16,8 +16,6 @@
 
 package org.geotools.data.geomedia;
 
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.ConnectionPoolManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +23,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.sql.ConnectionPoolDataSource;
+
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.ConnectionPoolManager;
 
 
 /**

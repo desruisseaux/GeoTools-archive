@@ -14,7 +14,7 @@
  *
  */
 
-package org.geotools.data.geomedia;
+package org.geotools.data.geomedia.attributeio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

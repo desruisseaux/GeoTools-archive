@@ -6,6 +6,7 @@
  */
 package org.geotools.data.jdbc;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
@@ -36,7 +37,7 @@ public interface SQLBuilder {
      *
      * @throws SQLEncoderException If an error occurs encoding the SQL
      */
-    public String buildSQLQuery(String typeName, String fidColumnName, 
+    public String buildSQLQuery(String typeName, FIDMapper mapper, 
             AttributeType[] attrTypes, Filter filter) throws SQLEncoderException;
     
     /**
@@ -71,7 +72,7 @@ public interface SQLBuilder {
      * @param typeName
      * @param attributes
      */
-    public void sqlColumns( StringBuffer sql, String fidColumnName, AttributeType attributes[] );
+    public void sqlColumns( StringBuffer sql, FIDMapper mapper, AttributeType attributes[] );
     
     /**
      * Consutrcts FROM clause for featureType

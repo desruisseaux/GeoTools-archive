@@ -1,17 +1,11 @@
-/*
- * Created on 16/10/2003
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package org.geotools.data.oracle;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +13,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -33,6 +26,8 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -62,13 +57,15 @@ public class OracleDataStoreTest extends TestCase {
     private Properties properties;
     private GeometryFactory jtsFactory = new GeometryFactory();
     private String schemaName;
+    private OracleDataStore dstore;
+    
     /*
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
         properties = new Properties();
-        properties.load(new FileInputStream("test.properties"));
+        properties.load(this.getClass().getResourceAsStream("test.properties"));
         schemaName = properties.getProperty("schema");
         OracleConnectionFactory fact = new OracleConnectionFactory(properties.getProperty("host"), 
                 properties.getProperty("port"), properties.getProperty("instance"));
@@ -76,6 +73,11 @@ public class OracleDataStoreTest extends TestCase {
         cPool = fact.getConnectionPool();
         Connection conn = cPool.getConnection();
         System.out.println(conn.getTypeMap());
+        
+        dstore = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
+        dstore.setFIDMapper("ORA_TEST_POINTS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POINTS", "ID", Types.INTEGER), "ORA_TEST_POINTS"));
+        dstore.setFIDMapper("ORA_TEST_LINES", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_LINES", "ID", Types.INTEGER), "ORA_TEST_LINES"));
+        dstore.setFIDMapper("RA_TEST_POLYGONS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POLYGONS", "ID", Types.INTEGER), "ORA_TEST_POLYGONS"));
     }
 
     /*
@@ -110,35 +112,21 @@ public class OracleDataStoreTest extends TestCase {
     }
 
     public void testGetFeatureTypes() throws IOException {
-        try {
-            DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-            String[] fts = ds.getTypeNames();
-            System.out.println(Arrays.asList(fts));
-            assertEquals(3, fts.length);
-        } catch (DataSourceException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        String[] fts = dstore.getTypeNames();
+        System.out.println(Arrays.asList(fts));
+        assertEquals(3, fts.length);
     }
 
     public void testGetSchema() throws Exception {
-        try {
-            DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-            FeatureType ft = ds.getSchema("ORA_TEST_POINTS");
+            FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
             assertNotNull(ft);
             System.out.println(ft);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 
     public void testGetFeatureReader() throws Exception {
-        try {
-            DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-            FeatureType ft = ds.getSchema("ORA_TEST_POINTS");
+            FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
             Query q = new DefaultQuery( "ORA_TEST_POINTS" );
-            FeatureReader fr = ds.getFeatureReader( q, Transaction.AUTO_COMMIT);
+            FeatureReader fr = dstore.getFeatureReader( q, Transaction.AUTO_COMMIT);
             int count = 0;
 
             while (fr.hasNext()) {
@@ -149,15 +137,10 @@ public class OracleDataStoreTest extends TestCase {
             assertEquals(5, count);
 
             fr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 
     public void testGetFeatureWriter() throws Exception {
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-        FeatureWriter writer = ds.getFeatureWriter("ORA_TEST_POINTS", Filter.NONE, Transaction.AUTO_COMMIT);
+        FeatureWriter writer = dstore.getFeatureWriter("ORA_TEST_POINTS", Filter.NONE, Transaction.AUTO_COMMIT);
         assertNotNull(writer);
 
         Feature feature = writer.next();
@@ -168,7 +151,7 @@ public class OracleDataStoreTest extends TestCase {
         writer.close();
 
         Query q = new DefaultQuery( "ORA_TEST_POINTS" );
-        FeatureReader reader = ds.getFeatureReader( q, Transaction.AUTO_COMMIT);
+        FeatureReader reader = dstore.getFeatureReader( q, Transaction.AUTO_COMMIT);
         Feature readF = reader.next();
         
         assertEquals("Changed Feature", feature.getAttribute(0));
@@ -197,8 +180,7 @@ public class OracleDataStoreTest extends TestCase {
         likeFilter.setPattern(pattern, "*", "?", "\\");
         likeFilter.setValue(attr);
         
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-        FeatureSource fs = ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
         FeatureResults fr = fs.getFeatures(likeFilter);
         assertEquals(5, fr.getCount());
         
@@ -209,14 +191,13 @@ public class OracleDataStoreTest extends TestCase {
     }
     
     public void testAttributeFilter() throws Exception {        
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
         CompareFilter attributeEquality = filterFactory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-        Expression attribute = filterFactory.createAttributeExpression(ds.getSchema("ORA_TEST_POINTS"), "NAME");
+        Expression attribute = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "NAME");
         Expression literal = filterFactory.createLiteralExpression("point 1");
         attributeEquality.addLeftValue(attribute);
         attributeEquality.addRightValue(literal);
         
-        FeatureSource fs = ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
         FeatureResults fr = fs.getFeatures(attributeEquality);
         assertEquals(1, fr.getCount());
         
@@ -227,14 +208,13 @@ public class OracleDataStoreTest extends TestCase {
     }
     
     public void testBBoxFilter() throws Exception {
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());        //
         GeometryFilter filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         Expression right = filterFactory.createBBoxExpression(new Envelope(-180, 180, -90, 90));
-        Expression left = filterFactory.createAttributeExpression(ds.getSchema("ORA_TEST_POINTS"), "SHAPE");
+        Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "SHAPE");
         filter.addLeftGeometry(left);
         filter.addRightGeometry(right);
         
-        FeatureSource fs = ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
         FeatureResults fr = fs.getFeatures(filter);        
         assertEquals(5, fr.getCount());
         
@@ -245,15 +225,14 @@ public class OracleDataStoreTest extends TestCase {
     }
     
     public void testPointGeometryConversion() throws Exception {
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
         CompareFilter filter = filterFactory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-        Expression left = filterFactory.createAttributeExpression(ds.getSchema("ORA_TEST_POINTS"), "NAME");
+        Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "NAME");
         Expression right = filterFactory.createLiteralExpression("point 1");
         filter.addLeftValue(left);
         filter.addRightValue(right);
         
         
-        FeatureSource fs = ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
         FeatureResults fr = fs.getFeatures(filter);        
         assertEquals(1, fr.getCount());
         
@@ -269,14 +248,13 @@ public class OracleDataStoreTest extends TestCase {
         Map fidGen = new HashMap();
         fidGen.put("ORA_TEST_POINTS", JDBCDataStoreConfig.FID_GEN_MANUAL_INC);
         JDBCDataStoreConfig config = JDBCDataStoreConfig.createWithSchemaNameAndFIDGenMap(schemaName, fidGen);
-        DataStore ds = new OracleDataStore(cPool, config);
         
         String name = "add_name";
         BigDecimal intval = new BigDecimal(70);
         Point point = jtsFactory.createPoint(new Coordinate(-15.0, -25));
-        Feature feature = ds.getSchema("ORA_TEST_POINTS").create(new Object[] { name, intval, point });
+        Feature feature = dstore.getSchema("ORA_TEST_POINTS").create(new Object[] { name, intval, point });
         FeatureReader reader = DataUtilities.reader(new Feature[] {feature});
-        FeatureStore fs = (FeatureStore) ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.addFeatures(reader);
 
         // Select is directly from the DB
@@ -293,18 +271,16 @@ public class OracleDataStoreTest extends TestCase {
     }
     
     public void testRemoveFeatures() throws Exception {
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
-        FeatureStore fs = (FeatureStore) ds.getFeatureSource("ORA_TEST_POINTS");
+        FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.removeFeatures(Filter.NONE);
         FeatureResults fr = fs.getFeatures();
         assertEquals(0, fr.getCount());
     }
     
     public void testPropertySelect() throws Exception {
-        DataStore ds = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
         DefaultQuery q = new DefaultQuery("ORA_TEST_POINTS",Filter.NONE);
         q.setPropertyNames(new String[]{"NAME"});
-        FeatureReader fr = ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
+        FeatureReader fr = dstore.getFeatureReader(q, Transaction.AUTO_COMMIT);
         Feature f = fr.next();
         FeatureType ft = f.getFeatureType();
         assertEquals(1, ft.getAttributeCount());

@@ -22,9 +22,12 @@ import org.geotools.data.*;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCTransactionState;
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.*;
 import org.geotools.filter.*;
 import org.geotools.filter.FilterFactory;
+import org.geotools.resources.Geotools;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
@@ -90,6 +93,8 @@ public class PostgisDataStoreTest extends TestCase {
             // LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
             dstore = new PostgisDataStore(connPool, TEST_NS);
+            
+	   		dstore.setFIDMapper("testset", new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
 
             //LOGGER.fine("about to create ds");
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);

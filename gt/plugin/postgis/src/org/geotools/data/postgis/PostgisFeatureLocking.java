@@ -16,6 +16,10 @@
  */
 package org.geotools.data.postgis;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureLock;
@@ -24,18 +28,10 @@ import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
-
-//JTS imports
-//geotools imports
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 
 
 /**
@@ -58,7 +54,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
- * @version $Id: PostgisFeatureLocking.java,v 1.9 2003/12/30 01:44:24 cholmesny Exp $
+ * @version $Id: PostgisFeatureLocking.java,v 1.9.2.1 2004/04/09 15:36:24 aaime Exp $
  */
 public class PostgisFeatureLocking extends PostgisFeatureStore
     implements FeatureLocking {

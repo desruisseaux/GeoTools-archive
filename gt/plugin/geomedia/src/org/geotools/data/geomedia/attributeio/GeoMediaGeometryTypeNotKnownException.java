@@ -32,7 +32,7 @@
  * Company:
  * </p>
  */
-package org.geotools.data.geomedia;
+package org.geotools.data.geomedia.attributeio;
 
 /**
  * DOCUMENT ME!

@@ -93,7 +93,7 @@ public interface DataStore {
      *
      * @return typeNames for available FeatureTypes.
      */
-    String[] getTypeNames();
+    String[] getTypeNames() throws IOException;
 
     /**
      * Retrieve FeatureType metadata by <code>typeName</code>.

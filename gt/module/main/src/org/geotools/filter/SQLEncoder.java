@@ -16,8 +16,12 @@
  */
 package org.geotools.filter;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,7 +47,7 @@ import java.util.logging.Logger;
  *       the LIKE type to capabilities, so others know that they can be
  *       encoded.
  * @task REVISIT: need to figure out exceptions, we're currently eating io
- *       errors, which is bad.  Probably need a generic visitor exception.
+ *       errors, which is bad. Probably need a generic visitor exception.
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     //use these when Like is implemented.
@@ -56,6 +60,11 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     // The escaped version of the multiple wildcard for the REGEXP pattern. 
     //private static String escapedWildcardMulti = "\\.\\*";
 
+    /** 
+     * Character used to escape column names 
+     */
+    private String colnameEscape = "";
+    
     /** error message for exceptions */
     private static final String IO_ERROR = "io problem writing filter";
 
@@ -63,7 +72,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     private static FilterCapabilities capabilities = null;
 
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");   
+    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** Map of comparison types to sql representation */
     private static Map comparisions = new HashMap();
@@ -116,34 +125,15 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     /** where to write the constructed string from visiting the filters. */
     protected Writer out;
 
+    /** the fid mapper used to encode the fid filters */
+    protected FIDMapper mapper;
+
     /**
      * Empty constructor
      */
     public SQLEncoder() {
     }
-    /** 
-     * Sets the capabilities of this filter.
-     * @return FilterCapabilities for this Filter
-     */
-    protected FilterCapabilities createFilterCapabilities(){
-        FilterCapabilities capabilities = new FilterCapabilities();
-        
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        capabilities.addType(AbstractFilter.BETWEEN);
-        capabilities.addType((short) 12345);
-        capabilities.addType((short) -12345);
-        
-        return capabilities; 
-    }
+
     /**
      * Convenience constructor to perform the whole encoding process at once.
      *
@@ -168,6 +158,41 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         } else {
             throw new SQLEncoderException("Filter type not supported");
         }
+    }
+    
+    /**
+     * Sets the FIDMapper that will be used in subsequente visit calls.
+     * There must be a FIDMapper in order to invoke the FIDFilter encoder.
+     * @param mapper
+     */
+    public void setFIDMapper(FIDMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    /**
+     * Sets the capabilities of this filter.
+     *
+     * @return FilterCapabilities for this Filter
+     */
+    protected FilterCapabilities createFilterCapabilities() {
+        FilterCapabilities capabilities = new FilterCapabilities();
+
+        capabilities.addType(AbstractFilter.LOGIC_OR);
+        capabilities.addType(AbstractFilter.LOGIC_AND);
+        capabilities.addType(AbstractFilter.LOGIC_NOT);
+        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
+        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
+        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
+        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
+        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(AbstractFilter.NULL);
+        capabilities.addType(AbstractFilter.BETWEEN);
+        capabilities.addType(AbstractFilter.FID);
+        capabilities.addType((short) 12345);
+        capabilities.addType((short) -12345);
+
+        return capabilities;
     }
 
     /**
@@ -216,15 +241,18 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
 
     /**
      * Describes the capabilities of this encoder.
+     * 
      * <p>
      * Performs lazy creation of capabilities.
      * </p>
+     *
      * @return The capabilities supported by this encoder.
      */
     public synchronized FilterCapabilities getCapabilities() {
-        if( capabilities == null ){
+        if (capabilities == null) {
             capabilities = createFilterCapabilities();
         }
+
         return capabilities; //maybe clone?  Make immutable somehow
     }
 
@@ -245,14 +273,14 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         try {
             //HACK: 12345 are Filter.NONE and Filter.ALL, they
             //should have some better names though.
-            if (filter.getFilterType() == 12345 ){
+            if (filter.getFilterType() == 12345) {
                 out.write("TRUE");
-            }
-            else if (filter.getFilterType() == -12345) {
+            } else if (filter.getFilterType() == -12345) {
                 out.write("FALSE");
-            }
-            else {
-                LOGGER.warning("exporting unknown filter type:"+filter.toString());
+            } else {
+                LOGGER.warning("exporting unknown filter type:"
+                    + filter.toString());
+
                 //throw new RuntimeException("Do not know how to export filter:"+filter.toString() );
             }
         } catch (java.io.IOException ioe) {
@@ -395,20 +423,6 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     }
 
     /**
-     * Writes the SQL for the Geometry Filter.
-     *
-     * @param filter the geometry logic to be turned into SQL.
-     *
-     * @task REVISIT: Declare abstract?  Eleminate?  Children must always
-     *       implement this.
-     */
-    public void visit(GeometryFilter filter) {
-        //if implementing BBox for use with an sql datasource be
-        //sure to implement an equals method for the BBoxExpression,
-        //as there is none now, and it is needed to test the unpacking
-    }
-
-    /**
      * Writes the SQL for the Null Filter.
      *
      * @param filter the null filter to be written to SQL.
@@ -431,12 +445,52 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     }
 
     /**
-     * This only exists the fulfill the interface - unless There is a way of
-     * determining the FID column in the database...
+     * Encodes an FidFilter.
      *
-     * @param filter the Fid Filter.
+     * @param filter
+     *
+     * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.FidFilter)
      */
     public void visit(FidFilter filter) {
+        if(mapper == null)
+            throw new RuntimeException("Must set a fid mapper before trying to encode FIDFilters");
+        
+        String[] fids = filter.getFids();
+        LOGGER.finer("Exporting FID=" + Arrays.asList(fids));
+
+        // prepare column name array
+        String[] colNames = new String[mapper.getColumnCount()];
+
+        for (int i = 0; i < colNames.length; i++) {
+            colNames[i] = mapper.getColumnName(i);
+        }
+
+        for (int i = 0; i < fids.length; i++) {
+            try {
+                Object[] attValues = mapper.getPKAttributes(fids[i]);
+
+                out.write("(");
+
+                for (int j = 0; j < attValues.length; j++) {
+                    out.write(colNames[j]);
+                    out.write(" = '");
+                    out.write(attValues[i].toString());
+                    out.write("'");
+
+                    if (j < (attValues.length - 1)) {
+                        out.write(" AND ");
+                    }
+                }
+
+                out.write(")");
+
+                if (i < (fids.length - 1)) {
+                    out.write(" OR ");
+                }
+            } catch (java.io.IOException e) {
+                LOGGER.warning("IO Error exporting FID Filter.");
+            }
+        }
     }
 
     /**
@@ -450,7 +504,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         LOGGER.finer("exporting ExpressionAttribute");
 
         try {
-            out.write("\"" + expression.getAttributePath() + "\"");
+            out.write(colnameEscape + expression.getAttributePath() + colnameEscape);
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
@@ -471,8 +525,6 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      * @param expression the Literal to export
      *
      * @throws RuntimeException for io exception with writer
-     *
-     * @task TODO: Fully support GeometryExpression literals
      */
     public void visit(LiteralExpression expression) throws RuntimeException {
         LOGGER.finer("exporting LiteralExpression");
@@ -482,15 +534,20 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
             short type = expression.getType();
 
             switch (type) {
-            case DefaultExpression.LITERAL_DOUBLE:
-            case DefaultExpression.LITERAL_INTEGER:
+            case Expression.LITERAL_DOUBLE:
+            case Expression.LITERAL_INTEGER:
                 out.write(literal.toString());
 
                 break;
 
-            case DefaultExpression.LITERAL_STRING:
+            case Expression.LITERAL_STRING:
                 out.write("'" + literal + "'");
 
+                break;
+                
+            case Expression.LITERAL_GEOMETRY:
+                visitLiteralGeometry(expression);
+                
                 break;
 
             default:
@@ -501,6 +558,23 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         }
     }
 
+    /**
+     * Subclasses must implement this method in order to encode geometry filters
+     * according to the specific database implementation
+     * @param expression
+     */    
+    protected void visitLiteralGeometry(LiteralExpression expression) throws IOException {
+        throw new RuntimeException("Subclasses must implement this method in order to handle geometries");
+    }
+    
+    
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
+     */
+    public void visit(GeometryFilter filter) {
+        throw new RuntimeException("Subclasses must implement this method in order to handle geometries");
+    }
+    
     /**
      * Writes the SQL for the Math Expression.
      *
@@ -534,4 +608,20 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         String message = "Function expression support not yet added.";
         throw new UnsupportedOperationException(message);
     }
+
+    
+    /**
+     * @return
+     */
+    protected String getColnameEscape() {
+        return colnameEscape;
+    }
+
+    /**
+     * @param string
+     */
+    protected void setColnameEscape(String string) {
+        colnameEscape = string;
+    }
+
 }

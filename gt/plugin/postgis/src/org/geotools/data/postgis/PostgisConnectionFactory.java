@@ -16,17 +16,16 @@
  */
 package org.geotools.data.postgis;
 
-import org.postgresql.jdbc3.Jdbc3ConnectionPool;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.ConnectionPoolManager;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.util.logging.Logger;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.ConnectionPoolManager;
 
 /**
  * Shell for JDBC transactions of all types. This creates connections for the
@@ -37,7 +36,7 @@ import java.util.Map;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @version $Id: PostgisConnectionFactory.java,v 1.7 2003/11/21 18:33:18 jive Exp $
+ * @version $Id: PostgisConnectionFactory.java,v 1.7.2.1 2004/04/09 15:36:24 aaime Exp $
  *
  * @task REVISIT: connection pooling, implementing java.sql.Datasource.  I
  *       removed the implementing because that class should be provided by the
@@ -73,9 +72,6 @@ public class PostgisConnectionFactory {
 
     /** The password of the user */
     private String password = "test";
-
-    /** An alternate character set to use. */
-    private String charSet;
     
     /** Map that contains Connection Pool Data Sources */
     private static Map dataSources = new HashMap();
@@ -148,14 +144,7 @@ public class PostgisConnectionFactory {
         this.password = password;
     }
 
-    /**
-     * Sets a different character set for the postgis driver to use.
-     *
-     * @param charSet the string of a valid charset name.
-     */
-    public void setCharSet(String charSet) {
-        this.charSet = charSet;
-    }
+    
 
     /**
      * Creates a database connection method to initialize a given database for
@@ -186,10 +175,6 @@ public class PostgisConnectionFactory {
         props.put("user", user);
         props.put("password", password);
 
-        if (charSet != null) {
-            props.put("charSet", charSet);
-        }
-
         return getConnection(props);
     }
 
@@ -210,9 +195,6 @@ public class PostgisConnectionFactory {
 	    poolDataSource.setPortNumber(port);
 	    poolDataSource.setUser(user);
 	    poolDataSource.setPassword(pass);
-	    if (charSet != null) {
-		  poolDataSource.setEncoding(charSet);
-	    }
 	    //source.setMaxConnections(10);
 	    //the source looks like this defaults to false, but we have
 	    //assumed true (as that's how it was before pooling)

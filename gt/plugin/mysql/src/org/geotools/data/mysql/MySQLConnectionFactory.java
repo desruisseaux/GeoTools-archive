@@ -1,9 +1,15 @@
 package org.geotools.data.mysql;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
+
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 
@@ -13,16 +19,23 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  */
 public class MySQLConnectionFactory {
 
+    /** Standard logging instance */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
+
+    /** Creates Mysql-specific JDBC driver class. */
+    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
     private static final String MYSQL_URL_PREFIX = "jdbc:mysql://";
     private static Map _dataSources = new HashMap();
     private String _dbURL;
     private String _username = "";
     private String _password = "";
-    
+    /** An alternate character set to use. */
+    private String charSet;
+
     /**
      * Creates a new MySQLConnectionFactory object from a MySQL database URL.  This
-     * is normally of the following format:<br>
-     * <br>
+     * is normally of the following format:<br/>
+     * <br/>
      * jdbc:mysql://<host>:<port>/<instance>
      * @param url the MySQL database URL
      */
@@ -37,10 +50,10 @@ public class MySQLConnectionFactory {
      * @param port the port number for the MySQL database
      * @param instance the MySQL database instance name
      */
-    public MySQLConnectionFactory(String host, Integer port, String instance) {
-        this(MYSQL_URL_PREFIX + host + ":" + port.toString() + "/" + instance);
+    public MySQLConnectionFactory(String host, int port, String instance) {
+        this(MYSQL_URL_PREFIX + host + ":" + String.valueOf(port) + "/" + instance);
     }
-    
+
     /**
      * Creates a new MySQLConnectionFactory object from a host name and an instance
      * name, using the normal MySQL port number of 3306.
@@ -48,7 +61,7 @@ public class MySQLConnectionFactory {
      * @param instance the MySQL database instance name
      */
     public MySQLConnectionFactory(String host, String instance) {
-        this(host, new Integer(3306), instance);
+        this(host, 3306, instance);
     }
 
     /**
@@ -69,6 +82,56 @@ public class MySQLConnectionFactory {
     }
 
     /**
+         * Creates a database connection method to initialize a given database for
+         * feature extraction with the user and password params.
+         *
+         * @param user the name of the user connect to connect to the pgsql db.
+         * @param password the password for the user.
+         *
+         * @return the sql Connection object to the database.
+         *
+         * @throws SQLException if the postgis sql driver could not be found
+         */
+    public Connection getConnection(String user, String password) throws SQLException {
+        Properties props = new Properties();
+        props.put("user", user);
+        props.put("password", password);
+
+        if (charSet != null) {
+            props.put("charSet", charSet);
+        }
+
+        return getConnection(props);
+    }
+
+    /**
+         * Creates a database connection method to initialize a given database for
+         * feature extraction with the given Properties.
+         *
+         * @param props Should contain at a minimum the user and password.
+         *        Additional properties, such as charSet, can also be added.
+         *
+         * @return the sql Connection object to the database.
+         *
+         * @throws SQLException if the postgis sql driver could not be found
+         */
+    public Connection getConnection(Properties props) throws SQLException {
+        // makes a new feature type bean to deal with incoming
+        Connection dbConnection = null;
+
+        // Instantiate the driver classes
+        try {
+            Class.forName(DRIVER_CLASS);
+            LOGGER.finest("getting connection at " + _dbURL + "with props: " + props);
+            dbConnection = DriverManager.getConnection(_dbURL, props);
+        } catch (ClassNotFoundException cnfe) {
+            throw new SQLException("Postgis driver was not found.");
+        }
+
+        return dbConnection;
+    }
+
+    /**
      * Creates and returns a MySQL ConnectionPool, or gets an existing ConnectionPool
      * if one exists, based upon the username and password set in this MySQLConnectionFactory
      * object.  Please call setLogin before calling this method, or use getConnectionPool(String, String)
@@ -78,11 +141,12 @@ public class MySQLConnectionFactory {
      */
     public ConnectionPool getConnectionPool() throws SQLException {
         String poolKey = _dbURL + _username + _password;
-        MysqlConnectionPoolDataSource poolDataSource = (MysqlConnectionPoolDataSource) _dataSources.get(poolKey);
+        MysqlConnectionPoolDataSource poolDataSource =
+            (MysqlConnectionPoolDataSource) _dataSources.get(poolKey);
 
         if (poolDataSource == null) {
             poolDataSource = new MysqlConnectionPoolDataSource();
-            
+
             poolDataSource.setURL(_dbURL);
             poolDataSource.setUser(_username);
             poolDataSource.setPassword(_password);
@@ -105,5 +169,21 @@ public class MySQLConnectionFactory {
         _username = username;
         _password = password;
     }
-    
+
+    public void free(ConnectionPool connectionPool) {
+        if (!connectionPool.isClosed()) {
+            connectionPool.close();
+        }
+        ConnectionPoolManager.getInstance().free(connectionPool);
+    }
+
+    /**
+         * Sets a different character set for the postgis driver to use.
+         *
+         * @param charSet the string of a valid charset name.
+         */
+    public void setCharSet(String charSet) {
+        this.charSet = charSet;
+    }
+
 }

@@ -90,7 +90,7 @@ public class OracleTest extends TestCase {
 
     public void setUp() throws Exception {
         properties = new Properties();
-        properties.load(new FileInputStream("test.properties"));
+        properties.load(this.getClass().getResourceAsStream("test.properties"));
         OracleDataSourceFactory dsFact = new OracleDataSourceFactory();
         OracleConnectionFactory conFact = new OracleConnectionFactory(properties.getProperty("host"),
                 properties.getProperty("port"), properties.getProperty("instance"));

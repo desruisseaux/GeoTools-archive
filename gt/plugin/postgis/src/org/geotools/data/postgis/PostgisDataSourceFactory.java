@@ -119,9 +119,8 @@ public class PostgisDataSourceFactory
         String port = (String) params.get("port");
         String database = (String) params.get("database");
         String table = (String) params.get("table");
-        String charSet = (String) params.get("charset");
-	String useStrict = (String) params.get("strictbbox");
-	String useGeos = (String) params.get("usegeos");
+    	String useStrict = (String) params.get("strictbbox");
+	    String useGeos = (String) params.get("usegeos");
         if (passwd == null) {
             passwd = "";
         }	    
@@ -131,7 +130,6 @@ public class PostgisDataSourceFactory
 
         try {
             connFact.setLogin(user, passwd);
-            connFact.setCharSet(charSet);
 	    
 	    ConnectionPool pool = connFact.getConnectionPool();
             PostgisDataSource pgds = new PostgisDataSource(pool, table);

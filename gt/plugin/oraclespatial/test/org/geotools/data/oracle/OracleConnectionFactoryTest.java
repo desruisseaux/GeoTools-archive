@@ -56,7 +56,7 @@ public class OracleConnectionFactoryTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         properties = new Properties();
-        properties.load(new FileInputStream("test.properties"));
+        properties.load(this.getClass().getResourceAsStream("test.properties"));
     }
 
     /**

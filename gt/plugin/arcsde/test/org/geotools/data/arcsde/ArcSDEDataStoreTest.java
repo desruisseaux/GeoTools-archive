@@ -179,8 +179,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      * "line_table" and "polygon_table", wether ot not they're defined as
      * single table names or as full qualified sde table names (i.e.
      * SDE.SDE.TEST_POINT)
+     * @throws IOException
      */
-    public void testGetTypeNames() {
+    public void testGetTypeNames() throws IOException {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
         testTypeExists(featureTypes, point_table);

@@ -16,6 +16,7 @@
  */
 package org.geotools.data.jdbc;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
@@ -25,7 +26,7 @@ import org.geotools.filter.SQLUnpacker;
 
 
 /**
- * Provides ...
+ * Provides  ...
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  */
@@ -48,23 +49,6 @@ public class DefaultSQLBuilder implements SQLBuilder {
         this.encoder = encoder;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.jdbc.SQLStatementBuilder#buildSQLQuery(java.lang.String, org.geotools.feature.AttributeType[], org.geotools.filter.Filter)
-     */
-    public String buildSQLQuery(String typeName, String fidColumnName,
-        AttributeType[] attrTypes, Filter filter) throws SQLEncoderException {
-        StringBuffer sqlBuffer = new StringBuffer();
-
-        sqlBuffer.append("SELECT ");
-        sqlColumns(sqlBuffer, fidColumnName, attrTypes);
-        sqlFrom(sqlBuffer, typeName);
-        sqlWhere(sqlBuffer, filter);
-
-        String sqlStmt = sqlBuffer.toString();
-
-        return sqlStmt;
-    }
-
     public Filter getPostQueryFilter(Filter filter) {
         FilterCapabilities cap = encoder.getCapabilities();
         SQLUnpacker unpacker = new SQLUnpacker(cap);
@@ -82,42 +66,6 @@ public class DefaultSQLBuilder implements SQLBuilder {
         unpacker.unPackAND(filter);
 
         return unpacker.getSupported();
-    }
-
-    /**
-     * Produces the select information required.
-     * 
-     * <p>
-     * The featureType, if known, is always requested.
-     * </p>
-     * 
-     * <p>
-     * sql: <code>featureID (,attributeColumn)</code>
-     * </p>
-     * 
-     * <p>
-     * We may need to provide AttributeReaders with a hook so they can request
-     * a wrapper function.
-     * </p>
-     *
-     * @param sql
-     * @param fidColumnName
-     * @param attributes
-     */
-    public void sqlColumns(StringBuffer sql, String fidColumnName,
-        AttributeType[] attributes) {
-        if (fidColumnName != null) {
-            sql.append(fidColumnName);
-        }
-
-        for (int i = 0; i < attributes.length; i++) {
-            sql.append(", ");
-            sql.append(attributes[i].getName());
-
-            //if (i < attributes.length - 1) {
-            //    sql.append(", ");
-            //}
-        }
     }
 
     /**
@@ -153,6 +101,53 @@ public class DefaultSQLBuilder implements SQLBuilder {
             String where = encoder.encode(preFilter);
             sql.append(" ");
             sql.append(where);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param typeName
+     * @param mapper
+     * @param attrTypes
+     * @param filter
+     *
+     * @return
+     *
+     * @throws SQLEncoderException
+     *
+     * @see DefaultSQLBuilder#buildSQLQuery(String, FIDMapper, AttributeType[],
+     *      Filter)
+     */
+    public String buildSQLQuery(String typeName, FIDMapper mapper,
+        AttributeType[] attrTypes, Filter filter) throws SQLEncoderException {
+        StringBuffer sqlBuffer = new StringBuffer();
+
+        sqlBuffer.append("SELECT ");
+        sqlColumns(sqlBuffer, mapper, attrTypes);
+        sqlFrom(sqlBuffer, typeName);
+        sqlWhere(sqlBuffer, filter);
+
+        String sqlStmt = sqlBuffer.toString();
+
+        return sqlStmt;
+    }
+
+    /**
+     * @see postgisDataStore.SQLBuilder#sqlColumns(java.lang.StringBuffer, postgisDataStore.FIDMapper.FIDMapper, org.geotools.feature.AttributeType[])
+     */
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper,
+        AttributeType[] attributes) {
+        for (int i = 0; i < mapper.getColumnCount(); i++) {
+            sql.append(mapper.getColumnName(i) + ", ");
+        }
+
+        for (int i = 0; i < attributes.length; i++) {
+            sql.append(attributes[i].getName());
+
+            if (i < (attributes.length - 1)) {
+                sql.append(", ");
+            }
         }
     }
 }

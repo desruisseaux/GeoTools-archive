@@ -16,17 +16,31 @@
  */
 package org.geotools.data.postgis;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
-import org.geotools.data.*;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.feature.*;
-import org.geotools.filter.*;
-import org.geotools.filter.FilterFactory;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.IllegalFilterException;
 
 
 /**

@@ -16,8 +16,59 @@
  */
 package org.geotools.data.postgis;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
-//JTS imports
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.EmptyFeatureReader;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.InProcessLockingManager;
+import org.geotools.data.LockingManager;
+import org.geotools.data.Query;
+import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.FeatureTypeInfo;
+import org.geotools.data.jdbc.JDBCDataStore;
+import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.JDBCFeatureLocking;
+import org.geotools.data.jdbc.JDBCFeatureStore;
+import org.geotools.data.jdbc.JDBCFeatureWriter;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.data.jdbc.QueryData;
+import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.filter.Filter;
+import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderPostgis;
+import org.geotools.filter.SQLEncoderPostgisGeos;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -26,66 +77,23 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.WKTWriter;
-import org.geotools.data.AttributeReader;
-import org.geotools.data.AttributeWriter;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.JDBCDataStore;
-import org.geotools.data.jdbc.JDBCFeatureLocking;
-import org.geotools.data.jdbc.JDBCFeatureStore;
-import org.geotools.data.jdbc.JDBCUtils;
-import org.geotools.data.jdbc.QueryData;
-import org.geotools.data.jdbc.SQLBuilder;
-import org.geotools.data.jdbc.WKTAttributeIO;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderPostgis;
-import org.geotools.filter.SQLEncoderPostgisGeos;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 /**
  * Postgis DataStore implementation.
  *
  * @author Chris Holmes
- * @version $Id: PostgisDataStore.java,v 1.19 2004/05/10 21:48:16 aaime Exp $
+ * @version $Id: PostgisDataStore.java,v 1.18.2.3 2004/05/02 15:31:43 aaime Exp $
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.data.postgis");
-    private static final int TABLE_NAME_COL = 3;
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     /** The invisible column to use as the fid if no primary key is set */
-    public static final String DEFAULT_FID_COLUMN = "oid";
 
-    /** Error message prefix for sql connection errors */
-    protected static final String CONN_ERROR = "Some sort of database connection error: ";
-
-    //private ConnectionPool connectionPool;
+    // public static final String DEFAULT_FID_COLUMN = "oid";
 
     /** Map of postgis geometries to jts geometries */
     private static Map GEOM_TYPE_MAP = new HashMap();
-
-    /** Well Known Text writer (from JTS). */
-    private static WKTWriter geometryWriter = new WKTWriter();
 
     static {
         GEOM_TYPE_MAP.put("GEOMETRY", Geometry.class);
@@ -98,256 +106,91 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         GEOM_TYPE_MAP.put("GEOMETRYCOLLECTION", GeometryCollection.class);
     }
 
-    public static final int OPTIMIZE_SAFE = 0;
-    public static final int OPTIMIZE_SQL = 1;
-    public final int OPTIMIZE_MODE;
+    private static Map CLASS_MAPPINGS = new HashMap();
 
-    /** To create the sql where statement */
-    protected SQLEncoder encoder = new SQLEncoderPostgis();
-    protected boolean useGeos = false;
+    static {
+        CLASS_MAPPINGS.put(String.class, "VARCHAR");
 
-    //private String namespace;
-    public PostgisDataStore(ConnectionPool connPool) throws IOException {
-        this(connPool, null);
+        CLASS_MAPPINGS.put(Boolean.class, "BOOLEAN");
+
+        CLASS_MAPPINGS.put(Integer.class, "INTEGER");
+
+        CLASS_MAPPINGS.put(Float.class, "REAL");
+        CLASS_MAPPINGS.put(Double.class, "DOUBLE PRECISION");
+
+        CLASS_MAPPINGS.put(BigDecimal.class, "DECIMAL");
+
+        CLASS_MAPPINGS.put(java.sql.Date.class, "DATE");
+        CLASS_MAPPINGS.put(java.sql.Time.class, "TIME");
+        CLASS_MAPPINGS.put(java.sql.Timestamp.class, "TIMESTAMP");
     }
 
-    public PostgisDataStore(ConnectionPool connPool, String namespace)
-        throws IOException {
+    private static Map GEOM_CLASS_MAPPINGS = new HashMap();
+
+    static {
+        // init the inverse map
+        Set keys = GEOM_TYPE_MAP.keySet();
+
+        for (Iterator it = keys.iterator(); it.hasNext();) {
+            String name = (String) it.next();
+            Class geomClass = (Class) GEOM_TYPE_MAP.get(name);
+            GEOM_CLASS_MAPPINGS.put(geomClass, name);
+        }
+    }
+
+    public static final int OPTIMIZE_SAFE = 0;
+    public static final int OPTIMIZE_SQL = 1;
+    private LockingManager lockingManager = createLockingManager();
+    protected SQLEncoder encoder = new SQLEncoderPostgis();
+    protected final boolean useGeos;
+    public final int OPTIMIZE_MODE;
+
+    protected PostgisDataStore(ConnectionPool connPool) throws IOException {
+        this(connPool, (String) null);
+    }
+
+    protected PostgisDataStore(ConnectionPool connPool, String namespace) throws IOException {
         this(connPool, null, namespace);
     }
 
-    public PostgisDataStore(ConnectionPool connPool, String schema,
-        String namespace) throws IOException {
-        this(connPool, schema, namespace, OPTIMIZE_SQL);
+    protected PostgisDataStore(ConnectionPool connPool, String schema, String namespace)
+        throws IOException {
+        this(
+            connPool,
+            new JDBCDataStoreConfig(namespace, schema, new HashMap(), new HashMap()),
+            OPTIMIZE_SQL);
     }
 
-    public PostgisDataStore(ConnectionPool connPool, String schema,
-        String namespace, int optimizeMode) throws IOException {
-        super(connPool, schema, new HashMap(), namespace);
+    protected PostgisDataStore(
+        ConnectionPool connPool,
+        String schema,
+        String namespace,
+        int optimizeMode)
+        throws IOException {
+        this(
+            connPool,
+            new JDBCDataStoreConfig(namespace, schema, new HashMap(), new HashMap()),
+            OPTIMIZE_SQL);
+    }
+
+    public PostgisDataStore(
+        ConnectionPool connectionPool,
+        JDBCDataStoreConfig config,
+        int optimizeMode)
+        throws IOException {
+        super(connectionPool, config);
+
         useGeos = getUseGeos();
         OPTIMIZE_MODE = optimizeMode;
     }
 
     /**
-     * Constructs an AttributeType from a row in a ResultSet. The ResultSet
-     * contains the information retrieved by a call to  getColumns() on the
-     * DatabaseMetaData object.  This information  can be used to construct an
-     * Attribute Type.
-     * 
-     * <p>
-     * This implementation construct an AttributeType using the default JDBC
-     * type mappings defined in JDBCDataStore.  These type mappings only
-     * handle native Java classes and SQL standard column types.  If a
-     * geometry type is found then getGeometryAttribute is called.
-     * </p>
-     * 
-     * <p>
-     * Note: Overriding methods must never move the current row pointer in the
-     * result set.
-     * </p>
+     * Allows subclass to create LockingManager to support their needs.
      *
-     * @param rs The ResultSet containing the result of a
-     *        DatabaseMetaData.getColumns call.
-     *
-     * @return The AttributeType built from the ResultSet.
-     *
-     * @throws SQLException If an error occurs processing the ResultSet.
-     * @throws DataSourceException For problems when calling
-     *         getGeometryAttribute.  Will be either wrapped SQLExceptions or
-     *         because the column could not be found in the geometry_columns
-     *         table.
+     * @return
      */
-    protected AttributeType buildAttributeType(ResultSet rs)
-        throws SQLException, DataSourceException {
-        final int TABLE_NAME = 3;
-        final int COLUMN_NAME = 4;
-        final int TYPE_NAME = 6;
-        String typeName = rs.getString(TYPE_NAME);
-
-        if (typeName.equals("geometry")) {
-            String tableName = rs.getString(TABLE_NAME);
-            String columnName = rs.getString(COLUMN_NAME);
-
-            return getGeometryAttribute(tableName, columnName);
-        } else {
-            return super.buildAttributeType(rs);
-        }
-    }
-
-    /**
-     * Returns an attribute type for a geometry column in a feature table.
-     *
-     * @param tableName The feature table name.
-     * @param columnName The geometry column name.
-     *
-     * @return Geometric attribute.
-     *
-     * @throws SQLException DOCUMENT ME!
-     * @throws DataSourceException if the geometry_columns table of postgis can
-     *         not be found, if this typename could not be found in the table,
-     *         or if there are sql problems.
-     *
-     * @task REVISIT: combine with querySRID, as they use the same select
-     *       statement.
-     * @task TODO: This should probably take a Transaction, so if things mess
-     *       up then we can rollback.
-     */
-    AttributeType getGeometryAttribute(String tableName, String columnName)
-        throws SQLException, DataSourceException {
-        Connection dbConnection = null;
-        Statement statement = null;
-        ResultSet result = null;
-
-        try {
-            dbConnection = getConnection(Transaction.AUTO_COMMIT);
-
-            String sqlStatement = "SELECT type FROM GEOMETRY_COLUMNS WHERE "
-                + "f_table_name='" + tableName + "' AND f_geometry_column='"
-                + columnName + "';";
-            LOGGER.fine("geometry sql statement is " + sqlStatement);
-
-            String geometryType = null;
-
-            // retrieve the result set from the JDBC driver
-            statement = dbConnection.createStatement();
-            result = statement.executeQuery(sqlStatement);
-
-            if (result.next()) {
-                geometryType = result.getString("type");
-                LOGGER.fine("geometry type is: " + geometryType);
-            }
-
-            if (geometryType == null) {
-                String msg = " no geometry found in the GEOMETRY_COLUMNS table "
-                    + " for " + tableName + " of the postgis install.  A row "
-                    + "for " + columnName + " is required  "
-                    + " for geotools to work correctly";
-                throw new DataSourceException(msg);
-            }
-
-            statement.close();
-
-            Class type = (Class) GEOM_TYPE_MAP.get(geometryType);
-
-            return AttributeTypeFactory.newAttributeType(columnName, type);
-
-            //I have no idea why my compiler is complaining about this.
-        } catch (IOException ioe) {
-            throw new DataSourceException("getting connection", ioe);
-        } finally {
-            JDBCUtils.close(result);
-            JDBCUtils.close(statement);
-            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
-        }
-    }
-
-    public SQLBuilder getSqlBuilder(String typeName) throws IOException {
-        FeatureTypeInfo info = getFeatureTypeInfo(typeName);
-        int srid = -1;
-
-        //HACK: geos should be integrated with the sql encoder, not a 
-        //seperate class.
-        SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos()
-                                            : new SQLEncoderPostgis();
-
-        if (info.getSchema().getDefaultGeometry() != null) {
-            String geom = info.getSchema().getDefaultGeometry().getName();
-            srid = info.getSRID(geom);
-            encoder.setDefaultGeometry(geom);
-        }
-
-        encoder.setFidColumn(info.getFidColumnName());
-        encoder.setSRID(srid);
-
-        return new PostgisSQLBuilder(encoder);
-    }
-
-    /**
-     * Override to create Well Known Text attribute reader.  Might be nice to
-     * have an WKTDataSource, between postgis and jdbc, as any simple feature
-     * for sql compliant database should work the same way, it can return wkt
-     * with AsText(), and will have a geometry_columns table where the info
-     * can be queried, ect.
-     *
-     * @param attrType The AttributeType to read.
-     * @param queryData The data containing the result of the query.
-     * @param index The index within the result set to read the data from.
-     *
-     * @return The AttributeReader that will read the geometry from the
-     *         results.
-     *
-     * @throws DataSourceException If an error occurs building the
-     *         AttributeReader.
-     *
-     * @task TODO: return a WKBAttributeReader, or a native object reader,
-     *       something that will be faster.
-     */
-    protected AttributeReader createGeometryReader(AttributeType attrType,
-        QueryData queryData, int index) throws DataSourceException {
-        return new WKTAttributeIO(queryData, attrType, index);
-    }
-
-    protected AttributeWriter createGeometryWriter(AttributeType attrType,
-        QueryData queryData, int index) throws DataSourceException {
-        return new WKTAttributeIO(queryData, attrType, index);
-    }
-
-    /**
-     * Override that works exactly the same except sets the default  fid column
-     * as 'oid', which is a reasonable default for postgis.
-     *
-     * @param typeName The name of the table to get a primary key for.
-     *
-     * @return The name of the primay key column.
-     *
-     * @throws IOException This will only occur if there is an error getting a
-     *         connection to the Database.
-     */
-    protected String determineFidColumnName(String typeName)
-        throws IOException {
-        String fidColumn = super.determineFidColumnName(typeName);
-
-        if (fidColumn == null) {
-            fidColumn = DEFAULT_FID_COLUMN;
-        }
-
-        return fidColumn;
-    }
-
-    protected int determineSRID(String tableName, String geometryColumnName)
-        throws IOException {
-        Connection dbConnection = null;
-        Statement statement = null;
-        ResultSet result = null;
-
-        try {
-            String sqlStatement = "SELECT srid FROM GEOMETRY_COLUMNS WHERE "
-                + "f_table_name='" + tableName + "' AND f_geometry_column='"
-                + geometryColumnName + "';";
-            dbConnection = getConnection(Transaction.AUTO_COMMIT);
-
-            statement = dbConnection.createStatement();
-            result = statement.executeQuery(sqlStatement);
-
-            if (result.next()) {
-                int retSrid = result.getInt("srid");
-                JDBCUtils.close(statement);
-
-                return retSrid;
-            } else {
-                String mesg = "No geometry column row for srid in table: "
-                    + tableName + ", geometry column " + geometryColumnName;
-                throw new DataSourceException(mesg);
-            }
-        } catch (SQLException sqle) {
-            String message = CONN_ERROR + sqle.getMessage();
-            LOGGER.warning(message);
-            throw new DataSourceException(message, sqle);
-        } finally {
-            JDBCUtils.close(result);
-            JDBCUtils.close(statement);
-            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
-        }
+    protected LockingManager createLockingManager() {
+        return new InProcessLockingManager();
     }
 
     protected boolean getUseGeos() throws IOException {
@@ -370,11 +213,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 }
             }
 
-            LOGGER.fine("returning " + retValue + " for useGeos");
-
             return retValue;
         } catch (SQLException sqle) {
-            String message = CONN_ERROR + sqle.getMessage();
+            String message = sqle.getMessage();
             LOGGER.warning(message);
             throw new DataSourceException(message, sqle);
         } finally {
@@ -382,16 +223,42 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    /**
-     * Crops non feature type tables.  There are alot of additional tables in a
-     * Oracle tablespace. This tries to remove some of them.  If the
-     * schemaName is provided in the Constructor then the job of narrowing
-     * down tables will be mush easier.  Otherwise there are alot of Meta
-     * tables and SDO tables to cull.  This method tries to remove as many as
-     * possible.
-     *
-     * @see org.geotools.data.jdbc.JDBCDataStore#allowTable(java.lang.String)
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getTypeNames()
      */
+    public String[] getTypeNames() throws IOException {
+        final int TABLE_NAME_COL = 3;
+        Connection conn = null;
+        List list = new ArrayList();
+
+        try {
+            conn = getConnection(Transaction.AUTO_COMMIT);
+
+            DatabaseMetaData meta = conn.getMetaData();
+            String[] tableType = { "TABLE" };
+            ResultSet tables = meta.getTables(null, config.getDatabaseSchemaName(), "%", tableType);
+
+            while (tables.next()) {
+                String tableName = tables.getString(TABLE_NAME_COL);
+
+                if (allowTable(tableName)) {
+                    list.add(tableName);
+                }
+            }
+
+            return (String[]) list.toArray(new String[list.size()]);
+        } catch (SQLException sqlException) {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
+            conn = null;
+
+            String message =
+                "Error querying database for list of tables:" + sqlException.getMessage();
+            throw new DataSourceException(message, sqlException);
+        } finally {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+        }
+    }
+
     protected boolean allowTable(String tablename) {
         if (tablename.equals("geometry_columns")) {
             return false;
@@ -403,18 +270,698 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return true;
     }
 
-    private String getGeometryText(Geometry geom, int srid) {
-        String geoText = geometryWriter.write(geom);
-        String sql = "GeometryFromText('" + geoText + "', " + srid + ")";
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
+     */
 
-        return sql;
+    /**
+     * This is a public entry point to the DataStore.
+     * 
+     * <p>
+     * We have given some though to changing this api to be based on query.
+     * </p>
+     * 
+     * <p>
+     * Currently the is is the only way to retype your features to different
+     * name spaces.
+     * </p>
+     * (non-Javadoc)
+     *
+     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
+     *      org.geotools.filter.Filter, org.geotools.data.Transaction)
+     */
+    public FeatureReader getFeatureReader(
+        final FeatureType requestType,
+        final Filter filter,
+        final Transaction transaction)
+        throws IOException {
+        String typeName = requestType.getTypeName();
+        FeatureType schemaType = getSchema(typeName);
+
+        int compare = DataUtilities.compare(requestType, schemaType);
+
+        Query query;
+
+        if (compare == 0) {
+            // they are the same type
+            //
+            query = new DefaultQuery(typeName, filter);
+        } else if (compare == 1) {
+            // featureType is a proper subset and will require reTyping
+            //
+            String[] names = attributeNames(requestType, filter);
+            query =
+                new DefaultQuery(typeName, filter, Query.DEFAULT_MAX, names, "getFeatureReader");
+        } else {
+            // featureType is not compatiable
+            //
+            throw new IOException("Type " + typeName + " does match request");
+        }
+
+        if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+            return new EmptyFeatureReader(requestType);
+        }
+
+        FeatureReader reader = getFeatureReader(query, transaction);
+
+        if (compare == 1) {
+            reader = new ReTypeFeatureReader(reader, requestType);
+        }
+
+        return reader;
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
-        AttributeWriter writer, QueryData queryData) throws IOException {
-        LOGGER.fine("returning postgis feature writer");
 
-        return new PostgisFeatureWriter(fReader, writer, queryData);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param featureType
+     * @param filter
+     *
+     * @return
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    /**
+     * Gets the list of attribute names required for both featureType and
+     * filter
+     *
+     * @param featureType The FeatureType to get attribute names for.
+     * @param filter The filter which needs attributes to filter.
+     *
+     * @return The list of attribute names required by a filter.
+     *
+     * @throws IOException If we can't get the schema.
+     */
+    protected String[] attributeNames(FeatureType featureType, Filter filter) throws IOException {
+        String typeName = featureType.getTypeName();
+        FeatureType origional = getSchema(typeName);
+        SQLBuilder sqlBuilder = getSqlBuilder(typeName);
+
+        if (featureType.getAttributeCount() == origional.getAttributeCount()) {
+            // featureType is complete (so filter must require subset
+            return DataUtilities.attributeNames(featureType);
+        }
+
+        String[] typeAttributes = DataUtilities.attributeNames(featureType);
+        String[] filterAttributes =
+            DataUtilities.attributeNames(sqlBuilder.getPostQueryFilter(filter));
+
+        if ((filterAttributes == null) || (filterAttributes.length == 0)) {
+            // no filter attributes required
+            return typeAttributes;
+        }
+
+        Set set = new HashSet();
+        set.addAll(Arrays.asList(typeAttributes));
+        set.addAll(Arrays.asList(filterAttributes));
+
+        if (set.size() == typeAttributes.length) {
+            // filter required a subset of featureType attributes
+            return typeAttributes;
+        } else {
+            return (String[]) set.toArray(new String[set.size()]);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param typeName
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public SQLBuilder getSqlBuilder(String typeName) throws IOException {
+        FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
+        int srid = -1;
+
+        // HACK: geos should be integrated with the sql encoder, not a 
+        // seperate class.
+        SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos() : new SQLEncoderPostgis();
+        encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
+
+        if (info.getSchema().getDefaultGeometry() != null) {
+            String geom = info.getSchema().getDefaultGeometry().getName();
+            srid = info.getSRID(geom);
+            encoder.setDefaultGeometry(geom);
+        }
+
+        encoder.setSRID(srid);
+
+        return new PostgisSQLBuilder(encoder);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param tableName
+     * @param geometryColumnName
+     *
+     * @return
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
+     */
+    protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
+        Connection dbConnection = null;
+
+        try {
+            String sqlStatement =
+                "SELECT srid FROM GEOMETRY_COLUMNS WHERE "
+                    + "f_table_name='"
+                    + tableName
+                    + "' AND f_geometry_column='"
+                    + geometryColumnName
+                    + "';";
+            dbConnection = getConnection(Transaction.AUTO_COMMIT);
+
+            Statement statement = dbConnection.createStatement();
+            ResultSet result = statement.executeQuery(sqlStatement);
+
+            if (result.next()) {
+                int retSrid = result.getInt("srid");
+                JDBCUtils.close(statement);
+
+                return retSrid;
+            } else {
+                String mesg =
+                    "No geometry column row for srid in table: "
+                        + tableName
+                        + ", geometry column "
+                        + geometryColumnName;
+                throw new DataSourceException(mesg);
+            }
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+
+            throw new DataSourceException(message, sqle);
+        } finally {
+            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
+        }
+    }
+
+    /**
+     * Provides the default implementation of determining the FID column.
+     * 
+     * <p>
+     * The default implementation of determining the FID column name is to use
+     * the primary key as the FID column.  If no primary key is present, null
+     * will be returned.  Sub classes can override this behaviour to define
+     * primary keys for vendor specific cases.
+     * </p>
+     * 
+     * <p>
+     * There is an unresolved issue as to what to do when there are multiple
+     * primary keys.  Maybe a restriction that table much have a single column
+     * primary key is appropriate.
+     * </p>
+     * 
+     * <p>
+     * This should not be called by subclasses to retreive the FID column name.
+     * Instead, subclasses should call getFeatureTypeInfo(String) to get the
+     * FeatureTypeInfo for a feature type and get the fidColumn name from the
+     * fidColumn name memeber.
+     * </p>
+     *
+     * @return The name of the primay key column or null if one does not exist.
+     */
+
+    //    protected String determineFidColumnName(String typeName)
+    //        throws IOException {
+    //        String fidColumn = super.determineFidColumnName(typeName);
+    //        
+    //        if(fidColumn == null)
+    //        	fidColumn = DEFAULT_FID_COLUMN;
+    //        	
+    //        return fidColumn;
+    //    }
+
+    /**
+     * Gets the namespace of the data store.
+     *
+     * @return The namespace.
+     */
+    public String getNameSpace() {
+        return config.getNamespace();
+    }
+
+    private static boolean isPresent(String[] array, String value) {
+        if (array != null) {
+            for (int i = 0; i < array.length; i++) {
+                if ((array[i] != null) && (array[i].equals(value))) {
+                    return (true);
+                }
+            }
+        }
+
+        return (false);
+    }
+
+    /**
+     * Constructs an AttributeType from a row in a ResultSet. The ResultSet
+     * contains the information retrieved by a call to  getColumns() on the
+     * DatabaseMetaData object.  This information  can be used to construct an
+     * Attribute Type.
+     * 
+     * <p>
+     * This implementation construct an AttributeType using the default JDBC
+     * type mappings defined in JDBCDataStore.  These type mappings only
+     * handle native Java classes and SQL standard column types.  If a
+     * geometry type is found then getGeometryAttribute is called.
+     * </p>
+     * 
+     * <p>
+     * Note: Overriding methods must never move the current row pointer in the
+     * result set.
+     * </p>
+     *
+     * @param metadataRs The ResultSet containing the result of a
+     *        DatabaseMetaData.getColumns call.
+     *
+     * @return The AttributeType built from the ResultSet.
+     *
+     * @throws IOException If an error occurs processing the ResultSet.
+     */
+    protected AttributeType buildAttributeType(ResultSet metadataRs) throws IOException {
+        try {
+            final int TABLE_NAME = 3;
+            final int COLUMN_NAME = 4;
+            final int TYPE_NAME = 6;
+            String typeName = metadataRs.getString(TYPE_NAME);
+
+            if (typeName.equals("geometry")) {
+                String tableName = metadataRs.getString(TABLE_NAME);
+                String columnName = metadataRs.getString(COLUMN_NAME);
+
+                return getGeometryAttribute(tableName, columnName);
+            } else {
+                return super.buildAttributeType(metadataRs);
+            }
+        } catch (SQLException e) {
+            throw new IOException("Sql error occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Returns an attribute type for a geometry column in a feature table.
+     *
+     * @param tableName The feature table name.
+     * @param columnName The geometry column name.
+     *
+     * @return Geometric attribute.
+     *
+     * @throws IOException DOCUMENT ME!
+     *
+     * @task REVISIT: combine with querySRID, as they use the same select
+     *       statement.
+     * @task This should probably take a Transaction, so if things mess up then
+     *       we can rollback.
+     */
+    AttributeType getGeometryAttribute(String tableName, String columnName) throws IOException {
+        Connection dbConnection = null;
+
+        try {
+            dbConnection = getConnection(Transaction.AUTO_COMMIT);
+
+            String sqlStatement =
+                "SELECT type FROM GEOMETRY_COLUMNS WHERE "
+                    + "f_table_name='"
+                    + tableName
+                    + "' AND f_geometry_column='"
+                    + columnName
+                    + "';";
+            LOGGER.fine("geometry sql statement is " + sqlStatement);
+
+            String geometryType = null;
+
+            // retrieve the result set from the JDBC driver
+            Statement statement = dbConnection.createStatement();
+            ResultSet result = statement.executeQuery(sqlStatement);
+
+            if (result.next()) {
+                geometryType = result.getString("type");
+                LOGGER.fine("geometry type is: " + geometryType);
+            }
+
+            if (geometryType == null) {
+                String msg =
+                    " no geometry found in the GEOMETRY_COLUMNS table "
+                        + " for "
+                        + tableName
+                        + " of the postgis install.  A row "
+                        + "for "
+                        + columnName
+                        + " is required  "
+                        + " for geotools to work correctly";
+                throw new DataSourceException(msg);
+            }
+
+            statement.close();
+
+            Class type = (Class) GEOM_TYPE_MAP.get(geometryType);
+
+            return AttributeTypeFactory.newAttributeType(columnName, type);
+        } catch (SQLException sqe) {
+            throw new IOException("An SQL exception occurred: " + sqe.getMessage());
+        } finally {
+            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
+     */
+    public void createSchema(FeatureType featureType) throws IOException {
+        String tableName = featureType.getTypeName();
+        AttributeType[] attributeType = featureType.getAttributeTypes();
+
+        FIDMapper fidMapper = typeHandler.getFIDMapper(tableName);
+
+        Connection con = this.getConnection(Transaction.AUTO_COMMIT);
+
+        Statement st = null;
+
+        if (!tablePresent(tableName, con)) {
+            try {
+                con.setAutoCommit(false);
+                st = con.createStatement();
+
+                StringBuffer statementSQL = new StringBuffer("CREATE TABLE " + tableName + " (");
+
+                if (!fidMapper.returnFIDColumnsAsAttributes()) {
+                    for (int i = 0; i < fidMapper.getColumnCount(); i++) {
+                        int val = fidMapper.getColumnType(i);
+                        String typeName = getSQLTypeName(fidMapper.getColumnType(i));
+
+                        if (typeName.equals("VARCHAR")) {
+                            typeName = typeName + "(" + fidMapper.getColumnSize(i) + ")";
+                        }
+
+                        statementSQL.append(fidMapper.getColumnName(i) + " " + typeName + ",");
+                    }
+                }
+
+                statementSQL.append(makeSqlCreate(attributeType));
+                statementSQL.append(" CONSTRAINT PK PRIMARY KEY (");
+
+                for (int i = 0; i < fidMapper.getColumnCount(); i++) {
+                    statementSQL.append(fidMapper.getColumnName(i) + ",");
+                }
+
+                statementSQL.setCharAt(statementSQL.length() - 1, ')');
+                statementSQL.append(")");
+
+                // System.out.println(statementSQL);
+                st.execute(statementSQL.toString());
+
+                for (int i = 0; i < attributeType.length; i++) {
+                    if (attributeType[i].isGeometry()) {
+                        GeometryAttributeType geomAttribute =
+                            (GeometryAttributeType) attributeType[i];
+                        CoordinateReferenceSystem refSys = geomAttribute.getCoordinateSystem();
+                        int SRID = -1;
+
+                        if (refSys != null) {
+                            SRID = -1;
+                        } else {
+                            SRID = -1;
+                        }
+
+                        DatabaseMetaData metaData = con.getMetaData();
+                        ResultSet rs = metaData.getCatalogs();
+                        rs.next();
+
+                        String dbName = rs.getString(1);
+                        rs.close();
+
+                        statementSQL =
+                            new StringBuffer(
+                                "INSERT INTO GEOMETRY_COLUMNS VALUES ("
+                                    + "'',"
+                                    + "'"
+                                    + dbName
+                                    + "',"
+                                    + "'"
+                                    + tableName
+                                    + "',"
+                                    + "'"
+                                    + attributeType[i].getName()
+                                    + "',"
+                                    + "2,"
+                                    + SRID
+                                    + ","
+                                    + "'"
+                                    + CLASS_MAPPINGS.get(geomAttribute.getType()).toString()
+                                    + "')");
+                        System.out.println(statementSQL);
+                        st.execute(statementSQL.toString());
+                    }
+                }
+
+                con.commit();
+
+                //"CREATE TABLE "+tableName+" ( )";
+
+                /*
+                   Statement st=con.createStatement();
+                   String statementSQL="CREATE TABLE "+tableName+" ( )";
+                   System.out.println(statementSQL);
+                   st.execute(statementSQL);
+                
+                   for (int i = 0; i < attributeType.length; i++) {
+                           String typeName = null;
+                           if ((typeName =(String) TYPE_MAP.get(attributeType[i].getType()))!= null) {
+                                   if (attributeType[i].isGeometry()) {
+                                           GeometryAttributeType geomAttribute=(GeometryAttributeType)attributeType[i];
+                                           CoordinateReferenceSystem ref=geomAttribute.getCoordinateSystem();
+                                           int SRID;
+                                           if (ref==null)
+                                                            SRID=-1;
+                                                   else SRID=-1;
+                                           statementSQL="SELECT AddGeometryColumn("
+                                                        +"'"+this.config.getNamespace()+"',"
+                                                        +"'"+tableName+"',"
+                                                        +"'"+geomAttribute.getName()+"',"
+                                                        +SRID+","
+                                                        +"'"+typeName+"',"
+                                                        +"2)";
+                                           System.out.println(statementSQL);
+                                           st.executeQuery(statementSQL);
+                                   } else {
+                                           if (typeName.equals("VARCHAR"))
+                                                   typeName = typeName
+                                                                           + "("
+                                                                           + attributeType[i].getFieldLength()
+                                                                           + ")";
+                
+                
+                                           System.out.println(typeName);
+                
+                
+                                           statementSQL = "ALTER TABLE "
+                                                                           + tableName
+                                                                           + " ADD COLUMN "
+                                                                           + attributeType[i].getName()+" "
+                                                                           + typeName;
+                                           System.out.println(statementSQL);
+                                           st.execute(statementSQL);
+                
+                                           if (!attributeType[i].isNillable()) {
+                                                   statementSQL="ALTER TABLE "+tableName
+                                     +" ALTER COLUMN "+attributeType[i].getName()
+                                     +" SET NOT NULL" ;
+                         System.out.println(statementSQL);
+                         st.execute(statementSQL);
+                                           }
+                
+                                   }
+                           } else        throw (new IOException("Type not supported!"));
+                   }
+                   con.commit();
+                   st.close();
+                   con.close();*/
+            } catch (SQLException e) {
+                try {
+                    if (con != null) {
+                        con.rollback();
+                    }
+                } catch (SQLException sqle) {
+                    throw new IOException(sqle.getMessage());
+                }
+
+                throw new IOException(e.getMessage());
+            } finally {
+                try {
+                    if (st != null) {
+                        st.close();
+                    }
+                } catch (SQLException e) {
+                    throw new IOException(e.getMessage());
+                } finally {
+                    try {
+                        if (con != null) {
+                            con.setAutoCommit(true);
+                            con.close();
+                        }
+                    } catch (SQLException e) {
+                        throw new IOException(e.getMessage());
+                    }
+                }
+            }
+        } else {
+            throw new IOException("The table " + tableName + " already exist.");
+        }
+    }
+
+    /**
+     * Returns the sql type name given the SQL type code
+     *
+     * @param typeCode
+     *
+     * @return
+     *
+     * @throws RuntimeException DOCUMENT ME!
+     */
+    private String getSQLTypeName(int typeCode) {
+        Class typeClass = (Class) TYPE_MAPPINGS.get(new Integer(typeCode));
+
+        if (typeClass == null) {
+            throw new RuntimeException("Uknown type " + typeCode + " please update TYPE_MAPPINGS");
+        }
+
+        String typeName = (String) CLASS_MAPPINGS.get(typeClass);
+
+        if (typeName == null) {
+            throw new RuntimeException(
+                "Uknown type name for class "
+                    + typeClass.getName()
+                    + " please update CLASS_MAPPINGS");
+        }
+
+        return typeName;
+    }
+
+    private StringBuffer makeSqlCreate(AttributeType[] attributeType) throws IOException {
+        StringBuffer buf = new StringBuffer("");
+
+        for (int i = 0; i < attributeType.length; i++) {
+            String typeName = null;
+
+            if ((typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getType())) != null) {
+                if (attributeType[i].isGeometry()) {
+                    typeName = "GEOMETRY";
+                } else if (typeName.equals("VARCHAR")) {
+                    typeName = typeName + "(" + attributeType[i].getFieldLength() + ")";
+                }
+
+                if (!attributeType[i].isNillable()) {
+                    typeName = typeName + " NOT NULL";
+                }
+
+                buf.append(attributeType[i].getName() + " " + typeName + ",");
+                System.out.println(buf);
+            } else {
+                throw (new IOException("Type not supported!"));
+            }
+        }
+
+        return buf;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param table
+     * @param con
+     *
+     * @return
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
+     */
+    private boolean tablePresent(String table, Connection con) throws IOException {
+        final int TABLE_NAME_COL = 3;
+        Connection conn = null;
+        List list = new ArrayList();
+
+        try {
+            conn = getConnection(Transaction.AUTO_COMMIT);
+
+            DatabaseMetaData meta = conn.getMetaData();
+            String[] tableType = { "TABLE" };
+            ResultSet tables = meta.getTables(null, config.getDatabaseSchemaName(), "%", tableType);
+
+            while (tables.next()) {
+                String tableName = tables.getString(TABLE_NAME_COL);
+
+                if (allowTable(tableName)
+                    && (tableName != null)
+                    && (tableName.equalsIgnoreCase(table))) {
+                    return (true);
+                }
+            }
+
+            return false;
+        } catch (SQLException sqlException) {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
+            conn = null;
+
+            String message =
+                "Error querying database for list of tables:" + sqlException.getMessage();
+            throw new DataSourceException(message, sqlException);
+        } finally {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param query
+     *
+     * @return
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    /**
+     * Get propertyNames in a safe manner.
+     * 
+     * <p>
+     * Method wil figure out names from the schema for query.getTypeName(), if
+     * query getPropertyNames() is <code>null</code>, or
+     * query.retrieveAllProperties is <code>true</code>.
+     * </p>
+     *
+     * @param query
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    private String[] propertyNames(Query query) throws IOException {
+        String[] names = query.getPropertyNames();
+
+        if ((names == null) || query.retrieveAllProperties()) {
+            String typeName = query.getTypeName();
+            FeatureType schema = getSchema(typeName);
+
+            names = new String[schema.getAttributeCount()];
+
+            for (int i = 0; i < schema.getAttributeCount(); i++) {
+                names[i] = schema.getAttributeType(i).getName();
+            }
+        }
+
+        return names;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#updateSchema(java.lang.String, org.geotools.feature.FeatureType)
+     */
+    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
+        // TODO Auto-generated method stub
     }
 
     /**
@@ -426,8 +973,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName)
-        throws IOException {
+    public FeatureSource getFeatureSource(String typeName) throws IOException {
         LOGGER.fine("get Feature source called on " + typeName);
 
         if (OPTIMIZE_MODE == OPTIMIZE_SQL) {
@@ -452,206 +998,122 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    //These are going to be needed by PostgisFeatureStore as well... we also
-    //could do the update stuff on the insert row, but I've just never used it
-    //before.  Want to get things working with something I'm sure of.
-
     /**
-     * Creates a sql insert statement.  Uses each feature's schema, which makes
-     * it possible to insert out of order, as well as inserting less than all
-     * features.
+     * DOCUMENT ME!
      *
-     * @param feature the feature to add.
-     * @param ftInfo the name of the feature table being inserted into.
+     * @param fReader
+     * @param writer
+     * @param queryData
      *
-     * @return an insert sql statement.
+     * @return
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    private String makeInsertSql(Feature feature, FeatureTypeInfo ftInfo) {
-        String tableName = ftInfo.getFeatureTypeName();
-        String attrValue;
-        StringBuffer sql = new StringBuffer("INSERT INTO \"" + tableName
-                + "\"(");
-        FeatureType featureSchema = feature.getFeatureType();
-
-        AttributeType[] types = featureSchema.getAttributeTypes();
-
-        if (ftInfo.getFidColumnName() != DEFAULT_FID_COLUMN) {
-            sql.append('"');
-            sql.append(ftInfo.getFidColumnName());
-            sql.append('"');
-            sql.append(", ");
-        }
-
-        for (int i = 0; i < types.length; i++) {
-            sql.append('"');
-            sql.append(types[i].getName());
-            sql.append('"');
-            sql.append((i < (types.length - 1)) ? ", " : ") ");
-        }
-
-        sql.append("VALUES (");
-
-        Object[] attributes = feature.getAttributes(null);
-
-        if (ftInfo.getFidColumnName() != DEFAULT_FID_COLUMN) {
-            String fid = feature.getID();
-            int split = fid.indexOf('.');
-
-            if ((split != -1) && fid.substring(0, split).equals(tableName)) {
-                fid = fid.substring(split + 1);
-            }
-
-            char ch = fid.charAt(0);
-
-            if (Character.isLetter(ch) || (ch == '_')) {
-                sql.append("'");
-                sql.append(fid);
-                sql.append("'");
-            } else if (Character.isDigit(ch)) {
-                try {
-                    long number = Long.parseLong(fid);
-                    sql.append(number);
-                } catch (NumberFormatException badNumber) {
-                    sql.append(fid);
-                }
-            } else {
-                sql.append(fid);
-            }
-
-            sql.append(", ");
-        }
-
-        for (int j = 0; j < attributes.length; j++) {
-            if (types[j].isGeometry()) {
-                String geomName = types[j].getName();
-                int srid = ftInfo.getSRID(geomName);
-                String geoText = getGeometryText((Geometry) attributes[j], srid);
-                sql.append(geoText);
-
-                //String geoText = geometryWriter.write((Geometry) attributes[j]);
-                //sql.append("GeometryFromText('" + geoText + "', " + srid + ")");
-            } else {
-                attrValue = addQuotes(attributes[j]);
-                sql.append(attrValue);
-            }
-
-            if (j < (attributes.length - 1)) {
-                sql.append(", ");
-            }
-        }
-
-        sql.append(");");
-
-        return sql.toString();
+    protected JDBCFeatureWriter createFeatureWriter(
+        FeatureReader fReader,
+        QueryData queryData)
+        throws IOException {
+        return new PostgisFeatureWriter(fReader, queryData);
     }
 
     /**
-     * Adds quotes to an object for storage in postgis.  The object should be a
-     * string or a number.  To perform an insert strings need quotes around
-     * them, and numbers work fine with quotes, so this method can be called
-     * on unknown objects.
+     * Retrieve a FeatureWriter over entire dataset.
+     * 
+     * <p>
+     * Quick notes: This FeatureWriter is often used to add new content, or
+     * perform summary calculations over the entire dataset.
+     * </p>
+     * 
+     * <p>
+     * Subclass may wish to implement an optimized featureWriter for these
+     * operations.
+     * </p>
+     * 
+     * <p>
+     * It should provide Feature for next() even when hasNext() is
+     * <code>false</code>.
+     * </p>
+     * 
+     * <p>
+     * Subclasses are responsible for checking with the lockingManger unless
+     * they are providing their own locking support.
+     * </p>
      *
-     * @param value The object to add quotes to.
+     * @param typeName
+     * @param transaction
      *
-     * @return a string representation of the object with quotes.
+     * @return
+     *
+     * @throws IOException
+     *
+     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
+     *      boolean, org.geotools.data.Transaction)
      */
-    private String addQuotes(Object value) {
-        String retString;
-
-        if (value != null) {
-            retString = "'" + value.toString() + "'";
-        } else {
-            retString = "null";
-        }
-
-        return retString;
+    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
+        throws IOException {
+        return getFeatureWriter(typeName, Filter.NONE, transaction);
     }
 
-    String getFidColumn(String typeName) throws IOException {
-        return getFeatureTypeInfo(typeName).getFidColumnName();
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String, org.geotools.data.Transaction)
+     */
+
+    /**
+     * Retrieve a FeatureWriter for creating new content.
+     * 
+     * <p>
+     * Subclass may wish to implement an optimized featureWriter for this
+     * operation. One based on prepaired statemnts is a possibility, as we do
+     * not require a ResultSet.
+     * </p>
+     * 
+     * <p>
+     * To allow new content the FeatureWriter should provide Feature for next()
+     * even when hasNext() is <code>false</code>.
+     * </p>
+     * 
+     * <p>
+     * Subclasses are responsible for checking with the lockingManger unless
+     * they are providing their own locking support.
+     * </p>
+     *
+     * @param typeName
+     * @param transaction
+     *
+     * @return
+     *
+     * @throws IOException
+     *
+     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
+     *      boolean, org.geotools.data.Transaction)
+     */
+    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+        throws IOException {
+        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL, transaction);
+
+        while (writer.hasNext()) {
+            writer.next(); // this would be a use for skip then :-)
+        }
+
+        return writer;
     }
 
     int getSRID(String typeName, String geomColName) throws IOException {
-        return getFeatureTypeInfo(typeName).getSRID(geomColName);
-    }
-
-    protected class PostgisFeatureWriter extends JDBCFeatureWriter {
-        public PostgisFeatureWriter(FeatureReader fReader,
-            AttributeWriter writer, QueryData queryData)
-            throws IOException {
-            super(fReader, writer, queryData);
-        }
-
-        protected void doInsert(Feature current)
-            throws IOException, SQLException {
-            LOGGER.fine("inserting into postgis feature " + current);
-
-            Statement statement = null;
-
-            try {
-                Connection conn = queryData.getConnection();
-                statement = conn.createStatement();
-
-                String sql = makeInsertSql(current,
-                        queryData.getFeatureTypeInfo());
-                LOGGER.info(sql);
-                statement.executeUpdate(sql);
-
-                //} catch (IllegalAttributeException e) {
-                //throw new DataSourceException("Unable to do insert", e);
-            } catch (SQLException sqle) {
-                String msg = "SQL Exception writing geometry column";
-                LOGGER.log(Level.SEVERE, msg, sqle);
-                queryData.close(sqle, this);
-                throw new DataSourceException(msg, sqle);
-            } finally {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException e) {
-                        String msg = "Error closing JDBC Statement";
-                        LOGGER.log(Level.WARNING, msg, e);
-                    }
-                }
-            }
-        }
-
-        public void close() throws IOException {
-            super.close();
-        }
+        return typeHandler.getFeatureTypeInfo(typeName).getSRID(geomColName);
     }
 
     /**
-     * This is just an initial stab at this.  Ideally we could somehow use
-     * ResultSet update sequences, but the jdbc driver doesn't handle postgis
-     * objects.   Using UpdateString with wkt didn't work with initial tests,
-     * it couldn't find an AsText column.  So for now we're just using a
-     * ripped  off modify from PostgisDataSource.  Should ideally rewrite
-     * stuff for  max code reuse, so the PostgisFeatureStore uses the same
-     * one.  And ideally put in JDBCDataStore for subclasses to just
-     * over-write the geometry part. private void updateGeometry(Geometry
-     * geom, QueryData queryData, int position, String fid)     throws
-     * DataSourceException, SQLException {                 FeatureType schema
-     * = queryData.getFeatureTypeInfo().getSchema();     AttributeType curType
-     * = schema.getAttributeType(position);     if (curType.isGeometry()) {
-     * //create the text to add geometry String geomName = curType.getName();
-     * int srid = queryData.getFeatureTypeInfo().getSRID(geomName); String
-     * geoText = geometryWriter.write((Geometry) geom); String newValue =
-     * null;//"SRID=" + srid + ";"+geoText;
-     * queryData.getResultSet().updateObject(geomName, newValue);
-     * queryData.getResultSet().updateRow();     }     /Statement statement =
-     * null; try { Connection conn =
-     * queryData.getResultSet().getStatement().getConnection(); statement =
-     * conn.createStatement(); String where = getFidWhere(fid, queryData);
-     * FeatureType schema = queryData.getFeatureTypeInfo().getSchema();
-     * AttributeType[] attType ={ schema.getAttributeType(position) };
-     * Object[] att = { geom }; String sql = makeModifySql(attType, att,
-     * where, queryData.getFeatureTypeInfo()); LOGGER.finer("this sql
-     * statement = " + sql); statement.executeUpdate(sql); } catch
-     * (SQLException sqle) { String message = CONN_ERROR + sqle.getMessage();
-     * LOGGER.warning(message); throw new DataSourceException(message, sqle);
-     * } finally { PostgisDataSource.close(statement); }
+     * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
+    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+        return new WKTAttributeIO();
+    }
 
-    //}
+    protected int getResultSetType(boolean forWrite) {
+        return ResultSet.TYPE_FORWARD_ONLY;
+    }
+
+    protected int getConcurrency(boolean forWrite) {
+        return ResultSet.CONCUR_READ_ONLY;
+    }
 }

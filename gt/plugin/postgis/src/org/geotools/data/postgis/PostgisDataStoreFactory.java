@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,16 +12,17 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.postgis;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.sql.SQLException;
-import java.util.Map;
 
 
 /**
@@ -63,31 +64,15 @@ public class PostgisDataStoreFactory
     static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
 
-    /**
-     * Param, package visibiity for JUnit tests.
-     * <p>
-     * Example of a non simple Param type where custom parse method
-     * is required.
-     * </p>
-     * <p>
-     * When we convert to BeanInfo custom PropertyEditors will be
-     * required for this Param.
-     * </p>
-     */
-    static final Param CHARSET = new Param("charset", Charset.class,
-            "character set", false, "ISO-8859-1") {
-            public Object parse(String text) throws IOException {
-                return Charset.forName(text);
-            }
-
-            public String text(Object value) {
-                return ((Charset) value).name();
-            }
-        };
 
     /** Param, package visibiity for JUnit tests */
     static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
+
+    /** Array with all of the params */
+    static final Param[] arrayParameters = {
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
+    };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -132,27 +117,24 @@ public class PostgisDataStoreFactory
     public boolean canProcess(Map params) {
         Object value;
 
-        if (!params.containsKey("dbtype")) {
-            return false;
+        if (params != null) {
+            for (int i = 0; i < arrayParameters.length; i++) {
+                if (!(((value = params.get(arrayParameters[i].key)) != null)
+                        && (arrayParameters[i].type.isInstance(value)))) {
+                    if (arrayParameters[i].required) {
+                        return (false);
+                    }
+                }
+            }
+        } else {
+            return (false);
         }
 
-        if (!((String) params.get("dbtype")).equalsIgnoreCase("postgis")) {
-            return false;
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
+            return (false);
+        } else {
+            return (true);
         }
-
-        if (!params.containsKey("host")) {
-            return false;
-        }
-
-        if (!params.containsKey("user")) {
-            return false;
-        }
-
-        if (!params.containsKey("database")) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -172,12 +154,16 @@ public class PostgisDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
+        if (canProcess(params)) {
+        } else {
+            throw new IOException("The parameteres map isn't correct!!");
+        }
+
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
-        Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
 
         // Try processing params first so we can get an error message
@@ -191,10 +177,6 @@ public class PostgisDataStoreFactory
                 port.toString(), database);
 
         connFact.setLogin(user, passwd);
-
-        if (charSet != null) {
-            connFact.setCharSet(charSet.name());
-        }
 
         ConnectionPool pool;
 
@@ -261,7 +243,7 @@ public class PostgisDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
         };
     }
 }

@@ -17,14 +17,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.data.jdbc.DefaultSQLBuilder;
-import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
-import org.geotools.filter.SQLUnpacker;
-
 
 /**
  * Builds sql for postgis.
@@ -48,23 +46,6 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         super(encoder);
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.jdbc.SQLStatementBuilder#buildSQLQuery(java.lang.String, org.geotools.feature.AttributeType[], org.geotools.filter.Filter)
-     */
-    public String buildSQLQuery(String typeName, String fidColumnName,
-        AttributeType[] attrTypes, Filter filter) throws SQLEncoderException {
-        StringBuffer sqlBuffer = new StringBuffer();
-
-        sqlBuffer.append("SELECT ");
-        sqlColumns(sqlBuffer, fidColumnName, attrTypes);
-        sqlFrom(sqlBuffer, typeName);
-        sqlWhere(sqlBuffer, filter);
-
-        String sqlStmt = sqlBuffer.toString();
-
-        return sqlStmt;
-    }
-
     /**
      * Produces the select information required.
      * 
@@ -85,15 +66,16 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      * @param fidColumnName
      * @param attributes
      */
-    public void sqlColumns(StringBuffer sql, String fidColumnName,
-        AttributeType[] attributes) {
-        if (fidColumnName != null) {
-            sql.append(fidColumnName);
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {
+        for (int i = 0; i < mapper.getColumnCount(); i++) {
+            sql.append(mapper.getColumnName(i));
+            if(attributes.length > 0 || i < (mapper.getColumnCount() - 1)) {
+				sql.append(", ");
+            }
         }
 
         for (int i = 0; i < attributes.length; i++) {
             String colName = attributes[i].getName();
-            sql.append(", ");
 
             if (attributes[i].isGeometry()) {
                 sql.append("AsText(force_2d(\"" + colName + "\"))");
@@ -101,9 +83,9 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
                 sql.append("\"" + colName + "\"");
             }
 
-            //if (i < (attributes.length - 1)) {
-            //  sql.append(", ");
-            //}
+            if (i < (attributes.length - 1)) {
+              sql.append(", ");
+            }
         }
     }
 
@@ -134,8 +116,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      *
      * @throws SQLEncoderException DOCUMENT ME!
      */
-    public void sqlWhere(StringBuffer sql, Filter preFilter)
-        throws SQLEncoderException {
+    public void sqlWhere(StringBuffer sql, Filter preFilter) throws SQLEncoderException {
         if ((preFilter != null) || (preFilter == Filter.NONE)) {
             String where = encoder.encode(preFilter);
             sql.append(" ");

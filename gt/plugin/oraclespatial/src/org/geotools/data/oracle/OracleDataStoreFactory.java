@@ -196,5 +196,6 @@ public class OracleDataStoreFactory
             new Param("schema", String.class, "The schema name to narrow down the exposed tables.", false),
             new Param("namespace", String.class, "The namespace to give the DataStore", false)
         };                
-    }    
+    }
+ 
 }

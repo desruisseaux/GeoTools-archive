@@ -22,12 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
@@ -36,12 +35,17 @@ import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
@@ -52,7 +56,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
-
 
 /**
  * Implementation of a Postgis specific FeatureStore.  This mostly just rips
@@ -65,7 +68,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * do some solid tests to see which is actually faster.
  *
  * @author Chris Holmes, TOPP
- * @version $Id: PostgisFeatureStore.java,v 1.8 2004/05/10 21:46:00 aaime Exp $
+ * @version $Id: PostgisFeatureStore.java,v 1.7.2.3 2004/05/02 15:31:43 aaime Exp $
  *
  * @task HACK: too little code reuse with PostgisDataStore.
  * @task TODO: make individual operations truly atomic.  If the transaction is
@@ -76,8 +79,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  */
 public class PostgisFeatureStore extends JDBCFeatureStore {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.data.postgis");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     /** Well Known Text writer (from JTS). */
     private static WKTWriter geometryWriter = new WKTWriter();
@@ -97,214 +99,214 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     protected String tableName;
 
     /** the name of the column to use for the featureId */
-    protected String fidColumn;
+    protected FIDMapper fidMapper;
 
-    public PostgisFeatureStore(PostgisDataStore postgisDataStore,
-        FeatureType featureType) throws IOException {
+    public PostgisFeatureStore(PostgisDataStore postgisDataStore, FeatureType featureType)
+        throws IOException {
         super(postgisDataStore, featureType);
         tableName = featureType.getTypeName();
-        fidColumn = postgisDataStore.getFidColumn(tableName);
+        fidMapper = postgisDataStore.getFIDMapper(tableName);
         sqlBuilder = postgisDataStore.getSqlBuilder(tableName);
 
         AttributeType geomType = featureType.getDefaultGeometry();
         encoder = new SQLEncoderPostgis();
+        encoder.setFIDMapper(postgisDataStore.getFIDMapper(featureType.getTypeName()));
 
         if (geomType != null) {
             //HACK: encoder should be set for each geometry.
             int srid = getSRID(geomType.getName());
             encoder.setDefaultGeometry(geomType.getName());
             encoder.setSRID(srid);
-            encoder.setFidColumn(fidColumn);
+            encoder.setFIDMapper(fidMapper);
         }
     }
 
-    /**
-     * Returns a feature collection, based on the passed filter.  The schema of
-     * the features passed in must match the schema of the datasource.
-     *
-     * @param reader Add features to the PostGIS database.
-     *
-     * @return A set of featureIds of the features added.
-     *
-     * @throws IOException if anything went wrong.
-     * @throws DataSourceException DOCUMENT ME!
-     *
-     * @task REVISIT: Check to make sure features passed in match schema.
-     * @task TODO: get working with the primary key fid column.  This will
-     *       currently just insert nulls for the fids if oid is not being used
-     *       as the column.  We probably need a sequence to generate the fids.
-     *       Or if the fid is supposed to be part of the insert (which doesn't
-     *       make sense if we return fids), then we should check for
-     *       uniqueness.
-     * @task REVISIT: not sure about previousAutoCommit stuff.  We want to make
-     *       sure that each of these actions is atomic if we're not working
-     *       against a Transaction.
-     */
-    public Set addFeatures(FeatureReader reader) throws IOException {
-        boolean fail = false;
-        Set curFids = null;
-        Set newFids = null;
+//    /**
+//     * Returns a feature collection, based on the passed filter.  The schema of
+//     * the features passed in must match the schema of the datasource.
+//     *
+//     * @param reader Add features to the PostGIS database.
+//     *
+//     * @return A set of featureIds of the features added.
+//     *
+//     * @throws IOException if anything went wrong.
+//     * @throws DataSourceException DOCUMENT ME!
+//     *
+//     * @task REVISIT: Check to make sure features passed in match schema.
+//     * @task TODO: get working with the primary key fid column.  This will
+//     *       currently just insert nulls for the fids if oid is not being used
+//     *       as the column.  We probably need a sequence to generate the fids.
+//     *       Or if the fid is supposed to be part of the insert (which doesn't
+//     *       make sense if we return fids), then we should check for
+//     *       uniqueness.
+//     * @task REVISIT: not sure about previousAutoCommit stuff.  We want to make
+//     *       sure that each of these actions is atomic if we're not working
+//     *       against a Transaction.
+//     */
+//    public Set addFeatures(FeatureReader reader) throws IOException {
+//        boolean fail = false;
+//        Set curFids = null;
+//        Set newFids = null;
+//
+//        //Feature[] featureArr = collection.getFeatures();
+//        Connection conn = null;
+//        Statement statement = null;
+//
+//        if (reader.hasNext()) {
+//            try {
+//                conn = getConnection();
+//
+//                curFids = getFidSet(conn);
+//                LOGGER.fine("fids before add: " + curFids);
+//                statement = conn.createStatement();
+//
+//                while (reader.hasNext()) {
+//                    String sql = makeInsertSql(tableName, reader.next());
+//                    LOGGER.finer("this sql statement = " + sql);
+//                    statement.executeUpdate(sql);
+//                }
+//
+//                newFids = getFidSet(conn);
+//                LOGGER.fine("fids after add: " + newFids);
+//                newFids.removeAll(curFids);
+//                LOGGER.fine("to return " + newFids);
+//            } catch (SQLException sqle) {
+//                fail = true;
+//                close(conn, getTransaction(), sqle);
+//
+//                String message = CONN_ERROR + sqle.getMessage();
+//                LOGGER.warning(message);
+//                throw new DataSourceException(message, sqle);
+//            } catch (IllegalAttributeException iae) {
+//                throw new DataSourceException("attribute problem", iae);
+//            } finally {
+//                reader.close();
+//                close(statement);
+//                close(conn, getTransaction(), null);
+//
+//                //finalizeTransactionMethod(previousAutoCommit, fail);
+//            }
+//        }
+//
+//        //Set retFids = new HashSet(newFids.size());
+//        //for (Iterator i = newFids.iterator(); i.hasNext;){
+//        return newFids;
+//    }
 
-        //Feature[] featureArr = collection.getFeatures();
-        Connection conn = null;
-        Statement statement = null;
+//    /**
+//     * Gets the set of fids for all features in this datasource .  Used by
+//     * insert to  figure out which features it added.  There should be a more
+//     * efficient way of doing this, I'm just not sure what.
+//     *
+//     * @param conn The connection to get the fid set with.
+//     *
+//     * @return a set of strings of the featureIds
+//     *
+//     * @throws IOException if there were problems connecting to the db backend.
+//     * @throws DataSourceException DOCUMENT ME!
+//     */
+//    private Set getFidSet(Connection conn) throws IOException {
+//        Set fids = new HashSet();
+//        Statement statement = null;
+//
+//        try {
+//            LOGGER.finer("entering fid set");
+//
+//            //conn = getConnection();
+//            statement = conn.createStatement();
+//
+//            DefaultQuery query = new DefaultQuery();
+//            query.setPropertyNames(new String[0]);
+//
+//            SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
+//
+//            //REVISIT: redo unpacker-this has to be called first, or it breaks.
+//            unpacker.unPackAND(null);
+//
+//            String sql = makeSql(unpacker, (Query) query);
+//            ResultSet result = statement.executeQuery(sql);
+//
+//            while (result.next()) {
+//                //REVISIT: this formatting could be done after the remove,
+//                //would speed things up, but also would make that code ugly.
+//                fids.add(createFid(result.getString(1)));
+//            }
+//        } catch (SQLException sqle) {
+//            String message = CONN_ERROR + sqle.getMessage();
+//            LOGGER.warning(message);
+//            close(conn, getTransaction(), sqle);
+//            throw new DataSourceException(message, sqle);
+//        } finally {
+//            close(statement);
+//            close(conn, getTransaction(), null);
+//        }
+//
+//        LOGGER.finest("returning fids " + fids);
+//
+//        return fids;
+//    }
 
-        if (reader.hasNext()) {
-            try {
-                conn = getConnection();
-
-                curFids = getFidSet(conn);
-                LOGGER.fine("fids before add: " + curFids);
-                statement = conn.createStatement();
-
-                while (reader.hasNext()) {
-                    String sql = makeInsertSql(tableName, reader.next());
-                    LOGGER.finer("this sql statement = " + sql);
-                    statement.executeUpdate(sql);
-                }
-
-                newFids = getFidSet(conn);
-                LOGGER.fine("fids after add: " + newFids);
-                newFids.removeAll(curFids);
-                LOGGER.fine("to return " + newFids);
-            } catch (SQLException sqle) {
-                fail = true;
-                close(conn, getTransaction(), sqle);
-
-                String message = CONN_ERROR + sqle.getMessage();
-                LOGGER.warning(message);
-                throw new DataSourceException(message, sqle);
-            } catch (IllegalAttributeException iae) {
-                throw new DataSourceException("attribute problem", iae);
-            } finally {
-                reader.close();
-                close(statement);
-                close(conn, getTransaction(), null);
-
-                //finalizeTransactionMethod(previousAutoCommit, fail);
-            }
-        }
-
-        //Set retFids = new HashSet(newFids.size());
-        //for (Iterator i = newFids.iterator(); i.hasNext;){
-        return newFids;
-    }
-
-    /**
-     * Gets the set of fids for all features in this datasource .  Used by
-     * insert to  figure out which features it added.  There should be a more
-     * efficient way of doing this, I'm just not sure what.
-     *
-     * @param conn The connection to get the fid set with.
-     *
-     * @return a set of strings of the featureIds
-     *
-     * @throws IOException if there were problems connecting to the db backend.
-     * @throws DataSourceException DOCUMENT ME!
-     */
-    private Set getFidSet(Connection conn) throws IOException {
-        Set fids = new HashSet();
-        Statement statement = null;
-
-        try {
-            LOGGER.finer("entering fid set");
-
-            //conn = getConnection();
-            statement = conn.createStatement();
-
-            DefaultQuery query = new DefaultQuery();
-            query.setPropertyNames(new String[0]);
-
-            SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
-
-            //REVISIT: redo unpacker-this has to be called first, or it breaks.
-            unpacker.unPackAND(null);
-
-            String sql = makeSql(unpacker, (Query) query);
-            ResultSet result = statement.executeQuery(sql);
-
-            while (result.next()) {
-                //REVISIT: this formatting could be done after the remove,
-                //would speed things up, but also would make that code ugly.
-                fids.add(createFid(result.getString(1)));
-            }
-        } catch (SQLException sqle) {
-            String message = CONN_ERROR + sqle.getMessage();
-            LOGGER.warning(message);
-            close(conn, getTransaction(), sqle);
-            throw new DataSourceException(message, sqle);
-        } finally {
-            close(statement);
-            close(conn, getTransaction(), null);
-        }
-
-        LOGGER.finest("returning fids " + fids);
-
-        return fids;
-    }
-
-    /**
-     * Creates a sql insert statement.  Uses each feature's schema, which makes
-     * it possible to insert out of order, as well as inserting less than all
-     * features.
-     *
-     * @param tableName the name of the feature table being inserted into.
-     * @param feature the feature to add.
-     *
-     * @return an insert sql statement.
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    private String makeInsertSql(String tableName, Feature feature)
-        throws IOException {
-        String attrValue;
-        StringBuffer sql = new StringBuffer();
-
-        sql.append("INSERT INTO \"");
-        sql.append(tableName);
-        sql.append("\"(");
-
-        FeatureType featureSchema = feature.getFeatureType();
-        AttributeType[] types = featureSchema.getAttributeTypes();
-
-        for (int i = 0; i < types.length; i++) {
-            sql.append("\"");
-            sql.append(types[i].getName());
-            sql.append("\"");
-            sql.append((i < (types.length - 1)) ? ", " : ") ");
-        }
-
-        sql.append("VALUES (");
-
-        Object[] attributes = feature.getAttributes(null);
-
-        for (int j = 0; j < attributes.length; j++) {
-	    if (attributes[j] == null) {
-		sql.append("null");
-	    } else if (types[j].isGeometry()) {
-                int srid = getSRID(types[j].getName());
-                String geoText = geometryWriter.write((Geometry) attributes[j]);
-                sql.append("GeometryFromText('");
-                sql.append(geoText);
-                sql.append("', ");
-                sql.append(srid);
-                sql.append(")");
-            } else {
-                attrValue = addQuotes(attributes[j]);
-                sql.append(attrValue);
-            }
-
-            if (j < (attributes.length - 1)) {
-                sql.append(", ");
-            }
-	    
-        }
-
-        sql.append(");");
-
-	LOGGER.fine("insert statement is " + sql);
-        return sql.toString();
-    }
+//    /**
+//     * Creates a sql insert statement.  Uses each feature's schema, which makes
+//     * it possible to insert out of order, as well as inserting less than all
+//     * features.
+//     *
+//     * @param tableName the name of the feature table being inserted into.
+//     * @param feature the feature to add.
+//     *
+//     * @return an insert sql statement.
+//     *
+//     * @throws IOException DOCUMENT ME!
+//     */
+//    private String makeInsertSql(String tableName, Feature feature) throws IOException {
+//        String attrValue;
+//        StringBuffer sql = new StringBuffer();
+//
+//        sql.append("INSERT INTO \"");
+//        sql.append(tableName);
+//        sql.append("\"(");
+//
+//        FeatureType featureSchema = feature.getFeatureType();
+//        AttributeType[] types = featureSchema.getAttributeTypes();
+//
+//        for (int i = 0; i < types.length; i++) {
+//            sql.append("\"");
+//            sql.append(types[i].getName());
+//            sql.append("\"");
+//            sql.append((i < (types.length - 1)) ? ", " : ") ");
+//        }
+//
+//        sql.append("VALUES (");
+//
+//        Object[] attributes = feature.getAttributes(null);
+//
+//        for (int j = 0; j < attributes.length; j++) {
+//            if (attributes[j] == null) {
+//                sql.append("null");
+//            } else if (types[j].isGeometry()) {
+//                int srid = getSRID(types[j].getName());
+//                String geoText = geometryWriter.write((Geometry) attributes[j]);
+//                sql.append("GeometryFromText('");
+//                sql.append(geoText);
+//                sql.append("', ");
+//                sql.append(srid);
+//                sql.append(")");
+//            } else {
+//                attrValue = addQuotes(attributes[j]);
+//                sql.append(attrValue);
+//            }
+//
+//            if (j < (attributes.length - 1)) {
+//                sql.append(", ");
+//            }
+//
+//        }
+//
+//        sql.append(");");
+//
+//        LOGGER.fine("insert statement is " + sql);
+//        return sql.toString();
+//    }
 
     protected int getSRID(String geomName) throws IOException {
         return getPostgisDataStore().getSRID(tableName, geomName);
@@ -367,6 +369,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             conn = getConnection();
             statement = conn.createStatement();
 
+            if (encodableFilter == null && unEncodableFilter != null) {
+                encodableFilter = getEncodableFilter(unEncodableFilter);
+            }
+
             if (encodableFilter != null) {
                 whereStmt = encoder.encode((AbstractFilter) encodableFilter);
                 sql = "DELETE from \"" + tableName + "\" " + whereStmt + ";";
@@ -374,36 +380,6 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 //do actual delete
                 LOGGER.fine("sql statment is " + sql);
                 statement.executeUpdate(sql);
-            }
-
-            if (unEncodableFilter != null) {
-                //this is very similar to getFidSet - the reason is so that we
-                //don't spend time constructing geometries when we don't need
-                //to, but we probably could get some better code reuse.
-                DefaultQuery query = new DefaultQuery();
-                query.setPropertyNames(new String[0]);
-                query.setFilter(unEncodableFilter);
-
-                FeatureResults features = getFeatures(unEncodableFilter);
-                FeatureReader iter = features.reader();
-
-                if (iter.hasNext()) {
-                    sql = "DELETE FROM \"" + tableName + "\" WHERE ";
-
-                    for (int i = 0; iter.hasNext(); i++) {
-                        fid = formatFid(iter.next());
-                        sql += (fidColumn + " = " + fid);
-
-                        if (iter.hasNext()) {
-                            sql += " OR ";
-                        } else {
-                            sql += ";";
-                        }
-                    }
-
-                    LOGGER.fine("our delete says : " + sql);
-                    statement.executeUpdate(sql);
-                }
             }
 
             close(statement);
@@ -417,8 +393,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         } catch (SQLEncoderException ence) {
             fail = true;
 
-            String message = "error encoding sql from filter "
-                + ence.getMessage();
+            String message = "error encoding sql from filter " + ence.getMessage();
             LOGGER.warning(message);
 
             throw new DataSourceException(message, ence);
@@ -447,8 +422,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *       now, but should be more fully implemented.
      * @task REVISIT: do some nice prepared statement stuff like oracle.
      */
-    public void modifyFeatures(AttributeType[] type, Object[] value,
-        Filter filter) throws IOException {
+    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+        throws IOException {
         // check locks!
         // (won't do anything if we use our own
         // database locking)
@@ -475,6 +450,11 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             conn = getConnection();
             statement = conn.createStatement();
 
+            if (encodableFilter == null && unEncodableFilter != null) {
+                FidFilter fidFilter = getEncodableFilter(unEncodableFilter);
+                encodableFilter = fidFilter;
+            }
+
             if (encodableFilter != null) {
                 whereStmt = encoder.encode((AbstractFilter) encodableFilter);
                 sql = makeModifySql(type, value, whereStmt);
@@ -482,29 +462,6 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 statement.executeUpdate(sql);
             }
 
-            if (unEncodableFilter != null) {
-                FeatureResults features = getFeatures(unEncodableFilter);
-                FeatureReader iter = features.reader();
-
-                if (iter.hasNext()) {
-                    whereStmt = " WHERE ";
-
-                    while (iter.hasNext()) {
-                        //for (FeatureIterator iter = coll.features();
-                        //  iter.hasNext();) {
-                        fid = formatFid(iter.next());
-                        whereStmt += (fidColumn + " = " + fid);
-
-                        if (iter.hasNext()) {
-                            whereStmt += " OR ";
-                        }
-                    }
-
-                    sql = makeModifySql(type, value, whereStmt);
-                    LOGGER.fine("unencoded modify is " + sql);
-                    statement.executeUpdate(sql);
-                }
-            }
         } catch (SQLException sqle) {
             fail = true;
             close(conn, getTransaction(), sqle);
@@ -515,8 +472,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         } catch (SQLEncoderException ence) {
             fail = true;
 
-            String message = "error encoding sql from filter "
-                + ence.getMessage();
+            String message = "error encoding sql from filter " + ence.getMessage();
             LOGGER.warning(message);
             throw new DataSourceException(message, ence);
         } catch (IllegalAttributeException iae) {
@@ -525,6 +481,26 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             close(statement);
             close(conn, getTransaction(), null);
         }
+    }
+
+    private FidFilter getEncodableFilter(Filter unEncodableFilter)
+        throws IOException, FactoryConfigurationError, IllegalAttributeException {
+        // this is very similar to getFidSet - the reason is so that we
+        // don't spend time constructing geometries when we don't need
+        // to, but we probably could get some better code reuse.
+        DefaultQuery query = new DefaultQuery();
+        query.setPropertyNames(new String[0]);
+        query.setFilter(unEncodableFilter);
+
+        FeatureResults features = getFeatures(unEncodableFilter);
+
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        FidFilter fidFilter = ff.createFidFilter();
+        for (FeatureReader it = features.reader(); it.hasNext();) {
+            Feature feature = it.next();
+            fidFilter.addFid(feature.getID());
+        }
+        return fidFilter;
     }
 
     /**
@@ -577,8 +553,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *
      * @throws IOException if the lengths of types and values don't match.
      */
-    private String makeModifySql(AttributeType[] types, Object[] values,
-        String whereStmt) throws IOException {
+    private String makeModifySql(AttributeType[] types, Object[] values, String whereStmt)
+        throws IOException {
         int arrLength = types.length;
 
         if (arrLength == values.length) {
@@ -595,15 +571,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                     //create the text to add geometry
                     int srid = getSRID(curType.getName());
                     String geoText = geometryWriter.write((Geometry) curValue);
-                    newValue = "GeometryFromText('" + geoText + "', " + srid
-                        + ")";
+                    newValue = "GeometryFromText('" + geoText + "', " + srid + ")";
                 } else {
                     //or add quotes, covers rest of cases
                     newValue = addQuotes(curValue);
                 }
 
-                sqlStatement.append("\"" + curType.getName() + "\" = "
-                    + newValue);
+                sqlStatement.append("\"" + curType.getName() + "\" = " + newValue);
 
                 //sqlStatement.append(curType.getName() + " = " + newValue);
                 sqlStatement.append((i < (arrLength - 1)) ? ", " : " ");
@@ -613,8 +587,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             return sqlStatement.toString();
         } else {
-            throw new IOException("length of value array is not "
-                + "same length as type array");
+            throw new IOException("length of value array is not " + "same length as type array");
         }
     }
 
@@ -657,33 +630,33 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      * @task HACK: Use the postgis SQLBuilder
      * @task REVISIT: rewrite the unpacker.
      */
-    public String makeSql(SQLUnpacker unpacker, Query query)
-        throws IOException {
+    public String makeSql(SQLUnpacker unpacker, Query query) throws IOException {
         //one to one relationship for now, so typeName is not used.
         //String tableName = query.getTypeName();
-        tableName = this.tableName;
 
         boolean useLimit = (unpacker.getUnSupported() == null);
         Filter filter = unpacker.getSupported();
         LOGGER.fine("Filter in making sql is " + filter);
 
-        StringBuffer sqlStatement = new StringBuffer("SELECT ");
-        sqlStatement.append(fidColumn);
-
         AttributeType[] attributeTypes = getAttTypes(query);
         int numAttributes = attributeTypes.length;
+
+        StringBuffer sqlStatement = new StringBuffer("SELECT ");
+        if (!fidMapper.returnFIDColumnsAsAttributes()) {
+            for (int i = 0; i < fidMapper.getColumnCount(); i++) {
+                sqlStatement.append(fidMapper.getColumnName(i));
+                if (numAttributes > 0 || i < (fidMapper.getColumnCount() - 1))
+                    sqlStatement.append(", ");
+            }
+        }
+
         LOGGER.finer("making sql for " + numAttributes + " attributes");
 
         for (int i = 0; i < numAttributes; i++) {
             String curAttName = attributeTypes[i].getName();
 
             if (Geometry.class.isAssignableFrom(attributeTypes[i].getType())) {
-                sqlStatement.append(", AsText(force_2d(\"" + curAttName
-                    + "\"))");
-
-                //REVISIT, see getIdColumn note.
-            } else if (fidColumn.equals(curAttName)) {
-                //do nothing, already covered by fid
+                sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
             } else {
                 sqlStatement.append(", \"" + curAttName + "\"");
             }
@@ -708,34 +681,33 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             limit = " LIMIT " + query.getMaxFeatures();
         }
 
-        sqlStatement.append(" FROM \"" + tableName + "\" " + where + limit
-            + ";").toString();
+        sqlStatement.append(" FROM \"" + tableName + "\" " + where + limit + ";").toString();
         LOGGER.fine("sql statement is " + sqlStatement);
 
         return sqlStatement.toString();
     }
 
-    /**
-     * Prepends the tablename (featureType) on to featureIds that start with
-     * digits.
-     *
-     * @param featureId A featureId string to be prepended with tablename if
-     *        needed.
-     *
-     * @return the prepended feautre Id.
-     */
-    protected String createFid(String featureId) {
-        String newFid;
-
-        if (Character.isDigit(featureId.charAt(0))) {
-            //so prepend the table name.
-            newFid = tableName + "." + featureId;
-        } else {
-            newFid = featureId;
-        }
-
-        return newFid;
-    }
+//    /**
+//     * Prepends the tablename (featureType) on to featureIds that start with
+//     * digits.
+//     *
+//     * @param featureId A featureId string to be prepended with tablename if
+//     *        needed.
+//     *
+//     * @return the prepended feautre Id.
+//     */
+//    protected String createFid(String featureId) {
+//        String newFid;
+//
+//        if (Character.isDigit(featureId.charAt(0))) {
+//            //so prepend the table name.
+//            newFid = tableName + "." + featureId;
+//        } else {
+//            newFid = featureId;
+//        }
+//
+//        return newFid;
+//    }
 
     /**
      * Gets the attribute types from the query.  If all are requested then
@@ -770,8 +742,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             //TODO: better error reporting, and completely test this method.
             if (attNames.size() != retPos) {
-                String msg = "attempted to request a property, "
-                    + attNames.get(0) + " that is not part of the schema ";
+                String msg =
+                    "attempted to request a property, "
+                        + attNames.get(0)
+                        + " that is not part of the schema ";
                 throw new IOException(msg);
             }
 
@@ -832,11 +806,19 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
             AttributeType[] attributeTypes = schema.getAttributeTypes();
 
+			if(!query.retrieveAllProperties()) {
+				try {
+                    schema = DataUtilities.createSubType(schema, query.getPropertyNames());
+                } catch (SchemaException e1) {
+                    throw new DataSourceException("Could not create subtype", e1);
+                }
+			}
+			 
+
             for (int j = 0, n = schema.getAttributeCount(); j < n; j++) {
                 if (attributeTypes[j].isGeometry()) {
                     String attName = attributeTypes[j].getName();
-                    Envelope curEnv = getEnvelope(conn, attName, sqlBuilder,
-                            filter);
+                    Envelope curEnv = getEnvelope(conn, attName, sqlBuilder, filter);
 
                     if (curEnv == null) {
                         return null;
@@ -852,8 +834,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         } catch (SQLException sqlException) {
             JDBCUtils.close(conn, transaction, sqlException);
             conn = null;
-            throw new DataSourceException("Could not count "
-                + query.getHandle(), sqlException);
+            throw new DataSourceException("Could not count " + query.getHandle(), sqlException);
         } catch (SQLEncoderException e) {
             // could not encode count
             // but at least we did not break the connection
@@ -870,39 +851,36 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     //REVISIT: do we want maxFeatures here too?  If we don't have maxFeatures then the answer
     //is still always going to be right (and guaranteed to be right, as opposed to two selects
     // that could be slightly different).  And the performance hit shouldn't be all that much.
-    protected Envelope getEnvelope(Connection conn, String geomName,
-        SQLBuilder sqlBuilder, Filter filter)
+    protected Envelope getEnvelope(
+        Connection conn,
+        String geomName,
+        SQLBuilder sqlBuilder,
+        Filter filter)
         throws SQLException, SQLEncoderException, IOException, ParseException {
         String typeName = getSchema().getTypeName();
         StringBuffer sql = new StringBuffer();
 
         //StringBuffer sqlBuffer = new StringBuffer();
-        sql.append("SELECT AsText(force_2d(Envelope(Extent(\"" + geomName
-            + "\")))) ");
+        sql.append("SELECT AsText(force_2d(Envelope(Extent(\"" + geomName + "\")))) ");
         sqlBuilder.sqlFrom(sql, typeName);
         sqlBuilder.sqlWhere(sql, filter);
         LOGGER.fine("SQL: " + sql);
 
-        Statement statement = null;
-        ResultSet results = null;
+        Statement statement = conn.createStatement();
+        ResultSet results = statement.executeQuery(sql.toString());
+        results.next();
+
+        String wkt = results.getString(1);
         Envelope retEnv = null;
-        try {
-            statement = conn.createStatement();
-            results = statement.executeQuery(sql.toString());
-            results.next();
-    
-            String wkt = results.getString(1);
-            retEnv = null;
-    
-            if (wkt == null) {
-                return null;
-            } else {
-                retEnv = geometryReader.read(wkt).getEnvelopeInternal();
-            }
-        } finally {
-            JDBCUtils.close(results);
-            JDBCUtils.close(statement);
+
+        if (wkt == null) {
+            return null;
+        } else {
+            retEnv = geometryReader.read(wkt).getEnvelopeInternal();
         }
+
+        results.close();
+        statement.close();
 
         return retEnv;
     }

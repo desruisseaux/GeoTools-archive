@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * of the column when queried with the ID from the feature table.
  *
  * @author Chris Holmes, Vision for New York
- * @version $Id: MysqlGeomColumn.java,v 1.3 2003/08/21 16:04:02 cholmesny Exp $
+ * @version $Id: MysqlGeomColumn.java,v 1.3.2.1 2004/05/02 20:17:58 aaime Exp $
  */
 public class MysqlGeomColumn {
     /** For get and set Storage type, see SFS for SQL spec */
@@ -533,11 +533,11 @@ public class MysqlGeomColumn {
             // set column name and type from database
             //TODO: use MysqlGeomColumn.getGeomType, once it's fully implemented
             if (columnName.equals(geoColumn)) { //if it is a geomtry column, by name
-                attributes[i - COLUMN_OFFSET] = attFactory.newAttributeType(columnName,
+                attributes[i - COLUMN_OFFSET] = AttributeTypeFactory.newAttributeType(columnName,
                         Geometry.class);
             } else {
                 colClass = (Class) sqlTypeMap.get(metaData.getColumnTypeName(i));
-                attributes[i - COLUMN_OFFSET] = attFactory.newAttributeType(columnName,
+                attributes[i - COLUMN_OFFSET] = AttributeTypeFactory.newAttributeType(columnName,
                         colClass);
             }
         }

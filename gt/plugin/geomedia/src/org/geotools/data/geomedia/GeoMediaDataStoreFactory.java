@@ -16,15 +16,15 @@
 
 package org.geotools.data.geomedia;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.jdbc.ConnectionPool;
 
 
 /**

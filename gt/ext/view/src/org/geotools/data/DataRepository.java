@@ -58,8 +58,9 @@ public class DataRepository {
      * @see org.geotools.data.Catalog#getPrefixes()
      * 
      * @return Set of namespace prefixes
+     * @throws IOException
      */
-    public Set getPrefixes() {
+    public Set getPrefixes() throws IOException {
     	Set prefix = new HashSet();
     	for( Iterator i=datastores.values().iterator(); i.hasNext();){
     		DataStore ds = (DataStore) i.next();
@@ -70,10 +71,10 @@ public class DataRepository {
     	}
         return prefix;
     }
-    private SortedSet typeNames( DataStore ds ){
+    private SortedSet typeNames( DataStore ds ) throws IOException {
     	return new TreeSet( Arrays.asList( ds.getTypeNames() ));    	
     }
-    private SortedMap types( DataStore ds ){
+    private SortedMap types( DataStore ds ) throws IOException {
     	SortedMap map = new TreeMap();
     	String typeNames[] = ds.getTypeNames();
     	for( int i=0; i<typeNames.length; i++){
@@ -87,8 +88,9 @@ public class DataRepository {
     	return map;
     }
     
-    /** All FeatureTypes by dataStoreId:typeName */
-    public SortedMap types() {
+    /** All FeatureTypes by dataStoreId:typeName 
+     * @throws IOException*/
+    public SortedMap types() throws IOException {
     	SortedMap map = new TreeMap();
     	for( Iterator i=datastores.entrySet().iterator(); i.hasNext();){
     		Map.Entry entry = (Map.Entry) i.next();

@@ -17,6 +17,8 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -68,7 +70,7 @@ public class JDBCDataStoreTest extends TestCase {
         
         FeatureType ft = ds.getSchema("FEATURE_TYPE1");
         
-        assertEquals("ID", ds.getFidColumnName("FEATURE_TYPE1"));
+        assertEquals(new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE1"), ds.getFIDMapper("FEATURE_TYPE1"));
         
         assertNotNull(ft);
         assertEquals("FEATURE_TYPE1", ft.getTypeName());
@@ -146,6 +148,7 @@ public class JDBCDataStoreTest extends TestCase {
         writer.close();
         
         FeatureReader reader = ds.getFeatureReader(new DefaultQuery("FEATURE_TYPE1",null), Transaction.AUTO_COMMIT);
+        reader.hasNext();
         Feature readF = reader.next();
         // I think this is a Mock object problem. Test needs to be done in real datastores assertEquals(feature, readF);
     }

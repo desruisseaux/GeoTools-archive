@@ -16,16 +16,13 @@
  */
 package org.geotools.data.postgis;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
-
-import junit.framework.TestCase;
 
 /**
  * Test Params used by PostgisDataStoreFactory.
@@ -68,49 +65,9 @@ public class PostgisDataStoreFactoryTest extends TestCase {
         
         super.setUp();
     }
-    public void testParamCHARSET() throws Throwable {
-        Param p = factory.CHARSET;
-        try {
-            p.parse(null);
-            fail("expected error for parse null");
-        }
-        catch( Exception e){}
-        
-        try {
-            p.parse("");
-            fail("expected error for parse empty");
-        }
-        catch( Exception e){}
-        assertNotNull( "parse ISO-8859-1", p.parse("ISO-8859-1"));
-        
-        assertNull("handle null", p.handle(null) );
-        assertNull("handle empty", p.handle("") );
-        assertNotNull( "handle ISO-8859-1", p.handle("ISO-8859-1"));
-        
-        Map map = new HashMap();
-        Charset latin1=Charset.forName("ISO-8859-1");
-        map.put("charset", latin1 );
-        assertEquals( latin1, p.lookUp( map ));
-        
-        try {
-            assertNotNull( "handle ISO-LATIN-1", p.handle("ISO-LATIN-1"));            
-        } catch (IOException expected){            
-        }
-        System.out.println( latin1.toString() );
-        System.out.println( latin1.name() );
-        System.out.println( p.text( latin1 ));
-        assertEquals("ISO-8859-1", p.text(latin1) );
-        try {
-            assertEquals("ISO-8859-1", p.text("ISO-8859-1") );
-            fail("Should not handle bare text");
-        }
-        catch( ClassCastException expected ){            
-        }
-    }
     public void testLocal() throws Exception {
         Map map = local;
         System.out.println( "local:"+map );
-        assertEquals( null, factory.CHARSET.lookUp(map) );
         assertEquals( "cite", factory.DATABASE.lookUp(map) );        
         assertEquals( "postgis", factory.DBTYPE.lookUp(map) );
         assertEquals( "hydra", factory.HOST.lookUp(map) );
@@ -131,7 +88,6 @@ public class PostgisDataStoreFactoryTest extends TestCase {
     public void testRemote() throws Exception {
         Map map = remote;
         System.out.println( "local:"+map );
-        assertEquals( null, factory.CHARSET.lookUp(map) );
         assertEquals( "testdb", factory.DATABASE.lookUp(map) );        
         assertEquals( "postgis", factory.DBTYPE.lookUp(map) );
         assertEquals( "localhost", factory.HOST.lookUp(map) );
