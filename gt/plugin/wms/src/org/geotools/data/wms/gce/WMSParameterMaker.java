@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.getCapabilities.Layer;
+import org.geotools.data.wms.getCapabilities.Style;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
@@ -36,9 +38,12 @@ public class WMSParameterMaker {
         param.name = "VERSION";
         param.maxOccurs = 1;
         param.minOccurs = 1;
-        param.remarks = "Value contains the width, in pixels, of the requested map";
+        param.remarks = "Value contains the version of the WMS server to be used";
         param.defaultValue = "1.1.1";
         param.validValues = new TreeSet();
+        
+        //param.validValues.add("1.0.0");
+        //param.validValues.add("1.1.0");
         param.validValues.add("1.1.1"); //TODO version support here
 
         Identifier id = null;
@@ -66,7 +71,7 @@ public class WMSParameterMaker {
         param.name = "REQUEST";
         param.maxOccurs = 1;
         param.minOccurs = 1;
-        param.remarks = "Value contains the width, in pixels, of the requested map";
+        param.remarks = "Value contains the the type of the request";
         param.defaultValue = "GetMap";
         param.validValues = new TreeSet();
         param.validValues.add("GetMap");
@@ -81,7 +86,7 @@ public class WMSParameterMaker {
         param.name = "SRS";
         param.maxOccurs = 1;
         param.minOccurs = 1;
-        param.remarks = "Value contains the desired SRS";
+        param.remarks = "Value contains the desired SRS for the entire map";
         
         Set srs = new TreeSet();
         retrieveSRSs(capabilities.getCapability().getLayer(), srs);
@@ -91,7 +96,6 @@ public class WMSParameterMaker {
 
         return param;
 	}	
-	
 	
 	private void retrieveSRSs(Layer layer, Set srsSet) {
 		List layerSRS = layer.getSrs();
@@ -123,65 +127,115 @@ public class WMSParameterMaker {
         param.maxOccurs = 1;
         param.minOccurs = 1;
         param.remarks = "Value contains the height, in pixels, of the requested map";
-
+        
         Identifier id = null;
 
         return param;
 	}		
 
-	public static GeneralOperationParameter createStylesReadParam() {
-        WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "STYLES";
-        param.maxOccurs = 1;
-        param.minOccurs = 1;
-        param.remarks = "Value contains a comma delimited String of layers";
-
-        Identifier id = null;
-
-        return param;
-	}	
-	
-	public static GeneralOperationParameter createLayersReadParam() {
+	public GeneralOperationParameter createLayersReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "LAYERS";
         param.maxOccurs = 1;
         param.minOccurs = 1;
-        param.remarks = "Value contains a comma delimited String of layers";
+        param.remarks = "Value contains a list containing multiple SimpleLayer instances, " 
+        	           +"representing a layer to be drawn and its style. The Style value "
+					   +"can be empty.";
+        param.availableLayers = new ArrayList();
+        retrieveLayers(capabilities.getCapability().getLayer(), param.availableLayers, null);
 
         Identifier id = null;
 
         return param;
 	}	
 	
-	public static GeneralOperationParameter createBBoxReadParam() {
+	private void retrieveLayers(Layer layer, List availableLayers, Set parentStyles) {
+		Set layerStyles = new TreeSet();
+		Iterator iterator = layer.getStyles().iterator();
+		while (iterator.hasNext()) {
+			Style style = (Style) iterator.next();
+			layerStyles.add(style.getName());
+		}
+		if (parentStyles != null) {
+			layerStyles.addAll(parentStyles);
+		}
+		
+		if (layer.getName() != null && layer.getName() != "") {
+			SimpleLayer simpleLayer = new SimpleLayer(layer.getName(), layerStyles);
+			availableLayers.add(simpleLayer);
+		}
+		
+		if (layer.getSubLayers() != null) {
+			Iterator iter = layer.getSubLayers().iterator();
+			while (iter.hasNext()) {
+				retrieveLayers((Layer) iter.next(), availableLayers, layerStyles);
+			}
+		}
+	}
+
+	public GeneralOperationParameter createBBoxMinXReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "BBOX";
+        param.name = "BBOX_MINX";
         param.maxOccurs = 1;
         param.minOccurs = 1;
-        param.remarks = "Value contains a BoundingBox in the form: \"minx,miny,maxx,maxy\"";
+        param.remarks = "Value contains the minX value for the bounding box";
 
         Identifier id = null;
 
         return param;
-	}	
-	
-	public static GeneralOperationParameter createTransparentReadParam() {
+	}
+
+	public GeneralOperationParameter createBBoxMinYReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
-        param.name = "TRANSPARENT";
+        param.name = "BBOX_MINY";
         param.maxOccurs = 1;
-        param.minOccurs = 0;
-        param.remarks = "Value indicates map transparency";
-        param.defaultValue = "FALSE";
-        param.validValues = new TreeSet();
-        param.validValues.add("TRUE");
-        param.validValues.add("FALSE");
+        param.minOccurs = 1;
+        param.remarks = "Value contains the minY value for the bounding box";
+
+        Identifier id = null;
+
+        return param;
+	}
+
+	public GeneralOperationParameter createBBoxMaxXReadParam() {
+        WMSOperationParameter param = new WMSOperationParameter();
+        param.name = "BBOX_MAXX";
+        param.maxOccurs = 1;
+        param.minOccurs = 1;
+        param.remarks = "Value contains the maxX value for the bounding box";
+
+        Identifier id = null;
+
+        return param;
+	}
+
+	public GeneralOperationParameter createBBoxMaxYReadParam() {
+        WMSOperationParameter param = new WMSOperationParameter();
+        param.name = "BBOX_MAXY";
+        param.maxOccurs = 1;
+        param.minOccurs = 1;
+        param.remarks = "Value contains the maxY value for the bounding box";
 
         Identifier id = null;
 
         return param;
 	}
 	
-	public static GeneralOperationParameter createBGColorReadParam() {
+	public GeneralOperationParameter createTransparentReadParam() {
+        WMSOperationParameter param = new WMSOperationParameter();
+        param.name = "TRANSPARENT";
+        param.maxOccurs = 1;
+        param.minOccurs = 0;
+        param.remarks = "Value indicates map transparency";
+        param.defaultValue = new Boolean(false);
+        param.valueClass = Boolean.class;
+
+        Identifier id = null;
+
+        return param;
+	}
+	
+	public GeneralOperationParameter createBGColorReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "BGCOLOR";
         param.maxOccurs = 1;
@@ -194,24 +248,21 @@ public class WMSParameterMaker {
         return param;
 	}
 	
-	public static GeneralOperationParameter createExceptionsReadParam() {
+	public GeneralOperationParameter createExceptionsReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "EXCEPTIONS";
         param.maxOccurs = 1;
         param.minOccurs = 0;
         param.remarks = "Value indicates the format in which exceptions are returned";
         param.defaultValue = "application/vnd.ogc.se_xml";
-        param.validValues = new TreeSet();
-        param.validValues.add("application/vnd.ogc.se_xml");
-        param.validValues.add("application/vnd.ogc.se_inimage");
-        param.validValues.add("application/vnd.ogc.se_blank");
-
+        param.validValues = new TreeSet(capabilities.getCapability().getException().getFormats());
+        
         Identifier id = null;
 
         return param;
 	}	
 
-	public static GeneralOperationParameter createTimeReadParam() {
+	public GeneralOperationParameter createTimeReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "TIME";
         param.maxOccurs = 1;
@@ -223,7 +274,7 @@ public class WMSParameterMaker {
         return param;
 	}	
 	
-	public static GeneralOperationParameter createElevationReadParam() {
+	public GeneralOperationParameter createElevationReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
         param.name = "ELEVATION";
         param.maxOccurs = 1;

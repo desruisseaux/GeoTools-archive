@@ -6,15 +6,13 @@
  */
 package org.geotools.data.wms.gce;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.units.Unit;
 
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.opengis.metadata.Identifier;
-import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameter;
 
@@ -31,8 +29,9 @@ public class WMSOperationParameter implements OperationParameter {
     int minOccurs;
     String name;
     String remarks;
-    String defaultValue;
+    Object defaultValue;
     Set validValues;
+    List availableLayers;
     Class valueClass = WMSParameterValue.class;	
 	
 	/* (non-Javadoc)
@@ -131,4 +130,7 @@ public class WMSOperationParameter implements OperationParameter {
 		return null;
 	}
 
+	public List getAvailableLayers() {
+		return availableLayers;
+	}
 }

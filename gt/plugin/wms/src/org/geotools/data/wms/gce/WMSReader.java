@@ -8,8 +8,7 @@ package org.geotools.data.wms.gce;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -19,14 +18,13 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.wms.GetMapRequest;
 import org.geotools.data.wms.GetMapResponse;
-import org.geotools.data.wms.ParseCapabilitiesException;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.getCapabilities.DCPType;
 import org.geotools.data.wms.getCapabilities.Get;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
-import org.jdom.JDOMException;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
 
@@ -39,43 +37,22 @@ import org.opengis.parameter.GeneralParameterValue;
 public class WMSReader implements GridCoverageReader {
 
 	private Object source;
-	private URL url;
 	private boolean hasNext = true;
 	private WMSFormat format;
+	private WMT_MS_Capabilities capabilities;
 	
 	/**
-	 * Source can be one of:
-	 * URL - points to a WMS's GetCapabilities location
-	 * String - representing a URL that points to a WMS's GetCapabilities location
-	 * 
-	 * Not supported right now:
-	 * //GetMapRequest - executes the request directly
-	 * //WMT_MS_Capabilities - Uses the GetCapabilities from there as the starting URL
+	 * Source must be a WMT_MS_Capabilities object
 	 * 
 	 * @param source 
 	 */
 	public WMSReader(Object source) {
 		this.source = source;
-		
-		if (source instanceof String || source instanceof URL) {
-			if (source instanceof String) {
-				try {
-					url = new URL((String) source);
-				} catch (MalformedURLException e) {
-					
-				}
-			} else {
-				url = (URL) source;
-			}
-		} 
-		/* else if (source instanceof WMT_MS_Capabilities) {
-			WMT_MS_Capabilities capabilities = (WMT_MS_Capabilities) source;
-			DCPType dcp = (DCPType) capabilities.getCapability().getRequest().getGetCapabilities().getDcpTypes().get(0);
-			Get get = (Get) dcp.getHttp().getGets().get(0);
-			url = get.getOnlineResource();
-		} else if (source instanceof GetMapRequest) {
-			request = (GetMapRequest) source;
-		} */
+		if (source instanceof WMT_MS_Capabilities) {
+			capabilities = (WMT_MS_Capabilities) source;
+		} else {
+			throw new RuntimeException("source is not of type WMT_MS_Capabilities");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -138,22 +115,68 @@ public class WMSReader implements GridCoverageReader {
 	public GridCoverage read(GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
 		
-		try {
-			WMT_MS_Capabilities capabilities = WebMapServer.getCapabilities(url);
-			
 			DCPType dcp = (DCPType) capabilities.getCapability().getRequest().getGetMap().getDcpTypes().get(0);
 			Get get = (Get) dcp.getHttp().getGets().get(0);
 			
 			GetMapRequest request = new GetMapRequest(get.getOnlineResource());
 		    
+			String minx = "",miny = "",maxx = "",maxy = "";
+			
 		    for (int i = 0; i < parameters.length; i++) {
 				WMSParameterValue value = (WMSParameterValue) parameters[i];
-				if (value == null)
+				if (value == null || value.getValue() == null)
 					continue;
+				
+				if (value.getDescriptor().getName(null).equals("LAYERS")) {
+					String layers = "";
+					String styles = "";
+					
+					List layerList = (List) value.getValue();
+					for (int j = 0; j < layerList.size(); j++) {
+						SimpleLayer simpleLayer = (SimpleLayer) layerList.get(j);
+						layers = layers + simpleLayer.getName();
+						styles = styles + simpleLayer.getStyle();
+						if (j < layerList.size()-1) {
+							layers = layers + ",";
+							styles = styles + ",";
+						}
+					}
+					request.setProperty("LAYERS", layers);
+					request.setProperty("STYLES", styles);
+					continue;
+				}
+				
+				if (value.getDescriptor().getName(null).equals("BBOX_MINX")) {
+					minx = (String) value.getValue();
+					continue;
+				}
+				if (value.getDescriptor().getName(null).equals("BBOX_MINY")) {
+					miny = (String) value.getValue();
+					continue;
+				}
+				if (value.getDescriptor().getName(null).equals("BBOX_MAXX")) {
+					maxx = (String) value.getValue();
+					continue;
+				}
+				if (value.getDescriptor().getName(null).equals("BBOX_MAXY")) {
+					maxy = (String) value.getValue();
+					continue;
+				}
+				
+				if (value.getDescriptor().getName(null).equals("TRANSPARENT")) {
+					if (value.booleanValue()) {
+						request.setProperty("TRANSPARENT", "TRUE");
+					} else {
+						request.setProperty("TRANSPARENT", "FALSE");
+					}
+					continue;
+				}
 								
 				request.setProperty(value.getDescriptor().getName(null), value.stringValue());					
 			}
 
+		    String bbox = minx+","+miny+","+maxx+","+maxy;
+		    request.setProperty("BBOX", bbox);
 		    
 		    GetMapResponse response = WebMapServer.issueGetMapRequest(request);
 
@@ -166,12 +189,6 @@ public class WMSReader implements GridCoverageReader {
 		    GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
 
 			return coverage; 
-			
-		} catch (JDOMException exception) {
-			throw new RuntimeException("Malformed XML", exception);
-		} catch (ParseCapabilitiesException exception) {
-			throw new RuntimeException("Invalid GetCapabilities response", exception);
-		}
 	}
 
 	/* (non-Javadoc)

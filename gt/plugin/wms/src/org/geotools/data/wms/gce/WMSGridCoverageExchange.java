@@ -10,14 +10,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidParameterException;
-import java.util.Iterator;
-import java.util.TreeSet;
 
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
@@ -74,7 +71,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 			for (int i = 0; i < formats.length; i++) {
 				Format format = formats[i];
 				if (format.accepts(source)) {
-					return format.getReader(source);
+					return format.getReader(capabilities);
 				}
 			}
 		}

@@ -67,12 +67,8 @@ public class WMSParameterValue implements ParameterValue {
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.opengis.parameter.ParameterValue#booleanValue()
-	 */
 	public boolean booleanValue() throws InvalidParameterTypeException {
-		// TODO Auto-generated method stub
-		return false;
+		return ((Boolean) value).booleanValue();
 	}
 
 	/* (non-Javadoc)
@@ -162,8 +158,7 @@ public class WMSParameterValue implements ParameterValue {
 	 * @see org.opengis.parameter.ParameterValue#setValue(boolean)
 	 */
 	public void setValue(boolean arg0) throws InvalidParameterValueException {
-		// TODO Auto-generated method stub
-
+		value = new Boolean(arg0);
 	}
 
 	/* (non-Javadoc)

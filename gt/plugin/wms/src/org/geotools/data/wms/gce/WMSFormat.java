@@ -87,10 +87,25 @@ public class WMSFormat extends AbstractGridFormat {
 	}
 
 	public GeneralOperationParameter[] getReadParameters() {
-		readParameters = new GeneralOperationParameter[14];
+		readParameters = new GeneralOperationParameter[16];
 		
 		WMSParameterMaker maker = new WMSParameterMaker(capabilities);
-		readParameters[0] = maker.createFormatReadParam();
+		readParameters[0] = maker.createVersionReadParam();
+		readParameters[1] = maker.createRequestReadParam();
+		readParameters[2] = maker.createFormatReadParam();
+		readParameters[3] = maker.createHeightReadParam();
+		readParameters[4] = maker.createWidthReadParam();
+		readParameters[5] = maker.createSRSReadParam();
+		readParameters[6] = maker.createLayersReadParam();
+		readParameters[7] = maker.createBBoxMinXReadParam();
+		readParameters[8] = maker.createBBoxMinYReadParam();
+		readParameters[9] = maker.createBBoxMaxXReadParam();
+		readParameters[10] = maker.createBBoxMaxYReadParam();
+		readParameters[11] = maker.createTransparentReadParam();
+		readParameters[12] = maker.createBGColorReadParam();
+		readParameters[13] = maker.createExceptionsReadParam();
+		readParameters[14] = maker.createElevationReadParam();
+		readParameters[15] = maker.createTimeReadParam();
 		
 		return readParameters;
 	}
