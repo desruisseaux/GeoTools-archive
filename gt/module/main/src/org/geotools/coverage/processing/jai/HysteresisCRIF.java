@@ -16,23 +16,15 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
+// JAI dependencies
 import javax.media.jai.CRIFImpl;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -46,13 +38,13 @@ import javax.media.jai.JAI;
  */
 public class HysteresisCRIF extends CRIFImpl {
     /**
-     * Construct a default factory.
+     * Constructs a default factory.
      */
     public HysteresisCRIF() {
     }
 
     /**
-     * Creates a {@link RenderedImage} representing the results of an imaging
+     * Creates a {@link RenderedImage} for the results of an imaging
      * operation for a given {@link ParameterBlock} and {@link RenderingHints}.
      */
     public RenderedImage create(final ParameterBlock param,

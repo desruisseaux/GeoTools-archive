@@ -16,29 +16,18 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
+// JAI dependencies
 import javax.media.jai.OperationDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
@@ -53,21 +42,21 @@ import org.geotools.resources.gcs.Resources;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class CombineDescriptor extends OperationDescriptorImpl {
+public class CombineDescriptor extends OperationDescriptorImpl {
     /**
      * The operation name.
      */
     public static final String OPERATION_NAME = "org.geotools.Combine";
 
     /**
-     * Construct the descriptor.
+     * Constructs the descriptor.
      */
     public CombineDescriptor() {
         super(new String[][]{{"GlobalName",  OPERATION_NAME},
                              {"LocalName",   OPERATION_NAME},
                              {"Vendor",      "Geotools 2"},
                              {"Description", "Combine rendered images using a linear relation."},
-                             {"DocURL",      "http://modules.geotools.org/gcs-coverage"},
+                             {"DocURL",      "http://www.geotools.org/"}, // TODO: provides more accurate URL
                              {"Version",     "1.0"},
                              {"arg0Desc",    "The coefficients for linear combinaison as a matrix."},
                              {"arg1Desc",    "An optional transform to apply on sample values "+
@@ -81,7 +70,7 @@ public final class CombineDescriptor extends OperationDescriptorImpl {
     }
 
     /**
-     * Returns <code>true</code> if this operation supports the specified mode, and
+     * Returns {@code true} if this operation supports the specified mode, and
      * is capable of handling the given input source(s) for the specified mode. 
      *
      * @param modeName The mode name (usually "Rendered").
@@ -107,7 +96,7 @@ public final class CombineDescriptor extends OperationDescriptorImpl {
     }
 
     /**
-     * Returns <code>true</code> if the parameters are valids. This implementation check
+     * Returns {@code true} if the parameters are valids. This implementation check
      * that the number of bands in the source src1 is equals to the number of bands of 
      * source src2.
      *

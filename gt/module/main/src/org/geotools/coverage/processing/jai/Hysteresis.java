@@ -16,17 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -35,6 +26,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 
+// JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.UntiledOpImage;
 import javax.media.jai.iterator.RandomIter;
@@ -43,7 +35,7 @@ import javax.media.jai.iterator.RandomIterFactory;
 
 /**
  * Effectue un seuillage par hysteresis sur une image.
- * L'opération de seuillage s'effectue de la manière suivante&nbsp;:
+ * L'opération de seuillage s'effectue de la manière suivante:
  * <br><br>
  * On dispose d'un seuil haut, <var>sh</var>, et d'un seuil bas, <var>sb</var>.
  * Si la valeur d'un pixel est supérieur à <var>sh</var>, on la conserve, elle
@@ -75,7 +67,7 @@ public class Hysteresis extends UntiledOpImage {
     private final double padValue;
 
     /**
-     * Construct a new Hysterisis filter for the given image.
+     * Constructs a new Hysterisis filter for the given image.
      *
      * @param source   The source image.
      * @param layout   The image layout.
@@ -98,7 +90,7 @@ public class Hysteresis extends UntiledOpImage {
     }
 
     /**
-     * Compute the whole image.
+     * Computes the whole image.
      */
     protected void computeImage(final Raster[]    sources,
                                 final WritableRaster dest,

@@ -16,17 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -34,22 +25,24 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 
+// JAI dependencies
 import javax.media.jai.AreaOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.iterator.RandomIter;
 import javax.media.jai.iterator.RandomIterFactory;
 
+// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
 /**
  * Replace {@link Double#NaN} values by the weighted average of neighbors values.
- * This operation use a box of <code>size</code>&times<code>size</code> pixels
- * centered on each <code>NaN</code> value. The weighted average is then computed,
- * ignoring all <code>NaN</code> values. If the number of valid values is greater
- * than <code>validityThreshold</code>, then the center <code>NaN</code> is replaced
- * by the computed average. Otherwise, the <code>NaN</code> value is left unchanged.
+ * This operation use a box of {@code size}&times{@code size} pixels centered on
+ * each {@code NaN} value. The weighted average is then computed, ignoring all
+ * {@code NaN} values. If the number of valid values is greater than
+ * {@code validityThreshold}, then the center {@code NaN} is replaced
+ * by the computed average. Otherwise, the {@code NaN} value is left unchanged.
  * 
  * @version $Id$
  * @author Lionel Flahaut
@@ -73,13 +66,13 @@ public class NodataFilter extends AreaOpImage {
     private final int validityThreshold;
 
     /**
-     * Construct a new operation.
+     * Constructs a new operation.
      *
      * @param source   The source image.
      * @param layout   The image layout.
      * @param map      The image properties and rendering hints.
      * @param padding  The number of pixel above, below, to the left and to the right of central
-     *                 <code>NaN</code> pixel. The full box size is <code>padding</code>&times;2+1.
+     *                 {@code NaN} pixel. The full box size is {@code padding}&times;2+1.
      * @param validityThreshold The minimal number of valid neighbors required in order to consider
      *                the average as valid.
      */
@@ -92,9 +85,8 @@ public class NodataFilter extends AreaOpImage {
         super(source, layout, map, false, null, padding, padding, padding, padding);
         this.validityThreshold = validityThreshold;
         /*
-         * Compute the array of distances once for ever. For the special case where
-         * <code>padding</code> equals 1, we will try to reuse the same array for
-         * all <code>NodataFilter</code> instances.
+         * Computes the array of distances once for ever. For the special case where the padding
+         * equals 1, we will try to reuse the same array for all NodataFilter instances.
          */
         if (padding==1 && sharedDistances!=null) {
             distances = sharedDistances;
@@ -114,7 +106,7 @@ public class NodataFilter extends AreaOpImage {
     }
 
     /**
-     * Compute a rectangle of outputs.
+     * Computes a rectangle of outputs.
      */
     protected void computeRect(final PlanarImage[] sources,
                                final WritableRaster   dest,
@@ -146,7 +138,7 @@ public class NodataFilter extends AreaOpImage {
                         continue;
                     }
                     /*
-                     * Compute the average and set the value if the amount of
+                     * Computes the average and set the value if the amount of
                      * valid pixels is at least equals to the threshold amount.
                      */
                     int       count       = 0; // Number of valid values.

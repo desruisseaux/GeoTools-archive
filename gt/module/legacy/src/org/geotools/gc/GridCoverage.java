@@ -120,6 +120,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @author Martin Desruisseaux
  *
  * @see GC_GridCoverage
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.grid.GridCoverage2D}.
  */
 public class GridCoverage extends Coverage {
     /**

@@ -16,17 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -36,6 +27,7 @@ import java.awt.image.RasterFormatException;
 import java.awt.image.WritableRaster;
 import java.util.Vector;
 
+// JAI and Vecmath dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
@@ -46,20 +38,22 @@ import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.operator.BandCombineDescriptor;
 import javax.vecmath.MismatchedSizeException;
 
+// Geotools dependencies
 import org.geotools.resources.XArray;
 import org.geotools.resources.image.ImageUtilities;
 
 
 /**
  * Computes a set of arbitrary linear combinations of the bands of many rendered source images,
- * using a specified matrix. The matrix size (<code>nRows</code>&times;<code>nColumns</code>)
- * must be equals to the following:
+ * using a specified matrix. The matrix size ({@code nRows}&times;{@code nColumns}) must be equals
+ * to the following:
+ * <br><br>
  * <ul>
- *   <li><code>nRows</code>: the number of desired destination bands.</li>
- *   <li><code>nColumns</code>: the total number of source bands (i.e. the
+ *   <li>{@code nRows}: the number of desired destination bands.</li>
+ *   <li>{@code nColumns}: the total number of source bands (i.e. the
  *       sum of the number of source bands in all source images) plus one.</li>
  * </ul>
- *
+ * <br>
  * The number of source bands used to determine the matrix dimensions is given by the
  * following code regardless of the type of {@link ColorModel} the sources have:
  *
@@ -102,13 +96,13 @@ public class Combine extends PointOpImage {
 
     /**
      * The source to use for each elements in {@link #matrix}.
-     * This matrix size must be the same than <code>matrix</code>.
+     * This matrix size must be the same than {@code matrix}.
      */
     final int[][] sources;
 
     /**
      * The band to use for each elements in {@link #matrix}.
-     * This matrix size must be the same than <code>matrix</code>.
+     * This matrix size must be the same than {@code matrix}.
      */
     final int[][] bands;
 
@@ -120,7 +114,7 @@ public class Combine extends PointOpImage {
 
     /**
      * The transform to apply on sample values before the linear combinaison,
-     * or <code>null</code> if none.
+     * or {@code null} if none.
      */
     protected final CombineTransform transform;
 
@@ -130,10 +124,10 @@ public class Combine extends PointOpImage {
      * @param images    The rendered sources.
      * @param matrix    The linear combinaison coefficients as a matrix.
      * @param transform The transform to apply on sample values before the linear combinaison,
-     *                  or <code>null</code> if none.
+     *                  or {@code null} if none.
      * @param hints     The rendering hints.
      *
-     * @throws MismatchedSizeException if some rows in the <code>matrix</code> argument doesn't
+     * @throws MismatchedSizeException if some rows in the {@code matrix} argument doesn't
      *         have the expected length.
      */
     public Combine(final Vector           images,
@@ -268,7 +262,7 @@ public class Combine extends PointOpImage {
                 }
                 while (!finished) {
                     /*
-                     * Compute the sample values.
+                     * Computes the sample values.
                      */
                     for (int i=0; i<numSamples; i++) {
                         samples[i] = iterRef[i].getSampleDouble(bands[i]);
@@ -306,10 +300,10 @@ public class Combine extends PointOpImage {
 
 
     /**
-     * Optimized <code>Combine</code> operation for dyadic (two sources) image. This operation
-     * performs a linear combinaison of two images (<CODE>src0</CODE> and <CODE>src1</CODE>).
-     * The parameters <CODE>scale0</CODE> and <CODE>scale1</CODE> indicate the scale of source
-     * images <CODE>src0</CODE> and <CODE>src1</CODE>. If we consider pixel at coordinate
+     * Optimized {@code Combine} operation for dyadic (two sources) image. This operation
+     * performs a linear combinaison of two images ({@code src0} and {@code src1}).
+     * The parameters {@code scale0} and {@code scale1} indicate the scale of source
+     * images {@code src0} and {@code src1}. If we consider pixel at coordinate
      * (<var>x</var>,<var>y</var>), its value is determinate by the pseudo-code:
      *
      * <blockquote><pre>
@@ -322,12 +316,12 @@ public class Combine extends PointOpImage {
      */
     final static class Dyadic extends Combine {
         /**
-         * The scale of image <code>src0</code> for each bands.
+         * The scale of image {@code src0} for each bands.
          */
         private final double[] scales0;
 
         /**
-         * The scale of image <code>src1</code> for each bands.
+         * The scale of image {@code src1} for each bands.
          */
         private final double[] scales1;
 
@@ -337,13 +331,13 @@ public class Combine extends PointOpImage {
         private final double[] offsets;
 
         /**
-         * Construct a new instance of <code>Combine.Dyadic</code>.
+         * Construct a new instance of {@code Combine.Dyadic}.
          *
          * @param images  The rendered sources. This vector must contains exactly 2 sources.
          * @param matrix  The linear combinaison coefficients as a matrix.
          * @param hints   The rendering hints.
          *
-         * @throws MismatchedSizeException if some rows in the <code>matrix</code> argument doesn't
+         * @throws MismatchedSizeException if some rows in the {@code matrix} argument doesn't
          *         have the expected length.
          */
         public Dyadic(final Vector        images,

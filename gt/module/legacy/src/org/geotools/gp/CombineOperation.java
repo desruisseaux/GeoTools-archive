@@ -36,7 +36,7 @@ import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.operator.BandCombineDescriptor;
 
 import org.geotools.cv.SampleDimension;
-import org.geotools.gp.jai.CombineDescriptor;
+import org.geotools.coverage.processing.jai.CombineDescriptor;
 
 
 /**

@@ -53,6 +53,9 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.util.InternationalString;
 
+/**
+ * @deprecated Replaced by {@link GridCoverage2D}.
+ */
 public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage
                             implements RenderedCoverage
 {

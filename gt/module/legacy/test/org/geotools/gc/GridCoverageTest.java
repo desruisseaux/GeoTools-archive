@@ -62,6 +62,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Move and rename this file as TestCoverageFactory.
  */
 public class GridCoverageTest extends TestCase {
     /**

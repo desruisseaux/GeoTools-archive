@@ -58,8 +58,8 @@ import javax.media.jai.util.CaselessStringKey;
 
 import org.geotools.cv.Coverage;
 import org.geotools.gc.GridCoverage;
-import org.geotools.gp.jai.HysteresisDescriptor;
-import org.geotools.gp.jai.NodataFilterDescriptor;
+import org.geotools.coverage.processing.jai.HysteresisDescriptor;
+import org.geotools.coverage.processing.jai.NodataFilterDescriptor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;

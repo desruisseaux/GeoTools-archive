@@ -16,21 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
@@ -39,6 +26,7 @@ import java.awt.image.renderable.ParameterBlock;
 import java.util.List;
 import java.util.Vector;
 
+// JAI dependencies
 import javax.media.jai.CRIFImpl;
 
 
@@ -49,9 +37,9 @@ import javax.media.jai.CRIFImpl;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class CombineCRIF extends CRIFImpl {
+public class CombineCRIF extends CRIFImpl {
     /**
-     * Construct a default factory.
+     * Constructs a default factory.
      */
     public CombineCRIF() {
     }
@@ -72,8 +60,8 @@ public final class CombineCRIF extends CRIFImpl {
     }
 
     /**
-     * Returns <code>true</code> if the combine operation could be done through
-     * the optimized <code>Combine.Dyadic</code> class.
+     * Returns {@code true} if the combine operation could be done through
+     * the optimized {@code Combine.Dyadic} class.
      */
     private static boolean isDyadic(final List sources, final double[][] matrix) {
         if (sources.size() != 2) {

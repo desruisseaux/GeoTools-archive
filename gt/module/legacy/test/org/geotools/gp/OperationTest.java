@@ -58,7 +58,7 @@ import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.TemporalCoordinateSystem;
 import org.geotools.gc.GridCoverage;
 import org.geotools.gc.GridCoverageTest;
-import org.geotools.gp.jai.CombineDescriptor;
+import org.geotools.coverage.processing.jai.CombineDescriptor;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.Arguments;
 

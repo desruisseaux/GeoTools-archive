@@ -17,29 +17,36 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
-// J2SE and JAI dependencies
+// J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.RenderedImage;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
 
+// JAI dependencies
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.RenderedOp;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.cv.Category;
-//import org.geotools.cv.CategoryListTest;
-import org.geotools.cv.SampleDimension;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.coverage.Category;
+import org.geotools.coverage.CategoryListTest;
+import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 
 /**
@@ -60,12 +67,12 @@ public class SampleTranscoderTest extends TestCase {
     /**
      * Random number generator for this test.
      */
-    private Random random;
+    private static final Random random = new Random(6215962897884256696L);
 
     /**
      * A sample dimension for a band.
      */
-    private SampleDimension band1;
+    private SampleDimensionGT band1;
 
     /**
      * Run the suite from the command line.
@@ -80,7 +87,7 @@ public class SampleTranscoderTest extends TestCase {
     public static Test suite() {
         return new TestSuite(SampleTranscoderTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -93,8 +100,7 @@ public class SampleTranscoderTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        random = new Random();
-        band1 = new SampleDimension(new Category[] {
+        band1 = new SampleDimensionGT(new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Clouds",      null, 2),
@@ -105,7 +111,7 @@ public class SampleTranscoderTest extends TestCase {
     }
 
     /**
-     * The the transformation using a random raster with only one band.
+     * Tests the transformation using a random raster with only one band.
      */
     public void testOneBand() throws TransformException {
         assertTrue(testOneBand(1,  0) instanceof RenderedImageAdapter);
@@ -114,28 +120,28 @@ public class SampleTranscoderTest extends TestCase {
     }
 
     /**
-     * The the transformation using a random raster with only one band.
+     * Tests the transformation using a random raster with only one band.
      * A sample dimension with only one category will be used.
      *
      * @param  scale The scale factor.
      * @param  offset The offset value.
      * @return The transformed image.
      */
-    private RenderedImage testOneBand(double scale, double offset) throws TransformException {
+    private RenderedImage testOneBand(final double scale, final double offset) throws TransformException {
         final Category category = new Category("Values", null, 0, 256, scale, offset);
-        return testOneBand(new SampleDimension(new Category[] {category}, null));
+        return testOneBand(new SampleDimensionGT(new Category[] {category}, null));
     }
 
     /**
-     * The the transformation using a random raster with only one band.
+     * Tests the transformation using a random raster with only one band.
      *
      * @param  band The sample dimension for the only band.
      * @return The transformed image.
      */
-    private RenderedImage testOneBand(final SampleDimension band) throws TransformException {
+    private RenderedImage testOneBand(final SampleDimensionGT band) throws TransformException {
         final int SIZE = 64;
         /*
-         * Construct a 64x64 image with random values.
+         * Constructs a 64x64 image with random values.
          * Samples values are integer in the range 0..160 inclusive.
          */
         final BufferedImage  source = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_BYTE_INDEXED);
@@ -144,10 +150,10 @@ public class SampleTranscoderTest extends TestCase {
         for (int i=0; i<array.length; i++) {
             array[i] = (byte) random.nextInt(161);
         }
-        GridCoverage coverage;
-        coverage = new GridCoverage("Test", source, GeographicCoordinateSystem.WGS84,
-                                    MathTransform2D.IDENTITY, new SampleDimension[]{band},
-                                    null, null);
+        final MathTransform identity = ProjectiveTransform.create(new AffineTransform());
+        GridCoverage2D coverage;
+        coverage = new GridCoverage2D("Test", source, GeographicCRS.WGS84, identity,
+                                      new SampleDimensionGT[]{band}, null, null);
         /*
          * Apply the operation. The SampleTranscoder class is suppose to transform our
          * integers into real-world values. Check if the result use floating-points.
@@ -164,20 +170,20 @@ public class SampleTranscoderTest extends TestCase {
         double[] sourceData = source.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);
         double[] targetData = target.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);
         band.getSampleToGeophysics().transform(sourceData, 0, sourceData, 0, sourceData.length);
-//        CategoryListTest.compare(sourceData, targetData, EPS);
+        CategoryListTest.compare(sourceData, targetData, EPS);
         /*
          * Construct a new image with the resulting data, and apply an inverse transformation.
          * Compare the resulting values with the original data.
          */
         RenderedImage back = PlanarImage.wrapRenderedImage(target).getAsBufferedImage();
-        coverage = new GridCoverage("Test", back, GeographicCoordinateSystem.WGS84,
-                                    MathTransform2D.IDENTITY,
-                                    new SampleDimension[]{band.geophysics(true)}, null, null);
+        coverage = new GridCoverage2D("Test", back, GeographicCRS.WGS84, identity,
+                                    new SampleDimensionGT[]{band.geophysics(true)}, null, null);
+
         back = coverage.geophysics(false).getRenderedImage();
         assertEquals(DataBuffer.TYPE_BYTE, back.getSampleModel().getDataType());
         sourceData = source.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);
         targetData =   back.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);
-//        CategoryListTest.compare(sourceData, targetData, 1+EPS);
+        CategoryListTest.compare(sourceData, targetData, 1+EPS);
         /*
          * Returns the "geophysics view" of the image.
          */

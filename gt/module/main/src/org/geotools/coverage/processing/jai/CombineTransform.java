@@ -16,17 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gp.jai;
+package org.geotools.coverage.processing.jai;
 
 
 /**
@@ -53,15 +44,15 @@ public interface CombineTransform {
     public abstract void transformSamples(final double[] values);
 
     /**
-     * Returns <code>true</code> if the transformation performed by {@link #transformSamples}
-     * do not depends on the ordering of samples in the <code>values</code> array. This method
-     * can returns <code>true</code> if the <code>transformSamples(double[])</code> implementation
+     * Returns {@code true} if the transformation performed by {@link #transformSamples}
+     * do not depends on the ordering of samples in the {@code values} array. This method
+     * can returns {@code true} if the {@code transformSamples(double[])} implementation
      * meet the following conditions:
      *
      * <ul>
-     *   <li>The transformation is separable, i.e. the output value <code>values[i]</code> depends
-     *       only on the input value <code>values[i]</code> for all <code>i</code>.</li>
-     *   <li>The transformation do not depends on the value of the index <code>i</code>.
+     *   <li>The transformation is separable, i.e. the output value {@code values[i]} depends
+     *       only on the input value {@code values[i]} for all <var>i</var>.</li>
+     *   <li>The transformation do not depends on the value of the index <var>i</var>.
      * </ul>
      *
      * For example, the following implementations meets the above mentioned conditions:
@@ -72,9 +63,9 @@ public interface CombineTransform {
      * }
      * </pre></blockquote>
      *
-     * A <code>true</code> value will allows some optimisations inside the
+     * A {@code true} value will allows some optimisations inside the
      * {@link Combine#computeRect Combine.computeRect(...)} method. This method
-     * may conservatly returns <code>false</code> if this information is unknow.
+     * may conservatly returns {@code false} if this information is unknow.
      */
     public abstract boolean isSeparable();
 }

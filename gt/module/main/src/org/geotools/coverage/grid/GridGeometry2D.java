@@ -73,16 +73,14 @@ public class GridGeometry2D extends GridGeometryGT {
      * Dimension for <var>x</var> and <var>y</var> values. There are the index of the two
      * first dimensions with a grid size greater than 1. <var>x</var> and <var>y</var>
      * dimensions are usually 0 and 1 respectively.
-     *
-     * @todo Set the values for those axis in the constructor.
      */
-    final int xAxis=0, yAxis=1;
+    final int xAxis, yAxis;
 
     /**
      * A math transform mapping only the two first dimensions of {@code gridToCoordinateSystem}.
      */
     private final MathTransform2D gridToCoordinateSystem2D;
-    
+
     /**
      * The inverse of {@code gridToCoordinateSystem2D}.
      */
@@ -112,10 +110,13 @@ public class GridGeometry2D extends GridGeometryGT {
             throws IllegalArgumentException
     {
         super(gridRange, gridToCoordinateSystem);
-        gridToCoordinateSystem2D   = getMathTransform2D(gridRange, gridToCoordinateSystem);
+        final int[] dimensions     = new int[] {0, 1};
+        gridToCoordinateSystem2D   = getMathTransform2D(gridRange, gridToCoordinateSystem, dimensions);
         gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
+        xAxis = dimensions[0];
+        yAxis = dimensions[1];
     }
-    
+
     /**
      * Constructs a new grid geometry. The argument are passed unchanged to the
      * {@linkplain GridGeometryGT#GridGeometryGT(GridRange,Envelope,boolean[]) super-class constructor}.
@@ -134,10 +135,13 @@ public class GridGeometry2D extends GridGeometryGT {
             throws IllegalArgumentException
     {
         super(gridRange, userRange, reverse);
-        gridToCoordinateSystem2D   = getMathTransform2D(gridRange, gridToCoordinateSystem);
+        final int[] dimensions     = new int[] {0, 1};
+        gridToCoordinateSystem2D   = getMathTransform2D(gridRange, gridToCoordinateSystem, dimensions);
         gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
+        xAxis = dimensions[0];
+        yAxis = dimensions[1];
     }
-    
+
     /**
      * Constructs a new two-dimensional grid geometry. A math transform will be computed
      * automatically with an inverted <var>y</var> axis (i.e. {@code gridRange} and
@@ -180,11 +184,16 @@ public class GridGeometry2D extends GridGeometryGT {
      *
      * @param  gridRange The grid range.
      * @param  transform The transform.
+     * @param  axis An array of length 2 where to store {@link #xAxis} and {@link #yAxis} values.
+     *              This argument is actually a hack to workaround Java language limitation (no
+     *              multiple return values). If we could, we should returns directly the
+     *              {@code dimensions} array computed in the body of this method.
      * @return The {@link MathTransform2D} part of {@code transform}.
      * @throws IllegalArgumentException if the 2D part is not separable.
      */
     private static MathTransform2D getMathTransform2D(final GridRange gridRange,
-                                                      MathTransform transform)
+                                                      MathTransform transform,
+                                                      final int[] axis)
             throws IllegalArgumentException
     {
         if (transform==null || transform instanceof MathTransform2D) {
@@ -212,20 +221,23 @@ public class GridGeometry2D extends GridGeometryGT {
          * If such a math transform doesn't have exactly 2 output dimensions, then select
          * the same output dimensions than the input ones.
          */
-        if (dimensions.length == 2) try {
-            transform = filter.separate(transform);
-            if (transform.getTargetDimensions() != 2) {
-                filter.clear();
-                filter.addTargetDimensions(dimensions);
-                transform = filter.separate(transform);
-            }
+        if (dimensions.length == 2) {
+            System.arraycopy(dimensions, 0, axis, 0, dimensions.length); // See hack in javadoc.
             try {
-                return (MathTransform2D) transform;
-            } catch (ClassCastException exception) {
+                transform = filter.separate(transform);
+                if (transform.getTargetDimensions() != 2) {
+                    filter.clear();
+                    filter.addTargetDimensions(dimensions);
+                    transform = filter.separate(transform);
+                }
+                try {
+                    return (MathTransform2D) transform;
+                } catch (ClassCastException exception) {
+                    cause = exception;
+                }
+            } catch (FactoryException exception) {
                 cause = exception;
             }
-        } catch (FactoryException exception) {
-            cause = exception;
         }
         IllegalArgumentException e = new IllegalArgumentException(Resources.format(
                                          ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
@@ -249,8 +261,8 @@ public class GridGeometry2D extends GridGeometryGT {
             return (MathTransform2D) gridToCoordinateSystem2D.inverse();
         } catch (NoninvertibleTransformException exception) {
             IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                        ResourceKeys.ERROR_BAD_TRANSFORM_$1,
-                                        Utilities.getShortClassName(gridToCoordinateSystem2D)));
+                                         ResourceKeys.ERROR_BAD_TRANSFORM_$1,
+                                         Utilities.getShortClassName(gridToCoordinateSystem2D)));
             e.initCause(exception);
             throw e;
         }
