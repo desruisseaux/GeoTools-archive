@@ -33,7 +33,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.Set;
 
 
 /**
@@ -42,7 +42,7 @@ import java.util.TreeSet;
  * @author jeichar
  */
 public class StreamGridCoverageExchange implements GridCoverageExchange {
-    TreeSet formats=new TreeSet();
+    Set formats=new java.util.HashSet();
 
     public StreamGridCoverageExchange() {
         for (Iterator iter = GridFormatFinder.getAvailableFormats(); iter.hasNext();) {
