@@ -14,7 +14,7 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package org.geotools.referencing;
+package org.geotools.referencing.operation;
 
 import javax.vecmath.*;
 import junit.framework.*;
@@ -76,12 +76,12 @@ public class MatrixTest extends TestCase {
     private static void assertEquals(float    m1, float    m2) {assertEquals(m1, m2, EPS);}
     private static void assertEquals(double   m1, double   m2) {assertEquals(m1, m2, EPS);}
     private static void assertEquals(Matrix3d m1, Matrix3d m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
-    private static void assertEquals(Matrix4d m1, Matrix4d m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
+    private static void assertEquals(Matrix4d m1, Matrix4d m2) {assertTrue(m1.epsilonEquals(m2, (double)EPS));}
     private static void assertEquals(Tuple4d  m1, Tuple4d  m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
     private static void assertEquals(Tuple3d  m1, Tuple3d  m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
     private static void assertEquals(Matrix3f m1, Matrix3f m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
     private static void assertEquals(Matrix4f m1, Matrix4f m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
-    private static void assertEquals(GMatrix  m1, GMatrix  m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
+    private static void assertEquals(GMatrix  m1, GMatrix  m2) {assertTrue(m1.epsilonEquals(m2, (double)EPS));}
     private static void assertEquals(GVector  v1, GVector  v2) {assertTrue(v1.epsilonEquals(v2, EPS));}
     private static void assertEquals(Tuple4f  m1, Tuple4f  m2) {assertTrue(m1.epsilonEquals(m2, EPS));}
     private static void assertEquals(Tuple3f  m1, Tuple3f  m2) {assertTrue(m1.epsilonEquals(m2, EPS));}

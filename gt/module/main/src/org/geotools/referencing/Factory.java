@@ -123,7 +123,7 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
     /**
      * Returns the vendor responsible for creating this factory implementation. Many implementations
      * may be available for the same factory interface. The default implementation returns
-     * {@linkplain org.geotools.metadata.citation.Citation.GEOTOOLS Geotools}.
+     * {@linkplain org.geotools.metadata.citation.Citation#GEOTOOLS Geotools}.
      *
      * @return The vendor for this factory implementation.
      */

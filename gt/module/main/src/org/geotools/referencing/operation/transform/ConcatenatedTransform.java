@@ -71,7 +71,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * But it is serialized in order to avoid rounding error if the inverse
      * transform is serialized instead of the original one.
      */
-    private MathTransform inverse;
+    private ConcatenatedTransform inverse;
     
     /**
      * Construct a concatenated transform. This constructor is for subclasses only. To
@@ -129,7 +129,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
 
     /**
-     * Construct a new concatenated transform.  This factory method checks for step transforms
+     * Construct a concatenated transform.  This factory method checks for step transforms
      * dimension. The returned transform will implements {@link MathTransform2D} if source and
      * target dimensions are equal to 2.  Likewise, it will implements {@link MathTransform1D}
      * if source and target dimensions are equal to 1.  {@link MathTransform} implementations
@@ -211,9 +211,18 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 return optimized;
             }
         }
-
         // Can't avoid the creation of a ConcatenatedTransform object.
         // Check for the type to create (1D, 2D, general case...)
+        return createConcatenatedTransform(tr1, tr2);
+    }
+
+    /**
+     * Continue the construction started by {@link #create}. The construction step is available
+     * separatly for testing purpose (in a JUnit test), and for {@link #inverse()} implementation.
+     */
+    static ConcatenatedTransform createConcatenatedTransform(final MathTransform tr1,
+                                                             final MathTransform tr2)
+    {
         final int dimSource = tr1.getDimSource();
         final int dimTarget = tr2.getDimTarget();
         //
@@ -334,10 +343,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     public synchronized final MathTransform inverse() throws NoninvertibleTransformException {
         assert isValid();
         if (inverse == null) {
-            inverse = create(transform2.inverse(), transform1.inverse());
-            if (inverse instanceof ConcatenatedTransform) {
-                ((ConcatenatedTransform) inverse).inverse = this;
-            }
+            inverse = createConcatenatedTransform(transform2.inverse(), transform1.inverse());
+            inverse.inverse = this;
         }
         return inverse;
     }

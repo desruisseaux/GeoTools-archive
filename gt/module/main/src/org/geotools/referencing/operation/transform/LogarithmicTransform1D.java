@@ -295,14 +295,14 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         private static final long serialVersionUID = -7235097164208708484L;
 
         /**
-         * The operation parameter descriptor for the {@link #base} parameter value.
+         * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
         public static final OperationParameter BASE = new org.geotools.parameter.OperationParameter(
                 "base", 10, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
-         * The operation parameter descriptor for the {@link #offset} parameter value.
+         * The operation parameter descriptor for the {@link #offset offset} parameter value.
          * Valid values range is unrestricted. The default value is 0.
          */
         public static final OperationParameter OFFSET = new org.geotools.parameter.OperationParameter(

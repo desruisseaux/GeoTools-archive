@@ -55,18 +55,19 @@ public class ReferencingSuite extends TestCase {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("All referencing tests");
-        suite.addTest(org.geotools.resources   .NumberParserTest      .suite());
-//      suite.addTest(org.geotools.util        .MonolineFormatterTest .suite());
-        suite.addTest(org.geotools.util        .RangeSetTest          .suite());
-        suite.addTest(org.geotools.util        .DisjointSetTest       .suite());
-        suite.addTest(org.geotools.util        .WeakHashSetTest       .suite());
-        suite.addTest(org.geotools.util        .WeakValueHashMapTest  .suite());
-        suite.addTest(org.geotools.measure     .FormatTest            .suite());
-//      suite.addTest(org.geotools.referencing .CodeListTest          .suite());
-        suite.addTest(org.geotools.referencing .BasicTest             .suite());
-        suite.addTest(org.geotools.referencing .MatrixTest            .suite());
-        suite.addTest(org.geotools.referencing .ParameterTest         .suite());
-        suite.addTest(org.geotools.referencing .LocalizationGridTest  .suite());
+        suite.addTest(org.geotools.resources                      .NumberParserTest      .suite());
+//      suite.addTest(org.geotools.util                           .MonolineFormatterTest .suite());
+        suite.addTest(org.geotools.util                           .RangeSetTest          .suite());
+        suite.addTest(org.geotools.util                           .DisjointSetTest       .suite());
+        suite.addTest(org.geotools.util                           .WeakHashSetTest       .suite());
+        suite.addTest(org.geotools.util                           .WeakValueHashMapTest  .suite());
+        suite.addTest(org.geotools.measure                        .FormatTest            .suite());
+//      suite.addTest(org.geotools.referencing                    .CodeListTest          .suite());
+        suite.addTest(org.geotools.referencing                    .BasicTest             .suite());
+        suite.addTest(org.geotools.referencing                    .ParameterTest         .suite());
+        suite.addTest(org.geotools.referencing.operation          .MatrixTest            .suite());
+        suite.addTest(org.geotools.referencing.operation.transform.LocalizationGridTest  .suite());
+        suite.addTest(org.geotools.referencing.operation.transform.MathTransformTest     .suite());
         return suite;
     }
 }

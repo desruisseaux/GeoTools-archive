@@ -29,7 +29,6 @@ import java.rmi.ServerException;
 import java.rmi.server.UnicastRemoteObject;
 import java.awt.geom.AffineTransform;        // For JavaDoc
 import javax.media.jai.PerspectiveTransform; // For JavaDoc
-//import javax.media.j3d.Transform3D;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
@@ -66,7 +65,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.opengis.ct.CT_MathTransform
  * @see AffineTransform
  * @see PerspectiveTransform
- * @see Transform3D
+ * @see javax.media.j3d.Transform3D
  * @see MathTransform2D
  *
  * @deprecated Replaced by {@link org.opengis.referencing.operation.MathTransform}

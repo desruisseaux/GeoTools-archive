@@ -173,7 +173,14 @@ public abstract class MathTransformProvider extends OperationMethod {
                 ensureValidValues(((ParameterValueGroup) value).getValues());
                 continue;
             }
-            final String name = value.getDescriptor().getName(null);
+            final String name;
+            final GeneralOperationParameter userDescriptor = value.getDescriptor();
+            final Identifier[] identifiers = userDescriptor.getIdentifiers();
+            if (identifiers!=null && identifiers.length!=0) {
+                name = identifiers[0].getCode();
+            } else {
+                name = userDescriptor.getName(null);
+            }
             final OperationParameter descriptor;
             try {
                 descriptor = parameters.getParameter(name);

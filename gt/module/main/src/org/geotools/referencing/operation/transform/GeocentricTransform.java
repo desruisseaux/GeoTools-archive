@@ -21,41 +21,44 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
-
-// JAI dependencies
-import javax.media.jai.ParameterList;
+import javax.units.Converter;
+import javax.units.Unit;
+import javax.units.SI;
 
 // OpenGIS dependencies
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.cs.Ellipsoid;
-
-// Resources
-import org.geotools.units.Unit;
+import org.geotools.parameter.ParameterValue;
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * Transforms three dimensional geographic points  to geocentric
- * coordinate points. Input points must be longitudes, latitudes
- * and heights above the ellipsoid.
+ * Transforms three dimensional {@linkplain org.geotools.referencing.crs.GeographicCRS geographic}
+ * points to {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} coordinate points.
+ * Input points must be longitudes, latitudes and heights above the ellipsoid.
  *
  * @version $Id$
  * @author Frank Warmerdam
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.GeocentricTransform}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
-final class GeocentricTransform extends AbstractMathTransform implements Serializable {
+public class GeocentricTransform extends AbstractMathTransform implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -111,50 +114,49 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     private final double ep2;
     
     /**
-     * <code>true</code> if geographic coordinates
-     * include an ellipsoidal height (i.e. are 3-D),
-     * or <code>false</code> if they are strictly 2-D.
+     * <code>true</code> if geographic coordinates include an ellipsoidal
+     * height (i.e. are 3-D), or <code>false</code> if they are strictly 2-D.
      */
     private final boolean hasHeight;
     
     /**
-     * The inverse of this transform.
-     * Will be created only when needed.
+     * The inverse of this transform. Will be created only when needed.
      */
     private transient MathTransform inverse;
     
     /**
-     * Construct a transform.
+     * Construct a transform from the specified ellipsoid.
      *
      * @param ellipsoid The ellipsoid.
      * @param hasHeight <code>true</code> if geographic coordinates
      *                  include an ellipsoidal height (i.e. are 3-D),
-     *                  or <code>false</code> if they are strictly 2-D.
+     *                  or <code>false</code> if they are only 2-D.
      */
-    protected GeocentricTransform(final Ellipsoid ellipsoid, final boolean hasHeight) {
+    public GeocentricTransform(final Ellipsoid ellipsoid, final boolean hasHeight) {
         this(ellipsoid.getSemiMajorAxis(),
              ellipsoid.getSemiMinorAxis(),
              ellipsoid.getAxisUnit(), hasHeight);
     }
     
     /**
-     * Construct a transform.
+     * Construct a transform from the specified parameters.
      *
      * @param semiMajor The semi-major axis length.
      * @param semiMinor The semi-minor axis length.
-     * @param units The axis units.
+     * @param units     The axis units.
      * @param hasHeight <code>true</code> if geographic coordinates
      *                  include an ellipsoidal height (i.e. are 3-D),
-     *                  or <code>false</code> if they are strictly 2-D.
+     *                  or <code>false</code> if they are only 2-D.
      */
-    protected GeocentricTransform(final double  semiMajor,
-                                  final double  semiMinor,
-                                  final Unit    units,
-                                  final boolean hasHeight)
+    public GeocentricTransform(final double  semiMajor,
+                               final double  semiMinor,
+                               final Unit    units,
+                               final boolean hasHeight)
     {
         this.hasHeight = hasHeight;
-        a   = Unit.METRE.convert(semiMajor, units);
-        b   = Unit.METRE.convert(semiMinor, units);
+        final Converter converter = units.getConverterTo(SI.METER);
+        a   = converter.convert(semiMajor);
+        b   = converter.convert(semiMinor);
         a2  = a*a;
         b2  = b*b;
         e2  = (a2 - b2) / a2;
@@ -183,9 +185,22 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * Converts geodetic coordinates (longitude, latitude, height) to
-     * geocentric coordinates (x, y, z) according to the current ellipsoid
-     * parameters.
+     * Gets the dimension of input points, which is 2 or 3.
+     */
+    public int getDimSource() {
+        return hasHeight ? 3 : 2;
+    }
+    
+    /**
+     * Gets the dimension of output points, which is 3.
+     */
+    public final int getDimTarget() {
+        return 3;
+    }
+    
+    /**
+     * Converts geodetic coordinates (longitude, latitude, height) to geocentric
+     * coordinates (x, y, z) according to the current ellipsoid parameters.
      */
     public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts) {
         transform(srcPts, srcOff, dstPts, dstOff, numPts, false);
@@ -225,9 +240,8 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * Converts geodetic coordinates (longitude, latitude, height) to
-     * geocentric coordinates (x, y, z) according to the current ellipsoid
-     * parameters.
+     * Converts geodetic coordinates (longitude, latitude, height) to geocentric
+     * coordinates (x, y, z) according to the current ellipsoid parameters.
      */
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
@@ -264,8 +278,8 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
      * Algorithm for Geocentric to Geodetic Coordinate Conversion", by
      * Ralph Toms, Feb 1996.
      */
-    protected final void inverseTransform(final double[] srcPts, int srcOff,
-                                          final double[] dstPts, int dstOff, int numPts)
+    public void inverseTransform(final double[] srcPts, int srcOff,
+                                 final double[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
         final int dimSource = getDimSource();
@@ -334,8 +348,8 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
      * Algorithm for Geocentric to Geodetic Coordinate Conversion", by
      * Ralph Toms, Feb 1996.
      */
-    protected final void inverseTransform(final float[] srcPts, int srcOff,
-                                          final float[] dstPts, int dstOff, int numPts)
+    public void inverseTransform(final float[] srcPts, int srcOff,
+                                 final float[] dstPts, int dstOff, int numPts)
     {
         int step = 0;
         final int dimSource = getDimSource();
@@ -411,24 +425,11 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * Gets the dimension of input points, which is 2 or 3.
-     */
-    public int getDimSource() {
-        return hasHeight ? 3 : 2;
-    }
-    
-    /**
-     * Gets the dimension of output points, which is 3.
-     */
-    public final int getDimTarget() {
-        return 3;
-    }
-    
-    /**
      * Returns the inverse of this transform.
      */
-    public synchronized MathTransform inverse() {
+    public MathTransform inverse() {
         if (inverse == null) {
+            // No need to synchronize; this is not a big deal if this object is created twice.
             inverse = new Inverse();
         }
         return inverse;
@@ -437,7 +438,7 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     /**
      * Returns a hash value for this transform.
      */
-    public final int hashCode() {
+    public int hashCode() {
         final long code = Double.doubleToLongBits( a ) +
                           37*(Double.doubleToLongBits( b ) +
                           37*(Double.doubleToLongBits( a2) +
@@ -448,11 +449,10 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * Compares the specified object with
-     * this math transform for equality.
+     * Compares the specified object with this math transform for equality.
      */
-    public final boolean equals(final Object object) {
-        if (object==this) {
+    public boolean equals(final Object object) {
+        if (object == this) {
             // Slight optimization
             return true;
         }
@@ -470,24 +470,17 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public final String toString() {
-        return toString("Ellipsoid_To_Geocentric");
-    }
-    
-    /**
-     * Returns the WKT for this math transform with the
-     * specified classification name. The classification
-     * name should be "Ellipsoid_To_Geocentric" or
-     * "Geocentric_To_Ellipsoid".
-     */
-    final String toString(final String classification) {
-        final StringBuffer buffer = paramMT(classification);
-        addParameter(buffer, "semi_major", a);
-        addParameter(buffer, "semi_minor", b);
-        buffer.append(']');
-        return buffer.toString();
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append(new ParameterValue("semi_major", a, SI.METER));
+        formatter.append(new ParameterValue("semi_minor", b, SI.METER));
+        return "Ellipsoid_To_Geocentric";
     }
     
     /**
@@ -514,7 +507,6 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
          */
         public void transform(final double[] source, final int srcOffset,
                               final double[] dest,   final int dstOffset, final int length)
-            throws TransformException
         {
             GeocentricTransform.this.inverseTransform(source, srcOffset, dest, dstOffset, length);
         }
@@ -524,16 +516,18 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
          */
         public void transform(final float[] source, final int srcOffset,
                               final float[] dest,   final int dstOffset, final int length)
-            throws TransformException
         {
             GeocentricTransform.this.inverseTransform(source, srcOffset, dest, dstOffset, length);
         }
-        
+    
         /**
-         * Returns a string representation of this transform.
+         * Format the inner part of a
+         * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+         * Known Text</cite> (WKT)</A> element.
          */
-        public final String toString() {
-            return GeocentricTransform.this.toString("Geocentric_To_Ellipsoid");
+        protected String formatWKT(final Formatter formatter) {
+            GeocentricTransform.this.formatWKT(formatter);
+            return "Geocentric_To_Ellipsoid";
         }
 
         /**
@@ -546,54 +540,118 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     }
     
     /**
-     * The provider for {@link GeocentricTransform}.
+     * The provider for {@link GeocentricTransform}. This provider will construct transforms
+     * from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
+     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} coordinate reference
+     * systems.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    static final class Provider extends MathTransformProvider {
+    public static class Provider extends MathTransformProvider {
         /**
-         * <code>false</code> for the direct transform,
-         * or <code>true</code> for the inverse transform.
+         * Serial number for interoperability with different versions.
          */
-        private final boolean inverse;
-        
+        private static final long serialVersionUID = 7043216580786030251L;
+
         /**
-         * Create a provider.
-         *
-         * @param inverse <code>false</code> for the direct transform,
-         *                or <code>true</code> for the inverse transform.
+         * The operation parameter descriptor for the "semi_major" parameter value.
+         * Valid values range from 0 to infinity.
          */
-        public Provider(final boolean inverse) {
-            super(inverse ? "Geocentric_To_Ellipsoid" : "Ellipsoid_To_Geocentric",
-                  ResourceKeys.GEOCENTRIC_TRANSFORM, null);
-            put("semi_major", Double.NaN, POSITIVE_RANGE);
-            put("semi_minor", Double.NaN, POSITIVE_RANGE);
-            putInt("dim_geoCS", 3, AbridgedMolodenskiTransform.Provider.DIM_RANGE);
-            // 'dim_geoCS' is a custom parameter: NOT AN OPENGIS SPECIFICATION
-            this.inverse = inverse;
+        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+                "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * The operation parameter descriptor for the "semi_minor" parameter value.
+         * Valid values range from 0 to infinity.
+         */
+        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+                "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
+         * The default value is 3.
+         */
+        private static final OperationParameter DIM_GEOCS = new org.geotools.parameter.OperationParameter(
+                "dim_geoCS", 3, 2, 3);
+
+        /**
+         * Constructs a provider.
+         */
+        public Provider() {
+            this("Ellipsoid_To_Geocentric", "9602");
+            //"Geocentric_To_Ellipsoid"
+        }
+
+        /**
+         * Constructs a provider using the specified identifiers.
+         */
+        Provider(final String ogc, final String epsg) {
+            super(new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, null,  ogc),
+                new Identifier(Citation.EPSG,    "EPSG", epsg)},
+                  3, 3, new OperationParameter[] {SEMI_MAJOR, SEMI_MINOR, DIM_GEOCS});
         }
         
         /**
-         * Returns a transform for the specified parameters.
+         * Creates a transform from the specified group of parameter values.
          *
-         * @param  parameters The parameter values in standard units.
-         * @return A {@link MathTransform} object of this classification.
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform create(final ParameterList parameters) {
-            final double semiMajor = parameters.getDoubleParameter("semi_major");
-            final double semiMinor = parameters.getDoubleParameter("semi_minor");
-            int dimGeographic = 3;
-            try {
-                dimGeographic = parameters.getIntParameter("dim_geoCS");
-            } catch (IllegalArgumentException exception) {
-                // the "dim_geoCS" parameter is a custom one required
-                // by our Geotools implementation. It is NOT an OpenGIS
-                // one. We can't require clients to know it.
-            }
-            GeocentricTransform transform = new GeocentricTransform(
-                    semiMajor, semiMinor, Unit.METRE, dimGeographic!=2);
-            return (inverse) ? transform.inverse() : transform;
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            final double  semiMajor = values.getValue("semi_major").doubleValue();
+            final double  semiMinor = values.getValue("semi_minor").doubleValue();
+            final int dimGeographic = values.getValue("dim_geoCS" ).intValue();
+            return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
+        }
+
+        /**
+         * Returns the resources key for {@linkplain #getName localized name}.
+         * This method is for internal purpose by Geotools implementation only.
+         */
+        protected int getLocalizationKey() {
+            return ResourceKeys.GEOCENTRIC_TRANSFORM;
+        }
+    }
+    
+    /**
+     * The provider for inverse of {@link GeocentricTransform}. This provider will construct
+     * transforms from {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} to
+     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
+     * systems.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static class ProviderInverse extends Provider {
+        /**
+         * Serial number for interoperability with different versions.
+         */
+        private static final long serialVersionUID = -7356791540110076789L;
+
+        /**
+         * Create a provider.
+         */
+        public ProviderInverse() {
+            super("Geocentric_To_Ellipsoid", "9602");
+            // NOTE: The EPSG code seems to be the same than for the direct transform.
+        }
+        
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            return ((GeocentricTransform) super.createMathTransform(values)).inverse();
         }
     }
 }

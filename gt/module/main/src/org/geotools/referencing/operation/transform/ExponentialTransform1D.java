@@ -328,17 +328,17 @@ public class ExponentialTransform1D extends AbstractMathTransform
         private static final long serialVersionUID = -5838840021166379987L;;
 
         /**
-         * The operation parameter descriptor for the {@link #base} parameter value.
+         * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
         public static final OperationParameter BASE = LogarithmicTransform1D.Provider.BASE;
 
         /**
-         * The operation parameter descriptor for the {@link #scale} parameter value.
-         * Valid values range is unrestricted. The default value is 0.
+         * The operation parameter descriptor for the {@link #scale scale} parameter value.
+         * Valid values range is unrestricted. The default value is 1.
          */
         public static final OperationParameter SCALE = new org.geotools.parameter.OperationParameter(
-                "scale", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
+                "scale", 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * Create a provider for logarithmic transforms.

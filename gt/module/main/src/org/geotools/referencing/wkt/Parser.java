@@ -101,7 +101,7 @@ public abstract class Parser extends AbstractParser {
      * Construct a parser for the specified locale using the specified factories.
      *
      * @param locale       The locale for parsing and formatting numbers.
-     * @param datumFactroy The factory to use for creating {@linkplain Datum datum}.
+     * @param datumFactory The factory to use for creating {@linkplain Datum datum}.
      * @param csFactory    The factory to use for creating {@linkplain CoordinateSystem
      *                     coordinate systems}.
      * @param crsFactory   The factory to use for creating {@linkplain CoordinateReferenceSystem

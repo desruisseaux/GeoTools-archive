@@ -1,0 +1,5 @@
+org.geotools.referencing.operation.transform.ProjectiveTransform$Provider
+org.geotools.referencing.operation.transform.LogarithmicTransform1D$Provider
+org.geotools.referencing.operation.transform.ExponentialTransform1D$Provider
+org.geotools.referencing.operation.transform.GeocentricTransform$Provider
+org.geotools.referencing.operation.transform.GeocentricTransform$ProviderInverse

@@ -435,7 +435,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * and {@link #scaleFactor} are usually not given.
      * When implementing these equations here, you will not
      * need to add the {@link #centralMeridian} to the output longitude or remove the
-     * {@link #majorAxis} ('<var>a</var>' or '<var>R</var>').
+     * {@link #semiMajor} ('<var>a</var>' or '<var>R</var>').
      *
      * @param x     The easting of the coordinate, linear distance on a unit sphere or ellipse.
      * @param y     The northing of the coordinate, linear distance on a unit sphere or ellipse.
@@ -446,7 +446,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *              and storing the result in <code>ptDst</code>.
      * @throws ProjectionException if the point can't be transformed.
      *
-     * @revisit TODO: The <code>ptDst</code> argument will be removed and the return type changed if
+     * @todo The <code>ptDst</code> argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
      * is implemented efficiently in a future J2SE release (maybe J2SE 1.5?).
      */
@@ -474,7 +474,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * {@link #falseEasting}, {@link #falseNorthing} and {@link #scaleFactor}
      * are usually not given. When implementing these equations here, you will not
      * need to remove the {@link #centralMeridian} from <var>x</var> or apply the
-     * {@link #majorAxis} ('<var>a</var>' or '<var>R</var>').
+     * {@link #semiMajor} ('<var>a</var>' or '<var>R</var>').
      *
      * @param x     The longitude of the coordinate, in <strong>radians</strong>.
      * @param y     The  latitude of the coordinate, in <strong>radians</strong>.
@@ -485,7 +485,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *              and storing the result in <code>ptDst</code>.
      * @throws ProjectionException if the point can't be transformed.
      *
-     * @revisit TODO: The <code>ptDst</code> argument will be removed and the return type changed if
+     * @todo The <code>ptDst</code> argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
      * is implemented efficiently in a future J2SE release (maybe J2SE 1.5?).
      */

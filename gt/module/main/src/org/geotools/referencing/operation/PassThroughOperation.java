@@ -90,8 +90,9 @@ public class PassThroughOperation extends SingleOperation
                                                  final int  numTrailingOrdinates)
     {
         ensureNonNull("operation", operation);
-        return new PassThroughTransform(firstAffectedOrdinate,
-                        operation.getMathTransform(), numTrailingOrdinates);
+        return PassThroughTransform.create(firstAffectedOrdinate,
+                                           operation.getMathTransform(),
+                                           numTrailingOrdinates);
     }
 
     /**

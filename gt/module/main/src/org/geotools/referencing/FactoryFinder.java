@@ -43,6 +43,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
+import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 

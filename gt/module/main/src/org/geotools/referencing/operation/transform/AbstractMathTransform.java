@@ -162,7 +162,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         if (dimPoint != dimSource) {
             throw new MismatchedDimensionException(constructMessage("ptSrc", dimPoint, dimSource));
         }
-        if (ptDst == null) {
+        if (ptDst != null) {
             dimPoint = ptDst.getDimension();
             if (dimPoint != dimTarget) {
                 throw new MismatchedDimensionException(constructMessage("ptDst", dimPoint, dimTarget));

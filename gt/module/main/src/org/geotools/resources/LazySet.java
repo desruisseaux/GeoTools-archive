@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing;
+package org.geotools.resources;
 
 // J2SE direct dependencies
 import java.util.Iterator;
@@ -28,12 +28,12 @@ import java.util.AbstractSet;
  * An immutable set built from an iterator, which will be filled only when needed. This
  * implementation do <strong>not</strong> check if all elements in the iterator are really
  * unique; we assume that it was already verified by {@link javax.imageio.spi.ServiceRegistry}.
- * This set is constructed by {@link FactoryFinder} only.
+ * This set is constructed by {@link org.geotools.referencing.FactoryFinder}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class LazySet extends AbstractSet {
+public final class LazySet extends AbstractSet {
     /**
      * The iterator to use for filling this set.
      */
