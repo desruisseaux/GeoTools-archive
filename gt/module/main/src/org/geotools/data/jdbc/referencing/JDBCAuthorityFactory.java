@@ -28,6 +28,7 @@ import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -161,7 +162,7 @@ public class JDBCAuthorityFactory implements CRSAuthorityFactory {
     /**
      * @see org.opengis.referencing.AuthorityFactory#createObject(java.lang.String)
      */
-    public Object createObject( String arg0 ) throws FactoryException {
+    public IdentifiedObject createObject( String arg0 ) throws FactoryException {
         return null;
     }
 

@@ -34,6 +34,7 @@ import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -125,7 +126,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
 	return factFinder(c).create(c);
     }
         
-    public Object createObject(String code) throws FactoryException {
+    public IdentifiedObject createObject(String code) throws FactoryException {
         return createCoordinateReferenceSystem(code);
     }
     
