@@ -14,8 +14,8 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.data.shapefile.shp.IndexFile;
-import org.geotools.data.shapefile.shp.ShapefileReader;
+import org.geotools.data.shape.shp.IndexFile;
+import org.geotools.data.shape.shp.ShapefileReader;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -97,9 +97,12 @@ public class ShapefileTest extends TestCaseSupport {
       if (reader1.hasNext()) {
 
         Geometry g1 = (Geometry) reader1.nextRecord().shape();
-        Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i) - 50));
+        Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i)));
         assertTrue(g1.equalsExact(g2));
-        
+
+        g2 = (Geometry) reader2.shapeAt(index.getOffsetInBytes(i));
+        assertTrue(g1.equalsExact(g2));
+
       } else {
         fail("uneven number of records");
       }

@@ -6,7 +6,7 @@
   <id>indexed-shapefile</id>
   <currentVersion>2.1.x</currentVersion>
   <shortDescription>indexed shapefile module</shortDescription>
-  <description>shapefile module</description>
+  <description>indexed shapefile module</description>
   <developers>
     <developer>
       <name>Tommaso Nolli</name>

@@ -850,14 +850,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             ret = getBounds();
         } else if (this.useIndex) {
             RTree rtree = this.openRTree();
-            try {
-                ret = rtree.getBounds(query.getFilter());
-            } catch (TreeException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            } catch (UnsupportedFilterException e) {
-                // Ignoring...
-            } finally {
-                try { rtree.close(); } catch (Exception ee) {}
+            if (rtree != null) {
+                try {
+                    ret = rtree.getBounds(query.getFilter());
+                } catch (TreeException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                } catch (UnsupportedFilterException e) {
+                    // Ignoring...
+                } finally {
+                    try { rtree.close(); } catch (Exception ee) {}
+                }
             }
         }
         
