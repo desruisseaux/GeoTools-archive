@@ -836,15 +836,33 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Gets the dimension of input points, which is 1.
+     *
+     * @deprecated Replaced by {@link #getSourceDimensions}.
      */
     public final int getDimSource() {
         return 1;
     }
     
     /**
+     * Gets the dimension of input points, which is 1.
+     */
+    public final int getSourceDimensions() {
+        return 1;
+    }
+    
+    /**
      * Gets the dimension of output points, which is 1.
+     *
+     * @deprecated Replaced by {@link #getTargetDimensions}.
      */
     public final int getDimTarget() {
+        return 1;
+    }
+    
+    /**
+     * Gets the dimension of output points, which is 1.
+     */
+    public final int getTargetDimensions() {
         return 1;
     }
     
