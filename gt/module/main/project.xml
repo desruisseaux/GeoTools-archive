@@ -2,24 +2,20 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-core</name>
-  <id>core</id>
-  <currentVersion>2.0-B5-DEV</currentVersion>
+  <name>main</name>
+  <id>main</id>
+  <currentVersion>2.0-B6-DEV</currentVersion>
   <versions>
     <version>
       <id>b1</id>
-      <name>2.0-b1</name>
-      <tag>GT_2_0_B1</tag>
+      <name>2.0-B6-DEV</name>
+      <tag>GT_2_0_B6</tag>
     </version>
   </versions>
-  <shortDescription>Core interfaces for
-  GeoTools2</shortDescription>
-  <description>The Core module contains the key interfaces that are
-  implemented and used by other GeoTools modules. Other than
-  Exceptions and Events the Core module contains no actual code,
-  instead that is provided by other modules. See the defaultcore
-  module for standard implemenations of the interfaces defined
-  here.</description>
+  <shortDescription>Geotools</shortDescription>
+  <description>The main module contains the key interfaces and
+  default implementations that are used by other GeoTools modules.
+  </description>
   <url>http://www.geotools.org/</url>
   <developers>
     <developer>
@@ -103,8 +99,7 @@
       <version>1.4</version>
       <properties>
         <release.bundle>true</release.bundle>
-       </properties>
-     
+       </properties>   
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
@@ -113,9 +108,70 @@
       <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <id>opengis</id>
-      <version>2.0-B5-DEV</version>
-      <url>http://www.geotools.org</url>
+      <id>vecmath</id>
+      <version>1.2.1</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
+      <id>mailapi</id>
+      <version>1.3</version>
+    </dependency>
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+      <type>test</type>
+      <url>http://junit.org/</url>
+    </dependency>
+    <dependency>
+      <id>mockrunner</id>
+      <version>0.2</version>
+      <type>test</type>
+      <url>http://mockrunner.sourceforge.net/</url>
+    </dependency>
+     <dependency>
+      <artifactId>batik</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-gvt</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-svg-dom</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+     <dependency>
+      <artifactId>batik-rasterizer</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-dom</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-bridge</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-css</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+     <dependency>
+      <artifactId>batik-xml</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <artifactId>batik-transcoder</artifactId>
+      <groupId>batik</groupId>
+      <version>1.5</version>
     </dependency>
   </dependencies>
   <build>
@@ -125,7 +181,7 @@
       </includes>
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>META-INF/</include>
           </includes>
