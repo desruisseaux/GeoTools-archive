@@ -1,0 +1,117 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.xml.handlers.xsi;
+
+import org.geotools.xml.XSIElementHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+
+/**
+ * SelectorHandler purpose.
+ * 
+ * <p>
+ * Represents a selector element
+ * </p>
+ * 
+ * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
+ * @author $Author:$ (last modification)
+ * @version $Id$
+ */
+public class SelectorHandler extends XSIElementHandler {
+    /** 'selector' */
+    public final static String LOCALNAME = "selector";
+    
+    private String id;
+    private String xpath;
+
+    /**
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return LOCALNAME.hashCode() * ((id == null) ? 1 : id.hashCode()) * ((xpath == null)
+        ? 1 : xpath.hashCode());
+    }
+
+    /**
+     * 
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     */
+    public XSIElementHandler getHandler(String namespaceURI, String localName)
+        throws SAXException {
+        return null;
+    }
+
+    /**
+     * 
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     */
+    public void startElement(String namespaceURI, String localName,
+        Attributes atts) throws SAXException {
+        id = atts.getValue("", "id");
+
+        if (id == null) {
+            id = atts.getValue(namespaceURI, "id");
+        }
+
+        // xpath
+        xpath = atts.getValue("", "xpath");
+
+        if (xpath == null) {
+            xpath = atts.getValue(namespaceURI, "xpath");
+        }
+    }
+
+    /**
+     * 
+     * @see org.geotools.xml.XSIElementHandler#getLocalName()
+     */
+    public String getLocalName() {
+        return LOCALNAME;
+    }
+
+    /**
+     * @return id attribute value
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @return xPath attribute value
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
+    /**
+     * 
+     * @see org.geotools.xml.XSIElementHandler#getHandlerType()
+     */
+    public int getHandlerType() {
+        return DEFAULT;
+    }
+
+    /**
+     * 
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     */
+    public void endElement(String namespaceURI, String localName)
+        throws SAXException {
+    }
+}
