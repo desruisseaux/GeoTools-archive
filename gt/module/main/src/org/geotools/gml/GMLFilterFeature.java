@@ -301,7 +301,7 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
             }
 
             try {
-                factory.setNamespace(new URI(namespaceURI));
+                factory.setNamespaceURI(new URI(namespaceURI));
             } catch (URISyntaxException e) {
                 LOGGER.warning(e.toString());
                 throw new SAXException(e);

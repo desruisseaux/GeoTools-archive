@@ -22,6 +22,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -295,7 +296,11 @@ public class CRSService {
 	static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
         
-        factory.setNamespace( schema.getNamespace() );
+        try {
+            factory.setNamespace( schema.getNamespace() );
+        } catch (URISyntaxException e) {
+            throw new SchemaException(e);
+        }
         factory.setName( schema.getTypeName() );
         
         GeometryAttributeType defaultGeometryType = null;

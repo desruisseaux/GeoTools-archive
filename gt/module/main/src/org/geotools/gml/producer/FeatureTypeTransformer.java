@@ -217,7 +217,7 @@ public class FeatureTypeTransformer extends TransformerBase {
             AttributeType[] attributes = type.getAttributeTypes();
 
             try {
-                startSchemaType(type.getTypeName(), type.getNamespace());
+                startSchemaType(type.getTypeName(), type.getNamespaceURI());
 
                 for (int i = 0; i < attributes.length; i++) {
                     encode(attributes[i]);

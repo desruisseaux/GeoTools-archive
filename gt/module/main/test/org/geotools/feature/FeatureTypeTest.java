@@ -54,7 +54,7 @@ public class FeatureTypeTest extends DataTestCase {
     
     FeatureTypeFactory at = FeatureTypeFactory.newInstance("AbstractThing");
     at.setAbstract(true);
-    at.setNamespace( new URI("http://www.nowhereinparticular.net"));
+    at.setNamespaceURI( new URI("http://www.nowhereinparticular.net"));
     
     FeatureType type1 = at.getFeatureType();
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
@@ -100,18 +100,18 @@ public class FeatureTypeTest extends DataTestCase {
   
   public void testEquals() throws Exception {
     FeatureTypeFactory at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace(new URI("http://www.nowhereinparticular.net"));
+    at.setNamespaceURI(new URI("http://www.nowhereinparticular.net"));
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
     final FeatureType ft = at.getFeatureType();
     at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace( new URI("http://www.nowhereinparticular.net"));
+    at.setNamespaceURI( new URI("http://www.nowhereinparticular.net"));
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
     FeatureType ft2 = at.getFeatureType();
     assertEquals(ft,ft2);
     at.setName("Thingee");
     assertTrue(! ft.equals(at.getFeatureType()));
     at = FeatureTypeFactory.createTemplate(ft);
-    at.setNamespace( new URI("http://www.somewhereelse.net"));
+    at.setNamespaceURI( new URI("http://www.somewhereelse.net"));
     assertTrue(! ft.equals(at.getFeatureType()));
     assertTrue(! ft.equals(null));
   }

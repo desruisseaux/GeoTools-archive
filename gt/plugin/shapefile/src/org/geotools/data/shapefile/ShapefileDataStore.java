@@ -163,7 +163,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected TypeEntry createTypeEntry( final String typeName ) {    
         URI namespace;
         try {
-            namespace = getSchema( typeName ).getNamespace();
+            namespace = getSchema( typeName ).getNamespaceURI();
         } catch (IOException e) {
             namespace = null;
         }

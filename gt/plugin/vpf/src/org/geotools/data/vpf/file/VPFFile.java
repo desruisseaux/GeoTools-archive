@@ -312,8 +312,16 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *  (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public URI getNamespace() {
+    public String getNamespace() {
         return featureType.getNamespace();
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#getNamespace()
+     */
+    public URI getNamespaceURI() {
+        return featureType.getNamespaceURI();
     }
 
     /**

@@ -62,7 +62,11 @@ public class DummyFeatureType implements FeatureType {
         return null;
     }
     
-    public URI getNamespace() {
+    public String getNamespace() {
+        return null;
+    }
+    
+    public URI getNamespaceURI() {
         return null;
     }
     

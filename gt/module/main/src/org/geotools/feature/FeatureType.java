@@ -175,8 +175,17 @@ public interface FeatureType extends FeatureFactory {
      * </p>
      * @return Namespace of schema (usually namespace prefix)
      * @TODO Change to use real URI rather than string
+     * @deprecated
      */
-    URI getNamespace();
+    String getNamespace();
+    
+    /**
+     * 
+     * same as new URI(getNamespace());
+     * 
+     * @return
+     */
+    URI getNamespaceURI();
 
     /**
      * Put this functionality in the factory, produce only  immutable

@@ -21,6 +21,7 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -120,7 +121,7 @@ public abstract class FeatureTypeFactory implements Factory {
         throws FactoryConfigurationError {
         FeatureTypeFactory factory = newInstance(original.getTypeName());
         factory.importType(original);
-        factory.setNamespace(original.getNamespace());
+        factory.setNamespaceURI(original.getNamespaceURI());
         factory.setDefaultGeometry(original.getDefaultGeometry());
 
         FeatureType[] ancestors = original.getAncestors();
@@ -179,7 +180,7 @@ public abstract class FeatureTypeFactory implements Factory {
         throws FactoryConfigurationError, SchemaException {
         FeatureTypeFactory factory = newInstance(name);
         factory.addTypes(types);
-        factory.setNamespace(ns);
+        factory.setNamespaceURI(ns);
         factory.setAbstract(isAbstract);
         if(defaultGeometry != null)
             factory.setDefaultGeometry((GeometryAttributeType) defaultGeometry);
@@ -214,7 +215,7 @@ public abstract class FeatureTypeFactory implements Factory {
             throws FactoryConfigurationError, SchemaException {
             FeatureTypeFactory factory = newInstance(name);
             factory.addTypes(types);
-            factory.setNamespace(ns);
+            factory.setNamespaceURI(ns);
             factory.setAbstract(isAbstract);
 
             if (superTypes != null) {
@@ -407,8 +408,19 @@ public abstract class FeatureTypeFactory implements Factory {
      * Set the namespace of the FeatureType this factory will produce.
      *
      * @param namespace The new namespace. May be null.
+     * @throws URISyntaxException
+     * @deprecated
      */
-    public void setNamespace(URI namespace) {
+    public void setNamespace(String namespace) throws URISyntaxException {
+        setNamespaceURI(new URI(namespace));
+    }
+
+    /**
+     * Set the namespace of the FeatureType this factory will produce.
+     *
+     * @param namespace The new namespace. May be null.
+     */
+    public void setNamespaceURI(URI namespace) {
         dirty |= isDifferent(namespace, this.namespace);
         this.namespace = namespace;
     }

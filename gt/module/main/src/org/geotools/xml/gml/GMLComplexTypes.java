@@ -6302,7 +6302,7 @@ public class GMLComplexTypes {
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
-        typeFactory.setNamespace(ftNS);
+        typeFactory.setNamespaceURI(ftNS);
         typeFactory.setName(ftName);
 
         GeometryAttributeType geometryAttribute = null;
@@ -6352,7 +6352,7 @@ public class GMLComplexTypes {
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
-        typeFactory.setNamespace(ftNS);
+        typeFactory.setNamespaceURI(ftNS);
         typeFactory.setName(ftName);
 
         GeometryAttributeType geometryAttribute = null;

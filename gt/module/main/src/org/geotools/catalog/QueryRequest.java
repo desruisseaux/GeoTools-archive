@@ -75,7 +75,10 @@ public class QueryRequest {
         }        
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
-		public URI getNamespace() {
+		public String getNamespace() {
+			return null;
+		}
+		public URI getNamespaceURI() {
 			return null;
 		}
 		public String getTypeName() {

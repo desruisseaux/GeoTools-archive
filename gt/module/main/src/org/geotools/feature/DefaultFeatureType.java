@@ -262,7 +262,16 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @return Namespace of schema.
      */
-    public URI getNamespace() {
+    public String getNamespace() {
+        return namespace==null?null:namespace.toString();
+    }
+
+    /**
+     * Gets the global schema namespace.
+     *
+     * @return Namespace of schema.
+     */
+    public URI getNamespaceURI() {
         return namespace;
     }
 
@@ -312,9 +321,9 @@ public class DefaultFeatureType implements FeatureType {
             return false;
         }
 
-        if ((namespace == null) && (other.getNamespace() != null)) {
+        if ((namespace == null) && (other.getNamespaceURI() != null)) {
             return false;
-        } else if (!namespace.equals(other.getNamespace())) {
+        } else if (!namespace.equals(other.getNamespaceURI())) {
             return false;
         }
 
@@ -397,7 +406,7 @@ public class DefaultFeatureType implements FeatureType {
      * @return true if descendant, false otherwise.
      */
     public boolean isDescendedFrom(FeatureType type) {
-        return isDescendedFrom(type.getNamespace(), type.getTypeName());
+        return isDescendedFrom(type.getNamespaceURI(), type.getTypeName());
     }
 
     /**
@@ -415,7 +424,7 @@ public class DefaultFeatureType implements FeatureType {
     public boolean isDescendedFrom(URI nsURI, String typeName) {
         for (int i = 0, ii = ancestors.length; i < ii; i++) {
             if (((nsURI == null)
-                    || ancestors[i].getNamespace().equals(nsURI))
+                    || ancestors[i].getNamespaceURI().equals(nsURI))
                     && ancestors[i].getTypeName().equals(typeName)) {
                 return true;
             }

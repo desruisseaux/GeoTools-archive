@@ -211,8 +211,14 @@ public class VPFFeatureType implements FeatureType {
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getNamespace()
      */
-    public URI getNamespace() {
-        return featureClass.getNamespace();
+    public String getNamespace() {
+        return featureClass.getNamespace().toString();
+    }
+    /* (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#getNamespace()
+     */
+    public URI getNamespaceURI() {
+        return featureClass.getNamespaceURI();
     }
 
     /* (non-Javadoc)

@@ -91,7 +91,7 @@ public class MemoryDataStoreTest extends DataTestCase {
     public void testFixture() throws Exception {
         FeatureType type = DataUtilities.createType("namespace.typename",
                 "name:String,id:0,geom:MultiLineString");
-        assertEquals("namespace", new URI("namespace"), type.getNamespace());
+        assertEquals("namespace", new URI("namespace"), type.getNamespaceURI());
         assertEquals("typename", "typename", type.getTypeName());
         assertEquals("attributes", 3, type.getAttributeCount());
 
@@ -766,7 +766,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         FeatureType actual = half.getSchema();
         
         assertEquals( type.getTypeName(), actual.getTypeName() );
-        assertEquals( type.getNamespace(), actual.getNamespace() );
+        assertEquals( type.getNamespaceURI(), actual.getNamespaceURI() );
         assertEquals( type.getAttributeCount(), actual.getAttributeCount() );
         for( int i=0; i<type.getAttributeCount(); i++){
             assertEquals( type.getAttributeType( i ), actual.getAttributeType( i ));

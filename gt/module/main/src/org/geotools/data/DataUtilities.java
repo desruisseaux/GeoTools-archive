@@ -798,7 +798,7 @@ public class DataUtilities {
     public static FeatureType createSubType(FeatureType featureType,
             String[] properties, CoordinateSystem override)
             throws SchemaException {
-        return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespace() );
+        return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespaceURI() );
     }
 
     public static FeatureType createSubType(FeatureType featureType,
@@ -845,7 +845,7 @@ public class DataUtilities {
         }
 
         if( typeName == null ) typeName = featureType.getTypeName();
-        if( namespace == null ) namespace = featureType.getNamespace();
+        if( namespace == null ) namespace = featureType.getNamespaceURI();
         
         return FeatureTypeFactory.newFeatureType(types, typeName, namespace);
     }
@@ -883,7 +883,7 @@ public class DataUtilities {
         }
 
         return FeatureTypeFactory.newFeatureType(types,
-            featureType.getTypeName(), featureType.getNamespace());
+            featureType.getTypeName(), featureType.getNamespaceURI());
     }
 
     /**
@@ -924,7 +924,7 @@ public class DataUtilities {
         FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(typeName);
         try {
             if( namespace != null ){
-                typeFactory.setNamespace( new URI(namespace));
+                typeFactory.setNamespaceURI( new URI(namespace));
             }
         } catch (URISyntaxException badNamespace ) {
             throw new SchemaException( badNamespace );            
