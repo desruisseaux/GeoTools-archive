@@ -542,8 +542,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "LatLonBoundingBoxType";
         }
         /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
@@ -589,6 +588,60 @@ public class WFSCapabilitiesComplexTypes {
                 new WFSAttribute("onlineResource",
                     XSISimpleTypes.String.getInstance(), WFSAttribute.REQUIRED)
             };
+        public static WFSComplexType getInstance(){return instance;}
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return attributes;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "PostType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -605,9 +658,9 @@ public class WFSCapabilitiesComplexTypes {
     
         // static element list
         private static final Element[] elements = {
-                new WFSElement("Get", WFSComplexTypes.GetType.getInstance(), 0,
+                new WFSElement("Get", GetType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null),
-                new WFSElement("Post", WFSComplexTypes.GetType.getInstance(),
+                new WFSElement("Post", GetType.getInstance(),
                     0, Integer.MAX_VALUE, false, null)
             };
     
@@ -620,6 +673,60 @@ public class WFSCapabilitiesComplexTypes {
                     return Integer.MAX_VALUE;
                 }
             };
+            /**
+             * @see org.geotools.xml.schema.Type#getName()
+             */
+            public String getName() {
+                return "HTTPType";
+            }
+            public static WFSComplexType getInstance(){return instance;}
+            
+            /**
+             * @see org.geotools.xml.schema.ComplexType#getAttributes()
+             */
+            public Attribute[] getAttributes() {
+                return null;
+            }
+            /**
+             * @see org.geotools.xml.schema.ComplexType#getChild()
+             */
+            public ElementGrouping getChild() {
+                return seq;
+            }
+            /**
+             * @see org.geotools.xml.schema.ComplexType#getChildElements()
+             */
+            public Element[] getChildElements() {
+                return elements;
+            }
+            /**
+             * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+             */
+            public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+                // TODO Auto-generated method stub
+                throw new SAXNotSupportedException();
+            }
+            /**
+             * @see org.geotools.xml.schema.Type#getInstanceType()
+             */
+            public Class getInstanceType() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            /**
+             * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+             */
+            public boolean canEncode(Element element, Object value, Map hints) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            /**
+             * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+             */
+            public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+                // TODO Auto-generated method stub
+                throw new OperationNotSupportedException();
+            }
     }
 
     /**
@@ -639,6 +746,60 @@ public class WFSCapabilitiesComplexTypes {
                 new WFSAttribute("onlineResource",
                     XSISimpleTypes.String.getInstance(), WFSAttribute.REQUIRED)
             };
+        public static WFSComplexType getInstance(){return instance;}
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return attributes;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "GetType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -667,18 +828,72 @@ public class WFSCapabilitiesComplexTypes {
                 new WFSElement("SRS", XSISimpleTypes.String.getInstance(), 1,
                     1, false, null),
                 new WFSElement("Operations",
-                    XSISimpleTypes.String.getInstance(), 0, 1, false, null),
+                    OperationsType.getInstance(), 0, 1, false, null),
                 new WFSElement("LatLongBoundingBox",
-                    WFSComplexTypes.LatLonBoundingBoxType.getInstance(), 0,
+                    LatLonBoundingBoxType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null),
                 new WFSElement("MetadataURL",
-                    WFSComplexTypes.MetadataURLType.getInstance(), 0,
+                    MetadataURLType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null)
             };
     
         // static sequence
         private static final DefaultSequence seq = new DefaultSequence(elements);
-    
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "FeatureTypeType";
+        }
+        public static WFSComplexType getInstance(){return instance;}
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -696,7 +911,7 @@ public class WFSCapabilitiesComplexTypes {
     
         // static element list
         private static final Element[] elements = {
-                new WFSElement("HTTP", WFSComplexTypes.HTTPType.getInstance(),
+                new WFSElement("HTTP", HTTPType.getInstance(),
                     1, 1, false, null)
             };
     
@@ -715,8 +930,7 @@ public class WFSCapabilitiesComplexTypes {
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes)
          */
-        public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs) throws SAXException, SAXNotSupportedException {
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
             Element e = value[0].getElement();
     
             if (e == null) {
@@ -755,6 +969,50 @@ public class WFSCapabilitiesComplexTypes {
             }
             return capab;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WFSCapability.class;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -773,7 +1031,7 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("DCPType",
-                    WFSComplexTypes.DCPTypeType.getInstance(), 1,
+                    DCPTypeType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null)
             };
     
@@ -785,6 +1043,59 @@ public class WFSCapabilitiesComplexTypes {
          */
         public ElementGrouping getChild() {
             return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "LockFeatureTypeType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
         }
     }
 
@@ -804,22 +1115,22 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("GetCapabilities",
-                    WFSComplexTypes.GetCapabilitiesType.getInstance(), 1, 1,
+                    GetCapabilitiesType.getInstance(), 1, 1,
                     false, null),
                 new WFSElement("DescribeFeatureType",
-                    WFSComplexTypes.DescribeFeatureType.getInstance(), 1, 1,
+                    DescribeFeatureTypeType.getInstance(), 1, 1,
                     false, null),
                 new WFSElement("Transaction",
-                    WFSComplexTypes.TransactionType.getInstance(), 1,
+                    TransactionType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null),
                 new WFSElement("GetFeature",
-                    WFSComplexTypes.GetFeatureTypeType.getInstance(), 1, 1,
+                    GetFeatureTypeType.getInstance(), 1, 1,
                     false, null),
                 new WFSElement("GetFeatureWithLock",
-                    WFSComplexTypes.GetFeatureTypeType.getInstance(), 1, 1,
+                    GetFeatureTypeType.getInstance(), 1, 1,
                     false, null),
                 new WFSElement("LockFeature",
-                    WFSComplexTypes.LockFeatureTypeType.getInstance(), 1, 1,
+                    LockFeatureTypeType.getInstance(), 1, 1,
                     false, null)
             };
     
@@ -838,6 +1149,59 @@ public class WFSCapabilitiesComplexTypes {
          */
         public ElementGrouping getChild() {
             return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "RequestType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
         }
     }
 
@@ -966,6 +1330,43 @@ public class WFSCapabilitiesComplexTypes {
             }
             return service;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -984,15 +1385,75 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Operations",
-                    WFSComplexTypes.OperationsType.getInstance(), 0, 1, false,
+                    OperationsType.getInstance(), 0, 1, false,
                     null),
                 new WFSElement("FeatureType",
-                    WFSComplexTypes.FeatureTypeType.getInstance(), 1,
+                    FeatureTypeType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null)
             };
     
         // static sequence
         private static final DefaultSequence seq = new DefaultSequence(elements);
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "FeatureTypeListType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -1011,7 +1472,7 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Request",
-                    WFSComplexTypes.RequestType.getInstance(), 1, 1, false, null),
+                    RequestType.getInstance(), 1, 1, false, null),
                 new WFSElement("VendorSpecificCapabilities",
                     XSISimpleTypes.String.getInstance(), 0, 1, false, null)
             };
@@ -1058,8 +1519,8 @@ public class WFSCapabilitiesComplexTypes {
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes)
          */
-        public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs) throws SAXException, SAXNotSupportedException {
+
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
             Element e = value[0].getElement();
     
             if (e == null) {
@@ -1098,6 +1559,36 @@ public class WFSCapabilitiesComplexTypes {
     
             return capab;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -1116,12 +1607,12 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("Service",
-                    WFSComplexTypes.ServiceType.getInstance(), 1, 1, false, null),
+                    ServiceType.getInstance(), 1, 1, false, null),
                 new WFSElement("Capability",
-                    WFSComplexTypes.GetCapabilitiesType.getInstance(), 1, 1,
+                    GetCapabilitiesType.getInstance(), 1, 1,
                     false, null),
                 new WFSElement("FeatureTypeList",
-                    WFSComplexTypes.FeatureTypeListType.getInstance(), 1, 1,
+                    FeatureTypeListType.getInstance(), 1, 1,
                     false, null),
                 
                 // TODO Add Filter_Capababilities from filterCapabilities.xsd
@@ -1153,6 +1644,52 @@ public class WFSCapabilitiesComplexTypes {
         public ElementGrouping getChild() {
             return seq;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "WFS_CapabilitiesType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
     }
 
     /**
@@ -1171,7 +1708,7 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new WFSElement("DCPType",
-                    WFSComplexTypes.ServiceType.getInstance(), 1,
+                    ServiceType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null)
             };
     
@@ -1192,6 +1729,59 @@ public class WFSCapabilitiesComplexTypes {
          */
         public ElementGrouping getChild() {
             return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "GetCapabilitiesType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
         }
     }
 
@@ -1234,6 +1824,52 @@ public class WFSCapabilitiesComplexTypes {
         public ElementGrouping getChild() {
             return seq;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "DescribeFeatureTypeType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -1265,6 +1901,59 @@ public class WFSCapabilitiesComplexTypes {
         public ElementGrouping getChild() {
             return seq;
         }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "TransactionType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
     }
 
     /**
@@ -1278,7 +1967,7 @@ public class WFSCapabilitiesComplexTypes {
      */
     static class GetFeatureTypeType extends WFSComplexType {
         // singleton instance
-        private static final WFSComplexType instance = new GetFeatureType();
+        private static final WFSComplexType instance = new GetFeatureTypeType();
     
         // static element list
         private static final Element[] elements = {
@@ -1298,6 +1987,59 @@ public class WFSCapabilitiesComplexTypes {
          */
         public ElementGrouping getChild() {
             return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new SAXNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "GetFeatureTypeType";
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
         }
     }
 }
