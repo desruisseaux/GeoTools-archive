@@ -48,10 +48,23 @@ public class JTS {
      * @throws TransformException 
      */
     public static Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
-    	double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
-    	double[] newcoords=new double[4];
-    	transform.transform(coords, 0, newcoords, 0, 4);
-    	return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
+        double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
+        double[] newcoords=new double[4];
+        transform.transform(coords, 0, newcoords, 0, 4);
+        return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
+    }
+
+    /**
+     * 
+     * TODO summary sentence for concatenate ...
+     * 
+     * @param transform1
+     * @param transform2
+     * @return
+     * @throws TransformException
+     */
+    public static MathTransform concatenate(MathTransform transform1,MathTransform transform2) throws TransformException {
+        return null;
     }
 
 }

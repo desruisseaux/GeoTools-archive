@@ -1,26 +1,6 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
-/*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
  *    (C) 2003, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
@@ -46,7 +26,11 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,12 +77,12 @@ public class ReprojectFeatureReader implements FeatureReader {
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
-        transformer.setMathTransform((MathTransform2D) transform);
+        transformer.setMathTransform(transform);
     }
 
     public ReprojectFeatureReader(FeatureReader reader,
         CoordinateReferenceSystem cs)
-        throws SchemaException{
+        throws SchemaException, OperationNotFoundException, NoSuchElementException, FactoryException{
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -111,11 +95,10 @@ public class ReprojectFeatureReader implements FeatureReader {
             throw new IllegalArgumentException("CoordinateSystem " + cs
                 + " already used (check before using wrapper)");
         }
-
-        this.transform = CRSService.reproject(original, cs, true);
+        
         this.schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
-        transformer.setMathTransform((MathTransform2D) transform);
+        transformer.setMathTransform(FactoryFinder.getCoordinateOperationFactory().createOperation(original,cs).getMathTransform());
     }
 
     /**

@@ -26,9 +26,13 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.JTS;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -81,7 +85,7 @@ public class ReprojectFeatureResults implements FeatureResults {
      */
     public ReprojectFeatureResults(FeatureResults results,
         CoordinateReferenceSystem destinationCS)
-        throws IOException, SchemaException, CannotCreateTransformException {
+        throws IOException, SchemaException{
         if (destinationCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -95,10 +99,10 @@ public class ReprojectFeatureResults implements FeatureResults {
                 + destinationCS + " already used (check before using wrapper)");
         }
 
-        this.schema = CRSService.transform(type, destinationCS);
+        this.schema = FeatureTypes.transform(type, destinationCS);
         this.results = results;
-
-        this.transform = CRSService.reproject(originalCs, destinationCS, true);
+        
+        this.transform = FactoryFinder.getCoordinateOperationFactory().createOperation(originalCs,destinationCS).getMathTransform();
 
         // Optimization 1: if the wrapped results is a forced cs results we
         // "eat" it to avoid useless feature object creation

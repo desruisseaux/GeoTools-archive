@@ -1,6 +1,6 @@
 package org.geotools.data.crs.geometry;
 
-import org.geotools.ct.MathTransform2D;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Andrea Aime
  */
 public class GeometryCoordinateSequenceTransformer {
-    private MathTransform2D transform;
+    private MathTransform transform;
     private CoordinateSequenceTransformer csTransformer;
 
     
@@ -33,7 +33,7 @@ public class GeometryCoordinateSequenceTransformer {
      * Sets the math transform to be used for transformation
      * @param transform
      */
-    public void setMathTransform(MathTransform2D transform) {
+    public void setMathTransform(MathTransform transform) {
         this.transform = transform;
     }
     
