@@ -27,21 +27,37 @@ import org.geotools.data.wms.capabilities.Capabilities;
 import org.opengis.parameter.GeneralOperationParameter;
 
 /**
- * @author rgould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * GridCoverageExchangeFormat describing Capabilities of a Web Map Server.
+ * <p>
+ * Unlike several file system Formats this represents the abilities of a
+ * dynamic Server. In addition file formats are often called by client
+ * code with the specification of a single URL for processing. WMSFormat
+ * will need a series of Layers.
+ * </p>
+ * @author Richard Gould, Refractions Researach
  */
 public class WMSFormat extends AbstractGridFormat {
-	
+	/** Parsed Capabilities Document */
 	private Capabilities capabilities;
 
+	/**
+	 * TODO: What does this mean? How can I have a WMSFormat without knowing
+	 * the capabilities of my Web Map Server?
+	 * <p>
+	 * It looks like a WMSFormat would need to be provided with
+	 * capabilities during the call to accepts( Object ) and getReader( Object ).
+	 * This still does not make sense to me as differnent Capabilties documents
+	 * (for different specifications) should dictate the required parameters
+	 * described by getReadParameters().
+	 */
 	public WMSFormat() {
 		
 	}
 	
 	/**
-	 * @param capabilities
+	 * WMSFormat creation.
+	 * 
+	 * @param capabilities Parsed Capabilties document from a Web Map Server
 	 */
 	public WMSFormat(Capabilities capabilities) {
 		this.capabilities = capabilities;
@@ -71,10 +87,15 @@ public class WMSFormat extends AbstractGridFormat {
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.Format#accepts(java.lang.Object)
 	 */
+	
 	/**
-	 * Determines if the input can be processed or not. Currently it accepts
-	 * WebMapServers, WMT_MS_Capabilities, and URLs and Strings that point to the
-	 * WMS's getCapabilities address.
+	 * Determines if the input can be processed or not.
+	 * <p>
+	 * Currently it accepts WebMapServers, WMT_MS_Capabilities, and URLs and Strings
+	 * that point to the WMS's getCapabilities address.
+	 * </p>
+	 * <p>
+	 * Feedback: this seams a bit crazy?
 	 */
 	public boolean accepts(Object input) {
 		if (input instanceof String) {
@@ -96,6 +117,14 @@ public class WMSFormat extends AbstractGridFormat {
 		return false;
 	}
 
+	/**
+	 * Retrive parameter metadata describing parameters required by this
+	 * Web Map Server.
+	 * <p>
+	 * This information should be specific enough to allow the creation of a
+	 * user interface.
+	 * </p> 
+	 */
 	public GeneralOperationParameter[] getReadParameters() {
 		readParameters = new GeneralOperationParameter[16];
 		

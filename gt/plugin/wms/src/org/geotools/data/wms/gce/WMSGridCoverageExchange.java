@@ -31,14 +31,17 @@ import org.geotools.data.wms.capabilities.Capabilities;
 import org.jdom.JDOMException;
 
 /**
- * @author rgould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * @author Richard Gould, Refractions Research
  */
 public class WMSGridCoverageExchange implements GridCoverageExchange {
+    /** Available formats for this Web Map Server */
     private Format[] formats;
+    
+    /** Parsed WMS Capabilities document */
     private Capabilities capabilities;
+    
+    /** Web Map Server proxy */
     private WebMapServer wms;
     
     public WMSGridCoverageExchange (Object source) throws MalformedURLException, IOException, ParseCapabilitiesException {
@@ -67,8 +70,12 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     	} else if (source instanceof Capabilities) {
     		capabilities = (Capabilities) source;
     	}
+    	WMSFormatFactory factory = new WMSFormatFactory( capabilities );
+    	if( !factory.isAvailable() ){
+    	    throw new RuntimeException( "WMS support is not available");
+    	}    	    
     	formats = new Format[1];
-    	formats[0] = new WMSFormat(capabilities);
+    	formats[0] = factory.createFormat();    	    
     }
 	
 	public void dispose() throws IOException {

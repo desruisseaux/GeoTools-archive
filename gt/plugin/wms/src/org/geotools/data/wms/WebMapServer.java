@@ -14,11 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-
-/*
- * Created on Jun 24, 2004
- *
- */
 package org.geotools.data.wms;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +37,10 @@ import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 /**
  * WebMapServer is a class representing a WMS.
@@ -63,6 +61,46 @@ import org.jdom.JDOMException;
  * for previous revisions.
  * </p>
  * 
+ * <p>
+ * Version number negotiation occurs as follows (credit OGC):
+ * <ul>
+ * <li><b>1)</b> If the server implements the requested version number,
+ *     the server shall send that version.
+ * <li><b>2a)</b> If a version unknown to the server is requested, the
+ *     server shall send the highest version less than the requested version.
+ * <li><b>2b)</b> If the client request is for a version lower than any of
+ *     those known to the server, then the server shall send the lowest version it knows.
+ * <li><b>3a)</b> If the client does not understand the new version number sent by the
+ *     server, it may either cease communicating with the server or send a new request
+ *     with a new version number that the client does understand but which is less than
+ *     that sent by the server (if the server had responded with a lower version).
+ * <li><b>3b)</b> If the server had responded with a higher version (because the request
+ *     was for a version lower than any known to the server), and the client does not
+ *     understand the proposed higher version, then the client may send a new request with
+ *     a version number higher than that sent by the server.
+ * </ul>
+ * </p>
+ * <p>
+ * The OGC tells us to repeat this process (or give up). This means we are actually going to
+ * come up with a bit of setup cost in figuring out our GetCapabilities request. Initial we
+ * have been using the JDOM parser and a Builder pattern to parse any getCapabilities document.
+ * </p>
+ * <p>
+ * This has a couple of drawbacks with respect to the above negotiation:
+ * <ul>
+ * <li>Each of the possibly many getCapability requests would need to be relized in memory
+ *     as a JDOM Document.
+ * <li>We only can realize a Capabilities object for specifications for which we have a parser.
+ *     Even if the Server is willing to give us a GetCapabilities docuemnt we can understand
+ *     we need to know enough to ask the correct question.
+ * <li>
+ * </ul>
+ * <p>
+ * So what to do? Easy - use the JDOM root element to confirm version numbers before starting
+ * the parser dance. Hard - make a custom SAX based class that grabs the version number for a
+ * provided stream. Use BufferedInputStream so that if the version numbers do match we can
+ * "rollback" and start the capabilities parsing off at the start of the stream.
+ * </p>
  * @author Richard Gould, Refractions Research
  */
 public class WebMapServer {
@@ -82,6 +120,7 @@ public class WebMapServer {
 	private GetMapResponse getMapResponse;
 	private GetMapRequest getMapRequest;
 	private AbstractRequest currentRequest;
+	/** Feedback: Why only one? */
 	private Thread requestRetriever;
 	private AbstractResponse currentResponse;
 	
@@ -211,13 +250,16 @@ public class WebMapServer {
 			} else if (currentRequest instanceof GetMapRequest) {
 				currentResponse = new GetMapResponse(contentType, inputStream);
 			} else if (currentRequest instanceof GetCapabilitiesRequest) {
+			    
 				try {
-
+				    Document document;
+					SAXBuilder builder = new SAXBuilder();
+					document = builder.build( finalURL.openStream() );
+			        
 					WMSParser generic = null;
-					WMSParser custom = null;
+					WMSParser custom = null;					
 					for (int i = 0; i < parsers.length; i++) {
-						int canProcess = parsers[i].canProcess(finalURL.openStream());
-						
+						int canProcess = parsers[i].canProcess( document );						
 						if (canProcess == WMSParser.GENERIC) {
 							generic = parsers[i];
 						} else if (canProcess == WMSParser.CUSTOM) {
@@ -229,9 +271,9 @@ public class WebMapServer {
 						parser = custom;
 					}
 					if (parser == null) {
-						throw new RuntimeException("No parsers available to parse that GetCapabilities document");
+					    // Um can we have the name & version number please?
+					    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
 					}
-					
 					currentResponse = new GetCapabilitiesResponse(parser, contentType, inputStream);
 					capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
 				} catch (JDOMException e) {

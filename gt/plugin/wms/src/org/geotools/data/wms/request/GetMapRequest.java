@@ -27,14 +27,37 @@ import org.geotools.data.wms.capabilities.Layer;
 
 
 /**
- * @author rgould
- *
  * Construct a WMS getMap request. 
+ * <p>
+ * Constructs a getMapRequest based on the following property values:
+ * <ul>
+ * <li>
+ * </ul>
+ * </p>
+ * <p>
+ * Q: List availableFormats and availableExceptions - why are these here?
+ * It looks like they are designed to restrict the values used for SRS, format
+ * and exceptions. If so the code never uses them.
+ * </p>
+ * @author Richard Gould, Refractions Research
  */
 public class GetMapRequest extends AbstractRequest {
 	
-	public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
+	public static final String ELEVATION = "ELEVATION";
+    public static final String TIME = "TIME";
+    public static final String EXCEPTIONS = "EXCEPTIONS";
+    public static final String BGCOLOR = "BGCOLOR";
+    public static final String TRANSPARENT = "TRANSPARENT";
+    public static final String WIDTH = "WIDTH";
+    public static final String HEIGHT = "HEIGHT";
+    public static final String FORMAT = "FORMAT";
+    public static final String BBOX = "BBOX";
+    public static final String SRS = "SRS";
+    public static final String REQUEST = "REQUEST";
+    
+    public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
 	public static final String EXCEPTION_BLANK   = "application/vnd.ogc.se_blank";
+	
 	private List availableLayers;
 	private Set availableSRSs;
 	private List availableFormats;
@@ -61,7 +84,7 @@ public class GetMapRequest extends AbstractRequest {
     	this.availableFormats = Arrays.asList(availableFormats);
     	this.availableExceptions = availableExceptions;
 
-    	setProperty("REQUEST", "GetMap");
+    	setProperty(REQUEST, "GetMap");
         
     }
     
@@ -108,7 +131,7 @@ public class GetMapRequest extends AbstractRequest {
      * @param srs A String indicating the Spatial Reference System to render the layers in.
      */
     public void setSRS(String srs) {
-        properties.setProperty("SRS", srs);
+        properties.setProperty(SRS, srs);
     }
     
     /**
@@ -125,7 +148,7 @@ public class GetMapRequest extends AbstractRequest {
      */
     public void setBBox(String bbox) {
     	//TODO enforce non-subsettable layers
-        properties.setProperty("BBOX", bbox);
+        properties.setProperty(BBOX, bbox);
     }
     
     /**
@@ -139,7 +162,7 @@ public class GetMapRequest extends AbstractRequest {
      * @param format The desired format for the GetMap response
      */
     public void setFormat(String format) {
-        properties.setProperty("FORMAT", format);
+        properties.setProperty(FORMAT, format);
     }
     
     /**
@@ -157,8 +180,8 @@ public class GetMapRequest extends AbstractRequest {
      * @param height
      */
     public void setDimensions(String width, String height) {
-        properties.setProperty("HEIGHT", height);
-        properties.setProperty("WIDTH", width);
+        properties.setProperty(HEIGHT, height);
+        properties.setProperty(WIDTH, width);
     }
     
     // End required parameters, being optional ones.
@@ -178,7 +201,7 @@ public class GetMapRequest extends AbstractRequest {
     	if (transparent) {
     		value = "TRUE";
     	}
-    	properties.setProperty("TRANSPARENT", value);
+    	properties.setProperty(TRANSPARENT, value);
     }
     
     /**
@@ -190,19 +213,25 @@ public class GetMapRequest extends AbstractRequest {
      * @param bgColour the background colour of the map, in the format 0xRRGGBB
      */
     public void setBGColour(String bgColour) {
-    	properties.setProperty("BGCOLOR", bgColour);
+    	properties.setProperty(BGCOLOR, bgColour);
     }
     
     /**
      * The exceptions type specifies what format the server should return exceptions in.
-     * The default is "application/vnd.ogc.se_xml". 
-     * Other valid values are:
-     * "application/vnd.ogc.se_inimage"
-     * "application/vnd.ogc.se_blank"
+     * <p>
+     * Valid values are:
+     * <ul>
+     * <li>"application/vnd.ogc.se_xml" (the default)
+     * <li>"application/vnd.ogc.se_inimage"
+     * <li>"application/vnd.ogc.se_blank"
+     * </ul>
+     * </p>
+     * </p>
+     * 
      * @param exceptions
      */
     public void setExceptions(String exceptions) {
-    	properties.setProperty("EXCEPTIONS", exceptions);
+    	properties.setProperty(EXCEPTIONS, exceptions);
     }
     
     /**
@@ -210,7 +239,7 @@ public class GetMapRequest extends AbstractRequest {
      * @param time See the Web Map Server Implementation Specification 1.1.1, Annexes B and C
      */
     public void setTime (String time) {
-    	properties.setProperty("TIME", time);
+    	properties.setProperty(TIME, time);
     }
     
     /**
@@ -219,16 +248,16 @@ public class GetMapRequest extends AbstractRequest {
      * @param elevation See the Web Map Server Implementation Specification 1.1.1, Annex C
      */
     public void setElevation (String elevation) {
-    	properties.setProperty("ELEVATION", elevation);
+    	properties.setProperty(ELEVATION, elevation);
     }
     
     /**
      * See the Web Map Server Implementation Specification 1.1.1, Annex C, in
      * particular section C.4.2
-     * 
+     * <p>
      * Example use:
-     * request.setSampleDimensionValue("DIM_WAVELENGTH", "4000");
-     * 
+     * <code>request.setSampleDimensionValue("DIM_WAVELENGTH", "4000");</code>
+     * </p>
      * @param name the request parameter name to set (usually with 'dim_' as prefix)
      * @param value the value of the request parameter (value, interval or comma-separated list)
      */

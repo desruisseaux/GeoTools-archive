@@ -18,19 +18,37 @@ package org.geotools.data.wms.gce;
 
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.data.wms.capabilities.Capabilities;
 
 /**
- * @author rgould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Factory for the creation of a Format for use with WebMapServer.
+ * <p>
+ * The level of separation afforded a Factory implementation is not currently used,
+ * however we may need make use of this class to provide a specific WMSFormat for each
+ * version of the WMS Specification.
+ * </p>
+ * @author Richard Gould, Refractions Research
  */
 public class WMSFormatFactory implements GridFormatFactorySpi {
+    /**
+     * WMSFormatFactory constructions based on parsed CapabilitiesDocument.
+     * <p>
+     * Currently only WMSFormat is supported - my impression is that a given
+     * WMS can understand several formats.
+     * </p>
+     * @param capabilities Capabilities Document used to determine supported formats 
+     */
+    public WMSFormatFactory(Capabilities capabilities) {
+        
+        // TODO Auto-generated constructor stub
+    }
 
+    /** Constructs a WMSFormat for use */
 	public Format createFormat() {
 		return new WMSFormat();
 	}
 
+	/** Ensures Format preconditions are met */
 	public boolean isAvailable() {
 		return true;
 	}

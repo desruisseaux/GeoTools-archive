@@ -20,10 +20,14 @@ import java.io.InputStream;
 
 
 /**
- * @author rgould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Process GetMapResponse.
+ * <p>
+ * Assume this is a placeholder allowing other code access to the InputStream?
+ * It would be nice if this class actually provided a real object either returned
+ * Image, SVG XML Document or a resolved GridCoverage in a manner similar to
+ * GetCapabilities.
+ * </p>
+ * @author Richard Gould, Refractions Research
  */
 public class GetMapResponse extends AbstractResponse {
 	public GetMapResponse(String contentType, InputStream response) {

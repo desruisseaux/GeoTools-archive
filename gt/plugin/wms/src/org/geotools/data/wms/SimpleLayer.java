@@ -19,16 +19,31 @@ package org.geotools.data.wms;
 import java.util.Set;
 
 /**
- * @author Richard Gould
- *
  * A simple bean that represents a layer name paired with a style name.
+ * <p>
+ * Feedback: This object is used in making requests - seems to indicate request information
+ * rather than that actual attribtues of a Layer?
+ * </p>
+ * @author Richard Gould, Refractions Research Inc.
  */
 public class SimpleLayer {
+    /** Name of layer */
 	private String name;
-	private String style;
 	/**
-	 * @param name
-	 * @param style
+	 * Name of style (limited to Set provided by validStyles).
+	 * <p>
+	 * null is used to indicate the "default" style.
+	 * </p>
+	 */
+	private String style;
+	/** Set of type <code>String</code> naming valid styles for this layer */
+	private Set validStyles;
+	
+	/**
+	 * SimpleLayer creation.
+	 * 
+	 * @param name Name of layer
+	 * @param style Name of style, null indicates default.
 	 */
 	public SimpleLayer(String name, String style) {
 		super();
@@ -36,6 +51,8 @@ public class SimpleLayer {
 		this.style = style;
 	}
 	/**
+	 * SimpleLayer creation.
+	 * 
 	 * @param name
 	 * @param style
 	 * @param validStyles
@@ -44,9 +61,7 @@ public class SimpleLayer {
 		super();
 		this.name = name;
 		this.validStyles = validStyles;
-	}
-	private Set validStyles;
-	
+	}		
 	public String getName() {
 		return name;
 	}
