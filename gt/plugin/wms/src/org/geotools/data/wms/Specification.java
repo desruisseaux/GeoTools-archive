@@ -131,9 +131,7 @@ public abstract class Specification {
 
         if (parser == null) {
             // Um can we have the name & version number please?
-            throw new RuntimeException(new InternationalString(
-                    "No parsers available to parse that GetCapabilities document")
-                .toString());
+            throw new RuntimeException("No parsers available to parse that GetCapabilities document");
         }
 
         return parser;

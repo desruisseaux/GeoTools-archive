@@ -28,17 +28,17 @@ import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSReader;
 import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.parameter.ParameterGroupDescriptor;
 import org.geotools.referencing.IdentifiedObject;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,34 +78,32 @@ public class WMSReaderTest extends TestCase {
     }
 
     public void testRead() throws Exception {
-        ParameterDescriptorGroup descriptorGroup = reader.getFormat()
+        ParameterDescriptorGroup descriptorGroup = (ParameterDescriptorGroup) reader.getFormat()
                                                          .getReadParameters();
 
-        GeneralParameterDescriptor[] paramDescriptors = descriptorGroup
-            .getParameters();
-        GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.length];
+        List paramDescriptors = descriptorGroup.descriptors();
+        GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.size()];
 
-        for (int i = 0; i < paramDescriptors.length; i++) {
-            GeneralParameterValue generalParameterValue = paramDescriptors[i]
-                .createValue();
+        for (int i = 0; i < paramDescriptors.size(); i++) {
+            GeneralParameterDescriptor paramDescriptor = (GeneralParameterDescriptor) paramDescriptors.get(i);
+            GeneralParameterValue generalParameterValue = paramDescriptor.createValue();
             generalParameterValues[i] = generalParameterValue;
 
-            String parameterName = paramDescriptors[i].getName().toString();
+            String parameterName = paramDescriptor.getName().getCode();
 
             if (parameterName.equals("LAYERS")) {
                 ParameterGroup groupValue = (ParameterGroup) generalParameterValue;
-                ParameterGroupDescriptor groupDesc = (ParameterGroupDescriptor) generalParameterValue
+                ParameterDescriptorGroup groupDesc = (ParameterDescriptorGroup) generalParameterValue
                     .getDescriptor();
 
-                ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptors[i];
+                ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptor;
 
-                GeneralParameterDescriptor[] layerDescriptors = layerGroup
-                    .getParameters();
-                GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.length];
+                List layerDescriptors = layerGroup.descriptors();
+                GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.size()];
 
-                for (int j = 0; j < layerDescriptors.length; j++) {
-                    Parameter layerValue = (Parameter) layerDescriptors[j]
-                        .createValue();
+                for (int j = 0; j < layerDescriptors.size(); j++) {
+                    GeneralParameterDescriptor layerDescriptor = (GeneralParameterDescriptor) layerDescriptors.get(j);
+                    Parameter layerValue = (Parameter) layerDescriptor.createValue();
                     layerParameterValues[j] = layerValue;
 
                     ParameterDescriptor layerDesc = (ParameterDescriptor) layerValue

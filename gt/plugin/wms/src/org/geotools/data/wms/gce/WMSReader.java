@@ -145,7 +145,7 @@ public class WMSReader implements GridCoverageReader {
             GeneralParameterValue generalValue = (GeneralParameterValue) values
                 .get(i);
 
-            String paramName = generalValue.getDescriptor().getName().toString();
+            String paramName = generalValue.getDescriptor().getName().getCode();
 
             if ((generalValue == null)) {
                 continue;
@@ -162,7 +162,7 @@ public class WMSReader implements GridCoverageReader {
                     Parameter parameter = (Parameter) layerList.get(j);
 
                     layers = layers
-                        + parameter.getDescriptor().getName().toString();
+                        + parameter.getDescriptor().getName().getCode();
                     styles = styles + (String) parameter.getValue();
 
                     if (j < (layerList.size() - 1)) {
@@ -242,7 +242,7 @@ public class WMSReader implements GridCoverageReader {
 				}
             }
 
-            request.setProperty(value.getDescriptor().getName().toString(),
+            request.setProperty(value.getDescriptor().getName().getCode(),
                 value.stringValue());
         }
 
