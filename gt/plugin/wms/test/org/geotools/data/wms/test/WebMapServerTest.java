@@ -17,6 +17,11 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -27,11 +32,13 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.wms.GetMapRequest;
-import org.geotools.data.wms.GetMapResponse;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
+import org.geotools.data.wms.response.GetMapResponse;
 
 /**
  * @author Richard Gould
@@ -43,6 +50,7 @@ public class WebMapServerTest extends TestCase {
 
 	URL serverURL;
 	URL brokenURL;
+	private URL featureURL;
 	
 	/*
 	 * @see TestCase#setUp()
@@ -50,6 +58,7 @@ public class WebMapServerTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		serverURL = new URL("http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
+		featureURL = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
 		brokenURL = new URL("http://afjklda.com");
 	}
 
@@ -124,11 +133,55 @@ public class WebMapServerTest extends TestCase {
 	    List exceptions = request.getAvailableExceptions();
 	    request.setExceptions((String) exceptions.get(0));
 	        
-	    GetMapResponse response = wms.issueGetMapRequest(request, false);
+	    GetMapResponse response = (GetMapResponse) wms.issueRequest(request, false);
 	    
-	    assertEquals(response.getFormat(), (String) formats.get(0));
-	    BufferedImage image = ImageIO.read(response.getResponse());
+	    assertEquals(response.getContentType(), (String) formats.get(0));
+	    BufferedImage image = ImageIO.read(response.getInputStream());
 	    assertEquals(image.getHeight(), 400);
+	}
+	
+	public void testIssueGetFeatureInfoRequest() throws Exception {
+		WebMapServer wms = new WebMapServer(featureURL, true);
+		wms.getCapabilities();
+		GetMapRequest getMapRequest = wms.createGetMapRequest();
+		
+		List simpleLayers = getMapRequest.getAvailableLayers();
+	    Iterator iter = simpleLayers.iterator();
+	    while (iter.hasNext()) {
+	    	SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+	    	Object[] styles = simpleLayer.getValidStyles().toArray();
+	    	if (styles.length == 0) {
+	    		simpleLayer.setStyle("");
+	    		continue;
+	    	}
+	    	Random random = new Random();
+	    	int randomInt = random.nextInt(styles.length);
+	    	simpleLayer.setStyle((String) styles[randomInt]);
+	    }
+	    getMapRequest.setLayers(simpleLayers);
+	    
+	    getMapRequest.setSRS("EPSG:42304");
+	    getMapRequest.setDimensions("400", "400");
+	    getMapRequest.setFormat("image/jpeg");
+	    
+	    getMapRequest.setBBox("-2.2e+06,-712631,3.0728e+06,3.84e+06");
+	    URL url2 = getMapRequest.getFinalURL();
+		
+		GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
+		request.setQueryLayers(request.getQueryableLayers());
+		request.setQueryPoint(200, 200);
+		request.setInfoFormat("application/vnd.ogc.gml");
+		URL url = request.getFinalURL();
+		
+		GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request, false);
+		assertEquals("application/vnd.ogc.gml", response.getContentType());
+		BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+        String line;
+        
+		while ((line = in.readLine()) != null) {
+            System.out.println(line);
+        }
+		
 	}
 	
 	public void testGetProblem() {
@@ -136,5 +189,7 @@ public class WebMapServerTest extends TestCase {
 		wms.getCapabilities();
 		assertNotNull(wms.getProblem());
 	}
+	
+	
 
 }

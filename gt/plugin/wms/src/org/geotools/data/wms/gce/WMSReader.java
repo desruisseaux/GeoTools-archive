@@ -26,10 +26,10 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.wms.GetMapRequest;
-import org.geotools.data.wms.GetMapResponse;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -182,9 +182,9 @@ public class WMSReader implements GridCoverageReader {
 		    String bbox = minx+","+miny+","+maxx+","+maxy;
 		    request.setProperty("BBOX", bbox);
 		    
-		    GetMapResponse response = wms.issueGetMapRequest(request, false);
+		    GetMapResponse response = (GetMapResponse) wms.issueRequest(request, false);
 
-		    BufferedImage image = ImageIO.read(response.getResponse());
+		    BufferedImage image = ImageIO.read(response.getInputStream());
 		    Envelope envelope = new Envelope(new double[] {366800, 2170400}, new double[] {816000, 2460400});
 		    CoordinateSystem cs = GeographicCoordinateSystem.WGS84;
 		    

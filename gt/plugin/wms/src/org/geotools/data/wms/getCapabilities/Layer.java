@@ -23,7 +23,7 @@ import java.util.List;
  *
  * Nested list of zero or more map Layers offered by this server.
  */
-public class Layer {
+public class Layer implements Comparable {
     /** A machine-readable (typically one word) identifier */
     private String name;
     
@@ -307,4 +307,15 @@ public class Layer {
     public void setSubLayers(List subLayers) {
         this.subLayers = subLayers;
     }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Object arg0) {
+		Layer layer = (Layer) arg0;
+		if (this.getName() != null && layer.getName() != null) {
+			return this.getName().compareTo(layer.getName());
+		}
+		return this.getTitle().compareTo(layer.getTitle());
+	}
 }
