@@ -30,7 +30,7 @@
  *             Institut Maurice-Lamontagne
  *             mailto:osl@osl.gc.ca
  */
-package org.geotools.coverage.io;
+package org.geotools.io.coverage;
 
 // Input/output
 import java.awt.Dimension;

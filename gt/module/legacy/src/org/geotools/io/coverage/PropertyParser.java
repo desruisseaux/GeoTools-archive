@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.coverage.io;
+package org.geotools.io.coverage;
 
 // Images
 import java.awt.Image;

@@ -30,8 +30,7 @@
  *             Institut Maurice-Lamontagne
  *             mailto:osl@osl.gc.ca
  */
-package org.geotools.coverage.io;
-
+package org.geotools.io.coverage;
 // Image input/output
 import java.io.File;
 import java.io.IOException;
