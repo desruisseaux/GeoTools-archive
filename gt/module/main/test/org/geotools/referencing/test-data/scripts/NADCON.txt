@@ -1,4 +1,4 @@
-// Tests points for the NADCON transform.
+// Tests points for the NADCON Transformation
 //
 // These test are not run by default in ScriptTest, since users may not 
 // have the shift files installed on their computers. Shift files can be
