@@ -10,8 +10,6 @@ import java.io.File;
 
 import org.geotools.coverage.WorldImageWriter;
 
-import junit.framework.TestCase;
-
 /**
  * @author rgould
  *

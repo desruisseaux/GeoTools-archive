@@ -10,11 +10,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.refractions.udig.TestCaseSupport;
+import org.geotools.coverage.TestCaseSupport;
 
-import src.org.geotools.coverage.WorldImageFormat;
+import org.geotools.coverage.WorldImageFormat;
 
-import junit.framework.TestCase;
 
 /**
  * @author rgould

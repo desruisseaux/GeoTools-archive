@@ -9,7 +9,7 @@ package org.geotools.coverage;
 import java.io.File;
 import java.io.IOException;
 
-import refractions.udig.TestCaseSupport;
+import org.geotools.coverage.TestCaseSupport;
 
 import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.FrameFactory;
