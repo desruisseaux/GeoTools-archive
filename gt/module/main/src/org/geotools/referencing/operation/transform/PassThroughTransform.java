@@ -142,6 +142,16 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
                                        final MathTransform subTransform,
                                        final int numTrailingOrdinates)
     {
+        if (firstAffectedOrdinate < 0) {
+            throw new IllegalArgumentException(Resources.format(
+                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+                    "firstAffectedOrdinate", new Integer(firstAffectedOrdinate)));
+        }
+        if (numTrailingOrdinates < 0) {
+            throw new IllegalArgumentException(Resources.format(
+                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+                    "numTrailingOrdinates", new Integer(numTrailingOrdinates)));
+        }
         if (firstAffectedOrdinate==0 && numTrailingOrdinates==0) {
             return subTransform;
         }

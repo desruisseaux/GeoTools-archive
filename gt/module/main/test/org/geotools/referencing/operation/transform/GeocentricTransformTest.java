@@ -17,34 +17,36 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
-import java.text.*;
-import java.awt.geom.*;
-import javax.vecmath.*;
-
-// Geotools dependencies
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-import org.geotools.units.Unit;
-import org.geotools.resources.XMath;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
+// J2SE dependencies and extensions
+import java.util.Collections;
+import javax.vecmath.Point3d;
 
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+// Geotools dependencies
+import org.geotools.resources.XMath;
+import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.GeocentricCRS;
+import org.geotools.referencing.operation.TransformationTest;
+
 
 /**
- * Test the following transformation classes:
+ * Test the following transformation classes with the geocentric transform:
  *
  * <ul>
- *   <li>{@link CoordinateTransformation}</li>
+ *   <li>{@link CoordinateOperation}</li>
  *   <li>{@link GeocentricTransform}</li>
  *   <li>{@link Ellipsoid}</li>
  * </ul>
@@ -53,6 +55,13 @@ import junit.framework.TestSuite;
  * @author Martin Desruisseaux
  */
 public class GeocentricTransformTest extends TransformationTest {
+    /**
+     * Runs the tests with the textual test runner.
+     */
+    public static void main(String args[]) {
+        junit.textui.TestRunner.run(suite());
+    }
+
     /**
      * Returns the test suite.
      */
@@ -68,7 +77,7 @@ public class GeocentricTransformTest extends TransformationTest {
     }
     
     /**
-     * Test the orthodromic distance computed by {@link Ellipsoid}. There is actually two
+     * Tests the orthodromic distance computed by {@link Ellipsoid}. There is actually two
      * algorithms used: one for the ellipsoidal model, and a simpler one for spherical model.
      * We test the ellipsoidal model using know values of nautical mile at different latitude.
      * Then, we test the spherical model with random values. If JDK 1.4 assertion is enabled,
@@ -106,7 +115,9 @@ public class GeocentricTransformTest extends TransformationTest {
          */
         final double radius = e.getSemiMajorAxis();
         final double circumference = (radius*1.00000001) * (2*Math.PI);
-        final Ellipsoid s = csFactory.createEllipsoid("Sphere", radius, radius, e.getAxisUnit());
+        final Ellipsoid s = (Ellipsoid)
+            datumFactory.createEllipsoid(Collections.singletonMap("name", "Sphere"),
+                                         radius, radius, e.getAxisUnit());
         assertTrue("Spheroid class", !Ellipsoid.class.equals(s.getClass()));
         for (double i=0; i<=180; i+=1) {
             final double base = 360*random.nextDouble()-180;
@@ -131,19 +142,16 @@ public class GeocentricTransformTest extends TransformationTest {
     /**
      * Tests the {@link GeocentricTransform} class.
      */
-    public void testGeocentricTransform() throws TransformException {
+    public void testGeocentricTransform() throws FactoryException, TransformException {
         /*
          * Gets the math transform from WGS84 to a geocentric transform.
          */
-        final Ellipsoid       ellipsoid =                  Ellipsoid.WGS84;
-        final CoordinateSystem sourceCS =   CompoundCoordinateSystem.WGS84;
-        final CoordinateSystem targetCS = GeocentricCoordinateSystem.DEFAULT;
-        final CoordinateTransformation transformation;
-        final MathTransform            transform;
-        final int                      dimension;
-        transformation = trFactory.createFromCoordinateSystems(sourceCS, targetCS);
-        transform      = transformation.getMathTransform();
-        dimension      = transform.getDimSource();
+        final Ellipsoid                 ellipsoid =     Ellipsoid.WGS84;
+        final CoordinateReferenceSystem sourceCRS = GeographicCRS.WGS84_3D;
+        final CoordinateReferenceSystem targetCRS = GeocentricCRS.CARTESIAN;
+        final CoordinateOperation       operation = opFactory.createOperation(sourceCRS, targetCRS);
+        final MathTransform             transform = operation.getMathTransform();
+        final int                       dimension = transform.getDimSource();
         assertEquals("Source dimension", 3, dimension);
         assertEquals("Target dimension", 3, transform.getDimTarget());
         assertSame("Inverse transform", transform, transform.inverse().inverse());

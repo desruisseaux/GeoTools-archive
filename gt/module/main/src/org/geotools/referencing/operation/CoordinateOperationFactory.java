@@ -336,7 +336,7 @@ public class CoordinateOperationFactory extends Factory
             final int dimSource = sourceCRS.getCoordinateSystem().getDimension();
             final int dimTarget = targetCRS.getCoordinateSystem().getDimension();
             if (dimTarget == dimSource) {
-                final Matrix  matrix    = new GeneralMatrix(dimTarget, dimSource);
+                final Matrix  matrix    = new GeneralMatrix(dimTarget+1, dimSource+1);
                 MathTransform transform = factory.createAffineTransform(matrix);
                 return createFromMathTransform(sourceCRS, targetCRS, transform);
             }

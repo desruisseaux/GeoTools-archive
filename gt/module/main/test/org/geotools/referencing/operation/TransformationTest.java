@@ -17,22 +17,32 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Random;
-
-// Geotools dependencies
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
 
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+// OpenGIS dependencies
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.OperationNotFoundException;
+
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.EngineeringCRS;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
@@ -43,19 +53,29 @@ import junit.framework.TestSuite;
  */
 public class TransformationTest extends TestCase {
     /**
-     * The default coordinate systems factory.
+     * The default datum factory.
      */
-    protected CoordinateSystemFactory csFactory;
+    protected static final DatumFactory datumFactory = FactoryFinder.getDatumFactory();
+
+    /**
+     * The default coordinate reference system factory.
+     */
+    protected static final CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+
+    /**
+     * The default math transform factory.
+     */
+    protected static final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
 
     /**
      * The default transformations factory.
      */
-    protected CoordinateTransformationFactory trFactory;
+    protected static final CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory();
     
     /**
      * Random numbers generator.
      */
-    protected Random random;
+    protected static final Random random = new Random(-3531834320875149028L);
 
     /**
      * Constructs a test case with the given name.
@@ -80,63 +100,51 @@ public class TransformationTest extends TestCase {
     }
 
     /**
-     * Set up common objects used for all tests. This include
-     * various factories.   This method is called once before
-     * any test is executed.
-     *
-     * @throws Exception if the setup failed.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        random    = new Random(-3531834320875149028L);
-        csFactory = CoordinateSystemFactory.getDefault();
-        trFactory = CoordinateTransformationFactory.getDefault();
-    }
-
-    /**
      * Quick self test, in part to give this test suite a test
      * and also to test the internal method.
      */
     public void testAssertPointsEqual(){
         String name = "self test";
-        double a[] = {10,10};
-        double b[] = {10.1,10.1};
-        double delta[] = {0.2,0.2};
-        assertPointsEqual(name,a,b,delta);
+        double a[]     = {10,   10  };
+        double b[]     = {10.1, 10.1};
+        double delta[] = { 0.2,  0.2};
+        assertPointsEqual(name, a, b, delta);
     }
 
     /**
-     * Make sure that <code>createFromCoordinateSystems(sourceCS, targetCS)</code>
-     * returns an identity transform when <code>sourceCS</code> and <code>targetCS</code>
-     * are identical, and tests the promiscuous CS.
+     * Make sure that <code>createOperation(sourceCRS, targetCRS)</code>
+     * returns an identity transform when <code>sourceCRS</code> and <code>targetCRS</code>
+     * are identical, and tests the generic CRS.
      */
-    public void testPromiscuousTransform() throws TransformException {
-        assertTrue(trFactory.createFromCoordinateSystems(GeographicCoordinateSystem.WGS84,
-                   GeographicCoordinateSystem.WGS84).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(LocalCoordinateSystem.CARTESIAN,
-                   LocalCoordinateSystem.CARTESIAN).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(LocalCoordinateSystem.PROMISCUOUS,
-                   LocalCoordinateSystem.PROMISCUOUS).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(LocalCoordinateSystem.PROMISCUOUS,
-                   LocalCoordinateSystem.CARTESIAN).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(LocalCoordinateSystem.CARTESIAN,
-                   LocalCoordinateSystem.PROMISCUOUS).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(GeographicCoordinateSystem.WGS84,
-                   LocalCoordinateSystem.PROMISCUOUS).getMathTransform().isIdentity());
-        assertTrue(trFactory.createFromCoordinateSystems(LocalCoordinateSystem.PROMISCUOUS,
-                   GeographicCoordinateSystem.WGS84).getMathTransform().isIdentity());
+    public void testGenericTransform() throws FactoryException {
+        assertTrue(opFactory.createOperation(GeographicCRS.WGS84,
+                   GeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
+                   EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_3D,
+                   EngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
+                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
+                   EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
+                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(GeographicCRS.WGS84,
+                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
+                   GeographicCRS.WGS84).getMathTransform().isIdentity());
         try {
-            trFactory.createFromCoordinateSystems(LocalCoordinateSystem.CARTESIAN,
-                                                  GeographicCoordinateSystem.WGS84);
+            opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
+                                      GeographicCRS.WGS84);
             fail();
-        } catch (CannotCreateTransformException exception) {
+        } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
         try {
-            trFactory.createFromCoordinateSystems(GeographicCoordinateSystem.WGS84,
-                                                  LocalCoordinateSystem.CARTESIAN);
+            opFactory.createOperation(GeographicCRS.WGS84,
+                                      EngineeringCRS.CARTESIAN_2D);
             fail();
-        } catch (CannotCreateTransformException exception) {
+        } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
     }
@@ -163,11 +171,6 @@ public class TransformationTest extends TestCase {
      * @param transform The transform to test.
      */
     public static void assertInterfaced(final MathTransform transform) {
-        if ((transform instanceof LinearTransform) && !((LinearTransform) transform).getMatrix().isAffine())
-        {
-            // Special case: Non-affine transforms not yet declared as a 1D or 2D transform.
-            return;
-        }
         int dim = transform.getDimSource();
         if (transform.getDimTarget() != dim) {
             dim = 0;
@@ -194,11 +197,9 @@ public class TransformationTest extends TestCase {
         final int stop = Math.min(expected.length, actual.length)/dimension * dimension;
         assertEquals("Array length for expected points", stop, expected.length);
         assertEquals("Array length for actual points",   stop,   actual.length);
-
         final StringBuffer buffer = new StringBuffer(name);
         buffer.append(": point[");
         final int start = buffer.length();
-
         for (int i=0; i<stop; i++) {
             buffer.setLength(start);
             buffer.append(i/dimension);

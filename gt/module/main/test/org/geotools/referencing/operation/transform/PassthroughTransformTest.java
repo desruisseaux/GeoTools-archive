@@ -17,27 +17,26 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.util.*;
-import java.awt.geom.*;
-import javax.media.jai.*;
-
-// Geotools dependencies
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-import org.geotools.resources.*;
-import org.geotools.resources.image.*;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
+import java.util.Arrays;
+import java.awt.geom.AffineTransform;
 
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.OperationNotFoundException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.TransformationTest;
 
 
 /**
@@ -79,36 +78,33 @@ public class PassthroughTransformTest extends TransformationTest {
      * such transform are optimized in a special way.
      */
     public void testLinear() throws FactoryException, TransformException {
-        final MathTransformFactory mtFactory = trFactory.getMathTransformFactory();
-        runTest(mtFactory.createAffineTransform(AffineTransform.getScaleInstance(4, 2)));
+        runTest(mtFactory.createAffineTransform(
+                new GeneralMatrix(AffineTransform.getScaleInstance(4, 2))));
     }
 
     /**
      * Test the general passthrough transform.
      */
     public void testPassthrough() throws FactoryException, TransformException {
-        final MathTransformFactory mtFactory = trFactory.getMathTransformFactory();
-        final ParameterList param = mtFactory.getMathTransformProvider("Exponential")
-                                             .getParameterList();
-        runTest(mtFactory.createParameterizedTransform("Exponential", param));
+        final ParameterValueGroup param = mtFactory.getDefaultParameters("Exponential");
+        runTest(mtFactory.createParameterizedTransform(param));
     }
 
     /**
      * Test the pass through transform.
      */
     private void runTest(final MathTransform sub) throws FactoryException, TransformException {
-        final MathTransformFactory mtFactory = trFactory.getMathTransformFactory();
         compare(sub, sub, 0);
         try {
             mtFactory.createPassThroughTransform(-1, sub, 0);
             fail("An illegal argument should have been detected");
-        } catch (IllegalArgumentException e) {
+        } catch (FactoryException e) {
             // This is the expected exception.
         }
         try {
             mtFactory.createPassThroughTransform(0, sub, -1);
             fail("An illegal argument should have been detected");
-        } catch (IllegalArgumentException e) {
+        } catch (FactoryException e) {
             // This is the expected exception.
         }
         assertSame("Failed to recognize that no passthrough transform was needed",
@@ -120,23 +116,27 @@ public class PassthroughTransformTest extends TransformationTest {
         assertEquals("Wrong number of source dimensions", sub.getDimSource() + subLower + 1, passthrough.getDimSource());
         assertEquals("Wrong number of target dimensions", sub.getDimTarget() + subLower + 1, passthrough.getDimTarget());
         compare(passthrough, sub, 2);
-
-        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
-                   JAIUtilities.createSequence(0, subLower-1), null).isIdentity());
-
-        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
-                   JAIUtilities.createSequence(subUpper, passthrough.getDimSource()-1), null).isIdentity());
-
-        final IntegerSequence outputDimensions = new IntegerSequence();
-        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(subLower, subUpper-1);
-        assertEquals("'createSubTransform' failed", sub, mtFactory.createSubTransform(passthrough,
-                     inputDimensions, outputDimensions));
-        final int[] expectedDimensions = new int[sub.getDimTarget()];
-        for (int i=0; i<expectedDimensions.length; i++) {
-            expectedDimensions[i] = subLower + i;
-        }
-        assertTrue("Unexpected output dimensions",
-                   Arrays.equals(JAIUtilities.toArray(outputDimensions), expectedDimensions));
+/*
+ *      TODO: The following was ported from the legacy test package, but the 'subTransform'
+ *            is not yet implemented in the new package. We would like to revisit it (just
+ *            use a projective transform instead of the complicated legacy implementation).
+ */
+//        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
+//                   JAIUtilities.createSequence(0, subLower-1), null).isIdentity());
+//
+//        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
+//                   JAIUtilities.createSequence(subUpper, passthrough.getDimSource()-1), null).isIdentity());
+//
+//        final IntegerSequence outputDimensions = new IntegerSequence();
+//        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(subLower, subUpper-1);
+//        assertEquals("'createSubTransform' failed", sub, mtFactory.createSubTransform(passthrough,
+//                     inputDimensions, outputDimensions));
+//        final int[] expectedDimensions = new int[sub.getDimTarget()];
+//        for (int i=0; i<expectedDimensions.length; i++) {
+//            expectedDimensions[i] = subLower + i;
+//        }
+//        assertTrue("Unexpected output dimensions",
+//                   Arrays.equals(JAIUtilities.toArray(outputDimensions), expectedDimensions));
     }
 
     /**
