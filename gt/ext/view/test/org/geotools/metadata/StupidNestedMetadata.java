@@ -23,6 +23,6 @@ package org.geotools.metadata;
  *
  */
 public interface StupidNestedMetadata extends Metadata {
-    FileMetadata getFileData();
+    StupidFileData getFileData();
     String getData();
 }

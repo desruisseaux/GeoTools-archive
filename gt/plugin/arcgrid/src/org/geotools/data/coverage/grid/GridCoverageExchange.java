@@ -8,7 +8,7 @@
  **
  *************************************************************************************************/
 
-package org.geotools.gc.exchange;
+package org.geotools.data.coverage.grid;
 
 // J2SE direct dependencies
 import java.io.IOException;

@@ -1,13 +1,15 @@
 /*
  * Created on Apr 26, 2004
  */
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.coverage.grid.stream.test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
-import org.geotools.data.gridcoverage.IOExchange;
+
+import org.geotools.data.arcgrid.test.TestCaseSupport;
+import org.geotools.data.coverage.grid.stream.IOExchange;
 /**
  * @author jeichar
  */

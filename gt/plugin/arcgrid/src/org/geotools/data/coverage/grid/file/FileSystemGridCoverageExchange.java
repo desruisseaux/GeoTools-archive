@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.data.gridcoverage;
+package org.geotools.data.coverage.grid.file;
 
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -17,13 +17,13 @@ import org.geotools.catalog.AbstractCatalog;
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.data.GridFormatFactorySpi;
 import org.geotools.data.GridFormatFinder;
-import org.geotools.gc.exchange.GridCoverageExchange;
-import org.geotools.gc.exchange.GridCoverageReader;
-import org.geotools.gc.exchange.GridCoverageWriter;
-import org.geotools.metadata.FileMetadata;
+import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -168,19 +168,8 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 	public class GridFileFormatFilter implements FileFilter {
 		
 		public GridFileFormatFilter() {
-			if( extensions == null ){
-				InputStream in = FSCatalogEntry.class
-						.getResourceAsStream("resources/FileSystemFormats");
-				Properties properties = new Properties();
-				try {
-					properties.load(in);
-				} catch (IOException ie) {
-					throw new RuntimeException(
-							"the file: resources/FileSystemFormats is either missing or corrupt");
-				}
-	
-				extensions = properties.keySet();
-			}
+				extensions = new HashSet();
+				extensions.add("asc");
 		}
 
 		/*

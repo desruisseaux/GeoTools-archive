@@ -18,7 +18,8 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 
 

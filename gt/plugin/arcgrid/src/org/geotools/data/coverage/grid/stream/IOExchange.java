@@ -17,7 +17,7 @@
 /*
  * Created on Apr 26, 2004
  */
-package org.geotools.data.gridcoverage;
+package org.geotools.data.coverage.grid.stream;
 
 import java.io.File;
 import java.io.FileReader;

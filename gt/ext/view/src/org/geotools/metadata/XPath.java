@@ -74,7 +74,7 @@ public class XPath {
                         metadata = (Metadata) metadata.getElement(element);
                     result.addAll(match(metadata, element.getEntity(), index + 1));
                 }else
-                    return result;
+                    continue;
             }else{
                 if( metadata==null )
                     result.add(element);

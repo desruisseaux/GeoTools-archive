@@ -17,7 +17,7 @@
 /*
  * Created on Apr 20, 2004
  */
-package org.geotools.data.gridcoverage;
+package org.geotools.data.coverage.grid;
 
 import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralOperationParameter;

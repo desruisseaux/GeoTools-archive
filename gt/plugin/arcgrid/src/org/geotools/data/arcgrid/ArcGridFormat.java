@@ -16,9 +16,7 @@
  */
 package org.geotools.data.arcgrid;
 
-import org.geotools.data.gridcoverage.GenericGridFormat;
-import org.geotools.gc.exchange.GridCoverageReader;
-import org.geotools.gc.exchange.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GenericGridFormat;
 import org.opengis.parameter.GeneralOperationParameter;
 import java.util.HashMap;
 

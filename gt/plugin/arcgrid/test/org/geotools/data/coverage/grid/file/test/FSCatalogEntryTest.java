@@ -4,14 +4,16 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
 
-import org.geotools.data.gridcoverage.FSCatalogEntry;
-import org.geotools.metadata.FileMetadata;
+import org.geotools.data.arcgrid.test.TestCaseSupport;
+import org.geotools.data.coverage.grid.file.FSCatalogEntry;
+import org.geotools.data.coverage.grid.file.FileMetadata;
+
 
 
 /**

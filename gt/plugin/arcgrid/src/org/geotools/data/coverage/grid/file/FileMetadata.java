@@ -14,8 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.data.coverage.grid.file;
 
+import org.geotools.metadata.Metadata;
 import org.opengis.coverage.grid.Format;
 
 /**

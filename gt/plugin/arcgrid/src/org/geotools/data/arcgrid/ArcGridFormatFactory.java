@@ -16,8 +16,8 @@
  */
 package org.geotools.data.arcgrid;
 
-import org.geotools.gc.exchange.GridCoverageReader;
-import org.geotools.gc.exchange.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 
 

@@ -38,14 +38,8 @@ import java.util.List;
  * @since 2.1
  */
 public abstract class AbstractMetadata implements Metadata {
-    EntityImpl type;
+    EntityImpl entity;
 
-    /**
-     * Creates a new AbstractMetadata object.
-     */
-    public AbstractMetadata() {
-        type = EntityImpl.getEntity(getClass());
-    }
 
     /**
      * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
@@ -55,7 +49,7 @@ public abstract class AbstractMetadata implements Metadata {
             elements = new ArrayList();
         }
 
-        List methods = type.getGetMethods();
+        List methods = getType().getGetMethods();
 
         for (Iterator iter = methods.iterator(); iter.hasNext();) {
             Method method = (Method) iter.next();
@@ -97,7 +91,7 @@ public abstract class AbstractMetadata implements Metadata {
         if (element instanceof ElementImpl) {
             elemImpl = (ElementImpl) element;
         } else {
-            elemImpl = (ElementImpl) type.getElement(element.getName());
+            elemImpl = (ElementImpl) getType().getElement(element.getName());
         }
 
         return invoke(elemImpl.getGetMethod());
@@ -116,8 +110,15 @@ public abstract class AbstractMetadata implements Metadata {
      * @see org.geotools.metadata.Metadata#getEntity()
      */
     public Entity getEntity() {
-        return type;
+        return getType();
     }
+    
+    private EntityImpl getType() {
+        if( entity == null )
+            entity=EntityImpl.getEntity(getClass());
+        return entity;
+    }
+
 
     /**
      * DOCUMENT ME!
@@ -185,9 +186,13 @@ public abstract class AbstractMetadata implements Metadata {
                 } //for
             } //for
         }
-
+        
         private void getInterfaces(Class class1, List list) {
             Class[] ifaces = class1.getInterfaces();
+            Class superclass=class1.getSuperclass();
+            
+            if( superclass!=null && !superclass.getClass().isAssignableFrom(Object.class))
+                getInterfaces(superclass, list);
 
             for (int i = 0; i < ifaces.length; i++) {
                 Class iface = ifaces[i];

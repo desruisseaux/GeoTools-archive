@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.data.gridcoverage;
+package org.geotools.data.coverage.grid.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,7 @@ import java.util.Properties;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.data.GridFormatFactorySpi;
-import org.geotools.metadata.FileMetadata;
-import org.geotools.metadata.FileMetadataImpl;
+import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.metadata.Metadata;
 import org.opengis.coverage.grid.Format;
 
@@ -92,25 +91,9 @@ public class FSCatalogEntry implements CatalogEntry{
 	}
 	
 	public static Format getFormat(String extension){
-		if( properties == null ){
-			InputStream in=FSCatalogEntry.class.getResourceAsStream("resources/FileSystemFormats");
-			properties = new Properties();
-			try{
-				properties.load(in);
-			}catch(IOException ie){ ie.printStackTrace();}
-		}
-		String format=properties.getProperty(extension);
-		if( format == null)
-			return null;
-		GridFormatFactorySpi factory=null;
-		try {
-			factory = (GridFormatFactorySpi) ClassLoader.getSystemClassLoader().loadClass(format).newInstance();
-		} catch (Exception e) {
-			System.err.println("The FileSystemFormats properties file is either corrupt or out of date for this system");
-			e.printStackTrace();
-		}
-		if ( factory==null )
-			return null;
+
+	    GridFormatFactorySpi factory=new ArcGridFormatFactory();
+	    
 		return factory.createFormat();
 	}
 	

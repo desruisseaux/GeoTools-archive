@@ -14,10 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.data.coverage.grid.file;
 
 import java.io.File;
 
+import org.geotools.metadata.AbstractMetadata;
 import org.opengis.coverage.grid.Format;
 
 /**

@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +15,12 @@ import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.DefaultQueryDefinition;
 import org.geotools.catalog.QueryResult;
 import org.geotools.data.arcgrid.ArcGridReader;
-import org.geotools.data.gridcoverage.FileSystemGridCoverageExchange;
+import org.geotools.data.arcgrid.test.TestCaseSupport;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.gc.exchange.GridCoverageReader;
-import org.geotools.gc.exchange.GridCoverageWriter;
 import org.geotools.metadata.Query;
 import org.opengis.coverage.grid.Format;
 

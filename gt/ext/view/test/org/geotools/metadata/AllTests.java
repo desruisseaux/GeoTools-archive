@@ -35,9 +35,8 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for org.geotools.metadata");
         //$JUnit-BEGIN$
-        suite.addTestSuite(TestFileMetadataImpl.class);
-        suite.addTestSuite(TestXPath.class);
-        suite.addTestSuite(TestQuery.class);
+        suite.addTestSuite(XPathTest.class);
+        suite.addTestSuite(QueryTest.class);
         //$JUnit-END$
         return suite;
     }

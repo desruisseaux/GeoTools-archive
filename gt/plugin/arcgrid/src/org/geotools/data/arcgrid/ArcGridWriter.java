@@ -17,9 +17,9 @@
 package org.geotools.data.arcgrid;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.gridcoverage.IOExchange;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
-import org.geotools.gc.exchange.GridCoverageWriter;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;

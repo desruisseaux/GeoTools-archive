@@ -17,12 +17,14 @@
 /*
  * Created on Apr 23, 2004
  */
-package org.geotools.data.gridcoverage;
+package org.geotools.data.coverage.grid.stream;
 
 import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.arcgrid.ArcGridReader;
 import org.geotools.data.arcgrid.ArcGridWriter;
-import org.geotools.gc.exchange.*;
+import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 import java.io.File;
 import java.io.IOException;
