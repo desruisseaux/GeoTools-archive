@@ -43,8 +43,10 @@ public class OptGraphSerializerTest extends TestCase {
     final Map edge2id = (Map)obj[3];
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
+  	  File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+      
+      serializer().setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       serializer().write(builder().getGraph());
       
@@ -59,7 +61,6 @@ public class OptGraphSerializerTest extends TestCase {
       assertTrue(after.getNodesOfDegree(1).size() == 2);
       assertTrue(after.getNodesOfDegree(2).size() == nnodes-2);
             
-      new File(filename).delete();
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -78,8 +79,9 @@ public class OptGraphSerializerTest extends TestCase {
     GraphTestUtil.buildPerfectBinaryTree(builder(), k);
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
+  	  File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+      serializer().setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       serializer().write(builder().getGraph());
       
