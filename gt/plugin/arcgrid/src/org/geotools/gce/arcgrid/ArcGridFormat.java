@@ -32,6 +32,10 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import java.io.Reader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import java.io.IOException;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
 
 /**A simple implementation of the Arc Grid Format.
  *
@@ -65,12 +69,17 @@ public class ArcGridFormat
 
     //reading parameters
     readParameters = new ParameterGroup(new ParameterDescriptorGroup(mInfo,
-        new GeneralParameterDescriptor[] {GRASS, COMPRESS}));
+        new GeneralParameterDescriptor[] {GRASS, COMPRESS,CRS}));
     //reading parameters
     writeParameters = new ParameterGroup(new ParameterDescriptorGroup(mInfo,
         new GeneralParameterDescriptor[] {GRASS, COMPRESS}));
   }
-
+  public static final ParameterDescriptor CRS = new ParameterDescriptor(
+              "crs",
+              CoordinateReferenceSystem.class, //calss of the object we will pass
+              null, //list of valid values not provided
+              GeographicCRS.WGS84//default value
+                                                    );
   /** Indicates whether the arcgrid data is compressed with GZIP */
   public static final ParameterDescriptor COMPRESS = new ParameterDescriptor(
       "Compressed",
