@@ -26,6 +26,7 @@ import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.ServiceException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
@@ -157,7 +158,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -252,7 +253,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -292,8 +293,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return null;
         }
 
@@ -326,7 +326,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -372,8 +372,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return null;
         }
 
@@ -406,7 +405,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -444,8 +443,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return null;
         }
 
@@ -478,7 +476,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -579,7 +577,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -707,7 +705,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -789,7 +787,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -891,7 +889,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -930,8 +928,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             // TODO Auto-generated method stub
             return null;
         }
@@ -1100,8 +1097,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             // TODO Auto-generated method stub
             return null;
         }
@@ -1221,9 +1217,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
+            Attributes attrs, Map hints){
             return null;
         }
 
@@ -1332,8 +1326,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             // TODO Auto-generated method stub
             return null;
         }
@@ -1378,7 +1371,7 @@ public class FilterComplexTypes {
             output.startElement(element.getNamespace(), element.getName(), ai);
 
             switch (me.getType()) {
-            case LiteralExpression.LITERAL_GEOMETRY:
+            case ExpressionType.LITERAL_GEOMETRY:
 
                 if (me.getLiteral() instanceof Geometry) {
                     GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance()
@@ -1388,9 +1381,9 @@ public class FilterComplexTypes {
                     break;
                 }
 
-            case LiteralExpression.LITERAL_DOUBLE:
-            case LiteralExpression.LITERAL_INTEGER:
-            case LiteralExpression.LITERAL_STRING:
+            case ExpressionType.LITERAL_DOUBLE:
+            case ExpressionType.LITERAL_INTEGER:
+            case ExpressionType.LITERAL_STRING:
                 output.characters(me.getLiteral().toString());
 
                 break;
@@ -1440,8 +1433,7 @@ public class FilterComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return (value == null) ? "" : value[0].toString();
         }
 
@@ -1650,7 +1642,7 @@ public class FilterComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }

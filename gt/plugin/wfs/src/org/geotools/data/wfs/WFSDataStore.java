@@ -62,8 +62,8 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.geometry.JTS;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
@@ -198,7 +198,7 @@ public class WFSDataStore extends AbstractDataStore {
         return connection;
     }
 
-    private static URL createGetCapabilitiesRequest(URL host) {
+    protected static URL createGetCapabilitiesRequest(URL host) {
         if (host == null) {
             return null;
         }
@@ -743,7 +743,7 @@ System.out.println(url);
             // reproject this
             try {
                 crs = CRS.decode(fsd.getSRS());
-                maxbbox = FactoryFinder.toGeographic(maxbbox,crs);
+                maxbbox = JTS.toGeographic(maxbbox,crs);
             } catch (FactoryException e) {
                 e.printStackTrace();maxbbox = null;
             } catch (MismatchedDimensionException e) {
