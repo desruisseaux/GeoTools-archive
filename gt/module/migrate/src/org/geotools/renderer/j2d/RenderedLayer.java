@@ -586,11 +586,11 @@ public abstract class RenderedLayer {
     }
 
     /**
-     * Indique qu'une partie de cette couche a besoin d'être redéssinée.
-     * Cette méthode peut être appelée à partir de n'importe quel thread
-     * (pas nécessairement celui de <i>Swing</i>).
+     * Advises that at least a portion of this layer need to be repaint.
+     * This method can been invoked from any thread (may or may not be
+     * the <cite>Swing</cite> thread).
      *
-     * @param bounds Coordonnées (en points) de la partie à redessiner.
+     * @param bounds The dirty region to repaint, in dots (1/72 of inch).
      */
     final void repaintComponent(final Rectangle bounds) {
         /*
@@ -632,10 +632,16 @@ public abstract class RenderedLayer {
         }
         if (Renderer.LOGGER.isLoggable(Level.FINEST)) {
             final Locale locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINEST,
-                                     ResourceKeys.SEND_REPAINT_EVENT_$5, new Object[]{getName(locale),
-                                     new Integer(bounds.x), new Integer(bounds.x+bounds.width-1),
-                                     new Integer(bounds.y), new Integer(bounds.y+bounds.height-1)});
+            final LogRecord record;
+            if (bounds != null) {
+                record = Resources.getResources(locale).getLogRecord(Level.FINEST,
+                                   ResourceKeys.SEND_REPAINT_EVENT_$5, new Object[]{getName(locale),
+                                   new Integer(bounds.x), new Integer(bounds.x+bounds.width-1),
+                                   new Integer(bounds.y), new Integer(bounds.y+bounds.height-1)});
+            } else {
+                record = Resources.getResources(locale).getLogRecord(Level.FINEST,
+                                   ResourceKeys.SEND_REPAINT_EVENT_$1, getName(locale));
+            }
             record.setSourceClassName("RenderedLayer");
             record.setSourceMethodName("repaint");
             Renderer.LOGGER.log(record);

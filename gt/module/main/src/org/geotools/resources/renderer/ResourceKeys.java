@@ -29,6 +29,7 @@ public interface ResourceKeys
     public static final int POLYGON_CACHE_USE_$4                     =     3;
     public static final int RESSAMPLING_RENDERED_IMAGE_$3            =     4;
     public static final int SCALE_$1                                 =     5;
+    public static final int SEND_REPAINT_EVENT_$1                    =    25;
     public static final int SEND_REPAINT_EVENT_$5                    =    24;
     public static final int UPDATE_CACHE_$1                          =     6;
 
