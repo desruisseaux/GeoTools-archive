@@ -153,6 +153,17 @@ public class DefaultQuery implements Query {
     }
 
     /**
+     * Copy contructor, clones the state of a generic Query into a DefaultQuery
+     * @param constraintQuery
+     */
+    public DefaultQuery(Query query) {
+      this(query.getTypeName(), query.getNamespace(), query.getFilter(), query.getMaxFeatures(),
+          query.getPropertyNames(), query.getHandle());
+      this.coordinateSystem = query.getCoordinateSystem();
+      this.coordinateSystemReproject = query.getCoordinateSystemReproject();
+    }
+
+    /**
      * The property names is used to specify the attributes that should be
      * selected for the return feature collection.  If the property array is
      * null, then the datasource should return all available properties, its
