@@ -18,6 +18,9 @@ package org.geotools.data.wms.response;
 
 import java.io.InputStream;
 
+import org.geotools.ows.ServiceException;
+import org.xml.sax.SAXException;
+
 /**
  * Represents the result of a GetStyles request.
  * 
@@ -30,10 +33,11 @@ public class GetStylesResponse extends AbstractResponse {
     /**
      * @param contentType
      * @param inputStream
+     * @throws SAXException 
+     * @throws ServiceException 
      */
-    public GetStylesResponse( String contentType, InputStream inputStream ) {
+    public GetStylesResponse( String contentType, InputStream inputStream ) throws ServiceException, SAXException {
         super(contentType, inputStream);
-        // TODO Auto-generated constructor stub
     }
 
 }

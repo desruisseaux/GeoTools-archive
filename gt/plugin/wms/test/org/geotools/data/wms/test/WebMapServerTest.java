@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -42,6 +43,7 @@ import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -259,4 +261,16 @@ public class WebMapServerTest extends TestCase {
         assertEquals(envelope.getMaximum(1), 89.8254, 0.0);
     }
     
+    public void testServiceExceptions  () throws Exception { 
+    	WebMapServer wms = new WebMapServer(featureURL);
+    	GetMapRequest request = wms.createGetMapRequest();
+    	request.setLayers(Collections.singletonList(new SimpleLayer("NoLayer", "NoStyle")));
+    	try {
+    		System.out.println(request.getFinalURL());
+    		GetMapResponse response = wms.issueRequest(request);
+    		assertTrue(false);
+    	} catch (ServiceException e) {
+    		e.printStackTrace();
+    	}    	
+    }
 }

@@ -7,12 +7,8 @@
  */
 package org.geotools.data.wms;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -25,8 +21,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
-
-import javax.naming.OperationNotSupportedException;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
@@ -46,20 +40,17 @@ import org.geotools.data.wms.request.PutStylesRequest;
 import org.geotools.data.wms.request.Request;
 import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.DescribeLayerResponse;
+import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
-import org.geotools.data.wms.xml.OGCSchema;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
+import org.geotools.ows.ServiceException;
 import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.handlers.DocumentHandler;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
@@ -97,25 +88,24 @@ public class WebMapServer implements Discovery {
     protected Specification[] specs;
     private Specification specification;
 
-    //Flag used to determine if we have checked the capabilities already,
-    //So we don't check multiple times
-    private boolean alreadyChecked;
-
     /**
      * Creates a new WebMapServer instance and attempts to retrieve the 
      * Capabilities document specified by serverURL. 
      * 
      * @param serverURL a URL that points to the capabilities document of a server
      * @throws IOException if there is an error communicating with the server
+     * @throws ServiceException if the server responds with an error
+     * @throws SAXException if there is an error while parsing the capabilities, such as bad XML
      */
-    public WebMapServer( final URL serverURL ) throws IOException {
+    public WebMapServer( final URL serverURL ) throws IOException, ServiceException, SAXException {
         this.serverURL = serverURL;
 
-        this.alreadyChecked = false;
-
         setupSpecifications();
-
-        getCapabilities();
+        
+        capabilities = negotiateVersion();
+        if (capabilities == null) {
+        	throw new ServiceException("Unable to parse capabilities.");
+        }
     }
 
     /**
@@ -161,8 +151,10 @@ public class WebMapServer implements Discovery {
      * 
      * @return a capabilities object that represents the Capabilities on the server
      * @throws IOException if there is an error communicating with the server, or the XML cannot be parsed
+     * @throws ServiceException if the server returns a ServiceException
+     * @throws SAXException if there is an error while parsing the capabilities
      */
-    private WMSCapabilities negotiateVersion() throws IOException {
+    private WMSCapabilities negotiateVersion() throws IOException, ServiceException, SAXException {
         List versions = new ArrayList(specs.length);
         Exception exception = null;
 
@@ -182,11 +174,12 @@ public class WebMapServer implements Discovery {
             AbstractGetCapabilitiesRequest request = tempSpecification.createGetCapabilitiesRequest(serverURL);
 
             //Grab document
-            URL url = request.getFinalURL();
-//                        System.out.println("URL: "+url.toExternalForm());
             WMSCapabilities tempCapabilities;
             try {
-                tempCapabilities = parseCapabilities(url);
+                tempCapabilities = issueRequest(request).getCapabilities();
+            } catch (ServiceException e) {
+            	tempCapabilities = null;
+            	exception = e;
             } catch (SAXException e) {
                 tempCapabilities = null;
                 exception = e;
@@ -212,19 +205,12 @@ public class WebMapServer implements Discovery {
 
             if (tempCapabilities != null && versions.contains(serverVersion)) {
                 // we can communicate with this server
-                // 
-//                                System.out.println("Server responded with "+serverVersion+". We know it and will use it now.");
-
                 int index = versions.indexOf(serverVersion);
                 this.specification = specs[index];
 
                 return tempCapabilities;
 
             } else if (compare < 0) {
-                if (tempCapabilities == null) {
-//                                        System.out.println("Unable to read from server at version:"+serverVersion+".");
-                }
-//                                System.out.println("Downgrading version.");
                 // server responded lower then we asked - and we don't understand.
                 maxClient = test - 1; // set current version as limit
 
@@ -234,6 +220,11 @@ public class WebMapServer implements Discovery {
 
                 if (clientVersion == null) {
                     if (exception != null) {
+                    	if (exception instanceof ServiceException) {
+                    		throw (ServiceException) exception;
+                    	} else if (exception instanceof SAXException) {
+                    		throw (SAXException) exception;
+                    	}
                         IOException e = new IOException(exception.getMessage());
                         throw e;
                     }
@@ -242,8 +233,6 @@ public class WebMapServer implements Discovery {
 
                 test = versions.indexOf(clientVersion);
             } else {
-//                                System.out.println("Server responded with "+serverVersion+" after a request for "+clientVersion);
-//                                System.out.println("Upgrading");
                 // server responsed higher than we asked - and we don't understand
                 minClient = test + 1; // set current version as lower limit
 
@@ -252,10 +241,13 @@ public class WebMapServer implements Discovery {
 
                 if (clientVersion == null) {
                     if (exception != null) {
+                    	if (exception instanceof ServiceException) {
+                    		throw (ServiceException) exception;
+                    	}
                         IOException e = new IOException(exception.getMessage());
                         throw e;
                     }
-                    return null; // do not know any higher version numbers
+                    return null; // do not know any lower version numbers
                 }
 
                 test = versions.indexOf(clientVersion);
@@ -325,75 +317,29 @@ public class WebMapServer implements Discovery {
         return after;
     }
 
-    private static WMSCapabilities parseCapabilities( URL url ) throws SAXException, IOException {
-        System.out.println(url);
-        Map hints = new HashMap();
-        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
-        
-
-
-        URLConnection urlConnection = url.openConnection();
-        //        urlConnection.setRequestProperty("accept", "application/vnd.ogc.wms+xml, text/xml, *; q=.2, */*; q=.2");
-        //        urlConnection.setRequestProperty("accept-encoding", "compress; q=1.0, gzip; q=0, *");
-
-//        OutputStream outputStream = urlConnection.getOutputStream();
-//        Writer out = new BufferedWriter(new OutputStreamWriter(outputStream));
-//        Map writerHints = new HashMap();
-//        hints.put(DocumentWriter.BASE_ELEMENT, OGCSchema.getInstance().getElements()[OGCSchema.GET_CAPABILITIES]);
-//        try {
-//            DocumentWriter.writeDocument(GetCapabilitiesRequest.SECTION_ALL, OGCSchema.getInstance(), out, writerHints);
-//        } catch (OperationNotSupportedException e) {
-//            e.printStackTrace();
-//        }         
-        
-        InputStream io = urlConnection.getInputStream();
-        
-        if (urlConnection.getContentEncoding() != null && urlConnection.getContentEncoding().indexOf("gzip") != -1) {
-            io = new GZIPInputStream(io);
-        }
-        
-        Object object = DocumentFactory.getInstance(io, hints, Level.WARNING);
-
-        WMSCapabilities capabilities = (WMSCapabilities) object;
-        return capabilities;
-    }
-
     /**
-     * Get the getCapabilities document. If it is not already retrieved, then 
-     * it shall be retrieved.
+     * Get the getCapabilities document. If there was an error parsing it
+     * during creation, it will return null (and it should have thrown an
+     * exception during creation).
      * 
      * @return a WMSCapabilities object, representing the Capabilities of the server
-     * @throws IOException if there is an error retrieving the capabilities
      */
-    public WMSCapabilities getCapabilities() throws IOException {
-        if (capabilities == null && !alreadyChecked) {
-            capabilities = negotiateVersion();
-            alreadyChecked = true;
-        }
-
+    public WMSCapabilities getCapabilities() {
         return capabilities;
     }
 
     /**
      * Issues a request to the server and returns that server's response. 
-     * As of 12 Nov 2004, it only supports GetMap and GetFeatureInfo.
-     * 
-     * It is not capable of issuing a GetCapabilities request. If this is
-     * desired, it is recommend that you subclass and over-ride
-     * getCapabilities. 
      * 
      * @param request the request to be issued
      * @return a response from the server, of type GetMapResponse or GetFeatureInfoResponse
      * @throws IOException
      * @throws SAXException
      */
-    private AbstractResponse internalIssueRequest( Request request ) throws IOException, SAXException {
+    private static AbstractResponse internalIssueRequest( Request request ) throws IOException, ServiceException, SAXException {
         URL finalURL = request.getFinalURL();
 
         URLConnection connection = finalURL.openConnection();
-
-        
 
         InputStream inputStream = connection.getInputStream();
         
@@ -403,7 +349,9 @@ public class WebMapServer implements Discovery {
 
         String contentType = connection.getContentType();
         
-        if (request instanceof GetFeatureInfoRequest) {
+        if (request instanceof GetCapabilitiesRequest) {
+        	return new GetCapabilitiesResponse(contentType, inputStream);
+        } else if (request instanceof GetFeatureInfoRequest) {
             return new GetFeatureInfoResponse(contentType, inputStream);
         } else if (request instanceof GetMapRequest) {
             return new GetMapResponse(contentType, inputStream);
@@ -418,6 +366,10 @@ public class WebMapServer implements Discovery {
         } else {
             throw new RuntimeException("Request is an invalid type. I do not know it.");
         }
+    }
+    
+    public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException, SAXException {
+    	return (GetCapabilitiesResponse) internalIssueRequest(request);
     }
     
     public GetMapResponse issueRequest(GetMapRequest request) throws IOException, SAXException {

@@ -17,6 +17,15 @@
 package org.geotools.data.wms.response;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.ows.ServiceException;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.handlers.DocumentHandler;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -28,9 +37,16 @@ public class AbstractResponse {
     protected InputStream inputStream;
     protected String contentType;
 
-    public AbstractResponse(String contentType, InputStream inputStream) {
+    public AbstractResponse(String contentType, InputStream inputStream) throws ServiceException, SAXException {
         this.inputStream = inputStream;
         this.contentType = contentType;
+        
+        /*
+         * Intercept XML ServiceExceptions and throw them
+         */
+        if (contentType.toLowerCase().equals("application/vnd.ogc.se_xml")) {
+        	throw parseException(inputStream);
+        }
     }
 
     public String getContentType() {
@@ -39,5 +55,17 @@ public class AbstractResponse {
 
     public InputStream getInputStream() {
         return inputStream;
+    }
+    
+    protected ServiceException parseException(InputStream inputStream) throws SAXException {
+        Map hints = new HashMap();
+        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
+
+        Object object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
+        if (object instanceof ServiceException) {
+        	return (ServiceException) object;
+        }
+        return null;
     }
 }

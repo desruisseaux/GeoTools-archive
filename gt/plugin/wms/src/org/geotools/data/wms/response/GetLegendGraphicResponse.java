@@ -18,6 +18,9 @@ package org.geotools.data.wms.response;
 
 import java.io.InputStream;
 
+import org.geotools.ows.ServiceException;
+import org.xml.sax.SAXException;
+
 /**
  * 
  * @author Richard Gould
@@ -27,9 +30,15 @@ public class GetLegendGraphicResponse extends AbstractResponse {
     /**
      * @param contentType
      * @param inputStream
+     * @throws SAXException 
+     * @throws ServiceException 
      */
-    public GetLegendGraphicResponse( String contentType, InputStream inputStream ) {
+    public GetLegendGraphicResponse( String contentType, InputStream inputStream ) throws ServiceException, SAXException {
         super(contentType, inputStream);
+        
+        if (contentType.toLowerCase().indexOf("text/xml") != -1) {
+        	throw parseException(inputStream);
+        }
     }
 
 }
