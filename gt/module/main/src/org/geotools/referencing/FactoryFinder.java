@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
 import org.geotools.geometry.JTS;
@@ -44,6 +43,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
@@ -86,7 +86,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @todo Allows the user to set ordering (i.e. preferred implementation).
  */
 public final class FactoryFinder {
-    
     
     /**
      * The service registry for this manager.
@@ -156,6 +155,7 @@ public final class FactoryFinder {
                                            DatumFactory.class,
                                            CSFactory.class,
                                            CRSFactory.class,
+                                           CRSAuthorityFactory.class,
                                            MathTransformFactory.class,
                                            AuthorityFactory.class,
                                            CoordinateOperationFactory.class}).iterator());
@@ -252,8 +252,8 @@ public final class FactoryFinder {
      * rather than use the decode method.
      * </p>
      */
-    public static synchronized Set getAuthorityFactories() {
-        return new LazySet(getProviders(AuthorityFactory.class));
+    public static synchronized Set getCRSAuthorityFactories() {
+        return new LazySet(getProviders(CRSAuthorityFactory.class));
     }
 
     /**

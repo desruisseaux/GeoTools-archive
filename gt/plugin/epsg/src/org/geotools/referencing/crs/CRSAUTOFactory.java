@@ -90,7 +90,6 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
 	 
     /**
      * Construct <code>CRSAUTOFactory</code>.
-     *
      */
     public CRSAUTOFactory(){
         this(FactoryFinder.getCRSFactory());

@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -62,12 +63,16 @@ public class CRS {
     public static CoordinateReferenceSystem decode( String code ) throws NoSuchAuthorityCodeException {
         int split = code.indexOf(':');
         if( split == -1 ){
-            throw new NoSuchAuthorityCodeException("No authority was defined - did you forget 'EPSG:number'?", "unknown", code );
+            throw new NoSuchAuthorityCodeException("No authority was defined - did you forget 'AUTHORITY:NUMBER'?", "unknown", code );
         }
         final String AUTHORITY = code.substring( 0, split );
         Throwable trouble = null;
-        for( Iterator i = FactoryFinder.getAuthorityFactories().iterator(); i.hasNext(); ){
-            AuthorityFactory factory = (AuthorityFactory) i.next();
+        
+        // FIXME: FactoryFinder does not appear to work for other modules
+        //
+        //for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
+        for( Iterator i=FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
+            CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             factory.getAuthority().getIdentifierTypes().contains( AUTHORITY );
             try {
                 CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
@@ -85,5 +90,5 @@ public class CRS {
         NoSuchAuthorityCodeException notFound = new NoSuchAuthorityCodeException( "Unabled to locate code", "not found", code); //$NON-NLS-1$ //$NON-NLS-2$
         if( trouble != null ) notFound.initCause( trouble );        
         throw notFound; 
-    }    
+    }
 }

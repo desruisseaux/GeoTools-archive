@@ -235,6 +235,8 @@ public class XSISimpleTypes {
      */
     protected static abstract class XSISimpleType implements SimpleType {
         /**
+         * @param name 
+         * @return 
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {

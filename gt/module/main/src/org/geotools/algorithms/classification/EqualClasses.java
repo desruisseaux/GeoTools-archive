@@ -17,7 +17,13 @@ public class EqualClasses {
     int numberClasses;
     double[] breaks;
     double[] collection;
-    /** Creates a new instance of EqualClasses */
+    
+    /**
+     * Creates a new instance of EqualClasses
+     *  
+     * @param numberClasses 
+     * @param fc
+     */
     public EqualClasses(int numberClasses, double[] fc) {
         
         breaks = new double[numberClasses-1];

@@ -46,7 +46,7 @@ public class RobustGeometryProperties implements org.geotools.algorithms.Geometr
      */
     protected double getArea(GeometryCollection geometryCollection1) {
         double area = 0.0d;
-        double perimeter = 0.0d;
+        //double perimeter = 0.0d;
         int numberOfGeometries1 = geometryCollection1.getNumGeometries();
         // Go through geometryCollection1 and sum areas of component geometries
         for (int i = 0; i < numberOfGeometries1; i++) {

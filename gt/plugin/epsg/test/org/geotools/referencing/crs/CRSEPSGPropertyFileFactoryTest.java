@@ -21,11 +21,10 @@ package org.geotools.referencing.crs;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import junit.framework.TestCase;
+
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * These EPSG support.
@@ -42,10 +41,7 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         factory = new CRSEPSGPropertyFileFactory();
-    }
-    public void testFactory(){
-        assertNotNull( factory );
-    }
+    }    
     public void testAuthority(){
         Citation authority = factory.getAuthority();
         
@@ -68,9 +64,28 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
         assertEquals( 2704, codes.size() );                               
     }
     
+    /**
+     * A random CRS for fun.
+     */
     public void test26910() throws Exception {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:26910");
         assertNotNull( crs );                
+    }
+    
+    /** UDIG requires this to work */
+    public void test4326() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:4326");
+        assertNotNull( crs );
+    }
+    /** UDIG requires this to work */
+    public void test4269() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:4269");
+        assertNotNull( crs );
+    }
+    /** UDIG requires this to work */
+    public void test42102() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:42102");
+        assertNotNull( crs );
     }
     public void testSuccess() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );

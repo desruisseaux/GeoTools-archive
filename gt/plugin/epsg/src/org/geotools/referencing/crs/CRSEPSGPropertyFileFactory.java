@@ -18,9 +18,10 @@
  */
 package org.geotools.referencing.crs;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
@@ -69,13 +70,27 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
 
     /** Cache of parsed CoordinateReferenceSystem WKT by EPSG_NUMBER */
     private Hashtable cache = new Hashtable();
-        
-    protected CRSEPSGPropertyFileFactory() throws FactoryException {
+    
+    /**
+     * Loads from epsg.properties if the file exists, defaults to internal defintions
+     * exported from postgis and cubeworks.
+     */
+    public CRSEPSGPropertyFileFactory() {
         this(FactoryFinder.getCRSFactory());
     }
     
-    protected CRSEPSGPropertyFileFactory(final CRSFactory factory ) throws FactoryException {
-    	this(factory, CRSEPSGPropertyFileFactory.class.getResource("epsg.properties"));
+    /**
+     * Loads from epsg.properties if the file exists, defaults to internal defintions
+     * exported from postgis and cubeworks.
+     */
+    protected CRSEPSGPropertyFileFactory(final CRSFactory factory ) {
+        this.crsFactory = factory;
+        try {
+            loadDefault();
+        }
+        catch( IOException oops ){
+            System.err.println("Could not load epsg.properties"+ oops );
+        }
     }
     
     /** 
@@ -83,7 +98,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      */
     protected CRSEPSGPropertyFileFactory(final CRSFactory factory,
                        	 URL definition) throws FactoryException {
-        this.crsFactory = factory;
+        this( factory );
         
         try {
             epsg.load( definition.openStream() );
@@ -95,12 +110,31 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
     }
     
     /**
+     * Loads from epsg.properties if the file exists, defaults to internal defintions
+     * exported from postgis and cubeworks.
+     * 
+     * @throws IOException
+     */
+    protected void loadDefault() throws IOException {
+        // Check the application directory first
+        //
+        File file = new File("epsg.properties");
+        if( file.exists() ){
+            epsg.load( new FileInputStream( file ));             
+        }        
+        // Use the built-in property defintions
+        //
+        URL url = CRSEPSGPropertyFileFactory.class.getResource("epsg.properties");
+        epsg.load( url.openStream() );
+    }
+    
+    /**
      * Returns a default coordinate system factory backed by the EPSG property file.
      * 
      * @return The default factory.
      * @throws SQLException if the connection to the database can't be etablished.
      */
-    public synchronized static CRSAuthorityFactory getDefault() throws FactoryException {
+    public synchronized static CRSAuthorityFactory getDefault() {
         if (DEFAULT == null) {        	
             DEFAULT = new CRSEPSGPropertyFileFactory();
         }            
@@ -135,7 +169,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
     }
     
     public Object createObject(String code) throws FactoryException {
-        return (Object) createCoordinateReferenceSystem(code);
+        return createCoordinateReferenceSystem(code);
     }
     
     public ProjectedCRS createProjectedCRS(String code) throws FactoryException {
@@ -171,8 +205,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      * @throws FactoryException if access to the underlying database failed.
      */
     public Set getAuthorityCodes(Class clazz) throws FactoryException {
-        //could cashe this info if it is time consuming to filter
-        Set set;
+        //could cashe this info if it is time consuming to filter        
         if (clazz.getName().equalsIgnoreCase(CoordinateReferenceSystem.class.getName())) {
             Set all= new java.util.TreeSet();
             for(java.util.Iterator i = epsg.keySet().iterator(); i.hasNext();) {
