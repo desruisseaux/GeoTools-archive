@@ -86,6 +86,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ *@deprecated Replaced by {@linnk org.geotools.referencing.operation.projection.LambertConformal}.
  */
 public class LambertConformal extends ConicProjection {
     /** 
