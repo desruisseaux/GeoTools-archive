@@ -17,6 +17,7 @@
 package org.geotools.xml;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -41,7 +42,7 @@ public class SLDParserTest extends TestCase{
 
         SAXParser parser = spf.newSAXParser();
 
-        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(example.toURI(),null);
+        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(new URI(example.toString()),null);
         XMLSAXHandler.setLogLevel(Level.FINEST);
         XSISAXHandler.setLogLevel(Level.FINEST);
         XMLElementHandler.setLogLevel(Level.FINEST);
