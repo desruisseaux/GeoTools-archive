@@ -29,9 +29,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-
 import org.geotools.cs.LocalCoordinateSystem;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.crs.CRSService;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -49,6 +50,7 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -60,9 +62,10 @@ import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * The default implementation of the {@linkPlain org.geotools.map.MapContext}
+ * interface
  *
- * @author wolf
+ * @author Andrea Aime
  */
 public class DefaultMapContext implements MapContext {
     /** The logger for the map module. */
@@ -73,8 +76,6 @@ public class DefaultMapContext implements MapContext {
 
     /** Utility field used by event firing mechanism. */
     protected javax.swing.event.EventListenerList listenerList = null;
-
-    /** DOCUMENT ME! */
     protected MapLayerListener layerListener = new MapLayerListener() {
             public void layerChanged(MapLayerEvent event) {
                 fireAsListEvent(event);
@@ -91,8 +92,8 @@ public class DefaultMapContext implements MapContext {
             private void fireAsListEvent(MapLayerEvent event) {
                 MapLayer layer = (MapLayer) event.getSource();
                 int position = layerList.indexOf(layer);
-                fireMapLayerListListenerLayerChanged(new MapLayerListEvent(DefaultMapContext.this,
-                        layer, position, event));
+                fireMapLayerListListenerLayerChanged(new MapLayerListEvent(
+                        DefaultMapContext.this, layer, position, event));
             }
         };
 
@@ -141,8 +142,8 @@ public class DefaultMapContext implements MapContext {
      * @param contactInformation DOCUMENT ME!
      * @param keywords DOCUMENT ME!
      */
-    public DefaultMapContext(MapLayer[] layers, String title, String contextAbstract,
-        String contactInformation, String[] keywords) {
+    public DefaultMapContext(MapLayer[] layers, String title,
+        String contextAbstract, String contactInformation, String[] keywords) {
         this(layers);
         setTitle(title);
         setAbstract(contextAbstract);
@@ -151,7 +152,8 @@ public class DefaultMapContext implements MapContext {
     }
 
     /**
-     * Add a new layer if not already present and trigger a {@link LayerListEvent}.
+     * Add a new layer if not already present and trigger a {@link
+     * LayerListEvent}.
      *
      * @param index DOCUMENT ME!
      * @param layer Then new layer that has been added.
@@ -165,7 +167,8 @@ public class DefaultMapContext implements MapContext {
 
         layerList.add(index, layer);
         layer.addMapLayerListener(layerListener);
-        fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, layer, index));
+        fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, layer,
+                index));
 
         return true;
     }
@@ -184,7 +187,8 @@ public class DefaultMapContext implements MapContext {
 
         layerList.add(layer);
         layer.addMapLayerListener(layerListener);
-        fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, layer, indexOf(layer)));
+        fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, layer,
+                indexOf(layer)));
 
         return true;
     }
@@ -199,31 +203,31 @@ public class DefaultMapContext implements MapContext {
         DefaultMapLayer layer = new DefaultMapLayer(featureSource, style, "");
         this.addLayer(layer);
     }
+
     /**
      * Add a new layer and trigger a {@link LayerListEvent}.
      *
-     * @param featureSource Then new layer that has been added.
+     * @param gc Then new layer that has been added.
      * @param style DOCUMENT ME!
      */
-    public void addLayer(GridCoverage gc, Style style ) {
-        this.addLayer( wrapGc( gc ), style );
+    public void addLayer(GridCoverage gc, Style style) {
+        this.addLayer(wrapGc(gc), style);
     }
+
     /**
      * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-     *  (temporary).
+     * (temporary).
      *
      * @param gc the grid coverage
      *
-     * @return a feature with the grid coverage envelope as the geometry and the grid coverage
-     *         itself in the "grid" attribute
-     *
-     * @throws IllegalAttributeException Should never be thrown
-     * @throws SchemaException Should never be thrown
+     * @return a feature with the grid coverage envelope as the geometry and
+     *         the grid coverage itself in the "grid" attribute
      */
     private static FeatureCollection wrapGc(GridCoverage gc) {
         // create surrounding polygon
         PrecisionModel pm = new PrecisionModel();
-        CoordinateSequenceFactory csf = DefaultCoordinateSequenceFactory.instance();
+        CoordinateSequenceFactory csf = DefaultCoordinateSequenceFactory
+            .instance();
         GeometryFactory gf = new GeometryFactory(pm, 0);
         Coordinate[] coord = new Coordinate[5];
         Rectangle2D rect = gc.getEnvelope().toRectangle2D();
@@ -232,44 +236,55 @@ public class DefaultMapContext implements MapContext {
         coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
         coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
         coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-        
+
         LinearRing ring = new LinearRing(csf.create(coord), gf);
         Polygon bounds = new Polygon(ring, null, gf);
-        
+
         // create the feature type
-        AttributeType geom = AttributeTypeFactory.newAttributeType("geom", Polygon.class);
-        AttributeType grid = AttributeTypeFactory.newAttributeType("grid", GridCoverage.class);
-        
+        AttributeType geom = AttributeTypeFactory.newAttributeType("geom",
+                Polygon.class);
+        AttributeType grid = AttributeTypeFactory.newAttributeType("grid",
+                GridCoverage.class);
+
         FeatureType schema = null;
-        AttributeType[] attTypes = {geom, grid};
-        
+        AttributeType[] attTypes = { geom, grid };
+
         // Fix the schema name
-        String typeName = gc.getName( null );
-        if( typeName == null ){
+        String typeName = gc.getName(null);
+
+        if (typeName == null) {
             typeName = "GridCoverage";
         }
+
         try {
-            schema = FeatureTypeFactory.newFeatureType(attTypes, typeName );
+            schema = FeatureTypeFactory.newFeatureType(attTypes, typeName);
         } catch (FactoryConfigurationError e) {
-            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            LOGGER.log(Level.WARNING, "Could not use gc", typeName);
+
             return null;
         } catch (SchemaException e) {
-            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            LOGGER.log(Level.WARNING, "Could not use gc", typeName);
+
             return null;
         }
-        
+
         // create the feature
         Feature feature;
+
         try {
-            feature = schema.create(new Object[] {bounds, gc});
+            feature = schema.create(new Object[] { bounds, gc });
         } catch (IllegalAttributeException e1) {
-            LOGGER.log( Level.WARNING, "Could not use gc", typeName );
+            LOGGER.log(Level.WARNING, "Could not use gc", typeName);
+
             return null;
         }
+
         FeatureCollection collection = FeatureCollections.newCollection();
-        collection.add( feature );
+        collection.add(feature);
+
         return collection;
     }
+
     /**
      * Add a new layer and trigger a {@link LayerListEvent}.
      *
@@ -311,7 +326,8 @@ public class DefaultMapContext implements MapContext {
         MapLayer layer = (MapLayer) layerList.remove(index);
 
         layer.removeMapLayerListener(layerListener);
-        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, layer, index));
+        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, layer,
+                index));
 
         return layer;
     }
@@ -345,11 +361,11 @@ public class DefaultMapContext implements MapContext {
             int toIndex = layerList.size() - 1;
 
             if (layerAdded == 1) {
-                fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, lastLayer,
-                        fromIndex, toIndex));
+                fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this,
+                        lastLayer, fromIndex, toIndex));
             } else {
-                fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this, null, fromIndex,
-                        toIndex));
+                fireMapLayerListListenerLayerAdded(new MapLayerListEvent(this,
+                        null, fromIndex, toIndex));
             }
         }
 
@@ -400,12 +416,13 @@ public class DefaultMapContext implements MapContext {
         }
 
         // fire event
-        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, null, fromIndex, toIndex));
+        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, null,
+                fromIndex, toIndex));
     }
 
     /**
-     * Return this model's list of layers.  If no layers are present, then an empty array is
-     * returned.
+     * Return this model's list of layers.  If no layers are present, then an
+     * empty array is returned.
      *
      * @return This model's list of layers.
      */
@@ -445,13 +462,15 @@ public class DefaultMapContext implements MapContext {
     }
 
     /**
-     * Get the bounding box of all the layers in this MapContext. If all the layers cannot
-     * determine the bounding box in the speed required for each layer, then null is returned. The
-     * bounds will be expressed in the MapContext coordinate system.
+     * Get the bounding box of all the layers in this MapContext. If all the
+     * layers cannot determine the bounding box in the speed required for each
+     * layer, then null is returned. The bounds will be expressed in the
+     * MapContext coordinate system.
      *
-     * @return The bounding box of the features or null if unknown and too expensive for the method
-     *         to calculate. TODO: when coordinate system information will be added reproject the
-     *         bounds according to the current coordinate system
+     * @return The bounding box of the features or null if unknown and too
+     *         expensive for the method to calculate. TODO: when coordinate
+     *         system information will be added reproject the bounds according
+     *         to the current coordinate system
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -466,7 +485,26 @@ public class DefaultMapContext implements MapContext {
             if (env == null) {
                 continue;
             } else {
-                // TODO: reproject envelope here if needed
+                try {
+                    CoordinateReferenceSystem sourceCs = fs.getSchema()
+                                                           .getDefaultGeometry()
+                                                           .getCoordinateSystem();
+
+                    if ((sourceCs != null) && (crs != null)
+                            && !sourceCs.equals(crs)) {
+                        MathTransform2D transform = (MathTransform2D) CRSService.reproject(sourceCs,
+                                crs, true);
+
+                        if (transform != null) {
+                            env = CRSService.transform(env, transform);
+                        }
+                    }
+                } catch (TransformException e) {
+                    LOGGER.log(Level.SEVERE,
+                        "Data source and map context coordinate system differ, yet it was not possible to get a projected bounds estimate...",
+                        e);
+                }
+
                 if (result == null) {
                     result = env;
                 } else {
@@ -479,12 +517,14 @@ public class DefaultMapContext implements MapContext {
     }
 
     /**
-     * Set a new area of interest and trigger a {@link BoundingBoxEvent}. Note that this is the
-     * only method to change coordinate system.  A <code>setCoordinateReferenceSystem</code>
-     * method is not provided to ensure this class is not dependant on transform classes.
+     * Set a new area of interest and trigger a {@link BoundingBoxEvent}. Note
+     * that this is the only method to change coordinate system.  A
+     * <code>setCoordinateReferenceSystem</code> method is not provided to
+     * ensure this class is not dependant on transform classes.
      *
      * @param areaOfInterest The new areaOfInterest.
-     * @param coordinateReferenceSystem The coordinate system being using by this model.
+     * @param coordinateReferenceSystem The coordinate system being using by
+     *        this model.
      *
      * @throws IllegalArgumentException if an argument is <code>null</code>.
      * @throws NullPointerException DOCUMENT ME!
@@ -502,9 +542,10 @@ public class DefaultMapContext implements MapContext {
         this.areaOfInterest = new Envelope(areaOfInterest);
         this.crs = coordinateReferenceSystem;
 
-        int type = MapBoundsEvent.AREA_OF_INTEREST_MASK | MapBoundsEvent.COORDINATE_SYSTEM_MASK;
-        fireMapBoundsListenerMapBoundsChanged(new MapBoundsEvent(this, type, oldAreaOfInterest,
-                oldCrs));
+        int type = MapBoundsEvent.AREA_OF_INTEREST_MASK
+            | MapBoundsEvent.COORDINATE_SYSTEM_MASK;
+        fireMapBoundsListenerMapBoundsChanged(new MapBoundsEvent(this, type,
+                oldAreaOfInterest, oldCrs));
     }
 
     /**
@@ -523,12 +564,13 @@ public class DefaultMapContext implements MapContext {
         this.areaOfInterest = areaOfInterest;
 
         fireMapBoundsListenerMapBoundsChanged(new MapBoundsEvent(this,
-                MapBoundsEvent.AREA_OF_INTEREST_MASK, oldAreaOfInterest, this.crs));
+                MapBoundsEvent.AREA_OF_INTEREST_MASK, oldAreaOfInterest,
+                this.crs));
     }
 
     /**
-     * Gets the current area of interest. If no area of interest is the, the default is to fall
-     * back on the layer bounds
+     * Gets the current area of interest. If no area of interest is the, the
+     * default is to fall back on the layer bounds
      *
      * @return Current area of interest
      */
@@ -537,8 +579,8 @@ public class DefaultMapContext implements MapContext {
             try {
                 areaOfInterest = getLayerBounds();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Can't get layer bounds, and area of interest is not set",
-                    e);
+                LOGGER.log(Level.SEVERE,
+                    "Can't get layer bounds, and area of interest is not set", e);
 
                 return null;
             }
@@ -561,8 +603,8 @@ public class DefaultMapContext implements MapContext {
     }
 
     /**
-     * Transform the coordinates according to the provided transform. Useful for zooming and
-     * panning processes.
+     * Transform the coordinates according to the provided transform. Useful
+     * for zooming and panning processes.
      *
      * @param transform The transform to change area of interest.
      */
@@ -575,10 +617,12 @@ public class DefaultMapContext implements MapContext {
         coords[2] = areaOfInterest.getMaxX();
         coords[3] = areaOfInterest.getMaxY();
         transform.transform(coords, 0, coords, 0, 2);
-        this.areaOfInterest = new Envelope(coords[0], coords[2], coords[1], coords[3]);
+        this.areaOfInterest = new Envelope(coords[0], coords[2], coords[1],
+                coords[3]);
 
         fireMapBoundsListenerMapBoundsChanged(new MapBoundsEvent(this,
-                MapBoundsEvent.AREA_OF_INTEREST_MASK, oldAreaOfInterest, this.crs));
+                MapBoundsEvent.AREA_OF_INTEREST_MASK, oldAreaOfInterest,
+                this.crs));
     }
 
     /**
@@ -591,19 +635,20 @@ public class DefaultMapContext implements MapContext {
      */
     public void moveLayer(int sourcePosition, int destPosition) {
         if ((sourcePosition < 0) || (sourcePosition >= layerList.size())) {
-            throw new IndexOutOfBoundsException("Source position " + sourcePosition
-                + " out of bounds");
+            throw new IndexOutOfBoundsException("Source position "
+                + sourcePosition + " out of bounds");
         }
 
         if ((destPosition < 0) || (destPosition >= layerList.size())) {
-            throw new IndexOutOfBoundsException("Destination position " + destPosition
-                + " out of bounds");
+            throw new IndexOutOfBoundsException("Destination position "
+                + destPosition + " out of bounds");
         }
 
         MapLayer layer = (MapLayer) layerList.remove(sourcePosition);
         layerList.add(destPosition, layer);
-        fireMapLayerListListenerLayerMoved(new MapLayerListEvent(this, layer, Math.min(sourcePosition, destPosition),
-            Math.max(sourcePosition, destPosition)));
+        fireMapLayerListListenerLayerMoved(new MapLayerListEvent(this, layer,
+                Math.min(sourcePosition, destPosition),
+                Math.max(sourcePosition, destPosition)));
     }
 
     /**
@@ -617,7 +662,8 @@ public class DefaultMapContext implements MapContext {
 
         layerList.clear();
 
-        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, null, 0, 1));
+        fireMapLayerListListenerLayerRemoved(new MapLayerListEvent(this, null,
+                0, 1));
     }
 
     /**
@@ -652,7 +698,8 @@ public class DefaultMapContext implements MapContext {
 
         String oldAbstracts = this.abstracts;
         this.abstracts = abstractValue;
-        propertyChangeSupport.firePropertyChange("abstract", oldAbstracts, abstracts);
+        propertyChangeSupport.firePropertyChange("abstract", oldAbstracts,
+            abstracts);
     }
 
     /**
@@ -678,8 +725,8 @@ public class DefaultMapContext implements MapContext {
 
         String oldContactInformation = this.contactInformation;
         this.contactInformation = contactInformation;
-        propertyChangeSupport.firePropertyChange("contactInformation", oldContactInformation,
-            contactInformation);
+        propertyChangeSupport.firePropertyChange("contactInformation",
+            oldContactInformation, contactInformation);
     }
 
     /**
@@ -712,7 +759,8 @@ public class DefaultMapContext implements MapContext {
 
         String[] oldKeywords = this.keywords;
         this.keywords = keywords;
-        propertyChangeSupport.firePropertyChange("keywords", oldKeywords, keywords);
+        propertyChangeSupport.firePropertyChange("keywords", oldKeywords,
+            keywords);
     }
 
     /**
@@ -756,7 +804,8 @@ public class DefaultMapContext implements MapContext {
             listenerList = new javax.swing.event.EventListenerList();
         }
 
-        listenerList.add(org.geotools.map.event.MapLayerListListener.class, listener);
+        listenerList.add(org.geotools.map.event.MapLayerListListener.class,
+            listener);
     }
 
     /**
@@ -770,7 +819,8 @@ public class DefaultMapContext implements MapContext {
             return;
         }
 
-        listenerList.remove(org.geotools.map.event.MapLayerListListener.class, listener);
+        listenerList.remove(org.geotools.map.event.MapLayerListListener.class,
+            listener);
     }
 
     /**
@@ -778,7 +828,8 @@ public class DefaultMapContext implements MapContext {
      *
      * @param event The event to be fired
      */
-    private void fireMapLayerListListenerLayerAdded(org.geotools.map.event.MapLayerListEvent event) {
+    private void fireMapLayerListListenerLayerAdded(
+        org.geotools.map.event.MapLayerListEvent event) {
         if (listenerList == null) {
             return;
         }
@@ -787,7 +838,8 @@ public class DefaultMapContext implements MapContext {
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == org.geotools.map.event.MapLayerListListener.class) {
-                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1]).layerAdded(event);
+                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1])
+                .layerAdded(event);
             }
         }
     }
@@ -807,7 +859,8 @@ public class DefaultMapContext implements MapContext {
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == org.geotools.map.event.MapLayerListListener.class) {
-                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1]).layerRemoved(event);
+                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1])
+                .layerRemoved(event);
             }
         }
     }
@@ -827,7 +880,8 @@ public class DefaultMapContext implements MapContext {
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == org.geotools.map.event.MapLayerListListener.class) {
-                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1]).layerChanged(event);
+                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1])
+                .layerChanged(event);
             }
         }
     }
@@ -837,7 +891,8 @@ public class DefaultMapContext implements MapContext {
      *
      * @param event The event to be fired
      */
-    private void fireMapLayerListListenerLayerMoved(org.geotools.map.event.MapLayerListEvent event) {
+    private void fireMapLayerListListenerLayerMoved(
+        org.geotools.map.event.MapLayerListEvent event) {
         if (listenerList == null) {
             return;
         }
@@ -846,7 +901,8 @@ public class DefaultMapContext implements MapContext {
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == org.geotools.map.event.MapLayerListListener.class) {
-                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1]).layerMoved(event);
+                ((org.geotools.map.event.MapLayerListListener) listeners[i + 1])
+                .layerMoved(event);
             }
         }
     }
@@ -856,7 +912,8 @@ public class DefaultMapContext implements MapContext {
      *
      * @param listener The listener to register.
      */
-    public synchronized void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
+    public synchronized void addPropertyChangeListener(
+        java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
@@ -879,12 +936,14 @@ public class DefaultMapContext implements MapContext {
      *
      * @param listener The listener to register.
      */
-    public synchronized void addMapBoundsListener(org.geotools.map.event.MapBoundsListener listener) {
+    public synchronized void addMapBoundsListener(
+        org.geotools.map.event.MapBoundsListener listener) {
         if (listenerList == null) {
             listenerList = new javax.swing.event.EventListenerList();
         }
 
-        listenerList.add(org.geotools.map.event.MapBoundsListener.class, listener);
+        listenerList.add(org.geotools.map.event.MapBoundsListener.class,
+            listener);
     }
 
     /**
@@ -898,7 +957,8 @@ public class DefaultMapContext implements MapContext {
             return;
         }
 
-        listenerList.remove(org.geotools.map.event.MapBoundsListener.class, listener);
+        listenerList.remove(org.geotools.map.event.MapBoundsListener.class,
+            listener);
     }
 
     /**
@@ -906,7 +966,8 @@ public class DefaultMapContext implements MapContext {
      *
      * @param event The event to be fired
      */
-    private void fireMapBoundsListenerMapBoundsChanged(org.geotools.map.event.MapBoundsEvent event) {
+    private void fireMapBoundsListenerMapBoundsChanged(
+        org.geotools.map.event.MapBoundsEvent event) {
         if (listenerList == null) {
             return;
         }
@@ -915,7 +976,8 @@ public class DefaultMapContext implements MapContext {
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == org.geotools.map.event.MapBoundsListener.class) {
-                ((org.geotools.map.event.MapBoundsListener) listeners[i + 1]).mapBoundsChanged(event);
+                ((org.geotools.map.event.MapBoundsListener) listeners[i + 1])
+                .mapBoundsChanged(event);
             }
         }
     }
