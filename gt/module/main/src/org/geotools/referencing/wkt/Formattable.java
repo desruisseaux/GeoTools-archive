@@ -26,11 +26,14 @@ package org.geotools.referencing.wkt;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.GeneralParameterValue;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.GeneralParameterValue;
 
 
 /**

@@ -28,17 +28,12 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.Locale;
-
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
-import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.XMath;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
@@ -50,6 +45,13 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.util.CodeList;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XMath;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**

@@ -30,12 +30,23 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.imageio.spi.ServiceRegistry;
 
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.OperationMethod;
+
+// Geotools dependencies
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -46,14 +57,6 @@ import org.geotools.resources.LazySet;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.WeakHashSet;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.OperationMethod;
 
 
 /**
@@ -143,10 +146,13 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
 
     /**
      * Returns a set of all available {@linkplain MathTransform math transform} methods. For each
-     * element in this set, the {@linkplain OperationMethod#getName operation method name} is the
-     * classification name to be recognized by the {@link #getDefaultParameters} method.
+     * element in this set, the {@linkplain OperationMethod#getName operation method name} will be
+     * a classification name known to the {@link #getDefaultParameters} method in this factory.
      *
      * @return All {@linkplain MathTransform math transform} methods available in this factory.
+     *
+     * @see #getDefaultParameters
+     * @see #createParameterizedTransform
      */
     public Set getAvailableTransforms() {
         return new LazySet(getProviders(MathTransformProvider.class));
@@ -198,17 +204,21 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     
     /**
      * Returns the default parameter values for a math transform of the given classification.
-     * The {@linkplain ParameterDescriptorGroup#getName parameter group name} will be the given
-     * classification, in order to allows direct use by {@link #createParameterizedTransform
-     * createParameterizedTransform}. The list of available classifications is implementation
-     * dependent.
+     * The classification may be the name of any operation method returned by the
+     * {@link #getAvailableTransforms} method. A typical example is
+     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
      *
-     * <P>This method always returns new values. Consequently, it is safe to modify the returned
-     * parameter values group and give them to <code>{@linkplain #createParameterizedTransform
+     * <P>The {@link #createParameterizedTransform createParameterizedTransform} method
+     * in this factory shall be able to infer the classification from the parameter group
+     * returned by this method. For this purpose, the current implementation set the
+     * {@linkplain ParameterDescriptorGroup#getName parameter group name} to the classification
+     * name.</P>
+     *
+     * <P>This method creates new parameter instances at every call. It is intented to be modified
+     * by the user before to be passed to <code>{@linkplain #createParameterizedTransform
      * createParameterizedTransform}(parameters)</code>.</P>
      *
-     * @param  classification The case insensitive classification to search for (e.g.
-     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
+     * @param  classification The case insensitive classification to search for.
      * @return The default parameter values.
      * @throws NoSuchIdentifierException if there is no transform registered for the specified
      *         classification.
@@ -225,12 +235,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Creates a transform from a group of parameters. The
-     * {@linkplain ParameterDescriptorGroup#getName parameter group name}
-     * is used as the classification name of the transform to construct (e.g.
-     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
-     * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
-     * parameters for cartographic projection transforms. Example:
+     * Creates a transform from a group of parameters. The classification name is inferred from
+     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}. Example:
      *
      * <blockquote><pre>
      * ParameterValueGroup p = factory.getDefaultParameters("Transverse_Mercator");
@@ -264,6 +270,9 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
              * programming errors (e.g. null pointer).
              */
             throw new FactoryException(exception);
+        }
+        if (tr instanceof AbstractMathTransform) {
+            ((AbstractMathTransform) tr).method = provider;
         }
         tr = (MathTransform) pool.canonicalize(tr);
         return tr;

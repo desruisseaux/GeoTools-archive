@@ -64,7 +64,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
-public class StereographicEquatorial extends StereographicOblique{
+public class StereographicEquatorial extends StereographicOblique {
     /**
      * A constant used in the transformations.
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
@@ -86,7 +86,7 @@ public class StereographicEquatorial extends StereographicOblique{
     {
         super(parameters, expected, stereoType);
         this.stereoType = stereoType;
-        assert super.k0 == k0;
+        assert super.k0 == k0 : super.k0;
         latitudeOfOrigin = 0.0;
     }
     

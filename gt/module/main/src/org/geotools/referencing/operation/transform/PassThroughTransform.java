@@ -167,7 +167,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
          * PassThroughTransform object. It is faster and easier to concatenate.
          */
         if (subTransform instanceof LinearTransform) {
-            GeneralMatrix matrix = ProjectiveTransform.wrap(((LinearTransform)subTransform).getMatrix());
+            GeneralMatrix matrix = GeneralMatrix.wrap(((LinearTransform)subTransform).getMatrix());
             matrix = PassThroughTransform.expand(matrix, firstAffectedOrdinate, numTrailingOrdinates, 1);
             return ProjectiveTransform.create(matrix);
         }
@@ -286,7 +286,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         for (int i=0; i<transDim; i++) {
             subPoint.ordinates[i] = point.getOrdinate(i + firstAffectedOrdinate);
         }
-        return expand(wrap(subTransform.derivative(subPoint)),
+        return expand(GeneralMatrix.wrap(subTransform.derivative(subPoint)),
                       firstAffectedOrdinate, numTrailingOrdinates, 0);
     }
 

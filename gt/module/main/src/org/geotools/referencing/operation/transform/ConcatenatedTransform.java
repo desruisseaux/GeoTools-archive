@@ -57,12 +57,12 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     /**
      * The first math transform.
      */
-    protected final MathTransform transform1;
+    public final MathTransform transform1;
     
     /**
      * The second math transform.
      */
-    protected final MathTransform transform2;
+    public final MathTransform transform2;
     
     /**
      * The inverse transform. This field will be computed only when needed.
@@ -380,11 +380,12 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         final int numCol = matrix1.getNumCol();
         final GeneralMatrix matrix;
         if (numCol == matrix2.getNumCol()) {
-            matrix = wrap(matrix2);
-            matrix.mul(wrap(matrix1));
+            matrix  =  GeneralMatrix.wrap(matrix2);
+            matrix.mul(GeneralMatrix.wrap(matrix1));
         } else {
             matrix = new GeneralMatrix(numRow, numCol);
-            matrix.mul(wrap(matrix2), wrap(matrix1));
+            matrix.mul(GeneralMatrix.wrap(matrix2),
+                       GeneralMatrix.wrap(matrix1));
         }
         return matrix;
     }

@@ -42,7 +42,6 @@ import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.gc.GC_GridGeometry;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
@@ -318,7 +317,6 @@ public class GridGeometry implements Serializable {
      * @return The grid range (never <code>null</code>).
      * @throws InvalidGridGeometryException if this grid geometry has no grid range.
      *
-     * @see GC_GridGeometry#getGridRange
      * @see RenderedImage#getMinX
      * @see RenderedImage#getMinY
      * @see RenderedImage#getWidth
@@ -345,8 +343,6 @@ public class GridGeometry implements Serializable {
      *
      * @return The transform (never <code>null</code>).
      * @throws InvalidGridGeometryException if this grid geometry has no transform.
-     *
-     * @see GC_GridGeometry#getGridToCoordinateSystem
      */
     public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
         if (gridToCoordinateSystem != null) {

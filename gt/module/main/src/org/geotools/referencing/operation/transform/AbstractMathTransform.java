@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -73,6 +74,14 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
+    /**
+     * The operation method for this math transform. This is usually the
+     * {@link MathTransformProvider} that constructed this math transform.
+     *
+     * @todo Move this class one level up, and make this field package-privated.
+     */
+    public OperationMethod method;
+
     /**
      * Construct a math transform.
      */
@@ -109,6 +118,20 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     public abstract int getTargetDimensions();
 
+    /**
+     * The method for this math transform, or <code>null</code> if unknow. This information is
+     * automatically set to the {@linkplain MathTransformProvider math transform provider} if
+     * this math transform was constructed through
+     * {@link MathTransformFactory#createParameterizedTransform}. It is null in all other cases.
+     * This behavior is used in order to separate main transforms (e.g.
+     * {@linkplain org.geotools.referencing.operation.projection.MapProjection map projections})
+     * from secondary transforms (e.g. axis swapping or unit conversions created with
+     * {@link MathTransformFactory#createAffineTransform}).
+     */
+    public final OperationMethod getMethod() {
+        return method;
+    }
+    
     /**
      * Returns the parameter descriptors for this math transform,
      * or <code>null</code> if unknow. This method is similar to
@@ -523,17 +546,6 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }
-
-    /**
-     * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
-     */
-    static GeneralMatrix wrap(final Matrix matrix) {
-        if (matrix instanceof GeneralMatrix) {
-            return (GeneralMatrix) matrix;
-        } else {
-            return new GeneralMatrix(matrix);
-        }
-    }
     
     /**
      * Creates the inverse transform of this object.
@@ -595,13 +607,19 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Compares the specified object with this math transform for equality.
      * The default implementation checks if <code>object</code> is an instance
-     * of the same class than <code>this</code>. Subclasses should override
-     * this method in order to compare internal fields.
+     * of the same class than <code>this</code> and use the same parameter descriptor.
+     * Subclasses should override this method in order to compare internal fields.
      */
     public boolean equals(final Object object) {
         // Do not check 'object==this' here, since this
         // optimization is usually done in subclasses.
-        return (object!=null && getClass().equals(object.getClass()));
+        if (object!=null && getClass().equals(object.getClass())) {
+            final AbstractMathTransform that = (AbstractMathTransform) object;
+            return Utilities.equals(this.method, that.method) &&
+                   Utilities.equals(this.getParameterDescriptors(),
+                                    that.getParameterDescriptors());
+        }
+        return false;
     }
     
     /**

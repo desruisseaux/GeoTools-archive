@@ -23,17 +23,18 @@
 package org.geotools.referencing.crs;
 
 // J2SE dependencies
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
-
 import javax.units.Unit;
 
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.AxisDirection;
@@ -45,6 +46,13 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -173,27 +181,30 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
         if (!equals(sourceOp.getMethod(), targetOp.getMethod(), false)) {
             return null;
         }
-        final GeneralParameterValue[] sourceParams = sourceOp.getParameterValues();
-        final GeneralParameterValue[] targetParams = targetOp.getParameterValues();
-        if (sourceParams==null || targetParams==null) {
+        final ParameterValueGroup sourceGroup = sourceOp.getParameterValues();
+        final ParameterValueGroup targetGroup = targetOp.getParameterValues();
+        if (sourceGroup==null || targetGroup==null) {
             return null;
         }
+        final Collection sourceParams = sourceGroup.values();
+        final Collection targetParams = targetGroup.values();
+        final GeneralParameterValue[] sourceArray = (GeneralParameterValue[])
+                sourceParams.toArray(new GeneralParameterValue[sourceParams.size()]);
         double scaleX = 1;
         double scaleY = 1;
         double  oldTX = 0;
         double  oldTY = 0;
         double  newTX = 0;
         double  newTY = 0;
-        final boolean[] done = new boolean[sourceParams.length];
-search: for (int i=0; i<targetParams.length; i++) {
-            final GeneralParameterValue      targetParam = targetParams[i];
+search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
+            final GeneralParameterValue      targetParam = (GeneralParameterValue) it.next();
             final GeneralParameterDescriptor descriptor  = targetParam.getDescriptor();
             final String                     name        = descriptor.getName().getCode();
-            for (int j=0; j<sourceParams.length; j++) {
-                if (done[j]) {
+            for (int j=0; j<sourceArray.length; j++) {
+                final GeneralParameterValue sourceParam = sourceArray[j];
+                if (sourceParam == null) {
                     continue;
                 }
-                final GeneralParameterValue sourceParam = sourceParams[j];
                 if (nameMatches(sourceParam.getDescriptor(), name)) {
                     if (sourceParam instanceof ParameterValue &&
                         targetParam instanceof ParameterValue)
@@ -251,7 +262,7 @@ search: for (int i=0; i<targetParams.length; i++) {
                      * End of processing of the pair of matching parameters.
                      * Search for a new pair.
                      */
-                    done[j] = true;
+                    sourceArray[j] = null;
                     continue search;
                 }
             }
@@ -266,8 +277,8 @@ search: for (int i=0; i<targetParams.length; i++) {
          * the source array without a matching parameter in the destination
          * array.
          */
-        for (int i=0; i<done.length; i++) {
-            if (!done[i]) {
+        for (int i=0; i<sourceArray.length; i++) {
+            if (sourceArray[i] != null) {
                 return null;
             }
         }
@@ -330,6 +341,65 @@ search: for (int i=0; i<targetParams.length; i++) {
         }
         return matrix;
     }
+
+    /**
+     * Returns the projection parameter values, or an empty array if none.
+     * Invoking this method is similar to invoking <code>{@linkplain #conversionFromBase
+     * conversionFromBase}.{@linkplain Conversion#getParameterValues getParameterValues}()</code>,
+     * except that only parameters relative to the projection are returned. More specifically,
+     * if some affine transform steps were added (for axis swapping or unit conversions), they
+     * will be ignored.
+     *
+     * @see org.opengis.referencing.operation.MathTransformFactory#createParameterizedTransform
+     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
+     */
+    public ParameterValueGroup getParameterValues() {
+        try {
+            return conversionFromBase.getParameterValues();
+        } catch (UnsupportedOperationException exception) {
+            /*
+             * HACK: A special processing is performed for concatenated transforms. Some steps may
+             *       be affine transforms added for swapping axis or unit conversions. They will be
+             *       ignored, since this method is about projection parameters only. This check will
+             *       work for Geotools implementation only. If the transforms are not recognized,
+             *       then the above exception will be thrown as if this test were never performed.
+             */
+            return getParameterValues(conversionFromBase.getMathTransform(), exception);
+        }
+    }
+
+    /**
+     * Returns the parameter values for the specified math transform, ignoring parameters
+     * for linear transforms. This method invokes itself recursively in order to inspect
+     * concatenated transforms.
+     *
+     * @param  mt        The math transform to check.
+     * @param  exception The exception to throws in case of failure.
+     * @return The parameter values.
+     * @throws UnsupportedOperationException if the parameters can't be fetched.
+     *         This is usually the <code>exception</code> specified in argument.
+     */
+    private static ParameterValueGroup getParameterValues(final MathTransform mt,
+                                                          final UnsupportedOperationException exception)
+    {
+        if (mt instanceof LinearTransform) {
+            return null;
+        }
+        if (mt instanceof ConcatenatedTransform) {
+            final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
+            final ParameterValueGroup param1 = getParameterValues(ct.transform1, exception);
+            final ParameterValueGroup param2 = getParameterValues(ct.transform2, exception);
+            if (param1 == null) return param2;
+            if (param2 == null) return param1;
+        }
+        if (mt instanceof AbstractMathTransform) {
+            final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
+            if (param != null) {
+                return param;
+            }
+        }
+        throw exception;
+    }
     
     /**
      * Returns a hash value for this projected CRS.
@@ -358,9 +428,19 @@ search: for (int i=0; i<targetParams.length; i++) {
                                  getAngularUnit(baseCRS.getCoordinateSystem()));
         formatter.append(baseCRS);
         formatter.append(conversionFromBase.getMethod());
-        final GeneralParameterValue[] parameters = conversionFromBase.getParameterValues();
-        for (int i=0; i<parameters.length; i++) {
-            formatter.append(parameters[i]);
+        final Collection parameters = getParameterValues().values();
+        for (final Iterator it=parameters.iterator(); it.hasNext();) {
+            final GeneralParameterValue param = (GeneralParameterValue) it.next();
+            if (nameMatches(param.getDescriptor(), "semi_major") ||
+                nameMatches(param.getDescriptor(), "semi_minor"))
+            {
+                /*
+                 * Do not format semi-major and semi-minor axis length,
+                 * since those informations are provided in the ellipsoid.
+                 */
+                continue;
+            }
+            formatter.append(param);
         }
         formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();

@@ -258,14 +258,12 @@ set _Mercator5_ = PROJCS["Mercator_1SP", _sphere_, PROJECTION["Mercator_1SP"], P
 source crs = _sphere_
 target crs = _Mercator5_
 test tolerance = (1e-5, 1e-5)
-print crs
 
 source pt = (-123.1, 49.2166666666)
 target pt = (-44908338.7410309, 20684472.5614467)
 
 source pt = (2.33656753, 43.96499314)
 target pt = (852407.523383703, 17893383.3945112)
-print pts
 
 source pt = (151.283333333, -33.9166666666)
 target pt = (55189952.71479, -13166379.0404011)

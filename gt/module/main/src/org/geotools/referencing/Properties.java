@@ -114,10 +114,9 @@ final class Properties extends AbstractMap {
         if (entries == null) {
             entries = new HashSet(Math.round(KEYS.length/0.75f)+1, 0.75f);
             for (int i=0; i<KEYS.length; i++) {
-                final String key = KEYS[i];
                 final Object value = get(i);
                 if (value != null) {
-                    entries.add(new MapEntry(key, value));
+                    entries.add(new MapEntry(KEYS[i], value));
                 }
             }
         }

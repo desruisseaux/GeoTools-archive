@@ -655,7 +655,7 @@ source crs=_NAD27_
 target crs=_OMerc11_
 test tolerance=(1e-1, 1e-1)
 
-source pt=(-76.8707953, 38.8092128)
+source pt=(38.8092128, -76.8707953)
 target pt=(1091027.1, 4277491.9)
 
 
@@ -1852,7 +1852,7 @@ target crs=_TwoPoint8_
 test tolerance=(1e-1, 1e-1)
 
 //from Snyder's "Map Projections", p. 274
-source pt=(-74, 40.8)
+source pt=(40.8, -74)
 target pt=(963436.1, 4369142.8)
 
 

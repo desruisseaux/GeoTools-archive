@@ -27,11 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.SingleCRS;
@@ -43,6 +39,14 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -193,20 +197,23 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
              * inferred from the MathTransform. This work for Geotools implementation,
              * but is likely to fails to infer parameters for other implementations.
              */
-            Map inherit = properties;
-            ParameterDescriptorGroup descriptors = null;
-            if (baseToDerived instanceof AbstractMathTransform) {
-                descriptors = ((AbstractMathTransform) baseToDerived).getParameterDescriptors();
-                if (descriptors != null) {
-                    inherit = new HashMap(properties);
-                    inherit.putAll(getProperties(descriptors));
+            method = getMethod(baseToDerived, null);
+            if (method == null) {
+                Map inherit = properties;
+                ParameterDescriptorGroup descriptors = null;
+                if (baseToDerived instanceof AbstractMathTransform) {
+                    descriptors = ((AbstractMathTransform) baseToDerived).getParameterDescriptors();
+                    if (descriptors != null) {
+                        inherit = new HashMap(properties);
+                        inherit.putAll(getProperties(descriptors));
+                    }
                 }
+                method = new org.geotools.referencing.operation.OperationMethod(
+                        /* properties       */ new UnprefixedMap(inherit, "method."),
+                        /* sourceDimensions */ dimSource,
+                        /* targetDimensions */ dimTarget,
+                        /* parameters       */ descriptors);
             }
-            method = new org.geotools.referencing.operation.OperationMethod(
-                    /* properties       */ new UnprefixedMap(inherit, "method."),
-                    /* sourceDimensions */ dimSource,
-                    /* targetDimensions */ dimTarget,
-                    /* parameters       */ descriptors);
         }
         /*
          * Constructs the conversion from all the information above. The ProjectedCRS subclass
@@ -218,6 +225,36 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                 /* targetCRS  */ this,
                 /* transform  */ baseToDerived,
                 /* method     */ method);
+    }
+
+    /**
+     * Returns the operation method for the specified math transform, or <code>null</code> if
+     * unknow. If the math transform is a concatenated math transform, then this method looks
+     * for one and only one math transform created by
+     * {@link org.geotools.referencing.operation.MathTransformFactory#createParameterizedTransform}.
+     * We do that in order to ignore affine transform concatenated for axis switching or units
+     * conversion, e.g. a map projection using (latitude,longitude) axis order instead of
+     * (longitude,latitude); they do not fundamentally change the operation method.
+     */
+    private static OperationMethod getMethod(final MathTransform tr, boolean[] foundMany) {
+        if (tr instanceof ConcatenatedTransform) {
+            if (foundMany == null) {
+                foundMany = new boolean[1];
+            }
+            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr;
+            final OperationMethod o1 = getMethod(ctr.transform1, foundMany);
+            final OperationMethod o2 = getMethod(ctr.transform2, foundMany);
+            if (!foundMany[0]) {
+                if (o1 == null) return o2;
+                if (o2 == null) return o1;
+                foundMany[0] = true;
+            }
+            return null;
+        }
+        if (tr instanceof AbstractMathTransform) {
+            return ((AbstractMathTransform) tr).getMethod();
+        }
+        return null;
     }
 
     /**

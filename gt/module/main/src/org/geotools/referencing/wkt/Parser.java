@@ -788,8 +788,7 @@ public class Parser extends MathTransformParser {
                 axis1 = createAxis("Y", AxisDirection.NORTH, linearUnit);
             }
             element.close();
-            return crsFactory.createProjectedCRS(properties, geoCRS,
-                    mtFactory.createParameterizedTransform(projection),
+            return crsFactory.createProjectedCRS(properties, geoCRS, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);

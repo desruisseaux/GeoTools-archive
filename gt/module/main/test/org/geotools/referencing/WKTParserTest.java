@@ -21,15 +21,19 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// Geotools dependencies
+import org.geotools.referencing.crs.ProjectedCRS;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Parser;
@@ -68,6 +72,94 @@ public class WKTParserTest extends TestCase {
     }
 
     /**
+     * Test a hard coded version of a WKT. This is more convenient for debugging.
+     */
+    public void testHardCoded() throws ParseException {
+        final Parser parser = new Parser();
+        String       wkt1, wkt2;
+        ProjectedCRS crs1, crs2;
+        /*
+         * First, rather simple Mercator projection.
+         * Uses standard units and axis order.
+         */
+        wkt1 = "PROJCS[\"Mercator test\",\n"                             +
+               "  GEOGCS[\"WGS84\",\n"                                   +
+               "    DATUM[\"WGS84\",\n"                                  +
+               "      SPHEROID[\"WGS84\", 6378137.0, 298.257223563]],\n" +
+               "    PRIMEM[\"Greenwich\", 0.0],\n"                       +
+               "    UNIT[\"degree\", 0.017453292519943295],\n"           +
+               "    AXIS[\"Longitude\", EAST],\n"                        +
+               "    AXIS[\"Latitude\", NORTH]],\n"                       +
+               "  PROJECTION[\"Mercator_1SP\"],\n"                       +
+               "  PARAMETER[\"central_meridian\", -20.0],\n"             +
+               "  PARAMETER[\"scale_factor\", 1.0],\n"                   +
+               "  PARAMETER[\"false_easting\", 500000.0],\n"             +
+               "  PARAMETER[\"false_northing\", 0.0],\n"                 +
+               "  UNIT[\"m\", 1.0],\n"                                   +
+               "  AXIS[\"x\", EAST],\n"                                  +
+               "  AXIS[\"y\", NORTH]]\n";
+        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2 = parser.format(crs1);
+        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        assertEquals(crs1, crs2);
+        assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
+        assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("PARAM_MT[\"Mercator_1SP\""));
+        /*
+         * Same Mercator projection as above, but
+         * switch longitude and latitude axis.
+         */
+        wkt1 = "PROJCS[\"Mercator test\",\n"                             +
+               "  GEOGCS[\"WGS84\",\n"                                   +
+               "    DATUM[\"WGS84\",\n"                                  +
+               "      SPHEROID[\"WGS84\", 6378137.0, 298.257223563]],\n" +
+               "    PRIMEM[\"Greenwich\", 0.0],\n"                       +
+               "    UNIT[\"degree\", 0.017453292519943295],\n"           +
+               "    AXIS[\"Latitude\", NORTH],\n"                        +
+               "    AXIS[\"Longitude\", EAST]],\n"                       +
+               "  PROJECTION[\"Mercator_1SP\"],\n"                       +
+               "  PARAMETER[\"central_meridian\", -20.0],\n"             +
+               "  PARAMETER[\"scale_factor\", 1.0],\n"                   +
+               "  PARAMETER[\"false_easting\", 500000.0],\n"             +
+               "  PARAMETER[\"false_northing\", 0.0],\n"                 +
+               "  UNIT[\"m\", 1.0],\n"                                   +
+               "  AXIS[\"x\", EAST],\n"                                  +
+               "  AXIS[\"y\", NORTH]]\n";
+        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2 = parser.format(crs1);
+        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        assertEquals(crs1, crs2);
+        assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
+        assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("CONCAT_MT[PARAM_MT["));
+        /*
+         * Try an other projection (Transverse Mercator).
+         */
+        wkt1 = "PROJCS[\"OSGB 1936 / British National Grid\",\n"                                          +
+               "  GEOGCS[\"OSGB 1936\",\n"                                                                +
+               "    DATUM[\"OSGB_1936\",\n"                                                               +
+               "      SPHEROID[\"Airy 1830\", 6377563.396, 299.3249646, AUTHORITY[\"EPSG\",\"7001\"]],\n" +
+               "      TOWGS84[375.0, -111.0, 431.0, 0.0, 0.0, 0.0, 0.0],\n"                               +
+               "      AUTHORITY[\"EPSG\",\"6277\"]],\n"                                                   +
+               "    PRIMEM[\"Greenwich\",0.0, AUTHORITY[\"EPSG\",\"8901\"]],\n"                           +
+               "    UNIT[\"DMSH\",0.0174532925199433, AUTHORITY[\"EPSG\",\"9108\"]],\n"                   +
+               "    AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST], AUTHORITY[\"EPSG\",\"4277\"]],\n"            +
+               "  PROJECTION[\"Transverse_Mercator\"],\n"                                                 +
+               "  PARAMETER[\"latitude_of_origin\", 49.0],\n"                                             +
+               "  PARAMETER[\"central_meridian\", -2.0],\n"                                               +
+               "  PARAMETER[\"scale_factor\", 0.999601272],\n"                                            +
+               "  PARAMETER[\"false_easting\", 400000.0],\n"                                              +
+               "  PARAMETER[\"false_northing\", -100000.0],\n"                                            +
+               "  UNIT[\"metre\", 1.0, AUTHORITY[\"EPSG\",\"9001\"]],\n"                                  +
+               "  AXIS[\"E\",EAST],\n"                                                                    +
+               "  AXIS[\"N\",NORTH],\n"                                                                   +
+               "  AUTHORITY[\"EPSG\",\"27700\"]]\n";
+        crs1 = (ProjectedCRS) parser.parseObject(wkt1);
+        wkt2 = parser.format(crs1);
+        crs2 = (ProjectedCRS)parser.parseObject(wkt2);
+        assertEquals(crs1, crs2);
+        assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
+    }
+
+    /**
      * Parse parsing of math transforms.
      */
     public void testMathTransform() throws IOException, ParseException {
@@ -90,7 +182,10 @@ public class WKTParserTest extends TestCase {
             throws IOException, ParseException
     {
         final BufferedReader reader = TestData.getReader(this, filename);
-        final Collection       pool = new HashSet();
+        if (reader == null) {
+            throw new FileNotFoundException(filename);
+        }
+        final Collection pool = new HashSet();
         String line;
         while ((line=reader.readLine()) != null) {
             line = line.trim();
@@ -123,8 +218,6 @@ public class WKTParserTest extends TestCase {
              * Ensure that the result is consistent.
              */
             String formatted = parser.format(parsed);
-            if (line.indexOf("semi_major")<0) formatted=remove(formatted, "semi_major");
-            if (line.indexOf("semi_minor")<0) formatted=remove(formatted, "semi_minor");
             final Object again;
             try {
                 again = parser.parseObject(formatted);
@@ -145,28 +238,5 @@ public class WKTParserTest extends TestCase {
             assertTrue("Inconsistent hashCode or equals method.",  pool.contains(again));
         }
         reader.close();
-    }
-
-    /**
-     * Remove the "PARAMETER" statement of the given name. This is needed because
-     * "semi_major" and "semi_minor" are not explicit parameters in the original
-     * WKT strings. The WKT formatter add them, but may format them in a different
-     * unit. Parsing them again may result in rounding errors.
-     */
-    private static String remove(final String wkt, final String param) {
-        int offset = -1;
-        while ((offset=wkt.indexOf("PARAMETER[", offset+1)) >= 0) {
-            final int present = wkt.indexOf(param);
-            int end = wkt.indexOf(']', offset);
-            if (present>=offset && present<end) {
-                final int length = wkt.length();
-                while (++end<length && Character.isWhitespace(wkt.charAt(end)));
-                if (end<length && wkt.charAt(end)==',') {
-                    end++;
-                }
-                return wkt.substring(0, offset) + wkt.substring(end);
-            }
-        }
-        return wkt;
     }
 }

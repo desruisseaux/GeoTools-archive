@@ -183,7 +183,7 @@ public class TransverseMercator extends MapProjection {
 
         /**
          * The parameters group.
-         * @task REVISIT: should we set some defualt UTM parameter values
+         * @task REVISIT: should we set some default UTM parameter values
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Transverse_Mercator"),

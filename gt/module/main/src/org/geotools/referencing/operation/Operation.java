@@ -27,14 +27,16 @@ package org.geotools.referencing.operation;
 import java.util.Collection;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.util.UnsupportedImplementationException;
-import org.opengis.parameter.GeneralParameterValue;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
+
+// Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -100,18 +102,20 @@ public class Operation extends SingleOperation
      * The default implementation infer the parameter values from the
      * {@link #transform transform}, if possible.
      *
+     * @throws UnsupportedOperationException if the parameters values can't be determined
+     *         for current math transform implementation.
+     *
      * @see MathTransformFactory#createParameterizedTransform
      * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
-    public GeneralParameterValue[] getParameterValues() {
+    public ParameterValueGroup getParameterValues() throws UnsupportedOperationException {
         if (transform instanceof AbstractMathTransform) {
-            final ParameterValueGroup group =
-                ((AbstractMathTransform) transform).getParameterValues();
-            if (group != null) {
-                final Collection params = group.values();
-                return (GeneralParameterValue[]) params.toArray(
-                        new GeneralParameterValue[params.size()]);
+            final ParameterValueGroup p = ((AbstractMathTransform) transform).getParameterValues();
+            if (p != null) {
+                return p;
             }
+            // TODO: localize the message.
+            throw new UnsupportedOperationException("No parameter available from the math transform");
         }
         throw new UnsupportedImplementationException(transform.getClass());
     }

@@ -127,13 +127,13 @@ public class ScriptTest extends TestCase {
 //    }
     
     /**
-     * Run the {@link #MERCATOR_SCRIPT}.
+     * Run "Mercator.txt".
      *
      * @throws Exception If a test failed.
      */
-//    public void testMercator() throws Exception {
-//        runScript(MERCATOR_SCRIPT);
-//    }
+    public void testMercator() throws Exception {
+        runScript("scripts/Mercator.txt");
+    }
     
     /**
      * Run the "ObliqueMercator.txt".

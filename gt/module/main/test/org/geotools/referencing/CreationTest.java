@@ -21,18 +21,20 @@ package org.geotools.referencing;
 // J2SE dependencies and extensions
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
-
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.resources.Arguments;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
@@ -47,8 +49,14 @@ import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.OperationMethod;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.projection.MapProjection;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -91,6 +99,9 @@ public class CreationTest extends TestCase {
      * @throws FactoryException if a coordinate reference system can't be created.
      */
     public void testCreation() throws FactoryException {
+        out.println();
+        out.println("Testing CRS creations");
+        out.println("---------------------");
         out.println();
         out.println("create Coodinate Reference System....1: ");
         final         DatumFactory datumFactory = FactoryFinder.getDatumFactory();
@@ -167,6 +178,49 @@ public class CreationTest extends TestCase {
     }
 
     /**
+     * Test all map projection creation.
+     */
+    public void testMapProjections() throws FactoryException {
+        out.println();
+        out.println("Testing classification names");
+        out.println("----------------------------");
+        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
+        final Collection methods = mtFactory.getAvailableTransforms();
+        for (final Iterator it=methods.iterator(); it.hasNext();) {
+            final OperationMethod    method = (OperationMethod) it.next();
+            final String     classification = method.getName().getCode();
+            final ParameterValueGroup param = mtFactory.getDefaultParameters(classification);
+            try {
+                param.parameter("semi_major").setValue(6377563.396);
+                param.parameter("semi_minor").setValue(6356256.909237285);
+            } catch (IllegalArgumentException e) {
+                // Above parameters do not exists. Ignore.
+            }
+            final MathTransform mt;
+            try {
+                mt = mtFactory.createParameterizedTransform(param);
+            } catch (FactoryException e) {
+                // Probably not a map projection. This test is mostly about projection, so ignore.
+                continue;
+            } catch (UnsupportedOperationException e) {
+                continue;
+            }
+            if (mt instanceof MapProjection) {
+                out.println(classification);
+                assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
+                final ProjectedCRS projCRS =
+                        new org.geotools.referencing.crs.ProjectedCRS("Test",
+                            org.geotools.referencing.crs.GeographicCRS.WGS84, mt,
+                            org.geotools.referencing.cs.CartesianCS.PROJECTED);
+                final Conversion conversion = projCRS.getConversionFromBase();
+                assertSame(mt, conversion.getMathTransform());
+                final OperationMethod projMethod = conversion.getMethod();
+                assertEquals(classification, projMethod.getName().getCode());
+            }
+        }
+    }
+
+    /**
      * Run the test from the command line.
      *
      * @param args the command line arguments.
@@ -177,6 +231,7 @@ public class CreationTest extends TestCase {
             out = arguments.out;
             final CreationTest test = new CreationTest(null);
             test.testCreation();
+            test.testMapProjections();
         } catch (FactoryException exception) {
             exception.printStackTrace(arguments.err);
         } else {

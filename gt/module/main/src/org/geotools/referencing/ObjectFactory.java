@@ -26,15 +26,18 @@ package org.geotools.referencing;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
-
+import java.util.Set;
+import javax.units.ConversionException;
 import javax.units.Unit;
 
-import org.geotools.referencing.wkt.Parser;
-import org.geotools.referencing.wkt.Symbols;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -71,7 +74,13 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Parser;
+import org.geotools.referencing.wkt.Symbols;
 
 
 /**
@@ -82,14 +91,14 @@ import org.opengis.util.InternationalString;
  * This factory is very flexible, whereas the authority factory is easier to use. So
  * {@link AuthorityFactory} can be used to make "standard" object, and <code>ObjectFactory</code>
  * can be used to make "special" objects.
- *
- * <P>Most methods expect a {@link Map} argument. The map is often (but is not required to be) a
+ * <br><br>
+ * Most methods expect a {@link Map} argument. The map is often (but is not required to be) a
  * {@link java.util.Properties} instance. The map shall contains at least a <code>"name"</code>
  * property. In the common case where the name is the only property, the map may be constructed with
  * <code>Collections.{@linkplain java.util.Collections#singletonMap singletonMap}("name",
  * <var>theName</var>)</code> where <var>theName</var> is an arbitrary name as free text.
  * The properties listed in the following table are also recongnized. Property names are
- * case-insensitive and trailing and leading spaces are ignored.</P>
+ * case-insensitive and trailing and leading spaces are ignored.
  *
  * <table border='1'>
  *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -141,6 +150,12 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
     private transient Parser parser;
 
     /**
+     * The math transform factory to use for creating the conversion of projected CRS.
+     * Will be fetched only when first needed.
+     */
+    private transient MathTransformFactory mtFactory;
+
+    /**
      * Construct a default factory. This method is public in order to allows instantiations
      * from a {@linkplain javax.imageio.spi.ServiceRegistry service registry}. Users should
      * not instantiate this factory directly, but use one of the following lines instead:
@@ -152,17 +167,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * </pre></blockquote>
      */
     public ObjectFactory() {
-    }
-
-    /**
-     * Returns the vendor responsible for creating this factory implementation. Many implementations
-     * may be available for the same factory interface. The default implementation returns
-     * {@linkplain org.geotools.metadata.citation.Citation#GEOTOOLS Geotools}.
-     *
-     * @return The vendor for this factory implementation.
-     */
-    public Citation getVendor() {
-        return org.geotools.metadata.citation.Citation.GEOTOOLS;
     }
 
 
@@ -697,6 +701,72 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         crs = (EngineeringCRS) canonicalize(crs);
         return crs;
     }
+    
+    /**
+     * Creates an image coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Image datum to use in created CRS.
+     * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ImageCRS createImageCRS(Map    properties,
+                                   ImageDatum  datum,
+                                   AffineCS       cs) throws FactoryException
+    {
+        ImageCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.ImageCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (ImageCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a temporal coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Temporal datum to use in created CRS.
+     * @param  cs The Temporal coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public TemporalCRS createTemporalCRS(Map      properties,
+                                         TemporalDatum datum,
+                                         TimeCS           cs) throws FactoryException
+    {
+        TemporalCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.TemporalCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (TemporalCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a vertical coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Vertical datum to use in created CRS.
+     * @param  cs The Vertical coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public VerticalCRS createVerticalCRS(Map     properties,
+                                         VerticalDatum datum,
+                                         VerticalCS       cs) throws FactoryException
+    {
+        VerticalCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.VerticalCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (VerticalCRS) canonicalize(crs);
+        return crs;
+    }
 
     /**
      * Creates a geocentric coordinate reference system from a {@linkplain CartesianCS
@@ -765,45 +835,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
             throw new FactoryException(exception);
         }
         crs = (GeographicCRS) canonicalize(crs);
-        return crs;
-    }
-    
-    /**
-     * Creates an image coordinate reference system. 
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  datum Image datum to use in created CRS.
-     * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @deprecated Provided for compatibility with GeoAPI 1.0, but will be removed in GeoAPI 1.1.
-     */
-    public ImageCRS createImageCRS(Map      properties,
-                                   ImageDatum    datum,
-                                   CoordinateSystem cs) throws FactoryException
-    {
-        return createImageCRS(properties, datum, (AffineCS) cs);
-    }
-    
-    /**
-     * Creates an image coordinate reference system. 
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  datum Image datum to use in created CRS.
-     * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
-     * @throws FactoryException if the object creation failed.
-     */
-    public ImageCRS createImageCRS(Map    properties,
-                                   ImageDatum  datum,
-                                   AffineCS       cs) throws FactoryException
-    {
-        ImageCRS crs;
-        try {
-            crs = new org.geotools.referencing.crs.ImageCRS(properties, datum, cs);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        crs = (ImageCRS) canonicalize(crs);
         return crs;
     }
 
@@ -877,68 +908,143 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      *         be created can be specified with the <code>"conversion."</code> prefix added in
      *         front of property names (example: <code>"conversion.name"</code>).
      * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  projectionName The classification name for the projection to be created
+     * @param  classification The classification name for the projection to be created
      *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
-     * @param  parameterValues The parameter value to give to the projection. Should includes
+     * @param  parameters The parameter values to give to the projection. May includes
      *         "central_meridian", "latitude_of_origin", "scale_factor", "false_easting",
      *         "false_northing" and any other parameters specific to the projection.
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      *
-     * @todo Not yet implemented.
+     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)}
+     *             for concistency with the rest of the API, which work with {@link ParameterValueGroup}
+     *             rather than an array of {@link GeneralParameterValue}.
      */
-    public ProjectedCRS createProjectedCRS(Map                          properties,
-                                           GeographicCRS                    geoCRS,
-                                           String                   projectionName,
-                                           GeneralParameterValue[] parameterValues,
-                                           CartesianCS                          cs)
+    public ProjectedCRS createProjectedCRS(Map                     properties,
+                                           GeographicCRS               geoCRS,
+                                           String              classification,
+                                           GeneralParameterValue[] parameters,
+                                           CartesianCS                     cs)
             throws FactoryException
     {
-        throw new UnsupportedOperationException();
+        final ParameterValueGroup group = getDefaultProjectionParameters(classification);
+        for (int i=0; i<parameters.length; i++) {
+            final GeneralParameterValue gp = parameters[i];
+            if (gp instanceof ParameterValue) {
+                final ParameterValue p = (ParameterValue) gp;
+                group.parameter(p.getDescriptor().getName().getCode()).setValue(p.getValue());
+            } else {
+                throw new UnsupportedOperationException();        
+            }
+        }
+        return createProjectedCRS(properties, geoCRS, group, cs);
     }
 
     /**
-     * Creates a temporal coordinate reference system. 
+     * Creates a projected coordinate reference system from a set of parameters. The classification
+     * name is inferred either from the {@linkplain ParameterDescriptorGroup#getName parameter
+     * group name}, or any other implementation dependent way.
+     * <br><br>
+     * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
+     * parameters for cartographic projection transforms. Example:
+     *
+     * <blockquote><pre>
+     * ParameterValueGroup parameters = factory.{@linkplain #getDefaultProjectionParameters getDefaultProjectionParameters}("Transverse_Mercator");
+     * p.parameter("semi_major").setValue(6378137.000);
+     * p.parameter("semi_minor").setValue(6356752.314);
+     * ProjectedCRS crs = factory.createProjectedCRS(..., parameters, ...);
+     * </pre></blockquote>
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  datum Temporal datum to use in created CRS.
-     * @param  cs The Temporal coordinate system for the created CRS.
+     *         Available properties are {@linkplain ObjectFactory listed there}.
+     *         Properties for the {@link Projection} object to be created can be specified
+     *         with the <code>"conversion."</code> prefix added in front of property names
+     *         (example: <code>"conversion.name"</code>).
+     * @param  geoCRS Geographic coordinate reference system to base projection on.
+     * @param  parameters The parameter values to give to the projection.
+     * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @see #getDefaultProjectionParameters
      */
-    public TemporalCRS createTemporalCRS(Map      properties,
-                                         TemporalDatum datum,
-                                         TimeCS           cs) throws FactoryException
+    public ProjectedCRS createProjectedCRS(Map                 properties,
+                                           GeographicCRS           geoCRS,
+                                           ParameterValueGroup parameters,
+                                           CartesianCS                 cs)
+            throws FactoryException
     {
-        TemporalCRS crs;
+        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
+        final EllipsoidalCS geoCS = (EllipsoidalCS) geoCRS.getCoordinateSystem();
+        final Matrix swap1, swap3;
         try {
-            crs = new org.geotools.referencing.crs.TemporalCRS(properties, datum, cs);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
+            swap1 = org.geotools.referencing.cs.EllipsoidalCS.swapAndScaleAxis(geoCS,
+                    org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
+            swap3 = org.geotools.referencing.cs.CartesianCS.swapAndScaleAxis(
+                    org.geotools.referencing.cs.CartesianCS.PROJECTED, cs);
+        } catch (IllegalArgumentException cause) {
+            // User-specified axis don't match.
+            throw new FactoryException(cause);
+        } catch (ConversionException cause) {
+            // A Unit conversion is non-linear.
+            throw new FactoryException(cause);
         }
-        crs = (TemporalCRS) canonicalize(crs);
-        return crs;
+        if (mtFactory == null) {
+            mtFactory = FactoryFinder.getMathTransformFactory();
+        }
+        final MathTransform step1 = mtFactory.createAffineTransform(swap1);
+        final MathTransform step2 = mtFactory.createParameterizedTransform(parameters);
+        final MathTransform step3 = mtFactory.createAffineTransform(swap3);
+        final MathTransform mt    = mtFactory.createConcatenatedTransform(
+                                    mtFactory.createConcatenatedTransform(step1, step2), step3);
+        return createProjectedCRS(properties, geoCRS, mt, cs);
     }
 
     /**
-     * Creates a vertical coordinate reference system. 
+     * Returns the default parameter values for a projection of the given classification.
+     * The classification may be the name of any operation method returned by the
+     * {@link #getAvailableProjections} method. A typical example is
+     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
+     * <br><br>
+     * This method creates new parameter instances at every call.
+     * It is intented to be modified by the user before to be passed to
+     * <code>{@linkplain #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
+     * createProjectedCRS}(..., parameters, ...)</code>.
      *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  datum Vertical datum to use in created CRS.
-     * @param  cs The Vertical coordinate system for the created CRS.
-     * @throws FactoryException if the object creation failed.
+     * @param  classification The case insensitive classification to search for.
+     * @return The default parameter values.
+     * @throws NoSuchIdentifierException if there is no projection registered for the specified
+     *         classification.
+     *
+     * @see #getAvailableProjections
+     * @see #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
+     *
+     * @todo Check if the classification is a projection operation:
      */
-    public VerticalCRS createVerticalCRS(Map     properties,
-                                         VerticalDatum datum,
-                                         VerticalCS       cs) throws FactoryException
+    public ParameterValueGroup getDefaultProjectionParameters(String classification)
+            throws NoSuchIdentifierException
     {
-        VerticalCRS crs;
-        try {
-            crs = new org.geotools.referencing.crs.VerticalCRS(properties, datum, cs);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
+        if (mtFactory == null) {
+            mtFactory = FactoryFinder.getMathTransformFactory();
         }
-        crs = (VerticalCRS) canonicalize(crs);
-        return crs;
+        return mtFactory.getDefaultParameters(classification);
+    }
+
+    /**
+     * Returns a set of all available {@linkplain Projection projection} methods. For each
+     * element in this set, the {@linkplain OperationMethod#getName operation method name}
+     * is a classification name to be recognized by the {@link #getDefaultProjectionParameters}
+     * method.
+     *
+     * @return All {@linkplain Projection projection} methods available in this factory.
+     *
+     * @see #getDefaultProjectionParameters
+     * @see #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
+     *
+     * @todo Not yet implemented. We need to ask to the math transform factory, and then to
+     *       filter the returned set to keep only the projections.
+     */
+    public Set/*<OperationMethod>*/ getAvailableProjections() {
+        throw new UnsupportedOperationException();        
     }
 
     /**

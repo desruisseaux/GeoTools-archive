@@ -101,8 +101,9 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
     public Matrix derivative(final Point2D point) throws TransformException {
-        final GeneralMatrix matrix1 = wrap(transform1.derivative(point));
-        final GeneralMatrix matrix2 = wrap(transform2.derivative(transform1.transform(point, null)));
+        final GeneralMatrix matrix1 = GeneralMatrix.wrap(transform1.derivative(point));
+        final GeneralMatrix matrix2 = GeneralMatrix.wrap(transform2.derivative(
+                                                         transform1.transform(point, null)));
         matrix2.mul(matrix1);
         return matrix2;
     }
