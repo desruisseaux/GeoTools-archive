@@ -57,6 +57,7 @@
       <excludes>
         <exclude>**/ArcSDEDataStoreTest.java</exclude>
         <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
+        <exclude>**/FilterTest.java</exclude>
       </excludes>
       <!-- End exclude tests -->
       <resources>

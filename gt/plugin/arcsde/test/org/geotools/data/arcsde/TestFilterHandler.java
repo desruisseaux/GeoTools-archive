@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 /**
  * stolen from filter module tests. Uses SAX to extact a GetFeature query from
  * and incoming GetFeature request XML stream.
- *
+ * 
  * <p>
  * Note that this Handler extension ignores Filters completely and must be
  * chained as a parent to the PredicateFilter method in order to recognize
@@ -40,8 +40,7 @@ import org.xml.sax.SAXException;
  * @author Rob Hranac, Vision for New York
  * @version 0.9 beta, 11/01/01
  */
-public class TestFilterHandler implements ContentHandler, FilterHandler
-{
+public class TestFilterHandler implements ContentHandler, FilterHandler {
     /** Standard logging class */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.defaultcore");
@@ -53,8 +52,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
     /**
      * Creates a new TestFilterHandler object.
      */
-    public TestFilterHandler()
-    {
+    public TestFilterHandler() {
     }
 
     /**
@@ -68,8 +66,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @param locator DOCUMENT ME!
      */
-    public void setDocumentLocator(Locator locator)
-    {
+    public void setDocumentLocator(Locator locator) {
     }
 
     /**
@@ -77,8 +74,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void startDocument() throws SAXException
-    {
+    public void startDocument() throws SAXException {
         //_log.info("start of document");
     }
 
@@ -87,8 +83,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void endDocument() throws SAXException
-    {
+    public void endDocument() throws SAXException {
         //_log.info( "at end of document");
     }
 
@@ -101,8 +96,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @throws SAXException DOCUMENT ME!
      */
     public void processingInstruction(String target, String data)
-        throws SAXException
-    {
+        throws SAXException {
     }
 
     /**
@@ -111,8 +105,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @param prefix DOCUMENT ME!
      * @param uri DOCUMENT ME!
      */
-    public void startPrefixMapping(String prefix, String uri)
-    {
+    public void startPrefixMapping(String prefix, String uri) {
     }
 
     /**
@@ -120,8 +113,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @param prefix DOCUMENT ME!
      */
-    public void endPrefixMapping(String prefix)
-    {
+    public void endPrefixMapping(String prefix) {
     }
 
     /**
@@ -135,8 +127,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @throws SAXException DOCUMENT ME!
      */
     public void startElement(String namespaceURI, String localName,
-        String rawName, Attributes atts) throws SAXException
-    {
+        String rawName, Attributes atts) throws SAXException {
     }
 
     /**
@@ -149,8 +140,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @throws SAXException DOCUMENT ME!
      */
     public void endElement(String namespaceURI, String localName, String rawName)
-        throws SAXException
-    {
+        throws SAXException {
     }
 
     /**
@@ -164,8 +154,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @throws SAXException DOCUMENT ME!
      */
     public void characters(char[] ch, int start, int length)
-        throws SAXException
-    {
+        throws SAXException {
     }
 
     /**
@@ -178,8 +167,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      * @throws SAXException DOCUMENT ME!
      */
     public void ignorableWhitespace(char[] ch, int start, int length)
-        throws SAXException
-    {
+        throws SAXException {
     }
 
     /**
@@ -189,8 +177,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void skippedEntity(String name) throws SAXException
-    {
+    public void skippedEntity(String name) throws SAXException {
     }
 
     /**
@@ -198,8 +185,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @param filter (OGC WFS) Filter from (SAX) filter..
      */
-    public void filter(Filter filter)
-    {
+    public void filter(Filter filter) {
         LOGGER.finer("found filter: " + filter.toString());
 
         this.filter = filter;
@@ -210,8 +196,7 @@ public class TestFilterHandler implements ContentHandler, FilterHandler
      *
      * @return (OGC WFS) Filter from (SAX) filter..
      */
-    public Filter getFilter()
-    {
+    public Filter getFilter() {
         return this.filter;
     }
 }

@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -20,53 +16,75 @@
  */
 package org.geotools.data.arcsde;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.TestCase;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import org.geotools.filter.*;
-import org.geotools.gml.GMLFilterDocument;
-import org.geotools.gml.GMLFilterGeometry;
-import org.xml.sax.helpers.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.logging.Logger;
-import javax.xml.parsers.*;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.BBoxExpression;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFilter;
+import org.geotools.gml.GMLFilterDocument;
+import org.geotools.gml.GMLFilterGeometry;
+import org.xml.sax.helpers.ParserAdapter;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
  * SdeDatasource's test cases
  *
- * @author Gabriel Rold?n
+ * @author Gabriel Roldán
  * @version $Id: ArcSDEDataStoreTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDEDataStoreTest extends TestCase {
-    /** DOCUMENT ME! */
+    /** package logger */
     private static Logger LOGGER = Logger.getLogger(ArcSDEDataStoreTest.class.getPackage()
                                                                              .getName());
 
     /** folder used to load test filters */
     private String dataFolder = "/testData/";
 
-    /** DOCUMENT ME! */
+    /** the set of test parameters loaded from /testData/testparams.properties */
     private Properties conProps = null;
 
-    /** DOCUMENT ME! */
+    /** the name of the table holding the point test features */
     private String point_table;
 
-    /** DOCUMENT ME! */
+    /** the name of the table holding the linestring test features */
     private String line_table;
 
-    /** DOCUMENT ME! */
+    /** the name of the table holding the polygon test features */
     private String polygon_table;
 
-    /** DOCUMENT ME! */
+    /** an ArcSDEDataStore created on setUp() to run tests against */
     private DataStore store;
 
-    /** DOCUMENT ME! */
+    /** a filter factory for testing */
     FilterFactory ff = FilterFactory.createFilterFactory();
 
     /**
@@ -77,9 +95,9 @@ public class ArcSDEDataStoreTest extends TestCase {
     }
 
     /**
-     * Creates a new SdeDataSourceTest object.
+     * Creates a new ArcSDEDataStoreTest object.
      *
-     * @param name DOCUMENT ME!
+     * @param name a name for the junit test
      */
     public ArcSDEDataStoreTest(String name) {
         super(name);
@@ -179,6 +197,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * "line_table" and "polygon_table", wether ot not they're defined as
      * single table names or as full qualified sde table names (i.e.
      * SDE.SDE.TEST_POINT)
+     *
      * @throws IOException
      */
     public void testGetTypeNames() throws IOException {
@@ -288,6 +307,15 @@ public class ArcSDEDataStoreTest extends TestCase {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param r DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
     private boolean testNext(FeatureReader r) throws Exception {
         if (r.hasNext()) {
             Feature f = r.next();
@@ -304,6 +332,15 @@ public class ArcSDEDataStoreTest extends TestCase {
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param typeName DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
     private FeatureReader getReader(String typeName) throws IOException {
         Query q = new DefaultQuery(typeName, Filter.NONE);
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
