@@ -3,8 +3,16 @@ package org.geotools.metadata;
 import java.io.IOException;
 
 import org.geotools.expr.Expr;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Represents a query against metadata.
@@ -53,9 +61,99 @@ public class Query {
 		
 		return filter.contains( feature );
 	}
-	public boolean accepts( Metadata meta ){
+	public boolean accepts( Metadata meta ) throws IOException{
 		Expr query = expr.resolve( meta );
-		Filter filter = query.filter( null );
-		return filter.contains( );
+		Filter filter = query.filter( fakeFeatureType );
+		return filter.contains( fakeFeature );
 	}
+	static FeatureType fakeFeatureType = new FeatureType(){
+		public String getNamespace() {
+			return null;
+		}
+		public String getTypeName() {
+			return null;
+		}
+		public AttributeType[] getAttributeTypes() {
+			return new AttributeType[0];
+		}
+		public boolean hasAttributeType(String xPath) {
+			return false;
+		}
+		public AttributeType getAttributeType(String xPath) {
+			return null;
+		}
+		public int find(AttributeType type) {
+			return -1;
+		}
+		public GeometryAttributeType getDefaultGeometry() {
+			return null;
+		}
+		public int getAttributeCount() {
+			return 0;
+		}
+		public AttributeType getAttributeType(int position) {
+			return null;
+		}
+		public boolean isDescendedFrom(String nsURI, String typeName) {
+			return false;
+		}
+		public boolean isDescendedFrom(FeatureType type) {
+			return false;
+		}
+		public boolean isAbstract() {
+			return false;
+		}
+		public FeatureType[] getAncestors() {
+			return null;
+		}
+		public Feature duplicate(Feature feature) throws IllegalAttributeException {
+			return null;
+		}
+		public Feature create(Object[] attributes) throws IllegalAttributeException {
+			return null;
+		}
+		public Feature create(Object[] attributes, String featureID) throws IllegalAttributeException {
+			return null;
+		}
+	};
+	static Feature fakeFeature = new Feature(){
+		public FeatureCollection getParent() {
+			return null;
+		}
+		public void setParent(FeatureCollection collection) {
+		}
+		public FeatureType getFeatureType() {
+			return fakeFeatureType;
+		}
+		public String getID() {
+			return "query";
+		}
+
+		public Object[] getAttributes(Object[] attributes) {
+			return new Object[0];
+		}
+		public Object getAttribute(String xPath) {
+			return null;
+		}
+		public Object getAttribute(int index) {
+			return null;
+		}
+		public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+		}
+		public int getNumberOfAttributes() {
+			return 0;
+		}
+		public void setAttributes(Object[] attributes) throws IllegalAttributeException {
+		}
+		public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
+		}
+		public Geometry getDefaultGeometry() {
+			return null;
+		}
+		public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+		}
+		public Envelope getBounds() {
+			return null;
+		}		
+	};
 }
