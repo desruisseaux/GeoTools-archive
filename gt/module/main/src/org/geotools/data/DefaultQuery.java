@@ -340,20 +340,14 @@ public class DefaultQuery implements Query {
      * can ignore the parameter and return the only version  that they have.
      * 
      * <p>
-     * This will not be used for awhile, but at some future point geotools
-     * should support feature versioning.  Obviously none do now, nor are any
-     * close to supporting it, so perhaps we should just wait and see.  And of
-     * course we'd need the corresponding supportsFeatureVersioning in the
-     * datasource metadata object.
+     * This is ready for use, it will be up to data store implementors to
+     * support it.
      * </p>
      *
-     * @return the version of the feature to return.
-     *
-     * @throws UnsupportedOperationException if a user attempts to use this
-     *         method - no versioning supported yet.
+     * @return the version of the feature to return, or null for latest. 
      */
-    public String getVersion() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("No feature versioning yet");
+    public String getVersion() {
+        return null; 
     }
 
     /**
