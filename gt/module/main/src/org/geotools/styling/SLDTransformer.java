@@ -109,28 +109,34 @@ public class SLDTransformer extends TransformerBase {
         }
         
         public void visit(TextSymbolizer text) {
+            if( text == null ) return;
             start("TextSymbolizer");
             
-            encodeGeometryProperty(text.getGeometryPropertyName());
+            if( text.getGeometryPropertyName() != null )
+                encodeGeometryProperty(text.getGeometryPropertyName());
             
-            element("Label",text.getLabel());
+            if( text.getLabel() != null )
+                element("Label",text.getLabel());
             
-            start("Font");
-            Font[] fonts = text.getFonts();
-            for (int i = 0; i < fonts.length; i++) {
-                encodeCssParam("font-family", fonts[i].getFontFamily());
+            if( text.getFonts() != null && text.getFonts().length != 0){
+                start("Font");
+                Font[] fonts = text.getFonts();
+                for (int i = 0; i < fonts.length; i++) {
+                    encodeCssParam("font-family", fonts[i].getFontFamily());
+                }
+                encodeCssParam("font-size", fonts[0].getFontSize());
+                encodeCssParam("font-style", fonts[0].getFontStyle());
+                encodeCssParam("font-weight", fonts[0].getFontWeight());
+                end("Font");
             }
-            encodeCssParam("font-size", fonts[0].getFontSize());
-            encodeCssParam("font-style", fonts[0].getFontStyle());
-            encodeCssParam("font-weight", fonts[0].getFontWeight());
-            end("Font");
             
-            start("Label");
-            text.getLabelPlacement().accept(this);
-            end("Label");
-            
+            if( text.getLabel() != null ){
+                start("Label");
+                text.getLabelPlacement().accept(this);
+                end("Label");
+            }
             if( text.getHalo() != null ) text.getHalo().accept(this);
-            if( text.getFill() != null ) text.getFill().accept(this);
+            if( text.getFill() != null ) text.getFill().accept(this);            
             end("TextSymbolizer");
         }
         
