@@ -104,29 +104,6 @@ public interface PolygonSymbolizer extends Symbolizer{
      *
      * @return The name of the attribute in the feature being styled 
      *  that should be used.  If null then the default geometry should be used.
-     * @deprecated Misnamed. Use getGeometryPropertyName instead.
-     */
-    String geometryPropertyName();
-    
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.
-     * 
-     * Geometry types other than inherently area types can be used.  
-     * If a line is used then the line string is closed for filling (only)
-     * by connecting its end point to its start point.
-     *
-     * The geometryPropertyName is the name of a geometry property in the
-     * Feature being styled.  Typically, features only have one geometry so,
-     * in general, the need to select one is not required.
-     *
-     * Note: this moves a little away from the SLD spec which provides an
-     * XPath reference to a Geometry object, but does follow it 
-     * in spirit.
-     *
-     * @return The name of the attribute in the feature being styled 
-     *  that should be used.  If null then the default geometry should be used.
      */
     String getGeometryPropertyName();
     

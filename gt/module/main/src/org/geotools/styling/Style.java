@@ -33,10 +33,6 @@ public interface Style {
     String getAbstract();
     void setAbstract(String abstractStr);
     boolean isDefault();
-    /**
-     * @deprecated Not proper bean pattern, use setDefault(boolean)
-     */
-    void setIsDefault(boolean isDefault);
     void setDefault(boolean isDefault);
     FeatureTypeStyle[] getFeatureTypeStyles();
     void setFeatureTypeStyles(FeatureTypeStyle[] types);

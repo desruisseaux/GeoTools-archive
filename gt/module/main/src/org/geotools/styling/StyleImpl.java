@@ -95,10 +95,6 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
         abstractText = abstractStr;
     }
 
-    public void setIsDefault(boolean isDefault) {
-        defaultB = isDefault;
-    }
-
     public void setDefault(boolean isDefault) {
         defaultB = isDefault;
     }
