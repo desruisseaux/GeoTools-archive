@@ -236,7 +236,7 @@ public class VPFFeatureReader implements FeatureReader {
             // This really shouldn't happen since everything should be nillable
             exc.printStackTrace();
         }
-        readNext(false);
+        while(readNext());
         return hasNext;
     }
 
@@ -280,9 +280,15 @@ public class VPFFeatureReader implements FeatureReader {
 
     //TODO: simplify this convoluted mess Venture with caution!
     /**
-     * 
+     * Read a row and determine if it matches the feature type
+     * Three possibilities here:
+     * row is null -- hasNext = false, do not try again
+     * row matches -- hasNext = true, do not try again
+     * row does not match -- hasNext is undefined because we must try again
+     * @return Whether we need to read again
      */
-    private void readNext(boolean reentrant) throws IOException {
+    private boolean readNext() throws IOException {
+        boolean result = true;
     	VPFFile file = (VPFFile) featureType.getFeatureClass().getFileList().get(0);
     	hasNext = false;
         VPFFile secondFile = null;
@@ -301,6 +307,7 @@ public class VPFFeatureReader implements FeatureReader {
         }
         if ((row == null)) {
             hasNext = false;
+            result = false;
 		}
 		// Exclude objects with a different FACC Code
 		else if ((featureType.getFaccCode() == null)
@@ -373,19 +380,9 @@ public class VPFFeatureReader implements FeatureReader {
                 }
 			}
             hasNext = true;
-		} else {
-			try {
-				readNext(true);
-			} catch (StackOverflowError exc) {
-                // We might read many many features before finding one that matches FACC Codes
-				// Allow the stack to collapse before trying again
-				if (reentrant) {
-					throw exc;
-				} else {
-					readNext(false);
-				}
-			}
-		}
+            result = false;
+		} 
+        return result;
     }
     /**
      * Returns the VPFFile for a particular column.
