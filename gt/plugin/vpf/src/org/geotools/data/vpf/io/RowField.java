@@ -56,10 +56,8 @@ public class RowField extends Number implements DataTypesDefinition {
      */
     public String toString() {
         if (value != null) {
-            //       return value.toString()+" ("+type+")";
-            return value.toString();
+            return value.toString().trim();
         } else {
-            //      return "null ("+type+")";
             return "null";
         }
     }
@@ -74,7 +72,6 @@ public class RowField extends Number implements DataTypesDefinition {
         if ((obj == null) || !(obj instanceof RowField)) {
             return false;
         }
-
         return toString().equals(obj.toString());
     }
 
@@ -100,18 +97,7 @@ public class RowField extends Number implements DataTypesDefinition {
         return value;
     }
 
-    /**
-     * Method <code>getAsString</code> is used to perform 
-     *
-     * @return a <code><code>String</code></code> value
-     */
-    public String getAsString() {
-        if (value != null) {
-            return value.toString();
-        } else {
-            return null;
-        }
-    }
+    
 
     /* (non-Javadoc)
      * @see java.lang.Number#intValue()

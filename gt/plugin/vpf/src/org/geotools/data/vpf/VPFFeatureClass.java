@@ -52,11 +52,11 @@ public class VPFFeatureClass implements FeatureClassTypes, DataTypesDefinition {
     public VPFFeatureClass(TableRow tr, File directory, VPFDataBase base) throws IOException {
         //this.base = base;
         //this.directory = directory;
-        classname = tr.get(FIELD_CLASS).getAsString().trim();
+        classname = tr.get(FIELD_CLASS).toString();
 
-        String tmp = tr.get(FIELD_TYPE).getAsString().trim();
+        String tmp = tr.get(FIELD_TYPE).toString();
         char featureType = tmp.charAt(0);
-        description = tr.get(FIELD_DESCRIPTION).getAsString().trim();
+        description = tr.get(FIELD_DESCRIPTION).toString();
 
         // This really needs to be fixed!!!!! 
         if (featureType == FEATURE_POINT) {

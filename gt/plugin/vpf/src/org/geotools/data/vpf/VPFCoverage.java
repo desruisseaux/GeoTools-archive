@@ -44,8 +44,8 @@ public class VPFCoverage implements VPFCoverageIfc, FileConstants {
     public VPFCoverage(TableRow tr, File directory, VPFDataBase base)
                 throws IOException {
         this.base = base;
-        name = tr.get(FIELD_COVERAGE_NAME).getAsString().trim();
-        description = tr.get(FIELD_DESCRIPTION).getAsString().trim();
+        name = tr.get(FIELD_COVERAGE_NAME).toString();
+        description = tr.get(FIELD_DESCRIPTION).toString();
         topology = tr.get(FIELD_LEVEL).shortValue();
         this.directory = new File(directory, name);
         setFeatureClasses();

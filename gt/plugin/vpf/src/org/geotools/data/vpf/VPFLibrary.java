@@ -50,7 +50,7 @@ public class VPFLibrary implements FileConstants {
         ymin = tr.get(VPFLibraryIfc.FIELD_YMIN).doubleValue();
         xmax = tr.get(VPFLibraryIfc.FIELD_XMAX).doubleValue();
         ymax = tr.get(VPFLibraryIfc.FIELD_YMAX).doubleValue();
-        libCover = tr.get(VPFLibraryIfc.FIELD_LIB_NAME).getAsString().trim();
+        libCover = tr.get(VPFLibraryIfc.FIELD_LIB_NAME).toString();
         this.directory = new File(dir, libCover);
         setCoverages();
     }
