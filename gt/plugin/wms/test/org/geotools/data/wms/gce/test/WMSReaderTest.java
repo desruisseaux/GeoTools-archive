@@ -16,11 +16,14 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;
+import org.geotools.data.wms.gce.WMSParameterMaker;
 import org.geotools.data.wms.gce.WMSParameterValue;
 import org.geotools.data.wms.gce.WMSReader;
 import org.geotools.data.wms.getCapabilities.Layer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
+import org.opengis.parameter.GeneralOperationParameter;
+
 
 /**
  * @author rgould
@@ -33,6 +36,7 @@ public class WMSReaderTest extends TestCase {
 	WMT_MS_Capabilities capabilities;
 	WMSReader reader;
 	URL server;
+	WMSFormat format;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -40,6 +44,7 @@ public class WMSReaderTest extends TestCase {
 		WMSGridCoverageExchange exchange = new WMSGridCoverageExchange(server);
 		capabilities = exchange.getCapabilities();
 		reader = (WMSReader) exchange.getReader(server);
+		format = (WMSFormat) reader.getFormat();
 	}
 
 	public WMSReaderTest(String arg0) {
@@ -60,8 +65,11 @@ public class WMSReaderTest extends TestCase {
 	public void testRead() {
 		try {
 			WMSParameterValue[] params = new WMSParameterValue[10];
-			params[0] = new WMSParameterValue("1.1.1", WMSOperationParameter.createVersionReadParam());
-			params[1] = new WMSParameterValue("GetMap", WMSOperationParameter.createRequestReadParam());
+			
+			WMSParameterMaker maker = new WMSParameterMaker(capabilities);
+			
+			params[0] = new WMSParameterValue("1.1.1", maker.createVersionReadParam());
+			params[1] = new WMSParameterValue("GetMap", maker.createRequestReadParam());
 			String layerList = "";
 			Iterator iter = capabilities.getCapability().getLayer().getSubLayers().iterator();
 			while (iter.hasNext()) {
@@ -71,14 +79,23 @@ public class WMSReaderTest extends TestCase {
 					layerList = layerList + ",";
 				}
 			}
-			params[2] = new WMSParameterValue(layerList, WMSOperationParameter.createLayersReadParam());
-			params[3] = new WMSParameterValue("", WMSOperationParameter.createStylesReadParam());
-			params[4] = new WMSParameterValue("EPSG:26904", WMSOperationParameter.createSRSReadParam());
-			params[5] = new WMSParameterValue("366800,2170400,816000,2460400", WMSOperationParameter.createBBoxReadParam());
-			params[6] = new WMSParameterValue("400", WMSOperationParameter.createWidthReadParam());
-			params[7] = new WMSParameterValue("400", WMSOperationParameter.createHeightReadParam());
-			params[8] = new WMSParameterValue("image/jpeg", WMSOperationParameter.createFormatReadParam());			
-		    
+			params[2] = new WMSParameterValue(layerList, WMSParameterMaker.createLayersReadParam());
+			params[3] = new WMSParameterValue("", WMSParameterMaker.createStylesReadParam());
+			params[4] = new WMSParameterValue("EPSG:26904", maker.createSRSReadParam());
+			params[5] = new WMSParameterValue("366800,2170400,816000,2460400", WMSParameterMaker.createBBoxReadParam());
+			params[6] = new WMSParameterValue("400", maker.createWidthReadParam());
+			params[7] = new WMSParameterValue("400", maker.createHeightReadParam());
+
+			//params[8] = new WMSParameterValue("image/jpeg", WMSOperationParameter.createFormatReadParam());
+			GeneralOperationParameter[] newParams = format.getReadParameters();
+			WMSOperationParameter param = (WMSOperationParameter) newParams[0];
+			String formatValue = "image/jpeg";
+			Iterator iter2 = param.getValidValues().iterator();
+			while (iter2.hasNext()) {
+				String format = (String) iter2.next();
+				System.out.println("FORMAT: "+format);				
+			}
+			params[8] = new WMSParameterValue(formatValue, param);
 			GridCoverage coverage = reader.read(params);
 			
 			System.out.println(coverage.getEnvelope());
