@@ -65,8 +65,7 @@ public class GetFeatureInfoRequest extends GetMapRequest {
 				request.getAvailableSRSs(), (String[]) request.getAvailableFormats().toArray(),
 				request.getAvailableExceptions());
 		this.properties = request.properties;
-		setProperty("REQUEST", "GetFeatureInfo");
-		
+	
 		this.queryableLayers = queryableLayers;
 		this.infoFormats = Arrays.asList(infoFormats);
 		queryLayers = new TreeSet();
@@ -123,4 +122,7 @@ public class GetFeatureInfoRequest extends GetMapRequest {
 	public Set getQueryableLayers() {
 		return queryableLayers;
 	}
+    protected void initRequest() {
+        setProperty("REQUEST", "GetFeatureInfo");
+    }
 }

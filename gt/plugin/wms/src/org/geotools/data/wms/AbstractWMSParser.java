@@ -61,7 +61,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      * @return <code>WMT_MS_Capabilities</code>
      */
     public abstract String getVersion();
-    
+        
     /**
      * Test if this WMSParser can handle the provided document.
      * <p>
@@ -159,8 +159,19 @@ public abstract class AbstractWMSParser implements WMSParser {
 	 * @return a List of String containing all known styles in this layer
 	 */
 	protected List queryStyles(Element layerElement) {
-		// TODO Auto-generated method stub
-		return extractStrings(layerElement, "Style");
+		// TODO This is buggy. Need to extract Style.Name.value not Style.value
+        List styleElements = layerElement.getChildren("Style");
+        List styles = new ArrayList();
+        
+        if (styleElements != null) {
+            
+            Iterator iter = styleElements.iterator();
+            while (iter.hasNext()) {
+                String value = ((Element) iter.next()).getChildText("Name");
+                styles.add(value);
+            }
+        }
+        return styles;
 	}
 	
 	/**
@@ -183,6 +194,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      * @return A List containing the String values of element's children specified by childName
      */
     protected List extractStrings(Element element, String childName) {
+    	//TODO: Remove srs-nessof this.
         List srsElements = element.getChildren(childName);
         List srs = new ArrayList();
         
@@ -285,30 +297,23 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
     
     protected URL queryPost(Element element) throws MalformedURLException { 
-        List dcpTypeElements = element.getChildren("DCPType");
-        for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
-            Element dcpTypeElement = (Element) i.next();
-            Element httpElement = dcpTypeElement.getChild("HTTP");
-            
-            Element get = httpElement.getChild("Post");
-            if (get!= null) {
-            	return parseOnlineResource(get.getChild("OnlineResource"));
-            }
-        }
-        return null;
+        return queryDCPType(element, "Post");
     } 
     protected URL queryGet(Element element) throws MalformedURLException {
+        return queryDCPType(element, "Get");
+    }
+    protected URL queryDCPType(Element element, String httpType) throws MalformedURLException {
         List dcpTypeElements = element.getChildren("DCPType");
         for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
             Element dcpTypeElement = (Element) i.next();
             Element httpElement = dcpTypeElement.getChild("HTTP");
             
-            Element get = httpElement.getChild("Get");
-            if (get!= null) {
-            	return parseOnlineResource(get.getChild("OnlineResource"));
+            Element httpTypeElement = httpElement.getChild(httpType);
+            if (httpTypeElement != null) {
+            	return parseOnlineResource(httpTypeElement.getChild("OnlineResource"));
             }
         }
-        return null;
+        return null;        
     }
 
     protected URL parseOnlineResource(Element onlineResourceElement) throws MalformedURLException {
@@ -333,12 +338,24 @@ public abstract class AbstractWMSParser implements WMSParser {
 		URL onlineResource = parseOnlineResource(serviceElement.getChild("OnlineResource"));
 	    String description = serviceElement.getChildText("Abstract");
 	    
-		String keywords[] = null;
-		Element keywordListElement = serviceElement.getChild("KeywordList");		
+	    
+		String keywords[] = queryKeywords(serviceElement);
+		
+		
+		builder.buildService( name, title, onlineResource,description, keywords );				
+    }
+    
+    /**
+     * @param serviceElement
+     * @return
+     */
+    protected String[] queryKeywords(Element serviceElement) {
+        String[] keywords = null;
+        Element keywordListElement = serviceElement.getChild("KeywordList");		
 		if (keywordListElement != null) {
 		    keywords = parseKeywordList(keywordListElement);		    
 		}
-		builder.buildService( name, title, onlineResource,description, keywords );				
+        return keywords;
     }
     
     /**

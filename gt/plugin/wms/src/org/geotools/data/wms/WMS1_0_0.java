@@ -17,14 +17,18 @@
 package org.geotools.data.wms;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -33,23 +37,23 @@ import org.jdom.Element;
  * <p>
  * This class opperates as a Factory creating the following related objects.
  * <ul>
- * <li>WMS1_0.Parser - a WMSParser capable of parsing a Get Capabilities Document
- * <li>WMS1_0.Format - a WMSFormat describing required parameters
- * <li>WMS1_0.MapRequest - a MapRequest specific to WMS 1.0
+ * <li>WMS1_0_0.Parser - a WMSParser capable of parsing a Get Capabilities Document
+ * <li>WMS1_0_0.Format - a WMSFormat describing required parameters
+ * <li>WMS1_0_0.MapRequest - a MapRequest specific to WMS 1.0
  * </ul>
  * </p>
  * <p>
  * The idea is that this class opperates a Toolkit for all things assocated with
- * Web Map Server 1.0 Specification. The various objects produced by this toolkit
+ * Web Map Server 1.0.0 Specification. The various objects produced by this toolkit
  * are used as stratagy objects for the top level Web Map Server objects:
  * <ul>
- * <li>Web Map Server - uses WMS1_0.Parser to derive a Get Capabilities Document
- * <li>Web Map Server - uses WMS1_0 as a WMSFormat factory to generate the correct
- *     WMS_1_0.Format.
+ * <li>Web Map Server - uses WMS1_0_0.Parser to derive a Get Capabilities Document
+ * <li>Web Map Server - uses WMS1_0_0 as a WMSFormat factory to generate the correct
+ *     WMS_1_0_0.Format.
  * </ul>
  * </p> 
  * <p>
- * WMS1_0 provides both name and version information that may be checked against
+ * WMS1_0_0 provides both name and version information that may be checked against
  * a GetCapabilities document during version negotiation.
  * </p> 
  * @author Jody Garnett, Refractions Research
@@ -185,6 +189,27 @@ public class WMS1_0_0 extends Specification {
         protected void initVersion(){
     	    setProperty("WMTVER", "1.0.0");
     	}
+        protected void initRequest(){
+            setProperty("REQUEST", "capabilities");
+        }
+    }
+    static public class GetMapRequest extends org.geotools.data.wms.request.GetMapRequest {
+        public GetMapRequest(URL onlineResource, String version, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions) {
+            super(onlineResource, version, availableLayers, availableSRSs, availableFormats, availableExceptions);
+        }
+        
+        protected void initRequest() {
+            setProperty("REQUEST", "map");
+        }
+    }
+    static public class GetFeatureInfoRequest extends org.geotools.data.wms.request.GetFeatureInfoRequest {
+        public GetFeatureInfoRequest(URL onlineResource, GetMapRequest getMapRequest,
+                Set queryableLayers, String[] infoFormats) {
+            super(onlineResource, getMapRequest, queryableLayers, infoFormats);
+        }
+        protected void initRequest() {
+            setProperty("REQUEST", "feature_info");
+        }
     }
     static public class Parser extends AbstractWMSParser {
         public String getVersion() {
@@ -230,6 +255,21 @@ public class WMS1_0_0 extends Specification {
                 }
             }        
             return formats;
+        }
+
+        protected URL queryDCPType(Element element, String httpType)
+                throws MalformedURLException {
+            List dcpTypeElements = element.getChildren("DCPType");
+            for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
+                Element dcpTypeElement = (Element) i.next();
+                Element httpElement = dcpTypeElement.getChild("HTTP");
+                
+                Element httpTypeElement = httpElement.getChild(httpType);
+                if (httpTypeElement != null) {
+                	return new URL((httpTypeElement.getAttributeValue("onlineResource")));
+                }
+            }
+            return null;      
         }
     }
 }

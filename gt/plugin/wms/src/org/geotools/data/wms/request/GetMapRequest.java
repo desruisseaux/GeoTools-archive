@@ -92,11 +92,16 @@ public class GetMapRequest extends AbstractRequest {
     	this.availableSRSs = availableSRSs;
     	this.availableFormats = Arrays.asList(availableFormats);
     	this.availableExceptions = availableExceptions;
-
-    	setProperty(REQUEST, "GetMap");
+    	
+    	initRequest();
+    	
         
     }
-    
+
+    protected void initRequest() {
+        setProperty(REQUEST, "GetMap");
+    }
+
     /**
      * Sets the version number of the request.
      * @param version A String indicting a WMS Version ("1.0.0", "1.1.0", "1.1.1", or "1.3.0")

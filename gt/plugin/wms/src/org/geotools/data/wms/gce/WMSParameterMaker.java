@@ -112,7 +112,9 @@ public class WMSParameterMaker {
 	
 	private void retrieveSRSs(Layer[] layers, Set srsSet) {
 		for (int i = 0; i < layers.length; i++) {
-			srsSet.addAll(layers[i].getSrs());
+			if (layers[i].getSrs() != null) {
+				srsSet.addAll(layers[i].getSrs());
+			}
 		}
 	}
 	

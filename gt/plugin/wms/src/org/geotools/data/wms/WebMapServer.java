@@ -113,10 +113,7 @@ public class WebMapServer {
 	public static final int NOTCONNECTED = 0;
 	public static final int ERROR = -1;
 	public static final int CONNECTED = 2;
-	private Thread getMapRetriever;
 	
-	private GetMapResponse getMapResponse;
-	private GetMapRequest getMapRequest;
 	private AbstractRequest currentRequest;
 	/** Feedback: Why only one? */
 	private Thread requestRetriever;
@@ -419,7 +416,7 @@ public class WebMapServer {
 				public void run() {
 					issueRequest();
 				}
-			});
+			}, "WebMapServer Request Thread");
 			requestRetriever.start();
 			return null;
 		}
