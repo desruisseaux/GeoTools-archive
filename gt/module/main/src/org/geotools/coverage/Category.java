@@ -17,6 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -85,7 +86,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * <br><br>
  * All <code>Category</code> objects are immutable and thread-safe.
  *
- * @version $Id: Category.java,v 1.23 2004/03/08 11:31:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see SampleDimension
@@ -916,7 +917,7 @@ public class Category implements Serializable {
      * A category with a localized name. Used for the pre-defined categories
      * {@link #NODATA}, {@link #FALSE} and {@link #TRUE}.
      *
-     * @version $Id: Category.java,v 1.23 2004/03/08 11:31:22 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Localized extends Category {

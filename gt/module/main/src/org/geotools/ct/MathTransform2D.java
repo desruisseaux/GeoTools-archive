@@ -23,6 +23,9 @@
  */
 package org.geotools.ct;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 

@@ -24,6 +24,9 @@ import org.geotools.pt.*;
 import org.geotools.cs.*;
 import org.geotools.ct.*;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 
 /**
  * An example of application reading points from the standard input,  transforming

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -39,6 +27,9 @@ package org.geotools.ct;
 import java.io.Serializable;
 import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.cs.Ellipsoid;
@@ -54,7 +45,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * Transforms a three dimensional geographic points using
  * abridged versions of formulas derived by Molodenski.
  *
- * @version $Id: AbridgedMolodenskiTransform.java,v 1.9 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  */
@@ -287,7 +278,7 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     /**
      * The provider for {@link AbridgedMolodenskiTransform}.
      *
-     * @version $Id: AbridgedMolodenskiTransform.java,v 1.9 2003/08/04 17:11:17 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Provider extends MathTransformProvider {

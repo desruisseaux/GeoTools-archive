@@ -18,10 +18,12 @@
  */
 package org.geotools.ct;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.FactoryException;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.ct.NoSuchClassificationException;
 import org.geotools.ct.MathTransform;

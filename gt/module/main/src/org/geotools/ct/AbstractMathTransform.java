@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -51,6 +39,9 @@ import java.rmi.RemoteException;
 
 // OpenGIS dependencies
 import org.opengis.ct.CT_MathTransform;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
@@ -74,7 +65,7 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * Subclasses must declare <code>implements&nbsp;MathTransform2D</code>
  * themself if they know to maps two-dimensional coordinate systems.
  *
- * @version $Id: AbstractMathTransform.java,v 1.12 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class AbstractMathTransform implements MathTransform {
@@ -620,7 +611,7 @@ public abstract class AbstractMathTransform implements MathTransform {
      * of the enclosing {@link MathTransform}. It is serializable only if the enclosing
      * math transform is also serializable.
      *
-     * @version $Id: AbstractMathTransform.java,v 1.12 2003/08/04 17:11:17 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     protected abstract class Inverse extends AbstractMathTransform implements Serializable {

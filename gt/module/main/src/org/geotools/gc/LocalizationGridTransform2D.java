@@ -30,12 +30,14 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.util.Arrays;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.AbstractMathTransform;
-import org.geotools.ct.TransformException;
 
 // Resources
 import org.geotools.resources.Utilities;

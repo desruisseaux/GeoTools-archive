@@ -32,6 +32,9 @@ import java.util.Collection;
 import java.io.Serializable;
 import javax.media.jai.ParameterListDescriptor;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
@@ -40,7 +43,6 @@ import org.geotools.cs.Projection;
 // Resources
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.AbstractMathTransform;
 import org.geotools.ct.MissingParameterException;
 import org.geotools.resources.cts.Resources;

@@ -32,6 +32,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 
 /**
  * A set of static methods working on OpenGIS objects.  Some of those methods

@@ -41,12 +41,14 @@ import java.io.ObjectStreamException;
 // JAI dependencies
 import javax.media.jai.iterator.WritableRectIter;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
-import org.geotools.ct.TransformException;
 import org.geotools.pt.MismatchedDimensionException;
 
 // Resources

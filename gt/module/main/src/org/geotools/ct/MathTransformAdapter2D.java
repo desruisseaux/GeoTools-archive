@@ -27,6 +27,9 @@ package org.geotools.ct;
 import org.opengis.ct.CT_MathTransform;
 import org.opengis.pt.PT_CoordinatePoint;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 
