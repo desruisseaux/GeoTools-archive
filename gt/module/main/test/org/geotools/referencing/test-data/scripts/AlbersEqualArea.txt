@@ -1,8 +1,10 @@
-// The following were calculated with ArcGIS 8.3 
-// (minor changes needed in projection names and parameters between ArcGIS and gt2:
-// ArcGIS calls this projection 'Albers')
-// points with an //Error: comment could not be calculated with ArcGIS, 
-// and were instead calculated with libproj4
+// Test points for the Albers Equal Area Conic Projection 
+// (EPSG 9822)
+//
+// The following test points were calculated with ArcGIS 8.3
+// ArcGIS calls this projection 'Albers'.
+// Points with an //Error: comment could not be calculated with ArcGIS, 
+// and were instead calculated with libproj4.
 //
 // Rueben Schulz - May 15, 2004
 //
@@ -16,6 +18,7 @@
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
 // than the value specified in the last "test tolerance" statement, then a failure is reported.
+// Inverse transforms are tested if java assertions are enabled.
 // If some test fails, "print" statements can be added in this script for debugging purpose:
 //
 //    print crs            (prints the source and target CRS, and the transform between them)
@@ -30,7 +33,7 @@ set _sphere_ = GEOGCS["sphere", DATUM["sphere", SPHEROID["sphere", 6370997.0, 0]
 ////////////////////////////////////////
 //Eliptical 2SP  sp1!=sp2
 //Albers_Conic_Equal_Area
-set _Albers1_ = PROJCS["BC Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -126.0], PARAMETER["latitude_of_origin", 45.0], PARAMETER["false_easting", 1000000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 50.0], PARAMETER["standard_parallel_2", 58.5], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers1_ = PROJCS["BC Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers"], PARAMETER["central_meridian", -126.0], PARAMETER["latitude_of_origin", 45.0], PARAMETER["false_easting", 1000000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 50.0], PARAMETER["standard_parallel_2", 58.5], AXIS["x",EAST], AXIS["y",NORTH]]
 set _Albers2_ = PROJCS["Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", -88.0], PARAMETER["latitude_of_origin", 14.5], PARAMETER["false_easting", 328.08333333], PARAMETER["false_northing", 192109.19583333], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", -20.0], PARAMETER["standard_parallel_2", -33.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _WGS84_
@@ -163,7 +166,7 @@ target pt = (16284412.01469642,       -35668487.50643850)
 ////////////////////////////////////////
 //Eliptical 1SP  sp1==sp2
 //Albers_Conic_Equal_Area
-set _Albers3_=PROJCS["Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 142.0], PARAMETER["latitude_of_origin", 42.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 57.0], PARAMETER["standard_parallel_2", 57.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Albers3_=PROJCS["Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 142.0], PARAMETER["latitude_of_origin", 42.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 57.0], AXIS["x",EAST], AXIS["y",NORTH]]
 set _Albers4_=PROJCS["Albers", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Albers_Conic_Equal_Area"], PARAMETER["central_meridian", 45.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 1000.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -77.0], PARAMETER["standard_parallel_2", -77.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _WGS84_
