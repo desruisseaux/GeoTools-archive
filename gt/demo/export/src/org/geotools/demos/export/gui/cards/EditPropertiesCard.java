@@ -19,6 +19,9 @@ package org.geotools.demos.export.gui.cards;
 import org.geotools.demos.export.ExportParameters;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.SimpleInternationalString;
@@ -443,7 +446,29 @@ public class EditPropertiesCard extends WizzardCard {
                 newValues[row][0] = Boolean.TRUE;
                 newValues[row][1] = type.getName();
                 newValues[row][2] = type.getType();
-                newValues[row][3] = new Integer(type.getFieldLength());
+                int fieldLen=0;
+                Filter f = type.getRestriction();
+            	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == f.COMPARE_LESS_THAN || f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL)){
+            		try{
+            		CompareFilter cf = (CompareFilter)f;
+            		if(cf.getLeftValue() instanceof org.geotools.filter.LengthFunction){
+            			fieldLen = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
+            		}else{
+            			if(cf.getRightValue() instanceof org.geotools.filter.LengthFunction){
+            				fieldLen = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+                		}
+            		}
+            		}catch(NumberFormatException e){
+            			fieldLen = 256;
+            		}
+            	}else{
+            		fieldLen = 256;
+            	}
+                
+                if (fieldLen <= 0) {
+                    fieldLen = 255;
+                }
+                newValues[row][3] = new Integer(fieldLen);
             }
 
             fireTableDataChanged();
