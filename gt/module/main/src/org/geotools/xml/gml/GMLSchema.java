@@ -925,11 +925,11 @@ public class GMLSchema implements Schema {
             String text = (String) value[0].getValue();
             text = text.trim();
 
-            final String[] enum = {
+            final String[] enumeration = {
                     "inapplicable", "unknown", "unavailable", "missing"
                 };
 
-            if (Arrays.binarySearch(enum, text) >= 0) {
+            if (Arrays.binarySearch(enumeration, text) >= 0) {
                 return value[0].getValue();
             }
 
