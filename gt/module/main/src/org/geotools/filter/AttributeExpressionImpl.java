@@ -84,7 +84,7 @@ public class AttributeExpressionImpl extends DefaultExpression
                 this.attPath = attPath;
             } else {
                 throw new IllegalFilterException(
-                    "Attribute does not conform to stated schema.");
+                    "Attribute: " +attPath+ " is not in stated schema "+schema.getTypeName()+".");
             }
         } else {
             this.attPath = attPath;
