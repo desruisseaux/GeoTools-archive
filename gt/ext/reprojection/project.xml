@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-reprojection</name>
+  <id>graph</id>
+  <currentVersion>2.0-B6-DEV</currentVersion>
+  <versions>
+    <version>
+      <id>b1</id>
+      <name>2.0-B6-DEV</name>
+      <tag>GT_2_0_B6_DEV</tag>
+    </version>
+  </versions>
+  <package>org.geotools</package>
+  <shortDescription>Reprojection serives for GeoServer and other clients.</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>
+  Reprojection Serives are presented as a series of convience methods.
+  Contains a Property file based CoordinateSystemAuthority (the property file is too
+  large to be included in the main geotools release). This class will need to be
+  ported to the new GeoAPI CoordinateReferenceSystem interfaces.</description>
+  <developers>
+    <developer>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.0-B6-DEV</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+   <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.2.1</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+      <type>test</type>
+      <url>http://junit.org/</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>testData/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
