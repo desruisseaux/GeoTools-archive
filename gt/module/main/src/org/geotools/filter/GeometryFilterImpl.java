@@ -17,6 +17,7 @@
 package org.geotools.filter;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.feature.Feature;
 import java.util.logging.Level;
@@ -202,30 +203,39 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         } else if (filterType == GEOMETRY_TOUCHES) {
             return left.touches(right);
         } else if (filterType == GEOMETRY_BBOX) {
-            Coordinate[] cr = right.getEnvelope().getCoordinates();
-            Coordinate[] cl = left.getEnvelope().getCoordinates();
+            Envelope envRight = right.getEnvelopeInternal();
+            Envelope envLeft = left.getEnvelopeInternal();
+            // Coordinate[] cr = right.getEnvelope().getCoordinates();
+            // Coordinate[] cl = left.getEnvelope().getCoordinates();
             //if (left.getDimension() >= 1) {  Found bug here, see GEOT-186
-            if (cl.length > 1 && cr.length > 1) {
-                if ((cl[0].x >= cr[0].x) && (cl[2].x <= cr[2].x)
-                        && (cl[0].y >= cr[0].y) && (cl[2].y <= cr[2].y)) {
-                    // feature contained in the bbox
-                    return true;
-                } else if ((cl[0].x > cr[2].x) || (cl[2].x < cr[0].x)
-                        || (cl[0].y > cr[2].y) || (cl[2].y < cr[0].y)) {
-                    // feature outside the bbox
-                    return false;
-                } else {
-                    if (LOGGER.isLoggable(Level.FINER)) {
-                        LOGGER.finer("Right: " + "[" + cr[0].x + "," + cr[0].y
-                            + "]" + "-" + "[" + cr[3].x + "," + cr[3].y + "]");
-                        LOGGER.finer("Left: " + "[" + cl[0].x + "," + cl[0].y
-                            + "]" + "-" + "[" + cl[3].x + "," + cl[3].y + "]");
-                    }
-
-                    return left.intersects(right);
-                }
-            } else {
+//            if (cl.length > 1 && cr.length > 1) {
+//                if ((cl[0].x >= cr[0].x) && (cl[2].x <= cr[2].x)
+//                        && (cl[0].y >= cr[0].y) && (cl[2].y <= cr[2].y)) {
+//                    // feature contained in the bbox
+//                    return true;
+//                } else if ((cl[0].x > cr[2].x) || (cl[2].x < cr[0].x)
+//                        || (cl[0].y > cr[2].y) || (cl[2].y < cr[0].y)) {
+//                    // feature outside the bbox
+//                    return false;
+//                } else {
+//                    if (LOGGER.isLoggable(Level.FINER)) {
+//                        LOGGER.finer("Right: " + "[" + cr[0].x + "," + cr[0].y
+//                            + "]" + "-" + "[" + cr[3].x + "," + cr[3].y + "]");
+//                        LOGGER.finer("Left: " + "[" + cl[0].x + "," + cl[0].y
+//                            + "]" + "-" + "[" + cl[3].x + "," + cl[3].y + "]");
+//                    }
+//
+//                    return left.intersects(right);
+//                }
+//            } else {
+//                return left.intersects(right);
+//            }
+            if(envRight.contains(envLeft) || envLeft.contains(envRight)) {
+                return true;
+            } else if(envRight.intersects(envLeft)) {
                 return left.intersects(right);
+            } else {
+                return false;
             }
 
             // Note that this is a pretty permissive logic
