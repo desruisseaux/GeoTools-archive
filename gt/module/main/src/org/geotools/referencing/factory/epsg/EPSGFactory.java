@@ -46,7 +46,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import javax.imageio.spi.ServiceRegistry;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
@@ -248,13 +247,6 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      * strictly for {@link #createObject} internal use.
      */
     private int lastObjectType = -2;
-
-    /**
-     * <code>true</code> if this factory has been registered as a service provider.
-     * This this case, this factory will never be fully {@linkplain #dispose disposed}
-     * except at the JVM shutdown.
-     */
-    private boolean isService;
 
     /**
      * The calendar instance for creating {@link java.util.Date} objects from a year
@@ -649,7 +641,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     {
         final Map properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
-            final Extent extent = createExtent(area);
+            final Extent extent = buffered.createExtent(area);
             properties.put(prepend(org.geotools.referencing.datum.Datum.VALID_AREA_PROPERTY), extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
@@ -956,7 +948,9 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                         }
                     }
                 }
-                returnValue = (Extent) ensureSingleton(extent, returnValue, code);
+                if (extent != null) {
+                    returnValue = (Extent) ensureSingleton(extent.unmodifiable(), returnValue, code);
+                }
             }
             result.close();
         } catch (SQLException exception) {
@@ -1687,35 +1681,6 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Called when this factory is added to the given <code>category</code> of the given
-     * <code>registry</code>  The object may already be registered under another category
-     * or categories.
-     * <br><br>
-     * This method is invoked automatically when this factory is registered as a plugin,
-     * and should not be invoked directly by the user.
-     *
-     * @param registry a <code>ServiceRegistry</code> where this factory has been registered.
-     * @param category a <code>Class</code> object indicating the registry category under which
-     *                 this object has been registered.
-     *
-     * @see org.geotools.referencing.FactoryFinder
-     */
-    public void onRegistration(final ServiceRegistry registry, final Class category) {
-        super.onRegistration(registry, category);
-        isService = true;
-        Runtime.getRuntime().addShutdownHook(new Thread("EPSG factory shutdown") {
-            public void run() {
-                isService = false; // Instructs 'dispose()' to close the connection.
-                try {
-                    dispose();
-                } catch (FactoryException exception) {
-                    // Too late to log the error, since we are exiting the JVM. Ignore...
-                }
-            }
-        });
-    }
-
-    /**
      * Dispose any resources hold by this object.
      *
      * @throws FactoryException if an error occured while closing the connection.
@@ -1726,9 +1691,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                 ((PreparedStatement) it.next()).close();
                 it.remove();
             }
-            if (!isService) {
-                connection.close();
-            }
+            connection.close();
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }

@@ -29,6 +29,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.AuthorityFactory;
@@ -323,6 +324,23 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
             return (PrimeMeridian) object;
         } catch (ClassCastException exception) {
             throw noSuchAuthorityCode(PrimeMeridian.class, code, exception);
+        }
+    }
+
+    /**
+     * Returns a {@linkplain Extent extent} (usually an area of validity) from a code.
+     * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
+     *
+     * @param  code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     */
+    public Extent createExtent(final String code) throws FactoryException {
+        final IdentifiedObject object = createObject(code);
+        try {
+            return (Extent) object;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(Extent.class, code, exception);
         }
     }
 

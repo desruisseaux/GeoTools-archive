@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.imageio.spi.ServiceRegistry;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
@@ -91,82 +93,70 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
     public static final String DEFAULT_CONNECTION = "jdbc:odbc:EPSG";
 
     /**
-     * The EPSG factory used. Only one instance will be shared. This trick is needed since the
-     * factory implements three interfaces. We want to avoid to constructs {@link EPSGFactory}
-     * three time, since it may be costly (because of database connections).
+     * The shutdown hook, or <code>null</code> if none.
      */
-    private static AbstractAuthorityFactory factory;
+    private Thread shutdown;
 
     /**
      * <code>true</code> if system preferences was used (or is to be used) instead of user
      * preferences.
      */
-    private static boolean system;
+    private boolean system;
 
     /**
      * Constructs an authority factory using the default set of
      * {@linkplain org.opengis.referencing.ObjectFactory object factories} and the
      * default connection parameters to the EPSG database.
-     *
-     * @throws SQLException if the constructor failed to connect to the EPSG database.
      */
-    public DefaultFactory() throws SQLException {
-        super(createFactory());
-        if (factory == authorityFactory) {
-            ((EPSGFactory) authorityFactory).buffered = this;
-        }
+    public DefaultFactory() {
+        super(new FactoryGroup(), MAX_PRIORITY);
     }
 
     /**
-     * Constructs an EPSG authority factory using the default connection parameters
-     * to the EPSG database.
-     *
-     * @return A single instance of EPSG factory.
-     * @throws SQLException if the constructor failed to connect to the EPSG database.
+     * Returns the authority, which is {@link org.geotools.metadata.citation.Citation#EPSG EPSG}.
      */
-    private static synchronized AbstractAuthorityFactory createFactory() throws SQLException {
-        if (factory == null) {
-            String url    = null;
-            String driver = null;
+    public Citation getAuthority() {
+        return org.geotools.metadata.citation.Citation.EPSG;
+    }
+
+    /**
+     * Returns the URL to use for the connection to the EPSG database.
+     * Subclasses may override this method in order to specify a different URL.
+     */
+    protected String getURL() {
+        return getPreference(CONNECTION, DEFAULT_CONNECTION, system);
+    }
+
+    /**
+     * Returns the driver to load before any attempt to connect to the EPSG database,
+     * or <code>null</code> if none.
+     * Subclasses may override this method in order to specify a different driver.
+     */
+    protected String getDriver() {
+        return getPreference(DRIVER, DEFAULT_DRIVER, system);
+    }
+
+    /**
+     * Returns the value for the specified preference node. This method try on user preferences
+     * first, and on the system preferences next if no user preferences was set. If both of them
+     * fails, the default value is returned.
+     */
+    private static String getPreference(final String node, final String defaultValue, boolean system) {
+        do {
+            final Preferences prefs;
             try {
-                Preferences prefs;
-                if (!system) {
-                    prefs = getPreferences(false);
-                    url    = prefs.get(CONNECTION, null);
-                    driver = prefs.get(DRIVER,     null);
-                }
-                if (url == null || driver == null) {
-                    prefs = getPreferences(true);
-                    if (url    == null) url    = prefs.get(CONNECTION, DEFAULT_CONNECTION);
-                    if (driver == null) driver = prefs.get(DRIVER,     DEFAULT_DRIVER);
-                    system = true;
-                }
+                prefs = getPreferences(system);
             } catch (SecurityException exception) {
-                if (url    == null) url    = DEFAULT_CONNECTION;
-                if (driver == null) driver = DEFAULT_DRIVER;
+                // We are not allowed to read those preferences.
+                // Try the other preference node or the default.
+                continue;
             }
-            final FactoryGroup factories = new FactoryGroup();
-            /*
-             * TODO: Infer the EPSGFactory subclass from the URL here.
-             */
-            factory = new EPSGFactory(factories, url, driver);
-            /*
-             * Ensures that the database connection will be closed on JVM exit.
-             * This code will be executed even if the JVM is terminated because
-             * of an exception or with [Ctrl-C].
-             */
-            Runtime.getRuntime().addShutdownHook(new Thread("Close EPSG connection") {
-                public void run() {
-                    try {
-                        factory.dispose();
-                    } catch (FactoryException exception) {
-                        // To late for logging, since the JVM is
-                        // in process of shutting down. Ignore...
-                    }
-                }
-            });
-        }
-        return factory;
+            final String value = prefs.get(node, null);
+            if (value != null) {
+                return value;
+            }
+        } while ((system = !system) == true);
+        return defaultValue;
     }
 
     /**
@@ -179,6 +169,72 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
     private static Preferences getPreferences(final boolean system) {
         return system ? Preferences.systemNodeForPackage(DefaultFactory.class)
                       : Preferences.  userNodeForPackage(DefaultFactory.class);
+    }
+
+    /**
+     * Returns the backing store authority factory. This method try to connect to the EPSG
+     * database using the default connection parameters the first time it is invoked.
+     *
+     * @return The backing store to uses in {@code createXXX(...)} methods.
+     * @throws FactoryException if the constructor failed to connect to the EPSG database.
+     *         This exception usually has a {@link SQLException} as its cause.
+     */
+    protected AbstractAuthorityFactory getBackingStore() throws FactoryException {
+        if (backingStore == null) try {
+            /*
+             * TODO: Infer the EPSGFactory subclass from the URL here.
+             */
+            final EPSGFactory epsg = new EPSGFactory(factories, getURL(), getDriver());
+            epsg.buffered = this;
+            backingStore = epsg;
+        } catch (SQLException exception) {
+            // TODO: localize
+            throw new FactoryException("Failed to connect to the EPSG database", exception);
+        }
+        return backingStore;
+    }
+
+    /**
+     * Called when this factory is added to the given <code>category</code> of the given
+     * <code>registry</code>  The object may already be registered under another category.
+     */
+    public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
+        super.onRegistration(registry, category);
+        /*
+         * Ensures that the database connection will be closed on JVM exit.
+         * This code will be executed even if the JVM is terminated because
+         * of an exception or with [Ctrl-C]. Note: we create this shutdown
+         * hook only if this factory is registered as a service because it
+         * will prevent this instance to be garbage collected until it is
+         * deregistered.
+         */
+        if (shutdown == null) {
+            shutdown = new Thread("EPSG factory shutdown") {
+                public void run() {
+                    try {
+                        dispose();
+                    } catch (FactoryException exception) {
+                        // To late for logging, since the JVM is
+                        // in process of shutting down. Ignore...
+                    }
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(shutdown);
+        }
+    }
+
+    /**
+     * Called when this factory is removed from the given <code>category</code> of the given
+     * <code>registry</code>.  The object may still be registered under another category.
+     */
+    public synchronized void onDeregistration(final ServiceRegistry registry, final Class category) {
+        if (shutdown != null) {
+            if (registry.getServiceProviderByClass(getClass()) == null) {
+                Runtime.getRuntime().removeShutdownHook(shutdown);
+                shutdown = null;
+            }
+        }
+        super.onDeregistration(registry, category);
     }
 
     /**
@@ -237,7 +293,7 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
         final Arguments arguments = new Arguments(args);
         final String       driver = arguments.getOptionalString("-driver");
         final String   connection = arguments.getOptionalString("-connection");
-        system = arguments.getFlag("-system");
+        final boolean     system = arguments.getFlag("-system");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         /*
          * If a driver or connection parameters were set, update the preferences.
@@ -300,6 +356,7 @@ public final class DefaultFactory extends BufferedAuthorityFactory {
             DefaultFactory factory = null;
             try {
                 factory = new DefaultFactory();
+                factory.system = system;
                 for (int i=0; i<args.length; i++) {
                     arguments.out.println(factory.createObject(args[i]));
                 }

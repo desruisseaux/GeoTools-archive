@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -64,6 +65,9 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.util.InternationalString;
 
+// Geotools dependencies
+import org.geotools.referencing.factory.FactoryGroup;
+
 
 /**
  * An authority factory that caches all objects created by an other factory. All
@@ -78,15 +82,29 @@ import org.opengis.util.InternationalString;
  * one. This means that this buffered factory will continue to returns them as long as
  * they are in use somewhere else in the Java virtual machine, but will be discarted
  * (and recreated on the fly if needed) otherwise.
+ * <br><br>
+ * An other purpose of {@code BufferedAuthorityFactory} is to creates the backing factory
+ * only the first time a {@code createFoo(...)} method is invoked. This approach allow to
+ * instantiate a connection to a database (for example) only when first needed.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
-     * The underlying authority factory.
+     * The default value for {@link #maxStrongReferences}.
      */
-    protected final AbstractAuthorityFactory authorityFactory;
+    private static final int DEFAULT_MAX = 20;
+
+    /**
+     * The underlying authority factory. This field may be <code>null</code> if this object was
+     * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected
+     * constructor}. This this case, the subclass is responsible for creating the backing store
+     * the first time {@link #getBackingStore} is invoked.
+     *
+     * @see #getBackingStore
+     */
+    protected AbstractAuthorityFactory backingStore;
 
     /**
      * The pool of cached objects.
@@ -104,10 +122,10 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
      *
-     * @param factory The factory to cache.
+     * @param factory The factory to cache. Can not be <code>null</code>.
      */
     public BufferedAuthorityFactory(final AbstractAuthorityFactory factory) {
-        this(factory, 20);
+        this(factory, DEFAULT_MAX);
     }
 
     /**
@@ -116,7 +134,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * amount of objects are created, then the strong references for the oldest ones are replaced
      * by weak references.
      *
-     * @param factory The factory to cache.
+     * @param factory The factory to cache. Can not be <code>null</code>.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
     public BufferedAuthorityFactory(AbstractAuthorityFactory factory,
@@ -124,25 +142,100 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     {
         super(factory.factories, factory.priority);
         while (factory instanceof BufferedAuthorityFactory) {
-            factory = ((BufferedAuthorityFactory) factory).authorityFactory;
+            factory = ((BufferedAuthorityFactory) factory).backingStore;
         }
-        this.authorityFactory    = factory;
+        this.backingStore        = factory;
         this.maxStrongReferences = maxStrongReferences;
     }
 
     /**
+     * Constructs an instance without initial backing store. This constructor is for subclass
+     * constructors only. The {@link #backingStore} field is initially <code>null</code>, and the
+     * subclasses are responsible for creating an appropriate backing store the first time the
+     * {@link #getBackingStore} method is invoked.
+     *
+     * @param factories The factories to use.
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
+     *
+     * @see #backingStore
+     * @see #getBackingStore
+     */
+    protected BufferedAuthorityFactory(final FactoryGroup factories,
+                                       final int          priority)
+    {
+        this(factories, priority, DEFAULT_MAX);
+    }
+
+    /**
+     * Constructs an instance without initial backing store. This constructor is for subclass
+     * constructors only. The {@link #backingStore} field is initially <code>null</code>, and the
+     * subclasses are responsible for creating an appropriate backing store the first time the
+     * {@link #getBackingStore} method is invoked.
+     *
+     * @param factories The factories to use.
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
+     * @param maxStrongReferences The maximum number of objects to keep by strong reference.
+     *
+     * @see #backingStore
+     * @see #getBackingStore
+     */
+    protected BufferedAuthorityFactory(final FactoryGroup factories,
+                                       final int          priority,
+                                       final int maxStrongReferences)
+    {
+        super(factories, priority);
+        this.maxStrongReferences = maxStrongReferences;
+    }
+
+    /**
+     * Returns the backing store authority factory. The default implementation returns
+     * {@link #backingStore}. Subclass may override this method in order to initialize
+     * the backing store only the first time a {@code createXXX(...)} method is invoked.
+     * Note that in this case, subclasses may need to override {@link #getVendor} and
+     * {@link #getAuthority} as well.
+     *
+     * @return The backing store to uses in {@code createXXX(...)} methods.
+     * @throws FactoryException if the creation of backing store failed.
+     */
+    protected AbstractAuthorityFactory getBackingStore() throws FactoryException {
+        return backingStore;
+    }
+
+    /**
+     * Returns {@code true} if this factory is ready. The default implementation returns
+     * {@code false} if {@link #getBackingStore} throws an exception.
+     */
+    public boolean isReady() {
+        try {
+            return getBackingStore().isReady();
+        } catch (FactoryException exception) {
+            /*
+             * TODO: log a message at the FINER lever. This is not a warning, since the purpose
+             *       of this 'isReady()' method is exactly that: check if the connection is up.
+             */
+            return false;
+        }
+    }
+
+    /**
      * Returns the vendor responsible for creating the underlying factory implementation.
+     * This method may need to be overriden if this {@code BufferedAuthorityFactory} was created
+     * using the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected constructor}.
      */
     public Citation getVendor() {
-        return authorityFactory.getVendor();
+        return (backingStore!=null) ? backingStore.getVendor() : super.getVendor();
     }
 
     /**
      * Returns the organization or party responsible for definition and maintenance of the
-     * underlying database.
+     * underlying database. This method should be overriden if this
+     * {@code BufferedAuthorityFactory} was created using the
+     * {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected constructor}.
      */
     public Citation getAuthority() {
-        return authorityFactory.getAuthority();
+        return backingStore.getAuthority();
     }
 
     /**
@@ -156,7 +249,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @throws FactoryException if access to the underlying database failed.
      */
     public Set getAuthorityCodes(final Class type) throws FactoryException {
-        return authorityFactory.getAuthorityCodes(type);
+        return getBackingStore().getAuthorityCodes(type);
     }
 
     /**
@@ -169,7 +262,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @throws FactoryException if the query failed for some other reason.
      */
     public InternationalString getDescriptionText(final String code) throws FactoryException {
-        return authorityFactory.getDescriptionText(code);
+        return getBackingStore().getDescriptionText(code);
     }
 
     /**
@@ -183,7 +276,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof IdentifiedObject) {
             object = (IdentifiedObject) cached;
         } else {
-            object = authorityFactory.createObject(code);
+            object = getBackingStore().createObject(code);
         }
         put(code, object);
         return object;
@@ -200,7 +293,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Datum) {
             datum = (Datum) cached;
         } else {
-            datum = authorityFactory.createDatum(code);
+            datum = getBackingStore().createDatum(code);
         }
         put(code, datum);
         return datum;
@@ -217,7 +310,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EngineeringDatum) {
             datum = (EngineeringDatum) cached;
         } else {
-            datum = authorityFactory.createEngineeringDatum(code);
+            datum = getBackingStore().createEngineeringDatum(code);
         }
         put(code, datum);
         return datum;
@@ -234,7 +327,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ImageDatum) {
             datum = (ImageDatum) cached;
         } else {
-            datum = authorityFactory.createImageDatum(code);
+            datum = getBackingStore().createImageDatum(code);
         }
         put(code, datum);
         return datum;
@@ -251,7 +344,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalDatum) {
             datum = (VerticalDatum) cached;
         } else {
-            datum = authorityFactory.createVerticalDatum(code);
+            datum = getBackingStore().createVerticalDatum(code);
         }
         put(code, datum);
         return datum;
@@ -268,7 +361,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TemporalDatum) {
             datum = (TemporalDatum) cached;
         } else {
-            datum = authorityFactory.createTemporalDatum(code);
+            datum = getBackingStore().createTemporalDatum(code);
         }
         put(code, datum);
         return datum;
@@ -285,7 +378,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeodeticDatum) {
             datum = (GeodeticDatum) cached;
         } else {
-            datum = authorityFactory.createGeodeticDatum(code);
+            datum = getBackingStore().createGeodeticDatum(code);
         }
         put(code, datum);
         return datum;
@@ -302,7 +395,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Ellipsoid) {
             ellipsoid = (Ellipsoid) cached;
         } else {
-            ellipsoid = authorityFactory.createEllipsoid(code);
+            ellipsoid = getBackingStore().createEllipsoid(code);
         }
         put(code, ellipsoid);
         return ellipsoid;
@@ -319,28 +412,27 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof PrimeMeridian) {
             meridian = (PrimeMeridian) cached;
         } else {
-            meridian = authorityFactory.createPrimeMeridian(code);
+            meridian = getBackingStore().createPrimeMeridian(code);
         }
         put(code, meridian);
         return meridian;
     }
 
     /**
-     * Gets the Geoid code from a WKT name.
-     *
-     * @deprecated May be replaced by an alias mechanism.
+     * Returns an {@linkplain Extent extent} (usually an area of validity) from a code.
      */
-    public String geoidFromWktName(final String wkt) {
-        return authorityFactory.geoidFromWktName(wkt);
-    }
-
-    /**
-     * Gets the WKT name of a Geoid. 
-     *
-     * @deprecated May be replaced by an alias mechanism.
-     */
-    public String wktFromGeoidName(final String geoid) {
-        return authorityFactory.wktFromGeoidName(geoid);
+    public synchronized Extent createExtent(final String code)
+            throws FactoryException
+    {
+        final Extent extent;
+        final Object cached = get(code);
+        if (cached instanceof Extent) {
+            extent = (Extent) cached;
+        } else {
+            extent = getBackingStore().createExtent(code);
+        }
+        put(code, extent);
+        return extent;
     }
 
     /**
@@ -354,7 +446,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateSystem) {
             cs = (CoordinateSystem) cached;
         } else {
-            cs = authorityFactory.createCoordinateSystem(code);
+            cs = getBackingStore().createCoordinateSystem(code);
         }
         put(code, cs);
         return cs;
@@ -371,7 +463,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CartesianCS) {
             cs = (CartesianCS) cached;
         } else {
-            cs = authorityFactory.createCartesianCS(code);
+            cs = getBackingStore().createCartesianCS(code);
         }
         put(code, cs);
         return cs;
@@ -388,7 +480,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof PolarCS) {
             cs = (PolarCS) cached;
         } else {
-            cs = authorityFactory.createPolarCS(code);
+            cs = getBackingStore().createPolarCS(code);
         }
         put(code, cs);
         return cs;
@@ -405,7 +497,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CylindricalCS) {
             cs = (CylindricalCS) cached;
         } else {
-            cs = authorityFactory.createCylindricalCS(code);
+            cs = getBackingStore().createCylindricalCS(code);
         }
         put(code, cs);
         return cs;
@@ -422,7 +514,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof SphericalCS) {
             cs = (SphericalCS) cached;
         } else {
-            cs = authorityFactory.createSphericalCS(code);
+            cs = getBackingStore().createSphericalCS(code);
         }
         put(code, cs);
         return cs;
@@ -439,7 +531,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EllipsoidalCS) {
             cs = (EllipsoidalCS) cached;
         } else {
-            cs = authorityFactory.createEllipsoidalCS(code);
+            cs = getBackingStore().createEllipsoidalCS(code);
         }
         put(code, cs);
         return cs;
@@ -456,7 +548,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalCS) {
             cs = (VerticalCS) cached;
         } else {
-            cs = authorityFactory.createVerticalCS(code);
+            cs = getBackingStore().createVerticalCS(code);
         }
         put(code, cs);
         return cs;
@@ -473,7 +565,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TimeCS) {
             cs = (TimeCS) cached;
         } else {
-            cs = authorityFactory.createTimeCS(code);
+            cs = getBackingStore().createTimeCS(code);
         }
         put(code, cs);
         return cs;
@@ -490,7 +582,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateSystemAxis) {
             axis = (CoordinateSystemAxis) cached;
         } else {
-            axis = authorityFactory.createCoordinateSystemAxis(code);
+            axis = getBackingStore().createCoordinateSystemAxis(code);
         }
         put(code, axis);
         return axis;
@@ -507,7 +599,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Unit) {
             unit = (Unit) cached;
         } else {
-            unit = authorityFactory.createUnit(code);
+            unit = getBackingStore().createUnit(code);
         }
         put(code, unit);
         return unit;
@@ -524,7 +616,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateReferenceSystem) {
             crs = (CoordinateReferenceSystem) cached;
         } else {
-            crs = authorityFactory.createCoordinateReferenceSystem(code);
+            crs = getBackingStore().createCoordinateReferenceSystem(code);
         }
         put(code, crs);
         return crs;
@@ -541,7 +633,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CompoundCRS) {
             crs = (CompoundCRS) cached;
         } else {
-            crs = authorityFactory.createCompoundCRS(code);
+            crs = getBackingStore().createCompoundCRS(code);
         }
         put(code, crs);
         return crs;
@@ -558,7 +650,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof DerivedCRS) {
             crs = (DerivedCRS) cached;
         } else {
-            crs = authorityFactory.createDerivedCRS(code);
+            crs = getBackingStore().createDerivedCRS(code);
         }
         put(code, crs);
         return crs;
@@ -575,7 +667,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EngineeringCRS) {
             crs = (EngineeringCRS) cached;
         } else {
-            crs = authorityFactory.createEngineeringCRS(code);
+            crs = getBackingStore().createEngineeringCRS(code);
         }
         put(code, crs);
         return crs;
@@ -592,7 +684,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeographicCRS) {
             crs = (GeographicCRS) cached;
         } else {
-            crs = authorityFactory.createGeographicCRS(code);
+            crs = getBackingStore().createGeographicCRS(code);
         }
         put(code, crs);
         return crs;
@@ -609,7 +701,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeocentricCRS) {
             crs = (GeocentricCRS) cached;
         } else {
-            crs = authorityFactory.createGeocentricCRS(code);
+            crs = getBackingStore().createGeocentricCRS(code);
         }
         put(code, crs);
         return crs;
@@ -626,7 +718,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ImageCRS) {
             crs = (ImageCRS) cached;
         } else {
-            crs = authorityFactory.createImageCRS(code);
+            crs = getBackingStore().createImageCRS(code);
         }
         put(code, crs);
         return crs;
@@ -643,7 +735,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ProjectedCRS) {
             crs = (ProjectedCRS) cached;
         } else {
-            crs = authorityFactory.createProjectedCRS(code);
+            crs = getBackingStore().createProjectedCRS(code);
         }
         put(code, crs);
         return crs;
@@ -660,7 +752,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TemporalCRS) {
             crs = (TemporalCRS) cached;
         } else {
-            crs = authorityFactory.createTemporalCRS(code);
+            crs = getBackingStore().createTemporalCRS(code);
         }
         put(code, crs);
         return crs;
@@ -677,7 +769,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalCRS) {
             crs = (VerticalCRS) cached;
         } else {
-            crs = authorityFactory.createVerticalCRS(code);
+            crs = getBackingStore().createVerticalCRS(code);
         }
         put(code, crs);
         return crs;
@@ -687,7 +779,10 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Releases resources immediately instead of waiting for the garbage collector.
      */
     public synchronized void dispose() throws FactoryException {
-        authorityFactory.dispose();
+        if (backingStore != null) {
+            backingStore.dispose();
+            backingStore = null;
+        }
         pool.clear();
         super.dispose();
     }

@@ -61,4 +61,15 @@ public class AbstractFactory implements Factory {
     public Citation getVendor() {
         return org.geotools.metadata.citation.Citation.GEOTOOLS;
     }
+
+    /**
+     * Returns {@code true} if this factory is ready. The default implementation may
+     * returns {@code false} for example if a connection to the EPSG database failed.
+     *
+     * @todo Consider moving this method in GeoAPI interfaces. However, we need to decide
+     *       first if there is a need for some general API for discovering factory capabilities.
+     */
+    public boolean isReady() {
+        return true;
+    }
 }
