@@ -219,6 +219,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         if (i != elements.size()) {
+System.out.println("Elements.size == "+elements.size());
             throw new SAXException("Invalid element order according: "
                 + type.getName() + "[" + i + "]");
         }
@@ -375,28 +376,49 @@ public class ComplexElementHandler extends XMLElementHandler {
     private int[] valid(Element element, int index) {
 
     	// does this element equate to the index in the doc?
-        XMLElementHandler indexHandler = ((XMLElementHandler) elements.get(index));
 
-        if(indexHandler == null || indexHandler.getElement() == null)
-        	return new int[]{index,0};
+        int[] r = null;
         
-        if(indexHandler.getElement() == element)
-        	return new int[]{index+1,1};
-        
-        if(element.getName()==null)
-        	return new int[]{index,0};
-        
-        if(element.getName()!=null && element.getName().equalsIgnoreCase(indexHandler.getName()))
-        	return new int[]{index+1,1};
-        
-        Element e = indexHandler.getElement().getSubstitutionGroup();
-        while(e != null){
-        	if(element.getName().equalsIgnoreCase(e.getName()))
-        		return new int[]{index+1,1};
-        	e = e.getSubstitutionGroup();
+        XMLElementHandler indexHandler = null;
+        if(index<elements.size()){
+            indexHandler = ((XMLElementHandler) elements.get(index));
+        }else{
+            // not found :)
+//System.out.println("Index is Size == "+index);
+            return new int[]{index,0};
         }
         
-        return new int[]{index,0};
+//System.out.println("Checking "+element.getName()+" "+index+"("+(indexHandler==null?"":indexHandler.getName())+")");
+        if(r ==null && (indexHandler == null || indexHandler.getElement() == null))
+        	return new int[]{index,0};
+        
+        if(r == null && indexHandler.getElement() == element)
+        	r =  new int[]{index+1,1};
+        
+        if(r == null && element.getName()==null)
+        	return new int[]{index,0};
+        
+        if(r == null && (element.getName()!=null && element.getName().equalsIgnoreCase(indexHandler.getName())))
+        	r =  new int[]{index+1,1};
+        if(r == null && element.getName()!=null){
+        Element e = indexHandler.getElement();
+        while(r == null && e != null){
+        	if(element.getName().equalsIgnoreCase(e.getName())){
+//System.out.println("Found sub "+indexHandler.getName()+" "+index);
+        		r =  new int[]{index+1,1};
+        	}
+        	e = e.getSubstitutionGroup();
+        }
+        }
+        
+        if(r == null){
+//System.out.println("not found "+indexHandler.getName()+" "+index);
+            r = new int[]{index,0};
+        }
+//        else{
+//System.out.println("found "+indexHandler.getName());
+//        }
+        return r;
     }
 
     /*
@@ -410,36 +432,47 @@ public class ComplexElementHandler extends XMLElementHandler {
             return new int[]{index,1};
         }
 
-        int i = index; // top of element matching list
+        int tIndex = index; // top of element matching list
         int t = 0; // top of child list
         
         int count = 0; // used for n-ary at a single spot
         int i2[] = new int[2];
-        while(t<eg.length && i<elements.size()){
-        	i2 = valid(eg[t],i); // new top element
-        	if(i2[1]==1 && i!=i2[0]){ // the match moved ahead ... try again
-        		count++;
-        		if(count<=eg[t].getMaxOccurs()){
-        			i = i2[0];
-        		}else{
-        			// move along and retest that spot
-        			if(eg[t].getMinOccurs()>count){
-        				// not good
-        				return new int[]{index,0}; // not whole sequence
-        			}
-        			t++;count=0; // next defined type
-        		}
+        while(t<eg.length && tIndex<elements.size()){
+//System.out.println("Sequence #child="+eg.length+" child="+t+" tIndex ="+tIndex);
+        	i2 = valid(eg[t],tIndex); // new top element
+        	if(i2[1]==1){ // they matched
+        	    if(tIndex==i2[0]){
+        	        // didn't more ahead ...
+        	        t++; // force next spot
+        	        count = 0; // reset
+        	    }else{
+        	        count ++;
+        	        if(count<=eg[t].getMaxOccurs()){
+        	            tIndex = i2[0]; // store index
+        	        }else{
+        	            // error, so redo
+        	            if(eg[t].getMinOccurs()>count){
+        	                // not good
+//System.out.println("Prob 1");
+        	                return new int[]{index,0}; // not whole sequence
+        	            }
+        	            t++;
+        	            count=0; // next defined type
+        	        }
+        	    }
         	}else{
     			// move along and retest that spot
     			if(eg[t].getMinOccurs()>count){
     				// not good
-    				return new int[]{index,0}; // not whole sequence
+//System.out.println("Prob 2");
+					return new int[]{index,0}; // not whole sequence
     			}
-    			t++;count=0; // next defined type
+    			t++;
+    			count=0; // next defined type
         	}
         }
         
-        return new int[]{i,1};
+        return new int[]{tIndex,1};
     }
 
     /*
@@ -469,10 +502,11 @@ public class ComplexElementHandler extends XMLElementHandler {
 //System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
 //        System.out.println("findChildElement("+localName+") was " + (e==null?"null":e.getName()));
-        if (e != null) {
+        if (e != null && namespaceURI.equals(e.getNamespace())) {
             XMLElementHandler r = ehf.createElementHandler(e);
 
             if (type.cache(r.getElement(), hints)) {
+//System.out.println("Adding "+r.getName()+" to "+getName());
                 elements.add(r);
             }
 
@@ -485,6 +519,7 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         if (r != null) {
             if (type.cache(r.getElement(), hints)) {
+//System.out.println("Adding2 "+r.getName()+" to "+getName());
                 elements.add(r);
             }
 
