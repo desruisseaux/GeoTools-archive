@@ -34,6 +34,11 @@
       <version>2.1.x</version>
     </dependency>
     <dependency>
+      <id>epsg</id>
+      <version>2.1.x</version>
+      <groupId>gt2</groupId>
+    </dependency>    
+    <dependency>
       <id>JTS</id>
       <version>1.4</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
