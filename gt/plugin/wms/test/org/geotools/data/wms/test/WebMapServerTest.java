@@ -111,7 +111,7 @@ public class WebMapServerTest extends TestCase {
 
         GetMapRequest request = wms.createGetMapRequest();
 
-        request.setVersion("1.1.1");
+        //request.setVersion("1.1.1");
 
         List simpleLayers = request.getAvailableLayers();
         Iterator iter = simpleLayers.iterator();

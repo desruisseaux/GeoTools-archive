@@ -73,6 +73,7 @@ import java.util.Set;
  * @author Richard Gould, Refractions Research
  */
 public class GetMapRequest extends AbstractRequest {
+    public static final String VERSION = "VERSION";
     public static final String ELEVATION = "ELEVATION";
     public static final String TIME = "TIME";
     public static final String EXCEPTIONS = "EXCEPTIONS";
@@ -113,6 +114,8 @@ public class GetMapRequest extends AbstractRequest {
         this.availableExceptions = availableExceptions;
 
         initRequest();
+        
+        setProperty(VERSION, version);
     }
 
     protected void initRequest() {
