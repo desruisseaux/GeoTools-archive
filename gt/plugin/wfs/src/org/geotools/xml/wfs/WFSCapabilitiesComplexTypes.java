@@ -225,8 +225,7 @@ public class WFSCapabilitiesComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new SAXNotSupportedException("Method not completed yet.");
+            return null;
         }
 
         /**
@@ -242,7 +241,6 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -2515,27 +2513,22 @@ System.out.println("Looking for : "+name);
                     "Invalid inputs for parsing a GetCapabilitiesType");
             }
 
-            if (value.length < 2) {
+            if (value.length < 1) {
                 throw new SAXException(
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
             // TODO merge one with only post, and one with only get?
-            OperationType[] c = new OperationType[value.length - 1];
+            List l = new LinkedList();
             List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
-                if ((sdl == null) && (value[i].getElement() != null)
-                        && "SchemaDescriptionLanguage".equals(
-                            value[i].getElement().getName())) {
-                    sdl = (List) value[i].getValue();
-                } else {
-                    c[i] = (OperationType) value[i];
-//                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
-                }
+//System.out.println(value[i].getElement().getName()+" "+value[i].getValue().getClass());
+                    OperationType t = (OperationType) value[i].getValue();
+                        l.add(t);
             }
 
-            return c;
+            return l.toArray(new OperationType[(l.size())]);
         }
 
         /**
@@ -2642,7 +2635,7 @@ System.out.println("Looking for : "+name);
             }
 
             // TODO merge one with only post, and one with only get?
-            OperationType[] c = new OperationType[value.length - 1];
+            List l = new LinkedList();
             List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
@@ -2651,12 +2644,18 @@ System.out.println("Looking for : "+name);
                             value[i].getElement().getName())) {
                     sdl = (List) value[i].getValue();
                 } else {
-                    c[i] = (OperationType) value[i];
+                    OperationType t = (OperationType) value[i].getValue();
+                    l.add(t);
 //                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
                 }
             }
 
-            return c;
+            OperationType[] ot = new OperationType[l.size()];
+            for(int i=0;i<ot.length;i++){
+                ot[i] = (OperationType)l.get(i);
+                ot[i].setFormats(sdl);
+            }
+            return ot;
         }
 
         /**
@@ -2759,14 +2758,15 @@ System.out.println("Looking for : "+name);
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            OperationType[] c = new OperationType[value.length];
+
+            List l = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (OperationType) value[i];
-//                c[i].setType(OperationType.TRANSACTION);
-            }
+                    OperationType t = (OperationType) value[i].getValue();
+                    l.add(t);
 
-            return c;
+            }
+            return l.toArray(new OperationType[l.size()]);
         }
 
         /**
@@ -2873,19 +2873,18 @@ System.out.println("Looking for : "+name);
 
 //            int t = OperationType.GET_FEATURE;
 
-            if (element.getName().equals("GetFeatureWithLock")) {
+//            if (element.getName().equals("GetFeatureWithLock")) {
 //                t = OperationType.GET_FEATURE_WITH_LOCK;
-            }
+//            }
 
-            // TODO merge one with only post, and one with only get?
-            OperationType[] c = new OperationType[value.length];
+            List l = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (OperationType) value[i];
-//                c[i].setType(t);
-            }
+                    OperationType t = (OperationType) value[i].getValue();
+                    l.add(t);
 
-            return c;
+            }
+            return l.toArray(new OperationType[l.size()]);
         }
 
         /**

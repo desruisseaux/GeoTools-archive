@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.data.wfs.FilterCapabilities;
+import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;

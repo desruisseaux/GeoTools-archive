@@ -19,20 +19,20 @@ package org.geotools.data.ows;
 import java.net.URL;
 
 public class OperationType {
-	protected Object[] formats;
+	protected Object formats;
 	private URL get;
 	private URL post;
 	
 	/**
 	 * @return Returns the formats.
 	 */
-	public Object[] getFormats() {
+	public Object getFormats() {
 		return formats;
 	}
 	/**
 	 * @param formats The formats to set.
 	 */
-	public void setFormats(Object[] formats) {
+	public void setFormats(Object formats) {
 		this.formats = formats;
 	}
 	/**
