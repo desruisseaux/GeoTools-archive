@@ -19,7 +19,7 @@ package org.geotools.xml.handlers.xsi;
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
-import org.geotools.xml.schema.DefaultAttributeGroup;
+import org.geotools.xml.schema.impl.AttributeGroupGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -232,7 +232,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
             attributes = ag.getAttributes();
         }
 
-        cache = new DefaultAttributeGroup(id, name,
+        cache = new AttributeGroupGT(id, name,
                 parent.getTargetNamespace(), attributes, anyAttributeNamespace);
 
         return cache;

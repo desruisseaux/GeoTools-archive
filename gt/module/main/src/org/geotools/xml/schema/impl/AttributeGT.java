@@ -14,9 +14,12 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
 
 import java.net.URI;
+
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.SimpleType;
 
 
 /**
@@ -26,7 +29,7 @@ import java.net.URI;
  *
  * @author dzwiers
  */
-public class DefaultAttribute implements Attribute {
+public class AttributeGT implements Attribute {
     private String defualT;
     private String fixed;
     private String id;
@@ -36,11 +39,11 @@ public class DefaultAttribute implements Attribute {
     private SimpleType type;
     private boolean form;
 
-    private DefaultAttribute() {
+    private AttributeGT() {
     }
 
     /**
-     * Creates a new DefaultAttribute object.
+     * Creates a new AttributeGT object.
      *
      * @param id DOCUMENT ME!
      * @param name DOCUMENT ME!
@@ -51,7 +54,7 @@ public class DefaultAttribute implements Attribute {
      * @param fixed DOCUMENT ME!
      * @param form DOCUMENT ME!
      */
-    public DefaultAttribute(String id, String name, URI namespace,
+    public AttributeGT(String id, String name, URI namespace,
         SimpleType type, int use, String defaulT, String fixed, boolean form) {
         this.id = id;
         this.name = name;

@@ -23,13 +23,13 @@ import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttribute;
-import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.AttributeGT;
+import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
 import org.geotools.xml.wfs.WFSSchema.WFSElement;
@@ -70,7 +70,7 @@ public class WFSBasicComplexTypes {
                 new WFSElement("Query", QueryType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null),
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("version",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED) {
@@ -218,7 +218,7 @@ public class WFSBasicComplexTypes {
                 new WFSElement("TypeName", XSISimpleTypes.QName.getInstance(),
                     0, Integer.MAX_VALUE, false, null),
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("version",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED) {
@@ -467,7 +467,7 @@ public class WFSBasicComplexTypes {
                         }
                     }
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handle", XSISimpleTypes.String.getInstance(),
                     Attribute.OPTIONAL),
@@ -616,7 +616,7 @@ public class WFSBasicComplexTypes {
          */
         public Attribute[] getAttributes() {
             return new Attribute[] {
-                new DefaultAttribute(null, "lockId", WFSSchema.NAMESPACE,
+                new AttributeGT(null, "lockId", WFSSchema.NAMESPACE,
                     XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL,
                     null, null, false),
             };

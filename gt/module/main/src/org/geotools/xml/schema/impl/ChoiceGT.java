@@ -14,7 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
+
+import org.geotools.xml.schema.Choice;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
 
 /**
  * <p>
@@ -23,37 +27,38 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public class DefaultSequence implements Sequence {
-    private ElementGrouping[] children;
+public class ChoiceGT implements Choice {
     private String id;
     private int min;
     private int max;
+    private ElementGrouping[] children;
 
-    private DefaultSequence() {
+    private ChoiceGT() {
     }
 
-    public DefaultSequence(ElementGrouping[] children) {
-        this.children = children;
-        min = max = 1;
-    }
-
-    public DefaultSequence(String id, ElementGrouping[] children, int min,
-        int max) {
-        this.children = children;
+    /**
+     * Creates a new ChoiceGT object.
+     *
+     * @param id DOCUMENT ME!
+     * @param min DOCUMENT ME!
+     * @param max DOCUMENT ME!
+     * @param children DOCUMENT ME!
+     */
+    public ChoiceGT(String id, int min, int max, ElementGrouping[] children) {
+        this.id = id;
         this.min = min;
         this.max = max;
-        this.id = id;
+        this.children = children;
+    }
+
+    public ChoiceGT(ElementGrouping[] children) {
+        this.min = 1;
+        this.max = 1;
+        this.children = children;
     }
 
     /**
-     * @see org.geotools.xml.schema.Sequence#getChildren()
-     */
-    public ElementGrouping[] getChildren() {
-        return children;
-    }
-
-    /**
-     * @see org.geotools.xml.schema.Sequence#getId()
+     * @see org.geotools.xml.schema.Choice#getId()
      */
     public String getId() {
         return id;
@@ -74,23 +79,32 @@ public class DefaultSequence implements Sequence {
     }
 
     /**
+     * @see org.geotools.xml.schema.Choice#getChildren()
+     */
+    public ElementGrouping[] getChildren() {
+        return children;
+    }
+
+    /**
      * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
      */
     public int getGrouping() {
-        return SEQUENCE;
+        return CHOICE;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
-        if (children != null) {
-            for (int i = 0; i < children.length; i++) {
-                Element e = children[i].findChildElement(name);
+        if (children == null) {
+            return null;
+        }
 
-                if (e != null) {
-                    return e;
-                }
+        for (int i = 0; i < children.length; i++) {
+            Element e = children[i].findChildElement(name);
+
+            if (e != null) {
+                return e;
             }
         }
 

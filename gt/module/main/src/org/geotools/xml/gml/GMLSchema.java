@@ -22,8 +22,6 @@ import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttributeValue;
-import org.geotools.xml.schema.DefaultFacet;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
@@ -31,6 +29,8 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.AttributeValueGT;
+import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
@@ -980,10 +980,10 @@ public class GMLSchema implements Schema {
 
             if (Arrays.binarySearch(enumeration, value) < 0) {
                 // not found
-                return new DefaultAttributeValue(attribute, null);
+                return new AttributeValueGT(attribute, null);
             }
 
-            return new DefaultAttributeValue(attribute, value.toString());
+            return new AttributeValueGT(attribute, value.toString());
         }
 
         /**
@@ -1042,10 +1042,10 @@ public class GMLSchema implements Schema {
          */
         public Facet[] getFacets() {
             return new Facet[] {
-                new DefaultFacet(Facet.ENUMERATION, "inapplicable"),
-                new DefaultFacet(Facet.ENUMERATION, "unknown"),
-                new DefaultFacet(Facet.ENUMERATION, "unavailable"),
-                new DefaultFacet(Facet.ENUMERATION, "missing"),
+                new FacetGT(Facet.ENUMERATION, "inapplicable"),
+                new FacetGT(Facet.ENUMERATION, "unknown"),
+                new FacetGT(Facet.ENUMERATION, "unavailable"),
+                new FacetGT(Facet.ENUMERATION, "missing"),
             };
         }
 

@@ -14,9 +14,12 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
 
 import java.net.URI;
+
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeGroup;
 
 
 /**
@@ -26,18 +29,18 @@ import java.net.URI;
  *
  * @author dzwiers
  */
-public class DefaultAttributeGroup implements AttributeGroup {
+public class AttributeGroupGT implements AttributeGroup {
     private String anyAttributeNamespace;
     private Attribute[] attributes;
     private String id;
     private String name;
     private URI namespace;
 
-    private DefaultAttributeGroup() {
+    private AttributeGroupGT() {
     }
 
     /**
-     * Creates a new DefaultAttributeGroup object.
+     * Creates a new AttributeGroupGT object.
      *
      * @param id DOCUMENT ME!
      * @param name DOCUMENT ME!
@@ -45,7 +48,7 @@ public class DefaultAttributeGroup implements AttributeGroup {
      * @param attributes DOCUMENT ME!
      * @param anyAttributeNamespace DOCUMENT ME!
      */
-    public DefaultAttributeGroup(String id, String name, URI namespace,
+    public AttributeGroupGT(String id, String name, URI namespace,
         Attribute[] attributes, String anyAttributeNamespace) {
         this.id = id;
         this.name = name;

@@ -33,14 +33,14 @@ import org.geotools.xml.schema.Any;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAny;
-import org.geotools.xml.schema.DefaultChoice;
-import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.AnyGT;
+import org.geotools.xml.schema.impl.ChoiceGT;
+import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -67,7 +67,7 @@ public class FilterComplexTypes {
                 new FilterElement("Simple_Arithmetic", EmptyType.getInstance()),
                 new FilterElement("Functions", FunctionsType.getInstance())
             };
-        private static Choice choice = new DefaultChoice(elements) {
+        private static Choice choice = new ChoiceGT(elements) {
                 public int getMaxOccurs() {
                     return Integer.MAX_VALUE;
                 }
@@ -162,7 +162,7 @@ public class FilterComplexTypes {
                 new FilterElement("Between", EmptyType.getInstance()),
                 new FilterElement("NullCheck", EmptyType.getInstance()),
             };
-        private static Choice choice = new DefaultChoice(elements) {
+        private static Choice choice = new ChoiceGT(elements) {
                 public int getMaxOccurs() {
                     return Integer.MAX_VALUE;
                 }
@@ -329,7 +329,7 @@ public class FilterComplexTypes {
                 new FilterElement("Function_Name",
                     Function_NameType.getInstance()),
             };
-        private static Sequence seq = new DefaultSequence(elements) {
+        private static Sequence seq = new SequenceGT(elements) {
                 public int getMaxOccurs() {
                     return Integer.MAX_VALUE;
                 }
@@ -405,7 +405,7 @@ public class FilterComplexTypes {
                 new FilterElement("Function_Names",
                     Function_NamesType.getInstance()),
             };
-        private static Sequence seq = new DefaultSequence(elements);
+        private static Sequence seq = new SequenceGT(elements);
 
         public static ComplexType getInstance() {
             return instance;
@@ -479,7 +479,7 @@ public class FilterComplexTypes {
                 new FilterElement("Scalar_Capabilities",
                     Scalar_CapabilitiesType.getInstance())
             };
-        private static Sequence seq = new DefaultSequence(elements);
+        private static Sequence seq = new SequenceGT(elements);
 
         public static ComplexType getInstance() {
             return instance;
@@ -595,7 +595,7 @@ public class FilterComplexTypes {
                 new FilterElement("Arithmetic_Operators",
                     Arithmetic_OperatorsType.getInstance()),
             };
-        private static Choice choice = new DefaultChoice(elements) {
+        private static Choice choice = new ChoiceGT(elements) {
                 public int getMaxOccurs() {
                     return Integer.MAX_VALUE;
                 }
@@ -706,7 +706,7 @@ public class FilterComplexTypes {
                 new FilterElement("Spatial_Operators",
                     Spatial_OperatorsType.getInstance()),
             };
-        private static Sequence seq = new DefaultSequence(elements);
+        private static Sequence seq = new SequenceGT(elements);
 
         public static ComplexType getInstance() {
             return instance;
@@ -797,7 +797,7 @@ public class FilterComplexTypes {
                 new FilterElement("Beyond", EmptyType.getInstance()),
                 new FilterElement("DWithin", EmptyType.getInstance())
             };
-        private static Choice choice = new DefaultChoice(elements) {
+        private static Choice choice = new ChoiceGT(elements) {
                 public int getMaxOccurs() {
                     return Integer.MAX_VALUE;
                 }
@@ -1057,7 +1057,7 @@ public class FilterComplexTypes {
                     }
                 ,
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1170,7 +1170,7 @@ public class FilterComplexTypes {
                     }
                 ,
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new FilterAttribute("name",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED),
@@ -1282,8 +1282,8 @@ public class FilterComplexTypes {
         //          </xsd:extension>
         //        </xsd:complexContent>
         //        </xsd:complexType>
-        private static Any any = new DefaultAny(null, 0, 1);
-        private static Sequence seq = new DefaultSequence(new ElementGrouping[] {
+        private static Any any = new AnyGT(null, 0, 1);
+        private static Sequence seq = new SequenceGT(new ElementGrouping[] {
                     any,
                 });
 
@@ -1674,7 +1674,7 @@ public class FilterComplexTypes {
                     }
                 ,
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new FilterAttribute("version",
                     XSISimpleTypes.String.getInstance(), 0, null, "1.2.0", false),

@@ -41,13 +41,13 @@ import org.geotools.xml.ogc.FilterSchema.FilterElement;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultChoice;
-import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.ChoiceGT;
+import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -608,7 +608,7 @@ public class FilterOpsComplexTypes {
                     }
                 ,
             };
-        private static Choice choice = new DefaultChoice(elems);
+        private static Choice choice = new ChoiceGT(elems);
         private static final ComplexType instance = new FilterType();
 
         public static ComplexType getInstance() {
@@ -894,7 +894,7 @@ public class FilterOpsComplexTypes {
                     }
                 ,
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -995,7 +995,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("PropertyName", PropertyNameType.getInstance()),
                 new FilterElement("Literal", LiteralType.getInstance()),
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
         private static Attribute[] attr = new Attribute[] {
                 new FilterAttribute("wildCard",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED),
@@ -1123,7 +1123,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("PropertyName", PropertyNameType.getInstance()),
                 new FilterElement("Literal", LiteralType.getInstance()),
             };
-        private static Choice seq = new DefaultChoice(elems);
+        private static Choice seq = new ChoiceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1233,7 +1233,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("UpperBoundary",
                     UpperBoundaryType.getInstance()),
             };
-        private static Sequence seq = new DefaultSequence(elems);
+        private static Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1347,7 +1347,7 @@ public class FilterOpsComplexTypes {
         private static Element[] elems = new Element[] {
                 new FilterElement("expression", ExpressionType.getInstance()),
             };
-        private static Choice choice = new DefaultChoice(elems);
+        private static Choice choice = new ChoiceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1438,7 +1438,7 @@ public class FilterOpsComplexTypes {
         private static Element[] elems = new Element[] {
                 new FilterElement("expression", ExpressionType.getInstance()),
             };
-        private static Sequence choice = new DefaultSequence(elems);
+        private static Sequence choice = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1539,9 +1539,9 @@ public class FilterOpsComplexTypes {
                 GMLSchema.getInstance().getElements()[29], // _Geometry
                 GMLSchema.getInstance().getElements()[41]
             };
-        private static Sequence child = new DefaultSequence(new ElementGrouping[] {
+        private static Sequence child = new SequenceGT(new ElementGrouping[] {
                     elems[0],
-                    new DefaultChoice(new Element[] { elems[1], elems[2] })
+                    new ChoiceGT(new Element[] { elems[1], elems[2] })
                 });
 
         public static ComplexType getInstance() {
@@ -1685,7 +1685,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("PropertyName", PropertyNameType.getInstance()),
                 GMLSchema.getInstance().getElements()[41]
             };
-        private Sequence seq = new DefaultSequence(elems);
+        private Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -1809,7 +1809,7 @@ public class FilterOpsComplexTypes {
                 GMLSchema.getInstance().getElements()[29], // _Geometry
                 new FilterElement("Distance", DistanceType.getInstance())
             };
-        private Sequence seq = new DefaultSequence(elems);
+        private Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;
@@ -2047,7 +2047,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("spatialOps", SpatialOpsType.getInstance()),
                 new FilterElement("logicOps", LogicOpsType.getInstance())
             };
-        private static Choice choice = new DefaultChoice(null, 2,
+        private static Choice choice = new ChoiceGT(null, 2,
                 Integer.MAX_VALUE, elems);
 
         public static ComplexType getInstance() {
@@ -2164,7 +2164,7 @@ public class FilterOpsComplexTypes {
                 new FilterElement("spatialOps", SpatialOpsType.getInstance()),
                 new FilterElement("logicOps", LogicOpsType.getInstance())
             };
-        private static Choice choice = new DefaultChoice(elems);
+        private static Choice choice = new ChoiceGT(elems);
 
         public static ComplexType getInstance() {
             return instance;

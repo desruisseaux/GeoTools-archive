@@ -68,7 +68,7 @@ package org.geotools.feature;
 public interface AttributeType {
 
     /**
-     * Whether or not this attribute is complex in any way.  DefaultAttribute
+     * Whether or not this attribute is complex in any way.  AttributeGT
      * returns false, any AttributeType that is any more complex should 
      * return true.  This is more or less a shortcut for instanceof, when
      * any sort of processing is to be done with AttributeTypes.  If it is
@@ -77,7 +77,7 @@ public interface AttributeType {
      * that indicates there is more to be done, and the actual AttributeType
      * should be determined and processed accordingly.
      *
-     * @return <code>true</code> if anything other than a DefaultAttribute,
+     * @return <code>true</code> if anything other than a AttributeGT,
      * one that does not have any special handling.
      *
      */

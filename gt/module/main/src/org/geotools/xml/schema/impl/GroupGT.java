@@ -14,7 +14,14 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
+
+import java.net.URI;
+
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
+import org.geotools.xml.schema.Group;
+
 
 /**
  * <p>
@@ -23,38 +30,47 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public class DefaultChoice implements Choice {
+public class GroupGT implements Group {
+    private ElementGrouping child;
     private String id;
+    private String name;
+    private URI namespace;
     private int min;
     private int max;
-    private ElementGrouping[] children;
 
-    private DefaultChoice() {
+    private GroupGT() {
     }
 
     /**
-     * Creates a new DefaultChoice object.
+     * Creates a new GroupGT object.
      *
      * @param id DOCUMENT ME!
+     * @param name DOCUMENT ME!
+     * @param namespace DOCUMENT ME!
+     * @param child DOCUMENT ME!
      * @param min DOCUMENT ME!
      * @param max DOCUMENT ME!
-     * @param children DOCUMENT ME!
      */
-    public DefaultChoice(String id, int min, int max, ElementGrouping[] children) {
+    public GroupGT(String id, String name, URI namespace,
+        ElementGrouping child, int min, int max) {
         this.id = id;
+        this.name = name;
+        name.toCharArray();
+        this.namespace = namespace;
+        this.child = child;
         this.min = min;
         this.max = max;
-        this.children = children;
-    }
-
-    public DefaultChoice(ElementGrouping[] children) {
-        this.min = 1;
-        this.max = 1;
-        this.children = children;
     }
 
     /**
-     * @see org.geotools.xml.schema.Choice#getId()
+     * @see org.geotools.xml.schema.Group#getChild()
+     */
+    public ElementGrouping getChild() {
+        return child;
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Group#getId()
      */
     public String getId() {
         return id;
@@ -75,35 +91,32 @@ public class DefaultChoice implements Choice {
     }
 
     /**
-     * @see org.geotools.xml.schema.Choice#getChildren()
+     * @see org.geotools.xml.schema.Group#getName()
      */
-    public ElementGrouping[] getChildren() {
-        return children;
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Group#getNamespace()
+     */
+    public URI getNamespace() {
+        return namespace;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
      */
     public int getGrouping() {
-        return CHOICE;
+        return GROUP;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
-        if (children == null) {
-            return null;
-        }
-
-        for (int i = 0; i < children.length; i++) {
-            Element e = children[i].findChildElement(name);
-
-            if (e != null) {
-                return e;
-            }
-        }
-
-        return null;
+System.out.println("GroupGT "+this.name+" "+this.namespace);
+System.out.println("GroupGT ... "+child.getClass().getName());
+        return (child == null) ? null : child.findChildElement(name);
     }
 }

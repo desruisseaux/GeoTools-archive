@@ -36,9 +36,6 @@ import org.geotools.xml.ogc.FilterSchema.FilterElement;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.Choice;
-import org.geotools.xml.schema.DefaultChoice;
-import org.geotools.xml.schema.DefaultFacet;
-import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
@@ -46,6 +43,9 @@ import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.ChoiceGT;
+import org.geotools.xml.schema.impl.FacetGT;
+import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.FeatureCollectionType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.QueryType;
 import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
@@ -169,9 +169,9 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("Delete", DeleteElementType.getInstance()),
                 new WFSElement("Native", NativeType.getInstance())
             };
-        private static Sequence child = new DefaultSequence(new ElementGrouping[] {
+        private static Sequence child = new SequenceGT(new ElementGrouping[] {
                     elems[0],
-                    new DefaultChoice(null, 0, Integer.MAX_VALUE,
+                    new ChoiceGT(null, 0, Integer.MAX_VALUE,
                         new Element[] { elems[1], elems[2], elems[3], elems[4] })
                 });
         private static Attribute[] attrs = new Attribute[] {
@@ -351,7 +351,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("Query", QueryType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null)
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("version",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED) {
@@ -544,7 +544,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("Lock", LockType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null),
             };
-        private Sequence child = new DefaultSequence(elems);
+        private Sequence child = new SequenceGT(elems);
         private Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("version",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED) {
@@ -707,7 +707,7 @@ public class WFSTransactionComplexTypes {
                     }
                 ,
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handle", XSISimpleTypes.String.getInstance(),
                     Attribute.OPTIONAL),
@@ -829,7 +829,7 @@ public class WFSTransactionComplexTypes {
                         }
                     }
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handler",
                     XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL),
@@ -973,7 +973,7 @@ public class WFSTransactionComplexTypes {
                         }
                     }
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handler",
                     XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL),
@@ -1115,7 +1115,7 @@ public class WFSTransactionComplexTypes {
                         }
                     }
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handler",
                     XSISimpleTypes.String.getInstance(), Attribute.OPTIONAL),
@@ -1361,7 +1361,7 @@ public class WFSTransactionComplexTypes {
                     }
                 ,
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -1528,7 +1528,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("FeaturesNotLocked",
                     FeaturesNotLockedType.getInstance(), 0, 1, true, null)
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -1645,7 +1645,7 @@ public class WFSTransactionComplexTypes {
         private static Element[] elems = new Element[] {
                 FilterSchema.getInstance().getElements()[1],
             };
-        private static Sequence child = new DefaultSequence(null, elems, 1,
+        private static Sequence child = new SequenceGT(null, elems, 1,
                 Integer.MAX_VALUE);
 
         public static WFSComplexType getInstance() {
@@ -1753,7 +1753,7 @@ public class WFSTransactionComplexTypes {
         private static Element[] elems = new Element[] {
                 FilterSchema.getInstance().getElements()[1],
             };
-        private static Sequence child = new DefaultSequence(null, elems, 1,
+        private static Sequence child = new SequenceGT(null, elems, 1,
                 Integer.MAX_VALUE);
 
         public static WFSComplexType getInstance() {
@@ -1897,7 +1897,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("TransactionResult",
                     TransactionResultType.getInstance()),
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("version",
                     XSISimpleTypes.String.getInstance(), Attribute.REQUIRED) {
@@ -2054,7 +2054,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("Message", XSISimpleTypes.String.getInstance(),
                     0, 1, true, null)
             };
-        private static Sequence child = new DefaultSequence(elems);
+        private static Sequence child = new SequenceGT(elems);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handle", XSISimpleTypes.String.getInstance(),
                     Attribute.OPTIONAL),
@@ -2194,7 +2194,7 @@ public class WFSTransactionComplexTypes {
                 	}
                 },
             };
-        private static Sequence child = new DefaultSequence(null, elems, 1,
+        private static Sequence child = new SequenceGT(null, elems, 1,
                 Integer.MAX_VALUE);
         private static Attribute[] attrs = new Attribute[] {
                 new WFSAttribute("handle", XSISimpleTypes.String.getInstance(),
@@ -2310,7 +2310,7 @@ public class WFSTransactionComplexTypes {
                 new WFSElement("FAILED", WFSEmptyType.getInstance()),
                 new WFSElement("FAILED", WFSEmptyType.getInstance()),
             };
-        private static Choice child = new DefaultChoice(elems);
+        private static Choice child = new ChoiceGT(elems);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2475,8 +2475,8 @@ public class WFSTransactionComplexTypes {
     private static class AllSomeType implements SimpleType {
         private static SimpleType instance = new AllSomeType();
         private static Facet[] facets = new Facet[] {
-                new DefaultFacet(Facet.ENUMERATION, "ALL"),
-                new DefaultFacet(Facet.ENUMERATION, "SOME")
+                new FacetGT(Facet.ENUMERATION, "ALL"),
+                new FacetGT(Facet.ENUMERATION, "SOME")
             };
 
         public static SimpleType getInstance() {

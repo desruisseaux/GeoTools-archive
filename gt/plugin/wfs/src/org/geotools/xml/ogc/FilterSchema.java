@@ -52,12 +52,13 @@ import org.geotools.xml.ogc.FilterOpsComplexTypes.UpperBoundaryType;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.AttributeGT;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -371,7 +372,7 @@ public class FilterSchema implements Schema {
         return true;
     }
 
-    static class FilterAttribute extends DefaultAttribute {
+    static class FilterAttribute extends AttributeGT {
         /**
          * DOCUMENT ME!
          *

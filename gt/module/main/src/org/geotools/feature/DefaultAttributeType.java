@@ -540,7 +540,7 @@ public class DefaultAttributeType implements AttributeType {
                 return BigDecimal.valueOf(number.longValue());
             }
 
-            throw new RuntimeException("DefaultAttribute.Numeric cannot parse "
+            throw new RuntimeException("AttributeGT.Numeric cannot parse "
                 + number);
         }
     }
@@ -737,7 +737,7 @@ public class DefaultAttributeType implements AttributeType {
 
             // consider wkt/wkb/gml support?
             throw new RuntimeException(
-                "DefaultAttribute.Geometric cannot parse " + value);
+                "AttributeGT.Geometric cannot parse " + value);
         }
         
         public Object duplicate(Object o) throws IllegalAttributeException {

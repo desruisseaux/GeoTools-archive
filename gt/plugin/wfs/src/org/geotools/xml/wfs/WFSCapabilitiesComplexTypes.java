@@ -29,16 +29,16 @@ import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultChoice;
-import org.geotools.xml.schema.DefaultFacet;
-import org.geotools.xml.schema.DefaultSequence;
-import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.ChoiceGT;
+import org.geotools.xml.schema.impl.FacetGT;
+import org.geotools.xml.schema.impl.SequenceGT;
+import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
 import org.geotools.xml.wfs.WFSSchema.WFSElement;
@@ -86,7 +86,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements) {
+        private static final SequenceGT seq = new SequenceGT(elements) {
                 /**
                  * @see schema.Choice#getMaxOccurs()
                  */
@@ -313,7 +313,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements) {
+        private static final SequenceGT seq = new SequenceGT(elements) {
                 /**
                  * @see schema.Sequence#getMaxOccurs()
                  */
@@ -440,7 +440,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultChoice seq = new DefaultChoice(elements) {
+        private static final ChoiceGT seq = new ChoiceGT(elements) {
                 /**
                  * @see schema.Choice#getMaxOccurs()
                  */
@@ -551,21 +551,21 @@ public class WFSCapabilitiesComplexTypes {
         private static final WFSComplexType instance = new MetadataURLType();
         private static Attribute[] attributes = {
                 new WFSAttribute("type",
-                    new DefaultSimpleType(null, null, WFSSchema.NAMESPACE,
+                    new SimpleTypeGT(null, null, WFSSchema.NAMESPACE,
                         SimpleType.RESTRICTION,
                         new SimpleType[] { XSISimpleTypes.NMTOKEN.getInstance() },
                         new Facet[] {
-                            new DefaultFacet(Facet.ENUMERATION, "TC211"),
-                            new DefaultFacet(Facet.ENUMERATION, "FGDC")
+                            new FacetGT(Facet.ENUMERATION, "TC211"),
+                            new FacetGT(Facet.ENUMERATION, "FGDC")
                         }, SimpleType.NONE), WFSAttribute.REQUIRED),
                 new WFSAttribute("format",
-                    new DefaultSimpleType(null, null, WFSSchema.NAMESPACE,
+                    new SimpleTypeGT(null, null, WFSSchema.NAMESPACE,
                         SimpleType.RESTRICTION,
                         new SimpleType[] { XSISimpleTypes.NMTOKEN.getInstance() },
                         new Facet[] {
-                            new DefaultFacet(Facet.ENUMERATION, "XML"),
-                            new DefaultFacet(Facet.ENUMERATION, "SGML"),
-                            new DefaultFacet(Facet.ENUMERATION, "TXT")
+                            new FacetGT(Facet.ENUMERATION, "XML"),
+                            new FacetGT(Facet.ENUMERATION, "SGML"),
+                            new FacetGT(Facet.ENUMERATION, "TXT")
                         }, SimpleType.NONE), WFSAttribute.REQUIRED)
             };
 
@@ -948,7 +948,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultChoice seq = new DefaultChoice(elements) {
+        private static final ChoiceGT seq = new ChoiceGT(elements) {
                 /**
                  * @see schema.Choice#getMaxOccurs()
                  */
@@ -1191,7 +1191,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -1396,7 +1396,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -1500,7 +1500,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -1621,7 +1621,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultChoice seq = new DefaultChoice(elements) {
+        private static final ChoiceGT seq = new ChoiceGT(elements) {
                 /**
                  * @see schema.Choice#getMaxOccurs()
                  */
@@ -1928,7 +1928,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static choice
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2076,7 +2076,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2209,7 +2209,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2366,7 +2366,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2539,7 +2539,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         /*
          * part of the singleton pattern
@@ -2659,7 +2659,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2786,7 +2786,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -2898,7 +2898,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final SequenceGT seq = new SequenceGT(elements);
 
         public static WFSComplexType getInstance() {
             return instance;

@@ -14,10 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
 
-import java.net.URI;
-
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
+import org.geotools.xml.schema.Sequence;
 
 /**
  * <p>
@@ -26,27 +27,37 @@ import java.net.URI;
  *
  * @author dzwiers
  */
-public class DefaultAny implements Any {
-    private String id = null;
-    private int min = 1;
-    private int max = 1;
-    private URI ns = null;
+public class SequenceGT implements Sequence {
+    private ElementGrouping[] children;
+    private String id;
+    private int min;
+    private int max;
 
-    private DefaultAny() {
+    private SequenceGT() {
     }
 
-    public DefaultAny(URI namespace) {
-        ns = namespace;
+    public SequenceGT(ElementGrouping[] children) {
+        this.children = children;
+        min = max = 1;
     }
 
-    public DefaultAny(URI namespace, int min, int max) {
-        ns = namespace;
+    public SequenceGT(String id, ElementGrouping[] children, int min,
+        int max) {
+        this.children = children;
         this.min = min;
         this.max = max;
+        this.id = id;
     }
 
     /**
-     * @see org.geotools.xml.schema.Any#getId()
+     * @see org.geotools.xml.schema.Sequence#getChildren()
+     */
+    public ElementGrouping[] getChildren() {
+        return children;
+    }
+
+    /**
+     * @see org.geotools.xml.schema.Sequence#getId()
      */
     public String getId() {
         return id;
@@ -67,23 +78,26 @@ public class DefaultAny implements Any {
     }
 
     /**
-     * @see org.geotools.xml.schema.Any#getNamespace()
-     */
-    public URI getNamespace() {
-        return ns;
-    }
-
-    /**
      * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
      */
     public int getGrouping() {
-        return ElementGrouping.ANY;
+        return SEQUENCE;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
+        if (children != null) {
+            for (int i = 0; i < children.length; i++) {
+                Element e = children[i].findChildElement(name);
+
+                if (e != null) {
+                    return e;
+                }
+            }
+        }
+
         return null;
     }
 }

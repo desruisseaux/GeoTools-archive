@@ -14,7 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
+
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementValue;
 
 /**
  * <p>
@@ -23,35 +26,35 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public class DefaultAttributeValue implements AttributeValue {
-    private String value;
-    private Attribute attribute;
+public class ElementValueGT implements ElementValue {
+    private Element element;
+    private Object value;
 
-    private DefaultAttributeValue() {
+    private ElementValueGT() {
     }
 
     /**
-     * Creates a new DefaultAttributeValue object.
+     * Creates a new ElementValueGT object.
      *
-     * @param attribute DOCUMENT ME!
+     * @param element DOCUMENT ME!
      * @param value DOCUMENT ME!
      */
-    public DefaultAttributeValue(Attribute attribute, String value) {
-        this.attribute = attribute;
+    public ElementValueGT(Element element, Object value) {
+        this.element = element;
         this.value = value;
     }
 
     /**
-     * @see org.geotools.xml.schema.AttributeValue#getValue()
+     * @see org.geotools.xml.schema.ElementValue#getElement()
      */
-    public String getValue() {
-        return value;
+    public Element getElement() {
+        return element;
     }
 
     /**
-     * @see org.geotools.xml.schema.AttributeValue#getAttribute()
+     * @see org.geotools.xml.schema.ElementValue#getValue()
      */
-    public Attribute getAttribute() {
-        return attribute;
+    public Object getValue() {
+        return value;
     }
 }

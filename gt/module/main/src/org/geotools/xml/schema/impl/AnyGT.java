@@ -14,9 +14,13 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
 
 import java.net.URI;
+
+import org.geotools.xml.schema.Any;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
 
 
 /**
@@ -26,47 +30,27 @@ import java.net.URI;
  *
  * @author dzwiers
  */
-public class DefaultGroup implements Group {
-    private ElementGrouping child;
-    private String id;
-    private String name;
-    private URI namespace;
-    private int min;
-    private int max;
+public class AnyGT implements Any {
+    private String id = null;
+    private int min = 1;
+    private int max = 1;
+    private URI ns = null;
 
-    private DefaultGroup() {
+    private AnyGT() {
     }
 
-    /**
-     * Creates a new DefaultGroup object.
-     *
-     * @param id DOCUMENT ME!
-     * @param name DOCUMENT ME!
-     * @param namespace DOCUMENT ME!
-     * @param child DOCUMENT ME!
-     * @param min DOCUMENT ME!
-     * @param max DOCUMENT ME!
-     */
-    public DefaultGroup(String id, String name, URI namespace,
-        ElementGrouping child, int min, int max) {
-        this.id = id;
-        this.name = name;
-        name.toCharArray();
-        this.namespace = namespace;
-        this.child = child;
+    public AnyGT(URI namespace) {
+        ns = namespace;
+    }
+
+    public AnyGT(URI namespace, int min, int max) {
+        ns = namespace;
         this.min = min;
         this.max = max;
     }
 
     /**
-     * @see org.geotools.xml.schema.Group#getChild()
-     */
-    public ElementGrouping getChild() {
-        return child;
-    }
-
-    /**
-     * @see org.geotools.xml.schema.Group#getId()
+     * @see org.geotools.xml.schema.Any#getId()
      */
     public String getId() {
         return id;
@@ -87,32 +71,23 @@ public class DefaultGroup implements Group {
     }
 
     /**
-     * @see org.geotools.xml.schema.Group#getName()
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @see org.geotools.xml.schema.Group#getNamespace()
+     * @see org.geotools.xml.schema.Any#getNamespace()
      */
     public URI getNamespace() {
-        return namespace;
+        return ns;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
      */
     public int getGrouping() {
-        return GROUP;
+        return ElementGrouping.ANY;
     }
 
     /**
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
-System.out.println("DefaultGroup "+this.name+" "+this.namespace);
-System.out.println("DefaultGroup ... "+child.getClass().getName());
-        return (child == null) ? null : child.findChildElement(name);
+        return null;
     }
 }

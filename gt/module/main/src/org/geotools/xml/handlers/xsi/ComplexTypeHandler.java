@@ -23,7 +23,6 @@ import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
@@ -31,6 +30,7 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -496,7 +496,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
                         }
                     }
 
-                    SimpleType st = new DefaultSimpleType(id, name,
+                    SimpleType st = new SimpleTypeGT(id, name,
                             parent.getTargetNamespace(),
                             SimpleType.RESTRICTION,
                             SimpleTypeHandler.getSimpleTypes(rest, parent),
@@ -861,7 +861,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
             }
             for (int i = 0; i < children.length; i++) {
                 Element t = children[i].findChildElement(name);
-//                System.out.println("ComplexTypeHandler.DefaultSequence ["+i+"] ... "+(children[i] == null?null:children[i].getClass().getName()));
+//                System.out.println("ComplexTypeHandler.SequenceGT ["+i+"] ... "+(children[i] == null?null:children[i].getClass().getName()));
                 if (t != null) { // found it
 
                     return t;

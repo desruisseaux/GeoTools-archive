@@ -14,9 +14,16 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
 
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeValue;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
+import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.io.IOException;
@@ -38,7 +45,7 @@ import javax.naming.OperationNotSupportedException;
  *
  * @author dzwiers
  */
-public class DefaultSimpleType implements SimpleType {
+public class SimpleTypeGT implements SimpleType {
     // file visible to avoid set* methods
     private int finaL;
     private String id;
@@ -48,12 +55,12 @@ public class DefaultSimpleType implements SimpleType {
     private int type = 0;
     private Facet[] constraints;
 
-    private DefaultSimpleType() {
+    private SimpleTypeGT() {
         // should not be called
     }
 
     /**
-     * Creates a new DefaultSimpleType object.
+     * Creates a new SimpleTypeGT object.
      *
      * @param id DOCUMENT ME!
      * @param name DOCUMENT ME!
@@ -63,7 +70,7 @@ public class DefaultSimpleType implements SimpleType {
      * @param constraints DOCUMENT ME!
      * @param finaL DOCUMENT ME!
      */
-    public DefaultSimpleType(String id, String name, URI namespace, int type,
+    public SimpleTypeGT(String id, String name, URI namespace, int type,
         SimpleType[] parents, Facet[] constraints, int finaL) {
         this.id = id;
         this.name = name;
@@ -189,14 +196,14 @@ public class DefaultSimpleType implements SimpleType {
 
         String[] vals = ((String) value.getValue()).split("\\s");
         List l = new LinkedList();
-        DefaultElementValue[] valss = new DefaultElementValue[1];
+        ElementValueGT[] valss = new ElementValueGT[1];
 
         for (int i = 0; i < vals.length; i++) {
-            valss[0] = new DefaultElementValue(value.getElement(), vals[i]);
+            valss[0] = new ElementValueGT(value.getElement(), vals[i]);
             l.add(parents[0].getValue(element, valss, attrs, hints));
         }
 
-        valss[0] = new DefaultElementValue(value.getElement(), l);
+        valss[0] = new ElementValueGT(value.getElement(), l);
 
         return valss[0];
     }
@@ -478,7 +485,7 @@ public class DefaultSimpleType implements SimpleType {
                 }
             }
 
-            return new DefaultAttributeValue(attribute, s);
+            return new AttributeValueGT(attribute, s);
         }
 
         return parents[0].toAttribute(attribute, value, hints);
@@ -577,13 +584,13 @@ public class DefaultSimpleType implements SimpleType {
             String s = "";
 
             if (i.hasNext()) {
-                Object t = parents[0].toAttribute(new DefaultAttribute(null,
+                Object t = parents[0].toAttribute(new AttributeGT(null,
                             null, namespace, parents[0], 0, null, null, false),
                         value, hints).getValue();
                 s = t.toString();
 
                 while (i.hasNext()) {
-                    t = parents[0].toAttribute(new DefaultAttribute(null, null,
+                    t = parents[0].toAttribute(new AttributeGT(null, null,
                                 namespace, parents[0], 0, null, null, false),
                             value, hints).getValue();
                     s = s + " " + t.toString();

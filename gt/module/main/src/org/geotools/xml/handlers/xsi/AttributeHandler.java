@@ -18,8 +18,8 @@ package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Attribute;
-import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.AttributeGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -288,7 +288,7 @@ public class AttributeHandler extends XSIElementHandler {
             }
         }
 
-        cache = new DefaultAttribute(id, name, parent.getTargetNamespace(), st,
+        cache = new AttributeGT(id, name, parent.getTargetNamespace(), st,
                 use, def, fixed, false);
 
         id = type = ref = null;

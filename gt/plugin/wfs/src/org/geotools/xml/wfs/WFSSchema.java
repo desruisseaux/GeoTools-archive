@@ -21,15 +21,15 @@ import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttribute;
-import org.geotools.xml.schema.DefaultFacet;
-import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.schema.impl.AttributeGT;
+import org.geotools.xml.schema.impl.FacetGT;
+import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.DescribeFeatureTypeType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.FeatureCollectionType;
 import org.geotools.xml.wfs.WFSBasicComplexTypes.GetCapabilitiesType;
@@ -165,12 +165,12 @@ public class WFSSchema implements Schema {
             StatusType.getInstance()
         };
     static final SimpleType[] simpleTypes = new SimpleType[] {
-            new DefaultSimpleType(null, "AllSomeType", NAMESPACE,
-                DefaultSimpleType.RESTRICTION,
+            new SimpleTypeGT(null, "AllSomeType", NAMESPACE,
+                SimpleTypeGT.RESTRICTION,
                 new SimpleType[] { XSISimpleTypes.String.getInstance() },
                 new Facet[] {
-                    new DefaultFacet(Facet.ENUMERATION, "ALL"),
-                    new DefaultFacet(Facet.ENUMERATION, "SOME")
+                    new FacetGT(Facet.ENUMERATION, "ALL"),
+                    new FacetGT(Facet.ENUMERATION, "SOME")
                 }, SimpleType.NONE),
         };
 
@@ -656,7 +656,7 @@ public class WFSSchema implements Schema {
      *
      * @see Attribute
      */
-    static class WFSAttribute extends DefaultAttribute {
+    static class WFSAttribute extends AttributeGT {
         /*
          * Should never be called
          */

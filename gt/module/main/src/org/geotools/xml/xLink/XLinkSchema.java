@@ -21,14 +21,14 @@ import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.DefaultAttributeValue;
-import org.geotools.xml.schema.DefaultFacet;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.AttributeValueGT;
+import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -366,7 +366,7 @@ public class XLinkSchema implements Schema {
         public AttributeValue toAttribute(Attribute attribute, Object value,
             Map hints) {
             if (canCreateAttributes(attribute, value, hints)) {
-                return new DefaultAttributeValue(attribute, (String) value);
+                return new AttributeValueGT(attribute, (String) value);
             }
 
             return null;
@@ -402,10 +402,10 @@ public class XLinkSchema implements Schema {
          */
         public Facet[] getFacets() {
             return new Facet[] {
-                new DefaultFacet(Facet.ENUMERATION, "onLoad"),
-                new DefaultFacet(Facet.ENUMERATION, "onRequest"),
-                new DefaultFacet(Facet.ENUMERATION, "other"),
-                new DefaultFacet(Facet.ENUMERATION, "none"),
+                new FacetGT(Facet.ENUMERATION, "onLoad"),
+                new FacetGT(Facet.ENUMERATION, "onRequest"),
+                new FacetGT(Facet.ENUMERATION, "other"),
+                new FacetGT(Facet.ENUMERATION, "none"),
             };
         }
     }
@@ -434,7 +434,7 @@ public class XLinkSchema implements Schema {
         public AttributeValue toAttribute(Attribute attribute, Object value,
             Map hints) {
             if (canCreateAttributes(attribute, value, hints)) {
-                return new DefaultAttributeValue(attribute, (String) value);
+                return new AttributeValueGT(attribute, (String) value);
             }
 
             return null;
@@ -564,11 +564,11 @@ public class XLinkSchema implements Schema {
          */
         public Facet[] getFacets() {
             return new Facet[] {
-                new DefaultFacet(Facet.ENUMERATION, "new"),
-                new DefaultFacet(Facet.ENUMERATION, "replace"),
-                new DefaultFacet(Facet.ENUMERATION, "embed"),
-                new DefaultFacet(Facet.ENUMERATION, "other"),
-                new DefaultFacet(Facet.ENUMERATION, "none"),
+                new FacetGT(Facet.ENUMERATION, "new"),
+                new FacetGT(Facet.ENUMERATION, "replace"),
+                new FacetGT(Facet.ENUMERATION, "embed"),
+                new FacetGT(Facet.ENUMERATION, "other"),
+                new FacetGT(Facet.ENUMERATION, "none"),
             };
         }
     }

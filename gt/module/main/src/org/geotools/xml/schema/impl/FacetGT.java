@@ -14,7 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.xml.schema;
+package org.geotools.xml.schema.impl;
+
+import org.geotools.xml.schema.Facet;
 
 /**
  * <p>
@@ -23,35 +25,35 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public class DefaultElementValue implements ElementValue {
-    private Element element;
-    private Object value;
+public class FacetGT implements Facet {
+    private int type;
+    private String value;
 
-    private DefaultElementValue() {
+    private FacetGT() {
     }
 
     /**
-     * Creates a new DefaultElementValue object.
+     * Creates a new FacetGT object.
      *
-     * @param element DOCUMENT ME!
+     * @param type DOCUMENT ME!
      * @param value DOCUMENT ME!
      */
-    public DefaultElementValue(Element element, Object value) {
-        this.element = element;
+    public FacetGT(int type, String value) {
+        this.type = type;
         this.value = value;
     }
 
     /**
-     * @see org.geotools.xml.schema.ElementValue#getElement()
+     * @see org.geotools.xml.schema.Facet#getFacetType()
      */
-    public Element getElement() {
-        return element;
+    public int getFacetType() {
+        return type;
     }
 
     /**
-     * @see org.geotools.xml.schema.ElementValue#getValue()
+     * @see org.geotools.xml.schema.Facet#getValue()
      */
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 }

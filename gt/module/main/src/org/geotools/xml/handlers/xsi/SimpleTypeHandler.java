@@ -17,10 +17,10 @@
 package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.DefaultFacet;
-import org.geotools.xml.schema.DefaultSimpleType;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.SimpleType;
+import org.geotools.xml.schema.impl.FacetGT;
+import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -238,7 +238,7 @@ public class SimpleTypeHandler extends XSIElementHandler {
 
         SimpleType[] simpleTypes = getSimpleTypes(child, parent);
 
-        cache = new DefaultSimpleType(id, name, parent.getTargetNamespace(),
+        cache = new SimpleTypeGT(id, name, parent.getTargetNamespace(),
                 child.getHandlerType(), simpleTypes, facets, finaL);
 
         logger.info("End compressing SimpleType " + getName());
@@ -325,7 +325,7 @@ public class SimpleTypeHandler extends XSIElementHandler {
 
         while (i.hasNext()) {
             FacetHandler fh = (FacetHandler) i.next();
-            facets[index] = new DefaultFacet(fh.getType(), fh.getValue());
+            facets[index] = new FacetGT(fh.getType(), fh.getValue());
             index++;
         }
 

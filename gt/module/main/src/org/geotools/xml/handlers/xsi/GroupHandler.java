@@ -19,9 +19,9 @@ package org.geotools.xml.handlers.xsi;
 import java.net.URI;
 
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.DefaultGroup;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.Group;
+import org.geotools.xml.schema.impl.GroupGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -225,7 +225,7 @@ System.out.println("GroupHandler.compress()" + (g==null?"null":g.getClass().getN
         }
 System.out.println("$$$$$");
 
-        cache = new DefaultGroup(id, name, uri, child,
+        cache = new GroupGT(id, name, uri, child,
                 minOccurs, maxOccurs);
 
         child = null;
