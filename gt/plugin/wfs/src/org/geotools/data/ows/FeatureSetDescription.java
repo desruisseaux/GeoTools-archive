@@ -30,12 +30,31 @@ import java.util.List;
  * @author dzwiers
  */
 public class FeatureSetDescription {
+	/**
+	 * Mask for no operation allowed on the FeatureType
+	 */
     public static final int NO_OPERATION = 0;
+	/**
+	 * Mask for query operation allowed on the FeatureType
+	 */
     public static final int QUERY_OPERATION = 1;
+	/**
+	 * Mask for insert operation allowed on the FeatureType
+	 */
     public static final int INSERT_OPERATION = 2;
+	/**
+	 * Mask for update operation allowed on the FeatureType
+	 */
     public static final int UPDATE_OPERATION = 4;
+	/**
+	 * Mask for delete operation allowed on the FeatureType
+	 */
     public static final int DELETE_OPERATION = 8;
+	/**
+	 * Mask for lock operation allowed on the FeatureType
+	 */
     public static final int LOCK_OPERATION = 16;
+    
     private String name;
     private String title;
     private String _abstract;
@@ -44,7 +63,18 @@ public class FeatureSetDescription {
     private Envelope latLongBoundingBox;
     private int operations;
 
-    //    private MetadataURL[] metadataURL;
+    /**
+     * Converts the string into the appropriate mask.
+     * 
+     * @param s The String to attempt to convert
+     * @return one of the Constant Operation Values
+     * @see FeatureSetDescription#DELETE_OPERATION
+     * @see FeatureSetDescription#UPDATE_OPERATION
+     * @see FeatureSetDescription#LOCK_OPERATION
+     * @see FeatureSetDescription#NO_OPERATION
+     * @see FeatureSetDescription#QUERY_OPERATION
+     * @see FeatureSetDescription#INSERT_OPERATION
+     */
     public static int findOperation(String s) {
         if ("Query".equals(s)) {
             return 1;
@@ -69,6 +99,18 @@ public class FeatureSetDescription {
         return 0;
     }
 
+    /**
+     * Converts the int into the appropriate String.
+     * 
+     * @param i the int to convert, must match exactly.
+     * @return A string representation of the int.
+     * @see FeatureSetDescription#DELETE_OPERATION
+     * @see FeatureSetDescription#UPDATE_OPERATION
+     * @see FeatureSetDescription#LOCK_OPERATION
+     * @see FeatureSetDescription#NO_OPERATION
+     * @see FeatureSetDescription#QUERY_OPERATION
+     * @see FeatureSetDescription#INSERT_OPERATION
+     */
     public static String writeOperation(int i) {
         switch (i) {
         case 1:
@@ -90,6 +132,18 @@ public class FeatureSetDescription {
         return "";
     }
 
+    /**
+     * Converts the int mask into the appropriate set of Strings.
+     * 
+     * @param i The int mask to attempt to convert
+     * @return Set of Strings representing the mask
+     * @see FeatureSetDescription#DELETE_OPERATION
+     * @see FeatureSetDescription#UPDATE_OPERATION
+     * @see FeatureSetDescription#LOCK_OPERATION
+     * @see FeatureSetDescription#NO_OPERATION
+     * @see FeatureSetDescription#QUERY_OPERATION
+     * @see FeatureSetDescription#INSERT_OPERATION
+     */
     public static String[] writeOperations(int i) {
         List l = new LinkedList();
 

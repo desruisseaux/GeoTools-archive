@@ -28,28 +28,87 @@ import java.util.Map;
  * @author dzwiers
  */
 public class FilterCapabilities {
-    // spatial
+	/**
+	 * Mask for no operation
+	 */
     public static final int NO_OP = 0;
+
+    // spatial masks
+	/**
+	 * Spatial Mask for bbox operation
+	 */
     public static final int BBOX = 1;
+	/**
+	 * Spatial Mask for equals operation
+	 */
     public static final int EQUALS = 2;
+	/**
+	 * Spatial Mask for disjoint operation
+	 */
     public static final int DISJOINT = 4;
+	/**
+	 * Spatial Mask for intersect operation
+	 */
     public static final int INTERSECT = 8;
+	/**
+	 * Spatial Mask for touches operation
+	 */
     public static final int TOUCHES = 16;
+	/**
+	 * Spatial Mask for crosses operation
+	 */
     public static final int CROSSES = 32;
+	/**
+	 * Spatial Mask for within operation
+	 */
     public static final int WITHIN = 64;
+	/**
+	 * Spatial Mask for contains operation
+	 */
     public static final int CONTAINS = 128;
+	/**
+	 * Spatial Mask for overlaps operation
+	 */
     public static final int OVERLAPS = 256;
+	/**
+	 * Spatial Mask for beyond operation
+	 */
     public static final int BEYOND = 512;
+	/**
+	 * Spatial Mask for dwithin operation
+	 */
     public static final int DWITHIN = 1024;
 
-    //scalar
+    //scalar masks
+	/**
+	 * Scalar Mask for logical operation
+	 */
     public static final int LOGICAL = 1;
+	/**
+	 * Scalar Mask for simple comparison operations
+	 */
     public static final int SIMPLE_COMPARISONS = 2;
+	/**
+	 * Scalar Mask for like operation
+	 */
     public static final int LIKE = 4;
+	/**
+	 * Scalar Mask for between operation
+	 */
     public static final int BETWEEN = 8;
+	/**
+	 * Scalar Mask for null check operation
+	 */
     public static final int NULL_CHECK = 16;
+	/**
+	 * Scalar Mask for simple arithmetic operations
+	 */
     public static final int SIMPLE_ARITHMETIC = 32;
+	/**
+	 * Scalar Mask for function operations
+	 */
     public static final int FUNCTIONS = 64;
+    
     private static Map smap = loadSMap();
     private static Map cmap = loadCMap();
     private int spatial_ops = NO_OP;
@@ -87,6 +146,12 @@ public class FilterCapabilities {
         return cmap;
     }
 
+    /**
+     * Translates a String into an int mask for the operation
+     * 
+     * @param s String, operation name
+     * @return one of the filter constants
+     */
     public static int findOperation(String s) {
         if (smap.containsKey(s)) {
             return ((Integer) smap.get(s)).intValue();
@@ -99,6 +164,12 @@ public class FilterCapabilities {
         return NO_OP;
     }
 
+    /**
+     * Converts a singular mask to the appropriate string as a Spatial Op
+     * 
+     * @param i The int constant
+     * @return The String representation of the int as a FilterType
+     */
     public static String writeSpatialOperation(int i) {
         switch (i) {
         case BBOX:
@@ -138,6 +209,12 @@ public class FilterCapabilities {
         return "";
     }
 
+    /**
+     * Converts a singular mask to the appropriate string as a Scalar Op
+     * 
+     * @param i The int constant
+     * @return The String representation of the int as a FilterType
+     */
     public static String writeScalarOperation(int i) {
         switch (i) {
         case LOGICAL:

@@ -27,26 +27,50 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  */
 public class ServiceException extends SAXException {
-    private String code = "";
+	
+	/**
+	 * Comment for <code>serialVersionUID</code>
+	 */
+	private static final long serialVersionUID = (("org.geotools.data.ows.ServiceException").hashCode());
+	private String code = "";
     private String locator = null;
 
     private ServiceException() {
+    	// should not be called
     }
 
+    /**
+     * @param msg Message
+     * @see SAXException#SAXException(java.lang.String)
+     */
     public ServiceException(String msg) {
         super(msg);
     }
 
+    /**
+     * Passes the message to the parent, or the code if the message is null.
+     * 
+     * @param msg Message
+     * @param code Error Code
+     * @param locator Error Location
+     * @see SAXException#SAXException(java.lang.String)
+     */
     public ServiceException(String msg, String code, String locator) {
         super(msg + ((code == null) ? "" : code));
         this.code = code;
         this.locator = locator;
     }
 
+    /**
+     * @return String the error code, such as 404-Not Found
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * @return String the location of the error, useful for parse errors
+     */
     public String getLocator() {
         return locator;
     }
