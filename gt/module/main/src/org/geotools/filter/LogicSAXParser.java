@@ -28,6 +28,91 @@ import java.util.logging.Logger;
  * Processes messages from clients to create Logic Filters.  Handles nested
  * logic filters.  Filters should call start and end when they reach logic
  * filters, and create when the filter is complete.
+ * 
+ *   This documenation provided by Dave Blasby April 1/2005 after fixing GEOS-328:
+ *  DJB: okay, there's no where near enough comments in here to understand whats going on.  Hopefully I'm correct.
+ *       I've looked at this for a bit, and this is what I can figure out.
+ * 
+ *       This is called by the FilterFilter class (nice name...NOT) which is also a sax parser-like class.
+ *       Basically, the FilterFilter does most of the Filter parsing - but it hands most of the work off to the
+ *       appropriate classes.  For NOT, AND, OR clauses, this class is used.
+ * 
+ *       As a simple example, <filter> <OR> [STATE_NAME = 'NY'] [STATE_NAME = 'WA'] </OR></FILTER>
+ *        Or, in long form:
+ *     <Filter>
+ *     <Or>
+ *         <PropertyIsEqualTo>
+ *            <PropertyName>STATE_NAME</PropertyName>
+ *              <Literal>NY</Literal>
+ *        	</PropertyIsEqualTo>
+ *          <PropertyIsEqualTo>
+ *            <PropertyName>STATE_NAME</PropertyName>
+ *              <Literal>WA</Literal>
+ *        	</PropertyIsEqualTo>
+ *     </Or>
+ *     </Filter>
+ * 
+ *   The "PropertyIsEqualTo" is handled by another parser, so we dont have to worry about it here for the moment.
+ * 
+ *   So, the order of events are like this:
+ * 
+ *    
+ *    start( "OR" )
+ *    add([STATE_NAME = 'NY'])   // these are handled by another class 
+ *    add([STATE_NAME = 'WA'])   // these are handled by another class 
+ *    end ("OR")
+ *    create()                   // this creates an actual Filter [[ STATE_NAME = NY ] OR [ STATE_NAME = WA ]]
+ *  
+ *    This is pretty simple, but it gets more complex when you have nested structures.
+ *
+ * 
+ *       <Filter>
+ *       <And>
+ *       <Or>
+ *           <PropertyIsEqualTo>
+ *              <PropertyName>STATE_NAME</PropertyName>
+ *                <Literal>NY</Literal>
+ *          	</PropertyIsEqualTo>
+ *            <PropertyIsEqualTo>
+ *              <PropertyName>STATE_NAME</PropertyName>
+ *                <Literal>WA</Literal>
+ *          	</PropertyIsEqualTo>
+ *       </Or>
+ *                  <PropertyIsEqualTo>
+ *                    <PropertyName>STATE_NAME</PropertyName>
+ *                      <Literal>BC</Literal>
+ *          	</PropertyIsEqualTo>
+ *       </And>
+ *       </Filter>
+ *
+ *     Again, we're going to ignore the "PropertyIsEqualTo" stuff since its handled elsewhere.
+ *     
+ *      The main idea is that there will be a LogicSAXParser for the top-level "AND" and another one
+ *      for the nested "OR".  It gets a bit harder to describe because the classes start passing events
+ *      to each other.
+ *
+ *        start("AND")  -- the parent LogicSAXParser starts to construct an "AND" filter
+ *        start("OR")   -- the "AND" parser sees that its sub-element is another logic operator.
+ *                         It makes another LogicSAXParser that will handle the "OR" SAX events.
+ *        add([STATE_NAME = 'NY']) -- this is sent to the "AND" parser.  It then sends it to the "OR" parser.
+ *                                    + "OR" parser remembers this component
+ *        add([STATE_NAME = 'WA']) -- this is sent to the "AND" parser.  It then sends it to the "OR" parser.
+ *                                    + "OR" parser remembers this component
+ *        end("OR") -- this is sent to the "AND" parser.  It then sends it to the "OR" parser.
+ *                                    + The "OR" parser marks itself as complete
+ *                              + The "AND" parser notices that its child is completed parsing
+ *                              + The "AND" parser calls create() on the "OR" parser to make a filter (see next step)
+ *                              + Since "OR" is finished, "AND" stop passing events to it.
+ *        "OR".create() -- makes a "[[ STATE_NAME = NY ] OR [ STATE_NAME = WA ]]" and "AND" remembers it as a component
+ *        add ([ STATE_NAME = BC ]) --This is added as a component to the "AND" filter.
+ *        end ("AND")   --  the "AND" parser marks itself as complete
+ *        create()      --  the "AND" parser creates a FILTER [[[ STATE_NAME = NY ] OR [ STATE_NAME = WA ]] AND [ STATE_NAME = BC ]]
+ *
+ *
+ *      Higher levels of nesting work the same way - each level will send the event down to the next level.
+ *
+ *      If logicFilter == null then this object is the one doing the processing.  If its non-null, then
+ *      the sub-object is doing the processing - event are sent to it.
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
@@ -69,11 +154,15 @@ public class LogicSAXParser {
      * @throws IllegalFilterException if filter type does not match  declared
      *         type.
      */
+     // logic types are AND=2, OR=1, NOT=3
     public void start(short logicType) throws IllegalFilterException {
         LOGGER.finest("got a start element: " + logicType);
 
         if (this.logicType != -1) {
-            logicFactory = new LogicSAXParser();
+        	//DJB: for GEOS-328 we need to keep the old parser around to handle multiple nestings of logic operators.
+        	if (logicFactory == null) {
+        		  logicFactory = new LogicSAXParser();
+        		}
             logicFactory.start(logicType);
         } else if (!AbstractFilter.isLogicFilter(logicType)) {
             throw new IllegalFilterException(
@@ -92,6 +181,7 @@ public class LogicSAXParser {
      * @throws IllegalFilterException If the end message can't be processed in
      *         this state.
      */
+     // logic types are AND=2, OR=1, NOT=3
     public void end(short logicType) throws IllegalFilterException {
         LOGGER.finer("got an end element: " + logicType);
 
