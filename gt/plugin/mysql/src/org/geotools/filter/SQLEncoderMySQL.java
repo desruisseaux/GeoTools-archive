@@ -65,7 +65,7 @@ public class SQLEncoderMySQL extends SQLEncoder
     public SQLEncoderMySQL() {
         capabilities = createFilterCapabilities();
 
-        setColnameEscape("\"");
+        setColnameEscape("");
     }
 
     public SQLEncoderMySQL(int srid) {
@@ -143,12 +143,12 @@ public class SQLEncoderMySQL extends SQLEncoder
             // left and right have to be valid expressions
             try {
                 /*   if (left == null) {
-                   out.write("\"" + defaultGeom + "\"");
+                   out.write(defaultGeom);
                    } else {
                        left.accept(this);
                    }*/
                 if (right == null) {
-                    out.write("\"" + defaultGeom + "\"");
+                    out.write(defaultGeom);
                 } else {
                     right.accept(this);
                 }
@@ -174,6 +174,9 @@ public class SQLEncoderMySQL extends SQLEncoder
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
         out.write("MBRContains(GeometryFromText('" + geomText + "', " + srid
-            + "),geom);");
+            + "),geom);");//TODO instead of hardcoding 'geom,' we need the name
+                          //     of the column (it could be 'the_geom' or anything
+                          //     else)
+        
     }
 }
