@@ -19,27 +19,31 @@ package org.geotools.data.arcsde;
 /**
  * Exception that can be thrown if an error occurs while creating a
  * <code>Geometryy</code> from a <code>SeShape</code> or viceversa
- *
- * @author Gabriel Roldán
- * @version $Id: GeometryBuildingException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
+ * 
+ * @author Gabriel Rold?n
+ * @version $Id: GeometryBuildingException.java,v 1.1 2004/06/21 15:00:33
+ *          cdillard Exp $
  */
 public class GeometryBuildingException extends Exception {
-    /**
-     * Creates a new GeometryBuildingException object.
-     *
-     * @param msg DOCUMENT ME!
-     */
-    public GeometryBuildingException(String msg) {
-        this(msg, null);
-    }
+	/**
+	 * Creates a new GeometryBuildingException object.
+	 * 
+	 * @param msg
+	 *            DOCUMENT ME!
+	 */
+	public GeometryBuildingException(String msg) {
+		this(msg, null);
+	}
 
-    /**
-     * Creates a new GeometryBuildingException object.
-     *
-     * @param msg DOCUMENT ME!
-     * @param cause DOCUMENT ME!
-     */
-    public GeometryBuildingException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+	/**
+	 * Creates a new GeometryBuildingException object.
+	 * 
+	 * @param msg
+	 *            DOCUMENT ME!
+	 * @param cause
+	 *            DOCUMENT ME!
+	 */
+	public GeometryBuildingException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 }

@@ -16,20 +16,16 @@
  */
 package org.geotools.data.arcsde;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.util.logging.Logger;
+
 import junit.framework.TestCase;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
@@ -46,9 +42,16 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.LogicFilter;
-import java.io.IOException;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -137,8 +140,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     public void testDeleteByAttOnlyFilter() throws Exception {
         testData.createTemptTable(true);
 
-        DataStore ds = testData.getDataStore();
-        String typeName = testData.getTemp_table();
+        DataStore ds = this.testData.getDataStore();
+        String typeName = this.testData.getTemp_table();
 
         //get 2 features and build an OR'ed PropertyIsEqualTo filter
         FeatureSource fs = ds.getFeatureSource(typeName);
@@ -152,12 +155,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         reader.close();
 
         FilterFactory ff = FilterFactory.createFilterFactory();
-        LogicFilter or = ff.createLogicFilter(AbstractFilter.LOGIC_OR);
-        CompareFilter eq = ff.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        LogicFilter or = ff.createLogicFilter(FilterType.LOGIC_OR);
+        CompareFilter eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         eq.addLeftValue(ff.createLiteralExpression(val1));
         eq.addRightValue(ff.createAttributeExpression(schema, attName));
         or.addFilter(eq);
-        eq = ff.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         eq.addLeftValue(ff.createLiteralExpression(val2));
         eq.addRightValue(ff.createAttributeExpression(schema, attName));
         or.addFilter(eq);
@@ -205,7 +208,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     public void testCreateSchema() throws IOException, SchemaException {
         FeatureType type;
         AttributeType[] atts = new AttributeType[4];
-        String typeName = testData.getTemp_table();
+        String typeName = this.testData.getTemp_table();
+        if(typeName.indexOf('.') != -1){
+        	LOGGER.info("Unqualifying type name to create schema.");
+        	typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
+        }
 
         atts[0] = AttributeTypeFactory.newAttributeType("FST_COL",
                 String.class, false);
@@ -217,11 +224,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 Integer.class, false);
         type = FeatureTypeFactory.newFeatureType(atts, typeName);
 
-        DataStore ds = testData.getDataStore();
+        DataStore ds = this.testData.getDataStore();
 
-        testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
+        this.testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
         ds.createSchema(type);
-        testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
+        this.testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
     }
 
     /**
@@ -299,13 +306,13 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         throws Exception {
         //the table created here is test friendly since it can hold
         //any kind of geometries.
-        testData.createTemptTable(true);
+        this.testData.createTemptTable(true);
 
-        String typeName = testData.getTemp_table();
-        FeatureCollection features = testData.createTestFeatures(geometryClass,
+        String typeName = this.testData.getTemp_table();
+        FeatureCollection features = this.testData.createTestFeatures(geometryClass,
                 10);
 
-        DataStore ds = testData.getDataStore();
+        DataStore ds = this.testData.getDataStore();
         FeatureSource fsource = ds.getFeatureSource(typeName);
 
         //incremented on each feature added event to

@@ -1,4 +1,4 @@
-	/*
+/*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002, Geotools Project Managment Committee (PMC)
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.AttributeType;
@@ -47,459 +46,487 @@ import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeUpdate;
 import com.vividsolutions.jts.geom.Geometry;
 
-
 /**
  * Implementation fo the FeatureWriter interface for use with the
  * ArcSDEDataStore class.
- *
+ * 
  * @author Jake Fear, jfear@polexis.com
  * @version
  */
 class ArcSDEFeatureWriter implements FeatureWriter {
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEFeatureWriter.class.getPackage()
-                                                                                   .getName());
-    private ArcSDEDataStore dataStore;
-    private ArcTransactionState transactionState;
-    private SeLayer layer;
-    private SeColumnDefinition[] columnDefinitions;
-    private List features;
+	private static final Logger LOGGER = Logger
+			.getLogger(ArcSDEFeatureWriter.class.getPackage().getName());
 
-    // Pointer into the current List of features
-    private int currentIndex;
+	private ArcSDEDataStore dataStore;
 
-    // Indicates that the current has not yet been added to the database
-    // when the values is true.
-    private boolean notInserted;
+	private ArcTransactionState transactionState;
 
-    // Because not all attributes are mutable we use
-    // these two variables to indicate the column name
-    // and FeatureType attribute index of the values
-    // that are mutable.  We consult the state of these
-    // arrays before we attempt to insert a row of data.
-    private String[] columns;
+	private SeLayer layer;
 
-    // Used to create "pointers" to attributes that are mutable.
-    private Integer[] mutableAttributeIndexes;
+	private SeColumnDefinition[] columnDefinitions;
 
-    /**
-     * Holds the name of the spatially enabled column in an ArcSDE SeLayer
-     * object that is represented by this writer.
-     */
-    private String spatialColumnName;
+	private List features;
 
-    /**
-     * Creates a new ArcSDEFeatureWriter.
-     *
-     * @param store
-     * @param state DOCUMENT ME!
-     * @param layer
-     * @param features
-     */
-    public ArcSDEFeatureWriter(ArcSDEDataStore store,
-        ArcTransactionState state, SeLayer layer, List features) {
-        transactionState = state;
+	// Pointer into the current List of features
+	private int currentIndex;
 
-        if (features != null) {
-            this.features = features;
-        } else {
-            this.features = new ArrayList();
-        }
+	// Indicates that the current has not yet been added to the database
+	// when the values is true.
+	private boolean notInserted;
 
-        this.dataStore = store;
-        this.layer = layer;
+	// Because not all attributes are mutable we use
+	// these two variables to indicate the column name
+	// and FeatureType attribute index of the values
+	// that are mutable. We consult the state of these
+	// arrays before we attempt to insert a row of data.
+	private String[] columns;
 
-        // We essentially use this as our primary key column.  This seems to 
-        // work ok with ArcSDE for the most part...
-        spatialColumnName = layer.getSpatialColumn();
-        currentIndex = -1;
-    }
+	// Used to create "pointers" to attributes that are mutable.
+	private Integer[] mutableAttributeIndexes;
 
-    /**
-     * Creates a new ArcSDEFeatureWriter object.
-     *
-     * @param store DOCUMENT ME!
-     * @param state DOCUMENT ME!
-     * @param layer DOCUMENT ME!
-     */
-    public ArcSDEFeatureWriter(ArcSDEDataStore store,
-        ArcTransactionState state, SeLayer layer) {
-        this(store, state, layer, null);
-    }
+	/**
+	 * Holds the name of the spatially enabled column in an ArcSDE SeLayer
+	 * object that is represented by this writer.
+	 */
+	private String spatialColumnName;
 
-    /**
-     * Provides the <code>FeatureType</code> that is acceptable for features
-     * handled by this <code>FeatureWriter</code>
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws RuntimeException DOCUMENT ME!
-     */
-    public FeatureType getFeatureType() {
-        try {
-            return ArcSDEAdapter.fetchSchema(dataStore.getConnectionPool(),
-                layer.getQualifiedName());
-        } catch (SeException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
-        }
-    }
+	/**
+	 * Creates a new ArcSDEFeatureWriter.
+	 * 
+	 * @param store
+	 * @param state
+	 *            DOCUMENT ME!
+	 * @param layer
+	 * @param features
+	 */
+	public ArcSDEFeatureWriter(ArcSDEDataStore store,
+			ArcTransactionState state, SeLayer layer, List features) {
+		transactionState = state;
 
-    /**
-     * Implements an operation similar to next in java.util.Iterator.  This
-     * allows the  caller to iterate over features obtained from the backing
-     * store and to instantiate new features and add them to the layer in the
-     * backing store.
-     *
-     * @return If no 'next feature' is available then a new feature object is
-     *         created and returned to the caller so that they may modify its
-     *         contents and later write it to the backing store.
-     *
-     * @throws IOException
-     */
-    public synchronized Feature next() throws IOException {
-        Feature feature;
+		if (features != null) {
+			this.features = features;
+		} else {
+			this.features = new ArrayList();
+		}
 
-        if (!hasNext()) {
-            // In this case we must instantiate a new feature and add it 
-            // to our internal list, thus allowing it to be modified...
-            // It is not clear that this cast will always be safe, but it seems to 
-            // be a safe approach for the default implementation provided.
-            DefaultFeatureType featureType = (DefaultFeatureType) getFeatureType();
-            Object[] attributes = new Object[featureType.getAttributeCount()];
+		this.dataStore = store;
+		this.layer = layer;
 
-            try {
-                feature = featureType.create(attributes);
-            } catch (IllegalAttributeException iae) {
-                LOGGER.log(Level.WARNING, iae.getMessage(), iae);
-                throw new IOException(iae.getMessage());
-            }
+		// We essentially use this as our primary key column. This seems to
+		// work ok with ArcSDE for the most part...
+		this.spatialColumnName = layer.getSpatialColumn();
+		this.currentIndex = -1;
+	}
 
-            features.add(feature);
-            currentIndex++;
-            notInserted = true;
-        } else {
-            // Simply return the next feature in the list...
-            feature = (Feature) features.get(++currentIndex);
-        }
+	/**
+	 * Creates a new ArcSDEFeatureWriter object.
+	 * 
+	 * @param store
+	 *            DOCUMENT ME!
+	 * @param state
+	 *            DOCUMENT ME!
+	 * @param layer
+	 *            DOCUMENT ME!
+	 */
+	public ArcSDEFeatureWriter(ArcSDEDataStore store,
+			ArcTransactionState state, SeLayer layer) {
+		this(store, state, layer, null);
+	}
 
-        return feature;
-    }
+	/**
+	 * Provides the <code>FeatureType</code> that is acceptable for features
+	 * handled by this <code>FeatureWriter</code>
+	 * 
+	 * @return DOCUMENT ME!
+	 * 
+	 * @throws RuntimeException
+	 *             DOCUMENT ME!
+	 */
+	public FeatureType getFeatureType() {
+		try {
+			return ArcSDEAdapter.fetchSchema(
+					this.dataStore.getConnectionPool(), this.layer
+							.getQualifiedName());
+		} catch (SeException e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
+		}
+	}
 
-    /**
-     * Removes the current feature from the backing store.
-     *
-     * @throws IOException If there are no features or if the backing store
-     *         throws an exception.
-     */
-    public synchronized void remove() throws IOException {
-        if ((features == null) || (currentIndex >= features.size())) {
-            throw new IOException("No current feature available.");
-        }
+	/**
+	 * Implements an operation similar to next in java.util.Iterator. This
+	 * allows the caller to iterate over features obtained from the backing
+	 * store and to instantiate new features and add them to the layer in the
+	 * backing store.
+	 * 
+	 * @return If no 'next feature' is available then a new feature object is
+	 *         created and returned to the caller so that they may modify its
+	 *         contents and later write it to the backing store.
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized Feature next() throws IOException {
+		Feature feature;
 
-        if (notInserted) {
-            features.remove(currentIndex--);
-            notInserted = false;
-        } else {
-            Feature feature = (Feature) features.get(currentIndex);
-            SeConnection connection = null;
+		if (!hasNext()) {
+			// In this case we must instantiate a new feature and add it
+			// to our internal list, thus allowing it to be modified...
+			// It is not clear that this cast will always be safe, but it seems
+			// to
+			// be a safe approach for the default implementation provided.
+			DefaultFeatureType featureType = (DefaultFeatureType) getFeatureType();
+			Object[] attributes = new Object[featureType.getAttributeCount()];
 
-            try {
-                connection = getConnection();
+			try {
+				feature = featureType.create(attributes);
+			} catch (IllegalAttributeException iae) {
+				LOGGER.log(Level.WARNING, iae.getMessage(), iae);
+				throw new IOException(iae.getMessage());
+			}
 
-                SeDelete seDelete = new SeDelete(connection);
+			this.features.add(feature);
+			this.currentIndex++;
+			this.notInserted = true;
+		} else {
+			// Simply return the next feature in the list...
+			feature = (Feature) this.features.get(++this.currentIndex);
+		}
 
-                long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
-                SeObjectId objectID = new SeObjectId(featureId);
-                seDelete.byId(layer.getQualifiedName(), objectID); 
-                dataStore.fireRemoved(feature);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                throw new IOException(e.getMessage());
-            } finally {
-                releaseConnection(connection);
-            }
-        }
-    }
+		return feature;
+	}
 
-    /**
-     * Writes the feature at the current index to the backing store.  If this
-     * feature is not yet in the backing store it will be inserted.
-     *
-     * @throws IOException In the case that it is not possible to write the
-     *         feature to the backing store because it either does not exist
-     *         or the  backing store throws its own exception that indicates
-     *         an error.
-     */
-    public synchronized void write() throws IOException {
-        if ((features == null) || (features.size() == 0)) {
-            throw new IOException("No feature to be written.");
-        }
+	/**
+	 * Removes the current feature from the backing store.
+	 * 
+	 * @throws IOException
+	 *             If there are no features or if the backing store throws an
+	 *             exception.
+	 */
+	public synchronized void remove() throws IOException {
+		if ((this.features == null)
+				|| (this.currentIndex >= this.features.size())) {
+			throw new IOException("No current feature available.");
+		}
 
-        SeConnection connection = null;
+		if (this.notInserted) {
+			this.features.remove(this.currentIndex--);
+			this.notInserted = false;
+		} else {
+			Feature feature = (Feature) this.features.get(this.currentIndex);
+			SeConnection connection = null;
 
-        try {
-            Feature feature = (Feature) features.get(currentIndex);
-            FeatureType featureType = feature.getFeatureType();
-            AttributeType[] attributeTypes = featureType.getAttributeTypes();
-            connection = getConnection();
+			try {
+				connection = getConnection();
 
-            if (notInserted) {
-                // We must insert the record into ArcSDE
-                SeInsert insert = new SeInsert(connection);
-                String[] cols = getColumns(attributeTypes, connection);
-                insert.intoTable(layer.getQualifiedName(), cols);
-                insert.setWriteMode(true);
+				SeDelete seDelete = new SeDelete(connection);
 
-                SeRow row = insert.getRowToSet();
+				long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
+				SeObjectId objectID = new SeObjectId(featureId);
+				seDelete.byId(this.layer.getQualifiedName(), objectID);
+				this.dataStore.fireRemoved(feature);
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				throw new IOException(e.getMessage());
+			} finally {
+				releaseConnection(connection);
+			}
+		}
+	}
 
-                // Now set the values for the new row here...
-                for (int i = 0; i < cols.length; i++) {
-                    setRowValue(row, i,
-                        feature.getAttribute(
-                            mutableAttributeIndexes[i].intValue()));
-                }
+	/**
+	 * Writes the feature at the current index to the backing store. If this
+	 * feature is not yet in the backing store it will be inserted.
+	 * 
+	 * @throws IOException
+	 *             In the case that it is not possible to write the feature to
+	 *             the backing store because it either does not exist or the
+	 *             backing store throws its own exception that indicates an
+	 *             error.
+	 */
+	public synchronized void write() throws IOException {
+		if ((this.features == null) || (this.features.size() == 0)) {
+			throw new IOException("No feature to be written.");
+		}
 
-                // Now "commit" the changes.
-                insert.execute();
-                insert.close();
-                dataStore.fireAdded(feature);
-            } else {
-                // The record is already inserted, so we will be updating
-                // the values associated with the given record.
-                SeUpdate update = new SeUpdate(connection);
-                String[] cols = getColumns(attributeTypes, connection);
-                String featureId = feature.getID().substring(feature.getID()
-                                                                    .lastIndexOf('.')
-                        + 1, feature.getID().length());
-                update.toTable(layer.getQualifiedName(), cols,
-                    spatialColumnName + " = " + featureId);
-                update.setWriteMode(true);
+		SeConnection connection = null;
 
-                SeRow row = update.getRowToSet();
+		try {
+			Feature feature = (Feature) this.features.get(this.currentIndex);
+			FeatureType featureType = feature.getFeatureType();
+			AttributeType[] attributeTypes = featureType.getAttributeTypes();
+			connection = getConnection();
 
-                // Set values on rows here.....
-                for (int i = 0; i < cols.length; i++) {
-                    Object value = feature.getAttribute(mutableAttributeIndexes[i]
-                            .intValue());
-                    setRowValue(row, i, value);
-                }
+			if (this.notInserted) {
+				// We must insert the record into ArcSDE
+				SeInsert insert = new SeInsert(connection);
+				String[] cols = getColumns(attributeTypes, connection);
+				insert.intoTable(this.layer.getQualifiedName(), cols);
+				insert.setWriteMode(true);
 
-                update.execute();
-                update.close();
+				SeRow row = insert.getRowToSet();
 
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-            throw new DataSourceException(e.getMessage(), e);
-        } finally {
-            releaseConnection(connection);
-        }
-    }
+				// Now set the values for the new row here...
+				for (int i = 0; i < cols.length; i++) {
+					setRowValue(row, i, feature
+							.getAttribute(this.mutableAttributeIndexes[i]
+									.intValue()));
+				}
 
-    /**
-     * Indicates whether or not this <code>FeatureWriter</code> contains more
-     * feature instances or not.
-     *
-     * @return true if the next call to <code>next()</code> will return an
-     *         already existing feature from the backing store.
-     *
-     * @throws IOException
-     */
-    public boolean hasNext() throws IOException {
-        int size = features.size();
+				// Now "commit" the changes.
+				insert.execute();
+				insert.close();
+				this.dataStore.fireAdded(feature);
+			} else {
+				// The record is already inserted, so we will be updating
+				// the values associated with the given record.
+				SeUpdate update = new SeUpdate(connection);
+				String[] cols = getColumns(attributeTypes, connection);
+				String featureId = feature.getID().substring(
+						feature.getID().lastIndexOf('.') + 1,
+						feature.getID().length());
+				update.toTable(this.layer.getQualifiedName(), cols,
+						this.spatialColumnName + " = " + featureId);
+				update.setWriteMode(true);
 
-        return ((features != null) && (size > 0) && ((currentIndex + 1) < size));
-    }
+				SeRow row = update.getRowToSet();
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    public void close() throws IOException {
-        dataStore = null;
-        layer = null;
-        features = null;
-        currentIndex = 0;
-    }
+				// Set values on rows here.....
+				for (int i = 0; i < cols.length; i++) {
+					Object value = feature
+							.getAttribute(this.mutableAttributeIndexes[i]
+									.intValue());
+					setRowValue(row, i, value);
+				}
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param attributeTypes DOCUMENT ME!
-     * @param connection DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws SeException DOCUMENT ME!
-     */
-    private synchronized String[] getColumns(AttributeType[] attributeTypes,
-        SeConnection connection) throws SeException {
-        if (columnDefinitions == null) {
-            SeTable table = new SeTable(connection, layer.getQualifiedName());
+				update.execute();
+				update.close();
 
-            // We are going to inspect the column defintions in order to 
-            // determine which attributes are actually mutable...
-            columnDefinitions = table.describe();
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			throw new DataSourceException(e.getMessage(), e);
+		} finally {
+			releaseConnection(connection);
+		}
+	}
 
-            ArrayList columnList = new ArrayList();
-            ArrayList indexes = new ArrayList();
+	/**
+	 * Indicates whether or not this <code>FeatureWriter</code> contains more
+	 * feature instances or not.
+	 * 
+	 * @return true if the next call to <code>next()</code> will return an
+	 *         already existing feature from the backing store.
+	 * 
+	 * @throws IOException
+	 */
+	public boolean hasNext() throws IOException {
+		int size = this.features.size();
 
-            for (int i = 0; i < attributeTypes.length; i++) {
-                // We need to exclude read only types from the set of "mutable" 
-                // column names.  See the ArcSDE documentation for the explanation
-                // of "1", if they provided a symbolic constant I would use it...
-                // As it is, I think this is easier to understand along with their
-                // documentation.  1 indicates an ArcSDE managed field.
-                if (columnDefinitions[i].getRowIdType() != 1) {
-                    columnList.add(attributeTypes[i].getName().toUpperCase());
-                    indexes.add(new Integer(i));
-                }
-            }
+		return ((this.features != null) && (size > 0) && ((this.currentIndex + 1) < size));
+	}
 
-            columns = new String[columnList.size()];
-            mutableAttributeIndexes = new Integer[indexes.size()];
-            columnList.toArray(columns);
-            indexes.toArray(mutableAttributeIndexes);
-        }
+	/**
+	 * DOCUMENT ME!
+	 * 
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 */
+	public void close() throws IOException {
+		this.dataStore = null;
+		this.layer = null;
+		this.features = null;
+		this.currentIndex = 0;
+	}
 
-        return columns;
-    }
+	/**
+	 * DOCUMENT ME!
+	 * 
+	 * @param attributeTypes
+	 *            DOCUMENT ME!
+	 * @param connection
+	 *            DOCUMENT ME!
+	 * 
+	 * @return DOCUMENT ME!
+	 * 
+	 * @throws SeException
+	 *             DOCUMENT ME!
+	 */
+	private synchronized String[] getColumns(AttributeType[] attributeTypes,
+			SeConnection connection) throws SeException {
+		if (this.columnDefinitions == null) {
+			SeTable table = new SeTable(connection, this.layer
+					.getQualifiedName());
 
-    /**
-     * Used to set a value on an SeRow object.  The values is converted to the
-     * appropriate type based on an inspection of the SeColumnDefintion
-     * object.
-     *
-     * @param row
-     * @param index
-     * @param value
-     *
-     * @throws SeException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     */
-    private void setRowValue(SeRow row, int index, Object value)
-        throws SeException, IOException {
-        SeColumnDefinition seColumnDefinition = null;
-        seColumnDefinition = row.getColumnDef(index);
+			// We are going to inspect the column defintions in order to
+			// determine which attributes are actually mutable...
+			this.columnDefinitions = table.describe();
 
-        switch (seColumnDefinition.getType()) {
-        case SeColumnDefinition.TYPE_INTEGER: {
-            if (value != null) {
-                row.setInteger(index, new Integer(value.toString()));
-            } else {
-                row.setInteger(index, null);
-            }
+			ArrayList columnList = new ArrayList();
+			ArrayList indexes = new ArrayList();
 
-            break;
-        }
+			for (int i = 0; i < attributeTypes.length; i++) {
+				// We need to exclude read only types from the set of "mutable"
+				// column names. See the ArcSDE documentation for the
+				// explanation
+				// of "1", if they provided a symbolic constant I would use
+				// it...
+				// As it is, I think this is easier to understand along with
+				// their
+				// documentation. 1 indicates an ArcSDE managed field.
+				if (this.columnDefinitions[i].getRowIdType() != 1) {
+					columnList.add(attributeTypes[i].getName().toUpperCase());
+					indexes.add(new Integer(i));
+				}
+			}
 
-        case SeColumnDefinition.TYPE_SMALLINT: {
-            if (value != null) {
-                row.setShort(index, new Short(value.toString()));
-            } else {
-                row.setShort(index, null);
-            }
+			this.columns = new String[columnList.size()];
+			this.mutableAttributeIndexes = new Integer[indexes.size()];
+			columnList.toArray(this.columns);
+			indexes.toArray(this.mutableAttributeIndexes);
+		}
 
-            break;
-        }
+		return this.columns;
+	}
 
-        case SeColumnDefinition.TYPE_FLOAT: {
-            if (value != null) {
-                row.setFloat(index, new Float(value.toString()));
-            } else {
-                row.setFloat(index, null);
-            }
+	/**
+	 * Used to set a value on an SeRow object. The values is converted to the
+	 * appropriate type based on an inspection of the SeColumnDefintion object.
+	 * 
+	 * @param row
+	 * @param index
+	 * @param value
+	 * 
+	 * @throws SeException
+	 *             DOCUMENT ME!
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 */
+	private void setRowValue(SeRow row, int index, Object value)
+			throws SeException, IOException {
+		SeColumnDefinition seColumnDefinition = null;
+		seColumnDefinition = row.getColumnDef(index);
 
-            break;
-        }
+		switch (seColumnDefinition.getType()) {
+		case SeColumnDefinition.TYPE_INTEGER: {
+			if (value != null) {
+				row.setInteger(index, new Integer(value.toString()));
+			} else {
+				row.setInteger(index, null);
+			}
 
-        case SeColumnDefinition.TYPE_DOUBLE: {
-            if (value != null) {
-                row.setDouble(index, new Double(value.toString()));
-            } else {
-                row.setDouble(index, null);
-            }
+			break;
+		}
 
-            break;
-        }
+		case SeColumnDefinition.TYPE_SMALLINT: {
+			if (value != null) {
+				row.setShort(index, new Short(value.toString()));
+			} else {
+				row.setShort(index, null);
+			}
 
-        case SeColumnDefinition.TYPE_STRING: {
-            if (value != null) {
-                row.setString(index, value.toString());
-            } else {
-                row.setString(index, null);
-            }
+			break;
+		}
 
-            break;
-        }
+		case SeColumnDefinition.TYPE_FLOAT: {
+			if (value != null) {
+				row.setFloat(index, new Float(value.toString()));
+			} else {
+				row.setFloat(index, null);
+			}
 
-        case SeColumnDefinition.TYPE_DATE: {
-            if (value != null) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime((Date) value);
-                row.setTime(index, calendar);
-            } else {
-                row.setTime(index, null);
-            }
+			break;
+		}
 
-            break;
-        }
+		case SeColumnDefinition.TYPE_DOUBLE: {
+			if (value != null) {
+				row.setDouble(index, new Double(value.toString()));
+			} else {
+				row.setDouble(index, null);
+			}
 
-        case SeColumnDefinition.TYPE_SHAPE: {
-            if (value != null) {
-                try {
-                    GeometryBuilder geometryBuilder = GeometryBuilder
-                        .builderFor(value.getClass());
-                    SeCoordinateReference coordRef = layer.getCoordRef();
-                    Geometry geom = (Geometry) value;
-                    SeShape shape = geometryBuilder.constructShape(geom, coordRef);
-                    row.setShape(index, shape);
-                } catch (Exception e) {
-                	String msg = e instanceof SeException? ((SeException)e).getSeError().getErrDesc() : e.getMessage();
-                    LOGGER.log(Level.WARNING, msg, e);
-                    throw new DataSourceException(msg, e);
-                }
-            } else {
-                row.setShape(index, null);
-            }
+			break;
+		}
 
-            break;
-        }
-        }
-    }
+		case SeColumnDefinition.TYPE_STRING: {
+			if (value != null) {
+				row.setString(index, value.toString());
+			} else {
+				row.setString(index, null);
+			}
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DataSourceException DOCUMENT ME!
-     * @throws UnavailableConnectionException DOCUMENT ME!
-     */
-    private synchronized SeConnection getConnection()
-        throws DataSourceException, UnavailableConnectionException {
-        if (transactionState != null) {
-            return transactionState.getConnection();
-        } else {
-            return dataStore.getConnectionPool().getConnection();
-        }
-    }
+			break;
+		}
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param connection
-     */
-    private synchronized void releaseConnection(SeConnection connection) {
-        if (transactionState != null) {
-            // NO-OP, the transactionState object will release the connection
-            // after it commits or rollsback the operations.
-        } else {
-            dataStore.getConnectionPool().release(connection);
-        }
-    }
+		case SeColumnDefinition.TYPE_DATE: {
+			if (value != null) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime((Date) value);
+				row.setTime(index, calendar);
+			} else {
+				row.setTime(index, null);
+			}
+
+			break;
+		}
+
+		case SeColumnDefinition.TYPE_SHAPE: {
+			if (value != null) {
+				try {
+					GeometryBuilder geometryBuilder = GeometryBuilder
+							.builderFor(value.getClass());
+					SeCoordinateReference coordRef = this.layer.getCoordRef();
+					Geometry geom = (Geometry) value;
+					SeShape shape = geometryBuilder.constructShape(geom,
+							coordRef);
+					row.setShape(index, shape);
+				} catch (Exception e) {
+					String msg = e instanceof SeException ? ((SeException) e)
+							.getSeError().getErrDesc() : e.getMessage();
+					LOGGER.log(Level.WARNING, msg, e);
+					throw new DataSourceException(msg, e);
+				}
+			} else {
+				row.setShape(index, null);
+			}
+
+			break;
+		}
+		}
+	}
+
+	/**
+	 * DOCUMENT ME!
+	 * 
+	 * @return DOCUMENT ME!
+	 * 
+	 * @throws DataSourceException
+	 *             DOCUMENT ME!
+	 * @throws UnavailableConnectionException
+	 *             DOCUMENT ME!
+	 */
+	private synchronized SeConnection getConnection()
+			throws DataSourceException, UnavailableConnectionException {
+		if (this.transactionState != null) {
+			return this.transactionState.getConnection();
+		}
+		return this.dataStore.getConnectionPool().getConnection();
+
+	}
+
+	/**
+	 * DOCUMENT ME!
+	 * 
+	 * @param connection
+	 */
+	private synchronized void releaseConnection(SeConnection connection) {
+		if (this.transactionState != null) {
+			// NO-OP, the transactionState object will release the connection
+			// after it commits or rollsback the operations.
+		} else {
+			this.dataStore.getConnectionPool().release(connection);
+		}
+	}
 }

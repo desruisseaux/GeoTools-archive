@@ -20,25 +20,28 @@ package org.geotools.data.arcsde;
  * Exception thrown when a free SDE connection can't be obtained after the
  * calling thread was waiting an available connection for
  * <code>SdeConnectionPool instance's getMaxWaitTime()</code> milliseconds
- *
- * @author Gabriel Roldán
- * @author Gabriel Roldán
- * @version $Id: UnavailableConnectionException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
- *
+ * 
+ * @author Gabriel Rold?n
+ * @author Gabriel Rold?n
+ * @version $Id: UnavailableConnectionException.java,v 1.1 2004/06/21 15:00:33
+ *          cdillard Exp $
+ * 
  * @task REVISIT: sure there are a better exception to use in somewhere... just
  *       take a look since it seems not very wise to have it here... may be in
  *       current jdbc package.
  */
 public class UnavailableConnectionException extends Exception {
-    /**
-     * Creates a new UnavailableConnectionException object.
-     *
-     * @param usedConnections DOCUMENT ME!
-     * @param config DOCUMENT ME!
-     */
-    public UnavailableConnectionException(int usedConnections,
-        ConnectionConfig config) {
-        super("The maximun of " + usedConnections + " to " + config.toString()
-            + " has been reached");
-    }
+	/**
+	 * Creates a new UnavailableConnectionException object.
+	 * 
+	 * @param usedConnections
+	 *            DOCUMENT ME!
+	 * @param config
+	 *            DOCUMENT ME!
+	 */
+	public UnavailableConnectionException(int usedConnections,
+			ConnectionConfig config) {
+		super("The maximun of " + usedConnections + " to " + config.toString()
+				+ " has been reached");
+	}
 }

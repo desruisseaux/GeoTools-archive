@@ -89,8 +89,8 @@ public class GeometryBuilderTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
-        geometryBuilder = null;
-        wktReader = null;
+        this.geometryBuilder = null;
+        this.wktReader = null;
         super.tearDown();
     }
 
@@ -356,8 +356,8 @@ public class GeometryBuilderTest extends TestCase {
         LOGGER.info("---- testBuildGeometries: testing " + testDataResource
             + " ----");
 
-        geometryBuilder = GeometryBuilder.builderFor(geometryClass);
-        LOGGER.info("created " + geometryBuilder.getClass().getName());
+        this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
+        LOGGER.info("created " + this.geometryBuilder.getClass().getName());
 
         Geometry[] expectedGeometries = loadTestData(testDataResource);
         Geometry createdGeometry;
@@ -375,7 +375,7 @@ public class GeometryBuilderTest extends TestCase {
             //and should not be called directly. We use it here
             //just for testing purposes. Instead, geometryBuilder.construct(SeShape)
             //must be used
-            createdGeometry = geometryBuilder.newGeometry(sdeCoords);
+            createdGeometry = this.geometryBuilder.newGeometry(sdeCoords);
             assertEquals(expectedGeometry.getClass(), createdGeometry.getClass());
         }
     }
@@ -500,7 +500,7 @@ public class GeometryBuilderTest extends TestCase {
                     continue;
                 }
 
-                g = wktReader.read(line);
+                g = this.wktReader.read(line);
                 LOGGER.info("loaded test geometry: " + g.toText());
                 testGeoms.add(g);
             }

@@ -16,10 +16,6 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.SeConnection;
-import junit.framework.TestCase;
-import org.geotools.data.DataSourceException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -27,6 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.DataSourceException;
+
+import com.esri.sde.sdk.client.SeConnection;
 
 
 /**
@@ -187,9 +189,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //the configured parameters to test the connections' pool
         //availability
         Map params = new HashMap(this.connectionParameters);
-        params.put(connectionConfig.MIN_CONNECTIONS_PARAM,
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
             new Integer(MIN_CONNECTIONS));
-        params.put(connectionConfig.MAX_CONNECTIONS_PARAM,
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
             new Integer(MAX_CONNECTIONS));
 
         createPool(params);
@@ -210,15 +212,14 @@ public class ArcSDEConnectionPoolTest extends TestCase {
     public void testChecksLimits()
         throws DataSourceException, UnavailableConnectionException {
         int MIN_CONNECTIONS = 2;
-        int MAX_CONNECTIONS = 6;
 
         //override pool.minConnections and pool.maxConnections from
         //the configured parameters to test the connections' pool
         //availability
         Map params = new HashMap(this.connectionParameters);
-        params.put(connectionConfig.MIN_CONNECTIONS_PARAM,
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
             new Integer(MIN_CONNECTIONS));
-        params.put(connectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
 
         //this MUST fail, since maxConnections is lower than minConnections
         try {

@@ -58,14 +58,14 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     private static FilterCapabilities capabilities = new FilterCapabilities();
 
     static {
-        capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabilities.addType(AbstractFilter.GEOMETRY_CONTAINS);
-        capabilities.addType(AbstractFilter.GEOMETRY_CROSSES);
-        capabilities.addType(AbstractFilter.GEOMETRY_DISJOINT);
-        capabilities.addType(AbstractFilter.GEOMETRY_EQUALS);
-        capabilities.addType(AbstractFilter.GEOMETRY_INTERSECTS);
-        capabilities.addType(AbstractFilter.GEOMETRY_OVERLAPS);
-        capabilities.addType(AbstractFilter.GEOMETRY_WITHIN);
+        capabilities.addType(FilterType.GEOMETRY_BBOX);
+        capabilities.addType(FilterType.GEOMETRY_CONTAINS);
+        capabilities.addType(FilterType.GEOMETRY_CROSSES);
+        capabilities.addType(FilterType.GEOMETRY_DISJOINT);
+        capabilities.addType(FilterType.GEOMETRY_EQUALS);
+        capabilities.addType(FilterType.GEOMETRY_INTERSECTS);
+        capabilities.addType(FilterType.GEOMETRY_OVERLAPS);
+        capabilities.addType(FilterType.GEOMETRY_WITHIN);
     }
 
     /** DOCUMENT ME! */
@@ -77,6 +77,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     /**
      */
     public GeometryEncoderSDE() {
+    	//intentionally blank
     }
 
     /**
@@ -111,9 +112,9 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @return DOCUMENT ME!
      */
     public SeFilter[] getSpatialFilters() {
-        SeFilter[] filters = new SeFilter[sdeSpatialFilters.size()];
+        SeFilter[] filters = new SeFilter[this.sdeSpatialFilters.size()];
 
-        return (SeFilter[]) sdeSpatialFilters.toArray(filters);
+        return (SeFilter[]) this.sdeSpatialFilters.toArray(filters);
     }
 
     /**
@@ -124,10 +125,10 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @throws IllegalStateException DOCUMENT ME!
      */
     private String getLayerName() throws SeException {
-        if (sdeLayer == null) {
+        if (this.sdeLayer == null) {
             throw new IllegalStateException("SDE layer has not been set");
         }
-        return sdeLayer.getQualifiedName(); //+ "." + sdeLayer.getName();
+        return this.sdeLayer.getQualifiedName();
     }
 
     /**
@@ -138,8 +139,10 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @throws GeometryEncoderException DOCUMENT ME!
      */
     public void encode(Filter filter) throws GeometryEncoderException {
-        sdeSpatialFilters = new ArrayList();
-
+        this.sdeSpatialFilters = new ArrayList();
+        if(Filter.NONE.equals(filter)){
+        	return;
+        }
         if (capabilities.fullySupports(filter)) {
             filter.accept(this);
         } else {
@@ -157,44 +160,44 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     public void visit(GeometryFilter filter) {
         try {
             switch (filter.getFilterType()) {
-            case AbstractFilter.GEOMETRY_BBOX:
+            case FilterType.GEOMETRY_BBOX:
                 addSpatialFilter(filter, SeFilter.METHOD_ENVP, true);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_CONTAINS:
+            case FilterType.GEOMETRY_CONTAINS:
                 addSpatialFilter(filter, SeFilter.METHOD_PC, true);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_CROSSES:
+            case FilterType.GEOMETRY_CROSSES:
                 addSpatialFilter(filter, SeFilter.METHOD_LCROSS_OR_CP, true);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_DISJOINT:
+            case FilterType.GEOMETRY_DISJOINT:
                 addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, false);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_EQUALS:
+            case FilterType.GEOMETRY_EQUALS:
                 addSpatialFilter(filter, SeFilter.METHOD_IDENTICAL, true);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_INTERSECTS:
+            case FilterType.GEOMETRY_INTERSECTS:
                 addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, true);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_OVERLAPS:
+            case FilterType.GEOMETRY_OVERLAPS:
                 addSpatialFilter(filter, SeFilter.METHOD_II, true);
                 addSpatialFilter(filter, SeFilter.METHOD_PC, false);
                 addSpatialFilter(filter, SeFilter.METHOD_SC, false);
 
                 break;
 
-            case AbstractFilter.GEOMETRY_WITHIN:
+            case FilterType.GEOMETRY_WITHIN:
                 addSpatialFilter(filter, SeFilter.METHOD_SC, true);
 
                 break;
@@ -218,6 +221,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter the Fid Filter.
      */
     public void visit(FidFilter filter) {
+    	//intentionally blank
     }
 
     /**
@@ -241,14 +245,14 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
 
         // Should probably assert that attExpr's property name is equal to
         // spatialCol...
-        String spatialCol = sdeLayer.getSpatialColumn();
+        String spatialCol = this.sdeLayer.getSpatialColumn();
         Geometry geom = (Geometry) geomExpr.getLiteral();
 
         // To prevent errors in ArcSDE, we first trim the user's Filter
         // geometry to the extents of our layer.
         GeometryBuilder gb = GeometryBuilder.builderFor(Polygon.class);
-        SeExtent seExtent = sdeLayer.getExtent();
-        SeShape extent = new SeShape(sdeLayer.getCoordRef());
+        SeExtent seExtent = this.sdeLayer.getExtent();
+        SeShape extent = new SeShape(this.sdeLayer.getCoordRef());
         extent.generateRectangle(seExtent);
 
         Geometry layerEnv = gb.construct(extent);
@@ -266,15 +270,15 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         //and if so then just make a null seshape, as it shouldn't match
         //any features in arcsde. -ch
         if (geom.getClass() == GeometryCollection.class) {
-            filterShape = new SeShape(sdeLayer.getCoordRef());
+            filterShape = new SeShape(this.sdeLayer.getCoordRef());
         } else {
             gb = GeometryBuilder.builderFor(geom.getClass());
-            filterShape = gb.constructShape(geom, sdeLayer.getCoordRef());
+            filterShape = gb.constructShape(geom, this.sdeLayer.getCoordRef());
         }
         // Add the filter to our list
         SeShapeFilter shapeFilter = new SeShapeFilter(getLayerName(),
-                sdeLayer.getSpatialColumn(), filterShape, sdeMethod, truth);
-        sdeSpatialFilters.add(shapeFilter);
+                this.sdeLayer.getSpatialColumn(), filterShape, sdeMethod, truth);
+        this.sdeSpatialFilters.add(shapeFilter);
     }
 
     /**
@@ -283,6 +287,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter DOCUMENT ME!
      */
     public void visit(Filter filter) {
+    	//intentionally blank
     }
 
     /**
@@ -291,6 +296,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter DOCUMENT ME!
      */
     public void visit(BetweenFilter filter) {
+    	//intentionally blank
     }
 
     /**
@@ -299,6 +305,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter DOCUMENT ME!
      */
     public void visit(CompareFilter filter) {
+//    	intentionally blank
     }
 
     /**
@@ -307,6 +314,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter DOCUMENT ME!
      */
     public void visit(LikeFilter filter) {
+//    	intentionally blank
     }
 
     /**
@@ -348,6 +356,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param filter DOCUMENT ME!
      */
     public void visit(NullFilter filter) {
+//    	intentionally blank
     }
 
     /**
@@ -356,6 +365,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param expression DOCUMENT ME!
      */
     public void visit(AttributeExpression expression) {
+//    	intentionally blank
     }
 
     /**
@@ -364,6 +374,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param expression DOCUMENT ME!
      */
     public void visit(Expression expression) {
+//    	intentionally blank
     }
 
     /**
@@ -372,6 +383,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param expression DOCUMENT ME!
      */
     public void visit(LiteralExpression expression) {
+//    	intentionally blank
     }
 
     /**
@@ -380,6 +392,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param expression DOCUMENT ME!
      */
     public void visit(MathExpression expression) {
+//    	intentionally blank
     }
 
     /**
@@ -388,5 +401,6 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @param expression DOCUMENT ME!
      */
     public void visit(FunctionExpression expression) {
+//    	intentionally blank
     }
 }

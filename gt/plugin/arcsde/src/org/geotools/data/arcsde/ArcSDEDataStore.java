@@ -40,7 +40,6 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-import org.geotools.metadata.extent.GeographicExtent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,9 +146,9 @@ class ArcSDEDataStore extends AbstractDataStore {
      * <p>
      * Just for convenience, if the type name is not full qualified, it will be
      * prepended by the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string.
-     * Anyway, it is strongly recommended that you use <b>only</b> full
+     * Anyway, it is strongly recommended that you use <b>only </b> full
      * qualified type names. The rational for this is that the actual ArcSDE
-     * name of a featuretype is full qualified,  and more than a single type
+     * name of a featuretype is full qualified, and more than a single type
      * can exist with the same non qualified name, if they pertein to
      * different database users. So, if a non qualified name is passed, the
      * user name which will be prepended to it is the user used to create the
@@ -171,10 +170,11 @@ class ArcSDEDataStore extends AbstractDataStore {
             throw new NullPointerException("typeName is null");
         }
 
-        //connection used to retrieve the user name if a non qualified type name was passed in
+        // connection used to retrieve the user name if a non qualified type
+        // name was passed in
         SeConnection conn = null;
 
-        //check if it is not qualified and prepend it with "instance.user." 
+        // check if it is not qualified and prepend it with "instance.user."
         if (typeName.indexOf('.') == -1) {
             try {
                 conn = getConnectionPool().getConnection();
@@ -244,7 +244,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @throws NullPointerException if <code>featureType</code> is
      *         <code>null</code>
      * @throws DataSourceException if there is <b>not an available (free)
-     *         connection</b> to the ArcSDE instance(in that case maybe you
+     *         connection </b> to the ArcSDE instance(in that case maybe you
      *         need to increase the maximun number of connections for the
      *         connection pool), or an SeException exception is catched while
      *         creating the feature type at the ArcSDE instance (e.g. a table
@@ -264,27 +264,28 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         final String nonQualifiedTypeName = featureType.getTypeName();
 
-           if (nonQualifiedTypeName.indexOf('.') != -1) {
-               throw new IllegalArgumentException(
-                   "Please do not use type names that contains '.' (dots)");
-           }
+        if (nonQualifiedTypeName.indexOf('.') != -1) {
+            throw new IllegalArgumentException(
+                "Please do not use type names that contains '.' (dots)");
+        }
 
         // Create a new SeTable/SeLayer with the specified attributes....
         SeConnection connection = null;
         SeTable table = null;
         SeLayer layer = null;
 
-        //flag to know if the table was created by us when catching an exception.
+        // flag to know if the table was created by us when catching an
+        // exception.
         boolean tableCreated = false;
 
-        //placeholder to a catched exception to know in the finally block
-        //if we should cleanup the crap we left in the database
+        // placeholder to a catched exception to know in the finally block
+        // if we should cleanup the crap we left in the database
         Exception error = null;
 
         try {
             connection = connectionPool.getConnection();
 
-            //create a table with provided username
+            // create a table with provided username
             String qualifiedName = null;
 
             if (nonQualifiedTypeName.indexOf('.') == -1) {
@@ -320,19 +321,22 @@ class ArcSDEDataStore extends AbstractDataStore {
                     SeColumnDefinition newCol = ArcSDEAdapter
                         .createSeColumnDefinition(currAtt);
 
-                    ///////////////////////////////////////////////////////////////
-                    //HACK!!!!: this hack is just to avoid the error that occurs //
-                    //when adding a column wich is not nillable. Need to fix this//
-                    //but by now it conflicts with the requirement of creating   //
-                    //the schema with the correct attribute order.               //
-                    ///////////////////////////////////////////////////////////////
+                    // /////////////////////////////////////////////////////////////
+                    // HACK!!!!: this hack is just to avoid the error that
+                    // occurs //
+                    // when adding a column wich is not nillable. Need to fix
+                    // this//
+                    // but by now it conflicts with the requirement of creating
+                    // //
+                    // the schema with the correct attribute order. //
+                    // /////////////////////////////////////////////////////////////
                     newCol = new SeColumnDefinition(newCol.getName(),
                             newCol.getType(), newCol.getSize(),
                             newCol.getScale(), true);
 
-                    ///////////////////////////////////////////////////////////////
-                    //END of horrible HACK                                       //
-                    ///////////////////////////////////////////////////////////////
+                    // /////////////////////////////////////////////////////////////
+                    // END of horrible HACK //
+                    // /////////////////////////////////////////////////////////////
                     LOGGER.info("Adding column " + newCol.getName()
                         + " to the actual table.");
                     table.addColumn(newCol);
@@ -353,6 +357,7 @@ class ArcSDEDataStore extends AbstractDataStore {
             throw new DataSourceException(uce.getMessage(), uce);
         } finally {
             if ((error != null) && tableCreated) {
+                // TODO: remove table if created and then failed
             }
 
             connectionPool.release(connection);
@@ -384,13 +389,13 @@ class ArcSDEDataStore extends AbstractDataStore {
                 "Remove the line 'table.delete()' for production use!!!");
             table.delete();
         } catch (SeException e) {
-            //intentionally do nothing
+            // intentionally do nothing
         }
 
         LOGGER.info("creating table " + qualifiedName);
 
-        //create the table using DBMS default configuration keyword.
-        //valid keywords are defined in the dbtune table.
+        // create the table using DBMS default configuration keyword.
+        // valid keywords are defined in the dbtune table.
         table.create(tmpCol, "DEFAULTS");
         LOGGER.info("table " + qualifiedName + " created...");
 
@@ -412,13 +417,13 @@ class ArcSDEDataStore extends AbstractDataStore {
         LOGGER.info("setting spatial column name: " + spatialColName);
         layer.setSpatialColumnName(spatialColName);
 
-        //Set the shape types that can be inserted into this layer
+        // Set the shape types that can be inserted into this layer
         int seShapeTypes = ArcSDEAdapter.guessShapeTypes(geometryAtt);
         layer.setShapeTypes(seShapeTypes);
         layer.setGridSizes(1100, 0, 0);
         layer.setDescription("Created with GeoTools");
 
-        //Define the layer's Coordinate Reference
+        // Define the layer's Coordinate Reference
         CoordinateReferenceSystem crs = geometryAtt.getCoordinateSystem();
         SeCoordinateReference coordref = getGenericCoordRef();
         String WKT = null;
@@ -446,12 +451,13 @@ class ArcSDEDataStore extends AbstractDataStore {
         layer.setCoordRef(coordref);
         LOGGER.info("CRS applyed to the new layer.");
 
-        ///////////////////////////
-        //this param is used by ArcSDE for database initialization purposes
+        // /////////////////////////
+        // this param is used by ArcSDE for database initialization purposes
         int estInitFeatCount = 4;
 
-        //this param is used by ArcSDE as an estimation of the average number
-        //of points the layer's geometries will have, one never will know what for
+        // this param is used by ArcSDE as an estimation of the average number
+        // of points the layer's geometries will have, one never will know what
+        // for
         int estAvgPointsPerFeature = 4;
         LOGGER.info("Creating the layer...");
         layer.create(estInitFeatCount, estAvgPointsPerFeature);
@@ -479,7 +485,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     private static SeCoordinateReference getGenericCoordRef()
         throws SeException {
-        //create a sde CRS with a huge value range and 5 digits of presission
+        // create a sde CRS with a huge value range and 5 digits of presission
         SeCoordinateReference seCRS = new SeCoordinateReference();
         int shift = 600000;
         SeExtent validRange = new SeExtent(-shift, -shift, shift, shift);
@@ -532,7 +538,7 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         try {
             FeatureType schema = getSchema(typeName);
-            sdeQuery = ArcSDEAdapter.createSeQuery(this, schema, query);
+            sdeQuery = ArcSDEQuery.createQuery(this, schema, query);
             sdeQuery.prepareQuery();
             sdeQuery.execute();
 
@@ -541,16 +547,16 @@ class ArcSDEDataStore extends AbstractDataStore {
             reader = new DefaultFeatureReader(attReader, resultingSchema) {
                         protected Feature readFeature(AttributeReader atts)
                             throws IllegalAttributeException, IOException {
-                        	ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
-                        	Object [] currAtts = sdeAtts.readAll();
-                        	System.arraycopy(currAtts, 0, attributes, 0, currAtts.length);
-                        	/*
-                            for (int i = 0, ii = atts.getAttributeCount();
-                                    i < ii; i++) {
-                                attributes[i] = atts.read(i);
-                            }*/
+                            ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
+                            Object[] currAtts = sdeAtts.readAll();
+                            System.arraycopy(currAtts, 0, this.attributes, 0,
+                                currAtts.length);
 
-                            return resultingSchema.create(attributes,
+                            /*
+                             * for (int i = 0, ii = atts.getAttributeCount(); i < ii;
+                             * i++) { attributes[i] = atts.read(i); }
+                             */
+                            return resultingSchema.create(this.attributes,
                                 sdeAtts.readFID());
                         }
                     };
@@ -600,12 +606,14 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     protected Filter getUnsupportedFilter(String typeName, Filter filter) {
         try {
-            ArcSDEAdapter.FilterSet filters = ArcSDEAdapter.computeFilters(this,
+            ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(this,
                     typeName, filter);
 
             Filter result = filters.getUnsupportedFilter();
 
             if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Supported filters: " + filters.getSqlFilter()
+                    + " --- " + filters.getGeometryFilter());
                 LOGGER.fine("Unsupported filter: " + result.toString());
             }
 
@@ -677,14 +685,20 @@ class ArcSDEDataStore extends AbstractDataStore {
                 "handle");
         ArrayList list = new ArrayList();
 
-        // We really don't need any transaction handling here, just keep it simple as
-        // we are going to exhaust this feature reader immediately.  Really, this could
-        // consume a great deal of memory based on the query.  
-        // PENDING Jake Fear: Optimize this operation, exhausting the reader in this
-        // case could be a cause of real trouble later on.  I need to think through 
-        // the consequences of all of this.  Really the feature writer should 
-        // delegate to a FeatureReader for the features that are queried.  That way
-        // we can stream all of these goodies instead of having big fat chunks...
+        // We really don't need any transaction handling here, just keep it
+        // simple as
+        // we are going to exhaust this feature reader immediately. Really, this
+        // could
+        // consume a great deal of memory based on the query.
+        // PENDING Jake Fear: Optimize this operation, exhausting the reader in
+        // this
+        // case could be a cause of real trouble later on. I need to think
+        // through
+        // the consequences of all of this. Really the feature writer should
+        // delegate to a FeatureReader for the features that are queried. That
+        // way
+        // we can stream all of these goodies instead of having big fat
+        // chunks...
         //
         // All that said, this works until I get everything else completed....
         FeatureReader featureReader = getFeatureReader(query,
@@ -700,13 +714,13 @@ class ArcSDEDataStore extends AbstractDataStore {
             }
         }
 
-        // Well, this seems to come prepopulated with a state object, 
-        // but I can't seem to figure out why.  As such we check for
+        // Well, this seems to come prepopulated with a state object,
+        // but I can't seem to figure out why. As such we check for
         // and existing state, and check that states class as well. If
         // it is a state we already provided (or at least of a workable
-        // type) then we will proceed with it.  Otherwise, we must remove
+        // type) then we will proceed with it. Otherwise, we must remove
         // the state and replace it with an appropriate transaction
-        // state object that we understand.  This should not present any
+        // state object that we understand. This should not present any
         // danger as the default state could not possibly have come from
         // us, and as such, no uncommitted changes could be lost.
         // Jake Fear 6/25/2004
@@ -737,7 +751,7 @@ class ArcSDEDataStore extends AbstractDataStore {
 
     /**
      * Provides a <code>FeatureWriter</code> in an appropriate state for
-     * immediately adding new <code>Feature</code> instances to  the specified
+     * immediately adding new <code>Feature</code> instances to the specified
      * layer.
      *
      * @param typeName
@@ -787,23 +801,10 @@ class ArcSDEDataStore extends AbstractDataStore {
     protected int getCount(Query query) throws IOException {
         LOGGER.info("getCount");
 
-        ArcSDEQuery sdeQuery = null;
+        int count = ArcSDEQuery.calculateResultCount(this, query);
+        LOGGER.info("count: " + count);
 
-        try {
-            sdeQuery = ArcSDEAdapter.createSeQuery(this, query);
-            sdeQuery.prepareQuery();
-
-            int count = sdeQuery.calculateResultCount();
-            LOGGER.info("count: " + count);
-
-            return count;
-        } catch (IOException ex) {
-        	throw ex;
-        } finally {
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-        }
+        return count;
     }
 
     /**
@@ -821,34 +822,13 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @return the bounds, or null if too expensive
      *
      * @throws IOException
-     * @throws DataSourceException DOCUMENT ME!
      */
     protected Envelope getBounds(Query query) throws IOException {
         LOGGER.info("getBounds");
 
-        ArcSDEQuery sdeQuery = null;
+        Envelope ev = ArcSDEQuery.calculateQueryExtent(this, query);
+        LOGGER.info("bounds: " + ev);
 
-        try {
-            sdeQuery = ArcSDEAdapter.createSeQuery(this, query);
-            sdeQuery.prepareQuery();
-
-            Envelope ev = sdeQuery.calculateQueryExtent();
-            LOGGER.info("bounds: " + ev);
-
-            return ev;
-        } catch (Exception ex) {
-            if (ex instanceof IOException) {
-                throw (IOException) ex;
-            } else {
-                throw new DataSourceException("unable to get bounds: "
-                    + ex.getMessage(), ex);
-            }
-        } finally {
-            LOGGER.info("closing query for bounds");
-
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-        }
+        return ev;
     }
 }

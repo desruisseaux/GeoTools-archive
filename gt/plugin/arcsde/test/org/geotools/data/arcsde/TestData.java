@@ -16,6 +16,19 @@
  */
 package org.geotools.data.arcsde;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
@@ -37,17 +50,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.feature.DefaultFeatureCollections;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 
 /**
@@ -100,6 +102,7 @@ public class TestData {
      * @throws IOException DOCUMENT ME!
      */
     public TestData() throws IOException {
+//    	intentionally blank
     }
 
     /**
@@ -109,8 +112,8 @@ public class TestData {
      */
     public void setUp() throws IOException {
         URL folderUrl = getClass().getResource("/testData");
-        dataFolder = folderUrl.toExternalForm() + "/";
-        conProps = new Properties();
+        this.dataFolder = folderUrl.toExternalForm() + "/";
+        this.conProps = new Properties();
 
         String propsFile = "/testData/testparams.properties";
         InputStream in = getClass().getResourceAsStream(propsFile);
@@ -119,25 +122,25 @@ public class TestData {
             throw new IOException("cannot find test params: " + propsFile);
         }
 
-        conProps.load(in);
-        point_table = conProps.getProperty("point_table");
-        line_table = conProps.getProperty("line_table");
-        polygon_table = conProps.getProperty("polygon_table");
-        temp_table = conProps.getProperty("temp_table");
+        this.conProps.load(in);
+        this.point_table = this.conProps.getProperty("point_table");
+        this.line_table = this.conProps.getProperty("line_table");
+        this.polygon_table = this.conProps.getProperty("polygon_table");
+        this.temp_table = this.conProps.getProperty("temp_table");
 
-        if (point_table == null) {
+        if (this.point_table == null) {
             throw new IOException("point_table not defined in " + propsFile);
         }
 
-        if (line_table == null) {
+        if (this.line_table == null) {
             throw new IOException("line_table not defined in " + propsFile);
         }
 
-        if (polygon_table == null) {
+        if (this.polygon_table == null) {
             throw new IOException("polygon_table not defined in " + propsFile);
         }
 
-        if (temp_table == null) {
+        if (this.temp_table == null) {
             throw new IOException("temp_table not defined in " + propsFile);
         }
     }
@@ -147,7 +150,7 @@ public class TestData {
      */
     public void tearDown() {
         deleteTempTable();
-        dataStore = null;
+        this.dataStore = null;
 
         ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
         pfac.clear();
@@ -162,14 +165,14 @@ public class TestData {
      * @throws IOException DOCUMENT ME!
      */
     public ArcSDEDataStore getDataStore() throws IOException {
-        if (dataStore == null) {
+        if (this.dataStore == null) {
             ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
-            ConnectionConfig config = new ConnectionConfig(conProps);
+            ConnectionConfig config = new ConnectionConfig(this.conProps);
             ArcSDEConnectionPool pool = pfac.createPool(config);
             this.dataStore = new ArcSDEDataStore(pool);
         }
 
-        return dataStore;
+        return this.dataStore;
     }
 
     /**
@@ -178,7 +181,7 @@ public class TestData {
      * @return Returns the conProps.
      */
     public Properties getConProps() {
-        return conProps;
+        return this.conProps;
     }
 
     /**
@@ -196,7 +199,7 @@ public class TestData {
      * @return Returns the dataFolder.
      */
     public String getDataFolder() {
-        return dataFolder;
+        return this.dataFolder;
     }
 
     /**
@@ -214,7 +217,7 @@ public class TestData {
      * @return Returns the line_table.
      */
     public String getLine_table() {
-        return line_table;
+        return this.line_table;
     }
 
     /**
@@ -232,7 +235,7 @@ public class TestData {
      * @return Returns the point_table.
      */
     public String getPoint_table() {
-        return point_table;
+        return this.point_table;
     }
 
     /**
@@ -241,7 +244,7 @@ public class TestData {
      * @return Returns the temp_table.
      */
     public String getTemp_table() {
-        return temp_table;
+        return this.temp_table;
     }
 
     /**
@@ -259,7 +262,7 @@ public class TestData {
      * @return Returns the polygon_table.
      */
     public String getPolygon_table() {
-        return polygon_table;
+        return this.polygon_table;
     }
 
     /**
@@ -276,7 +279,7 @@ public class TestData {
      */
     public void deleteTempTable() {
         //only if the datastore was used
-        if (dataStore != null) {
+        if (this.dataStore != null) {
             ArcSDEConnectionPool pool = null;
 
             try {
@@ -325,7 +328,7 @@ public class TestData {
      */
     public void createTemptTable(boolean insertTestData)
         throws SeException, IOException, UnavailableConnectionException {
-        ArcSDEConnectionPool connPool = ((ArcSDEDataStore) getDataStore())
+        ArcSDEConnectionPool connPool = getDataStore()
             .getConnectionPool();
 
         deleteTempTable(connPool);
@@ -443,8 +446,6 @@ public class TestData {
      */
     private static void insertData(SeLayer layer, SeConnection conn,
         SeColumnDefinition[] colDefs) throws SeException {
-        // Largest 64 bit signed number = 9223372036854775807
-        long long_number = 9223372036854775806L;
 
         /*
          *   Define the names of the columns that data is to be inserted into.
@@ -769,7 +770,7 @@ public class TestData {
      */
     public FeatureCollection createTestFeatures(Class jtsGeomType,
         int numFeatures) throws IOException, IllegalAttributeException {
-        FeatureCollection col = DefaultFeatureCollections.newCollection();
+        FeatureCollection col = FeatureCollections.newCollection();
         FeatureType type = getDataStore().getSchema(getTemp_table());
         Object[] values = new Object[type.getAttributeCount()];
 

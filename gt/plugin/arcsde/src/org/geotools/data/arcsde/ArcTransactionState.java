@@ -25,90 +25,93 @@ import org.geotools.data.Transaction;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 
-
 /**
  * Externalizes transactional state for <code>ArcSDEFeatureWriter</code>
  * instances.
- *
+ * 
  * @author Jake Fear
  * @version
  */
 class ArcTransactionState implements Transaction.State {
-    private static final Logger LOGGER = Logger.getLogger(ArcTransactionState.class.getPackage()
-                                                                                   .getName());
-    private SeConnection connection;
-    private ArcSDEDataStore dataStore;
+	private static final Logger LOGGER = Logger
+			.getLogger(ArcTransactionState.class.getPackage().getName());
 
-    /**
-     * Creates a new ArcTransactionState object.
-     *
-     * @param store DOCUMENT ME!
-     */
-    public ArcTransactionState(ArcSDEDataStore store) {
-        this.dataStore = store;
-    }
+	private SeConnection connection;
 
-    /**
-     *
-     */
-    public void commit() throws IOException {
-        try {
-            if (connection != null) {
-                connection.commitTransaction();
-            }
-        } catch (SeException se) {
-            LOGGER.log(Level.WARNING, se.getMessage(), se);
-            throw new IOException(se.getMessage());
-        }
-    }
+	private ArcSDEDataStore dataStore;
 
-    /**
-     *
-     */
-    public void rollback() throws IOException {
-        try {
-            if (connection != null) {
-                connection.rollbackTransaction();
-            }
-        } catch (SeException se) {
-            LOGGER.log(Level.WARNING, se.getMessage(), se);
-            throw new IOException(se.getMessage());
-        }
-    }
+	/**
+	 * Creates a new ArcTransactionState object.
+	 * 
+	 * @param store
+	 *            DOCUMENT ME!
+	 */
+	public ArcTransactionState(ArcSDEDataStore store) {
+		this.dataStore = store;
+	}
 
-    /**
-     *
-     */
-    public void addAuthorization(String authId) {
-    }
+	/**
+	 * 
+	 */
+	public void commit() throws IOException {
+		try {
+			if (connection != null) {
+				connection.commitTransaction();
+			}
+		} catch (SeException se) {
+			LOGGER.log(Level.WARNING, se.getMessage(), se);
+			throw new IOException(se.getMessage());
+		}
+	}
 
-    /**
-     *
-     */
-    public void setTransaction(Transaction transaction) {
-        if ((transaction == null) && (connection != null)) {
-            dataStore.getConnectionPool().release(connection);
-        } else if (transaction != null) {
-            try {
-                connection = dataStore.getConnectionPool().getConnection();
-                connection.setTransactionAutoCommit(0);
-                connection.startTransaction();
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, e.getMessage(), e);
-                throw new RuntimeException(e.getMessage());
-            }
-        } else {
-            throw new RuntimeException("Unexpected state.");
-        }
-    }
+	/**
+	 * 
+	 */
+	public void rollback() throws IOException {
+		try {
+			if (connection != null) {
+				connection.rollbackTransaction();
+			}
+		} catch (SeException se) {
+			LOGGER.log(Level.WARNING, se.getMessage(), se);
+			throw new IOException(se.getMessage());
+		}
+	}
 
-    /**
-     * Used only within the package to provide access to a single connection on
-     * which this transaction is being conducted.
-     *
-     * @return DOCUMENT ME!
-     */
-    SeConnection getConnection() {
-        return connection;
-    }
+	/**
+	 * 
+	 */
+	public void addAuthorization(String authId) {
+		// intentionally blank
+	}
+
+	/**
+	 * 
+	 */
+	public void setTransaction(Transaction transaction) {
+		if ((transaction == null) && (this.connection != null)) {
+			this.dataStore.getConnectionPool().release(this.connection);
+		} else if (transaction != null) {
+			try {
+				connection = dataStore.getConnectionPool().getConnection();
+				connection.setTransactionAutoCommit(0);
+				connection.startTransaction();
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, e.getMessage(), e);
+				throw new RuntimeException(e.getMessage());
+			}
+		} else {
+			throw new RuntimeException("Unexpected state.");
+		}
+	}
+
+	/**
+	 * Used only within the package to provide access to a single connection on
+	 * which this transaction is being conducted.
+	 * 
+	 * @return DOCUMENT ME!
+	 */
+	SeConnection getConnection() {
+		return connection;
+	}
 }

@@ -55,6 +55,7 @@ public class SQLEncoderSDE extends SQLEncoder
      * Creates a new SQLEncoderSDE object.
      */
     public SQLEncoderSDE() {
+//    	intentionally blank
     }
 
     /**
@@ -72,8 +73,8 @@ public class SQLEncoderSDE extends SQLEncoder
      */
     public void visit(AttributeExpression expression) throws RuntimeException {
         try {
-            out.write(sdeLayer.getQualifiedName());
-            out.write('.');
+        	this.out.write(this.sdeLayer.getQualifiedName());
+        	this.out.write('.');
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         } catch (SeException see) {
@@ -140,7 +141,7 @@ public class SQLEncoderSDE extends SQLEncoder
             return;
         }
 
-        String fidField = sdeLayer.getSpatialColumn();
+        String fidField = this.sdeLayer.getSpatialColumn();
 
         try {
             StringBuffer sb = new StringBuffer();
@@ -161,7 +162,7 @@ public class SQLEncoderSDE extends SQLEncoder
             }
 
             //System.err.println("QUERY: " + sb.toString());
-            out.write(sb.toString());
+            this.out.write(sb.toString());
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }

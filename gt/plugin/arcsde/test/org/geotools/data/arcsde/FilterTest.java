@@ -82,7 +82,7 @@ public class FilterTest extends TestCase {
         storeParams.put("instance", "sde");
         storeParams.put("user", "sde");
         storeParams.put("password", "sde");
-        dataStore = DataStoreFinder.getDataStore(storeParams);
+        this.dataStore = DataStoreFinder.getDataStore(storeParams);
     }
 
     /**
@@ -203,7 +203,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testDisjointFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -226,7 +226,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testContainsFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -249,7 +249,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testBBoxFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -272,7 +272,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testIntersectsFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -295,7 +295,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testOverlapsFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -318,7 +318,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testWithinFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -341,7 +341,7 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testCrossesFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -364,13 +364,13 @@ public class FilterTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testEqualFilter() throws Exception {
-        FeatureType ft = dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         FilterFactory ff = FilterFactory.createFilterFactory();
 
         // Get a geometry for equality comparison
         Filter fidFilter = ff.createFidFilter("SDE.SDE.JAKARTA.101");
-        FeatureReader fr = dataStore.getFeatureReader(new DefaultQuery(
+        FeatureReader fr = this.dataStore.getFeatureReader(new DefaultQuery(
                     "SDE.SDE.JAKARTA", fidFilter), Transaction.AUTO_COMMIT);
         Feature feature = fr.next();
         fr.close();
@@ -406,7 +406,7 @@ public class FilterTest extends TestCase {
         System.err.println("Performing slow read...");
 
         long startTime = System.currentTimeMillis();
-        FeatureReader fr = dataStore.getFeatureReader(allJakarta,
+        FeatureReader fr = this.dataStore.getFeatureReader(allJakarta,
                 Transaction.AUTO_COMMIT);
         FilteringFeatureReader ffr = new FilteringFeatureReader(fr, filter);
         ArrayList slowResults = new ArrayList();
@@ -423,7 +423,7 @@ public class FilterTest extends TestCase {
 
         DefaultQuery filteredJakarta = new DefaultQuery("SDE.SDE.JAKARTA",
                 filter);
-        fr = dataStore.getFeatureReader(filteredJakarta, Transaction.AUTO_COMMIT);
+        fr = this.dataStore.getFeatureReader(filteredJakarta, Transaction.AUTO_COMMIT);
 
         ArrayList fastResults = new ArrayList();
         collectResults(fr, fastResults);
