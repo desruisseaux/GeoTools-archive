@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
-import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.io.TableWriter;
@@ -45,6 +44,7 @@ import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
@@ -212,12 +212,12 @@ public final class FactoryFinder {
                         "4269=GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]]"
                         );
             } catch (NoSuchElementException e) {
-                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage() );
+                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage(), "EPSG", code ); //$NON-NLS-1$
             } catch (FactoryException e) {
-                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage() );
+                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage(), "EPSG", code ); //$NON-NLS-1$
             }
         }
-        throw new NoSuchAuthorityCodeException( "Unabled to locate definition of '"+code+"'"); //$NON-NLS-1$
+        throw new NoSuchAuthorityCodeException( "Unabled to locate code", "not found", code); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     /**
