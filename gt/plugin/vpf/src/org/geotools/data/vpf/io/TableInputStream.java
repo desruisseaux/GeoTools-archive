@@ -81,7 +81,7 @@ public class TableInputStream extends VPFInputStream implements FileConstants, D
      */
     public VPFHeader readHeader() throws VPFHeaderFormatException, IOException {
         byte[] fourBytes = new byte[4];
-        input.read(fourBytes);
+        input.readFully(fourBytes);
 
         char order = readChar();
         char ctrl = order;

@@ -381,7 +381,7 @@ public abstract class VPFInputStream implements FileConstants,
 
             byte[] dataBytes = new byte[instancesCount * DataUtils.getDataTypeSize(
                                                                  dataType)];
-            input.read(dataBytes);
+            input.readFully(dataBytes);
             result = DataUtils.decodeData(dataBytes, dataType);
 
             break;
@@ -452,22 +452,12 @@ public abstract class VPFInputStream implements FileConstants,
      */
     protected byte[] readNumber(int cnt) throws IOException {
         byte[] dataBytes = new byte[cnt];
-        int res = input.read(dataBytes);
-
-        if (res == cnt) {
-            if (byteOrder == LITTLE_ENDIAN_ORDER) {
-                dataBytes = DataUtils.toBigEndian(dataBytes);
-            }
-
-            return dataBytes;
-        } else {
-            if (res < 1) {
-                throw new EOFException("No more bytes in input stream");
-            } else {
-                throw new VPFDataException(
-                        "Inssufficient bytes in input stream : " + res);
-            }
+        input.readFully(dataBytes);
+        if (byteOrder == LITTLE_ENDIAN_ORDER) {
+            dataBytes = DataUtils.toBigEndian(dataBytes);
         }
+
+        return dataBytes;
     }
 
     /**
@@ -517,7 +507,7 @@ public abstract class VPFInputStream implements FileConstants,
         tripletData[0] = tripletDef;
 
         if (dataSize > 0) {
-            input.read(tripletData, 1, dataSize);
+            input.readFully(tripletData, 1, dataSize);
         }
 
         return new TripletId(tripletData);

@@ -715,7 +715,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
             byte[] dataBytes = new byte[instancesCount * DataUtils
                 .getDataTypeSize(dataType)];
-            inputStream.read(dataBytes);
+            inputStream.readFully(dataBytes);
             result = DataUtils.decodeData(dataBytes, dataType);
 
             break;
@@ -796,7 +796,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected void readHeader() throws VPFHeaderFormatException, IOException {
         byte[] fourBytes = new byte[4];
-        inputStream.read(fourBytes);
+        inputStream.readFully(fourBytes);
 
         byteOrder = readChar();
 
@@ -864,22 +864,13 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected byte[] readNumber(int cnt) throws IOException {
         byte[] dataBytes = new byte[cnt];
-        int res = inputStream.read(dataBytes);
-
-        if (res == cnt) {
-            if (byteOrder == LITTLE_ENDIAN_ORDER) {
-                dataBytes = DataUtils.toBigEndian(dataBytes);
-            }
-
-            return dataBytes;
-        } else {
-            if (res < 1) {
-                throw new EOFException("No more bytes in input stream");
-            } else {
-                throw new VPFDataException(
-                    "Inssufficient bytes in input stream : " + res);
-            }
+        inputStream.readFully(dataBytes);
+        
+        if (byteOrder == LITTLE_ENDIAN_ORDER) {
+            dataBytes = DataUtils.toBigEndian(dataBytes);
         }
+
+        return dataBytes;
     }
 
     /**
@@ -941,7 +932,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         tripletData[0] = tripletDef;
 
         if (dataSize > 0) {
-            inputStream.read(tripletData, 1, dataSize);
+            inputStream.readFully(tripletData, 1, dataSize);
         }
 
         return new TripletId(tripletData);
@@ -982,6 +973,9 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     public void close() throws IOException{
         inputStream.close();
+        if (variableIndex != null) {
+            variableIndex.close();
+        }
     }
     /**
      * Sets the position in the stream
