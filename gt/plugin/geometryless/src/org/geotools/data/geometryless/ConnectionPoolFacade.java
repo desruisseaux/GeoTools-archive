@@ -42,7 +42,7 @@ public class ConnectionPoolFacade implements ConnectionPoolDataSource {
    }
    catch ( Exception e )
    {
-  	throw new SQLException("Failed to instantiate connection pool using " + driver );
+  	throw new SQLException("Failed to instantiate connection pool using " + driver + "(" + e + ")" );
    }
     }
 
@@ -72,7 +72,7 @@ public class ConnectionPoolFacade implements ConnectionPoolDataSource {
         }
 	    catch ( Exception e )
 	   {
-		throw new SQLException("Failed to instantiate connection pool using " + _dbURL );
+		throw new SQLException("Failed to instantiate connection pool using " + _dbURL + "(" + e + ")" );
 	   }
     
     }

@@ -117,7 +117,7 @@ public class JDBCDataStoreTest extends TestCase {
         try {
             LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
-            setupTestTable(connPool.getConnection());
+           // setupTestTable(connPool.getConnection());
             dstore = new JDBCDataStore(connPool, TEST_NS);
 
             dstore.setFIDMapper(
@@ -149,12 +149,20 @@ public class JDBCDataStoreTest extends TestCase {
         //        dbdflag;int4;4;0;;YES;;
         //        the_geom;geometry;-1;0;;YES;;
 
-        Statement st = conn.createStatement();
+        Statement st = null ;
         try {
-            st.execute("DROP TABLE testset");
-        } catch (Exception e) {
-        }
-        st.execute(
+             	         st = conn.createStatement();
+ 	          st.execute("DROP TABLE testset");
+
+	} catch (Exception e) {
+		
+	}finally
+	{
+		if ( st != null ) st.close();
+	}
+
+             st = conn.createStatement();  
+                   st.execute(
             "CREATE TABLE testset ( gid integer, area double, perimeter double, testb_ integer, "
                 + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, x double, y double)");
         st.close();
@@ -200,6 +208,7 @@ public class JDBCDataStoreTest extends TestCase {
     public void dropTestTable(Connection conn) throws SQLException {
         Statement st = conn.createStatement();
         st.execute("DROP TABLE testset");
+        st.close();
     }
 
     //todo assert on schema.

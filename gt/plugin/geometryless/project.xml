@@ -68,12 +68,18 @@
         <groupId>mysql</groupId>
         <version>3.0.9</version>
     </dependency>
+    <dependency>
+        <artifactId>jtds</artifactId>
+        <groupId>mssql</groupId>
+        <version>0.9</version>
+    </dependency>
   </dependencies>
   <build>
   <unitTest>
     <!-- This section excludes the tests -->
     <excludes>
       <exclude>**/M*.java</exclude>
+            <exclude>**/L*.java</exclude>
        <exclude>**/JDBCTestSuite.java</exclude>
        <exclude>**/JDBCDataStoreAPITest.java</exclude>
         <exclude>**/ServiceTest.java</exclude>
