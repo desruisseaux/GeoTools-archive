@@ -24,6 +24,8 @@ import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 
 
 /**
@@ -200,7 +202,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         if (is_loose_bbox != null) {
             dataStore.setLooseBbox(is_loose_bbox.booleanValue());
         }
-
+        
         return dataStore;
     }
 

@@ -20,6 +20,9 @@ import org.postgresql.PGStatement;
  */
 public class OIDFidMapper extends AbstractFIDMapper {
 
+    /** <code>serialVersionUID</code> field */
+    private static final long serialVersionUID = 3257569520561763632L;
+
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
      */

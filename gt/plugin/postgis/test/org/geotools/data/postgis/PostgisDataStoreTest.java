@@ -18,6 +18,7 @@ package org.geotools.data.postgis;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
@@ -29,6 +30,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
@@ -53,12 +55,12 @@ import org.geotools.filter.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -497,5 +499,57 @@ public class PostgisDataStoreTest extends TestCase {
         state.rollback();
     }
 
+    public void testFIDCreation() throws Exception{
+        
+        FeatureStore store=(FeatureStore) dstore.getFeatureSource(dstore.getTypeNames()[0]);
+        final FeatureType type=store.getSchema();
+        Object[] attrs=new Object[type.getAttributeCount()];
+        for( int i = 0; i < attrs.length; i++ ) {
+            attrs[i]=type.getAttributeType(i).createDefaultValue();
+        }
+        final Feature feature=type.create(attrs);
+        Class geomType=type.getDefaultGeometry().getType();
+        
+        GeometryFactory f=new GeometryFactory();
+        LinearRing ring=f.createLinearRing(new Coordinate[]{new Coordinate(10,10),new Coordinate(10,10),new Coordinate(10,10),new Coordinate(10,10)});
+        Polygon poly=f.createPolygon(ring, new LinearRing[]{});
+        Geometry geom=f.createMultiPolygon(new Polygon[]{poly});
+        feature.setDefaultGeometry(geom);
+        String fid=feature.getID();
+        Set fids = store.addFeatures(new FeatureReader(){
+
+            boolean more = true;
+
+            public FeatureType getFeatureType() {
+                return feature.getFeatureType();
+            }
+
+            public Feature next() throws NoSuchElementException {
+                more = false;
+                return feature;
+            }
+
+            public boolean hasNext() {
+                return more;
+            }
+
+            public void close() {
+                // do nothing
+            }
+
+        });
+        FeatureReader reader = store
+                .getFeatures(
+                        FilterFactory.createFilterFactory().createFidFilter(
+                                (String) fids.iterator().next())).reader();
+        try {
+            Feature f2 = reader.next();
+            assertNotNull(f);
+        } finally {
+            if (reader != null)
+                reader.close();
+        }
+    }
+    
     //assertEquals( fixture.roadFeatures.length-1, data.features( "road" ).size() );
 }

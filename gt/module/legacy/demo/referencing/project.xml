@@ -142,7 +142,7 @@
              </dependency>
     <dependency>
       <id>JTS</id>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.6</version>
       <type>jar</type>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>

@@ -16,10 +16,13 @@
  */
 package org.geotools.data.postgis.fidmapper;
 
+import java.io.IOException;
 import java.sql.Connection;
 
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
+import org.geotools.feature.FeatureType;
 
 /**
  * Postgis specific FIDMapperFactory that uses the {@link org.geotools.data.postgis.fidmapper.OIDFidMapper OIDFidMapper}
@@ -39,4 +42,19 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
         String tableName, Connection connection, ColumnInfo[] colInfos) {
         return new OIDFidMapper();
     }
+//
+//    /**
+//     * @see org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory#getMapper(org.geotools.feature.FeatureType)
+//     */
+//    public FIDMapper getMapper( FeatureType featureType ) {
+//        return new TypedFIDMapper(new OIDFidMapper(), featureType.getTypeName());
+//    }
+//    
+//    /**
+//     * @see org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory#getMapper(java.lang.String, java.lang.String, java.lang.String, java.sql.Connection)
+//     */
+//    public FIDMapper getMapper( String catalog, String schema, String tableName,
+//            Connection connection ) throws IOException {
+//        return new TypedFIDMapper(new OIDFidMapper(), tableName);
+//    }
 }
