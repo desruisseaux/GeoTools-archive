@@ -41,8 +41,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
@@ -276,15 +276,6 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         throw new InvalidParameterValueException(Resources.format(
                 ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)), name, x);
     }
-
-    /**
-     * Returns the {@linkplain MathTransformProvider provider} for this map projection.
-     *
-     * @return The provider for this map projection.
-     *
-     * @todo
-     */
-//    public abstract OperationMethod getParameterValues();
     
     /**
      * Returns the value for the specified parameter name. Values are always returned
@@ -294,6 +285,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @param  name The parameter name as one of WKT name.
      * @return The parameter value for the specified name.
      * @throws InvalidParameterNameException if <code>name</code> is not a know parameter name.
+     *
+     * @todo
      */
     public double getParameterValue(String name) throws InvalidParameterNameException {
         name = name.trim().toLowerCase();
@@ -326,13 +319,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     
     //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////                          TRANSFORMATION METHODS                          ////////
-    ////////                                                                          ////////
     ////////             Includes an inner class for inverse projections.             ////////
     ////////                                                                          ////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
@@ -806,11 +796,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     
     //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////      IMPLEMENTATION OF Object AND MathTransform2D STANDARD METHODS       ////////
     ////////                                                                          ////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
@@ -855,11 +843,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     
     //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////                           FORMULAS FROM SNYDER                           ////////
     ////////                                                                          ////////
-    //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
@@ -899,5 +885,95 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         return Math.tan(0.5 * ((Math.PI/2) - phi)) /
                Math.pow((1-sinphi)/(1+sinphi), 0.5*excentricity);
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDER                                 ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * The base provider for {@link MapProjection}s.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static abstract class Provider extends MathTransformProvider {
+        /**
+         * Serial number for interoperability with different versions.
+         */
+        private static final long serialVersionUID = 6280666068007678702L;
+
+        /**
+         * The operation parameter descriptor for the {@link #semiMajor semiMajor} parameter value.
+         * Valid values range is from 0 to infinity. This parameter is mandatory.
+         *
+         * @todo Would like to start range from 0 <u>exclusive</u>.
+         */
+        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.OperationParameter(
+                "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * The operation parameter descriptor for the {@link #semiMinor semiMinor} parameter value.
+         * Valid values range is from 0 to infinity. This parameter is mandatory.
+         *
+         * @todo Would like to start range from 0 <u>exclusive</u>.
+         */
+        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.OperationParameter(
+                "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         */
+        public static final OperationParameter CENTRAL_MERIDIAN = new org.geotools.parameter.OperationParameter(
+                "central_meridian", 0, -180, 180, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final OperationParameter LATITUDE_OF_ORIGIN = new org.geotools.parameter.OperationParameter(
+                "latitude_of_origin", 0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the {@link #scaleFactor scaleFactor}
+         * parameter value. Valid values range is from 0 to infinity. Default value is 1.
+         *
+         * @todo Would like to start range from 0 <u>exclusive</u>.
+         */
+        public static final OperationParameter SCALE_FACTOR = new org.geotools.parameter.OperationParameter(
+                "scale_factor", 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
+
+        /**
+         * The operation parameter descriptor for the {@link #falseEasting falseEasting}
+         * parameter value. Valid values range is unrestricted. Default value is 0.
+         */
+        public static final OperationParameter FALSE_EASTING = new org.geotools.parameter.OperationParameter(
+                "false_easting", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * The operation parameter descriptor for the {@link #falseNorthing falseNorthing}
+         * parameter value. Valid values range is unrestricted. Default value is 0.
+         */
+        public static final OperationParameter FALSE_NORTHING = new org.geotools.parameter.OperationParameter(
+                "false_northing", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
+
+        /**
+         * Constructs a math transform provider from a set of parameters. The provider
+         * {@linkplain #getIdentifiers identifiers} will be the same than the parameter
+         * ones.
+         *
+         * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+         * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+         * @param parameters The set of parameters (never <code>null</code>).
+         */
+        public Provider(final OperationParameterGroup parameters) {
+            super(2, 2, parameters);
+        }
     }
 }

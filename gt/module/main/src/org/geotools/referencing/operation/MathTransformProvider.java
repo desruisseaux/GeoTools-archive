@@ -50,11 +50,11 @@ import org.geotools.resources.cts.ResourceKeys;
  * An {@linkplain OperationMethod operation method} capable to creates a {@linkplain MathTransform
  * math transform} from set of {@linkplain GeneralParameterValue parameter values}.
  * Implementations of this class should be listed in the following file:
- * <br><br>
+ * <br>
  * <blockquote>
  * <code>META-INF/services/org.geotools.referencing.operation.OperationProvider</code>
  * </blockquote>
- * <br><br>
+ * <br>
  * The {@linkplain MathTransformFactory math transform factory} will parse this file in order
  * to gets all available providers on a system. If this file is bundle in many JAR files, the
  * {@link MathTransformFactory math transform factory} will read all of them.
@@ -302,14 +302,14 @@ public abstract class MathTransformProvider extends OperationMethod {
      *
      * @param  group The parameter value group to search into.
      * @param  param The parameter to look for.
-     * @return The requested parameter value.
+     * @return The requested parameter value in standard unit.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static double doubleValue(final ParameterValueGroup group,
                                         final OperationParameter  param)
             throws ParameterNotFoundException
     {
-        return getValue(group, param).doubleValue();
+        return getValue(group, param).doubleValue(param.getUnit());
     }
 
     /**

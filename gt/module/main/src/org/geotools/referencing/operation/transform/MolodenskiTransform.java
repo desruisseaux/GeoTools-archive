@@ -46,7 +46,8 @@ import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * The Molodensky transformation (EPSG code 9604) transforms three dimensional 
+ * Two- or three-dimensional datum shift using the Molodensky transformation.
+ * The Molodensky transformation (EPSG code 9604) transforms two or three dimensional
  * geographic points from one geographic coordinate reference system to another
  * (a datum shift), using three shift parameters (delta X, delta Y, delta Z) and
  * the difference between the semi-major axis and flattenings of the two ellipsoids.
@@ -137,9 +138,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * @param dy       The <var>y</var> translation in meters.
      * @param dz       The <var>z</var> translation in meters.
      */
-    protected MolodenskiTransform(final double  a, final double  b, final boolean source3D,
-                                  final double ta, final double tb, final boolean target3D,
-                                  final double dx, final double dy, final double  dz)
+    public MolodenskiTransform(final double  a, final double  b, final boolean source3D,
+                               final double ta, final double tb, final boolean target3D,
+                               final double dx, final double dy, final double  dz)
     {
         this.source3D = source3D;
         this.target3D = target3D;
@@ -225,7 +226,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 //       (overwritting the source array  while source and target
                 //       dimensions are not the same).   This case occurs enough
                 //       in the CTS implementation...
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Not yet implemented.");
             }
             step = -getDimSource();
             srcOff -= (numPts-1)*step;

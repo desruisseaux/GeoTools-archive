@@ -321,7 +321,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
         /**
          * Serial number for interoperability with different versions.
          */
-        private static final long serialVersionUID = -5838840021166379987L;;
+        private static final long serialVersionUID = -5838840021166379987L;
 
         /**
          * The operation parameter descriptor for the {@link #base base} parameter value.
