@@ -8,7 +8,7 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.wms.WMS1_1_0.GetMapRequest;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 
 import java.net.URL;
@@ -59,7 +59,7 @@ public class WMS1_1_1 extends WMS1_1_0 {
      * @param server DOCUMENT ME!
      * @return DOCUMENT ME!
      */
-    public GetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
+    public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
         return new GetCapsRequest(server);
     }
 

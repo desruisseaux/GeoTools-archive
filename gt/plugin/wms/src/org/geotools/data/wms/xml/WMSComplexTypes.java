@@ -1,6 +1,18 @@
 /*
- * Created on 27-Oct-2004 TODO To change the template for this generated file go to Window - Preferences - Java - Code
- * Style - Code Templates
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.wms.xml;
 
@@ -49,10 +61,6 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-/**
- * @author Richard Gould TODO To change the template for this generated type comment go to Window - Preferences - Java -
- *         Code Style - Code Templates
- */
 public class WMSComplexTypes {
     static class OperationType extends WMSComplexType {
         private static final WMSComplexType instance = new OperationType();
@@ -1592,8 +1600,23 @@ public class WMSComplexTypes {
                     request.setGetFeatureInfo((WMSOperationType) value[i].getValue());                    
                 }
 
-                //TODO WMS-SLD requests here
-
+                if (sameName(elems[3], value[i])) {
+                    request.setDescribeLayer((WMSOperationType) value[i].getValue());
+                }
+                
+                if (sameName(elems[4], value[i])) {
+                    request.setGetLegendGraphic((WMSOperationType) value[i].getValue());
+                }
+                
+                if (sameName(elems[5], value[i])) {
+                    request.setGetStyles((WMSOperationType) value[i].getValue());
+                }
+                
+                if (sameName(elems[6], value[i])) {
+                    request.setPutStyles((WMSOperationType) value[i].getValue());
+                }
+                
+                //TODO extended operations here
             }
 
             return request;

@@ -6,18 +6,23 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -46,6 +51,35 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertEquals(properties.get("SERVICE"), "WMS");
 	}
 	
+    public void testCreateDescribeLayerRequest() throws Exception {
+        WebMapServer wms = new CustomWMS(server);
+        DescribeLayerRequest request = wms.createDescribeLayerRequest();
+        assertNotNull(request);
+        request.setLayers("land_fn,park,drain_fn,road,popplace");
+        System.out.println(request.getFinalURL());
+        DescribeLayerResponse response = (DescribeLayerResponse) wms.issueRequest(request);
+        assertNotNull(response);
+        
+        LayerDescription[] layerDescs = response.getLayerDescs();
+        assertEquals(layerDescs.length, 5);
+        
+        assertEquals(layerDescs[0].getName(), "land_fn");
+        assertEquals(layerDescs[1].getName(), "park");
+        assertEquals(layerDescs[2].getName(), "drain_fn");
+        assertEquals(layerDescs[3].getName(), "road");
+        assertEquals(layerDescs[4].getName(), "popplace");
+        
+        assertEquals(layerDescs[1].getWfs(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswfs_gmap?"));
+        assertEquals(layerDescs[4].getWfs(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswfs_gmap?"));
+        
+        assertEquals(layerDescs[1].getQueries().length, 1);
+        assertEquals(layerDescs[4].getQueries().length, 1);
+        
+        assertEquals(layerDescs[1].getQueries()[0], "park");
+        assertEquals(layerDescs[4].getQueries()[0], "popplace");
+        
+    }
+    
 	public void testCreateParser() throws Exception {
 		WMSCapabilities capabilities = createCapabilities("1.1.0Capabilities.xml");
 		

@@ -20,7 +20,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 
@@ -33,7 +34,7 @@ import org.geotools.data.wms.request.GetMapRequest;
  * 
  * <ul>
  * <li>
- * GetCapabilitiesRequest
+ * AbstractGetCapabilitiesRequest
  * </li>
  * <li>
  * GetMapRequest
@@ -51,7 +52,7 @@ import org.geotools.data.wms.request.GetMapRequest;
  * 
  * <ul>
  * <li>
- * WebMapServer - uses a GetCapabilitiesRequest during version negotiation.
+ * WebMapServer - uses a AbstractGetCapabilitiesRequest during version negotiation.
  * </li>
  * </ul>
  * </p>
@@ -80,9 +81,9 @@ public abstract class Specification {
     /**
      * Factory method to create WMSGetCapabilities Request
      * @param server the URL that points to the server's getCapabilities document
-     * @return a configured GetCapabilitiesRequest that can be used to access the Document 
+     * @return a configured AbstractGetCapabilitiesRequest that can be used to access the Document 
      */
-    public abstract GetCapabilitiesRequest createGetCapabilitiesRequest(
+    public abstract AbstractGetCapabilitiesRequest createGetCapabilitiesRequest(
         URL server);
 
     /**
@@ -109,4 +110,14 @@ public abstract class Specification {
      * @return a GetFeatureInfoRequest that can be configured and used
      */
     public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, GetMapRequest getMapRequest, Set queryableLayers, String[] formats );
+    
+    /**
+     * Creates a DescribeLayer request which can be used to retrieve
+     * information about specific layers on the Web Map Server.
+     * 
+     * @param onlineResource the location where the request can be made
+     * @return a DescribeLayerRequest to be configured and then passed to the Web Map Server
+     * @throws UnsupportedOperationException if the version of the specification doesn't support this request
+     */
+    public abstract DescribeLayerRequest createDescribeLayerRequest( URL onlineResource ) throws UnsupportedOperationException;
 }

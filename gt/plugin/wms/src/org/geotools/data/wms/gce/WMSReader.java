@@ -250,8 +250,13 @@ public class WMSReader implements GridCoverageReader {
         String bbox = minx + "," + miny + "," + maxx + "," + maxy;
         request.setProperty("BBOX", bbox);
 
-        GetMapResponse response = (GetMapResponse) wms.issueRequest(request);
-
+        GetMapResponse response;
+        try {
+            response = (GetMapResponse) wms.issueRequest(request);
+        } catch (SAXException e) {
+            e.printStackTrace();
+            throw new IOException(e.getLocalizedMessage());
+        }
         BufferedImage image = ImageIO.read(response.getInputStream());
 
         if (image == null) {

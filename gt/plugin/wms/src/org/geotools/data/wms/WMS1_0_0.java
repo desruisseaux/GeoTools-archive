@@ -19,7 +19,8 @@ import java.util.TreeSet;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.request.AbstractGetFeatureInfoRequest;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 
@@ -134,9 +135,9 @@ public class WMS1_0_0 extends Specification {
      * 
      * @see org.geotools.data.wms.Specification#createGetCapabilitiesRequest(java.net.URL)
      * @param server a URL that points to the 1.0.0 server
-     * @return a GetCapabilitiesRequest object that can provide a valid request
+     * @return a AbstractGetCapabilitiesRequest object that can provide a valid request
      */
-    public GetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
+    public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
         return new GetCapsRequest(server);
     }
 
@@ -148,7 +149,7 @@ public class WMS1_0_0 extends Specification {
      * <li>WMTVER=1.0.0</li>
      * </p>
      */
-    static public class GetCapsRequest extends GetCapabilitiesRequest {
+    static public class GetCapsRequest extends AbstractGetCapabilitiesRequest {
         /**
          * Construct a Request compatable with a 1.0.0 Web Feature Server.
          * 
@@ -236,9 +237,7 @@ public class WMS1_0_0 extends Specification {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /** 
      * @see org.geotools.data.wms.Specification#createGetMapRequest(java.net.URL, java.lang.String,
      *      org.geotools.data.wms.SimpleLayer[], java.util.Set, java.lang.String[], java.util.List)
      */
@@ -247,14 +246,20 @@ public class WMS1_0_0 extends Specification {
         return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see org.geotools.data.wms.Specification#createGetFeatureInfoRequest(java.net.URL,
      *      org.geotools.data.wms.request.GetMapRequest, java.util.Set, java.lang.String[])
      */
     public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource,
             org.geotools.data.wms.request.GetMapRequest getMapRequest, Set queryableLayers, String[] infoFormats ) {
         return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
+    }
+
+    /**
+     * Note that WMS 1.0.0 does not support this method.
+     * @see org.geotools.data.wms.Specification#createDescribeLayerRequest(java.net.URL)
+     */
+    public DescribeLayerRequest createDescribeLayerRequest( URL onlineResource ) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("WMS 1.0.0 does not support DescribeLayer");
     }
 }

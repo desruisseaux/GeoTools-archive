@@ -24,18 +24,18 @@ import java.net.URL;
  *
  * @author Richard Gould
  */
-public abstract class GetCapabilitiesRequest extends AbstractRequest {
+public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest {
     /** Represents the SERVICE parameter */
     public static final String SERVICE = "SERVICE"; //$NON-NLS-1$
 
     
     /**
-     * Creates a GetCapabilitiesRequest and sets the REQUEST, VERSION and
+     * Creates a AbstractGetCapabilitiesRequest and sets the REQUEST, VERSION and
      * SERVICE parameters.
      * 
      * @param serverURL
      */
-    public GetCapabilitiesRequest(URL serverURL) {
+    public AbstractGetCapabilitiesRequest(URL serverURL) {
         super(serverURL, null);
 
         initRequest();

@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.wms.xml.WMSComplexTypes.*;
+import org.geotools.data.wms.xml.WMSDescribeLayerTypes.*;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
@@ -151,6 +152,10 @@ public class WMSSchema implements Schema {
         new WMSElement("MIME", _MIMEType.getInstance()),
         new WMSElement("INIMAGE", _INIMAGEType.getInstance()),
         new WMSElement("BLANK", _BLANKType.getInstance()),
+        
+        new WMSElement("WMS_DescribeLayerResponse", WMS_DescribeLayerResponse.getInstance()),
+        new WMSElement("LayerDescription", _LayerDescription.getInstance()),
+        new WMSElement("Query", _Query.getInstance())
     };
     
     static final ComplexType[] complexTypes = new ComplexType[] {

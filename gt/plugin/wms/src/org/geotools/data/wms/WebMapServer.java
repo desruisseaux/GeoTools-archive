@@ -26,11 +26,13 @@ import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.Request;
 import org.geotools.data.wms.response.AbstractResponse;
+import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.xml.WMSSchema;
@@ -156,7 +158,7 @@ public class WebMapServer implements Discovery {
             Specification tempSpecification = specs[test];
             String clientVersion = tempSpecification.getVersion();
 
-            GetCapabilitiesRequest request = tempSpecification.createGetCapabilitiesRequest(serverURL);
+            AbstractGetCapabilitiesRequest request = tempSpecification.createGetCapabilitiesRequest(serverURL);
 
             //Grab document
             URL url = request.getFinalURL();
@@ -344,9 +346,10 @@ public class WebMapServer implements Discovery {
      * 
      * @param request the request to be issued
      * @return a response from the server, of type GetMapResponse or GetFeatureInfoResponse
-     * @throws IOException if there is an error while processing the request
+     * @throws IOException
+     * @throws SAXException
      */
-    public AbstractResponse issueRequest( Request request ) throws IOException {
+    public AbstractResponse issueRequest( Request request ) throws IOException, SAXException {
         this.currentRequest = request;
 
         issueRequest();
@@ -354,7 +357,7 @@ public class WebMapServer implements Discovery {
         return currentResponse;
     }
 
-    private void issueRequest() throws IOException {
+    private void issueRequest() throws IOException, SAXException {
         URL finalURL = currentRequest.getFinalURL();
 
         URLConnection connection = finalURL.openConnection();
@@ -366,6 +369,8 @@ public class WebMapServer implements Discovery {
             currentResponse = new GetFeatureInfoResponse(contentType, inputStream);
         } else if (currentRequest instanceof GetMapRequest) {
             currentResponse = new GetMapResponse(contentType, inputStream);
+        } else if (currentRequest instanceof DescribeLayerRequest) {
+            currentResponse = new DescribeLayerResponse(contentType, inputStream);
         } else {
             throw new RuntimeException("Request is an invalid type. I do not know it.");
         }
@@ -419,6 +424,12 @@ public class WebMapServer implements Discovery {
                 .getGetFeatureInfo().getGet(), getMapRequest, getQueryableLayers(), getCapabilities().getRequest()
                 .getGetFeatureInfo().getFormatStrings());
 
+        return request;
+    }
+    
+    public DescribeLayerRequest createDescribeLayerRequest() throws UnsupportedOperationException, IOException {
+        URL onlineResource = getCapabilities().getRequest().getDescribeLayer().getGet();
+        DescribeLayerRequest request = specification.createDescribeLayerRequest(onlineResource);
         return request;
     }
     

@@ -46,7 +46,7 @@ import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
@@ -74,7 +74,7 @@ public class WMS1_0_0Test extends TestCase {
     }
 
     public void testCreateGetCapabilitiesRequest() throws Exception {
-        GetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
+        AbstractGetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
 
         Properties properties = new Properties();
 
@@ -93,6 +93,15 @@ public class WMS1_0_0Test extends TestCase {
         WMSCapabilities capabilities = wms.getCapabilities();
 
         assertNotNull(capabilities);
+    }
+    
+    public void testCreateDescribeLayerRequest() throws Exception {
+        try {
+            spec.createDescribeLayerRequest(null);
+            assertTrue("Shouldn't be able to create DescribeLayer requests for version 1.0.0", false);
+        } catch (UnsupportedOperationException e) {
+            
+        }
     }
 
     protected void checkProperties(Properties properties) {

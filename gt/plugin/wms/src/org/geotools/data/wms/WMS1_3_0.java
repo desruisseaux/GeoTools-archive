@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.geotools.data.wms.WMS1_1_1.GetFeatureInfoRequest;
 import org.geotools.data.wms.WMS1_1_1.GetMapRequest;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -37,7 +37,7 @@ public class WMS1_3_0 extends WMS1_1_1 {
 	/* (non-Javadoc)
 	 * @see org.geotools.data.wms.Specification#createGetCapabilitiesRequest(java.net.URL)
 	 */
-	public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
+	public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
 		return new GetCapsRequest(server);
 	}
 	
@@ -53,7 +53,7 @@ public class WMS1_3_0 extends WMS1_1_1 {
 		}
 		
 		/* (non-Javadoc)
-		 * @see org.geotools.data.wms.request.GetCapabilitiesRequest#initVersion()
+		 * @see org.geotools.data.wms.request.AbstractGetCapabilitiesRequest#initVersion()
 		 */
 		protected void initVersion() {
 			setProperty("VERSION", "1.3.0");

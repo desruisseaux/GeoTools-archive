@@ -28,6 +28,10 @@ public class WMSRequest {
     private WMSOperationType getCapabilities;
     private WMSOperationType getMap;
     private WMSOperationType getFeatureInfo;
+    private WMSOperationType describeLayer;
+    private WMSOperationType getLegendGraphic;
+    private WMSOperationType getStyles;
+    private WMSOperationType putStyles;
 
     /**
      * DOCUMENT ME!
@@ -81,5 +85,29 @@ public class WMSRequest {
      */
     public void setGetMap(WMSOperationType getMap) {
         this.getMap = getMap;
+    }
+    public WMSOperationType getDescribeLayer() {
+        return describeLayer;
+    }
+    public void setDescribeLayer( WMSOperationType describeLayer ) {
+        this.describeLayer = describeLayer;
+    }
+    public WMSOperationType getGetLegendGraphic() {
+        return getLegendGraphic;
+    }
+    public void setGetLegendGraphic( WMSOperationType getLegendGraphic ) {
+        this.getLegendGraphic = getLegendGraphic;
+    }
+    public WMSOperationType getGetStyles() {
+        return getStyles;
+    }
+    public void setGetStyles( WMSOperationType getStyles ) {
+        this.getStyles = getStyles;
+    }
+    public WMSOperationType getPutStyles() {
+        return putStyles;
+    }
+    public void setPutStyles( WMSOperationType putStyles ) {
+        this.putStyles = putStyles;
     }
 }

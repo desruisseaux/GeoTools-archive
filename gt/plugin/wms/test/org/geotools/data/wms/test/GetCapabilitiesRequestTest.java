@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 
 import junit.framework.TestCase;
 
@@ -24,7 +24,7 @@ public class GetCapabilitiesRequestTest extends TestCase {
 	
 	public void testGetCapabilitiesRequest() throws Exception {
 		URL testURL = new URL("http://office.refractions.net:4001/cgi-bin/mapserv?map=/opt/dra2/orthophotos/tiles.map&");
-		GetCapabilitiesRequest request = new Request(testURL);
+		AbstractGetCapabilitiesRequest request = new Request(testURL);
 		URL finalURL = request.getFinalURL();
 		
         int index = finalURL.toExternalForm().lastIndexOf("?");
@@ -49,7 +49,7 @@ public class GetCapabilitiesRequestTest extends TestCase {
 		}
 	}
 	
-	protected class Request extends GetCapabilitiesRequest {
+	protected class Request extends AbstractGetCapabilitiesRequest {
 
 		/**
 		 * @param serverURL
@@ -60,7 +60,7 @@ public class GetCapabilitiesRequestTest extends TestCase {
 		}
 
 		/* (non-Javadoc)
-		 * @see org.geotools.data.wms.request.GetCapabilitiesRequest#initVersion()
+		 * @see org.geotools.data.wms.request.AbstractGetCapabilitiesRequest#initVersion()
 		 */
 		protected void initVersion() {
 			setProperty("VERSION", "1.1.1");
