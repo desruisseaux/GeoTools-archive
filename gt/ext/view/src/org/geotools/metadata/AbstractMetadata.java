@@ -1,3 +1,19 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.metadata;
 
 import java.lang.reflect.Method;
@@ -6,16 +22,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+
 /**
- * TODO type description
+ * A superclass for most metadata.  
  * 
+ * A subclass implements *MUST* implement minimum one subinterface of the Metadata interface
+ * 
+ * AbstractMetadata uses reflection to identify all the getXXX() methods.
+ * The getXXX() are used to construct all the Metadata.Entity and Metadata.Element objects
+ * The return type of each is used to determine whether the element is a simple element or an entity,
+ * if the element is not a simple entity a entity for that class will can be created as well.
+ * All Metadata.Entities and Elements are created when requested (Lazily)   
+ *
  * @author jeichar
  * @since 2.1
  */
 public abstract class AbstractMetadata implements Metadata {
-
     EntityImpl type;
 
+    /**
+     * Creates a new AbstractMetadata object.
+     */
     public AbstractMetadata() {
         type = EntityImpl.getEntity(getClass());
     }
@@ -24,18 +51,20 @@ public abstract class AbstractMetadata implements Metadata {
      * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
      */
     public final List getElements(List elements) {
-        if (elements == null)
+        if (elements == null) {
             elements = new ArrayList();
+        }
 
         List methods = type.getGetMethods();
+
         for (Iterator iter = methods.iterator(); iter.hasNext();) {
             Method method = (Method) iter.next();
+
             try {
                 elements.add(method.invoke(this, null));
             } catch (Exception e) {
-                throw new RuntimeException(
-                        "There must be a bug in the EntityImpl class during the introspection.",
-                        e);
+                throw new RuntimeException("There must be a bug in the EntityImpl class during the introspection.",
+                    e);
             }
         }
 
@@ -46,12 +75,16 @@ public abstract class AbstractMetadata implements Metadata {
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
      */
     public final Object getElement(String xpath) {
-        List elements=XPath.match(xpath,this);
-        if( elements.isEmpty() )
+        List elements = XPath.getValue(xpath, this);
+
+        if (elements.isEmpty()) {
             return null;
-        if( elements.size() == 1){
+        }
+
+        if (elements.size() == 1) {
             return elements.get(0);
         }
+
         return elements;
     }
 
@@ -59,7 +92,6 @@ public abstract class AbstractMetadata implements Metadata {
      * @see org.geotools.metadata.Metadata#getElement(org.geotools.metadata.ElementType)
      */
     public Object getElement(Element element) {
-
         ElementImpl elemImpl;
 
         if (element instanceof ElementImpl) {
@@ -67,6 +99,7 @@ public abstract class AbstractMetadata implements Metadata {
         } else {
             elemImpl = (ElementImpl) type.getElement(element.getName());
         }
+
         return invoke(elemImpl.getGetMethod());
     }
 
@@ -74,9 +107,8 @@ public abstract class AbstractMetadata implements Metadata {
         try {
             return m.invoke(this, null);
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "There must be a bug in the EntityImpl class during the introspection.",
-                    e);
+            throw new RuntimeException("There must be a bug in the EntityImpl class during the introspection.",
+                e);
         }
     }
 
@@ -87,27 +119,37 @@ public abstract class AbstractMetadata implements Metadata {
         return type;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @author $author$
+     * @version $Revision: 1.9 $
+     */
     private static class EntityImpl implements Entity {
-
+        static HashMap entityMap = new HashMap();
         ArrayList elemList = new ArrayList();
-
         HashMap elemMap = new HashMap();
-
         List getMethods;
-        
-        static HashMap entityMap=new HashMap();
 
         private EntityImpl(Class clazz) {
             init(clazz);
         }
-        
-        public static EntityImpl getEntity(Class clazz){
-            if( !entityMap.containsKey(clazz) ){
-                entityMap.put(clazz,new EntityImpl(clazz));
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param clazz DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public static EntityImpl getEntity(Class clazz) {
+            if (!entityMap.containsKey(clazz)) {
+                entityMap.put(clazz, new EntityImpl(clazz));
             }
+
             return (EntityImpl) entityMap.get(clazz);
         }
-        
+
         private void init(Class clazz) {
             getMethods = new ArrayList();
 
@@ -129,41 +171,45 @@ public abstract class AbstractMetadata implements Metadata {
                  */
                 for (int j = 0; j < newmethods.length; j++) {
                     Method method = newmethods[j];
+
                     if (method.getName().startsWith("get")) {
                         getMethods.add(method);
+
                         Class elementClass = method.getReturnType();
 
                         ElementImpl element = new ElementImpl(elementClass,
                                 method);
                         elemMap.put(method.getName().substring(3), element);
                         elemList.add(element);
-
                     }
-                }//for
-            }//for
-
+                } //for
+            } //for
         }
 
         private void getInterfaces(Class class1, List list) {
-
             Class[] ifaces = class1.getInterfaces();
 
             for (int i = 0; i < ifaces.length; i++) {
                 Class iface = ifaces[i];
                 getInterfaces(iface, list);
-            }//for
+            } //for
 
-            if (!class1.isInterface())
+            if (!class1.isInterface()) {
                 return;
+            }
 
-            if (class1 == Metadata.class)
+            if (class1 == Metadata.class) {
                 return;
+            }
 
-            if (!Metadata.class.isAssignableFrom(class1))
+            if (!Metadata.class.isAssignableFrom(class1)) {
                 return;
+            }
+
             if (list.contains(class1)) {
                 return;
             }
+
             list.add(class1);
         }
 
@@ -175,11 +221,16 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
          */
         public Object getElement(String xpath) {
-            List result = XPath.match(xpath, this);
-            if(result.isEmpty())
+            List result = XPath.getElement(xpath, this);
+
+            if (result.isEmpty()) {
                 return null;
-            if(result.size()==1)
+            }
+
+            if (result.size() == 1) {
                 return result.get(0);
+            }
+
             return result;
         }
 
@@ -187,22 +238,21 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Entity#getElements()
          */
         public List getElements() {
-
             return elemList;
         }
-
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @author $author$
+     * @version $Revision: 1.9 $
+     */
     private static class ElementImpl implements Element {
-
         private Method getMethod;
-
         private Class type;
-
         private String name;
-        
         private boolean nillable;
-        
         private Entity entity;
 
         /**
@@ -212,9 +262,10 @@ public abstract class AbstractMetadata implements Metadata {
             this.getMethod = method;
             type = elementClass;
             name = method.getName().substring(3);
-            if( Metadata.class.isAssignableFrom(elementClass))
-                entity=EntityImpl.getEntity(elementClass);
 
+            if (Metadata.class.isAssignableFrom(elementClass)) {
+                entity = EntityImpl.getEntity(elementClass);
+            }
         }
 
         /**
@@ -250,10 +301,15 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
          */
         public boolean isMetadataEntity() {
-            return entity==null?false:true;
+            return (entity == null) ? false : true;
         }
-        
-        public Entity getEntity(){
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return DOCUMENT ME!
+         */
+        public Entity getEntity() {
             return entity;
         }
     }

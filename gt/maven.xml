@@ -65,7 +65,7 @@
         maven createRelease -- uses argument: -Drelease.version=2.0-B5-DEV
         		
       If building a single module use one of:
-        maven java:compil e -- compile java files in src/
+        maven java:compile -- compile java files in src/
         maven test          -- run unit on test/ results in target/test-resutls
         maven jar:install   -- Install generated jar in repository for other modules
         

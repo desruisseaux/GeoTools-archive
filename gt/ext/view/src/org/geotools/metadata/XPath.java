@@ -107,7 +107,7 @@ public class XPath {
      * @return List of the Metadata.Elements that satisfy the XPath expression
      * represented by this object
      */
-    public List match(Metadata.Entity entity) {
+    public List getElement(Metadata.Entity entity) {
         return match(null, entity, 0);
     }
     
@@ -119,7 +119,7 @@ public class XPath {
      * @return List of Objects which are the values of the Metadata.Element indicated by
      * the XPath expression which this object represents
      */
-    public List match(Metadata metadata) {
+    public List getValue(Metadata metadata) {
         return match(metadata, metadata.getEntity(), 0);
     }
     
@@ -129,14 +129,19 @@ public class XPath {
      * @param metadata
      * @return
      */
-    public static List match(String expr, Metadata metadata) {
+    public static List getValue(String expr, Metadata metadata) {
         XPath xpath = new XPath(expr);
-        return xpath.match(metadata);
+        return xpath.getValue(metadata);
     }
 
-    public static List match(String expr, Metadata.Entity entity) {
+    public static List getElement(String expr, Metadata.Entity entity) {
         XPath xpath = new XPath(expr);
-        return xpath.match(entity);
+        return xpath.getElement(entity);
+    }
+
+    public static List getElement(String expr, Metadata metadata) {
+        XPath xpath = new XPath(expr);
+        return xpath.getElement(metadata.getEntity());
     }
 
     private class Term {

@@ -19,6 +19,8 @@ package org.geotools.metadata;
 import java.io.File;
 import java.net.URL;
 
+import org.geotools.data.arcgrid.ArcGridFormat;
+
 /**
  * TODO type description
  * 
@@ -34,7 +36,7 @@ public class StupidNestedMetadataImpl extends AbstractMetadata implements
     public FileMetadata getFileData() {
         URL resource = TestFileMetadataImpl.class.getResource("testdata/ArcGrid.asc");
         File f=new File(resource.getFile());
-        return new FileMetadataImpl(f, "ArcGrid");
+        return new FileMetadataImpl(f, new ArcGridFormat());
     }
 
     /** 

@@ -16,6 +16,8 @@
  */
 package org.geotools.metadata;
 
+import org.opengis.coverage.grid.Format;
+
 /**
  * TODO type description
  * 
@@ -35,7 +37,7 @@ public interface FileMetadata extends Metadata {
     /**
      * @return Returns the format.
      */
-    public String getFormat();
+    public Format getFormat();
     /**
      * @return Returns the lastModified.
      */

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.geotools.data.arcgrid.ArcGridFormat;
 import org.geotools.metadata.Metadata.Entity;
 
 import junit.framework.TestCase;
@@ -34,6 +35,8 @@ import junit.framework.TestCase;
 public class TestFileMetadataImpl extends TestCase {
 
     URL resource;
+    File f;
+    FileMetadataImpl metadata;
     
     protected void setUp() throws Exception{
         super.setUp();
@@ -41,17 +44,20 @@ public class TestFileMetadataImpl extends TestCase {
         assertNotNull(resource);
     }
 
+    private void init(){
+        f=new File(resource.getFile());
+        assertNotNull(f);
+        metadata=new FileMetadataImpl( f, new ArcGridFormat() );    	
+        assertNotNull(metadata);    }
+    
     public void testFileMetadataImpl() {
         File f=new File(resource.getFile());
         assertNotNull(f);
-        assertNotNull(new FileMetadataImpl( f, "ArcGrid" ));
+        assertNotNull(new FileMetadataImpl( f, new ArcGridFormat() ));
     }
 
     public void testGetName() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
 //      test begins
         assertEquals(metadata.getName(), f.getName());
@@ -59,74 +65,51 @@ public class TestFileMetadataImpl extends TestCase {
     }
 
     public void testGetExtension() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
-
+    	init();
 //      test begins
         assertEquals(metadata.getExtension(), "asc");
     }
 
     public void testGetFile() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
-
+    	init();
 //      test begins
         assertEquals(metadata.getFile(), f);
     }
 
     public void testGetFormat() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
-
+    	init();
 //      test begins
-        assertEquals(metadata.getFormat(), "ArcGrid");
+        assertNotNull(metadata.getFormat());
+        assertEquals( metadata.getFormat().getClass(), ArcGridFormat.class);
     }
 
     public void testGetLastModified() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
 //      test begins
         assertEquals(metadata.getLastModified(), f.lastModified());
     }
 
     public void testGetPath() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
 //      test begins
         assertEquals(metadata.getPath(), f.getPath());
     }
 
     public void testSetFormat() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
 //      test begins
-        metadata.setFormat("Geotiff");
-        assertEquals(metadata.getFormat(), "Geotiff");
+        metadata.setFormat(new ArcGridFormat());
+        assertEquals(metadata.getFormat().getClass(), ArcGridFormat.class);
     }
 
     /*
      * Calls getElements(null)
      */
     public void testGetElementsPassedNull() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
         // test begins
         List ret=metadata.getElements(null);
@@ -142,10 +125,8 @@ public class TestFileMetadataImpl extends TestCase {
      * calls getElements(new ArrayList())
      */
     public void testGetElementsPassedObjectArray() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
+
 
         // test begins
         ArrayList param=new ArrayList();
@@ -166,11 +147,7 @@ public class TestFileMetadataImpl extends TestCase {
    }
 
     public void testGetEntity() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
-
+    	init();
         // test begins
         assertNotNull(metadata.getEntity());
     }
@@ -179,10 +156,7 @@ public class TestFileMetadataImpl extends TestCase {
      * Class under test for Object getElement(ElementType)
      */
     public void testGetElementElementType() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
+    	init();
 
         // test begins
         Entity entity=metadata.getEntity();

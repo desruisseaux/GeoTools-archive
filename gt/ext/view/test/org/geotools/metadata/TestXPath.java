@@ -50,7 +50,7 @@ public class TestXPath extends TestCase {
     public void testMatchMetadataint() {
         XPath xpath=new XPath("FileData/Name");
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=xpath.match(data);
+        List result=xpath.getElement(data.getEntity());
         assertEquals(result.size(),1);
         Metadata.Element elem=(Metadata.Element)result.get(0);
         assertNotNull(elem);
@@ -59,7 +59,7 @@ public class TestXPath extends TestCase {
         
         xpath=new XPath("FileData");
         data=new StupidNestedMetadataImpl();
-        result=xpath.match(data);
+        result=xpath.getElement(data.getEntity());
         assertEquals(result.size(),1);
         elem=(Metadata.Element)result.get(0);
         assertNotNull(elem);
@@ -74,7 +74,7 @@ public class TestXPath extends TestCase {
      */
     public void testMatchStringMetadata() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=XPath.match("FileData/Name",data);
+        List result=XPath.getElement("FileData/Name",data);
         assertEquals(result.size(),1);
         Metadata.Element elem=(Metadata.Element)result.get(0);
         assertNotNull(elem);
@@ -88,21 +88,37 @@ public class TestXPath extends TestCase {
      */
     public void testMatchStringMetadataWildCards() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=XPath.match("FileData/\\w*",data);
+        List result=XPath.getElement("FileData/\\w*",data);
         assertEquals(result.size(),5);
 
-        result=XPath.match("\\w*/Name",data);
+        result=XPath.getElement("\\w*/Name",data);
         assertEquals(result.size(),1);
         Metadata.Element element=(Metadata.Element)result.get(0);
         assertEquals(element.getType(),String.class);
     
-        result=XPath.match("\\w*",data);
+        result=XPath.getElement("\\w*",data);
         assertEquals(result.size(),2);
         element=(Metadata.Element)result.get(0);        
         assertEquals(element.getType(),FileMetadata.class);
         element=(Metadata.Element)result.get(1);        
         assertEquals(element.getType(),String.class);
         
+        // Now test getValue
+        data=new StupidNestedMetadataImpl();
+        result=XPath.getValue("FileData/\\w*",data);
+        assertEquals(result.size(),5);
+
+        result=XPath.getValue("\\w*/Name",data);
+        assertEquals(result.size(),1);
+        String name=(String)result.get(0);
+        assertEquals(name,"ArcGrid.asc");
+    
+        result=XPath.getValue("\\w*",data);
+        assertEquals(result.size(),2);
+        Object elem=(Object)result.get(0);
+        assertEquals(elem.getClass(),FileMetadataImpl.class);   
+        elem=result.get(1);
+        assertEquals(element.getType(),String.class);        
     }
 
 }

@@ -18,6 +18,8 @@ package org.geotools.metadata;
 
 import java.io.File;
 
+import org.opengis.coverage.grid.Format;
+
 /**
  * TODO type description
  * 
@@ -28,7 +30,7 @@ public class FileMetadataImpl extends AbstractMetadata implements FileMetadata {
     String name;
     String path;
     String extension;
-    String format;
+    Format format;
     long lastModified;
     File file;
     
@@ -39,7 +41,7 @@ public class FileMetadataImpl extends AbstractMetadata implements FileMetadata {
      * 		"unkown" is the format is unknown
      * 		Static fields should be used
      */
-    FileMetadataImpl( File file, String format ){
+    public FileMetadataImpl( File file, Format format ){
         assert file.exists();
         path=file.getPath();
         name=file.getName();
@@ -71,7 +73,7 @@ public class FileMetadataImpl extends AbstractMetadata implements FileMetadata {
     /**
      * @return Returns the format.
      */
-    public String getFormat() {
+    public Format getFormat() {
         return format;
     }
     /**
@@ -89,7 +91,7 @@ public class FileMetadataImpl extends AbstractMetadata implements FileMetadata {
     /**
      * @param format The format to set.
      */
-    public void setFormat(String format) {
+    public void setFormat(Format format) {
         this.format = format;
     }
 
