@@ -114,6 +114,18 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             LOGGER.finest("types: (xml): " + localName + "; " + "(internal): "
                 + filterType);
 
+            //DJB: if you use "<AND>" instead of "<And>" the filter appears to work
+            //     but actually is completely screwed.  This should throw an error.
+            //     I'm not 100% sure if this is correct, but I dont think you can
+            //     have any tag here that's not in "convertType()".
+            //DJB: Found "UpperBoundary" and "LowerBoundary" - these are completely ignored by this parser!!!
+            //     Thats a pain, but...
+            //DJB: <Distance> also looks like its hacked in this function (see bottom)
+            
+			//didnt recognize filter tag
+			if ( (filterType == -1) && !( (localName.equals("UpperBoundary")) || (localName.equals("LowerBoundary")) || (localName.equals("Distance")) )   )
+				throw new SAXException("Attempted to construct illegal filter - I dont understand the tag: "+qName+".  HINT: tags are case-sensitive!");
+
             try {
                 if (isFidFilter) {
                     if (filterType == AbstractFilter.FID) {
@@ -159,13 +171,13 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                         // if at an expression start, tell the factory
                         LOGGER.finest("found an expression filter start");
                         expressionFactory.start(localName);
-                    } else if (localName.equals("Distance")) {
+                    } else if (localName.equals("Distance")) {  //DJB: this looks like hack
                         LOGGER.finest("inside distance");
 
-			//Not too sure what to do here, as units should be
-			//required element, so an error would be nice.  
-			//But geotools is also not supporting units at all,
-			//so I feel like it doesn't matter so much...
+						//Not too sure what to do here, as units should be
+						//required element, so an error would be nice.  
+						//But geotools is also not supporting units at all,
+						//so I feel like it doesn't matter so much...
                         if (("units").equals(atts.getLocalName(0))) {
                             units = atts.getValue(0);
                             LOGGER.finest("units = " + units);
