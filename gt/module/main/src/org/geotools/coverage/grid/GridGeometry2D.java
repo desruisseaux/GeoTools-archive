@@ -42,7 +42,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
@@ -75,9 +74,9 @@ public class GridGeometry2D extends GridGeometry {
      * first dimensions with a grid size greater than 1. <var>x</var> and <var>y</var>
      * dimensions are usually 0 and 1 respectively.
      *
-     * @todo Set the values for those axis.
+     * @todo Set the values for those axis in the constructor.
      */
-    private int xAxis, yAxis;
+    final int xAxis=0, yAxis=1;
 
     /**
      * A math transform mapping only the two first dimensions of {@code gridToCoordinateSystem}.
@@ -293,7 +292,7 @@ public class GridGeometry2D extends GridGeometry {
             } catch (TransformException exception) {
                 throw new CannotEvaluateException(
                           Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
-                          GridCoverage.toString(new DirectPosition2D(point)), exception));
+                          AbstractGridCoverage.toString(point), exception));
             }
         }
         throw new InvalidGridGeometryException(Resources.format(

@@ -133,14 +133,14 @@ final class GridSampleDimension extends SampleDimension {
 
     /**
      * Creates a set of sample dimensions for the given image. The array length of both
-     * arguments must matches the number of bands in the supplied <code>image</code>.
+     * arguments must matches the number of bands in the supplied {@code image}.
      *
      * @param  name  The name for data (e.g. "Elevation").
      * @param  image The image for which to create a set of sample dimensions.
      * @param  src   User-provided sample dimensions, or {@code null} if none.
      * @param  dst   The array where to put sample dimensions.
-     * @return <code>true</code> if all sample dimensions are geophysics, or <code>false</code>
-     *         if all sample dimensions are <strong>not</strong> geophysics.
+     * @return {@code true} if all sample dimensions are geophysics (quantitative), or
+     *         {@code false} if all sample dimensions are non-geophysics (qualitative).
      * @throws IllegalArgumentException if geophysics and non-geophysics dimensions are mixed.
      */
     static boolean create(final String          name,
@@ -199,7 +199,7 @@ final class GridSampleDimension extends SampleDimension {
      * @param  units The units of sample values, or {@code null} if unknow.
      * @param  colors The colors to use for values from {@code min} to {@code max}
      *         for each bands, or {@code null} for a default color palette. If non-null,
-     *         each arrays <code>colors[b]</code> may have any length; colors will be interpolated
+     *         each arrays {@code colors[b]} may have any length; colors will be interpolated
      *         as needed.
      * @param  hints An optional set of rendering hints, or {@code null} if none.
      *         Those hints will not affect the sample dimensions to be created. However,
@@ -301,9 +301,9 @@ final class GridSampleDimension extends SampleDimension {
          */
         SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
         if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
-//            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
+            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
         }
-        final boolean byteRenderingType = false; //TODO renderingType.getSize()<=8;
+        final boolean byteRenderingType = TypeMap.getSize(renderingType)<=8;
         final NumberRange sampleValueRange;
         final Category[]  categories;
         boolean needScaling = true;
@@ -317,7 +317,7 @@ final class GridSampleDimension extends SampleDimension {
             }
             case DataBuffer.TYPE_BYTE:
             case DataBuffer.TYPE_USHORT: {
-                if (rasterType == /*renderingType.getDataBufferType()*/0) {  // TODO
+                if (rasterType == TypeMap.getDataBufferType(renderingType)) {
                     needScaling = false;
                 }
                 // fall through

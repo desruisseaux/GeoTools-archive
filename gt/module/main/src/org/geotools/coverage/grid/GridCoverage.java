@@ -23,18 +23,13 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE and extensions
-import java.text.FieldPosition;
-import java.text.NumberFormat;
+// J2SE dependencies
 import java.util.Map;
-
-import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
-import javax.media.jai.util.CaselessStringKey;
 
-import org.geotools.coverage.AbstractCoverage;
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
+
 
 
 /**
@@ -42,12 +37,12 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link AbstractGridCoverage}.
  */
-public abstract class GridCoverage extends AbstractCoverage
-                                implements org.opengis.coverage.grid.GridCoverage
-{
+public abstract class GridCoverage extends AbstractGridCoverage {
     /**
-     * Construct a grid coverage using the specified coordinate reference system. If the
+     * Constructs a grid coverage using the specified coordinate reference system. If the
      * coordinate reference system is <code>null</code>, then the subclasses must override
      * {@link #getDimension()}.
      *
@@ -74,31 +69,10 @@ public abstract class GridCoverage extends AbstractCoverage
     }
     
     /**
-     * Construct a new coverage with the same
+     * Constructs a new coverage with the same
      * parameters than the specified coverage.
      */
     protected GridCoverage(final GridCoverage coverage) {
         super(coverage);
-    }
-    
-    /**
-     * Construct a string for the specified point.
-     * This is used for formatting error messages.
-     *
-     * @param  point The coordinate point to format.
-     * @return The coordinate point as a string, without '(' or ')' characters.
-     */
-    static String toString(final DirectPosition point) {
-        final StringBuffer buffer = new StringBuffer();
-        final FieldPosition dummy = new FieldPosition(0);
-        final NumberFormat format = NumberFormat.getNumberInstance();
-        final int       dimension = point.getDimension();
-        for (int i=0; i<dimension; i++) {
-            if (i!=0) {
-                buffer.append(", ");
-            }
-            format.format(point.getOrdinate(i), buffer, dummy);
-        }
-        return buffer.toString();
     }
 }

@@ -74,10 +74,15 @@ import org.geotools.resources.Utilities;
  * and on native code. The usual pattern for more complex services is to register a lightweight
  * proxy for the heavyweight service.</P>
  *
+ * <H2>Note on factory ordering in a multi-thread environment</H2>
+ * <P>This class is thread-safe. However, calls to any {@link #setAuthorityOrdering} or
+ * {@link #setVendorOrdering} methods have a system-wide effect. If two threads or two
+ * applications need a different ordering, they shall manage their own instance of
+ * {@link FactoryRegistry}. This {@code FactoryFinder} class is simply a convenience
+ * wrapper around a {@code FactoryRegistry} instance.</P>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Allows the user to set ordering (i.e. preferred implementation).
  */
 public final class FactoryFinder {
     /**

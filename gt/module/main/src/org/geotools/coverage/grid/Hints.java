@@ -16,24 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gp;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
@@ -41,11 +25,12 @@ import java.awt.RenderingHints;
 // JAI dependencies
 import javax.media.jai.JAI; // For Javadoc
 
+// OpenGIS dependencies
+import org.opengis.coverage.SampleDimensionType;                      // For Javadoc
+import org.opengis.referencing.operation.CoordinateOperationFactory;  // For Javadoc
+
 // Geotools Dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.cv.SampleDimensionType;             // For Javadoc
-import org.geotools.ct.CoordinateTransformation;        // For Javadoc
-import org.geotools.ct.CoordinateTransformationFactory; // For Javadoc
 
 
 /**
@@ -53,32 +38,25 @@ import org.geotools.ct.CoordinateTransformationFactory; // For Javadoc
  * {@link GridCoverageProcessor}, which formard them to {@link Operation#doOperation} at
  * every invocation. Rendering hints can be used to control some low-level details, like
  * the {@link JAI} instance to use when performing operation. Operations may use the
- * hints or ignore them.
- * <br><br>
- * For example, if a user wants to use the <code>"Resample"</code> operation with
- * a custom {@link CoordinateTransformation}, he should first create its own
- * {@link CoordinateTransformationFactory} implementation. Then, he can create
- * a {@link GridCoverageProcessor} with its factory as a rendering hint:
+ * hints or ignore them. Example:
  *
  * <blockquote><pre>
- * CoordinateTransformationFactory myFactory = <FONT FACE="Arial">...</FONT>
- * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_TRANSFORMATION_FACTORY}, myFactory);
+ * CoordinateOperationFactory myFactory = <FONT FACE="Arial">...</FONT>
+ * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
  * GridCoverageProcessor processor = new GridCoverageProcessor(hints);
  * </pre></blockquote>
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.Hints}.
  */
 public final class Hints extends RenderingHints.Key {
     /**
      * Key for setting the {@link GridCoverageProcessor} instance. The value for this
-     * key is set automatically by the <code>GridCoverageProcessor</code> constructor
+     * key is set automatically by the {@code GridCoverageProcessor} constructor
      * and is used by {@link Operation#getGridCoverageProcessor} only.
      */
     static final RenderingHints.Key PROCESSOR_INSTANCE =
-            new Hints(0, "org.geotools.gp.GridCoverageProcessor");
+            new Hints(0, "org.geotools.coverage.grid.GridCoverageProcessor");
 
     /**
      * Key for setting a {@link JAI} instance other than the default one when
@@ -88,19 +66,19 @@ public final class Hints extends RenderingHints.Key {
             new Hints(1, "javax.media.jai.JAI");
 
     /**
-     * Key for setting a {@link CoordinateTransformationFactory} object other
+     * Key for setting a {@link CoordinateOperationFactory} object other
      * than the default one when coordinate transformations must be performed
      * at rendering time.
      */
-    public static final RenderingHints.Key COORDINATE_TRANSFORMATION_FACTORY =
-            new Hints(2, "org.geotools.ct.CoordinateTransformationFactory");
+    public static final RenderingHints.Key COORDINATE_OPERATION_FACTORY =
+            new Hints(2, "org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
      * Key for setting a {@link SampleDimensionType} other than the default one
      * when sample values must be rescaled at rendering time.
      */
     public static final RenderingHints.Key SAMPLE_DIMENSION_TYPE =
-            new Hints(3, "org.geotools.cv.SampleDimensionType");
+            new Hints(3, "org.opengis.coverage.SampleDimensionType");
 
     /**
      * The class name for {@link #valueClass}.
@@ -143,10 +121,10 @@ public final class Hints extends RenderingHints.Key {
     }
 
     /**
-     * Returns <code>true</code> if the specified object is a valid value for this Key.
+     * Returns {@code true} if the specified object is a valid value for this key.
      *
      * @param  value The object to test for validity.
-     * @return <code>true</code> if the value is valid; <code>false</code> otherwise.
+     * @return {@code true} if the value is valid; <code>false</code> otherwise.
      */
     public boolean isCompatibleValue(final Object value) {
         if (value == null) {
@@ -155,8 +133,8 @@ public final class Hints extends RenderingHints.Key {
         if (valueClass == null) try {
             valueClass = Class.forName(className);
         } catch (ClassNotFoundException exception) {
-            Utilities.unexpectedException("org.geotools.gp", "Hints", "isCompatibleValue",
-                                          exception);
+            Utilities.unexpectedException("org.geotools.coverage.grid", "Hints",
+                                          "isCompatibleValue", exception);
             valueClass = Object.class;
         }
         return valueClass.isAssignableFrom(value.getClass());

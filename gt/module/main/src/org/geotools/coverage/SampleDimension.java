@@ -1105,7 +1105,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @return The sample dimension. Never <code>null</code>, but may be <code>this</code>.
      *
      * @see Category#geophysics
-     * @see org.geotools.coverage.grid.GridCoverage#geophysics
+     * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
      */
     public SampleDimension geophysics(final boolean geo) {
         if (geo == isGeophysics) {

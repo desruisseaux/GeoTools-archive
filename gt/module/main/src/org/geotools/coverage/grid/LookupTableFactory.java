@@ -17,18 +17,22 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
 import java.util.Map;
 
+// JAI dependencies
 import javax.media.jai.LookupTableJAI;
 
-import org.geotools.ct.MathTransform1D;
-import org.geotools.util.WeakValueHashMap;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -37,8 +41,6 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.LookupTableFactory}.
  */
 final class LookupTableFactory {
     /**
