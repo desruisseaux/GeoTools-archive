@@ -18,7 +18,7 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.gc;
-
+///CLOVER:USECLASS
 // J2SE dependencies
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -712,6 +712,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
         }
     }
 
+    
     /**
      * Returns a hash value for this transform.
      */
@@ -733,3 +734,4 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
         return false;
     }
 }
+
