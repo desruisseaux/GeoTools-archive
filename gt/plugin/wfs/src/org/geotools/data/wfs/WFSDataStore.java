@@ -259,13 +259,13 @@ public class WFSDataStore extends AbstractDataStore {
         // TODO sanity check for request with capabilities obj
 
         FeatureType t = null;
-
+        SAXException sax = null;
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
             try {
                 t = getSchemaPost(typeName);
             } catch (SAXException e) {
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
             }
         }
 
@@ -274,7 +274,7 @@ public class WFSDataStore extends AbstractDataStore {
                 t = getSchemaGet(typeName);
             } catch (SAXException e) {
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
             }
         }
 
@@ -283,7 +283,7 @@ public class WFSDataStore extends AbstractDataStore {
                 t = getSchemaPost(typeName);
             } catch (SAXException e) {
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
             }
         }
 
@@ -292,9 +292,11 @@ public class WFSDataStore extends AbstractDataStore {
                 t = getSchemaGet(typeName);
             } catch (SAXException e) {
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
             }
         }
+        if(t == null && sax!=null)
+            throw new IOException(sax.toString());
         
         //set crs?
         List l = capabilities.getFeatureTypes();
@@ -373,6 +375,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         url += ("&TYPENAME=" + typeName);
+System.out.println("SCHMEMA GET "+url);
         getUrl = new URL(url);
 
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
@@ -529,8 +532,9 @@ public class WFSDataStore extends AbstractDataStore {
 
             if (request.getFilter() != null) {
                 if (request.getFilter().getFilterType() == FilterType.GEOMETRY_BBOX) {
-                    url += ("&BBOX="
-                    + printBBoxGet(((GeometryFilter) request.getFilter())));
+                    String bb = printBBoxGet(((GeometryFilter) request.getFilter()),request.getTypeName());
+                    if(bb!=null)
+                        url += ("&BBOX=" + bb);
                 } else {
                     if (request.getFilter().getFilterType() == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
@@ -553,7 +557,7 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
 
-        //System.out.println(url); // url to request
+System.out.println("GET URL = "+url); // url to request
         getUrl = new URL(url);
 
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
@@ -596,7 +600,7 @@ public class WFSDataStore extends AbstractDataStore {
         return w.toString();
     }
 
-    private String printBBoxGet(GeometryFilter gf) throws IOException {
+    private String printBBoxGet(GeometryFilter gf,String typename) throws IOException {
         Envelope e = null;
 
         if (gf.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
@@ -610,9 +614,27 @@ public class WFSDataStore extends AbstractDataStore {
                 throw new IOException("Cannot encode BBOX:" + gf);
             }
         }
-
-        return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + ","
-        + e.getMaxY();
+        
+        if(e == null || e.isNull())
+            return null;
+        
+        // find layer's bbox
+        Envelope lbb = null;
+        if(capabilities != null && capabilities.getFeatureTypes() != null && typename!=null && !"".equals(typename)){
+            List fts = capabilities.getFeatureTypes();
+            if(!fts.isEmpty()){
+                for(Iterator i=fts.iterator();i.hasNext() && lbb == null;){
+                    FeatureSetDescription fsd = (FeatureSetDescription)i.next();
+                    if(fsd!=null && typename.equals(fsd.getName())){
+                        lbb = fsd.getLatLongBoundingBox();
+                    }
+                }
+            }
+        }
+        if(lbb == null || lbb.contains(e))
+            return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + ","
+            + e.getMaxY();
+        return null;
     }
 
     private WFSFeatureReader getFeatureReaderPost(Query query,
@@ -701,7 +723,9 @@ public class WFSDataStore extends AbstractDataStore {
      */
     public FeatureReader getFeatureReader(Query query, Transaction transaction)
         throws IOException {
-        WFSFeatureReader t = null;
+        FeatureReader t = null;
+        SAXException sax = null;
+        IOException io = null;
         Filter[] filters = splitFilters(query,transaction); // [server][post] 
         
         query = new DefaultQuery(query);
@@ -709,55 +733,92 @@ public class WFSDataStore extends AbstractDataStore {
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
             try {
                 t = getFeatureReaderPost(query, transaction);
+                if(t!=null)
+                    t.hasNext(); // throws spot
             } catch (SAXException e) {
+                t = null;
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
+            } catch (IOException e) {
+                t = null;
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
         if (((protos & GET_FIRST) == GET_FIRST) && (t == null)) {
             try {
                 t = getFeatureReaderGet(query, transaction);
+                if(t!=null)
+                    t.hasNext(); // throws spot
             } catch (SAXException e) {
+                t = null;
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
+            } catch (IOException e) {
+                t = null;
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
         if (((protos & POST_OK) == POST_OK) && (t == null)) {
             try {
                 t = getFeatureReaderPost(query, transaction);
+                if(t!=null)
+                    t.hasNext(); // throws spot
             } catch (SAXException e) {
+                t = null;
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
+            } catch (IOException e) {
+                t = null;
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
         if (((protos & GET_OK) == GET_OK) && (t == null)) {
             try {
                 t = getFeatureReaderGet(query, transaction);
+                if(t!=null)
+                    t.hasNext(); // throws spot
             } catch (SAXException e) {
+                t = null;
                 logger.warning(e.toString());
-                throw new IOException(e.toString());
+                sax = e;
+            } catch (IOException e) {
+                t = null;
+                logger.warning(e.toString());
+                io = e;
             }
         }
+
+        if(t==null && sax!=null)
+            throw new IOException(sax.toString());
+        if(t==null && io!=null)
+            throw io;
 
         if (t.hasNext()) { // opportunity to throw exception
 
             if (t.getFeatureType() != null) {
-            	if (!filters[1].equals( Filter.NONE ) ) {
-            		try {
-                        return new ReprojectFeatureReader(new FilteringFeatureReader(t, filters[1]),query.getCoordinateSystemReproject());
-                    } catch (CannotCreateTransformException e) {
-                        logger.warning(e.getMessage());
-                    } catch (SchemaException e) {
-                        logger.warning(e.getMessage());
+                if(query.getCoordinateSystemReproject()!=null && t.getFeatureType().getDefaultGeometry()!=null && t.getFeatureType().getDefaultGeometry().getCoordinateSystem()!=null){
+                    FeatureReader tmp = t;
+                    try {
+                        t = new ReprojectFeatureReader(t,query.getCoordinateSystemReproject());
+                    } catch (CannotCreateTransformException e1) {
+                        e1.printStackTrace();
+                        t = tmp;
+                    } catch (SchemaException e1) {
+                        e1.printStackTrace();
+                        t = tmp;
                     }
-                    return new FilteringFeatureReader(t, filters[1]);
+                }
+            	if (!filters[1].equals( Filter.NONE ) ) {
+                    t = new FilteringFeatureReader(t, filters[1]);
                 }
             	return t;
             }
-
             throw new IOException(
                 "There are features but no feature type ... odd");
         }
