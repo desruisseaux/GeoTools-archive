@@ -71,6 +71,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @deprecated
  */
 public class ObliqueOrthographic extends Orthographic {    
     /**

@@ -140,6 +140,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @task TODO: Declares that <code>"Stereographic"</code> is an ESRI name.
  *             Add the <code>"Double Stereographic"</code> alias (from ESRI)
  *             for <code>"Oblique_Stereographic"</code>.
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.Stereographic}.
  */
 public abstract class Stereographic extends PlanarProjection {
 

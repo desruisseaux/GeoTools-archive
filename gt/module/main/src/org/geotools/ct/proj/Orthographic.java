@@ -46,7 +46,6 @@ import org.geotools.ct.MissingParameterException;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
-
 /**
  * Orthographic Projection. This is a perspective azimuthal (planar) projection
  * that is neither conformal nor equal-area. It resembles a globe and only 
@@ -57,7 +56,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * <br><br>
  * 
  * NOTE: formulae used below are from a port, to java, of the 
- *       'proj' package of the USGS survey. USGS work is acknowledged here.
+ *       'proj4' package of the USGS survey. USGS work is acknowledged here.
  * <br><br>
  *
  * <strong>References:</strong><ul>
@@ -72,6 +71,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.Orthographic}.
  */
 public abstract class Orthographic extends PlanarProjection {
     /**

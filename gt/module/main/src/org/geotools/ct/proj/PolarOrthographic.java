@@ -72,6 +72,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author  Rueben Schulz
+ *
+ * @deprecated
  */
 public class PolarOrthographic extends Orthographic {
     /**

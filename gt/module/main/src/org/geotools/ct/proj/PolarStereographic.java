@@ -77,6 +77,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @deprecated
  */
 public class PolarStereographic extends Stereographic {
     /**
