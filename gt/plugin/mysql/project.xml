@@ -39,6 +39,7 @@
         <email>garysheppard@psu.edu</email>
         <organization>Penn State GeoVISTA Center</organization>
         <roles>
+        <role>Module Maintainer</role>
             <role>Java Developer</role>
         </roles>
     </developer>
