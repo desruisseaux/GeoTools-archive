@@ -220,7 +220,7 @@ public class FCBuffer extends Thread implements FeatureReader {
         return fc;
     }
 
-    private FeatureType ft = null;
+    protected FeatureType ft = null;
     /**
      * DOCUMENT ME!
      *

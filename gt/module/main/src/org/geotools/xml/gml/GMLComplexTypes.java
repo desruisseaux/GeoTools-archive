@@ -2732,12 +2732,12 @@ public class GMLComplexTypes {
                 return;
             }
 
-            //output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
+            output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
 
 //            Coordinate[] coords = g.getCoordinates();
             Envelope e = g.getEnvelopeInternal();
-            encodeCoords(element, e, output);
-//            output.endElement(GMLSchema.NAMESPACE, element.getName());
+            encodeCoords(elements[1], e, output);
+            output.endElement(GMLSchema.NAMESPACE, element.getName());
         }
     }
 
@@ -4073,10 +4073,9 @@ public class GMLComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
-            Feature f = getFeature(element, value, attrs, hints);
 
             if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
-                return f;
+                return getFeature(element, value, attrs, hints, null);
             }
 
             if (hints.get(STREAM_FEATURE_NAME_HINT) == null) {
@@ -4086,18 +4085,18 @@ public class GMLComplexTypes {
             String nm = (String) hints.get(STREAM_FEATURE_NAME_HINT);
 
             if ((nm != null) && nm.equals(element.getName())) {
-                stream(f, (FCBuffer) hints.get(STREAM_HINT));
+                stream(getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(STREAM_HINT)).ft), (FCBuffer) hints.get(STREAM_HINT));
 
                 return null;
             }
-            return f;
+            return getFeature(element, value, attrs, hints, null);
         }
 
         public Feature getFeature(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
-            FeatureType ft = (FeatureType) featureTypeMappings.get(element.getType()
-                                                                          .getNamespace()
-                    + "#" + element.getName());
+            Attributes attrs, Map hints, FeatureType ft) throws SAXException {
+            if(ft == null)
+                ft = (FeatureType) featureTypeMappings.get(element.getType()
+                    .getNamespace() + "#" + element.getName());
 
             if (ft == null) {
                 ft = loadFeatureType(element, value, attrs);
