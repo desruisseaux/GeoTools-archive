@@ -30,21 +30,24 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.units.SI;
 import javax.units.Unit;
 
+// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
+import org.opengis.util.ScopedName;
+
+// Geotools dependencies
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.NameFactory;
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -285,6 +288,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // Fix case for common keywords. They are not used
                 // by this class, but are used by some subclasses.
                 case -1528693765: if (key.equals("anchorpoint"))      key="anchorPoint";      break;
+                case -1805658881: if (key.equals("bursawolf"))        key="bursaWolf";        break;
                 case   109688209: if (key.equals("operationversion")) key="operationVersion"; break;
                 case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
                 case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
@@ -588,7 +592,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         }
         if (alias != null) {
             for (int i=0; i<alias.length; i++) {
-                if (name.equalsIgnoreCase(alias[i].asScopedName().toString().trim())) {
+                final ScopedName asScoped = alias[i].asScopedName();
+                if (asScoped!=null && name.equalsIgnoreCase(asScoped.toString().trim())) {
                     return true;
                 }
                 if (name.equalsIgnoreCase(alias[i].asLocalName().toString().trim())) {

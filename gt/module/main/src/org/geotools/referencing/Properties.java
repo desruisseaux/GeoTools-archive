@@ -27,8 +27,12 @@ import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.util.MapEntry;
+// OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.operation.CoordinateOperation;
+
+// Geotools dependencies
+import org.geotools.util.MapEntry;
 
 
 /**
@@ -90,6 +94,10 @@ final class Properties extends AbstractMap {
             case  1: return info.getIdentifiers();
             case  2: return info.getAlias();
             case  3: return info.getRemarks();
+            case  4: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getScope()              : null;
+            case  5: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getValidArea()          : null;
+            case  6: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getOperationVersion()   : null;
+            case  7: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getPositionalAccuracy() : null;
             default: return null;
         }
     }
@@ -101,10 +109,14 @@ final class Properties extends AbstractMap {
      * @todo Add properties for {@link IdentifiedObject} sub-interfaces.
      */
     private static final String[] KEYS = {
-        org.geotools.referencing.IdentifiedObject.NAME_PROPERTY,
-        org.geotools.referencing.IdentifiedObject.IDENTIFIERS_PROPERTY,
-        org.geotools.referencing.IdentifiedObject.ALIAS_PROPERTY,
-        org.geotools.referencing.IdentifiedObject.REMARKS_PROPERTY
+        /*[0]*/org.geotools.referencing.IdentifiedObject.   NAME_PROPERTY,
+        /*[1]*/org.geotools.referencing.IdentifiedObject.   IDENTIFIERS_PROPERTY,
+        /*[2]*/org.geotools.referencing.IdentifiedObject.   ALIAS_PROPERTY,
+        /*[3]*/org.geotools.referencing.IdentifiedObject.   REMARKS_PROPERTY,
+        /*[4]*/org.geotools.referencing.operation.Operation.SCOPE_PROPERTY,
+        /*[5]*/org.geotools.referencing.operation.Operation.VALID_AREA_PROPERTY,
+        /*[6]*/org.geotools.referencing.operation.Operation.OPERATION_VERSION_PROPERTY,
+        /*[7]*/org.geotools.referencing.operation.Operation.POSITIONAL_ACCURACY_PROPERTY
     };
 
     /**

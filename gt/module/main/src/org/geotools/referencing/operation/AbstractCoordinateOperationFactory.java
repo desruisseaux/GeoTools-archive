@@ -248,6 +248,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
                                   final ParameterValueGroup       parameters)
             throws FactoryException
     {
+        final Map properties;
         final OperationMethod method;
         final MathTransform transform;
         if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
@@ -264,8 +265,16 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
                         mtFactory.getAvailableMethods(CoordinateOperation.class),
                         (ParameterDescriptorGroup) parameters.getDescriptor());
         }
-        return createFromMathTransform(Collections.singletonMap(NAME_PROPERTY, name),
-                                       sourceCRS, targetCRS, transform, method,
+        if (name == DATUM_SHIFT) {
+            properties = new HashMap(4);
+            properties.put(NAME_PROPERTY, name);
+            properties.put(
+                  org.geotools.referencing.operation.CoordinateOperation.OPERATION_VERSION_PROPERTY,
+                  "(unknow)");
+        } else {
+            properties = Collections.singletonMap(NAME_PROPERTY, name);
+        }
+        return createFromMathTransform(properties, sourceCRS, targetCRS, transform, method,
                                        Operation.class);
     }
 
@@ -384,17 +393,21 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         final MathTransform mt2 = step2.getMathTransform(); if (mt2.isIdentity()) return step1;
         final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
         final CoordinateReferenceSystem targetCRS = step2.getTargetCRS();
-        final CoordinateOperation step;
-             if (step2.getName() == AXIS_CHANGES) step = step1;
-        else if (step1.getName() == AXIS_CHANGES) step = step2;
-        else {
-            return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
-                                               new CoordinateOperation[] {step1, step2});
+        CoordinateOperation step = null;
+        if (step1.getName()==AXIS_CHANGES && mt1.getSourceDimensions()==mt1.getTargetDimensions()) step = step2;
+        if (step2.getName()==AXIS_CHANGES && mt2.getSourceDimensions()==mt2.getTargetDimensions()) step = step1;
+        if (step instanceof Operation) {
+            /*
+             * Applies only on operation in order to avoid merging with PassThroughOperation.
+             * Also applies only if the transform to hide has identical source and target
+             * dimensions in order to avoid mismatch with the method's dimensions.
+             */
+            return createFromMathTransform(getProperties(step), sourceCRS, targetCRS,
+                   mtFactory.createConcatenatedTransform(mt1, mt2),
+                   ((Operation) step).getMethod(), CoordinateOperation.class);
         }
-        return createFromMathTransform(getProperties(step), sourceCRS, targetCRS,
-               mtFactory.createConcatenatedTransform(mt1, mt2),
-               (step instanceof Operation) ? ((Operation) step).getMethod() : null,
-               CoordinateOperation.class);
+        return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
+                                           new CoordinateOperation[] {step1, step2});
     }
 
     /**

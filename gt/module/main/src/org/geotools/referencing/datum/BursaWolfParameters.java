@@ -87,6 +87,21 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
     }
 
     /**
+     * Returns <code>true</code> if this Bursa Wolf parameters performs no operation.
+     * This is true when all parameters are set to zero.
+     */
+    public boolean isIdentity() {
+        return dx==0 && dy==0 && dz==0 && ex==0 && ey==0 && ez==0 && ppm==0;
+    }
+
+    /**
+     * Returns <code>true</code> if this Bursa Wolf parameters contains only translation terms.
+     */
+    public boolean isTranslation() {
+        return ex==0 && ey==0 && ez==0 && ppm==0;
+    }
+
+    /**
      * Returns an affine transform that can be used to define this
      * Bursa Wolf transformation. The formula is as follows:
      *

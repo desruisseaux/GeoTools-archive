@@ -541,7 +541,7 @@ public class Parser extends MathTransformParser {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);
             }
-            properties.put(org.geotools.referencing.datum.GeodeticDatum.TRANSFORMATIONS_PROPERTY,
+            properties.put(org.geotools.referencing.datum.GeodeticDatum.BURSA_WOLF_PROPERTY,
                            toWGS84);
         }
         try {

@@ -260,7 +260,7 @@ public class TransformationTest extends TestTransform {
             assertFalse(op instanceof PassThroughOperation);
             assertTrue (mt.isIdentity());
         }
-        if (false) {  // TODO: Not yet implemented
+        if (CoordinateOperationFactory.MOLODENSKI != null) {
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
@@ -268,12 +268,11 @@ public class TransformationTest extends TestTransform {
             assertTrue(op instanceof PassThroughOperation);
             assertFalse(mt.isIdentity());
         }
-        if (false) {  // TODO: Not yet implemented
+        if (CoordinateOperationFactory.MOLODENSKI != null) {
             sourceCRS = crsFactory.createFromWKT(Z_NAD27);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertTrue(op instanceof PassThroughOperation);
             assertFalse(mt.isIdentity());
         }
         if (true) {

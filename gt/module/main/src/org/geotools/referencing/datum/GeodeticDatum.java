@@ -25,18 +25,22 @@ package org.geotools.referencing.datum;
 // J2SE dependencies
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.vecmath.GMatrix;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
+// OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.Matrix;
+
+// Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -56,19 +60,33 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 8832100095648302944L;
+    private static final long serialVersionUID = 8832100095648302943L;
     
     /**
      * The default WGS 1984 datum.
      */
-    public static final GeodeticDatum WGS84 = new GeodeticDatum("WGS84",
-                                              org.geotools.referencing.datum.Ellipsoid.WGS84,
-                                              org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+    public static final GeodeticDatum WGS84;
+    static {
+        final Identifier[] identifiers = {
+            new Identifier(null, "WGS84"),
+            new Identifier(null, "WGS 84"),
+            new Identifier(null, "WGS_84"),
+            new Identifier(null, "WGS 1984"),
+            new Identifier(null, "WGS_1984"),
+        };
+        final Map properties = new HashMap(4);
+        properties.put(NAME_PROPERTY,  identifiers[0]);
+        properties.put(ALIAS_PROPERTY, identifiers);
+        WGS84 = new GeodeticDatum(properties,
+                    org.geotools.referencing.datum.Ellipsoid.WGS84,
+                    org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+    }
 
     /**
-     * The property for {@linkplain #getAffineTransform datum shifts}.
+     * The <code>{@value #BURSA_WOLF_PROPERTY}</code> property for
+     * {@linkplain #getAffineTransform datum shifts}.
      */
-    public static final String TRANSFORMATIONS_PROPERTY = "transformations";
+    public static final String BURSA_WOLF_PROPERTY = "bursaWolf";
 
     /**
      * The ellipsoid.
@@ -81,9 +99,9 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     private final PrimeMeridian primeMeridian;
     
     /**
-     * Parameters for Bursa Wolf transformations, or <code>null</code> if none.
+     * Bursa Wolf parameters for datum shifts, or <code>null</code> if none.
      */
-    private final BursaWolfParameters[] transformations;
+    private final BursaWolfParameters[] bursaWolf;
 
     /**
      * Construct a geodetic datum from a name.
@@ -102,7 +120,21 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     /**
      * Construct a geodetic datum from a set of properties. The properties map is
      * given unchanged to the {@linkplain org.geotools.referencing.datum.Datum#Datum(Map)
-     * super-class constructor}.
+     * super-class constructor}. Additionally, the following properties are understood by
+     * this construtor:
+     * <br><br>
+     * <table border='1'>
+     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+     *     <th nowrap>Property name</th>
+     *     <th nowrap>Value type</th>
+     *     <th nowrap>Value given to</th>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link #BURSA_WOLF_PROPERTY "bursaWolf"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link BursaWolfParameters} or an array of those&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getBursaWolfParameters}</td>
+     *   </tr>
+     * </table>
      *
      * @param properties      Set of properties. Should contains at least <code>"name"</code>.
      * @param ellipsoid       The ellipsoid.
@@ -117,26 +149,26 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
         this.primeMeridian = primeMeridian;
         ensureNonNull("ellipsoid",     ellipsoid);
         ensureNonNull("primeMeridian", primeMeridian);
-        BursaWolfParameters[] transformations;
-        final Object object = properties.get(TRANSFORMATIONS_PROPERTY);
+        BursaWolfParameters[] bursaWolf;
+        final Object object = properties.get(BURSA_WOLF_PROPERTY);
         if (object instanceof BursaWolfParameters) {
-            transformations = new BursaWolfParameters[] {
+            bursaWolf = new BursaWolfParameters[] {
                 (BursaWolfParameters) ((BursaWolfParameters) object).clone()
             };
         } else {
-            transformations = (BursaWolfParameters[]) object;
-            if (transformations != null) {
-                if (transformations.length == 0) {
-                    transformations = null;
+            bursaWolf = (BursaWolfParameters[]) object;
+            if (bursaWolf != null) {
+                if (bursaWolf.length == 0) {
+                    bursaWolf = null;
                 } else {
-                    transformations = (BursaWolfParameters[]) transformations.clone();
-                    for (int i=0; i<transformations.length; i++) {
-                        transformations[i] = (BursaWolfParameters) transformations[i].clone();
+                    bursaWolf = (BursaWolfParameters[]) bursaWolf.clone();
+                    for (int i=0; i<bursaWolf.length; i++) {
+                        bursaWolf[i] = (BursaWolfParameters) bursaWolf[i].clone();
                     }
                 }
             }
         }
-        this.transformations = transformations;
+        this.bursaWolf = bursaWolf;
     }
 
     /**
@@ -151,6 +183,24 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      */
     public PrimeMeridian getPrimeMeridian() {
         return primeMeridian;
+    }
+
+    /**
+     * Returns Bursa Wolf parameters for a datum shift toward the specified target,
+     * or <code>null</code> if none.
+     */
+    public BursaWolfParameters getBursaWolfParameters(
+                final org.opengis.referencing.datum.GeodeticDatum target)
+    {
+        if (bursaWolf != null) {
+            for (int i=0; i<bursaWolf.length; i++) {
+                final BursaWolfParameters candidate = bursaWolf[i];
+                if (equals(target, candidate.targetDatum, false)) {
+                    return (BursaWolfParameters) candidate.clone();
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -192,10 +242,10 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
         ensureNonNull("source", source);
         ensureNonNull("target", target);
         if (source instanceof GeodeticDatum) {
-            final BursaWolfParameters[] transformations = ((GeodeticDatum) source).transformations;
-            if (transformations != null) {
-                for (int i=0; i<transformations.length; i++) {
-                    final BursaWolfParameters transformation = transformations[i];
+            final BursaWolfParameters[] bursaWolf = ((GeodeticDatum) source).bursaWolf;
+            if (bursaWolf != null) {
+                for (int i=0; i<bursaWolf.length; i++) {
+                    final BursaWolfParameters transformation = bursaWolf[i];
                     if (equals(target, transformation.targetDatum, false)) {
                         return transformation.getAffineTransform();
                     }
@@ -207,10 +257,10 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
          * Search if a transform exists in the opposite direction.
          */
         if (target instanceof GeodeticDatum) {
-            final BursaWolfParameters[] transformations = ((GeodeticDatum) target).transformations;
-            if (transformations != null) {
-                for (int i=0; i<transformations.length; i++) {
-                    final BursaWolfParameters transformation = transformations[i];
+            final BursaWolfParameters[] bursaWolf = ((GeodeticDatum) target).bursaWolf;
+            if (bursaWolf != null) {
+                for (int i=0; i<bursaWolf.length; i++) {
+                    final BursaWolfParameters transformation = bursaWolf[i];
                     if (equals(source, transformation.targetDatum, false)) {
                         final Matrix matrix = transformation.getAffineTransform();
                         if (matrix instanceof GMatrix) {
@@ -230,8 +280,8 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
          *    source   -->   [common datum]   -->   target
          */
         if (source instanceof GeodeticDatum && target instanceof GeodeticDatum) {
-            final BursaWolfParameters[] sourceParam = ((GeodeticDatum) source).transformations;
-            final BursaWolfParameters[] targetParam = ((GeodeticDatum) target).transformations;
+            final BursaWolfParameters[] sourceParam = ((GeodeticDatum) source).bursaWolf;
+            final BursaWolfParameters[] targetParam = ((GeodeticDatum) target).bursaWolf;
             if (sourceParam!=null && targetParam!=null) {
                 org.opengis.referencing.datum.GeodeticDatum sourceStep;
                 org.opengis.referencing.datum.GeodeticDatum targetStep;
@@ -301,9 +351,18 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
         }
         if (super.equals(object, compareMetadata)) {
             final GeodeticDatum that = (GeodeticDatum) object;
-            return   equals(this.ellipsoid,       that.ellipsoid,      compareMetadata) &&
-                     equals(this.primeMeridian,   that.primeMeridian,  compareMetadata) &&
-              Arrays.equals(this.transformations, that.transformations                );
+            if (equals(this.ellipsoid,     that.ellipsoid,     compareMetadata) &&
+                equals(this.primeMeridian, that.primeMeridian, compareMetadata))
+            {
+                /*
+                 * HACK: We do not consider Bursa Wolf parameters as a non-metadata field.
+                 *       This is needed in order to get 'equalsIgnoreMetadata(...)' to returns
+                 *       'true' when comparing the WGS84 constant in this class with a WKT
+                 *       DATUM element with a TOWGS84[0,0,0,0,0,0,0] element. Furthermore,
+                 *       the Bursa Wolf parameters are not part of ISO 19111 specification.
+                 */
+                return !compareMetadata || Arrays.equals(this.bursaWolf, that.bursaWolf);
+            }
         }
         return false;
     }
@@ -338,9 +397,9 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
         // Do NOT invokes the super-class method, because
         // horizontal datum do not write the datum type.
         formatter.append(ellipsoid);
-        if (transformations != null) {
-            for (int i=0; i<transformations.length; i++) {
-                final BursaWolfParameters transformation = transformations[i];
+        if (bursaWolf != null) {
+            for (int i=0; i<bursaWolf.length; i++) {
+                final BursaWolfParameters transformation = bursaWolf[i];
                 if (isWGS84(transformation.targetDatum)) {
                     formatter.append(transformation);
                     break;

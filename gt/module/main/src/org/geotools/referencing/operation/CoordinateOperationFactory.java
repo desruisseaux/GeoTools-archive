@@ -67,6 +67,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -83,6 +84,36 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  */
 public class CoordinateOperationFactory extends AbstractCoordinateOperationFactory {
+    /**
+     * The operation to use by {@link #createTransformationStep(GeographicCRS,GeographicCRS)} for
+     * datum shift. This string can have one of the following values:
+     * <ul>
+     *   <li><code>"Abridged_Molodenski"</code> for the abridged Molodenski transformation.</li>
+     *   <li><code>"Molodenski"</code> for the Molodenski transformation.</li>
+     *   <li><code>null</code> for performing datum shifts is geocentric coordinates.</li>
+     * </ul>
+     * Molodenski transforms are disabled if the <code>-Dgeotools.molodenski=none</code> property
+     * was set on the command line. This is sometime useful for testing purposes.
+     */
+    static final String MOLODENSKI;
+    static {
+        String operation = "Molodenski"; // Default value. An alternative is "Abridged_Molodenski"
+        try {
+            final String candidate = System.getProperty("geotools.molodenski");
+            if (candidate != null) {
+                if (candidate.equalsIgnoreCase("abridged")) {
+                    operation = "Abridged_Molodenski";
+                } else {
+                    operation = null;
+                }
+                // TODO: Note: we can't log a message in class initializer.
+            }
+        } catch (SecurityException ignore) {
+            // Ignore. We will keep the default value.
+        }
+        MOLODENSKI = operation;
+    }
+
     /**
      * A unit of one millisecond.
      */
@@ -385,7 +416,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         }
         /*
          * The specified geographic coordinate system doesn't use standard axis
-         * (EAST, NORTH) or the greenwich meridian.
+         * (EAST, NORTH) or the greenwich meridian. Create a new one meeting those criterions.
          */
         return new org.geotools.referencing.crs.GeographicCRS(
                    getTemporaryName(crs), datum, STANDARD);
@@ -646,7 +677,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * Creates an operation between two geographic coordinate reference systems. The default
      * implementation can adjust axis order and orientation (e.g. transforming from
      * <code>(NORTH,WEST)</code> to <code>(EAST,NORTH)</code>), performs units conversion
-     * and apply Bursa Wolf transformation if needed.
+     * and apply datum shifts if needed.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
@@ -655,8 +686,6 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      *
      * @todo When rotating the prime meridian, we should ensure that
      *       transformed longitudes stay in the range [-180..+180°].
-     *
-     * @todo We should use Molodenski transforms when applicable.
      */
     protected CoordinateOperation createOperationStep(final GeographicCRS sourceCRS,
                                                       final GeographicCRS targetCRS)
@@ -681,6 +710,53 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             final EllipsoidalCS targetCS = (EllipsoidalCS) targetCRS.getCoordinateSystem();
             final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS, sourcePM, targetPM);
             return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
+        }
+        /*
+         * The two geographic CRS use different datum. If Molodenski transformations
+         * are allowed, try them first. Note that is some case if the datum shift can't
+         * be performed in a single Molodenski transformation step (i.e. if we need to
+         * go through at least one intermediate datum), then we will use the geocentric
+         * transform below instead: it allows to concatenates many Bursa Wolf parameters
+         * in a single affine transform.
+         */
+        if (MOLODENSKI != null) {
+            BursaWolfParameters bursaWolf = null;
+            if (sourceDatum instanceof org.geotools.referencing.datum.GeodeticDatum) {
+                bursaWolf = ((org.geotools.referencing.datum.GeodeticDatum) sourceDatum)
+                             .getBursaWolfParameters(targetDatum);
+            }
+            /*
+             * Apply the Molodenski transformation now. Note: in current parameters, we can't
+             * specify a different input and output dimension. However, our Molodenski transform
+             * allows that. We should expand the parameters block for this case (TODO).
+             */
+            if (bursaWolf!=null && !bursaWolf.isIdentity() && bursaWolf.isTranslation()) {
+                final ParameterValueGroup parameters = mtFactory.getDefaultParameters(MOLODENSKI);
+                final Ellipsoid      sourceEllipsoid = sourceDatum.getEllipsoid();
+                final Ellipsoid      targetEllipsoid = targetDatum.getEllipsoid();
+                final int            sourceDim       = getDimension(sourceCRS);
+                final int            targetDim       = getDimension(targetCRS);
+                parameters.parameter("src_semi_major").setValue(sourceEllipsoid.getSemiMajorAxis());
+                parameters.parameter("src_semi_minor").setValue(sourceEllipsoid.getSemiMinorAxis());
+                parameters.parameter("tgt_semi_major").setValue(targetEllipsoid.getSemiMajorAxis());
+                parameters.parameter("tgt_semi_minor").setValue(targetEllipsoid.getSemiMinorAxis());
+                parameters.parameter("dx")            .setValue(bursaWolf.dx);
+                parameters.parameter("dy")            .setValue(bursaWolf.dy);
+                parameters.parameter("dz")            .setValue(bursaWolf.dz);
+                parameters.parameter("dim")           .setValue(sourceDim);
+                if (sourceDim == targetDim) {
+                    final CoordinateOperation step1, step2, step3;
+                    final GeographicCRS normSourceCRS = normalize(sourceCRS, true);
+                    final GeographicCRS normTargetCRS = normalize(targetCRS, true);
+                    step1 = createOperationStep(sourceCRS, normSourceCRS);
+                    step2 = createFromParameters(DATUM_SHIFT, normSourceCRS, normTargetCRS, parameters);
+                    step3 = createOperationStep(normTargetCRS, targetCRS);
+                    return concatenate(step1, step2, step3);
+                } else {
+                    // TODO: Need some way to pass 'targetDim' to Molodenski.
+                    //       Fallback on geocentric transformations for now.
+                }
+            }
         }
         /*
          * If the two geographic CRS use different datum, transform from the
