@@ -11,6 +11,7 @@ import org.opengis.util.Cloneable;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -45,10 +46,11 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public void testRetrieve() {
+        GeometryFactory gf = new GeometryFactory();
         assertTrue(
             "geometry retrieval and match",
             ((Point) testFeature.getAttribute("testGeometry")).equals(
-                new Point(new Coordinate(1, 2), new PrecisionModel(), 1)));
+                gf.createPoint(new Coordinate(1, 2))));
         assertTrue(
             "boolean retrieval and match",
             ((Boolean) testFeature.getAttribute("testBoolean")).equals(new Boolean(true)));
@@ -95,14 +97,14 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public void testBounds() throws Exception {
-        PrecisionModel pm = new PrecisionModel();
+        GeometryFactory gf = new GeometryFactory();
         Geometry[] g = new Geometry[4];
-        g[0] = new Point(new Coordinate(0, 0), pm, 0);
-        g[1] = new Point(new Coordinate(0, 10), pm, 0);
-        g[2] = new Point(new Coordinate(10, 0), pm, 0);
-        g[3] = new Point(new Coordinate(10, 10), pm, 0);
+        g[0] = gf.createPoint(new Coordinate(0, 0));
+        g[1] = gf.createPoint(new Coordinate(0, 10));
+        g[2] = gf.createPoint(new Coordinate(10, 0));
+        g[3] = gf.createPoint(new Coordinate(10, 10));
 
-        GeometryCollection gc = new GeometryCollection(g, pm, 0);
+        GeometryCollection gc = gf.createGeometryCollection(g);
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance("bounds");
         factory.addType(newAtt("p1", Point.class));
         factory.addType(newAtt("p2", Point.class));
@@ -116,7 +118,7 @@ public class FeatureFlatTest extends TestCase {
         g[2].getCoordinate().x = 20;
         f.setAttribute(1, g[1]);
         f.setAttribute(2, g[2]);
-        gc = new GeometryCollection(g, pm, 0);
+        gc = gf.createGeometryCollection(g);
         assertEquals(gc.getEnvelopeInternal(), f.getBounds());
     }
 
