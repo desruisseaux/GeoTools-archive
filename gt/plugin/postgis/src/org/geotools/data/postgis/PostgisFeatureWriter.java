@@ -66,4 +66,15 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
     public void setWKBEnabled(boolean enabled) {
         WKBEnabled = enabled;
     }
+    
+    /**
+     * DJB: this is the javadoc from the superclass, but this wasnt being done.
+     * 
+     * Encodes the tableName, default is to do nothing, but postgis will
+     * override and put double quotes around the tablename.
+     */
+    protected String encodeName(String tableName) {
+	return "\""+tableName+"\"";
+    }
+    
 }
