@@ -379,7 +379,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             + " , hits " + styleFactory.getHits() + ", requests "
             + styleFactory.getRequests());
 	
-	LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = "+error);
+	if( error>0 )
+	    LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = "+error);
 
     }
 
