@@ -16,18 +16,21 @@
  */
 package org.geotools.data;
 
+// J2SE dependencies
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
+
+// Geotools dependencies
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterReal;
 import org.geotools.parameter.Parameter;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 
 
 /**
@@ -165,7 +168,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         Map properties = new HashMap();
         properties.put( "name", getDisplayName() );
         properties.put( "remarks", getDescription() );        
-        return new ParameterDescriptorGroup( properties, parameters );        
+        return new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
     }
 }
 
