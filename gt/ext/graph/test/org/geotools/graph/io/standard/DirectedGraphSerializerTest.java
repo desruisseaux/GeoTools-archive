@@ -35,8 +35,11 @@ public class DirectedGraphSerializerTest
     GraphTestUtil.buildNoBifurcations(builder(), nnodes);    
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
+      //String filename = System.getProperty("user.dir") + File.sptmp.tmp";
+	  File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+      
+    	serializer().setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       serializer().write(builder().getGraph());
       
@@ -84,7 +87,6 @@ public class DirectedGraphSerializerTest
       };
       after.visitNodes(visitor);
       
-      new File(filename).delete();
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -105,8 +107,10 @@ public class DirectedGraphSerializerTest
     final Map obj2node = (Map)obj[1];    
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
+	  File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+
+      serializer().setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       serializer().write(builder().getGraph());
       
@@ -201,8 +205,10 @@ public class DirectedGraphSerializerTest
     assertTrue(builder().getGraph().getEdges().size() == nnodes-3);
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
+  	  File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+      
+      serializer().setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       serializer().write(builder().getGraph());
       
