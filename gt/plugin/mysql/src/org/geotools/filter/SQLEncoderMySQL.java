@@ -54,7 +54,18 @@ public class SQLEncoderMySQL extends SQLEncoder
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
 
-    /**
+/** The standard SQL multicharacter wild card. */
+	private static final String SQL_WILD_MULTI = "%";
+
+	/** The standard SQL single character wild card. */
+	private static final String SQL_WILD_SINGLE = "_";
+	/** The escaped version of the multiple wildcard for the REGEXP pattern. */
+	private String escapedWildcardMulti = "\\.\\*";
+
+	/** The escaped version of the single wildcard for the REGEXP pattern. */
+	private String escapedWildcardSingle = "\\.\\?";
+
+		/**
      * Empty constructor TODO: rethink empty constructor, as BBOXes _need_ an
      * SRID, must make client set it somehow.  Maybe detect when encode is
      * called?
@@ -90,7 +101,7 @@ public class SQLEncoderMySQL extends SQLEncoder
         capabilities.addType((short) -12345);
         capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
         capabilities.addType(AbstractFilter.FID);
-
+		capabilities.addType(AbstractFilter.LIKE);
         return capabilities;
     }
 
@@ -171,10 +182,40 @@ public class SQLEncoderMySQL extends SQLEncoder
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
+		System.out.println("MBRIntersects(GeometryFromText('" + geomText + "', " + srid
+            + "),geom);");
         out.write("MBRIntersects(GeometryFromText('" + geomText + "', " + srid
             + "),geom);");//TODO instead of hardcoding 'geom,' we need the name
                           //     of the column (it could be 'the_geom' or anything
                           //     else)
         
     }
+
+		public void visit(LikeFilter filter) {
+		try {
+			String pattern = filter.getPattern();
+
+			pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
+			pattern = pattern
+					.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
+
+			//pattern = pattern.replace('\\', ''); //get rid of java escapes.
+			out.write("UPPER(");
+			((Expression) filter.getValue()).accept(this);
+			out.write(") LIKE ");
+			out.write("UPPER('" + pattern + "')");
+
+			String esc = filter.getEscape();
+
+			if (pattern.indexOf(esc) != -1) { //if it uses the escape char
+				out.write(" ESCAPE " + "'" + esc + "'"); //this needs testing
+			}
+
+			//TODO figure out when to add ESCAPE clause, probably just for the
+			// '_' char.
+		} catch (java.io.IOException ioe) {
+			LOGGER.warning("Unable to export filter" + ioe);
+		}
+	}
+
 }
