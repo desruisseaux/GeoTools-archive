@@ -88,7 +88,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * {@linkplain MatrixParameters matrix parameters}.
      */
     public MatrixParameterValues(final MatrixParameters descriptor) {
-        super(descriptor);        
+        super(descriptor);
         numRow = (ParameterValue) parameter(0);
         numCol = (ParameterValue) parameter(1);
     }
@@ -162,7 +162,9 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public ParameterDescriptor descriptor(final String name) throws ParameterNotFoundException {
+    public GeneralParameterDescriptor descriptor(final String name)
+            throws ParameterNotFoundException
+    {
         return ((MatrixParameters) descriptor).descriptor(name, numRow.intValue(),
                                                                 numCol.intValue());
     }
@@ -173,7 +175,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * @deprecated Use {@link #descriptor(String)} instead.
      */
     public ParameterDescriptor getParameter(final String name) throws ParameterNotFoundException {
-        return descriptor(name);
+        return (ParameterDescriptor) descriptor(name);
     }
 
     /**

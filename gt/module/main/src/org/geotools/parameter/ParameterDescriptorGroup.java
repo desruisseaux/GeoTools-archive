@@ -171,7 +171,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      * @return The parameter for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter for the given identifier code.
      */
-    public ParameterDescriptor descriptor(String name) throws ParameterNotFoundException {
+    public GeneralParameterDescriptor descriptor(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         List subgroups = null;
@@ -212,7 +212,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      * @deprecated Use {@link #descriptor} instead.
      */
     public ParameterDescriptor getParameter(String name) throws ParameterNotFoundException {
-        return descriptor(name);
+        return (ParameterDescriptor) descriptor(name);
     }
     
     /**

@@ -61,7 +61,7 @@ public class Parameters {
      * @return
      */
     public static GeneralParameterDescriptor id( ParameterDescriptorGroup type, String id ){
-        GeneralParameterDescriptor types[] = type.getParameters();
+//        GeneralParameterDescriptor types[] = type.descriptors();
         
         return null;
     }
@@ -73,9 +73,9 @@ public class Parameters {
         return null;
     }
     public static boolean allowed( ParameterDescriptorGroup group, GeneralParameterDescriptor type){
-        GeneralParameterDescriptor types[] = group.getParameters();
-        for( int i=0; i < types.length; i++ ){
-            if( types[i] == type ){
+        List types = group.descriptors();
+        for(final Iterator it=types.iterator(); it.hasNext();) {
+            if (it.next() == type) {
                 return true;
             }
         }

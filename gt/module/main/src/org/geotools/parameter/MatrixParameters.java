@@ -190,7 +190,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public final ParameterDescriptor descriptor(final String name)
+    public final GeneralParameterDescriptor descriptor(final String name)
             throws ParameterNotFoundException
     {
         return descriptor(name,
@@ -207,7 +207,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    final ParameterDescriptor descriptor(String name, final int numRow, final int numCol)
+    final GeneralParameterDescriptor descriptor(String name, final int numRow, final int numCol)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
@@ -349,7 +349,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      * @deprecated Use {@link #descriptor(String)} instead.
      */
     public final ParameterDescriptor getParameter(String name) {
-        return descriptor(name);
+        return (ParameterDescriptor) descriptor(name);
     }
 
     /**
