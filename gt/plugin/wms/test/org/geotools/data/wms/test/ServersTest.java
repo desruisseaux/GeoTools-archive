@@ -3,6 +3,7 @@ package org.geotools.data.wms.test;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -96,7 +97,7 @@ public class ServersTest extends TestCase {
             String filename = URLEncoder.encode(server.getHost()+random.nextInt(10000),"UTF-8");
             File file = new File("C:\\"+dir+"\\"+filename+".txt");
             file.createNewFile();
-            PrintStream out = new PrintStream(file);
+            PrintStream out = new PrintStream(new FileOutputStream(file));
             boolean passed = serverTest(out, server);
             out.flush();
             out.close();
