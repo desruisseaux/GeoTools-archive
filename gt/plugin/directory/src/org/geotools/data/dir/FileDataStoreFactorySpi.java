@@ -1,21 +1,79 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.dir;
-
-import java.io.IOException;
-import java.net.URL;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import java.io.IOException;
+import java.net.URL;
+
 
 /**
- * <p> 
- * DOCUMENT ME!
+ * <p>
+ * This interface includes some new functionality, and acts as a method of
+ * discovery for DataStoreFactories which support singular files.
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return An ordered list of file extensions which can be read by this
+     *         dataStore.
+     */
     public String[] getFileExtensions();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param f URL a url to a real file (may not be local)
+     *
+     * @return True when this dataStore can resolve and read the data specified
+     *         by the URL.
+     */
     public boolean canProcess(URL f);
-    public DataStore createDataStore(URL url) throws IOException ;
-    public String getTypeName(URL url) throws IOException ;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param url A URL to the data location for the single featureType of this
+     *        DataStore
+     *
+     * @return Returns an AbstractFileDataStore created from the data source
+     *         provided.
+     *
+     * @throws IOException
+     *
+     * @see AbstractFileDataStore
+     */
+    public DataStore createDataStore(URL url) throws IOException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param url The location of the datum to parse into features
+     *
+     * @return Returns the typename of the datum specified (on occasion this
+     *         may involve starting the parse as well to get the FeatureType
+     *         -- may not be instantanious).
+     *
+     * @throws IOException
+     */
+    public String getTypeName(URL url) throws IOException;
 }
