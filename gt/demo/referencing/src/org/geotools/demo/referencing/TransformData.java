@@ -47,10 +47,9 @@ import com.vividsolutions.jts.geom.CoordinateFilter;
 
 /**
  * A simple demo to transform the geometries in a shapefile from the source
- * coordinate system (CS) to an output target coordinate system. Source and target
- * CS's are given here as well know text (WKT) strings.
- *
- * TODO: change the default output path
+ * coordinate system (CS) to a target coordinate system. Source and target
+ * CS's are given here as well know text (WKT) strings. The default output path
+ * is the users home directory.
  *
  * @version $Id:
  * @author rschulz
@@ -66,22 +65,23 @@ public class TransformData {
     //private static String WKT_3 = "GEOGCS[\"Sphere\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]";
     //private static String WKT_4 = "PROJCS[\"TransverseMercator\", GEOGCS[\"Sphere\", DATUM[\"Sphere\", SPHEROID[\"Sphere\", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"semi_major\", 6370997], PARAMETER[\"semi_minor\", 6370997], PARAMETER[\"central_meridian\", 0.0], PARAMETER[\"latitude_of_origin\", 0.0], PARAMETER[\"scale_factor\", 1.0], PARAMETER[\"false_easting\", 0.0], PARAMETER[\"false_northing\", 0.0], UNIT[\"metre\",1.0], AXIS[\"x\",EAST], AXIS[\"y\",NORTH]]";
 
+    /** Factory to create coordinate systems from WKT strings*/
     private CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
+    
+    /** Factory to create transformations from a source and target CS */
     private CoordinateTransformationFactory ctFactory = CoordinateTransformationFactory.getDefault();
-    private CoordinateSystem inCS, outCS;
-    private CoordinateFilter transFilter;
     
     /** Creates a new instance of TransformData */
     public TransformData(URL inURL, URL outURL, String inWKT, String outWKT) {
         try {
             //create the CS's and transformation
-            inCS = csFactory.createFromWKT(inWKT);
-            outCS = csFactory.createFromWKT(outWKT);
+            CoordinateSystem inCS = csFactory.createFromWKT(inWKT);
+            CoordinateSystem outCS = csFactory.createFromWKT(outWKT);
             System.out.println("source CS: " + inCS.getName(Locale.ENGLISH));
             System.out.println("target CS: " + outCS.getName(Locale.ENGLISH));
             CoordinateTransformation transformation = ctFactory.createFromCoordinateSystems(inCS, outCS);
             System.out.println("transform: " + transformation.getMathTransform().toString());
-            transFilter = new TransformationCoordinateFilter(transformation.getMathTransform());
+            CoordinateFilter transFilter = new TransformationCoordinateFilter(transformation.getMathTransform());
             
             //get the input shapefile
             DataStore inStore = new ShapefileDataStore(inURL);
@@ -99,10 +99,8 @@ public class TransformData {
             
             while (inReader.hasNext()) {
                 Feature inFeature = inReader.next();
-                
                 for (int i = 0; i < inFeature.getNumberOfAttributes(); i++) {
                     Object inAttribute = inFeature.getAttribute(i);
-
                     if (inAttribute instanceof Geometry) {
                         Geometry geom = (Geometry) inAttribute;
                         geom.apply(transFilter);
@@ -111,11 +109,9 @@ public class TransformData {
                         outAttributes[i] = inAttribute;
                     }
                 }
-            
-                // Create the new feature
+                // Create and write the new feature
                 outFeatureWriter.next().setAttributes(outAttributes);
                 outFeatureWriter.write();
-              
             }
             
             //close stuff
@@ -123,14 +119,11 @@ public class TransformData {
             outFeatureWriter.close();
             
             System.out.println("Done");
-    
-        }
-        catch (Exception e){
+        } catch (Exception e){
             System.out.println("Exception: " + e);
             e.printStackTrace();
         }
     }
-    
     
     /**
      * Command line arguments are:
@@ -149,7 +142,7 @@ public class TransformData {
         
         if (args.length == 0) {
             inURL = TransformData.class.getClassLoader().getResource("org/geotools/sampleData/statepop.shp");
-            outURL = new URL("file:///home/rschulz/GIS/gt2/gt2test2/data/test6.shp");
+            outURL = new File(System.getProperty("user.home") + "/statepopTransform.shp").toURL();
             new TransformData(inURL, outURL, SOURCE_WKT, TARGET_WKT);
         } else if (args.length == 2) {
             inURL = new File(args[0]).toURL();
