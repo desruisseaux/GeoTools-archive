@@ -51,6 +51,8 @@ import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
+import org.geotools.data.shapefile.shp.xml.Metadata;
+import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -158,7 +160,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * Create our own TypeEntry that will calculate BBox based on
      * available metadata.
      */
-    protected TypeEntry createTypeEntry( final String typeName ) {
+    protected TypeEntry createTypeEntry( final String typeName ) {    
         URI namespace;
         try {
             namespace = getSchema( typeName ).getNamespace();
@@ -176,9 +178,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
              * @return geographic bounding box
              */
             protected Envelope createBounds() {
-                Object meta = metadata().get( "shp.xml" );
-                if( meta != null ) {
-                    return (Envelope) meta;
+                Envelope bbox = null;
+                Metadata meta = (Metadata) metadata().get( "shp.xml" );
+                if( meta != null ) {                    
+                    bbox = meta.getIdinfo().getLbounding();
+                    if( bbox != null ) {
+                        return bbox;                    
+                    }
+                    bbox = meta.getIdinfo().getBounding();
+                    // we would need to reproject this :-P
+                    // so lets not bother right now ...
                 }
                 return super.createBounds();
             }
@@ -194,19 +203,24 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @return Map with xmlURL parsed, or an EMPTY_MAP.
      */
     protected Map createMetadata( String typeName ) {
-        Object meta = parseShpXML();
-        if( meta != null ) {
+        if( xmlURL == null ) {
+            return Collections.EMPTY_MAP;
+        }
+        try {
+            System.out.println("found metadata = " + xmlURL );
+            ShpXmlFileReader reader = new ShpXmlFileReader( xmlURL );
+            
             Map map = new HashMap();
-            map.put( "shp.xml", meta );
+            map.put( "shp.xml", reader.parse() );
+            System.out.println("parsed ..." + xmlURL );
             return map;
         }
-        else {
+        catch (Throwable t ) {
+            LOGGER.warning("Could not parse "+xmlURL+":"+t.getLocalizedMessage() );
             return Collections.EMPTY_MAP;
         }
     }
-    protected Envelope parseShpXML() {
-        return null;
-    }
+    
     /**
      * Determine if the location of this shapefile is local or remote.
      *
