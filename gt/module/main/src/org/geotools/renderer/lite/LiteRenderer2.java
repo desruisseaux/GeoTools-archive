@@ -12,7 +12,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -106,6 +105,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     int error = 0;
+    
+    /** 
+     * This listener is added to the list of listeners automatically.  It should be removed
+     * if the default logging is not needed.
+     */
+    public static final DefaultRenderListener DEFAULT_LISTENER=new DefaultRenderListener();
 
     /** Filter factory for creating bounding box filters */
     private FilterFactory filterFactory = FilterFactory.createFilterFactory();
@@ -185,7 +190,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * using the map context interface
      */
     public LiteRenderer2() {
-        LOGGER.fine("creating new lite renderer, second release");
+        addRenderListener(DEFAULT_LISTENER);
     }
 
     /**
@@ -194,6 +199,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param context Contains pointers to layers, bounding box, and style required for rendering.
      */
     public LiteRenderer2( MapContext context ) {
+        this();
         this.context = context;
     }
 
@@ -250,7 +256,46 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         outputGraphics = (Graphics2D) g;
         screenSize = bounds;
     }
+    ListenerList renderListeners= new ListenerList();
+    
+    /**
+     * adds a listener that responds to error events of feature rendered events.
+     * 
+     * @see RenderListener
+     * 
+     * @param listener the listener to add.
+     */
+    public void addRenderListener(RenderListener listener){
+        renderListeners.add(listener);
+    }
+    /**
+     * Removes a render listener.
+     * 
+     * @see RenderListener
+     * 
+     * @param listener the listener to remove.
+     */
+    public void removeRenderListener(RenderListener listener){
+        renderListeners.remove(listener);
+    }
+    
+    private void fireFeatureRenderedEvent(Feature feature) {
+        Object[] objects=renderListeners.getListeners();
+        for( int i = 0; i < objects.length; i++ ) {
+            RenderListener listener=(RenderListener) objects[i];
+            listener.featureRenderer(feature);
+        }
+    }
 
+    private void fireErrorEvent(Exception e) {
+        Object[] objects=renderListeners.getListeners();
+        for( int i = 0; i < objects.length; i++ ) {
+            RenderListener listener=(RenderListener) objects[i];
+            listener.errorOccurred(e);
+        }
+    }
+
+    
     /**
      * Setter for property scaleDenominator.
      * 
@@ -321,8 +366,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         try {
             pixelToWorld = transform.createInverse();
         } catch (NoninvertibleTransformException e) {
-            LOGGER.warning("Can't create pixel to world transform: " + e.getMessage());
-            e.printStackTrace();
+            fireErrorEvent(new Exception("Can't create pixel to world transform", e));
         }
 
         Point2D p1 = new Point2D.Double();
@@ -362,8 +406,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 processStylers(graphics, results, currLayer.getStyle().getFeatureTypeStyles(), at,
                         context.getCoordinateReferenceSystem());
             } catch (Exception exception) {
-                LOGGER.warning("Exception " + exception + " rendering layer " + currLayer);
-                exception.printStackTrace();
+                fireErrorEvent(new Exception("Exception rendering layer " + currLayer,exception));
             }
 
             labelCache.endLayer(graphics, screenSize);
@@ -462,19 +505,19 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 q.setPropertyNames(attributes);
                 query = q;
             } catch (Exception e) {
-
+                fireErrorEvent(new Exception("Error transforming bbox",e));
                 canTransform = false;
                 DefaultQuery q = new DefaultQuery(schema.getTypeName());
                 q.setPropertyNames(attributes);
                 if( envelope.intersects(featureSource.getBounds())){
-                    LOGGER.severe("Got a tranform exception while trying to de-project the current "
+                    LOGGER.fine("Got a tranform exception while trying to de-project the current "
                             + "envelope, bboxs intersect therefore using envelope)");
                     Filter filter = null;
                     BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
                     filter = createBBoxFilters(schema, attributes, rightBBox);
                     q.setFilter(filter);
                 }else{
-                    LOGGER.severe("Got a tranform exception while trying to de-project the current "
+                    LOGGER.fine("Got a tranform exception while trying to de-project the current "
                             + "envelope, falling back on full data loading (no bbox query)");
                 }
                 query = q;
@@ -641,9 +684,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             processStylers(outputGraphics, DataUtilities.results(features), featureStylers, at,
                     null);
         } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, "I/O error while rendering the layer", ioe);
+            fireErrorEvent(new Exception("I/O error while rendering the layer" ,ioe));
         } catch (IllegalAttributeException iae) {
-            LOGGER.log(Level.SEVERE, "Illegal attribute exception while rendering the layer", iae);
+            fireErrorEvent(new Exception("Illegal attribute exception while rendering the layer" ,iae));
         }
 
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -707,7 +750,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             return c;
         } catch (Exception e) {
-            LOGGER.warning(e.toString());
+            fireErrorEvent(e);
         }
 
         return null;
@@ -786,6 +829,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             FeatureReader reader = features.reader();
             while( true ) {
                 try {
+
+                    if (renderingStopRequested) {
+                        break;
+                    }
+                    
                     if (!reader.hasNext()) {
                         break;
                     }
@@ -793,9 +841,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     boolean doElse = true;
                     Feature feature = reader.next();
 
-                    if (renderingStopRequested) {
-                        return;
-                    }
 
                     String typeName = feature.getFeatureType().getTypeName();
 
@@ -831,9 +876,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                             }
                         }
                     }
+                    fireFeatureRenderedEvent(feature);
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    error++;
+                    fireErrorEvent(e);
                 }
             }
 
@@ -1155,5 +1200,25 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     public void setMemoryPreloadingEnabled( boolean enabled ) {
         this.memoryPreloadingEnabled = enabled;
 
+    }
+    
+    /**
+     * By default ignores all feature renderered events and logs all exceptions as severe.
+     */
+    private static class DefaultRenderListener implements  RenderListener{
+        /**
+         * @see org.geotools.renderer.lite.RenderListener#featureRenderer(org.geotools.feature.Feature)
+         */
+        public void featureRenderer( Feature feature ) {
+            //do nothing.
+        }
+
+        /**
+         * @see org.geotools.renderer.lite.RenderListener#errorOccurred(java.lang.Exception)
+         */
+        public void errorOccurred( Exception e ) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        
     }
 }
