@@ -783,6 +783,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         return bounds(query);
     }
 
+    // TODO: change this so that it queries for just the bbox instead of the entire sub-query schema columns!
+    //        (this is harder than you might think because of filter requirements!)
     protected Envelope bounds(Query query) throws IOException {
         Filter filter = query.getFilter();
 
@@ -813,17 +815,23 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			if(!query.retrieveAllProperties()) {
 				try {
                     schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
-                    if (schemaNew.getDefaultGeometry() == null)  // does the schema have a geometry in it?
+                    if (schemaNew.getDefaultGeometry() == null)  // does the sub-schema have a geometry in it?
                     {
                     	//uh-oh better get one!
-                    	ArrayList al = new ArrayList (Arrays.asList(query.getPropertyNames()));
-                    	al.add(schema.getDefaultGeometry().getName());
-                    	schemaNew = DataUtilities.createSubType(schema, (String[]) al.toArray(new String[1]) );                    	
+                    	if (schema.getDefaultGeometry() != null)  // does the entire schema have a geometry in it? 
+                    	{
+                    		//buff-up the sub-schema so it has the default geometry in it.
+	                    	ArrayList al = new ArrayList (Arrays.asList(query.getPropertyNames()));
+	                    	al.add(schema.getDefaultGeometry().getName());
+	                    	schemaNew = DataUtilities.createSubType(schema, (String[]) al.toArray(new String[1]) );       
+                    	}
                     }
                 } catch (SchemaException e1) {
                     throw new DataSourceException("Could not create subtype", e1);
                 }
 			}
+			 // at this point, the query should have a geometry in it. 
+			 // BUT, if there's no geometry in the table, then the query will not (obviously) have a geometry in it.
 			 
 			 attributeTypes = schemaNew.getAttributeTypes();
 				 
@@ -843,7 +851,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             LOGGER.finer("returning bounds " + retEnv);
 
-            if(schemaNew!=null)
+            if ( (schemaNew!=null) && (schemaNew.getDefaultGeometry() != null) )
                 return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCoordinateSystem());
             if(query.getCoordinateSystem()!=null)
                 return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
