@@ -2168,6 +2168,7 @@ public class WFSTransactionComplexTypes {
         //	   </xsd:complexType>
         private static Element[] elems = new Element[] {
                 FilterSchema.getInstance().getElements()[1],
+				// TODO fix this for max elements
             };
         private static Sequence child = new DefaultSequence(null, elems, 1,
                 Integer.MAX_VALUE);

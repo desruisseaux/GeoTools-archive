@@ -132,12 +132,14 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         if (elements == null) {
             if (type != null) {
-                ElementValue[] vals = new ElementValue[1];
-                vals[0] = new DefaultElementValue(null, text); // null is ok as
-                                                               // this
-                                                               // represents the
-                                                               // mixed content
-
+                ElementValue[] vals;
+				if(type.isMixed()){
+					vals = new ElementValue[1];
+                	vals[0] = new DefaultElementValue(null, text); // null is ok as
+                			// this represents the mixed content
+				}else{
+					vals = new ElementValue[0];
+				}
                 value = type.getValue(elem, vals, attr, hints);
             } else {
                 value = text;

@@ -45,6 +45,8 @@ public interface Action {
     //	public String getTypeName();
     public Filter getFilter();
 
+    public String getTypeName();
+
     public static class UpdateAction implements Action {
         private Filter filter;
         private Map properties;
@@ -76,12 +78,12 @@ public interface Action {
             return new HashMap(properties);
         }
 
-        public String getTypeName() {
-            return typeName;
-        }
-
         public Filter getFilter() {
             return filter;
+        }
+
+        public String getTypeName() {
+            return typeName;
         }
     }
 

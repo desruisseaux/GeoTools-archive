@@ -792,7 +792,7 @@ public class FilterOpsComplexTypes {
             }
 
             if (value.length != 0) {
-                throw new SAXException("Invalid children: more than one");
+                throw new SAXException("Invalid children: more than 0 ... "+value.length);
             }
 
             if (!getName().equals(element.getType().getName())) {

@@ -32,13 +32,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.naming.OperationNotSupportedException;
 
@@ -146,13 +150,39 @@ public class WFSTransactionState implements State {
         HttpURLConnection hc = (HttpURLConnection) postUrl.openConnection();
         hc.setRequestMethod("POST");
 
+        Map hints = new HashMap();
+        hints.put(DocumentWriter.BASE_ELEMENT,
+			WFSSchema.getInstance().getElements()[24]); // Transaction
+        Set fts = new HashSet();
+        Iterator i = actions.iterator();
+        while(i.hasNext()){
+        	Action a = (Action)i.next();
+        	fts.add(a.getTypeName());
+        }
+        Set ns = new HashSet();
+        ns.add(WFSSchema.NAMESPACE.toString());
+        i = fts.iterator();
+        while(i.hasNext()){
+        	ns.add(ds.getSchema((String)i.next()).getNamespace().toString());
+        }
+        hints.put(DocumentWriter.SCHEMA_ORDER,
+    			ns.toArray(new String[ns.size()])); // Transaction
+
+//try{
+//StringWriter sw = new StringWriter();
+//
+//DocumentWriter.writeDocument(this, WFSSchema.getInstance(), sw, hints);
+//System.out.println(sw.toString());
+//sw.flush();
+//sw.close();
+//}catch(Exception e){
+//	e.printStackTrace();
+//}
+        
         OutputStream os = WFSDataStore.getOutputStream(hc, ds.auth);
 
         // write request
         Writer w = new OutputStreamWriter(os);
-        Map hints = new HashMap();
-        hints.put(DocumentWriter.BASE_ELEMENT,
-            WFSSchema.getInstance().getElements()[24]); // Transaction
 
         DocumentWriter.writeDocument(this, WFSSchema.getInstance(), w, hints);
         os.flush();
@@ -164,7 +194,7 @@ public class WFSTransactionState implements State {
 
         TransactionResult ft = (TransactionResult) DocumentFactory.getInstance(is,
                 hints, Level.WARNING);
-
+System.out.println("RESULT IS NULL? "+(ft == null));
         return ft;
     }
 

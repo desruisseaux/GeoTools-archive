@@ -100,7 +100,7 @@ public class GMLComplexTypes {
     private static final String STREAM_FEATURE_NAME_HINT = "org.geotools.xml.gml.STREAM_FEATURE_NAME_HINT";
 
     static void encode(Element e, Geometry g, PrintHandler output)
-        throws IOException {
+        throws OperationNotSupportedException, IOException {
         if (g instanceof Point) {
             encode(e, (Point) g, output);
 
@@ -153,7 +153,7 @@ public class GMLComplexTypes {
     static void encode(Element e, Point g, PrintHandler output)
         throws IOException {
         if ((g == null) || (g.getCoordinate() == null)) {
-            return;
+        	throw new IOException("Bad Point Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -173,7 +173,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "point", ai);
+            output.startElement(GMLSchema.NAMESPACE, "Point", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -181,7 +181,7 @@ public class GMLComplexTypes {
         encodeCoords(null, g.getCoordinates(), output);
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "point");
+            output.endElement(GMLSchema.NAMESPACE, "Point");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
@@ -189,8 +189,8 @@ public class GMLComplexTypes {
 
     static void encode(Element e, LineString g, PrintHandler output)
         throws IOException {
-        if ((g == null) || (g.getCoordinates() == null)) {
-            return;
+        if ((g == null) || (g.getNumPoints() == 0)) {
+        	throw new IOException("Bad LineString Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -210,7 +210,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "lineString", ai);
+            output.startElement(GMLSchema.NAMESPACE, "LineString", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -218,7 +218,7 @@ public class GMLComplexTypes {
         encodeCoords(null, g.getCoordinates(), output);
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "lineString");
+            output.endElement(GMLSchema.NAMESPACE, "LineString");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
@@ -226,8 +226,8 @@ public class GMLComplexTypes {
 
     static void encode(Element e, LinearRing g, PrintHandler output)
         throws IOException {
-        if ((g == null) || (g.getCoordinates() == null)) {
-            return;
+        if ((g == null) || (g.getNumPoints() == 0)) {
+        	throw new IOException("Bad LinearRing Data");
         }
 
         if (e == null) {
@@ -238,9 +238,9 @@ public class GMLComplexTypes {
     }
 
     static void encode(Element e, Polygon g, PrintHandler output)
-        throws IOException {
-        if ((g == null) || (g.getCoordinates() == null)) {
-            return;
+        throws OperationNotSupportedException, IOException {
+        if ((g == null) || (g.getNumPoints() == 0)) {
+        	throw new IOException("Bad Polygon Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -260,22 +260,20 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "polygon", ai);
+            output.startElement(GMLSchema.NAMESPACE, "Polygon", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
 
-        encode((new GMLSchema()).getElements()[35],
-            (LinearRing) g.getExteriorRing(), output);
+        ((new GMLSchema()).getElements()[35]).getType().encode((new GMLSchema()).getElements()[35],g.getExteriorRing(),output,null);
 
         if (g.getNumInteriorRing() > 0) {
             for (int i = 0; i < g.getNumInteriorRing(); i++)
-                encode((new GMLSchema()).getElements()[36],
-                    (LinearRing) g.getInteriorRingN(i), output);
+            	((new GMLSchema()).getElements()[36]).getType().encode((new GMLSchema()).getElements()[36],g.getInteriorRingN(i),output,null);
         }
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "polygon");
+            output.endElement(GMLSchema.NAMESPACE, "Polygon");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
@@ -283,8 +281,8 @@ public class GMLComplexTypes {
 
     static void encode(Element e, MultiPoint g, PrintHandler output)
         throws IOException {
-        if ((g == null) || (g.getNumPoints() > 0)) {
-            return;
+        if ((g == null) || (g.getNumGeometries() <= 0)) {
+        	throw new IOException("Bad MultiPoint Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -304,7 +302,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "multiPoint", ai);
+            output.startElement(GMLSchema.NAMESPACE, "MultiPoint", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -316,7 +314,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "multiPoint");
+            output.endElement(GMLSchema.NAMESPACE, "MultiPoint");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
@@ -325,8 +323,8 @@ public class GMLComplexTypes {
     static void encode(Element e, MultiLineString g, PrintHandler output)
         throws IOException {
 
-        if ((g == null) || g.isEmpty()) {
-            return;
+        if ((g == null) || g.getNumGeometries() <= 0) {
+        	throw new IOException("Bad MultiLineString Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -346,7 +344,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "multiLineString", ai);
+            output.startElement(GMLSchema.NAMESPACE, "MultiLineString", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -358,16 +356,16 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "multiLineString");
+            output.endElement(GMLSchema.NAMESPACE, "MultiLineString");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
     }
 
     static void encode(Element e, MultiPolygon g, PrintHandler output)
-        throws IOException {
-        if ((g == null) || (g.getNumPoints() > 0)) {
-            return;
+        throws OperationNotSupportedException, IOException {
+        if ((g == null) || (g.getNumGeometries() <= 0)) {
+        	throw new IOException("Bad MultiPolygon Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -387,7 +385,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "multiPolygon", ai);
+            output.startElement(GMLSchema.NAMESPACE, "MultiPolygon", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -399,16 +397,16 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "multiPolygon");
+            output.endElement(GMLSchema.NAMESPACE, "MultiPolygon");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
     }
 
     static void encode(Element e, GeometryCollection g, PrintHandler output)
-        throws IOException {
-        if ((g == null) || (g.getNumPoints() > 0)) {
-            return;
+        throws OperationNotSupportedException, IOException {
+        if ((g == null) || (g.getNumGeometries() <= 0)) {
+        	throw new IOException("Bad GeometryCollection Data");
         }
 
         AttributesImpl ai = new AttributesImpl();
@@ -428,7 +426,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.startElement(GMLSchema.NAMESPACE, "multiGeometry", ai);
+            output.startElement(GMLSchema.NAMESPACE, "MultiGeometry", ai);
         } else {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
@@ -440,7 +438,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            output.endElement(GMLSchema.NAMESPACE, "multiGeometry");
+            output.endElement(GMLSchema.NAMESPACE, "MultiGeometry");
         } else {
             output.endElement(e.getNamespace(), e.getName());
         }
@@ -1212,7 +1210,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Geometry g = (Geometry) value;
@@ -1393,7 +1391,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Point g = (Point) value;
@@ -1521,8 +1519,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             return (LineString) value[0].getValue();
@@ -1571,7 +1571,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             LineString g = (LineString) value;
@@ -1699,8 +1699,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             return (Polygon) value[0].getValue();
@@ -1752,7 +1754,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Polygon g = (Polygon) value;
@@ -1880,10 +1882,11 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
-
             return (LinearRing) value[0].getValue();
         }
 
@@ -1933,7 +1936,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             LinearRing g = (LinearRing) value;
@@ -2036,8 +2039,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             Object t = value[0].getValue();
@@ -2111,7 +2116,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Point g = (Point) value;
@@ -2209,8 +2214,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             Object t = value[0].getValue();
@@ -2304,7 +2311,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             LineString g = (LineString) value;
@@ -2401,8 +2408,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             Object t = value[0].getValue();
@@ -2492,7 +2501,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             LinearRing g = (LinearRing) value;
@@ -2588,8 +2597,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             Object t = value[0].getValue();
@@ -2685,7 +2696,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Geometry g = (Geometry) value;
@@ -2707,7 +2718,7 @@ public class GMLComplexTypes {
                 }
             }
 
-            if ((g == null) || (g.getCoordinates() == null)
+            if ((g == null) || (g.getNumPoints() == 0)
                     || (g.getCoordinates().length == 0)) {
                 return;
             }
@@ -2810,8 +2821,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             GeometryFactory gf = new GeometryFactory(DefaultCoordinateSequenceFactory
@@ -2886,7 +2899,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Polygon g = (Polygon) value;
@@ -2981,8 +2994,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             GeometryFactory gf = new GeometryFactory(DefaultCoordinateSequenceFactory
@@ -3043,7 +3058,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             GeometryCollection g = (GeometryCollection) value;
@@ -3141,8 +3156,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             GeometryFactory gf = new GeometryFactory(DefaultCoordinateSequenceFactory
@@ -3203,7 +3220,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             MultiPoint g = (MultiPoint) value;
@@ -3301,8 +3318,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             GeometryFactory gf = new GeometryFactory(DefaultCoordinateSequenceFactory
@@ -3363,7 +3382,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             MultiLineString g = (MultiLineString) value;
@@ -3461,8 +3480,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             GeometryFactory gf = new GeometryFactory(DefaultCoordinateSequenceFactory
@@ -3523,7 +3544,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             MultiPolygon g = (MultiPolygon) value;
@@ -3620,8 +3641,10 @@ public class GMLComplexTypes {
             Element e = value[0].getElement();
 
             if (e == null) {
-                throw new SAXException(
-                    "Internal error, ElementValues require an associated Element.");
+            	if(!element.isNillable())
+            		throw new SAXException(
+                    	"Internal error, ElementValues require an associated Element.");
+            	return null;
             }
 
             Double x;
@@ -3708,7 +3731,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             Coordinate g = (Coordinate) value;
@@ -3923,7 +3946,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                return;
+                throw new OperationNotSupportedException("Cannot encode");
             }
 
             CoordinateSequence g = (CoordinateSequence) value;
@@ -5288,7 +5311,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof Point)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -5446,7 +5469,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof Polygon)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -5604,7 +5627,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof Point)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -5763,7 +5786,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof MultiPoint)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -5923,7 +5946,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof MultiLineString)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -6083,7 +6106,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof MultiPolygon)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {
@@ -6243,7 +6266,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if ((value == null) || !(value instanceof GeometryCollection)) {
-                return;
+            	throw new OperationNotSupportedException("Value is "+value == null?"null":value.getClass().getName());
             }
 
             if (element == null) {

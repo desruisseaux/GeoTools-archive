@@ -107,7 +107,8 @@ public class SimpleElementHandler extends XMLElementHandler {
         throws SAXException {
         text = (text == null) ? null : text.trim();
 
-        ElementValue[] vals = new ElementValue[1];
+        ElementValue[] vals;
+        vals = new ElementValue[1];
         vals[0] = new DefaultElementValue(text, elem);
         value = type.getValue(elem, vals, attr, hints);
         attr = null;
