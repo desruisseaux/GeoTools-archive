@@ -129,10 +129,22 @@
 	<dependencies>
             <dependency>
                <groupId>gt2</groupId>
+               <artifactId>shapefile</artifactId>
+               <type>jar</type>
+               <version>2.1.x</version>
+             </dependency>
+            <dependency>
+               <groupId>gt2</groupId>
                <artifactId>main</artifactId>
                <type>jar</type>
                <version>2.1.x</version>
              </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <type>jar</type>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
     <dependency>
       <id>opengis+legacy</id>
       <version>0.1</version>
@@ -186,17 +198,4 @@
 			</includes>
 		</unitTest>
 	</build>
-	<reports>
-		<report>maven-jdepend-plugin</report>
-		<report>maven-checkstyle-plugin</report>
-		<report>maven-pmd-plugin</report>
-		<report>maven-changelog-plugin</report>
-		<report>maven-file-activity-plugin</report>
-		<report>maven-developer-activity-plugin</report>
-		<report>maven-javadoc-plugin</report>
-		<report>maven-jxr-plugin</report>
-		<report>maven-junit-report-plugin</report>
-		<report>maven-tasklist-plugin</report>
-                <report>maven-clover-plugin</report>
-	</reports>
 </project>
