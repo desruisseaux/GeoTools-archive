@@ -45,9 +45,9 @@ public class DefaultCSBuilder implements CSBuilder {
 	public void setOrdinate(double value, int ordinateIndex, int coordinateIndex) {
 		Coordinate c = coordinateArray[coordinateIndex];
 		switch(ordinateIndex) {
-			case 0: c.x = value;
-			case 1: c.y = value;
-			case 2: c.z = value;
+			case 0: c.x = value; break;
+			case 1: c.y = value; break;
+			case 2: c.z = value; break;
 		}
 	}
 
@@ -80,7 +80,7 @@ public class DefaultCSBuilder implements CSBuilder {
 	 */
 	public int getDimension() {
 		if(coordinateArray != null) {
-			return 3;
+			return 2;
 		} else {
 			return -1;
 		}
@@ -94,7 +94,7 @@ public class DefaultCSBuilder implements CSBuilder {
 		switch(ordinateIndex) {
 			case 0: c.x = value;
 			case 1: c.y = value;
-			case 2: c.z = value;
+			case 2: c.z = Double.NaN;
 		}
 		
 	}
