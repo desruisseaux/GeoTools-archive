@@ -568,7 +568,7 @@ System.out.println("SCHMEMA GET "+url);
             }
         }
 
-System.out.println("GET URL = "+url); // url to request
+//System.out.println("GET URL = "+url); // url to request
         getUrl = new URL(url);
 
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
