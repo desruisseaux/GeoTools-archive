@@ -26,8 +26,9 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Collection;
 import java.awt.geom.Point2D;
 import javax.units.NonSI;
 
@@ -130,10 +131,11 @@ public class Mercator extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
+            final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
-                return new Spherical(parameters, false);
+                return new Spherical(parameters, descriptors);
             } else {
-                return new Mercator(parameters, false);
+                return new Mercator (parameters, descriptors);
             }
         }
     }
@@ -192,10 +194,11 @@ public class Mercator extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
+            final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
-                return new Spherical(parameters, true);
+                return new Spherical(parameters, descriptors);
             } else {
-                return new Mercator(parameters, true);
+                return new Mercator (parameters, descriptors);
             }
         }
     }
@@ -210,27 +213,41 @@ public class Mercator extends MapProjection {
     protected Mercator(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        this(parameters, parameters.getDescriptor().getName().getCode().endsWith("2SP"));
+        this(parameters, getDescriptor(parameters).descriptors());
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static ParameterDescriptorGroup getDescriptor(final ParameterValueGroup parameters) {
+        try {
+            parameters.parameter(Provider2SP.STANDARD_PARALLEL.getName().getCode());
+            return Provider2SP.PARAMETERS;
+        } catch (ParameterNotFoundException ignore) {
+            return Provider1SP.PARAMETERS;
+        }
     }
 
     /**
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  sp2 Indicates if this is a 1 or 2 standard parallel case of the mercator projection.
+     * @param  The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    Mercator(final ParameterValueGroup parameters, final boolean sp2)
+    Mercator(final ParameterValueGroup parameters, final Collection expected)
             throws ParameterNotFoundException
     {
         //Fetch parameters 
-        super(parameters);
-        if (sp2) {
+        super(parameters, expected);
+        if (expected.contains(Provider2SP.STANDARD_PARALLEL)) {
             // scaleFactor is not a parameter in the Mercator_2SP case and is computed from
             // the standard parallel.   The super-class constructor should have initialized
             // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
             // user implementation still provides a scale factor for its custom projections.
-            standardParallel = Math.abs(doubleValue(Provider2SP.STANDARD_PARALLEL, parameters));
+            standardParallel = Math.abs(doubleValue(expected,
+                                        Provider2SP.STANDARD_PARALLEL, parameters));
             ensureLatitudeInRange(Provider2SP.STANDARD_PARALLEL, standardParallel, false);
             if (isSpherical) {
                 scaleFactor *= Math.cos(standardParallel);
@@ -249,22 +266,20 @@ public class Mercator extends MapProjection {
     /**
      * {@inheritDoc}
      */
+    protected ParameterDescriptorGroup getParameterDescriptors() {
+        return Double.isNaN(standardParallel) ? Provider1SP.PARAMETERS
+                                              : Provider2SP.PARAMETERS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public ParameterValueGroup getParameterValues() {
-        final boolean sp1 = Double.isNaN(standardParallel);
-        final ParameterDescriptorGroup descriptor = (sp1) ? Provider1SP.PARAMETERS
-                                                          : Provider2SP.PARAMETERS;
-        // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
-        final ParameterValueGroup values = (ParameterValueGroup) descriptor.createValue();
-        set(Provider.SEMI_MAJOR,       values, semiMajor      );
-        set(Provider.SEMI_MINOR,       values, semiMinor      );
-        set(Provider.CENTRAL_MERIDIAN, values, centralMeridian);
-        if (sp1) {
-            set(Provider1SP.SCALE_FACTOR, values, scaleFactor);
-        } else {
-            set(Provider2SP.STANDARD_PARALLEL, values, standardParallel);
+        final ParameterValueGroup values = super.getParameterValues();
+        if (!Double.isNaN(standardParallel)) {
+            final Collection expected = getParameterDescriptors().descriptors();
+            set(expected, Provider2SP.STANDARD_PARALLEL, values, standardParallel);
         }
-        set(Provider.FALSE_EASTING,  values, falseEasting );
-        set(Provider.FALSE_NORTHING, values, falseNorthing);
         return values;
     }
     
@@ -319,13 +334,13 @@ public class Mercator extends MapProjection {
          * Construct a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
-         * @param  sp2 Indicates if this is a 1 or 2 standard parallel case of the mercator projection.
+         * @param  The expected parameter descriptors.
          * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
-        protected Spherical(final ParameterValueGroup parameters, final boolean sp2)
+        protected Spherical(final ParameterValueGroup parameters, final Collection expected)
                 throws ParameterNotFoundException
         {
-            super(parameters, sp2);
+            super(parameters, expected);
             assert isSpherical;
 	}
 

@@ -102,6 +102,18 @@ public class Citation extends MetadataEntity
     }
 
     /**
+     * The <A HREF="http://www.esri.com">ESRI</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#ESRI
+     */
+    public static final Citation ESRI = new Citation("ESRI");
+    static {
+        ESRI.setCitedResponsibleParties(Collections.singleton(
+             org.geotools.metadata.citation.ResponsibleParty.ESRI));
+        ESRI.freeze();
+    }
+
+    /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      *
      * @see org.geotools.metadata.citation.ResponsibleParty#GEOTOOLS

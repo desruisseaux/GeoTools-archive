@@ -55,7 +55,8 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing                    .BasicTest           .suite());
         suite.addTest(org.geotools.referencing                    .ParameterTest       .suite());
         suite.addTest(org.geotools.referencing.operation.transform.LocalizationGridTest.suite());
-        suite.addTest(org.geotools.referencing.operation.transform.MathTransformTest     .suite());
+        suite.addTest(org.geotools.referencing.operation.transform.MathTransformTest   .suite());
+        suite.addTest(org.geotools.referencing.operation          .ProjectionTest      .suite());
         return suite;
     }
 }

@@ -33,7 +33,7 @@ import java.util.AbstractList;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class UnmodifiableArrayList extends AbstractList implements Serializable {
+public class UnmodifiableArrayList extends AbstractList implements Serializable {
     /**
      * For compatibility with different versions.
      */

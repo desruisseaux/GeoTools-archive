@@ -70,7 +70,7 @@ public class Contact extends MetadataEntity
         EPSG.setOnLineResource(org.geotools.metadata.citation.OnLineResource.EPSG);
         EPSG.freeze();
     }
-    
+
     /**
      * Contact informations for the
      * <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> group.
@@ -81,6 +81,17 @@ public class Contact extends MetadataEntity
     static {
         GEOTIFF.setOnLineResource(org.geotools.metadata.citation.OnLineResource.GEOTIFF);
         GEOTIFF.freeze();
+    }
+
+    /**
+     * Contact informations for <A HREF="http://www.esri.com">ESRI</A>.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#ESRI
+     */
+    public static final Contact ESRI = new Contact();
+    static {
+        ESRI.setOnLineResource(org.geotools.metadata.citation.OnLineResource.ESRI);
+        ESRI.freeze();
     }
     
     /**

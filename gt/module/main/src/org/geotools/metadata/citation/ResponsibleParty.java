@@ -67,8 +67,6 @@ public class ResponsibleParty extends MetadataEntity
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> responsible party.
      *
      * @see org.geotools.metadata.citation.Contact#EPSG
-     *
-     * @todo Localize.
      */
     public static ResponsibleParty EPSG = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
     static {
@@ -76,20 +74,30 @@ public class ResponsibleParty extends MetadataEntity
         EPSG.setContactInfo(org.geotools.metadata.citation.Contact.EPSG);
         EPSG.freeze();
     }
-    
+
     /**
      * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> responsible
      * party.
      *
      * @see org.geotools.metadata.citation.Contact#GEOTIFF
-     *
-     * @todo Localize.
      */
     public static ResponsibleParty GEOTIFF = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
     static {
         GEOTIFF.setOrganisationName(new SimpleInternationalString("GeoTIFF"));
         GEOTIFF.setContactInfo(org.geotools.metadata.citation.Contact.GEOTIFF);
         GEOTIFF.freeze();
+    }
+
+    /**
+     * The <A HREF="http://www.esri.com">ESRI</A> responsible party.
+     *
+     * @see org.geotools.metadata.citation.Contact#ESRI
+     */
+    public static ResponsibleParty ESRI = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        ESRI.setOrganisationName(new SimpleInternationalString("ESRI"));
+        ESRI.setContactInfo(org.geotools.metadata.citation.Contact.ESRI);
+        ESRI.freeze();
     }
     
     /**

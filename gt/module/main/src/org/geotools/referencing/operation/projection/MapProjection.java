@@ -27,6 +27,7 @@ package org.geotools.referencing.operation.projection;
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.Collection;
 import javax.units.Unit;
 import javax.units.SI;
 import javax.units.NonSI;
@@ -215,13 +216,37 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     protected MapProjection(final ParameterValueGroup values) throws ParameterNotFoundException {
-        semiMajor           = doubleValue(Provider.SEMI_MAJOR,         values);
-        semiMinor           = doubleValue(Provider.SEMI_MINOR,         values);
-        centralMeridian     = doubleValue(Provider.CENTRAL_MERIDIAN,   values);
-        latitudeOfOrigin    = doubleValue(Provider.LATITUDE_OF_ORIGIN, values);
-        scaleFactor         = doubleValue(Provider.SCALE_FACTOR,       values);
-        falseEasting        = doubleValue(Provider.FALSE_EASTING,      values);
-        falseNorthing       = doubleValue(Provider.FALSE_NORTHING,     values);
+        this(values, null);
+    }
+
+    /**
+     * Constructor invoked by sub-classes when we can't rely on
+     * {@link #getParameterDescriptors} before the construction
+     * is completed. This is the case when the later method depends on
+     * the value of some class's attribute, which has not yet been set.
+     * An example is {@link Mercator#getParameterDescriptors}.
+     *
+     * This method is not public because it is not a very elegant hack, and
+     * a work around exists. For example Mercator_1SP and Mercator_2SP could
+     * be implemented by two separated classes, in which case {@link #getParameterDescriptors}
+     * returns a constant and can be safely invoked in a constructor. We do
+     * not always use this cleaner way in the projection package because it
+     * is going to contains a lot of.. well... projections, and we will try
+     * to reduce the amount of class declarations.
+     */
+    MapProjection(final ParameterValueGroup values, Collection expected)
+            throws ParameterNotFoundException
+    {
+        if (expected == null) {
+            expected = getParameterDescriptors().descriptors();
+        }
+        semiMajor           = doubleValue(expected, Provider.SEMI_MAJOR,         values);
+        semiMinor           = doubleValue(expected, Provider.SEMI_MINOR,         values);
+        centralMeridian     = doubleValue(expected, Provider.CENTRAL_MERIDIAN,   values);
+        latitudeOfOrigin    = doubleValue(expected, Provider.LATITUDE_OF_ORIGIN, values);
+        scaleFactor         = doubleValue(expected, Provider.SCALE_FACTOR,       values);
+        falseEasting        = doubleValue(expected, Provider.FALSE_EASTING,      values);
+        falseNorthing       = doubleValue(expected, Provider.FALSE_NORTHING,     values);
         isSpherical         = (semiMajor == semiMinor);
         excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
         excentricity        = Math.sqrt(excentricitySquared);
@@ -236,6 +261,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * <code>param</code> argument, except {@link NonSI#DEGREE_ANGLE degrees} which
      * are converted to {@link SI#RADIAN radians}.
      *
+     * @param  descriptors The value returned by
+     *         <code>getParameterDescriptors().descriptors()</code>.
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
      * @return The requested parameter value.
@@ -243,20 +270,33 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *
      * @see MathTransformProvider#doubleValue
      */
-    static double doubleValue(final ParameterDescriptor param,
+    static double doubleValue(final Collection    descriptors,
+                              final ParameterDescriptor param,
                               final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        final Unit unit = param.getUnit();
-        final ParameterValue value = group.parameter(param.getName().getCode());
         double v;
-        if (unit != null) {
-            v = value.doubleValue(unit);
-            if (NonSI.DEGREE_ANGLE.equals(unit)) {
-                v = Math.toRadians(v);
+        final Unit unit = param.getUnit();
+        if (descriptors.contains(param)) {
+            final ParameterValue value = group.parameter(param.getName().getCode());
+            if (unit != null) {
+                v = value.doubleValue(unit);
+                if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                    v = Math.toRadians(v);
+                }
+            } else {
+                v = value.doubleValue();
             }
         } else {
-            v = value.doubleValue();
+            final Object value = param.getDefaultValue();
+            if (value instanceof Number) {
+                v = ((Number) value).doubleValue();
+                if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                    v = Math.toRadians(v);
+                }
+            } else {
+                v = Double.NaN;
+            }
         }
         return v;
     }
@@ -311,23 +351,52 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * Set the value in a parameter group. This convenience method is used
      * by subclasses for {@link #getParameterValues} implementation. Values
      * are automatically converted from radians to degrees if needed.
+     *
+     * @param descriptors The value returned by
+     *        <code>getParameterDescriptors().descriptors()</code>.
+     * @param descriptor  One of the {@link Provider} constants.
+     * @param values      The group in which to set the value.
+     * @param value       The value to set.
      */
-    static void set(final ParameterDescriptor descriptor,
+    static void set(final Collection          descriptors,
+                    final ParameterDescriptor descriptor,
                     final ParameterValueGroup values,
-                          double              value)
+                    double value)
     {
-        if (NonSI.DEGREE_ANGLE.equals(descriptor.getUnit())) {
-            value = Math.toDegrees(value);
+        if (descriptors.contains(descriptor)) {
+            if (NonSI.DEGREE_ANGLE.equals(descriptor.getUnit())) {
+                value = Math.toDegrees(value);
+            }
+            values.parameter(descriptor.getName().getCode()).setValue(value);
         }
-        values.parameter(descriptor.getName().getCode()).setValue(value);
     }
+
+    /**
+     * Returns the parameter descriptors for this map projection.
+     * This is used for a providing a default implementation of
+     * {@link #getParameterValues}, as well as arguments checking.
+     */
+    protected abstract ParameterDescriptorGroup getParameterDescriptors();
 
     /**
      * Returns the parameter values for this map projection.
      *
      * @return A copy of the parameter values for this map projection.
      */
-    public abstract ParameterValueGroup getParameterValues();
+    public ParameterValueGroup getParameterValues() {
+        final ParameterDescriptorGroup descriptor = getParameterDescriptors();
+        final Collection expected = descriptor.descriptors();
+        // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
+        final ParameterValueGroup values = (ParameterValueGroup) descriptor.createValue();
+        set(expected, Provider.SEMI_MAJOR,         values, semiMajor       );
+        set(expected, Provider.SEMI_MINOR,         values, semiMinor       );
+        set(expected, Provider.CENTRAL_MERIDIAN,   values, centralMeridian );
+        set(expected, Provider.LATITUDE_OF_ORIGIN, values, latitudeOfOrigin);
+        set(expected, Provider.SCALE_FACTOR,       values, scaleFactor     );
+        set(expected, Provider.FALSE_EASTING,      values, falseEasting    );
+        set(expected, Provider.FALSE_NORTHING,     values, falseNorthing   );
+        return values;
+    }
     
     /**
      * Returns the dimension of input points.

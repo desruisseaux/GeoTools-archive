@@ -24,8 +24,10 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Collections;
@@ -176,14 +178,45 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
     }
 
     /**
+     * A view of {@link #parameters} as an unmodifiable list. This class overides
+     * {@link #contains} with a faster implementation based on {@link HashSet}.
+     * It can help for map projection implementations (among other), which test
+     * often for a parameter validity.
+     */
+    private static final class AsList extends UnmodifiableArrayList {
+        /** For compatibility with different versions. */
+        private static final long serialVersionUID = -2116304004367396735L;
+
+        /** The element as a set. Will be constructed only when first needed. */
+        private transient Set asSet;
+
+        /** Construct a list for the specified array. */
+        public AsList(final GeneralParameterDescriptor[] array) {
+            super(array);
+        }
+
+        /** Test for the inclusion of the specified descriptor. */
+        public boolean contains(final Object object) {
+            if (asSet == null) {
+                asSet = new HashSet(this);
+            }
+            return asSet.contains(object);
+        }
+    }
+
+    /**
      * Returns the parameters in this group.
      */
     public List descriptors() {
         if (asList == null) {
-            if (parameters == null){
+            if (parameters == null) {
                 asList = Collections.EMPTY_LIST;
-            } else {
-                asList = new UnmodifiableArrayList(parameters);
+            } else switch (parameters.length) {
+                case 0:  asList = Collections.EMPTY_LIST;                   break;
+                case 1:  asList = Collections.singletonList(parameters[0]); break;
+                case 2:  // fall through
+                case 3:  asList = new UnmodifiableArrayList(parameters);    break;
+                default: asList = new AsList(parameters);                   break;
             }
         }
         return asList;
