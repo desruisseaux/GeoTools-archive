@@ -17,7 +17,10 @@
 package org.geotools.catalog;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.geotools.xml.XPath;
+import org.geotools.xml.XPathFactory;
 import org.opengis.catalog.MetadataEntity.Element;
 
 import junit.framework.TestCase;
@@ -28,7 +31,7 @@ import junit.framework.TestCase;
  * @author jeichar
  *
  */
-public class XPathTest extends TestCase {
+public class MetadataXPathTest extends TestCase {
 
     /*
      * @see TestCase#setUp()
@@ -38,30 +41,30 @@ public class XPathTest extends TestCase {
    }
 
     public void testXPath() {
-        XPath xpath=new XPath("google/library/*");
-        String[] terms=xpath.getTerms();
+        XPath xpath=new MetadataXPath("google/library/\\w*");
+        Pattern[] terms=xpath.getTerms();
         assertNotNull(terms);
-        assertEquals(terms[0],"google");
-        assertEquals(terms[1],"library");
-        assertEquals(terms[2],"*");
+        assertEquals(terms[0].pattern(),"google");
+        assertEquals(terms[1].pattern(),"library");
+        assertEquals(terms[2].pattern(),"\\w*");
     }
 
     /*
      * Class under test for Element match(Metadata, int)
      */
     public void testMatchMetadataint() {
-        XPath xpath=new XPath("fileData/name");
+        XPath xpath=new MetadataXPath("fileData/name");
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=xpath.getElement(data.getEntityType());
+        List result=xpath.find(data.getEntityType());
         assertEquals(result.size(),1);
         Element elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"name");
         assertEquals(elem.getType(),String.class);
         
-        xpath=new XPath("fileData");
+        xpath=new MetadataXPath("fileData");
         data=new StupidNestedMetadataImpl();
-        result=xpath.getElement(data.getEntityType());
+        result=xpath.find(data.getEntityType());
         assertEquals(result.size(),1);
         elem=(Element)result.get(0);
         assertNotNull(elem);
@@ -76,7 +79,7 @@ public class XPathTest extends TestCase {
      */
     public void testMatchStringMetadata() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=XPath.getElement("fileData/name",data);
+        List result=XPathFactory.find("fileData/name",data);
         assertEquals(result.size(),1);
         Element elem=(Element)result.get(0);
         assertNotNull(elem);
@@ -90,15 +93,15 @@ public class XPathTest extends TestCase {
      */
     public void testMatchStringMetadataWildCards() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=XPath.getElement("fileData/\\w*",data);
+        List result=XPathFactory.find("fileData/\\w*",data);
         assertEquals(result.size(),3);
 
-        result=XPath.getElement("\\w*/name",data);
+        result=XPathFactory.find("\\w*/name",data);
         assertEquals(result.size(),1);
         Element element=(Element)result.get(0);
         assertEquals(element.getType(),String.class);
     
-        result=XPath.getElement("\\w*",data);
+        result=XPathFactory.find("\\w*",data);
         assertEquals(result.size(),2);
         element=(Element)result.get(0);
         Element element1=(Element)result.get(1);
@@ -109,15 +112,15 @@ public class XPathTest extends TestCase {
         
         // Now test getValue
         data=new StupidNestedMetadataImpl();
-        result=XPath.getValue("fileData/\\w*",data);
+        result=XPathFactory.value("fileData/\\w*",data);
         assertEquals(result.size(),3);
 
-        result=XPath.getValue("\\w*/name",data);
+        result=XPathFactory.value("\\w*/name",data);
         assertEquals(result.size(),1);
         String name=(String)result.get(0);
         assertEquals(name,"Stupid");
     
-        result=XPath.getValue("\\w*",data);
+        result=XPathFactory.value("\\w*",data);
         assertEquals(result.size(),2);
     }
 

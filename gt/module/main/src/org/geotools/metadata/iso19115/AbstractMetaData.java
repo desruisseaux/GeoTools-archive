@@ -30,9 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.geotools.xml.XPathFactory;
 import org.opengis.catalog.MetadataEntity;
 
-import org.geotools.catalog.XPath;
 import org.opengis.metadata.MetaData;
 
 /**
@@ -85,7 +85,7 @@ public abstract class AbstractMetaData implements MetadataEntity, MetaData {
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
      */
     public final Object getElement(String xpath) {
-        List elements = XPath.getValue(xpath, this);
+        List elements = XPathFactory.value(xpath, this);
 
         if (elements.isEmpty()) {
             return null;
@@ -255,7 +255,7 @@ public abstract class AbstractMetaData implements MetadataEntity, MetaData {
          * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
          */
         public Object getElement(String xpath) {
-            List result = XPath.getElement(xpath, this);
+            List result = XPathFactory.find(xpath, this);
 
             if (result.isEmpty()) {
                 return null;

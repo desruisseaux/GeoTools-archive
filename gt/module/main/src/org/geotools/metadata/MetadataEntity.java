@@ -43,10 +43,10 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies
-import org.geotools.catalog.XPath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.xml.XPathFactory;
 
 
 /**
@@ -157,7 +157,7 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
      * @return element value, List of element value, or null if xPath did not match anything.
      */
     public final Object getElement(final String xpath) {
-        final List elements = XPath.getValue(xpath, this);
+        final List elements = XPathFactory.value(xpath, this);
         switch (elements.size()) {
             case 0:  return null;
             case 1:  return elements.get(0);
@@ -353,7 +353,7 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
          * 		A List is many Elements are found to match the xpath.
          */
         public Object getElement(final String xpath) {
-            final List result = XPath.getElement(xpath, this);
+            final List result = XPathFactory.find(xpath, this);
             switch (result.size()) {
                 case 0:  return null;
                 case 1:  return result.get(0);
