@@ -23,6 +23,7 @@ package org.geotools.measure;
 // J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.text.Format;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -303,6 +304,24 @@ public class CoordinateFormat extends Format {
             final Format format = formats[i];
             if (format!=lastFormat && (format instanceof SimpleDateFormat)) {
                 ((SimpleDateFormat) format).applyPattern(pattern);
+                lastFormat = format;
+            }
+        }
+    }
+
+    /**
+     * Set the time zone for dates fields. If some ordinates are formatted as date (for example in
+     * {@linkplain org.geotools.referencing.cs.TemporalCS temporal coordinate system}), then
+     * those dates will be formatted using the specified time zone.
+     *
+     * @param timezone The time zone for dates.
+     */
+    public void setTimeZone(final TimeZone timezone) {
+        Format lastFormat = null;
+        for (int i=0; i<formats.length; i++) {
+            final Format format = formats[i];
+            if (format!=lastFormat && (format instanceof DateFormat)) {
+                ((DateFormat) format).setTimeZone(timezone);
                 lastFormat = format;
             }
         }

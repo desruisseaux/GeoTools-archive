@@ -22,6 +22,7 @@ package org.geotools.measure;
 // J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.text.Format;
 import java.text.ParseException;
 
@@ -117,14 +118,8 @@ public class FormatTest extends TestCase {
                     new TemporalCRS("Time", datum, TemporalCS.DAYS));
         final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
         format.setCoordinateReferenceSystem(crs);
+        format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
 	DirectPosition position = new DirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
-        String txt = format.format( position );
-	String expected = "23°46,8'E 12°44,4'S 127,9 4 janv. 2003";
-	if( !expected.equals( txt )){
-	    System.err.println( "FORMAT:'"+txt+"'" );
-	    System.err.println( "EXPECT:'"+expected+"'" );
-
-	}
-        //assertEquals( expected, txt );
+        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
      }
 }
