@@ -57,14 +57,14 @@
      ================================================================== -->
         <goal name="info">
                 <echo>  
-      Information on Building Geotools2.0-B6-DEV
+      Information on Building Geotools 2.1.x
       -----------------------   
       Make sure you use 'maven build' in the top directory at least once in order
       to build all modules before working on individual ones.
                 
       If building everything use:
         maven build         -- this will try to build all modules regardless
-        maven createRelease -- uses argument: -Drelease.version=2.0-B5-DEV
+        maven createRelease -- uses argument: -Drelease.version=2.1.x
                         
       If building a single module use one of:
         maven java:compile -- compile java files in src/
