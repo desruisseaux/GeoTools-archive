@@ -291,11 +291,11 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *
      * @throws IllegalArgumentException if the range <code>[minimum..maximum]</code> is not valid.
      */
-    public SampleDimension(final String description,
+    public SampleDimension(final InternationalString description,
                            SampleDimensionType type,
                            ColorInterpretation color,
                            final Color [] palette,
-                           final String[] categories,
+                           final InternationalString[] categories,
                            final double[] nodata,
                                  double   minimum,
                                  double   maximum,
@@ -304,17 +304,17 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                            final Unit     unit)
     {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
-        //       ("Relax constraint on placement of this()/super() call in constructors").
+        //       ("Relax constraint on placement of this()/super() call in constructors").        
         this(list(description, type, color, palette, categories, nodata,
                   minimum, maximum, scale, offset, unit));
     }
 
     /** Constructs a list of categories. Used by constructors only. */
-    private static CategoryList list(final String description,
+    private static CategoryList list(final InternationalString description,
                                      SampleDimensionType type,
                                      ColorInterpretation color,
                                      final Color [] palette,
-                                     final String[] categories,
+                                     final InternationalString[] categories,
                                      final double[] nodata,
                                            double   minimum,
                                            double   maximum,
@@ -357,7 +357,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                     // This category will be added in step 2 below.
                     continue;
                 }
-                name = categories[intValue];
+                name = categories[intValue].toString();
             }
             final Number value = wrapSample(padValue, type, false);
             if (name == null) {
@@ -376,8 +376,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         if (nameCount != 0) {
             int lower = 0;
             for (int upper=1; upper<=categories.length; upper++) {
-                final String name = categories[lower].trim();
-                if (upper!=categories.length && name.equalsIgnoreCase(categories[upper].trim())) {
+                final String name = categories[lower].toString().trim();
+                if (upper!=categories.length && name.equalsIgnoreCase(categories[upper].toString().trim())) {
                     // If there is a suite of categories with identical name,  create only one
                     // category with range [lower..upper] instead of one new category for each
                     // sample value.
@@ -485,7 +485,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                                                      (int)Math.ceil (minimum),
                                                      (int)Math.floor(maximum));
                 categoryList.add(new Category(
-                    new SimpleInternationalString(description!=null ? description : "(automatic)"),
+                    description!=null ? description : new SimpleInternationalString("(automatic)"),
                     colors, range, scale, offset));
                 needQuantitative = false;
             }
@@ -614,12 +614,11 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         } else {
             colors = null;
         }
-        final Locale locale = Locale.getDefault();
-        return new SampleDimension(sd.getDescription(locale),
+        return new SampleDimension(sd.getDescription(),
                                    sd.getSampleDimensionType(),
                                    sd.getColorInterpretation(),
                                    colors,
-                                   sd.getCategoryNames(locale),
+                                   sd.getCategoryNames(),
                                    sd.getNoDataValues(),
                                    sd.getMinimumValue(),
                                    sd.getMaximumValue(),
