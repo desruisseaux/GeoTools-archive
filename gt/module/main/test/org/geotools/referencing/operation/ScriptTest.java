@@ -2,7 +2,6 @@
  * A first attempt to port script test to ...referencing
  *
  * To do:
- *   Uncomment MT_Molodensky_TestScript - needs MolodenskyTransform implemented
  *   Uncomment MT_Proj_TestScript - need some projections implemented
  *   Uncomment <projection>_TestScripts in main (to test CRS parsing)
  *      - requires a CRS parser
@@ -18,6 +17,7 @@
  *   Get MT_*Tests running - need a wkt parser for math transforms
  *   Uncomment MathTransform wkt check in addDefinition()
  *      - reqires fix / clarification to AbstractMathTransform formatWKT()
+ *   Uncomment MT_Molodensky_TestScript - needs MolodenskyTransform implemented
  */
 
 
@@ -712,9 +712,9 @@ public class ScriptTest extends TestCase {
      * @throws FactoryException if a line can't be parsed.
      * @throws TransformException if the transformation can't be run.
      */
-//    public void testMTMolodesky() throws IOException, FactoryException {
-//        runScript(MT_MOLODENSKY_SCRIPT);
-//    }
+    public void testMTMolodesky() throws IOException, FactoryException {
+        runScript(MT_MOLODENSKY_SCRIPT);
+    }
     
     /**
      * Run the test from the command line. By default, this method run all tests. In order
@@ -779,7 +779,7 @@ public class ScriptTest extends TestCase {
             done = true;
         }
         if (script==null || script.equalsIgnoreCase("MT_Molodensky")) {
-//            test.testMTMolodesky();
+            test.testMTMolodesky();
             done = true;
         }
         if (script!=null && !done) {
