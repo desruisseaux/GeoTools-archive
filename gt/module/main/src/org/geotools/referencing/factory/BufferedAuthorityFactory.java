@@ -183,7 +183,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * {@code false} if no backing store were setup and
      * {@link DeferredAuthorityFactory#createBackingStore} throws an exception.
      */
-    public synchronized boolean isReady() {
+    synchronized boolean isReady() {
         try {
             return getBackingStore().isReady();
         } catch (FactoryException exception) {

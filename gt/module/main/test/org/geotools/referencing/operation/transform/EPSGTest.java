@@ -20,7 +20,9 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -84,18 +86,31 @@ public class EPSGTest extends TestCase {
      * not throws an exception for peoples who don't have an EPSG database on their machine.
      */
     protected void setUp() {
-        // TODO: disabled for now.
-        if (false) {
+        boolean isReady = false;
+        try {
             // Do not rely on FactoryFinder: we rely want to test this implementation,
             // not an arbitrary implementation. The WKT-based factory for instance doesn't
             // have suffisient capabilities for this test.
             factory = new DefaultFactory();
-            if (!factory.isReady()) {
-                factory = null;
-                Logger.getLogger("org.geotools.referencing")
-                      .warning("Failed to connect to the EPSG factory. " +
-                               "No test will pe performed for this class.");
-            }
+            isReady = factory.isReady();
+        } catch (RuntimeException error) {
+            factory = null;
+            final LogRecord record = new LogRecord(Level.WARNING,
+                    "An error occured while setting up the date source for the EPSG database.\n" +
+                    "Maybe there is no JDBC-ODBC bridge for the current platform.\n" +
+                    "No test will pe performed for this class.");
+            record.setSourceClassName(EPSGTest.class.getName());
+            record.setSourceMethodName("setUp");
+            record.setThrown(error);
+            Logger.getLogger("org.geotools.referencing").log(record);
+            return;
+        }
+        if (!isReady) {
+            factory = null;
+            Logger.getLogger("org.geotools.referencing").warning(
+                "Failed to connect to the EPSG authority factory.\n" +
+                "This is a normal failure when no EPSG database is available on the current machine.\n" +
+                "No test will pe performed for this class.");
         }
     }
 

@@ -215,6 +215,22 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         } catch (SQLException exception) {
             // TODO: localize
             throw new FactoryException("Failed to connect to the EPSG database", exception);
+        } catch (RuntimeException exception) {
+            /*
+             * May happen in some unpolished JDBC drivers. For example the JDBC-ODBC bridge on
+             * Linux throws a NullPointerException when trying to log a warning to the tracer.
+             * Log a message, since many application will catch the FactoryException without
+             * looking further in its cause. Use a relatively low level for the warning, since
+             * this error may not be of interest in some configurations.
+             */
+            // TODO: localize
+            final LogRecord record = new LogRecord(Level.FINE,
+                    "Unexpected exception in JDBC data source.");
+            record.setSourceClassName(DefaultFactory.class.getName());
+            record.setSourceMethodName("createBackingStore");
+            record.setThrown(exception);
+            LOGGER.log(record);
+            throw new FactoryException("Failed to connect to the EPSG database", exception);
         }
         // TODO: Provide a localized message including the database version.
         LOGGER.config("Connected to EPSG database \"" + url + "\".");

@@ -143,6 +143,17 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
+     * Returns {@code true} if this factory is ready. The default implementation may
+     * returns {@code false} for example if a connection to the EPSG database failed.
+     *
+     * @todo Consider moving this method in GeoAPI interfaces. However, we need to decide
+     *       first if there is a need for some general API for discovering factory capabilities.
+     */
+    boolean isReady() {
+        return true;
+    }
+
+    /**
      * Returns the low-level {@linkplain ObjectFactory object factory} used for
      * {@linkplain #createObject object creation}.
      *

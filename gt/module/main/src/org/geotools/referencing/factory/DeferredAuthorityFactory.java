@@ -33,6 +33,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
+import org.geotools.factory.OptionalFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 
 
@@ -45,7 +46,9 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory {
+public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
+                                            implements OptionalFactory
+{
     /**
      * The timer for {@linkplain AbstractAuthorityFactory#dispose disposing} backing stores.
      *
@@ -107,6 +110,14 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory 
      * underlying database.
      */
     public abstract Citation getAuthority();
+
+    /**
+     * Returns {@code true} if this factory is ready. The default implementation returns
+     * {@code false} if {@link #createBackingStore} throws an exception.
+     */
+    public boolean isReady() {
+        return super.isReady();
+    }
 
     /**
      * Returns the backing store authority factory.

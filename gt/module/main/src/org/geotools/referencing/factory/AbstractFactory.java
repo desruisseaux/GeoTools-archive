@@ -31,9 +31,6 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.ObjectFactory;
 
-// Geotools dependencies
-import org.geotools.factory.OptionalFactory;
-
 
 /**
  * Base class for all factories. Factories can be grouped in two categories:
@@ -50,7 +47,7 @@ import org.geotools.factory.OptionalFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractFactory implements Factory, OptionalFactory {
+public class AbstractFactory implements Factory, org.geotools.factory.Factory {
     /**
      * The logger for event related to Geotools's factories.
      */
@@ -71,16 +68,5 @@ public class AbstractFactory implements Factory, OptionalFactory {
      */
     public Citation getVendor() {
         return org.geotools.metadata.citation.Citation.GEOTOOLS;
-    }
-
-    /**
-     * Returns {@code true} if this factory is ready. The default implementation may
-     * returns {@code false} for example if a connection to the EPSG database failed.
-     *
-     * @todo Consider moving this method in GeoAPI interfaces. However, we need to decide
-     *       first if there is a need for some general API for discovering factory capabilities.
-     */
-    public boolean isReady() {
-        return true;
     }
 }
