@@ -71,7 +71,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * JDBCDataStore).
  * </p>
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: ArcSDEDataStore.java,v 1.8 2004/06/28 10:24:32 jfear Exp $
  */
 public class ArcSDEDataStore extends AbstractDataStore {
@@ -512,71 +512,6 @@ public class ArcSDEDataStore extends AbstractDataStore {
         } finally {
             if (sdeQuery != null) {
                 sdeQuery.close();
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param argv DOCUMENT ME!
-     */
-    public static void main(String[] argv) {
-        ConnectionConfig cc = new ConnectionConfig("arcsde", "postgis", "5151",
-                "sde", "sde", "carto");
-        FeatureSource fs = null;
-
-        try {
-            ArcSDEConnectionPool pool = ConnectionPoolFactory.getInstance()
-                                                             .getPoolFor(cc);
-            DataStore ds = new ArcSDEDataStore(pool);
-            fs = ds.getFeatureSource("SDE.SDE.MG_PORTALES_K");
-            System.out.println("BBOX=" + fs.getBounds());
-            System.out.println("COUNT=" + fs.getCount(Query.ALL));
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-
-            return;
-        }
-
-        Feature f;
-        FeatureReader r = null;
-        long t = System.currentTimeMillis();
-
-        try {
-            FilterFactory ff = FilterFactory.createFilterFactory();
-            CompareFilter filter = ff.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
-            filter.addLeftValue(ff.createAttributeExpression(fs.getSchema(),
-                    "SHAPE"));
-            filter.addRightValue(ff.createLiteralExpression(1000));
-
-            Query q = new DefaultQuery(filter);
-            r = fs.getFeatures(q).reader();
-            t = System.currentTimeMillis() - t;
-            System.out.println("reader obtenido en " + t + "ms");
-
-            int count = 0;
-            t = System.currentTimeMillis();
-
-            while (r.hasNext()) {
-                f = r.next();
-                ++count;
-            }
-
-            r.close();
-            t = System.currentTimeMillis() - t;
-            System.out.println(count + " features obtenidas en " + t + "ms");
-        } catch (NoSuchElementException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        } catch (IllegalAttributeException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        } finally {
-            try {
-                r.close();
-            } catch (Exception ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             }
         }
     }
