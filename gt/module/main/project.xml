@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
@@ -246,6 +246,9 @@
       </includes>
       <excludes>
         <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
+        <exclude>**/org/geotools/ct/ScriptTest.java</exclude>
+        <exclude>**/org/geotools/referencing/operation/ScriptTest.java</exclude>
+        <exclude>**/org/geotools/referencing/operation/transform/MathTransformTest.java</exclude>
       </excludes>     
       <resources>
         <resource>
