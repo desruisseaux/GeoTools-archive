@@ -24,22 +24,21 @@ import java.util.List;
 
 
 /**
- * A superclass for most metadata.  
- * 
+ * A superclass for most metadata.
+ *
  * A subclass implements *MUST* implement minimum one subinterface of the Metadata interface
- * 
+ *
  * AbstractMetadata uses reflection to identify all the getXXX() methods.
  * The getXXX() are used to construct all the Metadata.Entity and Metadata.Element objects
  * The return type of each is used to determine whether the element is a simple element or an entity,
  * if the element is not a simple entity a entity for that class will can be created as well.
- * All Metadata.Entities and Elements are created when requested (Lazily)   
+ * All Metadata.Entities and Elements are created when requested (Lazily)
  *
  * @author jeichar
  * @since 2.1
  */
 public abstract class AbstractMetadata implements Metadata {
     EntityImpl entity;
-
 
     /**
      * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
@@ -112,16 +111,19 @@ public abstract class AbstractMetadata implements Metadata {
     public Entity getEntity() {
         return getType();
     }
-    
+
     private EntityImpl getType() {
-        if( entity == null )
-            entity=EntityImpl.getEntity(getClass());
+        if (entity == null) {
+            entity = EntityImpl.getEntity(getClass());
+        }
+
         return entity;
     }
 
-
     /**
-     * DOCUMENT ME!
+     * The EntityImpl class uses reflection to examine the structure of a metadata   
+     *  
+     * @see org.geotools.metadata.Metadata.Entity
      *
      * @author $author$
      * @version $Revision: 1.9 $
@@ -137,11 +139,11 @@ public abstract class AbstractMetadata implements Metadata {
         }
 
         /**
-         * DOCUMENT ME!
+         * Gets or creates the Enity instance that descibes the Class passed in as an argument
          *
-         * @param clazz DOCUMENT ME!
+         * @param clazz The class of a metadata to be inspected
          *
-         * @return DOCUMENT ME!
+         * @return A Metadata.Entity that descibes the class passed in by the class clazz
          */
         public static EntityImpl getEntity(Class clazz) {
             if (!entityMap.containsKey(clazz)) {
@@ -186,13 +188,15 @@ public abstract class AbstractMetadata implements Metadata {
                 } //for
             } //for
         }
-        
+
         private void getInterfaces(Class class1, List list) {
             Class[] ifaces = class1.getInterfaces();
-            Class superclass=class1.getSuperclass();
-            
-            if( superclass!=null && !superclass.getClass().isAssignableFrom(Object.class))
+            Class superclass = class1.getSuperclass();
+
+            if ((superclass != null)
+                    && !superclass.getClass().isAssignableFrom(Object.class)) {
                 getInterfaces(superclass, list);
+            }
 
             for (int i = 0; i < ifaces.length; i++) {
                 Class iface = ifaces[i];
@@ -248,8 +252,9 @@ public abstract class AbstractMetadata implements Metadata {
     }
 
     /**
-     * DOCUMENT ME!
-     *
+     * A basic implementation of the Metadata.Element class
+     * @see org.geotools.metadata.Metadata.Element
+     * 
      * @author $author$
      * @version $Revision: 1.9 $
      */
@@ -274,7 +279,7 @@ public abstract class AbstractMetadata implements Metadata {
         }
 
         /**
-         * @return
+         * Returns the java.lang.reflect.Method that can access the element data.
          */
         public Method getGetMethod() {
             return getMethod;
@@ -298,7 +303,6 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Element#isNillable()
          */
         public boolean isNillable() {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -310,9 +314,7 @@ public abstract class AbstractMetadata implements Metadata {
         }
 
         /**
-         * DOCUMENT ME!
-         *
-         * @return DOCUMENT ME!
+         * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
          */
         public Entity getEntity() {
             return entity;

@@ -1,7 +1,7 @@
 /*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,14 +16,14 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import java.io.File;
-
 import org.geotools.metadata.AbstractMetadata;
 import org.opengis.coverage.grid.Format;
+import java.io.File;
+
 
 /**
- * TODO type description
- * 
+ * A simple implementation of FileMetadata
+ *
  * @author jeichar
  *
  */
@@ -34,66 +34,70 @@ public class FileMetadataImpl extends AbstractMetadata implements FileMetadata {
     Format format;
     long lastModified;
     File file;
-    
+
     /**
      * Create a FileMetadata Instance
      * @param file the file the metadata will describe
      * @param format the format type of the file
-     * 		"unkown" is the format is unknown
-     * 		Static fields should be used
+     *                 "unkown" is the format is unknown
+     *                 Static fields should be used
      */
-    public FileMetadataImpl( File file, Format format ){
+    public FileMetadataImpl(File file, Format format) {
         assert file.exists();
-        path=file.getPath();
-        name=file.getName();
-        extension=name.substring((name.lastIndexOf('.')+1));
+        path = file.getPath();
+        name = file.getName();
+        extension = name.substring((name.lastIndexOf('.') + 1));
         lastModified = file.lastModified();
-        this.format=format;
-        this.file=file;
+        this.format = format;
+        this.file = file;
     }
-    
-    /** 
+
+    /**
      * @see org.opengis.catalog.MetadataEntity#getName()
      */
     public String getName() {
         return name;
     }
-    
+
     /**
      * @return Returns the extension.
      */
     public String getExtension() {
         return extension;
     }
+
     /**
      * @return Returns the associated file.
      */
     public File getFile() {
         return file;
     }
+
     /**
      * @return Returns the format.
      */
     public Format getFormat() {
         return format;
     }
+
     /**
      * @return Returns the lastModified.
      */
     public long getLastModified() {
         return lastModified;
     }
+
     /**
      * @return Returns the path.
      */
     public String getPath() {
         return path;
     }
+
     /**
      * @param format The format to set.
      */
     public void setFormat(Format format) {
         this.format = format;
     }
-
 }

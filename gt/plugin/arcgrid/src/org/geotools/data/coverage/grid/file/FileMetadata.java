@@ -1,7 +1,7 @@
 /*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,32 +19,44 @@ package org.geotools.data.coverage.grid.file;
 import org.geotools.metadata.Metadata;
 import org.opengis.coverage.grid.Format;
 
+
 /**
- * TODO type description
- * 
+ * A simple unstandard metadata that describes files
+ *
  * @author jeichar
  *
  */
 public interface FileMetadata extends Metadata {
-    /** 
-     * @see org.opengis.catalog.MetadataEntity#getName()
-     */
-    public String getName() ;
-    
     /**
-     * @return Returns the extension.
+     * Returns the File name
+     * @return Returns the File name
+     */
+    public String getName();
+
+    /**
+     * Returns the extension of the file.
+     * @return Returns the extension of the file.
      */
     public String getExtension();
+
     /**
+     * Returns the format of the file if it is known;
      * @return Returns the format.
+     * 		Null if format is not known
      */
     public Format getFormat();
+
     /**
-     * @return Returns the lastModified.
+     * Returns the date the file was last modified.
+     * 
+     * @return Returns the date the file was last modified.
      */
     public long getLastModified();
+
     /**
-     * @return Returns the path.
+     * Returns the path of the file.
+     * 
+     * @return Returns the path of the file.
      */
     public String getPath();
 }
