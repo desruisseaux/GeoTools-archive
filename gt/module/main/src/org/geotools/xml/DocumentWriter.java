@@ -49,8 +49,9 @@ import javax.naming.OperationNotSupportedException;
 
 
 /**
+ * This is the thing that writes documents.
  * <p>
- * DOCUMENT ME!
+ * This will create valid XML documents, given an object and a schema.
  * </p>
  *
  * @author dzwiers
@@ -71,10 +72,16 @@ public class DocumentWriter {
     public static final String USE_NEAREST = "DocumentWriter_USE_NEAREST";
 
     /**
+     * Write value to file using provided schema.
      * <p>
-     * TODO DOCUMENT ME!
+     * Hints:
+     * <ul>
+     * <li>WRITE_SCHEMA - (non null) write to outputfilename.xsd 
+     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
+     * <li>USE_NEAREST - (Boolean) not implemented
+     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </ul>
      * </p>
-     * Note:
      *
      * @param value
      * @param schema
@@ -109,6 +116,29 @@ public class DocumentWriter {
         writeDocument(value,schema,wf,hints);
         wf.close();
     }
+    /**
+     * Entry Point to Document writer.
+     * <p>
+     * Hints:
+     * <ul>
+     * <li>WRITE_SCHEMA - (Writer) will be used to write the schema
+     * <li>BASE_ELEMENT - (Element) mapping of value to element instance
+     * <li>USE_NEAREST - (Boolean) not implemented
+     * <li>SCHEMA_ORDER - (String[] or Schema[]) resolve ambiguity & import
+     * </ul>
+     * </p>
+     * @param value
+     * @param schema
+     * @param w
+     * @param hints optional hints for writing
+     * @throws OperationNotSupportedException
+     * @throws IOException
+     * 
+     * @see BASE_ELEMENT
+     * @see USE_NEAREST
+     * @see WRITE_SCHEMA
+     * @see SCHEMA_ORDER
+     */
     public static void writeDocument(Object value, Schema schema, Writer w,
                 Map hints) throws OperationNotSupportedException, IOException {
 

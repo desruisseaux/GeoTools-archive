@@ -21,7 +21,7 @@ import javax.xml.parsers.SAXParserFactory;
  *
  * @author dzwiers www.refractions.net
  */
-public class SchemaParserTester extends TestCase {
+public class SchemaParserTest extends TestCase {
     protected SAXParser parser;
 
     /*

@@ -16,6 +16,8 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Sequence;
+import org.geotools.xml.schema.Type;
+import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -171,27 +173,28 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new Function_NameType();
         public static ComplexType getInstance(){return instance;}
 
-        private static Element[] elements = new Element[] 
-        private static
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
-        /**
+                /**
+         * @see org.geotools.xml.schema.ComplexType#getParent()
+         */
+        public Type getParent() {
+            return XSISimpleTypes.String.getInstance();
+        }
+/**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -204,7 +207,6 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -226,27 +228,30 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new Function_NamesType();
         public static ComplexType getInstance(){return instance;}
 
-        private static Element[] elements = new Element[] 
-        private static
+        private static Element[] elements = new Element[] {
+                new DefaultElement("Function_Name", Function_NameType.getInstance()),
+        };
+        private static Sequence seq = new DefaultSequence(elements){
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elements;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -259,7 +264,6 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -281,27 +285,26 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new FunctionsType();
         public static ComplexType getInstance(){return instance;}
 
-        private static Element[] elements = new Element[] 
-        private static
+        private static Element[] elements = new Element[] {
+               new DefaultElement("Function_Names",Function_NamesType.getInstance()),
+        };
+        private static Sequence seq = new DefaultSequence(elements);
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elements;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -314,7 +317,6 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**

@@ -29,7 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
  *
  * @author dzwiers www.refractions.net
  */
-public class GMLParserTester extends TestCase {
+public class GMLParserTest extends TestCase {
     public void testSchema() throws SAXException, IOException {
         Schema s = SchemaFactory.getInstance(GMLSchema.NAMESPACE);
         assertNotNull(s);

@@ -23,10 +23,8 @@ import java.io.IOException;
 
 
 /**
- * <p>
- * DOCUMENT ME!
- * </p>
- *
+ * PrintHandler accepts SAXish events and generated output. 
+ * 
  * @author dzwiers
  */
 public interface PrintHandler {

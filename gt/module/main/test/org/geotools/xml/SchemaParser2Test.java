@@ -18,7 +18,7 @@ import java.util.logging.Level;
  *
  * @author dzwiers www.refractions.net
  */
-public class SchemaParserTester2 extends TestCase {
+public class SchemaParser2Test extends TestCase {
     //	public void testMail(){
     //		runit("","test/mails.xsd");
     //	}

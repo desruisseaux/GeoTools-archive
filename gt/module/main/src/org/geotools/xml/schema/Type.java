@@ -92,6 +92,7 @@ public interface Type {
 
 
     /**
+     * Can I write this object out as element specified?
      * 
      * @param element The element which may be used to represent the Object. This is included to allow for child definitions to include addition information where appropriate. 
      * @param value An Object which may or may not be encodeable by this type. The value may also be null.
@@ -103,6 +104,10 @@ public interface Type {
     public boolean canEncode(Element element, Object value, Map hints);
     
     /**
+     * Encode value as element on the provided output.
+     * <p>
+     * This is encoding because the PrintHandler does not have to go back to a stream.
+     * </p>
      * @param element The original element declaration to which we should encode. 
      * @param value The Object to encode.
      * @param output This is where the output should be written to.

@@ -2353,6 +2353,7 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
+            // TODO merge one with only post, and one with only get?
             Capability[] c = new Capability[value.length];
 
             for (int i = 0; i < value.length; i++) {
@@ -2466,6 +2467,7 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
+            // TODO merge one with only post, and one with only get?
             Capability[] c = new Capability[value.length - 1];
             List sdl = null;
 
@@ -2701,6 +2703,7 @@ public class WFSCapabilitiesComplexTypes {
                 t = Capability.GET_FEATURE_WITH_LOCK;
             }
 
+            // TODO merge one with only post, and one with only get?
             Capability[] c = new Capability[value.length];
 
             for (int i = 0; i < value.length; i++) {

@@ -23,7 +23,7 @@ import java.util.logging.Level;
  *
  * @author dzwiers www.refractions.net
  */
-public class GMLStreamingParserTester extends TestCase {
+public class GMLStreamingParserTest extends TestCase {
 
     public void testGTRoadsFeatures() throws SAXException, IOException {
         try {

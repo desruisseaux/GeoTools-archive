@@ -19,7 +19,7 @@ import java.util.logging.Level;
  *
  * @author dzwiers www.refractions.net
  */
-public class XMLParserTester extends TestCase {
+public class XMLParserTest extends TestCase {
     public void testMail(){
         try {            
             String path = "mails.xml";
