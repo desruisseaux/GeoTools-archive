@@ -70,8 +70,7 @@ public class AnyHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         return null;
     }
 
@@ -114,8 +113,16 @@ public class AnyHandler extends ElementGroupingHandler {
                     // TODO improve this
                     this.namespace = Any.ALL;
                 }else{
+                if(namespace.toLowerCase().equals("##targetNamespace")){
+                    try{
+                        this.namespace = new URI(namespaceURI);
+                    } catch (URISyntaxException e) {
+                        logger.warning(e.toString());
+                        this.namespace = new URI(namespace);
+                    }
+                }else{
                     this.namespace = new URI(namespace);
-                }}
+                }}}
             }
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
@@ -203,8 +210,7 @@ public class AnyHandler extends ElementGroupingHandler {
     /**
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
-    protected ElementGrouping compress(SchemaHandler parent)
-        throws SAXException {
+    protected ElementGrouping compress(SchemaHandler parent){
         synchronized(this){
             if (cache != null)
             	return cache;
@@ -232,8 +238,8 @@ public class AnyHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 
     /**
