@@ -396,7 +396,8 @@ public class WebMapServer implements Catalog {
             String test = (String) i.next();
 
             if (test.compareTo(version) < 0) {
-                if ((before == null) || (before.compareTo(test) > 0)) {
+                
+                if ((before == null) || (before.compareTo(test) < 0)) {
                     before = test;
                 }
             }
@@ -444,7 +445,7 @@ public class WebMapServer implements Catalog {
         Document document = null;
 
         try {
-            SAXBuilder builder = new SAXBuilder();
+            SAXBuilder builder = new SAXBuilder(false);
             URLConnection connection = url.openConnection();
 
             document = builder.build(connection.getInputStream());
