@@ -201,4 +201,8 @@ public class ArcGridOperationParameter implements OperationParameter {
     public Class getValueClass() {
         return valueClass;
     }
+
+	public String toWKT() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("ArcGridOpperationParameter not relizable as WKT");
+	}
 }
