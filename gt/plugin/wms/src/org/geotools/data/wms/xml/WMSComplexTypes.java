@@ -2162,11 +2162,9 @@ public class WMSComplexTypes {
         	
 
         private static Sequence seq = new SequenceGT(new ElementGrouping[]{elems[0], elems[1], elems[2], elems[3],
-//                new ChoiceGT(null, 0, Integer.MAX_VALUE, new ElementGrouping[]{
-//                        new ChoiceGT(null, 0, Integer.MAX_VALUE, new Element[]{elems[4], elems[19]}), 
-                        new ChoiceGT(null, 0, Integer.MAX_VALUE, new Element[]{elems[19], elems[4]}),
+                new ChoiceGT(null, 0, Integer.MAX_VALUE, new Element[]{elems[4], elems[19]}),
                 new ChoiceGT(null, 0, 1, new Element[]{elems[5], elems[20]}), elems[6], elems[7], elems[8], elems[9], elems[10],
-                elems[11], elems[12], elems[13], elems[14], elems[15], elems[16], elems[17], elems[21], elems[18]});
+                elems[11], elems[12], elems[13], elems[14], elems[15], elems[16], elems[17], elems[18], elems[21]});
 
         private static Attribute[] attributes = new Attribute[]{
                 new WMSAttribute(null, "queryable", WMSSchema.NAMESPACE, XSISimpleTypes.Boolean.getInstance(),
@@ -2294,11 +2292,14 @@ public class WMSComplexTypes {
 
             //Attributes -- only do queryable for now
 
+            // Do not set queryable unless it is explicitly specified
             String queryable = attrs.getValue("queryable");
-            if ("1".equals(queryable)) {
-                layer.setQueryable(true);
-            } else {
-                layer.setQueryable(new Boolean(queryable).booleanValue());
+            if (queryable != null) {
+               if ("1".equals(queryable)) {
+                  layer.setQueryable(true);
+               } else if ("0".equals(queryable)){	
+                  layer.setQueryable(new Boolean(queryable).booleanValue());
+               }
             }
 
             return layers;

@@ -94,7 +94,10 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         layer = capabilities.getLayers()[1];
         assertEquals(layer.getName(), "DOQ");
         assertEquals(layer.getTitle(), "USGS Digital Ortho-Quadrangles");
-        assertEquals(layer.getSrs().size(), 13);
+        // changed expected to 14 to account for inherited srs
+        assertEquals(layer.getSrs().size(), 14);
+        // Added additional check to test for inherited srs
+        assertTrue(layer.getSrs().contains("EPSG:4326"));
         assertTrue(layer.getSrs().contains("EPSG:26905"));
         assertTrue(layer.getSrs().contains("EPSG:26920"));
         assertEquals(layer.getBoundingBoxes().size(), 13);
@@ -113,7 +116,9 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
 		assertEquals(bbox.getMinY(), 1985200.0, 0.0);
 		assertEquals(bbox.getMaxX(), 269400.0, 0.0);
 		assertEquals(bbox.getMaxY(), 2048600.0, 0.0);
-        assertEquals(layer.getStyles().size(), 34);
+		 
+		// Changed expected value, no duplicates allowed by spec
+        assertEquals(layer.getStyles().size(), 18);
         assertTrue(layer.getStyles().contains("UTMGrid"));
         assertTrue(layer.getStyles().contains("GeoGrid_Cyan"));
         assertTrue(layer.getStyles().contains("GeoGrid_Black"));
@@ -122,15 +127,26 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         
         assertFalse(layer.isQueryable());
         
+    		// Added test to verify inheritance, should be same as previous llbbox
+        validateLatLonBoundingBox(layer.getLatLonBoundingBox(), 
+        		-168.67, 17.84, -65.15, 71.55);
+          
+        
         layer = capabilities.getLayers()[2];
         assertNotNull(layer);
         assertEquals(layer.getName(), "DRG");
         assertEquals(layer.getTitle(), "USGS Raster Graphics (Topo Maps)");
+    		// Added test to verify inheritance, should be same as previous llbbox
+        validateLatLonBoundingBox(layer.getLatLonBoundingBox(), 
+        		-168.67, 17.84, -65.15, 71.55);
         
         layer = capabilities.getLayers()[3];
         assertNotNull(layer);
         assertEquals(layer.getName(), "UrbanArea");
         assertEquals(layer.getTitle(), "USGS Urban Areas Ortho-Imagery");
+    		// Added test to verify inheritance, should be same as previous llbbox
+        validateLatLonBoundingBox(layer.getLatLonBoundingBox(), 
+        		-168.67, 17.84, -65.15, 71.55);
         
 	}
 	

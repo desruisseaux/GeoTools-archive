@@ -104,6 +104,14 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(layer.getName(), "Bathymetry");
 		assertEquals(layer.getTitle(), "Bathymetry");
 		
+		// Added test to verify inheritance, should be same as previous llbbox
+		llbbox = layer.getLatLonBoundingBox();
+		assertNotNull(llbbox);
+		assertEquals(llbbox.getMinX(), -180, 0.0);
+		assertEquals(llbbox.getMaxX(), 180, 0.0);
+		assertEquals(llbbox.getMinY(), -90, 0.0);
+		assertEquals(llbbox.getMaxY(), 90, 0.0);
+		
 		bbox = (BoundingBox) layer.getBoundingBoxes().get("CRS:84");
 		assertNotNull(bbox);
 		assertEquals(bbox.getCrs(), "CRS:84");
@@ -119,6 +127,14 @@ public class WMSSchemaTest extends TestCase {
 		assertTrue(layer.isQueryable());
 		assertEquals(layer.getName(), "Ocean features");
 		assertEquals(layer.getTitle(), "Ocean features");
+		
+		// Added test to verify inheritance, should be same as previous llbbox
+		llbbox = layer.getLatLonBoundingBox();
+		assertNotNull(llbbox);
+		assertEquals(llbbox.getMinX(), -180, 0.0);
+		assertEquals(llbbox.getMaxX(), 180, 0.0);
+		assertEquals(llbbox.getMinY(), -90, 0.0);
+		assertEquals(llbbox.getMaxY(), 90, 0.0);
 		
 		bbox = (BoundingBox) layer.getBoundingBoxes().get("CRS:84");
 		assertNotNull(bbox);
