@@ -84,6 +84,7 @@
           <directory>${basedir}/test</directory>
           <includes>
             <include>**/*.asc</include>
+            <include>**/*.asc.gz</include>
           </includes>
         </resource>
       </resources>
