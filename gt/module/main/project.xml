@@ -13,8 +13,8 @@
     </version>
   </versions>
   <shortDescription>Geotools</shortDescription>
-  <description>The main module contains the key interfaces and
-  default implementations that are used by other GeoTools modules.
+  <description>The main module contains the key interfaces and default
+               implementations that are used by other GeoTools modules.
   </description>
   <url>http://www.geotools.org/</url>
   <developers>
@@ -67,8 +67,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Developpement
-      (IRD)</organization>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -86,8 +85,7 @@
       <name>Sean Geoghegan</name>
       <id>seangeo</id>
       <email>sean.geoghegan@dsto.defence.gov.au</email>
-      <organization>Defence Science and Technology
-      Organisation</organization>
+      <organization>Defence Science and Technology Organisation</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -103,9 +101,14 @@
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
-      <id>opengis+css</id>
+      <id>opengis+legacy</id>
       <version>0.1</version>
       <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
       <id>vecmath</id>
