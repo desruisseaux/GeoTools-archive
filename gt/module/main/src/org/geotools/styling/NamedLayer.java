@@ -21,11 +21,15 @@ public class NamedLayer extends StyledLayer{
         return null;
     }
     
-    public StyledLayer[] getStyles(){
-        return (StyledLayer[])styles.toArray(new StyledLayer[0]);
+    public Style[] getStyles(){
+        return (Style[])styles.toArray(new Style[0]);
     }
     
-    public void addStyledLayer(StyledLayer sl){
+    /**
+     * 
+     * @param sl may be a StyleImpl or a NamedStyle
+     */
+    public void addStyle(Style sl){
         styles.add(sl);
     }
 

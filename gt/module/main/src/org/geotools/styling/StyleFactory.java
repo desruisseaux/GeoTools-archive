@@ -128,6 +128,8 @@ public abstract class StyleFactory implements Factory {
 
     public abstract Style createStyle();
 
+    public abstract NamedStyle createNamedStyle();
+
     public abstract Fill createFill(Expression color, Expression opacity);
 
     public abstract Fill createFill(Expression color);

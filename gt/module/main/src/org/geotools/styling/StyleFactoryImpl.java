@@ -40,6 +40,10 @@ public class StyleFactoryImpl extends StyleFactory {
         return new StyleImpl();
     }
 
+    public NamedStyle createNamedStyle(){
+    	return new NamedStyle();
+    }
+
     public PointSymbolizer createPointSymbolizer() {
         return new PointSymbolizerImpl();
     }
