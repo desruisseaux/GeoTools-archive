@@ -27,10 +27,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
+import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
 import org.geotools.geometry.JTS;
@@ -39,6 +37,7 @@ import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
+import org.geotools.util.ClassFinder;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
@@ -86,12 +85,32 @@ import com.vividsolutions.jts.geom.Envelope;
  * @todo Allows the user to set ordering (i.e. preferred implementation).
  */
 public final class FactoryFinder {
-    
-    /**
-     * The service registry for this manager.
-     * Will be initialized only when first needed.
-     */
-    private static ServiceRegistry registry;
+
+	/**
+	 * The service registry for this manager.
+	 * Will be initialized only when first needed.
+	 */
+	private static ServiceRegistry registry;
+	
+	/**
+	 * This method will initialize the {@link ServiceRegistry} and scan for
+	 * plugin the first time it will be invoked.
+	 * @return 
+	 */
+	public static ServiceRegistry getServiceRegistry() {
+	    if (registry == null) {
+			//TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
+			registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
+					DatumFactory.class,
+                    CSFactory.class,
+                    CRSFactory.class,
+                    CRSAuthorityFactory.class,
+                    MathTransformFactory.class,
+                    AuthorityFactory.class,
+                    CoordinateOperationFactory.class}).iterator());
+	    }
+	    return registry;
+	}
 
     /**
      * Programtic managment of AuthorityFactory.
@@ -123,48 +142,6 @@ public final class FactoryFinder {
     }
 
     /**
-     * Returns the providers for the specified category. This method will initialize
-     * the {@link ServiceRegistry} and scan for plugin the first time it will be invoked.
-     *
-     * @todo revisit
-     */
-    private static Iterator getProviders(final Class category) {
-        assert Thread.holdsLock(FactoryFinder.class);
-        ServiceRegistry services = getServiceRegistry();
-        Iterator iterator = services.getServiceProviders(category, false);
-        if (!iterator.hasNext()) {
-            /*
-             * No plugin. This method is probably invoked the first time for the specified
-             * category, otherwise we should have found at least the Geotools implementation.
-             * Scans the plugin now, but for this category only.
-             */
-            //System.out.println("No "+category.toString()+ " found ... scanning for plugins");
-            scanForPlugins(category);
-            iterator = services.getServiceProviders(category, false);
-        }
-        return iterator;
-    }
-    /**
-     * This method will initialize the {@link ServiceRegistry} and scan for
-     * plugin the first time it will be invoked.
-     * @return 
-     */
-    private static ServiceRegistry getServiceRegistry() {
-        if (registry == null) {
-            // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
-            registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
-                                           DatumFactory.class,
-                                           CSFactory.class,
-                                           CRSFactory.class,
-                                           CRSAuthorityFactory.class,
-                                           MathTransformFactory.class,
-                                           AuthorityFactory.class,
-                                           CoordinateOperationFactory.class}).iterator());
-        }
-        return registry;
-    }
-
-    /**
      * Returns the default implementation of {@link DatumFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
@@ -174,7 +151,7 @@ public final class FactoryFinder {
      *         {@link DatumFactory} interface.
      */
     public static synchronized DatumFactory getDatumFactory() throws NoSuchElementException {
-        return (DatumFactory) getProviders(DatumFactory.class).next();
+        return (DatumFactory) ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class).next();
     }
 
     /**
@@ -182,7 +159,7 @@ public final class FactoryFinder {
      * @return Set of available DatumFactory
      */
     public static synchronized Set getDatumFactories() {
-        return new LazySet(getProviders(DatumFactory.class));
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class));
     }
 
     /**
@@ -195,7 +172,7 @@ public final class FactoryFinder {
      *         {@link CSFactory} interface.
      */
     public static synchronized CSFactory getCSFactory() throws NoSuchElementException {
-        return (CSFactory) getProviders(CSFactory.class).next();
+        return (CSFactory) ClassFinder.getProviders(getServiceRegistry(), CSFactory.class).next();
     }
 
     /**
@@ -203,7 +180,7 @@ public final class FactoryFinder {
      * @return Set of available CSFactory implementations
      */
     public static synchronized Set getCSFactories() {
-        return new LazySet(getProviders(CSFactory.class));
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CSFactory.class));
     }
 
     /**
@@ -216,7 +193,7 @@ public final class FactoryFinder {
      *         {@link CRSFactory} interface.
      */
     public static synchronized CRSFactory getCRSFactory() throws NoSuchElementException {
-        return (CRSFactory) getProviders(CRSFactory.class).next();
+        return (CRSFactory) ClassFinder.getProviders(getServiceRegistry(), CRSFactory.class).next();
     }
 
     /**
@@ -224,7 +201,7 @@ public final class FactoryFinder {
      * @return Set of available CRSFactory
      */
     public static synchronized Set getCRSFactories() {
-        return new LazySet(getProviders(CRSFactory.class));
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CRSFactory.class));
     }
     
     /**
@@ -254,7 +231,7 @@ public final class FactoryFinder {
      * </p>
      */
     public static synchronized Set getCRSAuthorityFactories() {
-        return new LazySet(getProviders(CRSAuthorityFactory.class));
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CRSAuthorityFactory.class));
     }
 
     /**
@@ -268,7 +245,7 @@ public final class FactoryFinder {
     public static synchronized MathTransformFactory getMathTransformFactory()
             throws NoSuchElementException
     {
-        return (MathTransformFactory) getProviders(MathTransformFactory.class).next();
+        return (MathTransformFactory) ClassFinder.getProviders(getServiceRegistry(), MathTransformFactory.class).next();
     }
 
     /**
@@ -276,7 +253,7 @@ public final class FactoryFinder {
      * {@link MathTransformFactory} interface.
      */
     public static synchronized Set getMathTransformFactories() {
-        return new LazySet(getProviders(MathTransformFactory.class));
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), MathTransformFactory.class));
     }
 
     /**
@@ -290,7 +267,7 @@ public final class FactoryFinder {
     public static synchronized CoordinateOperationFactory getCoordinateOperationFactory()
             throws NoSuchElementException
     {
-        return (CoordinateOperationFactory) getProviders(CoordinateOperationFactory.class).next();
+        return (CoordinateOperationFactory) ClassFinder.getProviders(getServiceRegistry(), CoordinateOperationFactory.class).next();
     }
 
     /**
@@ -298,74 +275,7 @@ public final class FactoryFinder {
      * {@link CoordinateOperationFactory} interface.
      */
     public static synchronized Set getCoordinateOperationFactories() {
-        return new LazySet(getProviders(CoordinateOperationFactory.class));
-    }
-
-    /**
-     * Scans for factory plug-ins on the application class path. This method is needed because the
-     * application class path can theoretically change, or additional plug-ins may become available.
-     * Rather than re-scanning the classpath on every invocation of the API, the class path is
-     * scanned automatically only on the first invocation. Clients can call this method to prompt
-     * a re-scan. Thus this method need only be invoked by sophisticated applications which
-     * dynamically make new plug-ins available at runtime.
-     */
-    public static synchronized void scanForPlugins() {
-        /*
-         * Note: if the registry was not yet initialized, then there is no need to scan for
-         * plug-ins now, since they will be scanned the first time a service provider will
-         * be required.
-         */
-        if (registry != null) {
-            for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
-                    scanForPlugins((Class)categories.next());					
-
-            }
-        }
-    }
-
-    /**
-	 * @param class1
-	 */
-	private static void scanForPlugins(Class class1) {
-        ClassLoader[] loaders=org.geotools.factory.FactoryFinder.findClassLoaders();
-    	for (int i = 0; i < loaders.length; i++) {
-            scanForPlugins(loaders[i],class1); 
-    	}
-	}
-
-	/**
-     * Scans for factory plug-ins of the given category.
-     *
-     * @param loader The class loader to use.
-     * @param category The category to scan for plug-ins.
-     *
-     * @todo localize log messages and group them together.
-     */
-    private static void scanForPlugins(final ClassLoader loader, final Class category) {
-        //System.out.append("...scanning "+loader );
-        
-        final Logger    logger = Logger.getLogger("org.opengis");
-        final Iterator    iter = ServiceRegistry.lookupProviders(category, loader);
-        final String classname = Utilities.getShortName(category);
-        while (iter.hasNext()) {            
-            Object factory = iter.next();
-            //System.out.println(" ...found "+factory.getClass().toString() );
-            if (true) {
-                /*
-                 * If the factory implements more than one interface and an instance were
-                 * already registered, reuse the same instance instead of duplicating it.
-                 */
-                Object replacement = registry.getServiceProviderByClass(factory.getClass());
-                if (replacement != null) {
-                    factory = replacement;
-                }
-            }
-            final String operation = registry.registerServiceProvider(factory, category) ? "Register " : "Replace  ";
-            final LogRecord    log = new LogRecord(Level.CONFIG, operation + factory.getClass().getName() + " as " + classname);
-            log.setSourceClassName("org.opengis.go.FactoryFinder");
-            log.setSourceMethodName("scanForPlugins");
-            logger.log(log);
-        }
+        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CoordinateOperationFactory.class));
     }
 
     /**
@@ -382,7 +292,7 @@ public final class FactoryFinder {
     public static synchronized void listProviders(final Writer out, final Locale locale)
             throws IOException
     {
-        getProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
+        ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class); // Force the initialization of ServiceRegistry
         final TableWriter table  = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
@@ -390,12 +300,12 @@ public final class FactoryFinder {
         table.nextColumn();
         table.write("Implementation(s)");
         table.writeHorizontalSeparator();
-        for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
+        for (final Iterator categories=getServiceRegistry().getCategories(); categories.hasNext();) {
             final Class category = (Class)categories.next();
             table.write(Utilities.getShortName(category));
             table.nextColumn();
             boolean first = true;
-            for (final Iterator providers=getProviders(category); providers.hasNext();) {
+            for (final Iterator providers=ClassFinder.getProviders(getServiceRegistry(), category); providers.hasNext();) {
                 if (!first) {
                     table.write('\n');
                 }

@@ -31,9 +31,24 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.imageio.spi.ServiceRegistry;
 
-// OpenGIS dependencies
+import org.geotools.parameter.ParameterWriter;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.operation.transform.PassThroughTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.wkt.MathTransformParser;
+import org.geotools.referencing.wkt.Symbols;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.LazySet;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.ClassFinder;
+import org.geotools.util.DerivedSet;
+import org.geotools.util.WeakHashSet;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -45,23 +60,6 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
-
-// Geotools dependencies
-import org.geotools.parameter.ParameterWriter;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.referencing.operation.transform.PassThroughTransform;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.referencing.wkt.MathTransformParser;
-import org.geotools.referencing.wkt.Symbols;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.LazySet;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.util.DerivedSet;
-import org.geotools.util.WeakHashSet;
 
 
 /**
@@ -119,11 +117,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * returns instance of existing math transforms when possible.
      */
     private final WeakHashSet pool = new WeakHashSet();
-    
-    /**
-     * The service registry for finding {@link MathTransformProvider} implementations.
-     */
-    private final ServiceRegistry registry;
+
+	private ServiceRegistry registry;
     
     /**
      * Construct a default {@link MathTransform math transform} factory.
@@ -187,7 +182,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #createParameterizedTransform
      */
     public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
-        Set methods = new LazySet(getProviders(MathTransformProvider.class));
+        Set methods = new LazySet(ClassFinder.getProviders(registry, MathTransformProvider.class));
         if (type != null) {
             methods = new FilteredSet(methods, type);
         }
@@ -236,23 +231,6 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Returns the providers for the specified category. This method will scan for plugin the
-     * first time it will be invoked.
-     */
-    private synchronized Iterator getProviders(final Class category) {
-        Iterator iterator = registry.getServiceProviders(category, false);
-        if (!iterator.hasNext()) {
-            /*
-             * No plugin. This method is probably invoked the first time for the specified
-             * category, otherwise we should have found at least the Geotools implementation.
-             */
-            scanForPlugins();
-            iterator = registry.getServiceProviders(category, false);
-        }
-        return iterator;
-    }
-
-    /**
      * Returns the math transform provider for the specified operation method.
      * This provider can be used in order to query parameter for a method name
      * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
@@ -271,7 +249,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
-        final Iterator providers = getProviders(MathTransformProvider.class);        
+        final Iterator providers = ClassFinder.getProviders(registry, MathTransformProvider.class);        
         while (providers.hasNext()) {
             provider = (MathTransformProvider) providers.next();            
             if (provider.nameMatches(method)) {
@@ -494,29 +472,6 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             }
             throw new FactoryException(exception);
         }
-    }
-
-    /**
-     * Scans for provider plug-ins on the application class path. This method is needed because the
-     * application class path can theoretically change, or additional plug-ins may become available.
-     * Rather than re-scanning the classpath on every invocation of the API, the class path is
-     * scanned automatically only on the first invocation. Clients can call this method to prompt
-     * a re-scan. Thus this method need only be invoked by sophisticated applications which
-     * dynamically make new plug-ins available at runtime.
-     *
-     * @todo Provides the same logging mechanism than in {@link org.geotools.referencing.FactoryFinder}
-     *       once it will be implemented in the later.
-     */
-    public synchronized void scanForPlugins() {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
-            final Class category = (Class) categories.next();
-            final Iterator providers = ServiceRegistry.lookupProviders(category, loader);
-            while (providers.hasNext()) {
-                registry.registerServiceProvider(providers.next(), category);
-            }
-        }
-        last = null;
     }
 
     /**
