@@ -107,7 +107,7 @@ public class WebMapServer {
 	private WMSCapabilities capabilities;
 	private Exception problem;
 	
-	private WMSParser[] parsers;
+	//private WMSParser[] parsers;
 	
 	public static final int IN_PROGRESS = 1;
 	public static final int NOTCONNECTED = 0;
@@ -121,6 +121,8 @@ public class WebMapServer {
 	/** Feedback: Why only one? */
 	private Thread requestRetriever;
 	private AbstractResponse currentResponse;
+	private Specification[] specs;
+	private Specification specification;
 	
 	/**
 	 * Create a WebMapServer and immediately retrieve the GetCapabilities
@@ -155,8 +157,9 @@ public class WebMapServer {
 	public WebMapServer (final URL serverURL, boolean wait) {
 		this.serverURL = serverURL;
 		
-		parsers = new WMSParser[1];
-		parsers[0] = new Spec111WMSParser();
+		specs = new Specification[2];
+		specs[0] = new WMS1_0_0();
+		specs[1] = new WMS1_1_1();
 		
 		if (wait) {
 			return;
@@ -241,6 +244,7 @@ public class WebMapServer {
 	        
 	        int compare = serverVersion.compareTo( clientVersion );
 	        if( compare == 0 ){
+	        	this.specification = specification;
 	            return request; // we have an exact match
 	        }
 	        if( versions.contains( serverVersion )){
@@ -398,7 +402,11 @@ public class WebMapServer {
 					return null;
 				}
 			}
-			issueRequest(new GetCapabilitiesRequest(serverURL), false);
+			GetCapabilitiesRequest request = negotiateVersion(serverURL);
+			if (getProblem() != null) {
+				return null;
+			}
+			issueRequest(request, false);
 		}
 		return capabilities;
 	}
@@ -441,24 +449,8 @@ public class WebMapServer {
 					SAXBuilder builder = new SAXBuilder();
 					document = builder.build( finalURL.openStream() );
 			        
-					WMSParser generic = null;
-					WMSParser custom = null;					
-					for (int i = 0; i < parsers.length; i++) {
-						int canProcess = parsers[i].canProcess( document );						
-						if (canProcess == WMSParser.GENERIC) {
-							generic = parsers[i];
-						} else if (canProcess == WMSParser.CUSTOM) {
-							custom = parsers[i];
-						}
-					}
-					WMSParser parser = generic;
-					if (custom != null) {
-						parser = custom;
-					}
-					if (parser == null) {
-					    // Um can we have the name & version number please?
-					    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
-					}
+					WMSParser parser = specification.createParser(document);
+					
 					currentResponse = new GetCapabilitiesResponse(parser, contentType, inputStream);
 					capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
 				} catch (JDOMException e) {
@@ -564,12 +556,8 @@ public class WebMapServer {
 		
 		Layer[] layers = getCapabilities().getLayers();
 		for (int i = 0; i < layers.length; i++) {
-			srss.addAll(layers[i].getSrs());
-			
-			Layer parentLayer = layers[i].getParent();
-			while (parentLayer != null) {
-				srss.addAll(parentLayer.getSrs());
-				parentLayer = parentLayer.getParent();
+			if (layers[i].getSrs() != null) {
+				srss.addAll(layers[i].getSrs());
 			}
 		}
 		

@@ -33,4 +33,8 @@ public class WMSOperationType extends OperationType {
 	public String[] getFormatStrings() {
 		return (String[]) formats;
 	}
+	
+	public void setFormatStrings(String[] formats) {
+		this.formats = formats;
+	}
 }

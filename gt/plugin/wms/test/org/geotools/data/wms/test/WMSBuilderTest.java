@@ -40,14 +40,24 @@ public class WMSBuilderTest extends TestCase {
 		
 		builder.buildGetCapabilitiesOperation(formats, new URL("http://get.com"), new URL("http://post.com"));
 		builder.buildGetMapOperation( formats, new URL("http://get.com"), new URL("http://post.com"));
-		builder.buildLayer("Layer1", "layer1", true, null);
-		builder.buildSRS("EPSG:blah");
-		builder.buildSRS("EPSG:2");
-		builder.buildStyle("Style1");
-		builder.buildStyle("Style2");
-		builder.buildLayer("Layer2", "layer2", false, null);
-		builder.buildSRS("EPSG:3");
-		builder.buildStyle("Style3");
+		
+		List srss = new ArrayList(2);
+		srss.add("EPSG:blah");
+		srss.add("EPSG:2");
+
+		List styles = new ArrayList(2);
+		styles.add("Style1");
+		styles.add("Style2");
+		
+		builder.buildLayer("Layer1", "layer1", true, null, srss, styles);
+		
+		srss = new ArrayList(1);
+		srss.add("EPSG:3");
+		
+		styles = new ArrayList(1);
+		styles.add("Style3");
+		
+		builder.buildLayer("Layer2", "layer2", false, null, srss, styles);
 		
 		WMSCapabilities capabilities = builder.finish();
 		assertEquals(capabilities.getVersion(), "1.1.1");

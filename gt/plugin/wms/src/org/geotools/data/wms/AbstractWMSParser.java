@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.ows.OperationType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -144,33 +143,58 @@ public abstract class AbstractWMSParser implements WMSParser {
 		String title = layerElement.getChildText("Title");
         String name = layerElement.getChildText("Name");
         List srsElements = querySRS( layerElement );
+        List styleElements = queryStyles( layerElement );
         boolean queryable = Integer.parseInt(layerElement.getAttributeValue("queryable")) == 1;
-        builder.buildLayer( title, name, queryable, parentTitle );  
+        builder.buildLayer( title, name, queryable, parentTitle, srsElements, styleElements);  
         
 		List children = layerElement.getChildren( "Layer" );
 		for( Iterator i=children.iterator(); i.hasNext();) {
 			parseLayer( (Element) i.next(), builder, title );
 		}
 	}
+	
+	/**
+	 * List of available Styles in the provided layerElement
+	 * @param layerElement an element representing a layer
+	 * @return a List of String containing all known styles in this layer
+	 */
+	protected List queryStyles(Element layerElement) {
+		// TODO Auto-generated method stub
+		return extractStrings(layerElement, "Style");
+	}
+	
 	/**
 	 * List of available SRS for provided layerElement.
 	 * <p>
-	 * May need to override for WMS1.0.
+	 * May need to override for WMS1.0.0.
 	 * </p>
 	 * @param layerElement
 	 * @return
 	 */
-    List querySRS( Element layerElement ){
-        List srsElements = layerElement.getChildren("SRS");
+    protected List querySRS( Element layerElement ){
+    	return extractStrings(layerElement, "SRS");
+    }
+    
+    /**
+     * Calls element.getChildren(childName) and iterates through all
+     * the children, adding their value into a List which is returned.
+     * @param element The element to extract the strings from
+     * @param childName The name of the children in the element to extract values from
+     * @return A List containing the String values of element's children specified by childName
+     */
+    protected List extractStrings(Element element, String childName) {
+        List srsElements = element.getChildren(childName);
+        List srs = new ArrayList();
+        
         if (srsElements != null) {
-            List srs = new ArrayList();
+            
             Iterator iter = srsElements.iterator();
             while (iter.hasNext()) {
-                String srsValue = ((Element) iter.next()).getText();
-                srs.add(srsValue);
+                String value = ((Element) iter.next()).getText();
+                srs.add(value);
             }
         }
-        return null;
+        return srs;
     }
 
     /**
@@ -286,46 +310,7 @@ public abstract class AbstractWMSParser implements WMSParser {
         }
         return null;
     }
-    protected OperationType parseOperationType(Element element) throws MalformedURLException {
-        OperationType operationType = new OperationType();
-        Iterator iter;
-        
-        List formats = new ArrayList();
-        List formatElements = element.getChildren("Format");
-        iter = formatElements.iterator();
-        while (iter.hasNext()) {
-            Element formatElement = (Element) iter.next();
-            formats.add(formatElement.getValue());
-        }
-        
-        String[] formatStrings = new String[formats.size()];
-        for (int i = 0; i < formats.size(); i++) {
-        	formatStrings[i] = (String) formats.get(i);
-        }
-        
-        operationType.setFormats(formatStrings);
-        
-        List dcpTypes = new ArrayList();
-        List dcpTypeElements = element.getChildren("DCPType");
-        iter = dcpTypeElements.iterator();
-        while (iter.hasNext()) {
-            Element dcpTypeElement = (Element) iter.next();
-            Element httpElement = dcpTypeElement.getChild("HTTP");
-            
-            Element get = httpElement.getChild("Get");
-            if (get!= null) {
-            	operationType.setGet(parseOnlineResource(get.getChild("OnlineResource")));
-            }
-            
-            Element post = httpElement.getChild("Post");
-            if (post != null) {
-            	operationType.setPost(parseOnlineResource(post.getChild("OnlineResource")));
-            }
-        }
-        
-        return operationType;
-    }
-    
+
     protected URL parseOnlineResource(Element onlineResourceElement) throws MalformedURLException {
 		Namespace xlink = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 		
@@ -342,9 +327,6 @@ public abstract class AbstractWMSParser implements WMSParser {
      * @return a Service object constructed from the passed-in element
      */
     protected void parseService(Element serviceElement, WMSBuilder builder) throws MalformedURLException {
-        
-        
-		
         String name = serviceElement.getChildText("Name");
 		String title = serviceElement.getChildText("Title");
 		
@@ -358,6 +340,7 @@ public abstract class AbstractWMSParser implements WMSParser {
 		}
 		builder.buildService( name, title, onlineResource,description, keywords );				
     }
+    
     /**
      * @param keywordListElement
      * @return
@@ -370,5 +353,4 @@ public abstract class AbstractWMSParser implements WMSParser {
 	    }
 	    return keywords;
     }
-	
 }

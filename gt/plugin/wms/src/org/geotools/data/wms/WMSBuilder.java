@@ -20,11 +20,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.Layer;
-import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.ows.Service;
+import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.ows.WMSRequest;
 
 /**
  * Capabilities Builder for use by WMSParser instances.
@@ -60,7 +59,6 @@ public class WMSBuilder {
 	
 	private Layer layer;
 	private List srss;
-	private List boundingBoxes;
 	private List styles;
 
 	public WMSBuilder() {
@@ -114,19 +112,10 @@ public class WMSBuilder {
 		operationType.setPost(post);
 	}
 	
-	public void buildLayer(String title, String name, boolean queryable, String parentLayerTitle ) {
-		if (layer != null) {
-			layer.setBoundingBoxes(boundingBoxes);
-			layer.setSrs(srss);
-			layer.setStyles(styles);
-			boundingBoxes = null;
-			srss = null;
-			styles = null;
-		}
+	public void buildLayer(String title, String name, boolean queryable, String parentLayerTitle, List srss, List styles ) {
 		
 		layer = new Layer(title);
-		layers.add(layer);		
-		
+
 		layer.setName(name);
 		layer.setQueryable(queryable);
 		if (parentLayerTitle != null && parentLayerTitle.length() != 0) {
@@ -139,20 +128,11 @@ public class WMSBuilder {
 			}
 			layer.setParent((Layer) layers.get(index));
 		}
-	}
-	
-	public void buildSRS(String srs) {
-		if (srss == null) {
-			srss = new ArrayList();
-		}
-		srss.add(srs);
-	}
-	
-	public void buildStyle(String styleName) {
-		if (styles == null) {
-			styles = new ArrayList();
-		}
-		styles.add(styles);
+		
+		layer.setSrs(srss);
+		layer.setStyles(styles);
+		
+		layers.add(layer);
 	}
 	
 	public WMSCapabilities finish() {
@@ -164,7 +144,6 @@ public class WMSBuilder {
 		
 		capabilities.setRequest(request);
 		
-		layer.setBoundingBoxes(boundingBoxes);
 		layer.setSrs(srss);
 		layer.setStyles(styles);
 		

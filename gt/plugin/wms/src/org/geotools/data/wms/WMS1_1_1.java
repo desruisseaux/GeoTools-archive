@@ -16,6 +16,7 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
@@ -48,6 +49,14 @@ import org.jdom.Document;
  * @author Jody Garnett, Refractions Research
  */
 public class WMS1_1_1 extends Specification {
+	
+	private WMSParser[] parsers;
+	
+	public WMS1_1_1() {
+		parsers = new WMSParser[1];
+		parsers[0] = new Spec111WMSParser();
+	}
+	
     /** Expected name attribute for root element */
     public String getName(){
         return "WMT_MS_Capabilities";
@@ -79,7 +88,26 @@ public class WMS1_1_1 extends Specification {
      * @param document
      * @return Parser capable of handling provided document
      */
-    public WMSParser createParser( Document document ){
+    public WMSParser createParser( Document document ) throws IOException {
+    	WMSParser generic = null;
+		WMSParser custom = null;					
+		for (int i = 0; i < parsers.length; i++) {
+			int canProcess = parsers[i].canProcess( document );						
+			if (canProcess == WMSParser.GENERIC) {
+				generic = parsers[i];
+			} else if (canProcess == WMSParser.CUSTOM) {
+				custom = parsers[i];
+			}
+		}
+		WMSParser parser = generic;
+		
+		if (custom != null) {
+			parser = custom;
+		}
+		if (parser == null) {
+		    // Um can we have the name & version number please?
+		    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
+		}
         return new Parser();
     }
     static public class GetCapsRequest extends GetCapabilitiesRequest {

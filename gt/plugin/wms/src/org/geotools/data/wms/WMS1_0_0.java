@@ -16,6 +16,7 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +56,13 @@ import org.jdom.Element;
  */
 public class WMS1_0_0 extends Specification {
     
+	private WMSParser[] parsers;
+	
+	public WMS1_0_0() {
+		parsers = new WMSParser[1];
+		parsers[0] = null;
+	}
+	
     /** Expected name attribute for root element */
     public String getName(){
         return "WMT_MS_Capabilities";
@@ -127,7 +135,27 @@ public class WMS1_0_0 extends Specification {
     /* (non-Javadoc)
      * @see org.geotools.data.wms.Specification#createParser(org.jdom.Document)
      */
-    public WMSParser createParser(Document document) {
+    public WMSParser createParser(Document document) throws IOException {
+    	WMSParser generic = null;
+		WMSParser custom = null;					
+		for (int i = 0; i < parsers.length; i++) {
+			int canProcess = parsers[i].canProcess( document );						
+			if (canProcess == WMSParser.GENERIC) {
+				generic = parsers[i];
+			} else if (canProcess == WMSParser.CUSTOM) {
+				custom = parsers[i];
+			}
+		}
+		WMSParser parser = generic;
+		
+		if (custom != null) {
+			parser = custom;
+		}
+		if (parser == null) {
+		    // Um can we have the name & version number please?
+		    throw new RuntimeException("No parsers available to parse that GetCapabilities document");
+		}
+		
         return new Parser();
     }
     /* (non-Javadoc)
@@ -141,7 +169,7 @@ public class WMS1_0_0 extends Specification {
      * <p>
      * WMS 1.0.0 does requests a bit differently:
      * <ul>
-     * <li>WMSVER=1.0.0
+     * <li>WMTVER=1.0.0
      * <li>
      * </p>
      */ 
@@ -155,7 +183,7 @@ public class WMS1_0_0 extends Specification {
             super(urlGetCapabilities);
         }
         protected void initVersion(){
-    	    setProperty("WEBVER", "1.0.0");
+    	    setProperty("WMTVER", "1.0.0");
     	}
     }
     static public class Parser extends AbstractWMSParser {

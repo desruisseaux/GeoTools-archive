@@ -16,6 +16,7 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
@@ -24,7 +25,7 @@ import org.jdom.Document;
 /**
  * Provides support for the Web Map Server Specificaitons.
  * <p>
- * This class opperates as a Factory creating the following related objects.
+ * This class operates as a Factory creating the following related objects.
  * <ul>
  * <li>WMSParser - a WMSParser capable of parsing a Get Capabilities Document
  * <li>WMSFormat - a WMSFormat describing required parameters
@@ -81,6 +82,7 @@ public abstract class Specification {
      * </p>
      * @param document
      * @return Parser capable of handling provided document
+     * @throws IOException if there is an error reading document
      */
-    public abstract WMSParser createParser( Document document );
+    public abstract WMSParser createParser( Document document ) throws IOException ;
 }

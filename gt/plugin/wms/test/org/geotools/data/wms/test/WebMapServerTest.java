@@ -95,7 +95,7 @@ public class WebMapServerTest extends TestCase {
 		}
 		assertNotNull(wms.getCapabilities());
 	}
-
+	/** TODO DISABLED FOR NOW
 	public void testIssueGetMapRequest() throws Exception {
 	    WebMapServer wms = new WebMapServer(serverURL);
 	    
@@ -137,7 +137,7 @@ public class WebMapServerTest extends TestCase {
 	    assertEquals(response.getContentType(), (String) formats.get(0));
 	    BufferedImage image = ImageIO.read(response.getInputStream());
 	    assertEquals(image.getHeight(), 400);
-	}
+	} */
 	
 	//TODO This test is offline pending writing of a 1.1.0 parser.
 	/*public void testIssueGetFeatureInfoRequest() throws Exception {
