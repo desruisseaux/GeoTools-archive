@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.CannotCreateGridCoverageException;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;

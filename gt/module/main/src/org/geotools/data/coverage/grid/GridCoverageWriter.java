@@ -13,9 +13,9 @@ package org.geotools.data.coverage.grid;
 // J2SE dependencies
 import java.io.IOException;
 
-import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.FileFormatNotCompatibleWithGridCoverageException;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
