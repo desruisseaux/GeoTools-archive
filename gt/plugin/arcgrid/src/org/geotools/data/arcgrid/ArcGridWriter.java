@@ -143,7 +143,7 @@ public class ArcGridWriter implements GridCoverageWriter {
     	    GRASS = false;
     	}
     	else {
-    	    compressed = parameters.getValue( "Compress" ).booleanValue();
+    	    compressed = parameters.getValue( "Compressed" ).booleanValue();
     	    GRASS = parameters.getValue( "GRASS" ).booleanValue();
     	}              
     	if( compressed )
