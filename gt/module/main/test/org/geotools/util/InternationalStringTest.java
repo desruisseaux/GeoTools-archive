@@ -128,8 +128,9 @@ public class InternationalStringTest extends TestCase {
         assertEquals("CompareTo: ", 0, toTest.compareTo(toTest));
         assertEquals("Equals:", toTest, toTest);
         if (toTest instanceof CharSequence) {
-            assertEquals("CharSequence:", toTest.toString(),
-                         new StringBuffer((CharSequence) toTest).toString());
+            // TODO: Uncomment when we will be allowed to use J2SE 1.5
+//            assertEquals("CharSequence:", toTest.toString(),
+//                         new StringBuffer((CharSequence) toTest).toString());
         }
         /*
          * Tests serialization
