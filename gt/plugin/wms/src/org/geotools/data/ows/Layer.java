@@ -16,6 +16,7 @@
  */
 package org.geotools.data.ows;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,9 +35,11 @@ public class Layer implements Comparable {
     private List srs;
  
     /**
-     * A list of type BoundingBox
+     * A HashMap representings the bounding boxes on each layer.
+     * The Key is the CRS (or SRS) of the bounding box.
+     * The Value is the BoundingBox object itself.
      */
-    private List boundingBoxes;
+    private HashMap boundingBoxes;
     
     
     /**
@@ -55,10 +58,10 @@ public class Layer implements Comparable {
         this.title = title;
     }
     
-    public List getBoundingBoxes() {
+    public HashMap getBoundingBoxes() {
         return boundingBoxes;
     }
-    public void setBoundingBoxes(List boundingBoxes) {
+    public void setBoundingBoxes(HashMap boundingBoxes) {
         this.boundingBoxes = boundingBoxes;
     }
 

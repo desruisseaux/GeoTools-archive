@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSBuilder;
 
@@ -50,6 +51,7 @@ public class WMSBuilderTest extends TestCase {
 		styles.add("Style2");
 		
 		builder.buildLayer("Layer1", "layer1", true, null, srss, styles);
+		builder.buildBoundingBox("bork", 1.0, 1.0, 2.0, 2.0);
 		
 		srss = new ArrayList(1);
 		srss.add("EPSG:3");
@@ -67,7 +69,9 @@ public class WMSBuilderTest extends TestCase {
 		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0], "image/jpeg");
 		assertEquals(capabilities.getLayers()[0].getName(), "layer1");
 		assertEquals(capabilities.getLayers()[1].getTitle(), "Layer2");
-		//TODO FIX THIS? BUG? assertEquals((String) capabilities.getLayers()[1].getSrs().get(0), "EPSG:3" );
+		assertEquals((String) capabilities.getLayers()[1].getSrs().get(0), "EPSG:3" );
+		BoundingBox bbox = (BoundingBox) capabilities.getLayers()[0].getBoundingBoxes().get("bork");
+		assertEquals(Double.toString(bbox.getMinX()), Double.toString(1.0));
 	}
 
 }

@@ -47,14 +47,19 @@ public class GetCapabilitiesResponse extends AbstractResponse {
 	private WMSCapabilities capabilities;
 
 	public GetCapabilitiesResponse(WMSParser parser, String contentType, InputStream inputStream) throws JDOMException, ParseCapabilitiesException, IOException {
-		super(contentType, inputStream);
-		
-		SAXBuilder builder = new SAXBuilder();
-		Document document = builder.build(inputStream);
-		
-		capabilities = parser.constructCapabilities( document, new WMSBuilder() );
+		this(parser, buildDocument(new SAXBuilder(), inputStream));
 	}
-	
+
+    public GetCapabilitiesResponse(WMSParser parser, Document document) throws ParseCapabilitiesException{
+	    super(null, null);
+		capabilities = parser.constructCapabilities( document, new WMSBuilder() );    
+	}
+
+    private static Document buildDocument(SAXBuilder builder, InputStream inputStream) throws IOException, JDOMException{
+		return builder.build(inputStream);
+    }
+
+    
 	/** Retrived parsed Capabilities */
 	public WMSCapabilities getCapabilities() {
 		return capabilities;

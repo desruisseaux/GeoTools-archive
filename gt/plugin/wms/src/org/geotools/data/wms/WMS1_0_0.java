@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +65,7 @@ public class WMS1_0_0 extends Specification {
 	
 	public WMS1_0_0() {
 		parsers = new WMSParser[1];
-		parsers[0] = null;
+		parsers[0] = new Parser();
 	}
 	
     /** Expected name attribute for root element */
@@ -79,23 +80,25 @@ public class WMS1_0_0 extends Specification {
     }
     
     static final Map mime = new HashMap();
+    //TODO Fill out the rest of these mime types!
     static {
         mime.put("GIF", "image/gif");
         mime.put("PNG", "image/png");
         mime.put("JPEG", "image/jpeg");
-        mime.put("WebCGM", null );
-        mime.put("SVG", null );
-        mime.put("GML.1", null );
-        mime.put("GML.2", null );
-        mime.put("GML.3", null );
-        mime.put("WBMP", null );
-        mime.put("WMS_XML", null );
-        mime.put("MIME", null );
-        mime.put("INIMAGE", null );
-        mime.put("TIFF", null );
-        mime.put("GeoTIFF", null );
-        mime.put("PPM", null );
-        mime.put("BLANK", null );
+        mime.put("BMP", "image/bmp");
+        mime.put("WebCGM", "image/cgm;Version=4;ProfileId=WebCGM" );
+        mime.put("SVG", "image/svg+xml" );
+        mime.put("GML.1", "text/xml" );
+        mime.put("GML.2", "text/xml" );
+        mime.put("GML.3", "text/xml" );
+        mime.put("WBMP", "image/vnd.wap.wbmp" );
+        mime.put("WMS_XML", "application/vnd.ogc.wms_xml" );
+        mime.put("MIME", "mime" );
+        mime.put("INIMAGE", "application/vnd.ogc.se_inimage" );
+        mime.put("TIFF", "image/tiff" );
+        mime.put("GeoTIFF", "image/tiff" );
+        mime.put("PPM", "image/x-portable-pixmap" );
+        mime.put("BLANK", "application/vnd.ogc.se_blank" );
              
     }    
     /**
@@ -192,6 +195,9 @@ public class WMS1_0_0 extends Specification {
         protected void initRequest(){
             setProperty("REQUEST", "capabilities");
         }
+        protected void initService(){
+            ;
+        }
     }
     static public class GetMapRequest extends org.geotools.data.wms.request.GetMapRequest {
         public GetMapRequest(URL onlineResource, String version, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions) {
@@ -242,10 +248,13 @@ public class WMS1_0_0 extends Specification {
          */
         protected List queryFormats(Element op) {
             // Example: <Format><PNG /><JPEG /><GML.1 /></Format>
+            
+            Element formatElement = op.getChild("Format");
+            
             Iterator iter;
             
             List formats = new ArrayList();
-            List formatElements = op.getChildren("Format");
+            List formatElements = formatElement.getChildren();
             iter = formatElements.iterator();
             while (iter.hasNext()) {
                 Element format = (Element) iter.next();
@@ -274,6 +283,26 @@ public class WMS1_0_0 extends Specification {
         protected URL queryServiceOnlineResource(Element serviceElement)
                 throws MalformedURLException {
             return new URL(serviceElement.getChildText("OnlineResource"));
+        }
+        protected String[] queryKeywords(Element serviceElement) {
+            String keywords = serviceElement.getChildTextTrim("Keywords");
+            return keywords.split(" ");
+        }
+        protected String getRequestGetCapName() {
+            return "Capabilities";
+        }
+        protected String getRequestGetFeatureInfoName() {
+            return "FeatureInfo";
+        }
+        protected String getRequestGetMapName() {
+            return "Map";
+        }
+        protected List querySRS(Element layerElement) {
+            Element srsElement = layerElement.getChild("SRS");
+            if (srsElement != null) {
+                return Arrays.asList(srsElement.getTextTrim().split(" "));
+            }
+            return null;
         }
     }
 }

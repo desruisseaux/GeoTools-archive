@@ -224,9 +224,12 @@ public class WebMapServer {
 	        String clientVersion = specification.getVersion();
 	        
 	        GetCapabilitiesRequest request = specification.createGetCapabilitiesRequest( server );
-	        String serverVersion = queryVersion( request );
 	        
-	        if (getProblem() != null) {
+	        //Grab document
+		    URL url = request.getFinalURL();
+		    Document document = buildDocument(url);
+	        
+		    if (getProblem() != null) {
 	        	/*
 	        	 * There was an error accessing the server.
 	        	 * 
@@ -238,11 +241,17 @@ public class WebMapServer {
 	        	 */
         		return null;
 	        }
+		    
+	        String serverVersion = queryVersion( document );
+	        
+	        
 	        
 	        int compare = serverVersion.compareTo( clientVersion );
 	        if( compare == 0 ){
-	        	this.specification = specification;
-	            return request; // we have an exact match
+	            //we have an exact match and have capabilities as well!
+	            this.specification = specification;
+	            
+	            return request; 
 	        }
 	        if( versions.contains( serverVersion )){
                // we can communicate with this server
@@ -329,17 +338,18 @@ public class WebMapServer {
 	    return specs;
 	}
 	
-	private String queryVersion( GetCapabilitiesRequest request ) {
-	    URL url = request.getFinalURL();
-	    Document document;
-		try {
+	private String queryVersion( Document document ) {
+        Element element = document.getRootElement();
+        
+	    return element.getAttributeValue("version");	    
+	}
+
+	private Document buildDocument(URL url) {
+        Document document = null;
+        try {
 		    SAXBuilder builder = new SAXBuilder();
 		    URLConnection connection = url.openConnection();
-		    String mimeType = connection.getContentType();
-		    // should be:
-		    // - application/vnd.ogc.wms_xml (Great!)
-            // - application/xml
-            // - text/xml		    
+
 		    document = builder.build( connection.getInputStream() );
         } catch (JDOMException badXML) {
         	problem = badXML;
@@ -348,11 +358,10 @@ public class WebMapServer {
         	problem = badIO;
             return null;
         }
-        Element element = document.getRootElement(); //Root = 		
-	    String version;
-	    return element.getAttributeValue("version");	    
-	}
-	/**
+        return document;
+    }
+
+    /**
 	 * Gets the current status of the GetCapabilities document.
 	 * <UL>
 	 * <LI>IN_PROGRESS: The thread is currently retrieving a request
@@ -440,25 +449,17 @@ public class WebMapServer {
 			} else if (currentRequest instanceof GetMapRequest) {
 				currentResponse = new GetMapResponse(contentType, inputStream);
 			} else if (currentRequest instanceof GetCapabilitiesRequest) {
-			    
 				try {
-				    Document document;
-					SAXBuilder builder = new SAXBuilder();
-					document = builder.build( finalURL.openStream() );
+				    Document document = buildDocument(finalURL);
 			        
 					WMSParser parser = specification.createParser(document);
 					
-					currentResponse = new GetCapabilitiesResponse(parser, contentType, inputStream);
+					currentResponse = new GetCapabilitiesResponse(parser, document);
 					capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
-				} catch (JDOMException e) {
-					problem = e;
-					//throw new RuntimeException("Data at the given URL is not valid XML", e);
 				} catch (ParseCapabilitiesException e) {
 					problem = e;
-					//throw new RuntimeException("XML at the given URL is not a valid serverURL document");
 				} catch (IOException e) {
 					problem = e;
-					//throw new RuntimeException("Unable to connect to the URL", e);
 				}
 			} else {
 				throw new RuntimeException("Request is an invalid type. I do not know it.");

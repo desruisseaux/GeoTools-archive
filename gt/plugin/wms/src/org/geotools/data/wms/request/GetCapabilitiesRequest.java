@@ -31,9 +31,6 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 	 */
 	public GetCapabilitiesRequest(URL serverURL) {
 		super(serverURL);
-		initRequest();
-		initService();
-		initVersion();	
 		
 		// Need to strip off the query, as getFinalURL will add it back
 		// on, with all the other properties. If we don't, elements will
@@ -60,10 +57,15 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 			while (tokenizer.hasMoreTokens()) {
 				String token = tokenizer.nextToken();
 				String[] param = token.split("=");
-				setProperty(param[0], param[1]);
+				setProperty(param[0].toUpperCase(), param[1]);
 			}
 		}
+		
+		initRequest();
+		initService();
+		initVersion();	
 	}
+	
 	/**
 	 * Default implementation REQUEST = GetCapabilities
 	 * <p>
