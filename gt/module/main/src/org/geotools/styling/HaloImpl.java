@@ -20,7 +20,7 @@
 package org.geotools.styling;
 
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 /**
  * @version $Id: HaloImpl.java,v 1.7 2003/09/06 04:52:31 seangeo Exp $
@@ -108,8 +108,8 @@ public class HaloImpl implements Halo, Cloneable {
         
         if (obj instanceof HaloImpl) {
             HaloImpl other = (HaloImpl) obj;
-            return EqualsUtils.equals(radius, other.radius) &&
-                EqualsUtils.equals(fill, other.fill);
+            return Utilities.equals(radius, other.radius) &&
+                   Utilities.equals(fill, other.fill);
         }
         
         return false;

@@ -21,7 +21,7 @@ package org.geotools.styling;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -151,8 +151,8 @@ public class PointSymbolizerImpl implements PointSymbolizer, Cloneable {
 
         if (oth instanceof PointSymbolizerImpl) {
             PointSymbolizerImpl other = (PointSymbolizerImpl) oth;
-            return EqualsUtils.equals(geometryPropertyName, other.geometryPropertyName) &&
-                EqualsUtils.equals(graphic, other.graphic);
+            return Utilities.equals(geometryPropertyName, other.geometryPropertyName) &&
+                   Utilities.equals(graphic, other.graphic);
         }
         
         return false;

@@ -27,7 +27,7 @@ import java.util.logging.LogRecord;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -195,10 +195,10 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
 
         if (oth instanceof StyleImpl) {
             StyleImpl other = (StyleImpl) oth;
-            return EqualsUtils.equals(name, other.name) &&
-                EqualsUtils.equals(title, other.title) &&
-                EqualsUtils.equals(abstractText, other.abstractText) &&
-                EqualsUtils.equals(featureTypeStyleList, other.featureTypeStyleList);
+            return Utilities.equals(name, other.name) &&
+                   Utilities.equals(title, other.title) &&
+                   Utilities.equals(abstractText, other.abstractText) &&
+                   Utilities.equals(featureTypeStyleList, other.featureTypeStyleList);
         }
         
         return false;

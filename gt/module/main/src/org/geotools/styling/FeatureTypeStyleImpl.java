@@ -21,7 +21,7 @@ package org.geotools.styling;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -192,11 +192,11 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
 
         if (oth instanceof FeatureTypeStyleImpl) {
             FeatureTypeStyleImpl other = (FeatureTypeStyleImpl) oth;
-            return EqualsUtils.equals(name, other.name) &&
-                EqualsUtils.equals(title, other.title) &&
-                EqualsUtils.equals(abstractStr, other.abstractStr) &&
-                EqualsUtils.equals(featureTypeName, other.featureTypeName) &&
-                EqualsUtils.equals(ruleList, other.ruleList);
+            return Utilities.equals(name, other.name) &&
+                   Utilities.equals(title, other.title) &&
+                   Utilities.equals(abstractStr, other.abstractStr) &&
+                   Utilities.equals(featureTypeName, other.featureTypeName) &&
+                   Utilities.equals(ruleList, other.ruleList);
         }
         
         return false;

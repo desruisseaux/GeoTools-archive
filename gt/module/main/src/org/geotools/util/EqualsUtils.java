@@ -6,11 +6,17 @@
  */
 package org.geotools.util;
 
-/** Utility class that provides a method for checking equality
- *  between two objects using the method defined by Joshua Bloch in
- *  Effective Java.
+/**
+ * Utility class that provides a method for checking equality
+ * between two objects using the method defined by Joshua Bloch in
+ * Effective Java.
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation. 
+ *
+ * @deprecated This method was already provided in {@link org.geotools.resources.Utilities}.
+ *             Note that this method is not part of the public API and may be removed in any
+ *             future Geotools version (especially when a similar method will be available
+ *             in J2SE code).
  */
 public class EqualsUtils {
 

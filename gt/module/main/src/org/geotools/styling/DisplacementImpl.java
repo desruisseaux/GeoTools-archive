@@ -21,7 +21,7 @@ package org.geotools.styling;
 
 import org.geotools.filter.Expression;
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -104,8 +104,8 @@ public class DisplacementImpl implements Displacement, Cloneable {
         
         if (obj instanceof DisplacementImpl) {
             DisplacementImpl other = (DisplacementImpl) obj;
-            return EqualsUtils.equals(displacementX, other.displacementX) &&
-                EqualsUtils.equals(displacementY, other.displacementY);
+            return Utilities.equals(displacementX, other.displacementX) &&
+                   Utilities.equals(displacementY, other.displacementY);
         }
         
         return false;

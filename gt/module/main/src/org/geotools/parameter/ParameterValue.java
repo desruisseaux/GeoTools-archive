@@ -1,0 +1,571 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2004, Geotools Project Managment Committee (PMC)
+ * (C) 2004, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *    This package contains documentation from OpenGIS specifications.
+ *    OpenGIS consortium's work is fully acknowledged here.
+ */
+package org.geotools.parameter;
+
+// J2SE dependencies
+import java.net.URL;
+import java.util.Set;
+import java.util.Locale;
+import javax.units.Unit;
+import javax.units.SI;
+import javax.units.NonSI;
+import javax.units.Converter;
+
+// OpenGIS dependencies
+import org.opengis.util.CodeList;
+import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.InvalidParameterValueException;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
+
+
+/**
+ * A parameter value used by an operation method. Most parameter values are numeric, but
+ * other types of parameter values are possible. The parameter type can be fetch with the
+ * <code>{@linkplain #getValue()}.{@linkplain Object#getClass() getClass()}</code> idiom.
+ * The {@link #getValue()} and {@link #setValue(Object)} methods can be invoked at any time.
+ * Others getters and setters are parameter-type dependents.
+ *  
+ * @version $Id$
+ * @author Martin Desruisseaux
+ *
+ * @see org.geotools.parameter.OperationParameter
+ * @see org.geotools.parameter.ParameterValueGroup
+ */
+public class ParameterValue extends GeneralParameterValue implements org.opengis.parameter.ParameterValue {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -5837826787089486776L;
+
+    /**
+     * The value.
+     */
+    private Object value;
+
+    /**
+     * The unit of measure for the value, or <code>null</code> if it doesn't apply.
+     */
+    private Unit unit;
+
+    /**
+     * Construct a parameter from the specified name and value. This convenience constructor
+     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if such
+     * an object was available, then the preferred way to get a <code>ParameterValue</code>
+     * is to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     *
+     * @param name  The parameter name.
+     * @param value The parameter value.
+     */
+    public ParameterValue(final String name, final int value) {
+        this(new org.geotools.parameter.OperationParameter(name,
+                 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        this.value = new Integer(value);
+    }
+
+    /**
+     * Construct a parameter from the specified name and value. This convenience constructor
+     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if such
+     * an object was available, then the preferred way to get a <code>ParameterValue</code> is
+     * to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     *
+     * @param name  The parameter name.
+     * @param value The parameter value.
+     * @param unit  The unit for the parameter value.
+     */
+    public ParameterValue(final String name, final double value, final Unit unit) {
+        this(new org.geotools.parameter.OperationParameter(name,
+                 Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, normalize(unit)));
+        this.value = new Double(value);
+        this.unit  = unit;
+    }
+
+    /**
+     * Construct a parameter from the specified enumeration. This convenience constructor
+     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if
+     * such an object was available, then the preferred way to get a <code>ParameterValue</code>
+     * is to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     *
+     * @param name  The parameter name.
+     * @param value The parameter value.
+     */
+    public ParameterValue(final String name, final CodeList value) {
+        this(new org.geotools.parameter.OperationParameter(name, value));
+        this.value = value;
+    }
+
+    /**
+     * Construct a parameter value from the specified descriptor.
+     * The value will be initialized to the default value, if any.
+     *
+     * @param descriptor The abstract definition of this parameter.
+     */
+    public ParameterValue(final OperationParameter descriptor) {
+        super(descriptor);
+        value = descriptor.getDefaultValue();
+        unit  = descriptor.getUnit();
+    }
+
+    /**
+     * Normalize the specified unit into one of "standard" units used in projections.
+     */
+    private static Unit normalize(final Unit unit) {
+        if (SI.METER          .isCompatible(unit)) return SI.METER;
+        if (NonSI.DAY         .isCompatible(unit)) return NonSI.DAY;
+        if (NonSI.DEGREE_ANGLE.isCompatible(unit)) return NonSI.DEGREE_ANGLE;
+        return unit;
+    }
+
+    /**
+     * Check the parameter value validity.
+     *
+     * @param  value The value to check, or <code>null</code>.
+     * @throws InvalidParameterValueException if the parameter value is illegal.
+     */
+    private void ensureValidValue(final Object value) throws InvalidParameterValueException {
+        if (value == null) {
+            return;
+        }
+        final String error;
+        final OperationParameter descriptor = (OperationParameter) this.descriptor;
+        if (descriptor.getValueClass().isAssignableFrom(value.getClass())) {
+            error = getClassTypeError();
+        } else {
+            final Comparable minimum = descriptor.getMinimumValue();
+            final Comparable maximum = descriptor.getMaximumValue();
+            if ((minimum!=null && minimum.compareTo(value)>0) ||
+                (maximum!=null && maximum.compareTo(value)<0))
+            {
+                error = Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
+                                         value, minimum, maximum);
+            } else {
+                final Set validValues = descriptor.getValidValues();
+                if (validValues!=null && !validValues.contains(value)) {
+                    error = Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+                                             getName(), value);
+                } else {
+                    return;
+                }
+            }
+        }
+        throw new InvalidParameterValueException(error, getName(), value);
+    }
+
+    /**
+     * Format an error message for illegal method call for the current value type.
+     */
+    private String getClassTypeError() {
+        return Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
+               Utilities.getShortName(((OperationParameter)descriptor).getValueClass()));
+    }
+
+    /**
+     * Returns the parameter name in the default locale.
+     */
+    private String getName() {
+        return descriptor.getName(Locale.getDefault());
+    }
+
+    /**
+     * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}.
+     * If the parameter value has no unit (for example because it is a {@link String} type),
+     * then this method returns <code>null</code>. Note that "no unit" doesn't means
+     * "dimensionless".
+     *
+     * @return The unit of measure, or <code>null</code> if none.
+     *
+     * @see #doubleValue()
+     * @see #doubleValueList()
+     * @see #getValue
+     */
+    public Unit getUnit() {
+        return unit;
+    }
+
+    /**
+     * Returns the unit type as one of error message code. Used for
+     * checking unit type are better error message formatting if needed.
+     */
+    private static int getUnitMessageID(final Unit unit) {
+        if (SI.METER .isCompatible(unit)) return ResourceKeys.ERROR_NON_LINEAR_UNIT_$1;
+        if (SI.SECOND.isCompatible(unit)) return ResourceKeys.ERROR_NON_TEMPORAL_UNIT_$1;
+        if (SI.RADIAN.isCompatible(unit)) return ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1;
+        return -1;
+    }
+
+    /**
+     * Returns the numeric value of the coordinate operation parameter in the specified unit
+     * of measure. This convenience method apply unit conversion on the fly as needed.
+     *
+     * @param  unit The unit of measure for the value to be returned.
+     * @return The numeric value represented by this parameter after conversion to type
+     *         <code>double</code> and conversion to <code>unit</code>.
+     * @throws InvalidParameterTypeException if the value is not a numeric type.
+     * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
+     *
+     * @see #getUnit
+     * @see #setValue(double,Unit)
+     * @see #doubleValueList(Unit)
+     */
+    public double doubleValue(final Unit unit) throws InvalidParameterTypeException {
+        if (this.unit == null) {
+            throw new IllegalStateException(Resources.format(
+                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+        }
+        ensureNonNull("unit", unit);
+        final int expectedID = getUnitMessageID(this.unit);
+        if (getUnitMessageID(unit) != expectedID) {
+            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+        }
+        return this.unit.getConverterTo(unit).convert(doubleValue());
+    }
+
+    /**
+     * Returns the numeric value of the coordinate operation parameter with its
+     * associated {@linkplain #getUnit unit of measure}.
+     *
+     * @return The numeric value represented by this parameter after conversion to type <code>double</code>.
+     * @throws InvalidParameterTypeException if the value is not a numeric type.
+     *
+     * @see #getUnit
+     * @see #setValue(double)
+     * @see #doubleValueList()
+     */
+    public double doubleValue() throws InvalidParameterTypeException {
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns the positive integer value of an operation parameter, usually used
+     * for a count. An integer value does not have an associated unit of measure.
+     *
+     * @return The numeric value represented by this parameter after conversion to type <code>int</code>.
+     * @throws InvalidParameterTypeException if the value is not an integer type.
+     *
+     * @see #setValue(int)
+     * @see #intValueList
+     */
+    public int intValue() throws InvalidParameterTypeException {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns the boolean value of an operation parameter
+     * A boolean value does not have an associated unit of measure.
+     *
+     * @return The boolean value represented by this parameter.
+     * @throws InvalidParameterTypeException if the value is not a boolean type.
+     *
+     * @see #setValue(boolean)
+     */
+    public boolean booleanValue() throws InvalidParameterTypeException {
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns the string value of an operation parameter.
+     * A string value does not have an associated unit of measure.
+     *
+     * @return The string value represented by this parameter.
+     * @throws InvalidParameterTypeException if the value is not a string.
+     *
+     * @see #getValue
+     * @see #setValue(Object)
+     */
+    public String stringValue() throws InvalidParameterTypeException {
+        if (value instanceof CharSequence) {
+            return value.toString();
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns an ordered sequence of numeric values in the specified unit of measure.
+     * This convenience method apply unit conversion on the fly as needed.
+     *
+     * @param  unit The unit of measure for the value to be returned.
+     * @return The sequence of values represented by this parameter after conversion to type
+     *         <code>double</code> and conversion to <code>unit</code>.
+     * @throws InvalidParameterTypeException if the value is not an array of <code>double</code>s.
+     * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
+     *
+     * @see #getUnit
+     * @see #setValue(double[],Unit)
+     * @see #doubleValue(Unit)
+     */
+    public double[] doubleValueList(final Unit unit) throws InvalidParameterTypeException {
+        if (this.unit == null) {
+            throw new IllegalStateException(Resources.format(
+                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+        }
+        ensureNonNull("unit", unit);
+        final int expectedID = getUnitMessageID(this.unit);
+        if (getUnitMessageID(unit) != expectedID) {
+            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+        }
+        final Converter converter = this.unit.getConverterTo(unit);
+        final double[] values = (double[]) doubleValueList().clone();
+        for (int i=0; i<values.length; i++) {
+            values[i] = converter.convert(values[i]);
+        }
+        return values;
+    }
+
+    /**
+     * Returns an ordered sequence of two or more numeric values of an operation parameter
+     * list, where each value has the same associated {@linkplain Unit unit of measure}.
+     *
+     * @return The sequence of values represented by this parameter.
+     * @throws InvalidParameterTypeException if the value is not an array of <code>double</code>s.
+     *
+     * @see #getUnit
+     * @see #setValue(Object)
+     * @see #doubleValue()
+     */
+    public double[] doubleValueList() throws InvalidParameterTypeException {
+        if (value instanceof double[]) {
+            return (double[]) value;
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns an ordered sequence of two or more integer values of an operation parameter list,
+     * usually used for counts. These integer values do not have an associated unit of measure.
+     *
+     * @return The sequence of values represented by this parameter.
+     * @throws InvalidParameterTypeException if the value is not an array of <code>int</code>s.
+     *
+     * @see #setValue(Object)
+     * @see #intValue
+     */
+    public int[] intValueList() throws InvalidParameterTypeException {
+        if (value instanceof int[]) {
+            return (int[]) value;
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns a reference to a file or a part of a file containing one or more parameter
+     * values. When referencing a part of a file, that file must contain multiple identified
+     * parts, such as an XML encoded document. Furthermore, the referenced file or part of a
+     * file can reference another part of the same or different files, as allowed in XML documents.
+     *
+     * @return The reference to a file containing parameter values.
+     * @throws InvalidParameterTypeException if the value is not a reference to a file or an URL.
+     *
+     * @see #getValue
+     * @see #setValue(Object)
+     */
+    public URL valueFile() throws InvalidParameterTypeException {
+        if (value instanceof URL) {
+            return (URL) value;
+        } else {
+            throw new InvalidParameterTypeException(getClassTypeError(), descriptor.getName(null));
+        }
+    }
+
+    /**
+     * Returns the parameter value as an object. The object type is typically a {@link Double},
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URL}, <code>double[]</code> or
+     * <code>int[]</code>.
+     *
+     * @return The parameter value as an object.
+     *
+     * @see #setValue(Object)
+     */
+    public Object getValue() {
+        return value;
+    }
+
+    /**
+     * Set the parameter value as a floating point and its associated unit.
+     *
+     * @param  value The parameter value.
+     * @param  unit The unit for the specified value.
+     * @throws InvalidParameterValueException if the floating point type is inappropriate for this
+     *         parameter, or if the value is illegal for some other reason (for example a value out
+     *         of range).
+     *
+     * @see #setValue(double)
+     * @see #doubleValue(Unit)
+     */
+    public void setValue(final double value, final Unit unit) throws InvalidParameterValueException {
+        ensureNonNull("unit", unit);
+        final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
+        if (targetUnit == null) {
+            throw new IllegalStateException(Resources.format(
+                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+        }
+        final int expectedID = getUnitMessageID(targetUnit);
+        if (getUnitMessageID(unit) != expectedID) {
+            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+        }
+        final Double converted = new Double(unit.getConverterTo(targetUnit).convert(value));
+        ensureValidValue(converted);
+        this.value = new Double(value);
+        this.unit  = unit;
+    }
+
+    /**
+     * Set the parameter value as a floating point.
+     * The unit, if any, stay unchanged.
+     *
+     * @param value The parameter value.
+     * @throws InvalidParameterValueException if the floating point type is inappropriate for this
+     *         parameter, or if the value is illegal for some other reason (for example a value out
+     *         of range).
+     *
+     * @see #setValue(double,Unit)
+     * @see #doubleValue()
+     */
+    public void setValue(final double value) throws InvalidParameterValueException {
+        final Double check = new Double(value);
+        ensureValidValue(check);
+        this.value = check;
+    }
+
+    /**
+     * Set the parameter value as an integer.
+     *
+     * @param  value The parameter value.
+     * @throws InvalidParameterValueException if the integer type is inappropriate for this parameter,
+     *         or if the value is illegal for some other reason (for example a value out of range).
+     *
+     * @see #intValue
+     */
+    public void setValue(final int value) throws InvalidParameterValueException {
+        final Integer check = new Integer(value);
+        ensureValidValue(check);
+        this.value = check;
+    }
+
+    /**
+     * Set the parameter value as a boolean.
+     *
+     * @param  value The parameter value.
+     * @throws InvalidParameterValueException if the boolean type is inappropriate for this parameter.
+     *
+     * @see #booleanValue
+     */
+    public void setValue(final boolean value) throws InvalidParameterValueException {
+        final Boolean check = Boolean.valueOf(value);
+        ensureValidValue(check);
+        this.value = check;
+    }
+
+    /**
+     * Set the parameter value as an object. The object type is typically a {@link Double},
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URL}, <code>double[]</code>
+     * or <code>int[]</code>.
+     *
+     * @param  value The parameter value.
+     * @throws InvalidParameterValueException if the type of <code>value</code> is inappropriate
+     *         for this parameter, or if the value is illegal for some other reason (for example
+     *         the value is numeric and out of range).
+     *
+     * @see #getValue
+     */
+    public void setValue(final Object value) throws InvalidParameterValueException {
+        ensureValidValue(value);
+        this.value = value;
+    }
+
+    /**
+     * Set the parameter value as an array of floating point and their associated unit.
+     *
+     * @param  values The parameter values.
+     * @param  unit The unit for the specified value.
+     * @throws InvalidParameterValueException if the floating point type is inappropriate for this
+     *         parameter, or if the value is illegal for some other reason (for example a value out
+     *         of range).
+     */
+    public void setValue(double[] values, final Unit unit) throws InvalidParameterValueException {
+        ensureNonNull("unit", unit);
+        final Unit targetUnit = ((OperationParameter) descriptor).getUnit();
+        if (targetUnit == null) {
+            throw new IllegalStateException(Resources.format(
+                                            ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName()));
+        }
+        final int expectedID = getUnitMessageID(targetUnit);
+        if (getUnitMessageID(unit) != expectedID) {
+            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+        }
+        final double[] converted = (double[]) values.clone();
+        final Converter converter = unit.getConverterTo(targetUnit);
+        for (int i=0; i<converted.length; i++) {
+            converted[i] = converter.convert(converted[i]);
+        }
+        ensureValidValue(converted);
+        this.value = values;
+        this.unit  = unit;
+    }
+    
+    /**
+     * Compares the specified object with this parameter for equality.
+     *
+     * @param  object The object to compare to <code>this</code>.
+     * @return <code>true</code> if both objects are equal.
+     */
+    public boolean equals(final Object object) {
+        if (super.equals(object)) {
+            final ParameterValue that = (ParameterValue) object;
+            return Utilities.equals(this.value, that.value) &&
+                   Utilities.equals(this.unit,  that.unit);
+        }
+        return false;
+    }
+    
+    /**
+     * Returns a hash value for this parameter.
+     *
+     * @return The hash code value. This value doesn't need to be the same
+     *         in past or future versions of this class.
+     */
+    public int hashCode() {
+        int code = super.hashCode()*37;
+        if (value != null) code +=   value.hashCode();
+        if (unit  != null) code += 37*unit.hashCode();
+        return code;
+    }
+}

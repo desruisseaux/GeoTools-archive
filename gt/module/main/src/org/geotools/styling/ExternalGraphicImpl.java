@@ -26,7 +26,7 @@ import java.util.Map;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -135,8 +135,8 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
 
         if (oth instanceof ExternalGraphicImpl) {
             ExternalGraphicImpl other = (ExternalGraphicImpl) oth;
-            return EqualsUtils.equals(uri,other.uri) &&
-                EqualsUtils.equals(format, other.format);
+            return Utilities.equals(uri,other.uri) &&
+                   Utilities.equals(format, other.format);
         }
         
         return false;

@@ -24,7 +24,7 @@ package org.geotools.styling;
 // Geotools dependencies
 import org.geotools.filter.Expression;
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 /** Provides a Java representation of the Font element of an SLD.
  * 
@@ -157,10 +157,10 @@ public class FontImpl implements Font, Cloneable {
 
         if (oth instanceof FontImpl) {
             FontImpl other = (FontImpl) oth;
-            return EqualsUtils.equals(this.fontFamily, other.fontFamily) &&
-                    EqualsUtils.equals(this.fontSize, other.fontSize) &&
-                    EqualsUtils.equals(this.fontStyle, other.fontStyle) &&
-                    EqualsUtils.equals(this.fontWeight, other.fontWeight);
+            return Utilities.equals(this.fontFamily, other.fontFamily) &&
+                   Utilities.equals(this.fontSize, other.fontSize) &&
+                   Utilities.equals(this.fontStyle, other.fontStyle) &&
+                   Utilities.equals(this.fontWeight, other.fontWeight);
         }
 
         return false;

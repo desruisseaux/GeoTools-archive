@@ -1,0 +1,102 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2004, Geotools Project Managment Committee (PMC)
+ * (C) 2004, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *    This package contains documentation from OpenGIS specifications.
+ *    OpenGIS consortium's work is fully acknowledged here.
+ */
+package org.geotools.referencing.cs;
+
+// J2SE dependencies
+import java.util.Map;
+import javax.units.SI;
+import javax.units.Unit;
+import javax.units.UnitFormat;
+
+// OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+
+
+/**
+ * A one-dimensional coordinate system containing a single time axis, used to describe the
+ * temporal position of a point in the specified time units from a specified time origin.
+ * A <code>TemporalCS</code> shall have one {@linkplain #getAxis axis}.
+ *
+ * <TABLE CELLPADDING='6' BORDER='1'>
+ * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
+ * <TR><TD>
+ *   {@link org.geotools.referencing.crs.TemporalCRS Temporal}
+ * </TD></TR></TABLE>
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+public class TemporalCS extends CoordinateSystem implements org.opengis.referencing.cs.TemporalCS {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 5222911412381303989L;
+
+    /**
+     * A one-dimensional temporal CS with
+     * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#TIME time}</var>,
+     * axis in days.
+     */
+    public static TemporalCS DAYS = new TemporalCS("Temporal",
+                    org.geotools.referencing.cs.CoordinateSystemAxis.TIME);
+
+    /**
+     * Unit for milliseconds.
+     *
+     * @todo This declaration may moves in {@link javax.units.NonSI} in a future version.
+     */
+    public static Unit MILLISECOND = UnitFormat.label(SI.SECOND.multiply(1./1000), "ms");
+
+    /**
+     * Construct a coordinate system from a name.
+     *
+     * @param name  The coordinate system name.
+     * @param axis  The axis.
+     */
+    public TemporalCS(final String name, final CoordinateSystemAxis axis) {
+        super(name, new CoordinateSystemAxis[] {axis});
+        ensureTimeUnit(getAxis(0).getUnit());
+    }
+
+    /**
+     * Construct a coordinate system from a set of properties.
+     * The properties map is given unchanged to the superclass constructor.
+     *
+     * @param properties   Set of properties. Should contains at least <code>"name"</code>.
+     * @param axis         The axis.
+     */
+    public TemporalCS(final Map properties, final CoordinateSystemAxis axis) {
+        super(properties, new CoordinateSystemAxis[] {axis});
+        ensureTimeUnit(getAxis(0).getUnit());
+    }
+
+    /**
+     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * system. The default implementation accepts only temporal directions (i.e.
+     * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
+     */
+    protected boolean isCompatibleDirection(final AxisDirection direction) {
+        return AxisDirection.FUTURE.equals(direction.absolute());
+    }
+}

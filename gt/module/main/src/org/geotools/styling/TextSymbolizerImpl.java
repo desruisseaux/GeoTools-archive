@@ -22,7 +22,7 @@ package org.geotools.styling;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 /**
  * Provides a Java representation of an SLD TextSymbolizer that
  * defines how text symbols should be rendered.
@@ -242,12 +242,12 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
 
         if (oth instanceof TextSymbolizerImpl) {
             TextSymbolizerImpl other = (TextSymbolizerImpl) oth;
-            return EqualsUtils.equals(this.geometryPropertyName, other.geometryPropertyName) &&
-                    EqualsUtils.equals(this.label, other.label) &&
-                    EqualsUtils.equals(this.halo, other.halo) &&
-                    EqualsUtils.equals(this.fonts, other.fonts) &&
-                    EqualsUtils.equals(this.labelPlacement, other.labelPlacement) &&
-                    EqualsUtils.equals(this.fill, other.fill);
+            return Utilities.equals(this.geometryPropertyName, other.geometryPropertyName) &&
+                   Utilities.equals(this.label, other.label) &&
+                   Utilities.equals(this.halo, other.halo) &&
+                   Utilities.equals(this.fonts, other.fonts) &&
+                   Utilities.equals(this.labelPlacement, other.labelPlacement) &&
+                   Utilities.equals(this.fill, other.fill);
         }
 
         return false;

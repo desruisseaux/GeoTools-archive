@@ -26,8 +26,8 @@ import java.util.List;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
 import org.geotools.filter.Filter;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -285,17 +285,17 @@ public class RuleImpl implements Rule, Cloneable {
 
         if (oth instanceof RuleImpl) {
             RuleImpl other = (RuleImpl) oth;
-            return EqualsUtils.equals(name, other.name) && 
-                EqualsUtils.equals(title, other.title) &&
-                EqualsUtils.equals(abstractStr, other.abstractStr) &&
-                EqualsUtils.equals(filter, other.filter) &&
-                hasElseFilter == other.hasElseFilter &&
-                EqualsUtils.equals(graphics, other.graphics) &&
-                EqualsUtils.equals(symbolizers, other.symbolizers) &&
-                Double.doubleToLongBits(maxScaleDenominator) == 
-                    Double.doubleToLongBits(other.maxScaleDenominator) &&
-                Double.doubleToLongBits(minScaleDenominator) ==
-                    Double.doubleToLongBits(other.minScaleDenominator);
+            return Utilities.equals(name, other.name) && 
+                   Utilities.equals(title, other.title) &&
+                   Utilities.equals(abstractStr, other.abstractStr) &&
+                   Utilities.equals(filter, other.filter) &&
+                   hasElseFilter == other.hasElseFilter &&
+                   Utilities.equals(graphics, other.graphics) &&
+                   Utilities.equals(symbolizers, other.symbolizers) &&
+                   Double.doubleToLongBits(maxScaleDenominator) == 
+                   Double.doubleToLongBits(other.maxScaleDenominator) &&
+                   Double.doubleToLongBits(minScaleDenominator) ==
+                   Double.doubleToLongBits(other.minScaleDenominator);
                 
         }
         

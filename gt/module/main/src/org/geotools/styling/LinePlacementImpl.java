@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 // Geotools dependencies
 import org.geotools.filter.Expression;
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -90,7 +90,7 @@ public class LinePlacementImpl implements LinePlacement, Cloneable {
         
         if (obj instanceof LinePlacementImpl) {
             LinePlacementImpl other = (LinePlacementImpl) obj;
-            return EqualsUtils.equals(perpendicularOffset, other.perpendicularOffset);
+            return Utilities.equals(perpendicularOffset, other.perpendicularOffset);
         }
         
         return false;

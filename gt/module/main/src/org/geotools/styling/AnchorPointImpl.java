@@ -21,7 +21,7 @@ package org.geotools.styling;
 
 import org.geotools.filter.Expression;
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -104,8 +104,8 @@ public class AnchorPointImpl implements AnchorPoint, Cloneable {
         
         if (obj instanceof AnchorPointImpl) {
             AnchorPointImpl other = (AnchorPointImpl) obj;
-            return EqualsUtils.equals(this.anchorPointX, other.anchorPointX) &&
-                EqualsUtils.equals(this.anchorPointY, other.anchorPointY);
+            return Utilities.equals(this.anchorPointX, other.anchorPointX) &&
+                   Utilities.equals(this.anchorPointY, other.anchorPointY);
         }
         
         return false;     

@@ -18,7 +18,7 @@ package org.geotools.styling;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -209,9 +209,9 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
 
         if (oth instanceof PolygonSymbolizerImpl) {
             PolygonSymbolizerImpl other = (PolygonSymbolizerImpl) oth;
-            return EqualsUtils.equals(this.geometryPropertyName, other.geometryPropertyName) &&
-                EqualsUtils.equals(fill, other.fill) &&
-                EqualsUtils.equals(stroke, other.stroke);
+            return Utilities.equals(this.geometryPropertyName, other.geometryPropertyName) &&
+                   Utilities.equals(fill, other.fill) &&
+                   Utilities.equals(stroke, other.stroke);
         }
 
         return false;

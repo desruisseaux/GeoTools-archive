@@ -41,7 +41,7 @@ import java.util.Iterator;
 
 import org.geotools.filter.Expression;
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -410,11 +410,11 @@ public class GraphicImpl implements Graphic, Cloneable {
 
         if (oth instanceof GraphicImpl) {
             GraphicImpl other = (GraphicImpl) oth;
-            return EqualsUtils.equals(this.geometryPropertyName, other.geometryPropertyName) &&
-                EqualsUtils.equals(this.size, other.size) &&
-                EqualsUtils.equals(this.rotation, other.rotation) &&
-                EqualsUtils.equals(this.opacity, other.opacity) &&
-                EqualsUtils.equals(this.symbols, other.symbols);
+            return Utilities.equals(this.geometryPropertyName, other.geometryPropertyName) &&
+                   Utilities.equals(this.size, other.size) &&
+                   Utilities.equals(this.rotation, other.rotation) &&
+                   Utilities.equals(this.opacity, other.opacity) &&
+                   Utilities.equals(this.symbols, other.symbols);
         }
         
         return false;

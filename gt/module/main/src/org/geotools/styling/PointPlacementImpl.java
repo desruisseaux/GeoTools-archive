@@ -20,7 +20,7 @@
 package org.geotools.styling;
 
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
+import org.geotools.resources.Utilities;
 
 /**
  * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
@@ -134,9 +134,9 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
         
         if (obj instanceof PointPlacementImpl) {
             PointPlacementImpl other = (PointPlacementImpl) obj;
-            return EqualsUtils.equals(anchorPoint, other.anchorPoint) &&
-                EqualsUtils.equals(displacement, other.displacement) &&
-                EqualsUtils.equals(rotation, other.rotation);
+            return Utilities.equals(anchorPoint, other.anchorPoint) &&
+                   Utilities.equals(displacement, other.displacement) &&
+                   Utilities.equals(rotation, other.rotation);
         }
         
         return false;

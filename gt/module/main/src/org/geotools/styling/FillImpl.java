@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.util.Cloneable;
-import org.geotools.util.EqualsUtils;
 import org.geotools.filter.Expression;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -238,10 +238,10 @@ public class FillImpl implements Fill, Cloneable {
 
         if (oth instanceof FillImpl) {
             FillImpl other = (FillImpl) oth;
-            return EqualsUtils.equals(this.color, other.color) &&
-                EqualsUtils.equals(this.backgroundColor, other.backgroundColor) &&
-                EqualsUtils.equals(this.opacity, other.opacity) &&
-                EqualsUtils.equals(this.graphicFill, other.graphicFill);
+            return Utilities.equals(this.color, other.color) &&
+                   Utilities.equals(this.backgroundColor, other.backgroundColor) &&
+                   Utilities.equals(this.opacity, other.opacity) &&
+                   Utilities.equals(this.graphicFill, other.graphicFill);
         }
 
         return false;
