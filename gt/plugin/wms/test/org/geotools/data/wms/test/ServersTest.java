@@ -22,8 +22,7 @@ import org.geotools.data.wms.WebMapServer;
 public class ServersTest extends TestCase {
     public void testServers() throws Exception{
     	URL[] servers = new URL[15];
-//servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
-//This one can't do 1.3.0    	
+//		servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
 //    	servers[1] = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetCapabilities");
 //    	servers[2] = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
 //  This returning Gzip content  	

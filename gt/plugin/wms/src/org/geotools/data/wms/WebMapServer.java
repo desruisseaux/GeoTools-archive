@@ -43,6 +43,7 @@ import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
+import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -313,6 +314,7 @@ public class WebMapServer implements Discovery {
         System.out.println(url);
         Map hints = new HashMap();
         hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
 
         URLConnection urlConnection = url.openConnection();
         //        urlConnection.setRequestProperty("accept", "application/vnd.ogc.wms+xml, text/xml, *; q=.2, */*; q=.2");
