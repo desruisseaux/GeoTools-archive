@@ -2052,9 +2052,8 @@ public class WFSTransactionComplexTypes {
 				if("ALL".equals(t) || "SOME".equals(t))
 					return t;
 				throw new SAXException("Invalid value: not ALL or NONE");
-			}else{
-				throw new SAXNotSupportedException("Invalid child value type.");
 			}
+			throw new SAXNotSupportedException("Invalid child value type.");
 		}
 		/* (non-Javadoc)
 		 * @see org.geotools.xml.schema.Type#getName()
