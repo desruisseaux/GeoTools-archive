@@ -25,8 +25,10 @@ package org.geotools.data.vpf.io;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version 1.0.0
+ * @deprecated
  */
 public class Coordinate3DDouble extends CoordinateDouble {
+    static final int dimensionality = 3;
     /**
      * Creates a new Coordinate3DDouble object.
      *
@@ -34,6 +36,11 @@ public class Coordinate3DDouble extends CoordinateDouble {
      */
     public Coordinate3DDouble(double[][] coords) {
         super(coords);
+    }
+    
+    
+    public int getDimensionality() {
+        return dimensionality;
     }
 }
 

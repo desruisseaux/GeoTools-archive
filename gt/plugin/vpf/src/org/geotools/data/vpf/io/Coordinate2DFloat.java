@@ -27,14 +27,19 @@ package org.geotools.data.vpf.io;
  * @version 1.0.0
  */
 public class Coordinate2DFloat extends CoordinateFloat {
-    /**
-     * Creates a new Coordinate2DFloat object.
-     *
-     * @param coords DOCUMENT ME!
-     */
+    
+    static final int dimensionality = 2;
+    
+    
     public Coordinate2DFloat(float[][] coords) {
         super(coords);
     }
+    
+    
+    public int getDimensionality() {
+        return dimensionality;
+    }
+    
 }
 
 // Coordinate2DFloat

@@ -25,7 +25,7 @@ import org.geotools.data.vpf.ifc.DataTypesDefinition;
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version $Id: RowField.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
  */
-public class RowField implements DataTypesDefinition {
+public class RowField extends Number implements DataTypesDefinition {
     /**
      * Describe variable <code>value</code> here.
      *
@@ -113,51 +113,45 @@ public class RowField implements DataTypesDefinition {
         }
     }
 
-    /**
-     * Method <code>getAsInt</code> is used to perform 
-     *
-     * @return an <code><code>int</code></code> value
+    /* (non-Javadoc)
+     * @see java.lang.Number#intValue()
      */
-    public int getAsInt() {
+    public int intValue() {
         return ((Number) value).intValue();
     }
 
-    /**
-     * <code>getAsLong</code> returns <code>long</code> value but it is
-     * <code>java int</code> value conerted to <code>java long</code>. VPF
-     * standard support <code>long int</code> values, however it is type of 32
-     * bits what is <code>java int</code> type indeed.
-     *
-     * @return a <code>long</code> value
+    /* (non-Javadoc)
+     * @see java.lang.Number#longValue()
      */
-    public long getAsLong() {
+    public long longValue() {
         return ((Number) value).longValue();
     }
 
-    /**
-     * Method <code>getAsShort</code> is used to perform 
-     *
-     * @return a <code><code>short</code></code> value
+    /* (non-Javadoc)
+     * @see java.lang.Number#byteValue()
      */
-    public short getAsShort() {
+    public byte byteValue() {
+        return ((Number) value).byteValue();
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Number#shortValue()
+     */
+    public short shortValue() {
         return ((Number) value).shortValue();
     }
 
-    /**
-     * Method <code>getAsFloat</code> is used to perform 
-     *
-     * @return a <code><code>float</code></code> value
+    /* (non-Javadoc)
+     * @see java.lang.Number#floatValue()
      */
-    public float getAsFloat() {
+    public float floatValue() {
         return ((Number) value).floatValue();
     }
 
-    /**
-     * Method <code>getAsDouble</code> is used to perform 
-     *
-     * @return a <code><code>double</code></code> value
+    /* (non-Javadoc)
+     * @see java.lang.Number#doubleValue()
      */
-    public double getAsDouble() {
+    public double doubleValue() {
         return ((Number) value).doubleValue();
     }
+    
 }

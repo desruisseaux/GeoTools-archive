@@ -28,8 +28,9 @@ import org.geotools.data.vpf.ifc.Coordinate;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version 1.0.0
+ * @deprecated
  */
-public class CoordinateDouble implements Coordinate {
+public abstract class CoordinateDouble implements Coordinate {
     /**
      * Describe variable <code>coordinates</code> here.
      *
@@ -69,4 +70,10 @@ public class CoordinateDouble implements Coordinate {
 
         return sb.toString();
     }
+    
+    public double[][] getCoordinates() {
+        return coordinates;
+    }
+    
+    public abstract int getDimensionality();
 }

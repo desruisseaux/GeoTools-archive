@@ -46,10 +46,10 @@ public class VPFLibrary implements FileConstants {
     public VPFLibrary(TableRow tr, File dir, VPFDataBase base)
                throws IOException {
         this.base = base;
-        xmin = tr.get(VPFLibraryIfc.FIELD_XMIN).getAsDouble();
-        ymin = tr.get(VPFLibraryIfc.FIELD_YMIN).getAsDouble();
-        xmax = tr.get(VPFLibraryIfc.FIELD_XMAX).getAsDouble();
-        ymax = tr.get(VPFLibraryIfc.FIELD_YMAX).getAsDouble();
+        xmin = tr.get(VPFLibraryIfc.FIELD_XMIN).doubleValue();
+        ymin = tr.get(VPFLibraryIfc.FIELD_YMIN).doubleValue();
+        xmax = tr.get(VPFLibraryIfc.FIELD_XMAX).doubleValue();
+        ymax = tr.get(VPFLibraryIfc.FIELD_YMAX).doubleValue();
         libCover = tr.get(VPFLibraryIfc.FIELD_LIB_NAME).getAsString().trim();
         this.directory = new File(dir, libCover);
         setCoverages();

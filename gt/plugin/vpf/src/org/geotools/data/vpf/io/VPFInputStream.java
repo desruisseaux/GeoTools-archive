@@ -30,6 +30,9 @@ import org.geotools.data.vpf.ifc.VPFHeader;
 import org.geotools.data.vpf.ifc.VPFRow;
 import org.geotools.data.vpf.util.DataUtils;
 
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 /**
  * VPFInputStream.java Created: Mon Feb 24 22:39:57 2003
@@ -254,6 +257,12 @@ public abstract class VPFInputStream implements FileConstants,
      */
     public List readAllRows() throws IOException {
         LinkedList list = new LinkedList();
+        try {
+            setPosition(1);
+        } catch (IOException exc) {
+            // This indicates that there are no rows
+            return list;
+        }
         VPFRow row = readRow();
 
         while (row != null) {
@@ -410,22 +419,22 @@ public abstract class VPFInputStream implements FileConstants,
             break;
 
         case DATA_2_COORD_F:
-            result = readCoordFloat(instancesCount, 2);
+            result = readCoord2DFloat(instancesCount);
 
             break;
 
         case DATA_2_COORD_R:
-            result = readCoordDouble(instancesCount, 2);
+            result = readCoord2DDouble(instancesCount);
 
             break;
 
         case DATA_3_COORD_F:
-            result = readCoordFloat(instancesCount, 3);
+            result = readCoord3DFloat(instancesCount);
 
             break;
 
         case DATA_3_COORD_R:
-            result = readCoordDouble(instancesCount, 3);
+            result = readCoord3DDouble(instancesCount);
 
             break;
 
@@ -516,30 +525,52 @@ public abstract class VPFInputStream implements FileConstants,
         return new TripletId(tripletData);
     }
 
-    protected CoordinateFloat readCoordFloat(int instancesCount, int dim)
-                                      throws IOException {
-        float[][] data = new float[instancesCount][dim];
+    protected DirectPosition[] readCoord3DFloat(int instancesCount)
+        throws IOException {
+        DirectPosition[] result = new DirectPosition[instancesCount];
 
-        for (int i = 0; i < instancesCount; i++) {
-            for (int j = 0; j < dim; j++) {
-                data[i][j] = readFloat();
-            }
+        for (int inx = 0; inx < instancesCount; inx++) {
+            result[inx] = new GeneralDirectPosition(readFloat(), readFloat(),
+                    readFloat());
         }
 
-        return new CoordinateFloat(data);
+        return result;
     }
 
-    protected CoordinateDouble readCoordDouble(int instancesCount, int dim)
-                                        throws IOException {
-        double[][] data = new double[instancesCount][dim];
+    protected DirectPosition[] readCoord2DFloat(int instancesCount)
+        throws IOException {
+        DirectPosition[] result = new DirectPosition[instancesCount];
 
-        for (int i = 0; i < instancesCount; i++) {
-            for (int j = 0; j < dim; j++) {
-                data[i][j] = readDouble();
-            }
+        for (int inx = 0; inx < instancesCount; inx++) {
+            result[inx] = new DirectPosition2D(readFloat(), readFloat());
         }
 
-        return new CoordinateDouble(data);
+        return result;
+    }
+
+    protected DirectPosition[] readCoord2DDouble(int instancesCount)
+        throws IOException {
+        DirectPosition[] result = null;
+        result = new DirectPosition[instancesCount];
+
+        for (int inx = 0; inx < instancesCount; inx++) {
+            result[inx] = new DirectPosition2D(readDouble(), readDouble());
+        }
+
+        return result;
+    }
+
+    protected DirectPosition[] readCoord3DDouble(int instancesCount)
+        throws IOException {
+        DirectPosition[] result = null;
+        result = new DirectPosition[instancesCount];
+
+        for (int inx = 0; inx < instancesCount; inx++) {
+            result[inx] = new GeneralDirectPosition(readDouble(), readDouble(),
+                    readDouble());
+        }
+
+        return result;
     }
 
     /**

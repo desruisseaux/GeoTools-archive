@@ -124,7 +124,7 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
         if (tableRow != null) {
             currentFeature = readFeature(tableRow, type);
 
-            int tileid = ((RowField) currentFeature.get("tile_id")).getAsInt();
+            int tileid = ((RowField) currentFeature.get("tile_id")).intValue();
 
             if (tileid != currentTile) {
                 if (edgeInput != null) {
@@ -150,7 +150,7 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
                 currentTile = tileid;
             }
 
-            int fac_id = ((RowField) currentFeature.get("fac_id")).getAsInt();
+            int fac_id = ((RowField) currentFeature.get("fac_id")).intValue();
             faceRow = (TableRow) faceInput.readRow(fac_id);
 
             currentFace = readFace(faceRow);

@@ -29,7 +29,7 @@ import org.geotools.data.vpf.ifc.Coordinate;
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version 1.0.0
  */
-public class CoordinateFloat implements Coordinate {
+public abstract class CoordinateFloat implements Coordinate {
     /**
      * Describe variable <code>coordinates</code> here.
      *
@@ -69,4 +69,11 @@ public class CoordinateFloat implements Coordinate {
 
         return sb.toString();
     }
+    
+    public float[][] getCoordinates() {
+        return coordinates;
+    }
+
+    public abstract int getDimensionality();
+    
 }

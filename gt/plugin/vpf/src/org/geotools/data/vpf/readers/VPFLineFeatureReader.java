@@ -88,7 +88,7 @@ public class VPFLineFeatureReader extends VPFReader implements FileConstants {
         if (tableRow != null) {
             currentFeature = readFeature(tableRow, type);
 
-            int tileid = ((RowField) currentFeature.get("tile_id")).getAsInt();
+            int tileid = ((RowField) currentFeature.get("tile_id")).intValue();
 
             if (tileid != currentTile) {
                 if (edgeInput != null) {
@@ -105,7 +105,7 @@ public class VPFLineFeatureReader extends VPFReader implements FileConstants {
                 currentEdge = 1;
             }
 
-            int edgeid = ((RowField) currentFeature.get("edg_id")).getAsInt();
+            int edgeid = ((RowField) currentFeature.get("edg_id")).intValue();
             edgeRow = (TableRow) edgeInput.readRow(edgeid);
             currentEdgeData = readEdge(edgeRow);
 

@@ -86,7 +86,7 @@ public class VPFPointFeatureReader extends VPFReader implements FileConstants {
         if (tableRow != null) {
             currentFeature = readFeature(tableRow, type);
 
-            int tileid = ((RowField) currentFeature.get("tile_id")).getAsInt();
+            int tileid = ((RowField) currentFeature.get("tile_id")).intValue();
 
             if (tileid != currentTile) {
                 if (pointInput != null) {
@@ -102,7 +102,7 @@ public class VPFPointFeatureReader extends VPFReader implements FileConstants {
                 currentTile = tileid;
             }
 
-            int edgeid = ((RowField) currentFeature.get("end_id")).getAsInt();
+            int edgeid = ((RowField) currentFeature.get("end_id")).intValue();
             pointRow = (TableRow) pointInput.readRow(edgeid);
             currentPointData = readPoint(pointRow);
 

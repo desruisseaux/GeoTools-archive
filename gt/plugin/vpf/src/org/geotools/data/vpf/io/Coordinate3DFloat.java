@@ -27,14 +27,14 @@ package org.geotools.data.vpf.io;
  * @version 1.0.0
  */
 public class Coordinate3DFloat extends CoordinateFloat {
-    /**
-     * Creates a new Coordinate3DFloat object.
-     *
-     * @param coords DOCUMENT ME!
-     */
+    
+    static final int dimensionality = 3;
+
     public Coordinate3DFloat(float[][] coords) {
         super(coords);
     }
+    
+    public int getDimensionality() {
+        return dimensionality;
+    }
 }
-
-// Coordinate3DFloat

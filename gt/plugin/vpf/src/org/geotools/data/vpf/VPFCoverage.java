@@ -46,7 +46,7 @@ public class VPFCoverage implements VPFCoverageIfc, FileConstants {
         this.base = base;
         name = tr.get(FIELD_COVERAGE_NAME).getAsString().trim();
         description = tr.get(FIELD_DESCRIPTION).getAsString().trim();
-        topology = tr.get(FIELD_LEVEL).getAsShort();
+        topology = tr.get(FIELD_LEVEL).shortValue();
         this.directory = new File(directory, name);
         setFeatureClasses();
     }

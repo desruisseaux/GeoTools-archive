@@ -39,9 +39,9 @@ public class PrimitiveDataFactory {
 
         try {
             ed = new EdgeData();
-            ed.put("id", new Integer(edge.get("id").getAsInt()));
-            ed.put("start_node", new Integer(edge.get("start_node").getAsInt()));
-            ed.put("end_node", new Integer(edge.get("end_node").getAsInt()));
+            ed.put("id", new Integer(edge.get("id").intValue()));
+            ed.put("start_node", new Integer(edge.get("start_node").intValue()));
+            ed.put("end_node", new Integer(edge.get("end_node").intValue()));
             ed.put("right_face", edge.get("right_face"));
             ed.put("left_face", edge.get("left_face"));
             ed.put("right_edge", edge.get("right_edge"));
@@ -70,8 +70,8 @@ public class PrimitiveDataFactory {
     protected HashMap readFace(TableRow face) {
         HashMap fd = new HashMap();
         fd.put("id", face.get("id").getAsString());
-        fd.put("ext_id", new Integer(face.get(1).getAsInt()));
-        fd.put("ring_ptr", new Integer(face.get("ring_ptr").getAsInt()));
+        fd.put("ext_id", new Integer(face.get(1).intValue()));
+        fd.put("ring_ptr", new Integer(face.get("ring_ptr").intValue()));
 
         return fd;
     }
@@ -87,8 +87,8 @@ public class PrimitiveDataFactory {
     protected HashMap readRing(TableRow ring) {
         HashMap rd = new HashMap();
         rd.put("id", ring.get("id").getAsString());
-        rd.put("face_id", new Integer(ring.get("face_id").getAsInt()));
-        rd.put("start_edge", new Integer(ring.get("start_edge").getAsInt()));
+        rd.put("face_id", new Integer(ring.get("face_id").intValue()));
+        rd.put("start_edge", new Integer(ring.get("start_edge").intValue()));
 
         return rd;
     }

@@ -27,6 +27,9 @@ package org.geotools.data.vpf.io;
  * @version 1.0.0
  */
 public class Coordinate2DDouble extends CoordinateDouble {
+    
+    static final int dimensionality = 2;
+    
     /**
      * Creates a new Coordinate2DDouble object.
      *
@@ -35,6 +38,11 @@ public class Coordinate2DDouble extends CoordinateDouble {
     public Coordinate2DDouble(double[][] coords) {
         super(coords);
     }
+    
+    public int getDimensionality() {
+        return dimensionality;
+    }
+    
 }
 
 // Coordinate2DDouble
