@@ -21,8 +21,6 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
-//import java.util.Set;
-//import java.util.HashSet;
 import java.util.Collections;
 
 // Parsing
@@ -152,8 +150,10 @@ public final class MathTransformParser extends AbstractParser {
 //should be able to use parameter.getValue().getClass() here, but it returns null            
             if (Integer.class.equals(((OperationParameter)parameter.getDescriptor()).getValueClass())) {
                 parameter.setValue(param.pullInteger("value"));
-            } else {
+            } else if (Double.class.equals(((OperationParameter)parameter.getDescriptor()).getValueClass())) {
                 parameter.setValue(param.pullDouble("value"));
+            } else {
+                parameter.setValue(param.pullString("value"));
             }
             param.close();
         }
