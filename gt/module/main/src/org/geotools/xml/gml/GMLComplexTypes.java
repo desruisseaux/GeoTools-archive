@@ -2205,6 +2205,7 @@ public class GMLComplexTypes {
                 }
 
                 CoordinateSequence c = (CoordinateSequence) t;
+                // TODO -- be forgiving
                 p = gf.createLineString(c);
             }
 
