@@ -90,28 +90,47 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers
  */
 public class WFSDataStore extends AbstractDataStore {
-    protected static final Logger logger = Logger.getLogger(
-            "org.geotools.data.wfs");
-    protected static final int POST_FIRST = 1;
-    protected static final int GET_FIRST = 2;
-    protected static final int POST_OK = 4;
-    protected static final int GET_OK = 8;
+    
     protected WFSCapabilities capabilities = null;
-    protected int protos = 0;
-    protected Authenticator auth = null;
+    
+    protected static final int AUTO_PROTOCOL = 3;
+    protected static final int POST_PROTOCOL = 1;
+    protected static final int GET_PROTOCOL = 2;
+    
+    protected int protocol = AUTO_PROTOCOL; // visible for transaction
+    protected Authenticator auth = null; // visible for transaction
+    
     private int bufferSize = 10;
     private int timeout = 3000;
     private Map featureTypeCache = new HashMap();
 
+    /**
+     * Construct <code>WFSDataStore</code>.
+     *
+     * Should NEVER be called!
+     */
     private WFSDataStore() {
     	// not called
     }
 
-    protected WFSDataStore(URL host, Boolean get, Boolean post, String username,
+    /**
+     * Construct <code>WFSDataStore</code>.
+     *
+     * @param host - may not yet be a capabilities url
+     * @param protocol - true,false,null (post,get,auto)
+     * @param username - iff password
+     * @param password - iff username
+     * @param timeout - default 3000 (ms)
+     * @param buffer - default 10 (features)
+     * 
+     * @throws SAXException
+     * @throws IOException
+     */
+    protected WFSDataStore(URL host, Boolean protocol, String username,
         String password, int timeout, int buffer)
         throws SAXException, IOException {
-        super(false); // TODO update when writeable
-        logger.setLevel(Level.WARNING);
+        super(true);
+        WFSDataStoreFactory.logger.setLevel(Level.WARNING);
 
         // TODO find a better way of adding functionality to the factory ... perhaps putting in your own RootHandler?
         new WFSSchemaFactory();
@@ -120,35 +139,43 @@ public class WFSDataStore extends AbstractDataStore {
             auth = new WFSAuthenticator(username, password, host);
         }
 
-        // TODO support using POST for getCapabilities
-        HttpURLConnection hc = (HttpURLConnection) host.openConnection();
-        InputStream is = getInputStream(hc, auth);
-        Object t = DocumentFactory.getInstance(is, null, logger.getLevel());
-
-        if (t instanceof WFSCapabilities) {
-            capabilities = (WFSCapabilities) t;
+        if (protocol == null) {
+            this.protocol = AUTO_PROTOCOL;
         } else {
-            throw new SAXException(
-                "The specified URL Should have returned a 'WFSCapabilities' object. Returned a "
-                + ((t == null) ? "null value."
-                               : (t.getClass().getName() + " instance.")));
-        }
-
-        if (get == null) {
-            protos = GET_OK;
-        } else {
-            protos = get.booleanValue() ? (GET_FIRST + GET_OK) : 0;
-        }
-
-        if (post == null) {
-            protos = protos | POST_OK;
-        } else {
-            protos = post.booleanValue() ? (POST_FIRST + POST_OK)
-                                         : (protos | protos);
+            if (protocol.booleanValue()) {
+                this.protocol = POST_PROTOCOL;
+            } else {
+                this.protocol = GET_PROTOCOL;
+            }
         }
 
         this.timeout = timeout;
         this.bufferSize = buffer;
+        
+        findCapabilities(host);
+    }
+    
+    private void findCapabilities(URL host) throws SAXException, IOException {
+
+        // TODO support using POST for getCapabilities
+        
+        Object t = null;
+        try{
+            HttpURLConnection hc = (HttpURLConnection) host.openConnection();
+            InputStream is = getInputStream(hc, auth);
+            t = DocumentFactory.getInstance(is, null, WFSDataStoreFactory.logger.getLevel());
+        }catch(Throwable e){
+            HttpURLConnection hc = (HttpURLConnection) createGetCapabilitiesRequest(host).openConnection();
+            InputStream is = getInputStream(hc, auth);
+            t = DocumentFactory.getInstance(is, null, WFSDataStoreFactory.logger.getLevel());
+        }
+        if (t instanceof WFSCapabilities) {
+            capabilities = (WFSCapabilities) t;
+        } else {
+            throw new SAXException(
+            "The specified URL Should have returned a 'WFSCapabilities' object. Returned a "
+            + ((t == null) ? "null value." : (t.getClass().getName() + " instance.")));
+        }
     }
 
     protected static InputStream getInputStream(HttpURLConnection url,
@@ -164,7 +191,7 @@ public class WFSDataStore extends AbstractDataStore {
             try {
                 result = url.getInputStream();
             } catch (MalformedURLException e) {
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 throw e;
             }
 
@@ -196,7 +223,7 @@ public class WFSDataStore extends AbstractDataStore {
         return new BufferedOutputStream(result);
     }
 
-    protected static URL createGetCapabilitiesRequest(URL host) {
+    private static URL createGetCapabilitiesRequest(URL host) {
         if (host == null) {
             return null;
         }
@@ -224,7 +251,7 @@ public class WFSDataStore extends AbstractDataStore {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
-            logger.warning(e.toString());
+            WFSDataStoreFactory.logger.warning(e.toString());
 
             return host;
         }
@@ -265,55 +292,35 @@ public class WFSDataStore extends AbstractDataStore {
         FeatureType t = null;
         SAXException sax = null;
         IOException io = null;
-        if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
+        if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
             try {
                 t = getSchemaPost(typeName);
             } catch (SAXException e) {
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 sax = e;
             } catch (IOException e) {
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 io = e;
             }
         }
 
-        if (((protos & GET_FIRST) == GET_FIRST) && (t == null)) {
+        if (((protocol & GET_PROTOCOL) == GET_PROTOCOL) && (t == null)) {
             try {
                 t = getSchemaGet(typeName);
             } catch (SAXException e) {
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 sax = e;
             } catch (IOException e) {
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 io = e;
             }
         }
 
-        if (((protos & POST_OK) == POST_OK) && (t == null)) {
-            try {
-                t = getSchemaPost(typeName);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                logger.warning(e.toString());
-                io = e;
-            }
-        }
-
-        if (((protos & GET_OK) == GET_OK) && (t == null)) {
-            try {
-                t = getSchemaGet(typeName);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                logger.warning(e.toString());
-                io = e;
-            }
-        }
         if(t == null && sax!=null)
             throw new IOException(sax.toString());
+
+        if(t == null && io!=null)
+            throw io;
         
         //set crs?
         FeatureSetDescription fsd = getFSD(typeName);
@@ -329,18 +336,18 @@ public class WFSDataStore extends AbstractDataStore {
             	t = CRSService.transform(t,crs);
             }
         } catch (FactoryException e) {
-            logger.warning(e.getMessage());
+            WFSDataStoreFactory.logger.warning(e.getMessage());
         } catch (SchemaException e) {
-            logger.warning(e.getMessage());
+            WFSDataStoreFactory.logger.warning(e.getMessage());
         }
         
         if(ftName!=null){
             try {
                 t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName,t.getNamespaceURI(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
             } catch (FactoryConfigurationError e1) {
-                logger.warning(e1.getMessage());
+                WFSDataStoreFactory.logger.warning(e1.getMessage());
             } catch (SchemaException e1) {
-                logger.warning(e1.getMessage());
+                WFSDataStoreFactory.logger.warning(e1.getMessage());
             }
         }
 
@@ -355,7 +362,6 @@ public class WFSDataStore extends AbstractDataStore {
         List l = capabilities.getFeatureTypes();
         Iterator i = l.iterator();
         String crsName = null;
-        String ftName = null;
 
         while (i.hasNext() && crsName==null) {
                 FeatureSetDescription fsd = (FeatureSetDescription) i.next();
@@ -366,7 +372,8 @@ public class WFSDataStore extends AbstractDataStore {
         return null;
     }
 
-    private FeatureType getSchemaGet(String typeName)
+    //  protected for testing
+    protected FeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
 
@@ -399,7 +406,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         url += ("&TYPENAME=" + typeName);
-//System.out.println("SCHMEMA GET "+url);
+
         getUrl = new URL(url);
 
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
@@ -429,7 +436,8 @@ public class WFSDataStore extends AbstractDataStore {
         return ft;
     }
 
-    private FeatureType getSchemaPost(String typeName)
+    // protected for testing
+    protected FeatureType getSchemaPost(String typeName)
         throws IOException, SAXException {
         URL postUrl = capabilities.getDescribeFeatureType().getPost();
 
@@ -465,7 +473,7 @@ public class WFSDataStore extends AbstractDataStore {
 //            DocumentWriter.writeDocument(new String[] { typeName },
 //                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
 //        } catch (OperationNotSupportedException e) {
-//            logger.warning(e.toString());
+//            WFSDataStoreFactory.logger.warning(e.toString());
 //            throw new SAXException(e);
 //        }
         
@@ -473,7 +481,7 @@ public class WFSDataStore extends AbstractDataStore {
             DocumentWriter.writeDocument(new String[] { typeName },
                 WFSSchema.getInstance(), w, hints);
         } catch (OperationNotSupportedException e) {
-            logger.warning(e.toString());
+            WFSDataStoreFactory.logger.warning(e.toString());
             throw new SAXException(e);
         }
         os.flush();
@@ -509,14 +517,15 @@ public class WFSDataStore extends AbstractDataStore {
 
         return ft;
     }
-    private CRSService crs;
+    private CRSService crsService;
     private CRSService getCRSService(){
-        if(crs == null)
-            crs = new CRSService();
-        return crs;
+        if(crsService == null)
+            crsService = new CRSService();
+        return crsService;
     }
-    
-    private WFSFeatureReader getFeatureReaderGet(Query request,
+
+    //  protected for testing
+    protected WFSFeatureReader getFeatureReaderGet(Query request,
         Transaction transaction) throws UnsupportedEncodingException, IOException, SAXException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
@@ -617,7 +626,7 @@ public class WFSDataStore extends AbstractDataStore {
         try {
             DocumentWriter.writeFragment(f, FilterSchema.getInstance(), w, hints);
         } catch (OperationNotSupportedException e) {
-            logger.warning(e.toString());
+            WFSDataStoreFactory.logger.warning(e.toString());
             throw new SAXException(e);
         }
 
@@ -661,7 +670,8 @@ public class WFSDataStore extends AbstractDataStore {
         return null;
     }
 
-    private WFSFeatureReader getFeatureReaderPost(Query query,
+    //  protected for testing
+    protected WFSFeatureReader getFeatureReaderPost(Query query,
         Transaction transaction) throws SAXException, IOException {
         URL postUrl = capabilities.getGetFeature().getPost();
 
@@ -684,7 +694,7 @@ public class WFSDataStore extends AbstractDataStore {
 //        try{
 //            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
 //        }catch(OperationNotSupportedException e){
-//            logger.warning(e.toString());
+//            WFSDataStoreFactory.logger.warning(e.toString());
 //            throw new SAXException(e);
 //        }
 //        System.out.println("WFS FILTER START");
@@ -696,7 +706,7 @@ public class WFSDataStore extends AbstractDataStore {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
                 hints);
         } catch (OperationNotSupportedException e) {
-            logger.warning(e.toString());
+            WFSDataStoreFactory.logger.warning(e.toString());
             throw new SAXException(e);
         }
 
@@ -762,8 +772,8 @@ public class WFSDataStore extends AbstractDataStore {
             // reproject this
             try {
                 crs = getCRSService().createCRS(fsd.getSRS());
-                MathTransform mt = getCRSService().reproject(getCRSService().GEOGRAPHIC,crs,false);
-                maxbbox = getCRSService().transform(maxbbox,mt);
+                MathTransform mt = CRSService.reproject(CRSService.GEOGRAPHIC,crs,false);
+                maxbbox = CRSService.transform(maxbbox,mt);
             } catch (FactoryException e) {
                 e.printStackTrace();maxbbox = null;
             } catch (CannotCreateTransformException e) {
@@ -781,66 +791,34 @@ public class WFSDataStore extends AbstractDataStore {
             filters[0] = Filter.ALL;
         }
         ((DefaultQuery)query).setFilter(filters[0]);
-        if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
+        if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
             try {
                 t = getFeatureReaderPost(query, transaction);
                 if(t!=null)
                     t.hasNext(); // throws spot
             } catch (SAXException e) {
                 t = null;
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 sax = e;
             } catch (IOException e) {
                 t = null;
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 io = e;
             }
         }
 
-        if (((protos & GET_FIRST) == GET_FIRST) && (t == null)) {
+        if (((protocol & GET_PROTOCOL) == GET_PROTOCOL) && (t == null)) {
             try {
                 t = getFeatureReaderGet(query, transaction);
                 if(t!=null)
                     t.hasNext(); // throws spot
             } catch (SAXException e) {
                 t = null;
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 sax = e;
             } catch (IOException e) {
                 t = null;
-                logger.warning(e.toString());
-                io = e;
-            }
-        }
-
-        if (((protos & POST_OK) == POST_OK) && (t == null)) {
-            try {
-                t = getFeatureReaderPost(query, transaction);
-                if(t!=null)
-                    t.hasNext(); // throws spot
-            } catch (SAXException e) {
-                t = null;
-                logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                t = null;
-                logger.warning(e.toString());
-                io = e;
-            }
-        }
-
-        if (((protos & GET_OK) == GET_OK) && (t == null)) {
-            try {
-                t = getFeatureReaderGet(query, transaction);
-                if(t!=null)
-                    t.hasNext(); // throws spot
-            } catch (SAXException e) {
-                t = null;
-                logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                t = null;
-                logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 io = e;
             }
         }
@@ -941,7 +919,7 @@ public class WFSDataStore extends AbstractDataStore {
             }
 
         if (!found) {
-            logger.warning("Could not find typeName: " + ft.getTypeName());
+            WFSDataStoreFactory.logger.warning("Could not find typeName: " + ft.getTypeName());
             return new Filter[]{Filter.NONE,q.getFilter()};
         }
         WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);

@@ -57,7 +57,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	
 	        if (postStack.size() > 1) {
-	            WFSDataStore.logger.warning("Too many stack items after run: "
+	            WFSDataStoreFactory.logger.warning("Too many stack items after run: "
 	                + postStack.size());
 	        }
 	
@@ -72,7 +72,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	
 	        if (preStack.size() > 1) {
-	            WFSDataStore.logger.warning("Too many stack items after run: "
+	            WFSDataStoreFactory.logger.warning("Too many stack items after run: "
 	                + preStack.size());
 	        }
 	
@@ -90,7 +90,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	        if (!postStack.isEmpty()) {
 	        	postStack.push(filter);
-	            WFSDataStore.logger.warning(
+                WFSDataStoreFactory.logger.warning(
 	                "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
 	        } else {
 	            switch (filter.getFilterType()) {
@@ -148,7 +148,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            default:
 	                postStack.push(filter);
-	            WFSDataStore.logger.warning(
+	            WFSDataStoreFactory.logger.warning(
 	                    "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
 	
 	                break;
@@ -550,7 +550,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 		                        preStack.push(f);
 	                        }
 	                    } else {
-	                    	WFSDataStore.logger.warning(
+                            WFSDataStoreFactory.logger.warning(
 	                            "LogicFilter found which is not 'and, or, not");
 
 	                        while (postStack.size() > i)
@@ -633,7 +633,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     */
 	    public void visit(Expression expression) {
 	    	postStack.push(expression);
-	        WFSDataStore.logger.warning(
+            WFSDataStoreFactory.logger.warning(
 	            "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)");
 	    }
 	
@@ -959,26 +959,31 @@ public class WFSFilterVisitor implements FilterVisitor {
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
          */
         public void visit( AttributeExpression expression ) {
+            // do nothing
         }
         /*
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
          */
         public void visit( Expression expression ) {
+            // do nothing
         }
         /*
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
          */
         public void visit( LiteralExpression expression ) {
+            // do nothing
         }
         /*
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
          */
         public void visit( MathExpression expression ) {
+            // do nothing
         }
         /*
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
          */
         public void visit( FunctionExpression expression ) {
+            // do nothing
         }
     }
 }

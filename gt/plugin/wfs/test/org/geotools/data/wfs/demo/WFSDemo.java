@@ -30,9 +30,9 @@ public class WFSDemo {
         	URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
         
             Map m = new HashMap();
-            m.put(WFSDataStoreFactory.GET_CAPABILITIES_URL.key,url);
+            m.put(WFSDataStoreFactory.URL.key,url);
             m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000));
-            m.put(WFSDataStoreFactory.USE_GET.key,Boolean.TRUE);
+            m.put(WFSDataStoreFactory.PROTOCOL.key,Boolean.FALSE);
 
             DataStore wfs = (new WFSDataStoreFactory()).createNewDataStore(m);
             Query query = new DefaultQuery(wfs.getTypeNames()[1]);

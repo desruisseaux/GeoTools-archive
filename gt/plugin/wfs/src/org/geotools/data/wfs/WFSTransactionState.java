@@ -14,12 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on 28-Sep-2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package org.geotools.data.wfs;
 
 import org.geotools.data.Transaction;
@@ -107,31 +102,28 @@ public class WFSTransactionState implements State {
         // TODO deal with authID and locking ... WFS only allows one authID / transaction ...
         TransactionResult tr = null;
 
-        if (((ds.protos & WFSDataStore.POST_FIRST) == WFSDataStore.POST_FIRST)
+        if (((ds.protocol & WFSDataStore.POST_PROTOCOL) == WFSDataStore.POST_PROTOCOL)
                 && (tr == null)) {
             try {
                 tr = commitPost();
             } catch (OperationNotSupportedException e) {
-                WFSDataStore.logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             } catch (SAXException e) {
-                WFSDataStore.logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             }
         }
 
-        //	get not supported using kvp in spec except delete ... we don't allow it
-        //	    if((ds.protos & WFSDataStore.GET_FIRST) == WFSDataStore.GET_FIRST && tr == null)
-        //	        tr = commitGet();
-        if (((ds.protos & WFSDataStore.POST_OK) == WFSDataStore.POST_OK)
+        if (((ds.protocol & WFSDataStore.GET_PROTOCOL) == WFSDataStore.GET_PROTOCOL)
                 && (tr == null)) {
             try {
                 tr = commitPost();
             } catch (OperationNotSupportedException e) {
-                WFSDataStore.logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             } catch (SAXException e) {
-                WFSDataStore.logger.warning(e.toString());
+                WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             }
         }
@@ -174,7 +166,7 @@ public class WFSTransactionState implements State {
         ns.add(WFSSchema.NAMESPACE.toString());
         i = fts.iterator();
         while(i.hasNext()){
-        	ns.add(ds.getSchema((String)i.next()).getNamespace().toString());
+        	ns.add(ds.getSchema((String)i.next()).getNamespace());
         }
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction

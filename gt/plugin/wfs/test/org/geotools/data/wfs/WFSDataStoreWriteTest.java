@@ -50,19 +50,11 @@ public class WFSDataStoreWriteTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
 
-    private DataStore getDataStore(URL server, boolean isPost) throws IOException{
+    private WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();
-        m.put(WFSDataStoreFactory.GET_CAPABILITIES_URL.key,server);
+        m.put(WFSDataStoreFactory.URL.key,server);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        if(isPost){
-            m.put(WFSDataStoreFactory.USE_POST.key,Boolean.TRUE);
-            m.put(WFSDataStoreFactory.USE_GET.key,Boolean.FALSE);
-        }
-        else {
-            m.put(WFSDataStoreFactory.USE_GET.key,Boolean.TRUE);
-            m.put(WFSDataStoreFactory.USE_POST.key,Boolean.FALSE);
-        }
-        return (new WFSDataStoreFactory()).createNewDataStore(m);
+        return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
     }
     
     public FidFilter doInsert(DataStore ds,FeatureType ft,FeatureReader insert) throws NoSuchElementException, IOException, IllegalAttributeException{
@@ -203,7 +195,7 @@ public class WFSDataStoreWriteTest extends TestCase {
 //        URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
     	URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
 
-        DataStore post = getDataStore(url,true);
+        DataStore post = getDataStore(url);
         FeatureType ft = post.getSchema("topp:states");
 
 		GeometryFactory gf = new GeometryFactory();
