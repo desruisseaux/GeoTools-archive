@@ -57,8 +57,8 @@ freely available.</description>
     </dependency>
     <dependency>
       <id>postgresql</id>
-      <version>3.0</version>
-      <url>http://www.postgresql.com/</url>
+      <version>74.213</version>
+      <url>http://jdbc.postgresql.org</url>
        <properties>
         <relese.bundle>true</relese.bundle>
       </properties>
