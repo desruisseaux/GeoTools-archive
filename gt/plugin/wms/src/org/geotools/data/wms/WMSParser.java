@@ -18,20 +18,20 @@ package org.geotools.data.wms;
 
 import java.io.IOException;
 
-import org.geotools.data.wms.capabilities.Capabilities;
+import org.geotools.data.ows.Capabilities;
 import org.jdom.Document;
 
 /**
  * Provides support for parsing of a WMS GetCapabilties Document.
  * <p>
- * Instances will be responsible for parsing he GetCapabilities document according to
+ * Instances will be responsible for parsing the GetCapabilities document according to
  * a specific implementation specification.
  * <p>
  * This class takes part in a GOF Builder pattern, the different instances of WMSParser
  * compete based on the value of canProcess to determine which one can best handle a provided
  * document. The winner makes a series of callback to the WMSBuilder object. WMSBuilder takes
- * care of the complexity of constructing a Capability object - inparticular the details
- * corrasponding to the representaiton of Layers.
+ * care of the complexity of constructing a Capability object - in particular, the details
+ * corresponding to the representation of Layers.
  * </p>
  * <p>
  * We have taken this approach to isolate the parsing code from the representation of
@@ -53,7 +53,7 @@ public interface WMSParser {
      * <p>
      * Sample use:
      * <pre><code>
-     * SAXBuilder builder = new SAXBuilder();
+     *  SAXBuilder builder = new SAXBuilder();
 	 *	Document document;
 	 *	try {
 	 *		document = builder.build(stream);
@@ -66,10 +66,10 @@ public interface WMSParser {
      * @param document Document to test
      * @returns GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
      */
-	public int canProcess(Document docuemnt) throws IOException;
+	public int canProcess(Document document) throws IOException;
 	
 	/**
-	 * Ues WMSBuilder to construct a Capabilities object for the provided docuemnt.
+	 * Use WMSBuilder to construct a Capabilities object for the provided docuemnt.
 	 * <p>
 	 * Use of Builder pattern allows us to vary the Parser and isolate the complexities of
 	 * Capabilities construction (especially layer objects) from Parsing code. Note the use of

@@ -25,9 +25,9 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.ows.Capabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.capabilities.Capabilities;
 import org.jdom.JDOMException;
 
 /**

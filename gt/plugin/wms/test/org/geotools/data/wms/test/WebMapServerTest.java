@@ -32,9 +32,9 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.ows.Capabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
@@ -109,6 +109,8 @@ public class WebMapServerTest extends TestCase {
 	    Capabilities capabilities = wms.getCapabilities();
 	    
 	    GetMapRequest request = wms.createGetMapRequest();
+	    
+	    request.setVersion("1.1.1");
 	    
 	    List simpleLayers = request.getAvailableLayers();
 	    Iterator iter = simpleLayers.iterator();

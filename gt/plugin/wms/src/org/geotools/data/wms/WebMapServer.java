@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
@@ -45,7 +45,7 @@ import org.jdom.input.SAXBuilder;
  * 
  * <p>
  * When performing the GetCapabilities request, all query parameters
- * are saved and over-ride the defaults:
+ * are saved except the following, which are over-rided.
  * <pre><code>
  * service=WMS
  * version=1.1.1
@@ -156,12 +156,16 @@ public class WebMapServer {
 		this.serverURL = serverURL;
 		
 		parsers = new WMSParser[1];
-		parsers[0] = new Parser1_1_1();
+		parsers[0] = new Spec111WMSParser();
 		
 		if (wait) {
 			return;
 		}
-		issueRequest( negotiateVersion( serverURL ), !wait);
+		GetCapabilitiesRequest request = negotiateVersion( serverURL );
+		if (getProblem() != null) {
+			return;
+		}
+		issueRequest( request, !wait);
 	}
 	/**
 	 * Negotiate for WMS GetCapabilities Document we know how to handle.
@@ -221,6 +225,19 @@ public class WebMapServer {
 	        
 	        GetCapabilitiesRequest request = specification.createRequest( server );
 	        String serverVersion = queryVersion( request );
+	        
+	        if (getProblem() != null) {
+	        	/*
+	        	 * There was an error accessing the server.
+	        	 * 
+	        	 * Not sure if there is any way at all to recover from this,
+	        	 * as the WMS specification states that if a request is made
+	        	 * for a higher or lower version, it should return a valid getCaps,
+	        	 * but in this instance, it hasn't. 
+	        	 * 
+	        	 */
+        		return null;
+	        }
 	        
 	        int compare = serverVersion.compareTo( clientVersion );
 	        if( compare == 0 ){
@@ -299,14 +316,14 @@ public class WebMapServer {
 	}
 	    
 	/**
-	 * Map of known specification.
+	 * Map of known specifications.
 	 * <p>
-	 * We could do the plug-in thing here to add specificaitons at a later date.
+	 * We could do the plug-in thing here to add specifications at a later date.
 	 * @return Sorted Map of Specifications by version number.
 	 */
 	private List specifications(){
 	    List specs = new ArrayList( 2 );	    
-	    specs.add( new WMS1_0() );
+	    specs.add( new WMS1_0_0() );
 	    specs.add( new WMS1_1_1() );
 	    return specs;
 	}
@@ -324,8 +341,10 @@ public class WebMapServer {
             // - text/xml		    
 		    document = builder.build( connection.getInputStream() );
         } catch (JDOMException badXML) {
+        	problem = badXML;
             return null;
         } catch (IOException badIO) {
+        	problem = badIO;
             return null;
         }
         Element element = document.getRootElement(); //Root = 		

@@ -99,7 +99,7 @@ public class GetMapRequest extends AbstractRequest {
     
     /**
      * Sets the version number of the request.
-     * @param version A String indicting a WMS Version ("1.0.0", "1.1.0", or "1.1.1")
+     * @param version A String indicting a WMS Version ("1.0.0", "1.1.0", "1.1.1", or "1.3.0")
      */
     public void setVersion(String version) {
         //TODO Version stuff here

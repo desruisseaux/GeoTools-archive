@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.Utils;
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
 

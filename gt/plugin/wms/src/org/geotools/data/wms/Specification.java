@@ -33,13 +33,13 @@ import org.jdom.Document;
  * </ul>
  * </p>
  * <p>
- * The idea is that this class opperates a Toolkit for all things assocated with
- * a Web Map Server  Specification. The various objects produced by this toolkit
- * are used as stratagy objects for the top level WebMapServer object:
+ * The idea is that this class operates a Toolkit for all things assocated with
+ * a Web Map Server Specification. The various objects produced by this toolkit
+ * are used as strategy objects for the top level WebMapServer object:
  * <ul>
  * <li>WebMapServer - uses a WMSParser to derive a Capabilities object
- * <li>WebMapServer - uses a WMSFormatFactory to generate the correct WMSFormat
  * <li>WebMapServer - uses a GetCapabilitiesRequest during version negotiation.
+ * <li>WMSGridCoverageExchange - uses a WMSFormatFactory to generate the correct WMSFormat
  * </ul>
  * </p> 
  * <p>
@@ -71,7 +71,7 @@ public abstract class Specification {
      * <p>
      * By allowing the specification to choose a Parser based on the document
      * we are given an oppertunity to choose a specific parser for several
-     * vendors that generate unusal Capabilities documents.
+     * vendors that generate unusual Capabilities documents.
      * </p>
      * <p>
      * That is even the version number negotiation worked out

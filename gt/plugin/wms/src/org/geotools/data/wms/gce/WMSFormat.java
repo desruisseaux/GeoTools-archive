@@ -23,7 +23,7 @@ import java.net.URL;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.wms.capabilities.Capabilities;
+import org.geotools.data.ows.Capabilities;
 import org.opengis.parameter.GeneralOperationParameter;
 
 /**

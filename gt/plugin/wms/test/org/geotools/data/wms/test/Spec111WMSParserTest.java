@@ -21,18 +21,17 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.wms.Parser1_1_1;
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.wms.Spec111WMSParser;
 import org.geotools.data.wms.WMSBuilder;
-import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
 /**
  * @author Richard Gould
  */
-public class Parser1_1_1Test extends TestCase {
+public class Spec111WMSParserTest extends TestCase {
 	
 	private URL getCapsURL;
 
@@ -49,7 +48,7 @@ public class Parser1_1_1Test extends TestCase {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(getCapsURL);
 		
-		Parser1_1_1 parser = new Parser1_1_1();
+		Spec111WMSParser parser = new Spec111WMSParser();
 		
 		Capabilities capabilities = parser.constructCapabilities( document, new WMSBuilder() );
 		assertNotNull(capabilities);

@@ -18,7 +18,7 @@ package org.geotools.data.wms.gce;
 
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.wms.capabilities.Capabilities;
+import org.geotools.data.ows.Capabilities;
 
 /**
  * Factory for the creation of a Format for use with WebMapServer.
@@ -30,7 +30,9 @@ import org.geotools.data.wms.capabilities.Capabilities;
  * @author Richard Gould, Refractions Research
  */
 public class WMSFormatFactory implements GridFormatFactorySpi {
-    /**
+    private Capabilities capabilities;
+
+	/**
      * WMSFormatFactory constructions based on parsed CapabilitiesDocument.
      * <p>
      * Currently only WMSFormat is supported - my impression is that a given
@@ -40,12 +42,12 @@ public class WMSFormatFactory implements GridFormatFactorySpi {
      */
     public WMSFormatFactory(Capabilities capabilities) {
         
-        // TODO Auto-generated constructor stub
+    	this.capabilities = capabilities;
     }
 
     /** Constructs a WMSFormat for use */
 	public Format createFormat() {
-		return new WMSFormat();
+		return new WMSFormat(capabilities);
 	}
 
 	/** Ensures Format preconditions are met */

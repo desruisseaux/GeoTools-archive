@@ -16,9 +16,6 @@
  */
 package org.geotools.data.wms;
 
-import java.io.IOException;
-import java.text.ParseException;
-
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
 

@@ -21,13 +21,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.capabilities.Layer;
+import org.geotools.data.ows.Layer;
 
 /**
+ * Provides miscellaneous utility methods for use with WMSs.
+ * 
  * @author Richard Gould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Utils {
 	

@@ -16,8 +16,6 @@
  */
 package org.geotools.data.wms;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.Request;
-import org.geotools.data.wms.capabilities.Service;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -59,7 +53,7 @@ import org.jdom.Element;
  * </p> 
  * @author Jody Garnett, Refractions Research
  */
-public class WMS1_0 extends Specification {
+public class WMS1_0_0 extends Specification {
     
     /** Expected name attribute for root element */
     public String getName(){

@@ -14,8 +14,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.ows.Capabilities;
 import org.geotools.data.wms.SimpleLayer;
-import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;

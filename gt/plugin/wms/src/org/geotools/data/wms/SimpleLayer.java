@@ -19,11 +19,8 @@ package org.geotools.data.wms;
 import java.util.Set;
 
 /**
- * A simple bean that represents a layer name paired with a style name.
- * <p>
- * Feedback: This object is used in making requests - seems to indicate request information
- * rather than that actual attribtues of a Layer?
- * </p>
+ * A simple bean that represents a layer name paired with a style name for use in requests.
+ *
  * @author Richard Gould, Refractions Research Inc.
  */
 public class SimpleLayer {

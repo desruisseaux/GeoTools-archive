@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.OperationType;
-import org.geotools.data.wms.capabilities.Request;
-import org.geotools.data.wms.capabilities.Service;
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.OperationType;
+import org.geotools.data.ows.Request;
+import org.geotools.data.ows.Service;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -36,25 +36,15 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
 /**
- * Genaerte a Capabilities bean from a WMS 1.1.1 complient GetCapabilities document.
- * <p>
- * Feedback:
- * <ul>
- * <li>This classname does not conform to the geotools naming conventions - it shuld end in WMSParser
- * (since it impelments that interface).
- * <li>Consider rename to one of: Spec111WMSParser, CapabilitiesDocument111WMSParser
- * <li>WIth a rename of WMSParser to CapabilitiesParser we could use WMS111CapabilitiesParser
- *     (although this woudl prevent the addition processing other documents to the WMSParser
- *      interface)
- * </ul>
- * </p>
+ * Generate a Capabilities bean from a WMS 1.1.1 complient GetCapabilities document.
+ * 
  * @author Richard Gould, Refractions Research
  * @see OPENGIS PROJECT DOCUMENT 00-028 OpenGIS® Web Map Server Interface Implementation Specification
  */
-public class Parser1_1_1 implements WMSParser {
+public class Spec111WMSParser implements WMSParser {
 
     /**
-     * Package visiable test method - not part of the public api.
+     * Package visible test method - not part of the public api.
      * <p>
      * Used as a storage place for Richards Code while I adjust class
      * to use of JDom
@@ -95,12 +85,7 @@ public class Parser1_1_1 implements WMSParser {
 	public int canProcess(Document document) {		
 		Element element = document.getRootElement(); //Root = "WMT_MS_Capabilities"
 			
-		// String Testing Feedback:
-		// - good habit to test w/ String first
-		//   !"WMT_MS_Capabilities".equals( element.getName() )
-		// - do you need to use element.getName().trim() or a regex for this comparison?
-		//   That is - you may want to be a little bit more forgiving of whitespace issues.
-		if (!element.getName().equals("WMT_MS_Capabilities")) {
+		if (!"WMT_MS_Capabilities".equals(element.getName().trim())) {
 			return WMSParser.NO;
 		}
 		String version = element.getAttributeValue("version");
@@ -140,10 +125,7 @@ public class Parser1_1_1 implements WMSParser {
 	        List layerList = new ArrayList();
 	        parseLayers(layerElement, layerList);
 
-	        Layer[] layers = new Layer[layerList.size()];
-	        for (int i = 0; i < layerList.size(); i++) {
-	        	layers[i] = (Layer) layerList.get(i);
-	        }
+	        Layer[] layers = (Layer[]) layerList.toArray(new Layer[layerList.size()]);
 	        
 			capabilities = new Capabilities();
 			capabilities.setService(service);

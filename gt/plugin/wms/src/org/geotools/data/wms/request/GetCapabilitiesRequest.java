@@ -85,7 +85,7 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 	 * Subclass can override if needed:
 	 * <pre><code>
 	 * protected void initVersion(){
-	 *   setProperty("WEBVER", "1.0.0");
+	 *   setProperty("WMTVER", "1.0.0");
 	 * }
 	 * </code></pre>
 	 * </p>

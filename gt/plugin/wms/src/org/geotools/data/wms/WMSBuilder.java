@@ -20,11 +20,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.OperationType;
-import org.geotools.data.wms.capabilities.Request;
-import org.geotools.data.wms.capabilities.Service;
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.OperationType;
+import org.geotools.data.ows.Request;
+import org.geotools.data.ows.Service;
 
 /**
  * Capabilities Builder for use by WMSParser instances.

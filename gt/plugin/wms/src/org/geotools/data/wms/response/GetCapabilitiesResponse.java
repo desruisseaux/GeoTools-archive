@@ -19,10 +19,10 @@ package org.geotools.data.wms.response;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.geotools.data.ows.Capabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
-import org.geotools.data.wms.capabilities.Capabilities;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;

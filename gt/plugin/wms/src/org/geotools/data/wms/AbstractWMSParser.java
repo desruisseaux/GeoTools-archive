@@ -16,25 +16,17 @@
  */
 package org.geotools.data.wms;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.data.wms.capabilities.Capabilities;
-import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.OperationType;
-import org.geotools.data.wms.capabilities.Request;
-import org.geotools.data.wms.capabilities.Service;
+import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.OperationType;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 
 /**
  * Initial start at generating a Capabilities bean from a WMS GetCapabilities document.
@@ -43,7 +35,7 @@ import org.jdom.input.SAXBuilder;
  * <li>WMS 1.0.0: @link http://www.opengis.org/docs/00-028.pdf
  * <li>WMS 1.1.0: @link http://www.opengis.org/docs/01-047r2.pdf
  * <li>WMS 1.1.1: @link http://www.opengis.org/docs/01-068r3.pdf
- * <li>WMS 1.3.0: @http://portal.opengis.org/files/?artifact_id=4756
+ * <li>WMS 1.3.0: @link http://portal.opengis.org/files/?artifact_id=4756
  * </p>
  * 
  * @author Jody Garnett, Refractions Research
