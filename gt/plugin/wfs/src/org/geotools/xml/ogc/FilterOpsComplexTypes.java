@@ -1320,8 +1320,7 @@ public class FilterOpsComplexTypes {
             BetweenFilter lf = (BetweenFilter) value;
 
             output.startElement(element.getNamespace(), element.getName(), null);
-            elems[0].getType().encode(elems[0], lf.getMiddleValue(), output,
-                hints); // expression
+            encodeExpr(lf.getMiddleValue(),output,hints);
             elems[1].getType().encode(elems[1], lf.getLeftValue(), output, hints); // LowerBoundary
             elems[2].getType().encode(elems[2], lf.getRightValue(), output,
                 hints); // UpperBoundary
@@ -1413,7 +1412,7 @@ public class FilterOpsComplexTypes {
             Expression lf = (Expression) value;
 
             output.startElement(element.getNamespace(), element.getName(), null);
-            elems[0].getType().encode(elems[0], lf, output, hints); // expression
+            encodeExpr(lf,output,hints);
             output.endElement(element.getNamespace(), element.getName());
         }
     }
@@ -1502,7 +1501,7 @@ public class FilterOpsComplexTypes {
             Expression lf = (Expression) value;
 
             output.startElement(element.getNamespace(), element.getName(), null);
-            elems[0].getType().encode(elems[0], lf, output, hints); // expression
+            encodeExpr(lf,output,hints);
             output.endElement(element.getNamespace(), element.getName());
         }
     }

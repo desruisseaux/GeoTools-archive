@@ -54,7 +54,7 @@ public class XMLEncoderTest extends FilterTestSupport {
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);
         LOGGER.finer("running XMLEncoderTests");
-        ;
+
         dataFolder = System.getProperty("dataFolder");
 
         if (dataFolder == null) {
