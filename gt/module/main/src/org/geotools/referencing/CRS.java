@@ -113,26 +113,16 @@ public class CRS {
             try {
                 Object value = visitor.factory( factory );
                 if( value != null ) list.add( value );
-            } catch (Throwable t ){
-                if( t != null ){
-                    // log trouble - as we can only throw the "last" cause
-                    System.err.println( trouble );
-                }
+            } catch (Throwable t ){                
                 trouble = t;
             }            
-        }
+        }        
         if( list.isEmpty()){
             if( trouble != null ) {
                 // trouble is the last known cause of failure
                 if( trouble instanceof FactoryException ) throw (FactoryException) trouble;            
                 if( trouble instanceof Exception ) throw new FactoryException( (Exception) trouble );
                 throw new FactoryException( "Trouble encountered while visiting CoordianteOpperationFactory", trouble );
-            }
-        }
-        else {
-            if( trouble != null ){
-                // log trouble - ie the last known cause of failure
-                System.err.println( trouble );
             }
         }
         return list;
@@ -166,12 +156,12 @@ public class CRS {
             CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             try {
                 Citation authority = factory.getAuthority();
-                System.out.println("Checking "+AUTHORITY+ " authority against "+authority );
-                System.out.println(" is "+AUTHORITY+ " in "+authority.getIdentifiers() );
-                System.out.println(" ..."+authority.getIdentifiers().contains( AUTHORITY ) );
+                //System.out.println("Checking "+AUTHORITY+ " authority against "+authority );
+                //System.out.println(" is "+AUTHORITY+ " in "+authority.getIdentifiers() );
+                //System.out.println(" ..."+authority.getIdentifiers().contains( AUTHORITY ) );
                 if( !authority.getIdentifiers().contains( AUTHORITY ) ) continue;
                 
-                System.out.println("Lookup "+code+ " authority "+factory.getClass().toString() );
+                //System.out.println("Lookup "+code+ " authority "+factory.getClass().toString() );
                 CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code.toUpperCase() );
                 if( crs != null ) return crs;
             } catch (FactoryException e) {
