@@ -8,8 +8,8 @@
   <versions>
     <version>
       <id>b1</id>
-      <name>2.0-b1</name>
-      <tag>GT_2_0_B1</tag>
+      <name>2.0-B6-DEV</name>
+      <tag>GT_2_0_B6_DEV</tag>
     </version>
   </versions>
   <package>org.geotools</package>
@@ -36,9 +36,9 @@
   </developers>
   <dependencies>
     <dependency>
-      <artifactId>core</artifactId>
+      <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
     <dependency>
       <id>JTS</id>
@@ -48,12 +48,7 @@
     <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>data</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
     <!-- Use this when you dont have classes12 and sdoapi -->
     <dependency>
@@ -74,29 +69,9 @@
           <version>12</version>
         </dependency>-->
     <dependency>
-      <artifactId>defaultcore</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>resources</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>filter</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>opengis</artifactId>
-      <groupId>opengis</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>cts-coordtrans</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
       <id>vecmath</id>
@@ -119,9 +94,10 @@
              End test includes -->
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit</directory>
+          <directory>${basedir}/test</directory>
           <includes>
             <include>testData/</include>
+            <include>**/test-date/</include>
           </includes>
         </resource>
       </resources>

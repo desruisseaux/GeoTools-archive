@@ -4,12 +4,12 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-arcgrid</name>
   <id>arcgrid</id>
-  <currentVersion>2.0-B5-DEV</currentVersion>
+  <currentVersion>2.0-B6-DEV</currentVersion>
   <versions>
     <version>
       <id>b1</id>
-      <name>2.0-b1</name>
-      <tag>GT_2_0_B1</tag>
+      <name>2.0-B6-DEV</name>
+      <tag>GT_2_0_B6</tag>
     </version>
   </versions>
   <package>org.geotools</package>
@@ -39,9 +39,9 @@
   </developers>
   <dependencies>
     <dependency>
-      <artifactId>core</artifactId>
+      <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <version>2.0-B6-DEV</version>
     </dependency>
     <dependency>
       <id>JTS</id>
@@ -49,24 +49,14 @@
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
-      <artifactId>gcs-coverage</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
     </dependency>
     <dependency>
-      <artifactId>cts-coordtrans</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>resources</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
-      <artifactId>defaultcore</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
       <artifactId>lite-rendering</artifactId>
@@ -74,25 +64,9 @@
       <version>2.0-B5-DEV</version>
     </dependency>
     <dependency>
-      <artifactId>data</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-    </dependency>
-    <dependency>
       <id>vecmath</id>
       <version>1.2.1</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
-    </dependency>
-    <dependency>
-      <id>opengis</id>
-      <version>2.0-B5-DEV</version>
-      <url>http://www.geotools.org</url>
-    </dependency>
-    <dependency>
-      <id>map</id>
-      <groupId>gt2</groupId>
-      <version>2.0-B5-DEV</version>
-      <url>http://www.geotools.org</url>
     </dependency>
   </dependencies>
   <build>
