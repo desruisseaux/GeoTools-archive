@@ -1,6 +1,9 @@
 package org.geotools.styling;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +30,9 @@ public class SLDParser {
     private String graphicSt = "Graphic";    // to make pmd to shut up
     private String geomSt = "Geometry";    // to make pmd to shut up
     private String fillSt = "Fill";
+    
+    /** useful for detecting relative onlineresources */
+    private URL sourceUrl;
     
      /**
      * Create a Stylereader - use if you already have a dom to parse.
@@ -111,7 +117,13 @@ public class SLDParser {
      * @throws java.io.FileNotFoundException if the file is missing
      */
     public void setInput(String filename) throws java.io.FileNotFoundException {
-        source = new InputSource(new java.io.FileInputStream(new File(filename)));
+    	File f = new File(filename);
+        source = new InputSource(new java.io.FileInputStream(f));
+        try {
+			sourceUrl = f.toURL();
+		} catch (MalformedURLException e) {
+			LOGGER.warning("Can't build URL for file " + f.getAbsolutePath());
+		}
     }
     
     /**
@@ -123,6 +135,11 @@ public class SLDParser {
      */
     public void setInput(File f) throws java.io.FileNotFoundException {
         source = new InputSource(new java.io.FileInputStream(f));
+        try {
+			sourceUrl = f.toURL();
+		} catch (MalformedURLException e) {
+			LOGGER.warning("Can't build URL for file " + f.getAbsolutePath());
+		}
     }
     
     /**
@@ -134,6 +151,7 @@ public class SLDParser {
      */
     public void setInput(java.net.URL url) throws java.io.IOException {
         source = new InputSource(url.openStream());
+        sourceUrl = url;
     }
     
     /**
@@ -869,7 +887,7 @@ public class SLDParser {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("processing external graphic ");
         }
-        
+
         String format = "";
         String uri = "";
         Map paramList = new HashMap();
@@ -928,7 +946,26 @@ public class SLDParser {
             }
         }
         
-        ExternalGraphic extgraph = factory.createExternalGraphic(uri, format);
+        URL url = null;
+        try{
+        	url = new URL(uri);
+        }catch(MalformedURLException mfe){
+        	LOGGER.fine("Looks like " + uri + " is a relative path..");
+        	if(sourceUrl != null){
+        		try{
+        			url = new URL(sourceUrl, uri);
+        		}catch(MalformedURLException e){
+        			LOGGER.warning("can't parse " + uri + " as relative to" + sourceUrl.toExternalForm());
+        		}
+        	}
+        }
+        
+        ExternalGraphic extgraph;
+        if (url == null){
+        	extgraph = factory.createExternalGraphic(uri, format);
+        }else{
+        	extgraph = factory.createExternalGraphic(url, format);
+        }
         extgraph.setCustomProperties(paramList);
         return extgraph;
     }
