@@ -25,6 +25,7 @@ package org.geotools.data.vpf.io;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @version 1.0.0
+ * @deprecated replaced by DirectPosition classes
  */
 public class Coordinate2DDouble extends CoordinateDouble {
     
