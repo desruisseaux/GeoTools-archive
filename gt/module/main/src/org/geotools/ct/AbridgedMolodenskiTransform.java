@@ -63,6 +63,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *   <li> National Imagry and Mapping Agency (NIMA), Department of Defense World 
  *        Geodetic System 1984, Technical Report 8350.2. 
  *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
+ *   <li> "Coordinate Conversions and Transformations including Formulas",
+ *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
  * @version $Id$
@@ -247,17 +249,50 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
     
     /**
      * Transforms a list of coordinate point ordinal values.
-     * @task REVISIT: this functionality already exists in AbstractMathTransform
      */
-    public void transform(final float[] srcPts, final int srcOff,
-                          final float[] dstPts, final int dstOff, int numPts)
+    public void transform(final float[] srcPts, int srcOff,
+                          final float[] dstPts, int dstOff, int numPts)
     {
-        // TODO: Copy the implementation from 'transform(double[]...)'.
-        try {
-            super.transform(srcPts, srcOff, dstPts, dstOff, numPts);
+        int step = 0;
+        if (srcPts==dstPts && srcOff<dstOff && srcOff+numPts*getDimSource()>dstOff) {
+            if (source3D != target3D) {
+                // see TODO above
+                throw new UnsupportedOperationException();
+            }
+            step = -getDimSource();
+            srcOff -= (numPts-1)*step;
+            dstOff -= (numPts-1)*step;
         }
-        catch (TransformException exception) {
-            // Should not happen.
+        while (--numPts >= 0) {
+            double x = Math.toRadians(srcPts[srcOff++]);
+            double y = Math.toRadians(srcPts[srcOff++]);
+            double z = (source3D) ? srcPts[srcOff++] : 0;
+            final double sinX = Math.sin(x);
+            final double cosX = Math.cos(x);
+            final double sinY = Math.sin(y);
+            final double cosY = Math.cos(y);
+            final double sin2Y = sinY*sinY;
+            final double nu = a / Math.sqrt(1 - e2*sin2Y);
+            final double rho = nu * (1 - e2) / (1 - e2*sin2Y);
+            
+            // See sin(1") note above
+            y += (dz*cosY - sinY*(dy*sinX + dx*cosX) + adf*Math.sin(2*y)) / rho;
+            x += (dy*cosX - dx*sinX) / (nu*cosY);
+            
+            //stay within latitude +-90 deg. and longitude +-180 deg.
+            if (Math.abs(y) > Math.PI/2.0) {
+                dstPts[dstOff++] = 0.0F;
+                dstPts[dstOff++] = (y > 0.0) ? 90.0F : -90.0F;
+            } else {
+                dstPts[dstOff++] = (float) Math.toDegrees(ensureInRange(x));
+                dstPts[dstOff++] = (float) Math.toDegrees(y);
+            }
+            if (target3D) {
+                z += dx*cosY*cosX + dy*cosY*sinX + dz*sinY + adf*sin2Y - da;
+                dstPts[dstOff++] = (float) z;
+            }
+            srcOff += step;
+            dstOff += step;
         }
     }
     
@@ -282,6 +317,7 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
      *
      * @param  x The longitude.
      * @return The longitude in the range +/- 180°.
+     *
      * @task REVISIT: could be moved to AbstractMathTransform
      */
     final double ensureInRange(double x) {
