@@ -32,6 +32,7 @@ import javax.units.Unit;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -72,9 +73,16 @@ import org.opengis.referencing.operation.MathTransformFactory;
  */
 //how is this going to work with the factory finder
 public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
-    
-    private CRSFactory crsFactory;
-    private MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
+    /**
+     * A tuple of {@link CRSFactory} and the {@link MathTransformFactory}. All other
+     * factories are left to null. A factory group provides convenience methods that
+     * can't appears in GeoAPI factories, because they involve more than one of them.
+     * For example there is a {@link FactoryGroup#createProjectedCRS} that creates
+     * itself a math transform from a given set of parameters. Because this method
+     * involves both a math transform factory and a CRS factory, it can't be a
+     * {@link MathTransformFactory} or a {@link CRSFactory} method.
+     */
+    private final FactoryGroup factories;
     
     /**
      * The default coordinate system authority factory.
@@ -102,7 +110,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
      * @param factory The underlying factory used for objects creation.
      */
     public AUTOCRSAuthorityFactory(final CRSFactory factory) {
-        this.crsFactory = factory;
+        factories = new FactoryGroup(null, null, factory, null);
         facts.put( new Integer(42001), new Auto42001() );
         facts.put( new Integer(42002), new Auto42002() );
         facts.put( new Integer(42003), new Auto42003() );
@@ -158,8 +166,11 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         return set;
     }
 
+    /**
+     * @deprecated This method was required by old GeoAPI interfaces, but is not required anymore.
+     */
     public org.opengis.referencing.ObjectFactory getObjectFactory() {
-        return crsFactory;
+        return factories.getCRSFactory();
     }
     
     public org.opengis.metadata.citation.Citation getVendor() {
@@ -364,23 +375,22 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.GENERIC_2D;
+            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
             
             final double   falseNorthing   = code.latitude >= 0.0 ? 0.0 : 10000000.0;
             final double   zone            = Math.min(Math.floor((code.longitude + 180.0)/6.0)+1, 60);
             final double   centralMeridian = -183.0 + zone*6.0;
             final String   classification  = "Transverse_Mercator";
 
-            ParameterValueGroup parameters = mtFactory.getDefaultParameters(classification);
+            ParameterValueGroup parameters = factories.getMathTransformFactory().getDefaultParameters(classification);
             parameters.parameter("central_meridian").setValue(centralMeridian);
             parameters.parameter("latitude_of_origin").setValue(0.0);
             parameters.parameter("scale_factor").setValue(0.9996);
             parameters.parameter("false_easting").setValue(500000.0);
             parameters.parameter("false_northing").setValue(falseNorthing);
-            MathTransform trans = mtFactory.createParameterizedTransform(parameters);
             
-            return crsFactory.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto UTM"), 
-                    geoCRS, trans, cartCS);
+            return factories.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto UTM"), 
+                    geoCRS, null, parameters, cartCS);
         }
     }
     
@@ -431,22 +441,21 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.GENERIC_2D;
+            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
           
             final double   centralMeridian = code.longitude;
             final double   falseNorthing   = code.latitude >= 0.0 ? 0.0 : 10000000.0;
             final String   classification  = "Transverse_Mercator";
             
-            ParameterValueGroup parameters = mtFactory.getDefaultParameters(classification);
+            ParameterValueGroup parameters = factories.getMathTransformFactory().getDefaultParameters(classification);
             parameters.parameter("central_meridian").setValue(centralMeridian);
             parameters.parameter("latitude_of_origin").setValue(0.0);
             parameters.parameter("scale_factor").setValue(0.9996);
             parameters.parameter("false_easting").setValue(500000.0);
             parameters.parameter("false_northing").setValue(falseNorthing);
-            MathTransform trans = mtFactory.createParameterizedTransform(parameters);
             
-            return crsFactory.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Tr. Mercator"), 
-                    geoCRS, trans, cartCS);  
+            return factories.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Tr. Mercator"), 
+                    geoCRS, null, parameters, cartCS);  
         }		
     }
 
@@ -496,22 +505,21 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.GENERIC_2D;
+            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
           
             final double   centralMeridian  = code.longitude;
             final double   latitudeOfOrigin = code.latitude;
             final String   classification   = "Orthographic";
             
-            ParameterValueGroup parameters = mtFactory.getDefaultParameters(classification);
+            ParameterValueGroup parameters = factories.getMathTransformFactory().getDefaultParameters(classification);
             parameters.parameter("central_meridian").setValue(centralMeridian);
             parameters.parameter("latitude_of_origin").setValue(latitudeOfOrigin);
             parameters.parameter("scale_factor").setValue(1.0);
             parameters.parameter("false_easting").setValue(0.0);
             parameters.parameter("false_northing").setValue(0.0);
-            MathTransform trans = mtFactory.createParameterizedTransform(parameters);
             
-            return crsFactory.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Orthographic"), 
-                    geoCRS, trans, cartCS);  
+            return factories.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Orthographic"), 
+                    geoCRS, null, parameters, cartCS);  
         }
     }
     
@@ -562,23 +570,22 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.GENERIC_2D;
+            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
         
             final double   centralMeridian   = code.longitude;
             final double   standardParallel1 = code.latitude;
             final String   classification    = "Equirectangular";
             
-            ParameterValueGroup parameters = mtFactory.getDefaultParameters(classification);
+            ParameterValueGroup parameters = factories.getMathTransformFactory().getDefaultParameters(classification);
             parameters.parameter("central_meridian").setValue(centralMeridian);
             parameters.parameter("latitude_of_origin").setValue(0.0);
             parameters.parameter("standard_parallel_1").setValue(standardParallel1);
             parameters.parameter("scale_factor").setValue(1.0);
             parameters.parameter("false_easting").setValue(0.0);
             parameters.parameter("false_northing").setValue(0.0);
-            MathTransform trans = mtFactory.createParameterizedTransform(parameters);
             
-            return crsFactory.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Orthographic"), 
-                    geoCRS, trans, cartCS);  
+            return factories.createProjectedCRS(Collections.singletonMap("name", "WGS 84 / Auto Orthographic"), 
+                    geoCRS, null, parameters, cartCS);  
         }
     }
     

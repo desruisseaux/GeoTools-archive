@@ -26,10 +26,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.units.ConversionException;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.datum.Datum;
@@ -37,6 +40,7 @@ import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSFactory;
@@ -236,6 +240,13 @@ public class FactoryGroup {
             throws FactoryException
     {
         /*
+         * Complete missing informations in the parameter block, if any.
+         */
+        final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
+        final Unit axisUnit = ellipsoid.getAxisUnit();
+        set(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit);
+        set(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit);
+        /*
          * Computes matrix for swapping axis and performing units conversion.
          * There is one matrix to apply before projection on (longitude,latitude)
          * coordinates, and one matrix to apply after projection on (easting,northing)
@@ -271,6 +282,27 @@ public class FactoryGroup {
             method = (OperationMethod) methods.get();
         }
         return getCRSFactory().createProjectedCRS(properties, method, base, mt, derivedCS);
+    }
+
+    /**
+     * Set the value for the specified parameter, if not already set.
+     */
+    private static void set(final ParameterValueGroup parameters, final String name,
+                            final double value, final Unit unit)
+    {
+        final ParameterValue parameter;
+        try {
+            parameter = parameters.parameter(name);
+        } catch (ParameterNotFoundException ignore) {
+            // Parameter not found. Ignore.
+            return;
+        }
+        try {
+            parameter.doubleValue();
+        } catch (IllegalStateException exception) {
+            // Parameter not set. Set it now.
+            parameter.setValue(value, unit);
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -71,7 +71,7 @@ import org.geotools.resources.cts.Resources;
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
@@ -105,7 +105,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     protected final double excentricity;
     
     /**
-     * The square of excentricity: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
+     * The square of excentricity: e² = (a²-b²)/a² where
      * <var>e</var> is the {@linkplain #excentricity excentricity},
      * <var>a</var> is the {@linkplain #semiMajor semi major} axis length and
      * <var>b</var> is the {@linkplain #semiMinor semi minor} axis length.
@@ -203,8 +203,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *         <ul>
      *           <li>"semi_major" (mandatory: no default)</li>
      *           <li>"semi_minor" (mandatory: no default)</li>
-     *           <li>"central_meridian"   (default to 0ï¿½)</li>
-     *           <li>"latitude_of_origin" (default to 0ï¿½)</li>
+     *           <li>"central_meridian"   (default to 0°)</li>
+     *           <li>"latitude_of_origin" (default to 0°)</li>
      *           <li>"scale_factor"       (default to 1 )</li>
      *           <li>"false_easting"      (default to 0 )</li>
      *           <li>"false_northing"     (default to 0 )</li>
@@ -609,10 +609,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         /*
          * Makes sure that the longitude before conversion stay within +/- PI radians. As a
          * special case, we do not check the range if no rotation were applied on the longitude.
-         * This is because the user may have a big area ranging from -180ï¿½ to +180ï¿½. With the
-         * slight rounding errors related to map projections, the 180ï¿½ longitude may be slightly
+         * This is because the user may have a big area ranging from -180° to +180°. With the
+         * slight rounding errors related to map projections, the 180° longitude may be slightly
          * over the limit. Rolling the longitude would changes its sign. For example a bounding
-         * box from 30ï¿½ to +180ï¿½ would become 30ï¿½ to -180ï¿½, which is probably not what the user
+         * box from 30° to +180° would become 30° to -180°, which is probably not what the user
          * wanted.
          */
         ptDst = transformNormalized(centralMeridian!=0 ?
@@ -640,9 +640,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         throws ProjectionException
     {
         /*
-         * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
+         * Vérifie s'il faudra parcourir le tableau en sens inverse.
          * Ce sera le cas si les tableaux source et destination se
-         * chevauchent et que la destination est aprï¿½s la source.
+         * chevauchent et que la destination est après la source.
          */
         final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                  srcOffset+(2*numPts) > dstOffset);
@@ -771,10 +771,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             /*
              * Makes sure that the longitude after conversion stay within +/- PI radians. As a
              * special case, we do not check the range if no rotation were applied on the longitude.
-             * This is because the user may have a big area ranging from -180ï¿½ to +180ï¿½. With the
-             * slight rounding errors related to map projections, the 180ï¿½ longitude may be slightly
+             * This is because the user may have a big area ranging from -180° to +180°. With the
+             * slight rounding errors related to map projections, the 180° longitude may be slightly
              * over the limit. Rolling the longitude would changes its sign. For example a bounding
-             * box from 30ï¿½ to +180ï¿½ would become 30ï¿½ to -180ï¿½, which is probably not what the user
+             * box from 30° to +180° would become 30° to -180°, which is probably not what the user
              * wanted.
              */
             final double x = Math.toDegrees(centralMeridian!=0 ?
@@ -809,9 +809,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 throws TransformException
         {
             /*
-             * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
+             * Vérifie s'il faudra parcourir le tableau en sens inverse.
              * Ce sera le cas si les tableaux source et destination se
-             * chevauchent et que la destination est aprï¿½s la source.
+             * chevauchent et que la destination est après la source.
              */
             final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                      srcOffset+(2*numPts) > dstOffset);
@@ -1000,9 +1000,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compute function <code>f(s,c,eï¿½) = c/sqrt(1 - sï¿½&times;eï¿½)</code> needed for the true scale
+     * Compute function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
      * latitude (Snyder 14-15), where <var>s</var> and <var>c</var> are the sine and cosine of
-     * the true scale latitude, and <var>eï¿½</var> is the {@linkplain #excentricitySquared
+     * the true scale latitude, and <var>e²</var> is the {@linkplain #excentricitySquared
      * eccentricity squared}.
      */
     final double msfn(final double s, final double c) {
@@ -1071,7 +1071,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
-         * parameter value. Valid values range is from -180 to 180ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
                 new Identifier[] {
@@ -1086,7 +1086,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new Identifier[] {
@@ -1161,14 +1161,15 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * Returns <code>true</code> is the parameters use a spherical datum.
          */
         static boolean isSpherical(final ParameterValueGroup values) {
-        	try {
-        		return doubleValue(SEMI_MAJOR, values) ==
-        			doubleValue(SEMI_MINOR, values);
-        	}
-        	catch( Throwable t){
-        		// probably could not find the requested values -- gobble error and and be forgiving
-        		return false;
-        	}
+            try {
+                return doubleValue(SEMI_MAJOR, values) ==
+                       doubleValue(SEMI_MINOR, values);
+            } catch (IllegalStateException exception) {
+                // Probably could not find the requested values -- gobble error and be forgiving.
+                // The error will probably be thrown at MapProjection construction time, which is
+                // less surprising to some users.
+                return false;
+            }
         }
 
         /**
