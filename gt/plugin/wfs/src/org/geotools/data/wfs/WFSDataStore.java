@@ -57,6 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -176,45 +177,23 @@ public class WFSDataStore extends AbstractDataStore {
         }
     }
 
-<<<<<<< .mine
     protected static HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost) throws IOException{
 
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         if(isPost){
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
-            connection.setDoInput(true);
             connection.setRequestProperty("Content-type", "application/xml");
-=======
-    protected static InputStream getInputStream(HttpURLConnection url,
-        Authenticator auth) throws IOException {
-        // TODO ensure that we can sync using the class loader and not have concurent thread issues
-        //
-        // should be ok, as we would only be playing with the classloader's allocated space
-        InputStream result = null;
-        
-        if(auth == null){
-            url.connect();
->>>>>>> .r10759
         }else{
             connection.setRequestMethod("GET");
         }
+        connection.setDoInput(true);
         synchronized (Authenticator.class) {
                 Authenticator.setDefault(auth);
-<<<<<<< .mine
                 connection.connect();
-=======
-                url.connect();
->>>>>>> .r10759
                 Authenticator.setDefault(null);
         }
-<<<<<<< .mine
         return connection;
-=======
-        result = url.getInputStream();
-
-        return new BufferedInputStream(result);
->>>>>>> .r10759
     }
 
     private static URL createGetCapabilitiesRequest(URL host) {
@@ -431,10 +410,8 @@ public class WFSDataStore extends AbstractDataStore {
         //System.out.println(postUrl);
         HttpURLConnection hc = getConnection(postUrl,auth,true);
 
-        OutputStream os = hc.getOutputStream();
-
         // write request
-        Writer w = new OutputStreamWriter(os);
+        Writer osw = new OutputStreamWriter(hc.getOutputStream());
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
@@ -460,15 +437,16 @@ public class WFSDataStore extends AbstractDataStore {
         
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
-                WFSSchema.getInstance(), w, hints);
+                WFSSchema.getInstance(), osw, hints);
         } catch (OperationNotSupportedException e) {
             WFSDataStoreFactory.logger.warning(e.getMessage());
             throw new SAXException(e);
         }
-        w.flush();
-        os.flush();
         
-        InputStream is = hc.getInputStream();
+        osw.flush();
+        osw.close();
+        
+        InputStream is = new BufferedInputStream(hc.getInputStream());
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
 
@@ -494,8 +472,6 @@ public class WFSDataStore extends AbstractDataStore {
 
         FeatureType ft = GMLComplexTypes.createFeatureType(element);
 
-        w.close();
-        os.close();
         is.close();
 
         return ft;
@@ -510,7 +486,8 @@ public class WFSDataStore extends AbstractDataStore {
             return null;
         }
 
-        String query = getUrl.getQuery().toUpperCase();
+        String query = getUrl.getQuery();
+        query = query == null?null:query.toUpperCase();
         String url = getUrl.toString();
 
         if ((query == null) || "".equals(query)) {
@@ -664,18 +641,6 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
-
-//        Writer sw = new StringWriter();
-//        try{
-//            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
-//        }catch(OperationNotSupportedException e){
-//            WFSDataStoreFactory.logger.warning(e.toString());
-//            throw new SAXException(e);
-//        }
-//        System.out.println("WFS FILTER START");
-//        System.out.println(sw);
-//        System.out.println("WFS FILTER END");
-//        System.out.println("FILTER WAS "+query.getFilter());
         
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
@@ -688,7 +653,7 @@ public class WFSDataStore extends AbstractDataStore {
         os.flush();
         os.close();
 
-        InputStream is = hc.getInputStream();
+        BufferedInputStream is = new BufferedInputStream(hc.getInputStream());
 
         // 	    System.out.println("ready?"+is.available());
         WFSTransactionState ts = null;
