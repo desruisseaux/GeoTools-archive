@@ -32,24 +32,19 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
 
-import javax.media.jai.IntegerSequence;
-
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.image.JAIUtilities;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.gc.GC_GridGeometry;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
@@ -126,8 +121,8 @@ public class GridGeometry implements Serializable {
         this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
         if (gridRange!=null && gridToCoordinateSystem!=null) {
             final int dimRange  = gridRange.getDimension();
-            final int dimSource = gridToCoordinateSystem.getDimSource();
-            final int dimTarget = gridToCoordinateSystem.getDimTarget();
+            final int dimSource = gridToCoordinateSystem.getSourceDimensions();
+            final int dimTarget = gridToCoordinateSystem.getTargetDimensions();
             if (dimRange != dimSource) {
                 throw new MismatchedDimensionException(format(dimRange, dimSource));
             }
@@ -279,7 +274,7 @@ public class GridGeometry implements Serializable {
      */
     public int getDimension() {
         if (gridToCoordinateSystem != null) {
-            return gridToCoordinateSystem.getDimSource();
+            return gridToCoordinateSystem.getSourceDimensions();
         }
         return getGridRange().getDimension();
     }
@@ -332,10 +327,9 @@ public class GridGeometry implements Serializable {
     public GridRange getGridRange() throws InvalidGridGeometryException {
         if (gridRange != null) {
             return gridRange;
-        } else {
+        }
             throw new InvalidGridGeometryException(Resources.format(
                       ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
-        }
     }
     
     /**
@@ -357,9 +351,8 @@ public class GridGeometry implements Serializable {
     public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
         if (gridToCoordinateSystem != null) {
             return gridToCoordinateSystem;
-        } else {
-            throw new InvalidGridGeometryException();
         }
+            throw new InvalidGridGeometryException();
     }
     
     /**
@@ -402,12 +395,12 @@ public class GridGeometry implements Serializable {
         if (transform==null || transform instanceof MathTransform2D) {
             return (MathTransform2D) transform;
         }
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
-        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(0, 1);
-        final IntegerSequence outputDimensions = new IntegerSequence();
-// TODO
+//        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
+//        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(0, 1);
+//        final IntegerSequence outputDimensions = new IntegerSequence();
+//// TODO
 //        try {
-//            transform = factory.createSubTransform(transform, inputDimensions, outputDimensions);
+//            transform = factory.(transform, inputDimensions, outputDimensions);
 //        } catch (FactoryException exception) {
 //            // A MathTransform2D is not mandatory. Just tell that we have none.
 //            return null;
