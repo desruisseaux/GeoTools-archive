@@ -152,9 +152,9 @@ public class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testTransverseMercator() throws Exception {
-//        runScript("scripts/TransverseMercator.txt");
-//    }   
+    public void testTransverseMercator() throws Exception {
+        runScript("scripts/TransverseMercator.txt");
+    }   
     
     /**
      * Run "AlbersEqualArea.txt"
