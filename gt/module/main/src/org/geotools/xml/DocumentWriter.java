@@ -501,7 +501,7 @@ public class DocumentWriter {
                 if (!element.getType().getNamespace().equals(schema
                             .getTargetNamespace())) {
                     found = true;
-
+                    XSISAXHandler.setLogLevel(logger.getLevel());
                     Schema s = SchemaFactory.getInstance(element.getNamespace());
 
                     if ((element.getName() != null)
@@ -654,7 +654,7 @@ public class DocumentWriter {
                 if (!attribute.getSimpleType().getNamespace().equals(schema
                             .getTargetNamespace())) {
                     found = true;
-
+                    XSISAXHandler.setLogLevel(logger.getLevel());
                     Schema s = SchemaFactory.getInstance(attribute.getNamespace());
 
                     if ((attribute.getName() != null)
@@ -759,6 +759,7 @@ public class DocumentWriter {
             }
         } else {
             // use a ref
+        	XSISAXHandler.setLogLevel(logger.getLevel());
             Schema s = SchemaFactory.getInstance(group.getNamespace());
             ai.addAttribute("", "ref", "", "QName",
                 s.getPrefix() + ":" + group.getName());
@@ -818,6 +819,7 @@ public class DocumentWriter {
             }
         } else {
             // use a ref
+        	XSISAXHandler.setLogLevel(logger.getLevel());
             Schema s = SchemaFactory.getInstance(attributeGroup.getNamespace());
             ai.addAttribute("", "ref", "", "QName",
                 s.getPrefix() + ":" + attributeGroup.getName());
@@ -890,7 +892,7 @@ public class DocumentWriter {
                 }
             } else {
                 ai = new AttributesImpl();
-
+                XSISAXHandler.setLogLevel(logger.getLevel());
                 Schema s = SchemaFactory.getInstance(st.getNamespace());
                 ai.addAttribute("", "base", "", "QName",
                     s.getPrefix() + ":" + st.getName());
@@ -1456,6 +1458,7 @@ public class DocumentWriter {
                 if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
                 } else {
+                	XSISAXHandler.setLogLevel(logger.getLevel());
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
 
                     if (prefix == null) {
@@ -1513,6 +1516,7 @@ public class DocumentWriter {
                 if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
                 } else {
+                	XSISAXHandler.setLogLevel(logger.getLevel());
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
 
                     if (prefix == null) {
@@ -1568,6 +1572,7 @@ public class DocumentWriter {
                 if (namespaceURI.equals(schema.getTargetNamespace())) {
                     prefix = "";
                 } else {
+                	XSISAXHandler.setLogLevel(logger.getLevel());
                     prefix = SchemaFactory.getInstance(namespaceURI).getPrefix();
 
                     if (prefix == null) {
@@ -1764,6 +1769,7 @@ public class DocumentWriter {
                                 if (nsIndex >= 0) { // found
 
                                     URI uri = new URI(stringOrder[i]);
+                                    XSISAXHandler.setLogLevel(logger.getLevel());
                                     so.add(SchemaFactory.getInstance(uri));
                                     targNS.remove(nsIndex);
                                 } else {
