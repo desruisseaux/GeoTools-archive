@@ -83,7 +83,7 @@ import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
-import org.geotools.index.rtree.fs.FileSystemPageStore;
+import org.geotools.index.rtree.cachefs.FileSystemPageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -202,7 +202,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         dbfURL = new URL(filename + dbfext);
         shxURL = new URL(filename + shxext);
         
-        // TODO: (tnolli) Choose a default tree type, is RTree ok?
         if (this.isLocal()) {
             File grxTree = new File(new URL(filename + grxext).getPath());
             File qixTree = new File(new URL(filename + qixext).getPath());

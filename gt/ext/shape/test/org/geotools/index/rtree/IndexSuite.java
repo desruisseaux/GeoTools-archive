@@ -10,7 +10,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.index.rtree.fs.FileSystemPageStoreTest;
 import org.geotools.index.rtree.memory.MemoryPageStoreTest;
 
 
@@ -31,7 +30,8 @@ public class IndexSuite extends TestCase {
   public static Test suite() {
     TestSuite suite = new TestSuite("All Index Tests");
 
-    suite.addTestSuite(FileSystemPageStoreTest.class);
+    suite.addTestSuite(org.geotools.index.rtree.fs.FileSystemPageStoreTest.class);
+    suite.addTestSuite(org.geotools.index.rtree.cachefs.FileSystemPageStoreTest.class);
     suite.addTestSuite(MemoryPageStoreTest.class);
 
     suite.addTestSuite(RTreeTest.class);

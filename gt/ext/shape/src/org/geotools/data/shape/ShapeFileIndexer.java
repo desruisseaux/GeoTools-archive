@@ -41,7 +41,7 @@ import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.quadtree.fs.IndexHeader;
 import org.geotools.index.rtree.PageStore;
 import org.geotools.index.rtree.RTree;
-import org.geotools.index.rtree.fs.FileSystemPageStore;
+import org.geotools.index.rtree.cachefs.FileSystemPageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -312,8 +312,11 @@ public class ShapeFileIndexer {
         keyDef.addField(Integer.class);
         keyDef.addField(Long.class);
         
-        FileSystemPageStore fps = new FileSystemPageStore(rtreeFile,
-                                                          keyDef);
+        FileSystemPageStore fps = new FileSystemPageStore(rtreeFile, 
+                                                          keyDef, 
+                                                          this.max, 
+                                                          this.min, 
+                                                          this.split);
         RTree rtree = new RTree(fps);
 
         Record record = null;
