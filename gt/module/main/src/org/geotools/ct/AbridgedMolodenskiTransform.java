@@ -71,6 +71,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.AbridgedMolodenskiTransform}.
  */
 class AbridgedMolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**

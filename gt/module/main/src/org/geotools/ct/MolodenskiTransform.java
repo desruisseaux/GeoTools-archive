@@ -65,6 +65,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.MolodenskiTransform}.
  */
 class MolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**
