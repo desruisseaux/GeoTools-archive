@@ -702,6 +702,10 @@ public class FilterOpsComplexTypes {
                 return;
             }
 
+            if (filter == Filter.ALL) {
+                return;
+            }
+
             if (element != null) {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);

@@ -264,12 +264,16 @@ public class WFSDataStore extends AbstractDataStore {
 
         FeatureType t = null;
         SAXException sax = null;
+        IOException io = null;
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
             try {
                 t = getSchemaPost(typeName);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 sax = e;
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
@@ -279,6 +283,9 @@ public class WFSDataStore extends AbstractDataStore {
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 sax = e;
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
@@ -288,6 +295,9 @@ public class WFSDataStore extends AbstractDataStore {
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 sax = e;
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                io = e;
             }
         }
 
@@ -297,6 +307,9 @@ public class WFSDataStore extends AbstractDataStore {
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 sax = e;
+            } catch (IOException e) {
+                logger.warning(e.toString());
+                io = e;
             }
         }
         if(t == null && sax!=null)
@@ -559,7 +572,7 @@ public class WFSDataStore extends AbstractDataStore {
                         }
                     } else {
                         // rest
-                        if (request.getFilter() != Filter.NONE) {
+                        if (request.getFilter() != Filter.NONE && request.getFilter() != Filter.ALL) {
                             url += URLEncoder.encode("&FILTER="
                                 + printFilter(request.getFilter()), "UTF-8");
                         }
@@ -764,6 +777,8 @@ public class WFSDataStore extends AbstractDataStore {
         if(maxbbox!=null){
             WFSBBoxFilterVisitor bfv = new WFSBBoxFilterVisitor(maxbbox);
             filters[0].accept(bfv);
+        }else{
+            filters[0] = Filter.ALL;
         }
         ((DefaultQuery)query).setFilter(filters[0]);
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
