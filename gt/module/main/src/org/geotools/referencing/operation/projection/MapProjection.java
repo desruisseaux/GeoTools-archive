@@ -484,8 +484,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             if (distance > getToleranceForAssertions(longitude, latitude)) {
                 // Do not fail for NaN values.
                 throw new AssertionError("\u03B5=" + distance +
-                                         " (\u0394\u03BB=" + (longitude-centralMeridian) + "\u00B0" +
-                                         ", \u0394\u03C6=" + (latitude-latitudeOfOrigin) + "\u00B0)");
+                                         " (\u0394\u03BB=" + (longitude-Math.toDegrees(centralMeridian)) + "\u00B0" +
+                                         ", \u0394\u03C6=" + (latitude-Math.toDegrees(latitudeOfOrigin)) + "\u00B0)");
             }
         } catch (TransformException exception) {
             final AssertionError error = new AssertionError(exception.getLocalizedMessage());
