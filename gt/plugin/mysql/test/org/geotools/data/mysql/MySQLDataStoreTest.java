@@ -27,7 +27,7 @@ import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.*;
 import org.geotools.filter.*;
 import org.geotools.filter.FilterFactory;
-import org.geotools.resources.Geotools;
+import org.geotools.resources.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
