@@ -1350,7 +1350,7 @@ public class FilterComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             return (element.getType() != null)
             && getName().equals(element.getType().getName())
-            && value instanceof LiteralExpression;
+            && (value instanceof LiteralExpression || value instanceof String);
         }
 
         /**
@@ -1363,9 +1363,19 @@ public class FilterComplexTypes {
             if (!canEncode(element, value, hints)) {
                 return;
             }
-
-            LiteralExpression me = (LiteralExpression) value;
+            
             AttributesImpl ai = new AttributesImpl();
+
+
+            if(value instanceof String){
+                // short cut for single type
+                output.startElement(element.getNamespace(), element.getName(), ai);
+                output.characters(value.toString());
+                output.endElement(element.getNamespace(), element.getName());
+                return;
+            }
+            
+            LiteralExpression me = (LiteralExpression) value;
             output.startElement(element.getNamespace(), element.getName(), ai);
 
             switch (me.getType()) {

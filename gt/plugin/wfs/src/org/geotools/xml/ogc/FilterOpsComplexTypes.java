@@ -1108,8 +1108,8 @@ public class FilterOpsComplexTypes {
                 "string", lf.getEscape());
 
             output.startElement(element.getNamespace(), element.getName(), at);
-            elems[0].getType().encode(elems[0], lf.getPattern(), output, hints); // PropertyName
-            elems[1].getType().encode(elems[1], lf.getValue(), output, hints); // Literal
+            elems[0].getType().encode(elems[0], lf.getValue(), output, hints); // PropertyName
+            elems[1].getType().encode(elems[1], lf.getPattern(), output, hints); // Literal
             output.endElement(element.getNamespace(), element.getName());
         }
     }

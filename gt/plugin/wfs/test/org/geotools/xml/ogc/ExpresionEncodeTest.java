@@ -22,8 +22,10 @@ import java.io.StringWriter;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.BetweenFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LikeFilter;
 import org.geotools.xml.DocumentWriter;
 
 /**
@@ -62,6 +64,21 @@ public class ExpresionEncodeTest extends FilterTestSupport {
 
         StringWriter output = new StringWriter();
         DocumentWriter.writeFragment(bf,
+            FilterSchema.getInstance(), output, null);
+        
+//        System.out.println(output);
+    }
+    
+    public void testLikeFilter() throws IllegalFilterException, OperationNotSupportedException, IOException{
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        Expression testAttribute = ff.createAttributeExpression(testSchema, "testString");
+
+        LikeFilter lf = ff.createLikeFilter();
+        lf.setValue(testAttribute);
+        lf.setPattern(ff.createLiteralExpression("test*"), "*", ".", "!");
+
+        StringWriter output = new StringWriter();
+        DocumentWriter.writeFragment(lf,
             FilterSchema.getInstance(), output, null);
         
         System.out.println(output);
