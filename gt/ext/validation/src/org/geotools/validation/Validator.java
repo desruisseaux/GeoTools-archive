@@ -114,8 +114,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public ValidationResults featureValidation(String dsid, 
-										FeatureReader features)
+	public void featureValidation(String dsid, FeatureReader features, ValidationResults results )
 		throws IOException, Exception//, WfsTransactionException 
 	{
 		//LOGGER.finer("FeatureValidation called on "+dsid+":"+type.getTypeName() ); 
@@ -123,38 +122,20 @@ public class Validator
 		if (validationProcessor == null)
 		{
 			LOGGER.warning("ValidationProcessor unavailable");
-			return null;
+			return;
 		}
 		
 		FeatureType type = features.getFeatureType();
 		
 		final Map failed = new TreeMap();
+		
 		/** Set up our validation results */
-		ValidationResults results = makeFeatureValidationResults(failed);
-
 		try {
 			validationProcessor.runFeatureTests(dsid, type, features, results);
 		} catch (Exception badIdea) {
 			// ValidationResults should have handled stuff, will redesign :-)
 			throw new DataSourceException("Validation Failed", badIdea);
 		}
-
-		if (failed.isEmpty()) {
-			return results; // everything worked out
-		}
-
-		StringBuffer message = new StringBuffer();
-
-		for (Iterator i = failed.entrySet().iterator(); i.hasNext();) {
-			Map.Entry entry = (Map.Entry) i.next();
-			message.append(entry.getKey());
-			message.append(" failed test ");
-			message.append(entry.getValue());
-			message.append("\n");
-		}
-		return results;
-		//throw new Exception("Validation - " + message.toString());
-		//throw new WfsTransactionException(message.toString(), "validation");
 	}
 
 
@@ -219,14 +200,14 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public ValidationResults integrityValidation(Map stores, Envelope bBox)
+	public void integrityValidation(Map stores, Envelope bBox, ValidationResults results )
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();
 		//ValidationProcessor validation = request.getValidationProcessor();
 		if( validationProcessor == null ) {
 			LOGGER.warning( "Validation Processor unavaialble" );
-			return null;
+			return;
 		}
 		LOGGER.finer( "Required to validate "+stores.size()+" typeRefs" );
 		LOGGER.finer( "within "+bBox );
@@ -283,8 +264,7 @@ public class Validator
 		}
 		LOGGER.finer( "Total of "+sources.size()+" featureSource marshalled for testing" );
 		final Map failed = new TreeMap();
-		ValidationResults results = makeIntegrityValidationResults(failed);
-
+		
 		try {
 			//should never be null, but confDemo is giving grief, and I 
 			//don't want transactions to mess up just because validation 
@@ -301,7 +281,7 @@ public class Validator
 		if (failed.isEmpty()) 
 		{
 			LOGGER.finer( "All validation tests passed" );            
-			return results; // everything worked out
+			return; // everything worked out
 		}
 		
 		/** One or more of the tests failed if we reached here, so dump out
@@ -315,8 +295,7 @@ public class Validator
 			message.append(" failed test ");
 			message.append(entry.getValue());
 			message.append("\n");
-		}
-		return results;
+		}		
 		//throw new Exception("Validation - " + message.toString());
 		//throw new WfsTransactionException(message.toString(), "validation");
 	}

@@ -109,7 +109,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	{
 		LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
 		String typeRef1 = getGeomTypeRefA();
-		LOGGER.finer( typeRef1 +": looking up FeatureSource " );    	
+		LOGGER.finer( typeRef1 +": looking up FeatureSource" );		
 		FeatureSource geomSource1 = (FeatureSource) layers.get( typeRef1 );
 		LOGGER.finer( typeRef1 +": found "+ geomSource1.getSchema().getTypeName() );
 		
@@ -118,7 +118,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 			return validateSingleLayer(geomSource1, isExpected(), results, envelope);
 		else
 		{
-			LOGGER.finer( typeRef2 +": looking up FeatureSource " );        
+			LOGGER.warning( typeRef2 +": looking up FeatureSource " );        
 			FeatureSource geomSource2 = (FeatureSource) layers.get( typeRef2 );
 			LOGGER.finer( typeRef2 +": found "+ geomSource2.getSchema().getTypeName() );
 			return validateMultipleLayers(geomSource1, geomSource2, isExpected(), results, envelope);
@@ -387,9 +387,13 @@ public class OverlapsIntegrity extends RelationIntegrity
 	
 	
 	
+	/** Try and Filter by the provided bbox, will default to Filter.ALL if null */
 	static public Filter filterBBox(Envelope bBox, FeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
+		if( bBox == null ){
+			return Filter.NONE;
+		}
 		FilterFactory ff = FilterFactory.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
 		//GeometryFilter bbFilter = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);

@@ -313,6 +313,7 @@ public class ValidationProcessor {
     public void runFeatureTests(String dsID, FeatureType type,
         FeatureReader reader, ValidationResults results)
         throws Exception {
+    	
         // check for any tests that are to be performed on ALL features
         ArrayList tests = (ArrayList) featureLookup.get(ANYTYPENAME);
 

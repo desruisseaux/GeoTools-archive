@@ -133,7 +133,7 @@ public class BatchValidator {
 			{
 				try
 				{
-					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures().reader());
+					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures().reader(), null);
 				} catch (IOException e1)
 				{
 					e1.printStackTrace();
@@ -151,7 +151,7 @@ public class BatchValidator {
 		/** do the integrity validation dance */
 		try
 		{
-			validator.integrityValidation(dsm, envelope);
+			validator.integrityValidation(dsm, envelope, null);
 		} catch (IOException e1)
 		{
 			e1.printStackTrace();

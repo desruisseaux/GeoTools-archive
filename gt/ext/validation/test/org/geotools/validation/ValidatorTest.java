@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -139,4 +140,59 @@ public class ValidatorTest extends TestCase {
     	fixture.processor.runIntegrityTests( set, map, null, results );    	    	
     	assertEquals( "integrity test", 0, results.error.size() );
     }
+    public void testValidator() throws Exception {
+    	Validator validator = new Validator( fixture.repository, fixture.processor );
+
+    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureReader reader = lakes.getFeatures().reader();
+    	DefaultFeatureResults results = new DefaultFeatureResults();
+    	validator.featureValidation( "LAKES",reader, results );
+    	
+    	assertEquals( 0, results.error.size() );
+    }
+    public void testValidator2() throws Exception {
+    	Validator validator = new Validator( fixture.repository, fixture.processor );
+    	
+    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	Feature newFeature = createInvalidLake();
+    	FeatureReader add = DataUtilities.reader( new Feature[]{ newFeature, } );
+
+    	DefaultFeatureResults results = new DefaultFeatureResults();    	
+    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), add, results );
+    	add.close();
+    	System.out.println( results.error );    	
+    	assertEquals( "lakes test", 2, results.error.size() );
+    	
+    	FeatureReader add2 = DataUtilities.reader( new Feature[]{ newFeature, } );
+    	//results = new DefaultFeatureResults();
+    	validator.featureValidation( "LAKES", add, results );
+    	assertEquals( "lakes test2", 2, results.error.size() );
+    }
+    
+    public void testIntegrityValidator() throws Exception {
+    	Validator validator = new Validator( fixture.repository, fixture.processor );
+    	
+    	DefaultFeatureResults results = new DefaultFeatureResults();
+    	Set set = fixture.repository.types().keySet();
+    	Map map = new HashMap();
+    	for( Iterator i=set.iterator(); i.hasNext(); ){
+    		String typeRef = (String) i.next();
+    		String split[] = typeRef.split(":");
+    		map.put( typeRef, fixture.repository.source( split[0], split[1] ) );
+    	}    	
+    	validator.integrityValidation( map, null, results );    	    	
+    	assertEquals( "integrity test", 0, results.error.size() );
+    }
+    public void testIntegrityValidator2() throws Exception {
+    	Validator validator = new Validator( fixture.repository, fixture.processor );
+    	
+    	DefaultFeatureResults results = new DefaultFeatureResults();
+    	Set set = new HashSet();
+    	Map map = new HashMap();
+    	set.add( "RIVERS:rivers" );
+    	map.put( "RIVERS:rivers", fixture.repository.source( "RIVERS", "rivers" ));
+    	
+    	validator.integrityValidation( map, null, results );    	    	
+    	assertEquals( "integrity test", 0, results.error.size() );
+    }       
 }
