@@ -17,13 +17,11 @@
 package org.geotools.data.wms.request;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.geotools.data.wms.SimpleLayer;
-import org.geotools.data.wms.capabilities.Layer;
 
 
 /**
@@ -31,13 +29,24 @@ import org.geotools.data.wms.capabilities.Layer;
  * <p>
  * Constructs a getMapRequest based on the following property values:
  * <ul>
- * <li>
+ * <li>ELEVATION
+ * <li>TIME
+ * <li>EXCEPTIONS
+ * <li>BGCOLOR
+ * <li>TRANSPARENT
+ * <li>WIDTH
+ * <li>HEIGHT
+ * <li>SRS
+ * <li>REQUEST
+ * <li><i>vendor specific parameters</i>
  * </ul>
  * </p>
  * <p>
  * Q: List availableFormats and availableExceptions - why are these here?
  * It looks like they are designed to restrict the values used for SRS, format
  * and exceptions. If so the code never uses them.
+ * Q: How constant is the GetMapRequest format across WMS versions? Do we need
+ * to generalize here?
  * </p>
  * @author Richard Gould, Refractions Research
  */
