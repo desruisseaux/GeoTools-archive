@@ -27,21 +27,21 @@ package org.geotools.xml.schema;
  */
 public interface Attribute {
     /**
-     * Represent a mask used to determine the life of the
-     * attribute in an instance document.
+     * Represent a mask used to determine the life of the attribute in an
+     * instance document.
      */
     public static final int OPTIONAL = 0;
 
-    /** 
-     * Represent a mask used to determine the life of the
-     * attribute in an instance document.
-      */
+    /**
+     * Represent a mask used to determine the life of the attribute in an
+     * instance document.
+     */
     public static final int PROHIBITED = 1;
 
-    /** 
-     * Represent a mask used to determine the life of the
-     * attribute in an instance document.
-      */
+    /**
+     * Represent a mask used to determine the life of the attribute in an
+     * instance document.
+     */
     public static final int REQUIRED = 2;
 
     /**
@@ -92,6 +92,12 @@ public interface Attribute {
      * @return
      */
     public String getName();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  
+     */
     public String getNamespace();
 
     /**

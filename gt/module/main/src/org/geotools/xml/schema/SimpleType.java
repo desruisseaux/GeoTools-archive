@@ -18,6 +18,7 @@ package org.geotools.xml.schema;
 
 import java.util.Map;
 
+
 /**
  * <p>
  * This interface is intended to represent an XML Schema simple type. This
@@ -77,9 +78,8 @@ public interface SimpleType extends Type {
      * @return
      */
     public String getId();
-    
+
     /**
-     * 
      * <p>
      * returns the value as a string
      * </p>
@@ -87,27 +87,43 @@ public interface SimpleType extends Type {
      * @param attribute
      * @param value
      * @param hints
+     *
      * @return
      */
-    public AttributeValue toAttribute(Attribute attribute, Object value, Map hints);
+    public AttributeValue toAttribute(Attribute attribute, Object value,
+        Map hints);
 
-    public boolean canCreateAttributes(Attribute attribute, Object value, Map hints);
-    
+    /**
+     * DOCUMENT ME!
+     *
+     * @param attribute DOCUMENT ME!
+     * @param value DOCUMENT ME!
+     * @param hints DOCUMENT ME!
+     *
+     * @return  
+     */
+    public boolean canCreateAttributes(Attribute attribute, Object value,
+        Map hints);
+
     /**
      * Returns an int of either List, Union or Restriction
-     * 
+     *
      * @return
      */
     public int getChildType();
-    
+
     /**
-     * A simple simpleType when either a List or Restriction ... A set when a Union
+     * A simple simpleType when either a List or Restriction ... A set when a
+     * Union
+     *
      * @return
      */
     public SimpleType[] getParents();
-    
+
     /**
-     * The list of facets for this Restriction ... Null if another type (List, Union)
+     * The list of facets for this Restriction ... Null if another type (List,
+     * Union)
+     *
      * @return
      */
     public Facet[] getFacets();

@@ -16,17 +16,6 @@
  */
 package org.geotools.xml.xsi;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.naming.OperationNotSupportedException;
-
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeValue;
@@ -39,6 +28,15 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import javax.naming.OperationNotSupportedException;
 
 
 /**
@@ -53,6 +51,8 @@ import org.xml.sax.SAXException;
  */
 public class XSISimpleTypes {
     private static Map m;
+
+    /** DOCUMENT ME!  */
     public static final java.lang.String NAMESPACE = "http://www.w3.org/2001/XMLSchema";
 
     /**
@@ -74,7 +74,14 @@ public class XSISimpleTypes {
 
         return r;
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param type DOCUMENT ME!
+     *
+     * @return  
+     */
     public static SimpleType find(Class type) {
         // assuming strings and class values will not conflict
         if (m == null) {
@@ -143,7 +150,6 @@ public class XSISimpleTypes {
         m.put(Base64Binary.getInstance().getName(), Base64Binary.getInstance());
         m.put(HexBinary.getInstance().getName(), HexBinary.getInstance());
         m.put(Language.getInstance().getName(), Language.getInstance());
-        
 
         m.put(Integer.getInstance().getInstanceType(), Integer.getInstance());
         m.put(Decimal.getInstance().getInstanceType(), Decimal.getInstance());
@@ -159,10 +165,14 @@ public class XSISimpleTypes {
         m.put(Int.getInstance().getInstanceType(), Int.getInstance());
         m.put(Short.getInstance().getInstanceType(), Short.getInstance());
         m.put(Byte.getInstance().getInstanceType(), Byte.getInstance());
-        m.put(UnsignedLong.getInstance().getInstanceType(), UnsignedLong.getInstance());
-        m.put(UnsignedShort.getInstance().getInstanceType(), UnsignedShort.getInstance());
-        m.put(UnsignedInt.getInstance().getInstanceType(), UnsignedInt.getInstance());
-        m.put(UnsignedByte.getInstance().getInstanceType(), UnsignedByte.getInstance());
+        m.put(UnsignedLong.getInstance().getInstanceType(),
+            UnsignedLong.getInstance());
+        m.put(UnsignedShort.getInstance().getInstanceType(),
+            UnsignedShort.getInstance());
+        m.put(UnsignedInt.getInstance().getInstanceType(),
+            UnsignedInt.getInstance());
+        m.put(UnsignedByte.getInstance().getInstanceType(),
+            UnsignedByte.getInstance());
         m.put(Float.getInstance().getInstanceType(), Float.getInstance());
         m.put(Double.getInstance().getInstanceType(), Double.getInstance());
 
@@ -173,7 +183,8 @@ public class XSISimpleTypes {
         m.put(gMonth.getInstance().getInstanceType(), gMonth.getInstance());
         m.put(gMonthDay.getInstance().getInstanceType(), gMonthDay.getInstance());
         m.put(gYear.getInstance().getInstanceType(), gYear.getInstance());
-        m.put(gYearMonth.getInstance().getInstanceType(), gYearMonth.getInstance());
+        m.put(gYearMonth.getInstance().getInstanceType(),
+            gYearMonth.getInstance());
         m.put(Time.getInstance().getInstanceType(), Time.getInstance());
 
         m.put(ID.getInstance().getInstanceType(), ID.getInstance());
@@ -194,73 +205,88 @@ public class XSISimpleTypes {
         m.put(NCName.getInstance().getInstanceType(), NCName.getInstance());
         m.put(Boolean.getInstance().getInstanceType(), Boolean.getInstance());
         m.put(AnyURI.getInstance().getInstanceType(), AnyURI.getInstance());
-        m.put(Base64Binary.getInstance().getInstanceType(), Base64Binary.getInstance());
+        m.put(Base64Binary.getInstance().getInstanceType(),
+            Base64Binary.getInstance());
         m.put(HexBinary.getInstance().getInstanceType(), HexBinary.getInstance());
         m.put(Language.getInstance().getInstanceType(), Language.getInstance());
     }
 
     /**
-     * <p> 
+     * <p>
      * A generic implementation of a SimpleType for use by the xsi Schema.
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     protected static abstract class XSISimpleType implements SimpleType {
-
         /**
-         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
+         *      java.lang.Object, java.util.Map)
          */
-        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+        public boolean canCreateAttributes(Attribute attribute, Object value,
+            Map hints) {
             // TODO ensure equals works here
-            return value!=null && value.getClass().equals(getInstanceType()) && attribute.getSimpleType()!=null && this.getClass().equals(attribute.getSimpleType().getClass());
+            return (value != null)
+            && value.getClass().equals(getInstanceType())
+            && (attribute.getSimpleType() != null)
+            && this.getClass().equals(attribute.getSimpleType().getClass());
         }
 
         /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             // TODO ensure equals works here
-            return value!=null && value.getClass().equals(getInstanceType()) && element.getType()!=null && this.getClass().equals(element.getType().getClass());
+            return (value != null)
+            && value.getClass().equals(getInstanceType())
+            && (element.getType() != null)
+            && this.getClass().equals(element.getType().getClass());
         }
-        
+
         /**
-         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute,
+         *      java.lang.Object, java.util.Map)
          */
-        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
-            return new DefaultAttributeValue(attribute,value.toString());
+        public AttributeValue toAttribute(Attribute attribute, Object value,
+            Map hints) {
+            return new DefaultAttributeValue(attribute, value.toString());
         }
-        
+
         /**
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, org.geotools.xml.PrintHandler,
+         *      java.util.Map)
          */
-        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            if(element == null){
-                output.startElement(getNamespace(),getName(),null);
-            	output.characters(value.toString());
-            	output.endElement(getNamespace(),getName());
-            }else{
-                output.startElement(element.getNamespace(),element.getName(),null);
-            	output.characters(value.toString());
-            	output.endElement(element.getNamespace(),element.getName());
+        public void encode(Element element, Object value, PrintHandler output,
+            Map hints) throws IOException, OperationNotSupportedException {
+            if (element == null) {
+                output.startElement(getNamespace(), getName(), null);
+                output.characters(value.toString());
+                output.endElement(getNamespace(), getName());
+            } else {
+                output.startElement(element.getNamespace(), element.getName(),
+                    null);
+                output.characters(value.toString());
+                output.endElement(element.getNamespace(), element.getName());
             }
         }
-        
+
         /**
          * <p>
-         * This method is intended to return an instance of the implemented type.
+         * This method is intended to return an instance of the implemented
+         * type.
          * </p>
          *
-         * @throws RuntimeException when not overridden
-         *
          * @return
+         *
+         * @throws RuntimeException when not overridden
          */
         public static SimpleType getInstance() {
             throw new RuntimeException("This method must be overwritten");
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getParent()
          */
         public Type getParent() {
@@ -268,7 +294,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getNamespace()
          */
         public java.lang.String getNamespace() {
@@ -276,7 +301,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.SimpleType#getFinal()
          */
         public int getFinal() {
@@ -284,7 +308,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.SimpleType#getId()
          */
         public java.lang.String getId() {
@@ -314,18 +337,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema Integer
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Integer extends XSISimpleType {
         private static SimpleType instance = new Integer();
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getName()
          */
         public java.lang.String getName() {
@@ -333,8 +354,8 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element, org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
+         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
+         *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrsgetValue, Map hints) throws SAXException {
@@ -354,7 +375,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.schemas.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -363,18 +383,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Decimal
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Decimal extends XSISimpleType {
         private static SimpleType instance = new Decimal();
 
         /**
-         * 
          * @see org.geotools.xml.schemas.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -382,7 +400,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getName()
          */
         public java.lang.String getName() {
@@ -390,8 +407,8 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element, org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
+         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
+         *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
@@ -412,18 +429,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NegativeInteger
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NegativeInteger extends XSISimpleType {
         private static SimpleType instance = new NegativeInteger();
 
         /**
-         * 
          * @see org.geotools.xml.schemas.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -431,7 +446,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getName()
          */
         public java.lang.String getName() {
@@ -439,8 +453,8 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element, org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
+         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
+         *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
@@ -463,18 +477,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NonNegativeInteger
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NonNegativeInteger extends XSISimpleType {
         private static SimpleType instance = new NonNegativeInteger();
 
         /**
-         * 
          * @see org.geotools.xml.schemas.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -482,7 +494,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getName()
          */
         public java.lang.String getName() {
@@ -513,12 +524,11 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of PositiveInteger
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class PositiveInteger extends XSISimpleType {
         private static SimpleType instance = new PositiveInteger();
@@ -531,7 +541,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -539,7 +548,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -563,18 +571,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NonPositiveInteger
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NonPositiveInteger extends XSISimpleType {
         private static SimpleType instance = new NonPositiveInteger();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -582,7 +588,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -590,7 +595,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -614,18 +618,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Long
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Long extends XSISimpleType {
         private static SimpleType instance = new Long();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -633,7 +635,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -641,7 +642,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -665,18 +665,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Int
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Int extends XSISimpleType {
         private static SimpleType instance = new Int();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -684,7 +682,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -692,7 +689,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -716,18 +712,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Short
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Short extends XSISimpleType {
         private static SimpleType instance = new Short();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -735,7 +729,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -743,7 +736,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -767,18 +759,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Byte
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Byte extends XSISimpleType {
         private static SimpleType instance = new Byte();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -786,7 +776,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -794,7 +783,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -818,18 +806,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of UnsignedLong
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class UnsignedLong extends XSISimpleType {
         private static SimpleType instance = new UnsignedLong();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -837,7 +823,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -845,7 +830,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -869,18 +853,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of UnsignedShort
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class UnsignedShort extends XSISimpleType {
         private static SimpleType instance = new UnsignedShort();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -888,7 +870,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -896,7 +877,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -920,18 +900,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of UnsignedInt
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class UnsignedInt extends XSISimpleType {
         private static SimpleType instance = new UnsignedInt();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -939,7 +917,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -947,7 +924,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -971,18 +947,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of UnsignedByte
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class UnsignedByte extends XSISimpleType {
         private static SimpleType instance = new UnsignedByte();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -990,7 +964,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -998,7 +971,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1022,18 +994,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Float
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Float extends XSISimpleType {
         private static SimpleType instance = new Float();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1041,7 +1011,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1049,7 +1018,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1073,18 +1041,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Double
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Double extends XSISimpleType {
         private static SimpleType instance = new Double();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1092,7 +1058,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1100,7 +1065,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1124,18 +1088,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Date
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Date extends XSISimpleType {
         private static SimpleType instance = new Date();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1143,7 +1105,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1151,7 +1112,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1191,18 +1151,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of DateTime
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class DateTime extends XSISimpleType {
         private static SimpleType instance = new DateTime();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1210,7 +1168,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1218,7 +1175,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1309,18 +1265,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Duration
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Duration extends XSISimpleType {
         private static SimpleType instance = new Duration();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1328,7 +1282,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1336,7 +1289,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1437,18 +1389,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of gDay
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class gDay extends XSISimpleType {
         private static SimpleType instance = new gDay();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1456,7 +1406,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1464,7 +1413,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1492,18 +1440,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of gMonth
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class gMonth extends XSISimpleType {
         private static SimpleType instance = new gMonth();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1511,7 +1457,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1519,7 +1464,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1547,18 +1491,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of gMonthDay
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class gMonthDay extends XSISimpleType {
         private static SimpleType instance = new gMonthDay();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1566,7 +1508,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1574,7 +1515,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1603,18 +1543,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of gYear
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class gYear extends XSISimpleType {
         private static SimpleType instance = new gYear();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1622,7 +1560,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1630,7 +1567,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1658,18 +1594,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of gYearMonth
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class gYearMonth extends XSISimpleType {
         private static SimpleType instance = new gYearMonth();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1677,7 +1611,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1685,7 +1618,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1714,18 +1646,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Time
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Time extends XSISimpleType {
         private static SimpleType instance = new Time();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1733,7 +1663,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1741,7 +1670,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1810,18 +1738,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of ID
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class ID extends XSISimpleType {
         private static SimpleType instance = new ID();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1829,7 +1755,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1837,7 +1762,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1860,18 +1784,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of IDREF
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class IDREF extends XSISimpleType {
         private static SimpleType instance = new IDREF();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1879,7 +1801,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1887,7 +1808,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1910,18 +1830,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of IDREFS
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class IDREFS extends XSISimpleType {
         private static SimpleType instance = new IDREFS();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1929,7 +1847,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1937,7 +1854,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -1961,18 +1877,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of ENTITY
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class ENTITY extends XSISimpleType {
         private static SimpleType instance = new ENTITY();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -1980,7 +1894,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -1988,7 +1901,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2011,18 +1923,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of ENTITIES
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class ENTITIES extends XSISimpleType {
         private static SimpleType instance = new ENTITIES();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2030,7 +1940,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2038,7 +1947,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2062,18 +1970,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NMTOKEN
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NMTOKEN extends XSISimpleType {
         private static SimpleType instance = new NMTOKEN();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2081,7 +1987,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2089,7 +1994,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2112,18 +2016,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NMTOKENS
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NMTOKENS extends XSISimpleType {
         private static SimpleType instance = new NMTOKENS();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2131,7 +2033,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2139,7 +2040,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2163,18 +2063,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NOTATION
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NOTATION extends XSISimpleType {
         private static SimpleType instance = new NOTATION();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2182,7 +2080,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2190,7 +2087,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2213,18 +2109,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of String
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class String extends XSISimpleType {
         private static SimpleType instance = new String();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2232,7 +2126,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2240,7 +2133,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2263,18 +2155,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NormalizedString
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NormalizedString extends XSISimpleType {
         private static SimpleType instance = new NormalizedString();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2282,7 +2172,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2290,7 +2179,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2314,18 +2202,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Token
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Token extends XSISimpleType {
         private static SimpleType instance = new Token();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2333,7 +2219,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2341,7 +2226,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2365,18 +2249,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of QName
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class QName extends XSISimpleType {
         private static SimpleType instance = new QName();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2384,7 +2266,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2392,7 +2273,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2415,18 +2295,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Name
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Name extends XSISimpleType {
         private static SimpleType instance = new Name();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2434,7 +2312,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2442,7 +2319,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2465,18 +2341,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of NCNAME
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class NCName extends XSISimpleType {
         private static SimpleType instance = new NCName();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2484,7 +2358,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2492,7 +2365,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2515,18 +2387,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Boolean
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Boolean extends XSISimpleType {
         private static SimpleType instance = new Boolean();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2534,7 +2404,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2542,7 +2411,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2566,18 +2434,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of AnyURI
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class AnyURI extends XSISimpleType {
         private static SimpleType instance = new AnyURI();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2585,7 +2451,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2593,7 +2458,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2620,18 +2484,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Base64Binary
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Base64Binary extends XSISimpleType {
         private static SimpleType instance = new Base64Binary();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2639,7 +2501,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2647,7 +2508,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2670,18 +2530,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of HexBinary
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class HexBinary extends XSISimpleType {
         private static SimpleType instance = new HexBinary();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2689,7 +2547,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2697,7 +2554,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2720,18 +2576,16 @@ public class XSISimpleTypes {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * XSI Schema instance of Language
      * </p>
-     * @author dzwiers
      *
+     * @author dzwiers
      */
     public static class Language extends XSISimpleType {
         private static SimpleType instance = new Language();
 
         /**
-         *
          * @see schema.xsi.XSISimpleTypes.XSISimpleType#getInstance()
          */
         public static SimpleType getInstance() {
@@ -2739,7 +2593,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.SimpleType#getName()
          */
         public java.lang.String getName() {
@@ -2747,7 +2600,6 @@ public class XSISimpleTypes {
         }
 
         /**
-         *
          * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,

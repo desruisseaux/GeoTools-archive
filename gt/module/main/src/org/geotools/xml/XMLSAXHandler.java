@@ -1,22 +1,20 @@
 /*
- * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2002, Geotools
- * Project Managment Committee (PMC) This library is free software; you can
- * redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; version 2.1 of
- * the License. This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
- * General Public License for more details.
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.xml;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
@@ -26,37 +24,48 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * XMLSAXHandler purpose.
+ * 
  * <p>
  * This is a schema content handler. Code here has been modified from code
  * written by Ian Schneider.
  * </p>
+ * 
  * <p>
  * This class contains one stack used to store part of the parse tree. The
  * ElementHandlers found on the stack have direct next handlers placed on the
- * stack. So here's the warning, be careful to read how you may be affecting (or
- * forgetting to affect) the stack.
+ * stack. So here's the warning, be careful to read how you may be affecting
+ * (or forgetting to affect) the stack.
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
+ *
  * @see XMLElementHandler
  */
 public class XMLSAXHandler extends DefaultHandler {
-
-    /** the logger -- should be used for debugging (assuming there are bugs LOL) */
-    protected final static Logger logger = Logger
-            .getLogger("net.refractions.xml.sax");
+    /**
+     * the logger -- should be used for debugging (assuming there are bugs LOL)
+     */
+    protected final static Logger logger = Logger.getLogger(
+            "net.refractions.xml.sax");
 
     // the stack of handlers
     private Stack handlers = new Stack();
-    
+
     // hints
     private Map hints;
-
     private ElementHandlerFactory ehf = new ElementHandlerFactory(logger);
 
     // used to store prefix -> targetNamespace mapping until which time as the
@@ -76,21 +85,23 @@ public class XMLSAXHandler extends DefaultHandler {
     /**
      * <p>
      * This contructor is intended to create an XMLSAXHandler to be used when
-     * parsing an XML instance document. The instance document's uri is also be
-     * provided, as this will allow the parser to resolve relative uri's.
+     * parsing an XML instance document. The instance document's uri is also
+     * be provided, as this will allow the parser to resolve relative uri's.
      * </p>
-     * 
+     *
      * @param intendedDocument
+     * @param hints DOCUMENT ME!
      */
-    public XMLSAXHandler(URI intendedDocument,Map hints) {
+    public XMLSAXHandler(URI intendedDocument, Map hints) {
         instanceDocument = intendedDocument;
         this.hints = hints;
     }
 
     /**
      * Implementation of endDocument.
-     * 
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ContentHandler#endDocument()
      */
     public void endDocument() throws SAXException {
@@ -99,8 +110,9 @@ public class XMLSAXHandler extends DefaultHandler {
 
     /**
      * Implementation of startDocument.
-     * 
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ContentHandler#startDocument()
      */
     public void startDocument() throws SAXException {
@@ -114,15 +126,17 @@ public class XMLSAXHandler extends DefaultHandler {
 
     /**
      * Implementation of characters.
-     * 
+     *
      * @param ch
      * @param start
      * @param length
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ContentHandler#characters(char[], int, int)
      */
     public void characters(char[] ch, int start, int length)
-            throws SAXException {
+        throws SAXException {
         try {
             String text = String.copyValueOf(ch, start, length);
 
@@ -137,49 +151,52 @@ public class XMLSAXHandler extends DefaultHandler {
 
     /**
      * Implementation of endElement.
-     * 
+     *
      * @param namespaceURI
      * @param localName
      * @param qName
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
     public void endElement(String namespaceURI, String localName, String qName)
-            throws SAXException {
+        throws SAXException {
         logger.info("END: " + qName);
 
         try {
             ((XMLElementHandler) handlers.pop()).endElement(namespaceURI,
-                    localName,hints);
+                localName, hints);
         } catch (Exception e) {
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
-                    + locator.getColumnNumber());
+                + locator.getColumnNumber());
             throw new SAXException(e);
         }
     }
 
     /**
      * Implementation of startElement.
-     * 
+     *
      * @param namespaceURI
      * @param localName
      * @param qName
      * @param atts
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
      *      java.lang.String, java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-            String qName, Attributes atts) throws SAXException {
+        String qName, Attributes atts) throws SAXException {
         logger.info("START: " + qName);
 
         if (schemaProxy.size() != 0) {
             logger.info("ADDING NAMESPACES: " + schemaProxy.size());
 
-            String t = atts.getValue(
-                    "http://www.w3.org/2001/XMLSchema-instance",
+            String t = atts.getValue("http://www.w3.org/2001/XMLSchema-instance",
                     "schemaLocation");
 
             if ((t == null) || "".equals(t)) {
@@ -218,7 +235,7 @@ public class XMLSAXHandler extends DefaultHandler {
         try {
             XMLElementHandler parent = ((XMLElementHandler) handlers.peek());
             logger.finest("Parent Node = " + parent.getClass().getName()
-                    + "  '" + parent.getName() + "'");
+                + "  '" + parent.getName() + "'");
 
             //            logger.finest("Parent Node = "+parent.getClass().getName()+"
             // '"+parent.getName()+"' "+
@@ -230,7 +247,8 @@ public class XMLSAXHandler extends DefaultHandler {
             //                                ((Sequence)((ComplexType)parent.getType()).getChild()).getChildren().length)+"":"null"))));
             logger.finest("This Node = " + localName + " :: " + namespaceURI);
 
-            XMLElementHandler eh = parent.getHandler(namespaceURI, localName,hints);
+            XMLElementHandler eh = parent.getHandler(namespaceURI, localName,
+                    hints);
 
             if (eh == null) {
                 eh = new IgnoreHandler();
@@ -243,7 +261,7 @@ public class XMLSAXHandler extends DefaultHandler {
         } catch (Exception e) {
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
-                    + locator.getColumnNumber());
+                + locator.getColumnNumber());
             throw new SAXException(e);
         }
     }
@@ -252,7 +270,7 @@ public class XMLSAXHandler extends DefaultHandler {
      * <p>
      * Used to set the logger level for all XMLSAXHandlers
      * </p>
-     * 
+     *
      * @param l
      */
     public static void setLogLevel(Level l) {
@@ -262,13 +280,16 @@ public class XMLSAXHandler extends DefaultHandler {
 
     /**
      * getDocument purpose.
-     * <p>
-     * Completes the post-processing phase, and returns the value from the parse
-     * ...
-     * </p>
      * 
-     * @return @throws
-     *         SAXException
+     * <p>
+     * Completes the post-processing phase, and returns the value from the
+     * parse ...
+     * </p>
+     *
+     * @return
+     *
+     * @throws SAXException
+     *
      * @see DocumentHandler#getValue()
      */
     public Object getDocument() throws SAXException {
@@ -277,47 +298,54 @@ public class XMLSAXHandler extends DefaultHandler {
 
     /**
      * Implementation of error.
-     * 
+     *
      * @param exception
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
     public void error(SAXParseException exception) throws SAXException {
         logger.severe("ERROR " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
-                + locator.getLineNumber());
+            + locator.getLineNumber());
     }
 
     /**
      * Implementation of fatalError.
-     * 
+     *
      * @param exception
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
      */
-    public void fatalError(SAXParseException exception) throws SAXException {
+    public void fatalError(SAXParseException exception)
+        throws SAXException {
         logger.severe("FATAL " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
-                + locator.getLineNumber());
+            + locator.getLineNumber());
         throw exception;
     }
 
     /**
      * Implementation of warning.
-     * 
+     *
      * @param exception
+     *
      * @throws SAXException
+     *
      * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
      */
     public void warning(SAXParseException exception) throws SAXException {
         logger.warning("WARN " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
-                + locator.getLineNumber());
+            + locator.getLineNumber());
     }
 
     /**
      * Stores the locator for future error reporting
-     * 
+     *
      * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
      */
     public void setDocumentLocator(Locator locator) {
@@ -337,7 +365,7 @@ public class XMLSAXHandler extends DefaultHandler {
      *      java.lang.String)
      */
     public void startPrefixMapping(String prefix, String uri)
-            throws SAXException {
+        throws SAXException {
         if ("http://www.w3.org/2001/XMLSchema-instance".equals(uri)) {
             return;
         }

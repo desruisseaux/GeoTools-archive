@@ -1,43 +1,52 @@
 /*
- * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2002, Geotools
- * Project Managment Committee (PMC) This library is free software; you can
- * redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; version 2.1 of
- * the License. This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
- * General Public License for more details.
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.xml;
-
-import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * XSIElementHandler purpose.
+ * 
  * <p>
- * This abstract class is intended to act as both a definition of what a generic
- * handler is, and a default handler.
+ * This abstract class is intended to act as both a definition of what a
+ * generic handler is, and a default handler.
  * </p>
+ * 
  * <p>
  * When extending this class, one should as a minimum replace the start/end
  * Element methods.
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
  */
 public abstract class XSIElementHandler implements Serializable {
-
-    /** the logger -- should be used for debugging (assuming there are bugs LOL) */
-    protected final static Logger logger = Logger
-            .getLogger("net.refractions.xsi.element");
+    /**
+     * the logger -- should be used for debugging (assuming there are bugs LOL)
+     */
+    protected final static Logger logger = Logger.getLogger(
+            "net.refractions.xsi.element");
 
     /** Type constants */
     public static final int DEFAULT = 0; // for those cases where type is not
@@ -61,8 +70,8 @@ public abstract class XSIElementHandler implements Serializable {
     public static final int FACET = 32;
 
     /**
-     * Creates a new XSIElementHandler object. Intended to limit creation to the
-     * sub-packages
+     * Creates a new XSIElementHandler object. Intended to limit creation to
+     * the sub-packages
      */
     protected XSIElementHandler() {
     }
@@ -70,20 +79,21 @@ public abstract class XSIElementHandler implements Serializable {
     /**
      * Returns one of the Specified types ... intended for use by the child
      * packages only
-     * 
+     *
      * @return int (DEFAULT?)
      */
     public abstract int getHandlerType();
 
     /**
-     * In most cases this class should not be called within this framework as we
-     * do not intend to parse + store all the information required to recreate
-     * the exact Schema document being parsed. As a result, information such as
-     * annotations are ignored. When used, they method may be called multiple
-     * times for one element. This means the implementor should keep this in
-     * mind when overriding this method.
-     * 
+     * In most cases this class should not be called within this framework as
+     * we do not intend to parse + store all the information required to
+     * recreate the exact Schema document being parsed. As a result,
+     * information such as annotations are ignored. When used, they method may
+     * be called multiple times for one element. This means the implementor
+     * should keep this in mind when overriding this method.
+     *
      * @param text
+     *
      * @throws SAXException
      * @throws SAXNotSupportedException
      */
@@ -94,46 +104,52 @@ public abstract class XSIElementHandler implements Serializable {
     /**
      * handles SAX end Element events. this is an opportunity to complete some
      * post-processing
-     * 
+     *
      * @param namespaceURI
      * @param localName
+     *
      * @throws SAXException
+     *
      * @see SchemaContentHandler#endElement
      */
     public abstract void endElement(String namespaceURI, String localName)
-            throws SAXException;
+        throws SAXException;
 
     /**
-     * handles SAX start Element events. This is an opportunity to complete some
-     * pre-processing.
-     * 
+     * handles SAX start Element events. This is an opportunity to complete
+     * some pre-processing.
+     *
      * @param namespaceURI
      * @param localName
      * @param attr
+     *
      * @throws SAXException
+     *
      * @see SchemaContentHandler#startElement
      */
     public abstract void startElement(String namespaceURI, String localName,
-            Attributes attr) throws SAXException;
+        Attributes attr) throws SAXException;
 
     /**
      * This method will be used to create the XSI document. Validation and
      * in-fix processing is expected to exist within this method, along with
      * data logging for post-processing. This method will directly affect the
      * stack being used to complete the parse.
-     * 
+     *
      * @param namespaceURI
      * @param localName
+     *
      * @return XSIElementHandler, or null
+     *
      * @throws SAXException
      */
     public abstract XSIElementHandler getHandler(String namespaceURI,
-            String localName) throws SAXException;
+        String localName) throws SAXException;
 
     /**
-     * Returns the LocalName for this element (ie this declaration in the Schema
-     * ... so ComplexType or Sequence ...)
-     * 
+     * Returns the LocalName for this element (ie this declaration in the
+     * Schema ... so ComplexType or Sequence ...)
+     *
      * @return String (not-null)
      */
     public abstract String getLocalName();
@@ -150,9 +166,9 @@ public abstract class XSIElementHandler implements Serializable {
             XSIElementHandler ob = (XSIElementHandler) obj;
 
             if (getLocalName() != null) {
-                    return getLocalName().equals(ob.getLocalName());
+                return getLocalName().equals(ob.getLocalName());
             } else {
-                    return (null == ob.getLocalName());
+                return (null == ob.getLocalName());
             }
         } else {
             return false;
@@ -168,7 +184,7 @@ public abstract class XSIElementHandler implements Serializable {
      * <p>
      * Sets the logging level for all XSIElementHandlers
      * </p>
-     * 
+     *
      * @param l
      */
     public static void setLogLevel(Level l) {

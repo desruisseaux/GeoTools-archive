@@ -30,18 +30,16 @@ import java.util.List;
  * AllHandler purpose.
  * 
  * <p>
- * This represents an 'all' element in an xml schema. 
+ * This represents an 'all' element in an xml schema.
  * </p>
- * 
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
  */
 public class AllHandler extends ElementGroupingHandler {
-    /** 'all'  */
+    /** 'all' */
     public static final String LOCALNAME = "all";
-    
     private String id;
     private int minOccurs;
     private int maxOccurs;
@@ -49,8 +47,8 @@ public class AllHandler extends ElementGroupingHandler {
     private All cache = null;
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -75,8 +73,8 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -104,7 +102,6 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -112,7 +109,6 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
     protected ElementGrouping compress(SchemaHandler parent)
@@ -135,7 +131,7 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         cache = da;
-        
+
         id = null;
         elements = null;
 
@@ -143,7 +139,6 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -152,7 +147,6 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -160,22 +154,21 @@ public class AllHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Default implementation for when the parse is complete
      * </p>
-     * 
-     * @see All
+     *
      * @author dzwiers
      *
+     * @see All
      */
     private static class DefaultAll implements All {
         // file visible to avoid set* methods.
@@ -185,7 +178,6 @@ public class AllHandler extends ElementGroupingHandler {
         int minOccurs;
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
@@ -206,7 +198,6 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.All#getElements()
          */
         public Element[] getElements() {
@@ -214,7 +205,6 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.All#getId()
          */
         public String getId() {
@@ -222,7 +212,6 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
          */
         public int getMaxOccurs() {
@@ -230,7 +219,6 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
          */
         public int getMinOccurs() {
@@ -238,7 +226,6 @@ public class AllHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
          */
         public int getGrouping() {

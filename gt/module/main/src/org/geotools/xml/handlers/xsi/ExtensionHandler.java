@@ -28,22 +28,20 @@ import java.util.List;
  * <p>
  * Represents an Extension element
  * </p>
- * 
  *
  * @author dzwiers www.refractions.net
  */
 public class ExtensionHandler extends XSIElementHandler {
-    /** 'extension'  */
+    /** 'extension' */
     public static final String LOCALNAME = "extension";
-    
     private String base;
-//    private AnyAttributeHandler anyAttribute;
+
+    //    private AnyAttributeHandler anyAttribute;
     // TODO USE the anyAttribute !
     private Object child;
     private List attributeDec;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -52,8 +50,8 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -79,20 +77,19 @@ public class ExtensionHandler extends XSIElementHandler {
             }
 
             // anyattribute
-//            if (AnyAttributeHandler.LOCALNAME.equalsIgnoreCase(localName)) {
-//                AnyAttributeHandler ah = new AnyAttributeHandler();
-//
-//                if (anyAttribute == null) {
-//                    anyAttribute = ah;
-//                } else {
-//                    throw new SAXNotRecognizedException(getLocalName()
-//                        + " may only have one '"
-//                        + AnyAttributeHandler.LOCALNAME + "' declaration.");
-//                }
-//
-//                return ah;
-//            }
-
+            //            if (AnyAttributeHandler.LOCALNAME.equalsIgnoreCase(localName)) {
+            //                AnyAttributeHandler ah = new AnyAttributeHandler();
+            //
+            //                if (anyAttribute == null) {
+            //                    anyAttribute = ah;
+            //                } else {
+            //                    throw new SAXNotRecognizedException(getLocalName()
+            //                        + " may only have one '"
+            //                        + AnyAttributeHandler.LOCALNAME + "' declaration.");
+            //                }
+            //
+            //                return ah;
+            //            }
             // attribute
             if (AttributeHandler.LOCALNAME.equalsIgnoreCase(localName)) {
                 if (attributeDec == null) {
@@ -167,7 +164,6 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -175,12 +171,11 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-
         base = atts.getValue("", "base");
 
         if (base == null) {
@@ -192,7 +187,7 @@ public class ExtensionHandler extends XSIElementHandler {
      * <p>
      * gets a list of AttributeHandlers
      * </p>
-     * 
+     *
      * @return
      */
     public List getAttributeDeclarations() {
@@ -200,7 +195,6 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns the 'base' attribute
      * </p>
@@ -212,7 +206,6 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns the child handler
      * </p>
@@ -231,8 +224,8 @@ public class ExtensionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

@@ -41,9 +41,8 @@ import java.util.List;
  * @version $Id$
  */
 public class AttributeGroupHandler extends XSIElementHandler {
-    /** 'attributeGroup'  */
+    /** 'attributeGroup' */
     public final static String LOCALNAME = "attributeGroup";
-    
     private static int offset = 0;
     private String id;
     private String name;
@@ -61,7 +60,6 @@ public class AttributeGroupHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -71,8 +69,8 @@ public class AttributeGroupHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -122,8 +120,8 @@ public class AttributeGroupHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -147,7 +145,6 @@ public class AttributeGroupHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -156,19 +153,22 @@ public class AttributeGroupHandler extends XSIElementHandler {
 
     /**
      * returns the 'name' attribute
+     *
+     * @return
      */
     public String getName() {
         return name;
     }
 
     /**
-     * 
      * <p>
      * Reduces the memory imprint returning a smaller object
      * </p>
      *
      * @param parent
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected AttributeGroup compress(SchemaHandler parent)
@@ -178,8 +178,10 @@ public class AttributeGroupHandler extends XSIElementHandler {
         }
 
         String anyAttributeNamespace = (anyAttribute == null) ? null
-                : anyAttribute.getNamespace();
+                                                              : anyAttribute
+            .getNamespace();
         Attribute[] attributes = null;
+
         if (attrDecs != null) {
             Iterator i = attrDecs.iterator();
             HashSet h = new HashSet();
@@ -206,6 +208,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
         }
 
         String name = this.name;
+
         if ((ref != null) && !"".equalsIgnoreCase(ref)) {
             AttributeGroup ag = parent.lookUpAttributeGroup(ref);
 
@@ -229,13 +232,13 @@ public class AttributeGroupHandler extends XSIElementHandler {
             attributes = ag.getAttributes();
         }
 
-        cache = new DefaultAttributeGroup(id,name,parent.getTargetNamespace(),attributes,anyAttributeNamespace);
+        cache = new DefaultAttributeGroup(id, name,
+                parent.getTargetNamespace(), attributes, anyAttributeNamespace);
 
         return cache;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -243,8 +246,8 @@ public class AttributeGroupHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

@@ -42,7 +42,8 @@ public interface Type {
      * value) for this element based on it's children. Remember, this is a XML
      * is a tree structure, so if you don't include some children, they are gone
      * forever (so be careful when ignoring data).
-     * </p><p>
+     * </p>
+     * <p>
      * A SAXNotSupportedException should be thrown when the child's
      * [inherited, default implementation of
      * getValue(ElementValue[],Attributes)] method should be used.

@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
  * <p>
  * Represents a selector element
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
@@ -35,12 +35,10 @@ import org.xml.sax.SAXException;
 public class SelectorHandler extends XSIElementHandler {
     /** 'selector' */
     public final static String LOCALNAME = "selector";
-    
     private String id;
     private String xpath;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -49,8 +47,8 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -58,8 +56,8 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -78,7 +76,6 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -86,6 +83,8 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return id attribute value
      */
     public String getId() {
@@ -93,6 +92,8 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return xPath attribute value
      */
     public String getXpath() {
@@ -100,7 +101,6 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -108,8 +108,8 @@ public class SelectorHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

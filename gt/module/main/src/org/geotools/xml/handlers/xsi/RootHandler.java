@@ -36,9 +36,8 @@ import java.net.URI;
  * @version $Id$
  */
 public class RootHandler extends XSIElementHandler {
-    /** 'root'  */
+    /** 'root' */
     public final static String LOCALNAME = "root";
-    
     private SchemaHandler schema;
     private URI uri;
 
@@ -51,7 +50,7 @@ public class RootHandler extends XSIElementHandler {
     /**
      * Creates a new RootHandler object.
      *
-     * @param uri 
+     * @param uri
      */
     public RootHandler(URI uri) {
         this.uri = uri;
@@ -59,7 +58,6 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -67,15 +65,16 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
         if (SchemaHandler.LOCALNAME.equalsIgnoreCase(localName)
                 && SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
-            if(schema == null)
+            if (schema == null) {
                 schema = new SchemaHandler();
+            }
 
             return schema;
         }
@@ -84,8 +83,8 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes attr) throws SAXException {
@@ -94,7 +93,6 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -102,13 +100,13 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
-     * intended to be called after the parse, this generates a Schema
-     * object from the schema which was parsed in.
+     * intended to be called after the parse, this generates a Schema object
+     * from the schema which was parsed in.
      * </p>
      *
      * @return
+     *
      * @throws SAXException
      */
     public Schema getSchema() throws SAXException {
@@ -116,18 +114,17 @@ public class RootHandler extends XSIElementHandler {
 
         return s;
     }
-    
 
     /**
-     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
+     *      java.lang.String)
      */
     public void startPrefixMapping(String arg0, String arg1)
-            throws SAXException {
+        throws SAXException {
         schema.startPrefixMapping(arg0, arg1);
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -135,8 +132,8 @@ public class RootHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

@@ -1,6 +1,24 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.xml.schema;
 
+import org.geotools.xml.PrintHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,19 +27,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.xml.PrintHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public class DefaultSimpleType implements SimpleType {
     // file visible to avoid set* methods
@@ -32,16 +46,32 @@ public class DefaultSimpleType implements SimpleType {
     private SimpleType[] parents = null;
     private int type = 0;
     private Facet[] constraints;
-    
-    private DefaultSimpleType(){}
-    public DefaultSimpleType(String id, String name, String namespace, int type, SimpleType[] parents, Facet[] constraints, int finaL){
-        this.id = id;this.name = name; this.namespace = namespace;
-        this.parents = parents;
-        this.type = type; this.constraints = constraints;
+
+    private DefaultSimpleType() {
     }
 
     /**
-     * 
+     * Creates a new DefaultSimpleType object.
+     *
+     * @param id DOCUMENT ME!
+     * @param name DOCUMENT ME!
+     * @param namespace DOCUMENT ME!
+     * @param type DOCUMENT ME!
+     * @param parents DOCUMENT ME!
+     * @param constraints DOCUMENT ME!
+     * @param finaL DOCUMENT ME!
+     */
+    public DefaultSimpleType(String id, String name, String namespace,
+        int type, SimpleType[] parents, Facet[] constraints, int finaL) {
+        this.id = id;
+        this.name = name;
+        this.namespace = namespace;
+        this.parents = parents;
+        this.type = type;
+        this.constraints = constraints;
+    }
+
+    /**
      * @see org.geotools.xml.xsi.Type#getInstanceType()
      */
     public Class getInstanceType() {
@@ -50,7 +80,6 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
-     * 
      * @see org.geotools.xml.xsi.SimpleType#getFinal()
      */
     public int getFinal() {
@@ -58,7 +87,6 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
-     * 
      * @see org.geotools.xml.xsi.SimpleType#getId()
      */
     public String getId() {
@@ -66,7 +94,6 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
-     * 
      * @see org.geotools.xml.xsi.Type#getName()
      */
     public String getName() {
@@ -74,7 +101,6 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
-     * 
      * @see org.geotools.xml.xsi.Type#getName()
      */
     public String getNamespace() {
@@ -82,7 +108,6 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
-     * 
      * @see org.geotools.xml.xsi.Type#getParent()
      */
     public SimpleType[] getParents() {
@@ -122,14 +147,18 @@ public class DefaultSimpleType implements SimpleType {
         if (parents == null) {
             return null;
         }
+
         ElementValue[] valss = new ElementValue[1];
         valss[0] = value;
+
         for (int i = 0; i < parents.length; i++) {
             Object o = parents[0].getValue(element, valss, attrs, hints);
+
             if (o != null) {
                 return o;
             }
         }
+
         return null;
     }
 
@@ -147,11 +176,11 @@ public class DefaultSimpleType implements SimpleType {
         DefaultElementValue[] valss = new DefaultElementValue[1];
 
         for (int i = 0; i < vals.length; i++) {
-            valss[0] = new DefaultElementValue(value.getElement(),vals[i]);
+            valss[0] = new DefaultElementValue(value.getElement(), vals[i]);
             l.add(parents[0].getValue(element, valss, attrs, hints));
         }
 
-        valss[0] = new DefaultElementValue(value.getElement(),l);
+        valss[0] = new DefaultElementValue(value.getElement(), l);
 
         return valss[0];
     }
@@ -227,8 +256,7 @@ public class DefaultSimpleType implements SimpleType {
 
                 case Facet.LENGTH:
 
-                    int maxLength = Integer.parseInt(constraints[i]
-                            .getValue());
+                    int maxLength = Integer.parseInt(constraints[i].getValue());
 
                     if (val.length() != maxLength) {
                         throw new SAXException("Too long places");
@@ -365,8 +393,7 @@ public class DefaultSimpleType implements SimpleType {
                     break;
 
                 case Facet.TOTALDIGITS:
-                    maxLength = Integer.parseInt(constraints[i].getValue())
-                        + 1;
+                    maxLength = Integer.parseInt(constraints[i].getValue()) + 1;
 
                     if (val.length() > maxLength) {
                         throw new SAXException("Too many digits");
@@ -393,113 +420,167 @@ public class DefaultSimpleType implements SimpleType {
     public Facet[] getFacets() {
         return constraints;
     }
+
     /**
-     * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+     * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute,
+     *      java.lang.Object, java.util.Map)
      */
-    public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
-        if(value == null)return null;
-        if(type == UNION){
-            for(int i=0;i<parents.length;i++){
+    public AttributeValue toAttribute(Attribute attribute, Object value,
+        Map hints) {
+        if (value == null) {
+            return null;
+        }
+
+        if (type == UNION) {
+            for (int i = 0; i < parents.length; i++) {
                 // finds first that works
                 // TODO check that 'equals' works here
-                if(parents[i].equals(attribute.getSimpleType()) && parents[i].canCreateAttributes(attribute,value,hints))
-                    return parents[i].toAttribute(attribute,value,hints);
+                if (parents[i].equals(attribute.getSimpleType())
+                        && parents[i].canCreateAttributes(attribute, value,
+                            hints)) {
+                    return parents[i].toAttribute(attribute, value, hints);
+                }
             }
-            return parents[0].toAttribute(attribute,value,hints);
-        }else{
-            if(type == LIST){
-                List l = (List)value;
+
+            return parents[0].toAttribute(attribute, value, hints);
+        } else {
+            if (type == LIST) {
+                List l = (List) value;
                 Iterator i = l.iterator();
                 String s = "";
-                if(i.hasNext()){
-                    Object t = parents[0].toAttribute(attribute,i.next(),hints).getValue();
+
+                if (i.hasNext()) {
+                    Object t = parents[0].toAttribute(attribute, i.next(), hints)
+                                         .getValue();
                     s = t.toString();
-                    while(i.hasNext()){
-                        t = parents[0].toAttribute(attribute,i.next(),hints).getValue();
-                        s = s+" "+t.toString();
-                	}
+
+                    while (i.hasNext()) {
+                        t = parents[0].toAttribute(attribute, i.next(), hints)
+                                      .getValue();
+                        s = s + " " + t.toString();
+                    }
                 }
-                return new DefaultAttributeValue(attribute,s);
-            }else
-                return parents[0].toAttribute(attribute,value,hints);
+
+                return new DefaultAttributeValue(attribute, s);
+            } else {
+                return parents[0].toAttribute(attribute, value, hints);
+            }
         }
     }
 
     /**
-     * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+     * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
+     *      java.lang.Object, java.util.Map)
      */
-    public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
-        if(value == null)return false;
-        if(type == UNION){
-            for(int i=0;i<parents.length;i++){
+    public boolean canCreateAttributes(Attribute attribute, Object value,
+        Map hints) {
+        if (value == null) {
+            return false;
+        }
+
+        if (type == UNION) {
+            for (int i = 0; i < parents.length; i++) {
                 // finds first that works
                 // TODO check that 'equals' works here
-                if(parents[i].equals(attribute.getSimpleType()) && parents[i].canCreateAttributes(attribute,value,hints))
+                if (parents[i].equals(attribute.getSimpleType())
+                        && parents[i].canCreateAttributes(attribute, value,
+                            hints)) {
                     return true;
+                }
             }
+
             return false;
-        }else{
-            if(type == LIST){
-                return parents[0].canCreateAttributes(attribute,value,hints);
-            }else
-                return parents[0].canCreateAttributes(attribute,value,hints);
+        } else {
+            if (type == LIST) {
+                return parents[0].canCreateAttributes(attribute, value, hints);
+            } else {
+                return parents[0].canCreateAttributes(attribute, value, hints);
+            }
         }
     }
 
     /**
-     * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+     * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
+     *      java.lang.Object, java.util.Map)
      */
     public boolean canEncode(Element element, Object value, Map hints) {
-        if(value == null)return false;
-        if(type == UNION){
-            for(int i=0;i<parents.length;i++){
+        if (value == null) {
+            return false;
+        }
+
+        if (type == UNION) {
+            for (int i = 0; i < parents.length; i++) {
                 // finds first that works
                 // TODO check that 'equals' works here
-                if(parents[i].equals(element.getType()) && parents[i].canEncode(element,value,hints))
+                if (parents[i].equals(element.getType())
+                        && parents[i].canEncode(element, value, hints)) {
                     return true;
+                }
             }
+
             return false;
-        }else{
-            if(type == LIST){
-                return parents[0].canEncode(element,value,hints);
-            }else
-                return parents[0].canEncode(element,value,hints);
+        } else {
+            if (type == LIST) {
+                return parents[0].canEncode(element, value, hints);
+            } else {
+                return parents[0].canEncode(element, value, hints);
+            }
         }
     }
 
     /**
-     * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+     * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element,
+     *      java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
      */
-    public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-        if(value == null)return;
-        if(type == UNION){
-            for(int i=0;i<parents.length;i++){
+    public void encode(Element element, Object value, PrintHandler output,
+        Map hints) throws IOException, OperationNotSupportedException {
+        if (value == null) {
+            return;
+        }
+
+        if (type == UNION) {
+            for (int i = 0; i < parents.length; i++) {
                 // finds first that works
                 // TODO check that 'equals' works here
-                if(parents[i].equals(element.getType()) && parents[i].canEncode(element,value,hints))
-                    parents[i].encode(element,value,output,hints);
-                	return;
+                if (parents[i].equals(element.getType())
+                        && parents[i].canEncode(element, value, hints)) {
+                    parents[i].encode(element, value, output, hints);
+                }
+
+                return;
             }
-            parents[0].encode(element,value,output,hints);
+
+            parents[0].encode(element, value, output, hints);
+
             return;
-        }else{
-            if(type == LIST){
-                List l = (List)value;
+        } else {
+            if (type == LIST) {
+                List l = (List) value;
                 Iterator i = l.iterator();
                 String s = "";
-                if(i.hasNext()){
-                    Object t = parents[0].toAttribute(new DefaultAttribute(null,null,namespace,parents[0],0,null,null,false),value,hints).getValue();
+
+                if (i.hasNext()) {
+                    Object t = parents[0].toAttribute(new DefaultAttribute(
+                                null, null, namespace, parents[0], 0, null,
+                                null, false), value, hints).getValue();
                     s = t.toString();
-                    while(i.hasNext()){
-                        t = parents[0].toAttribute(new DefaultAttribute(null,null,namespace,parents[0],0,null,null,false),value,hints).getValue();
-                        s = s+" "+t.toString();
-                	}
+
+                    while (i.hasNext()) {
+                        t = parents[0].toAttribute(new DefaultAttribute(null,
+                                    null, namespace, parents[0], 0, null, null,
+                                    false), value, hints).getValue();
+                        s = s + " " + t.toString();
+                    }
                 }
-                parents[0].encode(element,s,output,hints);
+
+                parents[0].encode(element, s, output, hints);
+
                 return;
-            }else
-                parents[0].encode(element,value,output,hints);
-            	return;
+            } else {
+                parents[0].encode(element, value, output, hints);
+            }
+
+            return;
         }
     }
 }

@@ -35,9 +35,8 @@ import java.util.List;
  * @version $Id$
  */
 public class RedefineHandler extends XSIElementHandler {
-    /** 'redefine'  */
+    /** 'redefine' */
     public final static String LOCALNAME = "redefine";
-    
     private static int offset = 0;
     private String id;
     private String schemaLocation;
@@ -55,7 +54,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -64,8 +62,8 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -125,8 +123,8 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -144,7 +142,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -152,7 +149,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns a list of AttributeGroupHandlers
      * </p>
@@ -164,7 +160,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns a list of ComplexTypeHandlers
      * </p>
@@ -176,7 +171,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns a list of GroupHandlers
      * </p>
@@ -188,7 +182,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns the id attribute
      * </p>
@@ -200,7 +193,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns the schemaLocation attribute
      * </p>
@@ -212,7 +204,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns a list of SimpleTypeHandlers
      * </p>
@@ -224,7 +215,6 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -232,8 +222,8 @@ public class RedefineHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

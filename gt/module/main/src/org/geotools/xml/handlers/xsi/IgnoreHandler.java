@@ -22,9 +22,8 @@ import org.xml.sax.SAXException;
 
 
 /**
- * 
  * <p>
- * Used to represent elements which are not important to our parse, basically 
+ * Used to represent elements which are not important to our parse, basically
  * place holders.
  * </p>
  *
@@ -33,11 +32,10 @@ import org.xml.sax.SAXException;
  * @version $Id$
  */
 public class IgnoreHandler extends XSIElementHandler {
-    /** ""  */
+    /** "" */
     public final static String LOCALNAME = "";
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#characters(java.lang.String)
      */
     public void characters(String text) throws SAXException {
@@ -45,7 +43,6 @@ public class IgnoreHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -53,8 +50,8 @@ public class IgnoreHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -62,7 +59,6 @@ public class IgnoreHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -70,7 +66,6 @@ public class IgnoreHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -78,16 +73,16 @@ public class IgnoreHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes attr) throws SAXException {

@@ -1,23 +1,55 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.xml.schema;
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public class DefaultAttribute implements Attribute {
-
-    private String defualT,fixed,id,name,namespace;
+    private String defualT;
+    private String fixed;
+    private String id;
+    private String name;
+    private String namespace;
     private int use;
     private SimpleType type;
     private boolean form;
-    
-    private DefaultAttribute(){}
-    
-    public DefaultAttribute(String id, String name, String namespace, SimpleType type, int use, String defaulT, String fixed, boolean form){
+
+    private DefaultAttribute() {
+    }
+
+    /**
+     * Creates a new DefaultAttribute object.
+     *
+     * @param id DOCUMENT ME!
+     * @param name DOCUMENT ME!
+     * @param namespace DOCUMENT ME!
+     * @param type DOCUMENT ME!
+     * @param use DOCUMENT ME!
+     * @param defaulT DOCUMENT ME!
+     * @param fixed DOCUMENT ME!
+     * @param form DOCUMENT ME!
+     */
+    public DefaultAttribute(String id, String name, String namespace,
+        SimpleType type, int use, String defaulT, String fixed, boolean form) {
         this.id = id;
         this.name = name;
         this.namespace = namespace;
@@ -27,7 +59,7 @@ public class DefaultAttribute implements Attribute {
         this.fixed = fixed;
         this.form = form;
     }
-    
+
     /**
      * @see org.geotools.xml.schema.Attribute#getDefault()
      */
@@ -83,5 +115,4 @@ public class DefaultAttribute implements Attribute {
     public String getNamespace() {
         return namespace;
     }
-
 }

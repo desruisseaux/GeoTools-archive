@@ -30,34 +30,32 @@ import org.xml.sax.SAXException;
  * <p>
  * Represents an 'any' element.
  * </p>
- * 
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
  */
 public class AnyHandler extends ElementGroupingHandler {
-    /** 'any'  */
+    /** 'any' */
     public final static String LOCALNAME = "any";
 
-    /** strict  */
+    /** strict */
     public static final int STRICT = 0;
 
-    /** lax  */
+    /** lax */
     public static final int LAX = 1;
 
-    /** skip  */
+    /** skip */
     public static final int SKIP = 2;
-    
     private String id;
     private String namespace;
     private int minOccurs;
     private int maxOccurs;
-//    private int processContents;
+
+    //    private int processContents;
     private Any cache = null;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -66,18 +64,17 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
-
         return null;
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -105,14 +102,13 @@ public class AnyHandler extends ElementGroupingHandler {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
 
-//        String processContents = atts.getValue("", "processContents");
-//
-//        if (processContents == null) {
-//            processContents = atts.getValue(namespaceURI, "processContents");
-//        }
-//
-//        this.processContents = findProcess(processContents);
-
+        //        String processContents = atts.getValue("", "processContents");
+        //
+        //        if (processContents == null) {
+        //            processContents = atts.getValue(namespaceURI, "processContents");
+        //        }
+        //
+        //        this.processContents = findProcess(processContents);
         if ((null == min) || "".equalsIgnoreCase(min)) {
             minOccurs = 1;
         } else {
@@ -131,7 +127,6 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -139,13 +134,14 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * <p>
-     * maps strings -> int constants for the 'process' attribute 
+     * maps strings -> int constants for the 'process' attribute
      * </p>
      *
      * @param process
+     *
      * @return
+     *
      * @throws SAXException
      */
     public static int findProcess(String process) throws SAXException {
@@ -170,13 +166,13 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * <p>
-     * reverses the findProcess method, converting from integers to String for 
+     * reverses the findProcess method, converting from integers to String for
      * the process attribute.
      * </p>
      *
      * @param process
+     *
      * @return
      */
     public static String writeProcess(int process) {
@@ -193,7 +189,6 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
     protected ElementGrouping compress(SchemaHandler parent)
@@ -215,7 +210,6 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -223,21 +217,21 @@ public class AnyHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Any instance implementation
      * </p>
-     * @see Any
+     *
      * @author dzwiers
      *
+     * @see Any
      */
     private static class DefaultAny implements Any {
         String id;
@@ -251,7 +245,6 @@ public class AnyHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Any#getId()
          */
         public String getId() {
@@ -259,7 +252,6 @@ public class AnyHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
          */
         public int getMaxOccurs() {
@@ -267,7 +259,6 @@ public class AnyHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
          */
         public int getMinOccurs() {
@@ -275,7 +266,6 @@ public class AnyHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Any#getNamespace()
          */
         public String getNamespace() {
@@ -283,7 +273,6 @@ public class AnyHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
          */
         public int getGrouping() {

@@ -35,15 +35,13 @@ import java.util.List;
  * @version $Id$
  */
 public class UnionHandler extends XSIElementHandler {
-    /** 'union'  */
+    /** 'union' */
     public final static String LOCALNAME = "union";
-    
     private String id;
     private String memberTypes;
     private List simpleTypes;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -54,8 +52,8 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -79,8 +77,8 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -98,7 +96,6 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -106,6 +103,7 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
+     * DOCUMENT ME!
      *
      * @return memberTypes attribute value
      */
@@ -114,6 +112,7 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
+     * DOCUMENT ME!
      *
      * @return list of simpleTypeHandlers representing the nested simpleTypes
      */
@@ -122,7 +121,6 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -130,8 +128,8 @@ public class UnionHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

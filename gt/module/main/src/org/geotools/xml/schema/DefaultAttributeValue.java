@@ -1,23 +1,46 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.xml.schema;
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public class DefaultAttributeValue implements AttributeValue {
-
     private String value;
     private Attribute attribute;
-    private DefaultAttributeValue(){}
-    
-    public DefaultAttributeValue(Attribute attribute, String value){
+
+    private DefaultAttributeValue() {
+    }
+
+    /**
+     * Creates a new DefaultAttributeValue object.
+     *
+     * @param attribute DOCUMENT ME!
+     * @param value DOCUMENT ME!
+     */
+    public DefaultAttributeValue(Attribute attribute, String value) {
         this.attribute = attribute;
         this.value = value;
     }
+
     /**
      * @see org.geotools.xml.schema.AttributeValue#getValue()
      */
@@ -31,5 +54,4 @@ public class DefaultAttributeValue implements AttributeValue {
     public Attribute getAttribute() {
         return attribute;
     }
-
 }

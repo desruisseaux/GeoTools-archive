@@ -30,51 +30,45 @@ package org.geotools.xml.schema;
  */
 public interface ElementGrouping {
     /**
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
      */
     public static final int ELEMENT = 1;
 
-    /** 
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
-      */
+    /**
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
+     */
     public static final int GROUP = 2;
 
-    /** 
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
-      */
+    /**
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
+     */
     public static final int ANY = 4;
 
-    /** 
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
-      */
+    /**
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
+     */
     public static final int SEQUENCE = 8;
 
-    /** 
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
-      */
+    /**
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
+     */
     public static final int CHOICE = 16;
 
-    /** 
-     * ElementGrouping mask to determine the type of
-     * ElementGrouping represented. This is intended to 
-     * reduce the use of the instanceof operand, 
-     * increasing performance.
-      */
+    /**
+     * ElementGrouping mask to determine the type of ElementGrouping
+     * represented. This is intended to  reduce the use of the instanceof
+     * operand,  increasing performance.
+     */
     public static final int ALL = 32;
 
     /**

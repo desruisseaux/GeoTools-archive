@@ -1,25 +1,59 @@
-
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.xml.schema;
 
 /**
- * <p> 
+ * <p>
  * DOCUMENT ME!
  * </p>
- * @author dzwiers
  *
+ * @author dzwiers
  */
 public class DefaultGroup implements Group {
-
     private ElementGrouping child;
-    private String id,name,namespace;
-    private int min,max;
-    
-    private DefaultGroup(){}
-    public DefaultGroup(String id, String name, String namespace, ElementGrouping child, int min, int max){
-        this.id = id;this.name = name; this.namespace = namespace;
-        this.child = child;this.min = min;this.max = max;
+    private String id;
+    private String name;
+    private String namespace;
+    private int min;
+    private int max;
+
+    private DefaultGroup() {
     }
-    
+
+    /**
+     * Creates a new DefaultGroup object.
+     *
+     * @param id DOCUMENT ME!
+     * @param name DOCUMENT ME!
+     * @param namespace DOCUMENT ME!
+     * @param child DOCUMENT ME!
+     * @param min DOCUMENT ME!
+     * @param max DOCUMENT ME!
+     */
+    public DefaultGroup(String id, String name, String namespace,
+        ElementGrouping child, int min, int max) {
+        this.id = id;
+        this.name = name;
+        this.namespace = namespace;
+        this.child = child;
+        this.min = min;
+        this.max = max;
+    }
+
     /**
      * @see org.geotools.xml.schema.Group#getChild()
      */
@@ -73,6 +107,6 @@ public class DefaultGroup implements Group {
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
-        return child==null?null:child.findChildElement(name);
+        return (child == null) ? null : child.findChildElement(name);
     }
 }

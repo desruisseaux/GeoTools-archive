@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
  * <p>
  * Represents an 'include' element
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
@@ -35,9 +35,9 @@ import org.xml.sax.SAXException;
 public class IncludeHandler extends XSIElementHandler {
     /** 'include' */
     public final static String LOCALNAME = "include";
-    
     private static int offset = 0;
-//    private String id;
+
+    //    private String id;
     private String schemaLocation;
     private int hashCodeOffset = getOffset();
 
@@ -49,17 +49,17 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return (LOCALNAME.hashCode() * ((schemaLocation == null)
-        ? 1 : schemaLocation.hashCode())) + hashCodeOffset;
+        return (LOCALNAME.hashCode() * ((schemaLocation == null) ? 1
+                                                                 : schemaLocation
+        .hashCode())) + hashCodeOffset;
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -67,17 +67,16 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-//        id = atts.getValue("", "id");
-//
-//        if (id == null) {
-//            id = atts.getValue(namespaceURI, "id");
-//        }
-
+        //        id = atts.getValue("", "id");
+        //
+        //        if (id == null) {
+        //            id = atts.getValue(namespaceURI, "id");
+        //        }
         schemaLocation = atts.getValue("", "schemaLocation");
 
         if (schemaLocation == null) {
@@ -86,7 +85,6 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -94,7 +92,6 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the schemaLocation attribute
      * </p>
@@ -106,7 +103,6 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -114,8 +110,8 @@ public class IncludeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

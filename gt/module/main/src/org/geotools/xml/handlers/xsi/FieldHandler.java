@@ -25,10 +25,9 @@ import org.xml.sax.SAXException;
  * FieldHandler purpose.
  * 
  * <p>
- * Represents a 'field' element. This class is not currently in use as 
- * key ... constraints are not used.
+ * Represents a 'field' element. This class is not currently in use as  key ...
+ * constraints are not used.
  * </p>
- * 
  * TODO Use the referential constraints ... thus using this class
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
@@ -36,14 +35,12 @@ import org.xml.sax.SAXException;
  * @version $Id$
  */
 public class FieldHandler extends XSIElementHandler {
-    /** 'field'  */
+    /** 'field' */
     public final static String LOCALNAME = "field";
-    
     private String id;
     private String xpath;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -52,8 +49,8 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -61,8 +58,8 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -80,7 +77,6 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -88,11 +84,9 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * The ID
      * </p>
-     *
      * TODO Is this method required?
      *
      * @return
@@ -102,11 +96,9 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * The Xpath
      * </p>
-     *
      * TODO Is this method required?
      *
      * @return
@@ -116,7 +108,6 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -124,8 +115,8 @@ public class FieldHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

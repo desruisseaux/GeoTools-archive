@@ -188,13 +188,12 @@ public interface Schema {
 
     /**
      * <p>
-     * Gets the URI which is represented by this Schema. 
+     * Gets the URI which is represented by this Schema.
      * </p>
      *
      * @return
      */
     public URI getURI();
-    
 
     /**
      * <p>
@@ -244,7 +243,7 @@ public interface Schema {
      * <p>
      * This looks to see if the URI passed in is represented by this Schema.
      * Often this method uses some heuritics on the list of included URIs.
-     * This allows one Schema to represent one targetNamespace, but be 
+     * This allows one Schema to represent one targetNamespace, but be
      * potentially represented in more than one file.
      * </p>
      *

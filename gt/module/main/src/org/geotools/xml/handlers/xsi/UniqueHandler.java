@@ -28,8 +28,8 @@ import java.util.List;
  * UniqueHandler purpose.
  * 
  * <p>
- * represents a unique element. This class is not currently used except as
- * a placeholder.
+ * represents a unique element. This class is not currently used except as a
+ * placeholder.
  * </p>
  * TODO used this class semantically
  *
@@ -38,16 +38,14 @@ import java.util.List;
  * @version $Id$
  */
 public class UniqueHandler extends XSIElementHandler {
-    /** 'unique'  */
+    /** 'unique' */
     public final static String LOCALNAME = "unique";
-    
     private String id;
     private String xpath;
     private SelectorHandler selector;
     private List fields;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -56,8 +54,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -96,8 +94,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -115,7 +113,6 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -123,7 +120,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
+     * DOCUMENT ME!
+     *
      * @return the id attribute value
      */
     public String getId() {
@@ -131,7 +129,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
+     * DOCUMENT ME!
+     *
      * @return the xpath attribute value
      */
     public String getXpath() {
@@ -139,6 +138,7 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
+     * DOCUMENT ME!
      *
      * @return List of FieldHandlers representing sub-elements
      */
@@ -147,7 +147,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
+     * DOCUMENT ME!
+     *
      * @return the selector sub-element
      */
     public SelectorHandler getSelector() {
@@ -155,7 +156,6 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -163,8 +163,8 @@ public class UniqueHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

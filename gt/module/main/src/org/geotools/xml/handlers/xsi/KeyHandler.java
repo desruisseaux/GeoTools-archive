@@ -28,10 +28,9 @@ import java.util.List;
  * KeyHandler purpose.
  * 
  * <p>
- * represents a 'key' element. This class is not currently used asside 
- * from as a placeholder.
+ * represents a 'key' element. This class is not currently used asside  from as
+ * a placeholder.
  * </p>
- * 
  * TODO use this class semantically
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
@@ -39,16 +38,14 @@ import java.util.List;
  * @version $Id$
  */
 public class KeyHandler extends XSIElementHandler {
-    /** 'key'  */
+    /** 'key' */
     public final static String LOCALNAME = "key";
-    
     private String id;
     private String name;
     private SelectorHandler selector;
     private List fields;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -57,8 +54,8 @@ public class KeyHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -96,8 +93,8 @@ public class KeyHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -115,7 +112,6 @@ public class KeyHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -175,7 +171,6 @@ public class KeyHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -183,8 +178,8 @@ public class KeyHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

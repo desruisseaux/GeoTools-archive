@@ -34,16 +34,13 @@ import org.xml.sax.SAXNotRecognizedException;
  * @version $Id$
  */
 public class ListHandler extends XSIElementHandler {
-    
     /** 'list' */
     public final static String LOCALNAME = "list";
-    
     private String id;
     private String itemType;
     private SimpleTypeHandler simpleType;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -52,8 +49,8 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -80,8 +77,8 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -99,7 +96,6 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -107,7 +103,6 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the itemType attribute
      * </p>
@@ -119,7 +114,6 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the nested simpleType if one exists
      * </p>
@@ -131,7 +125,6 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -139,8 +132,8 @@ public class ListHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

@@ -40,16 +40,13 @@ import java.util.List;
 public class SequenceHandler extends ElementGroupingHandler {
     /** 'sequence' */
     public final static String LOCALNAME = "sequence";
-    
     private String id;
     private int maxOccurs;
     private int minOccurs;
     private List children; // element, group, choice, sequence or any
-    
     private Sequence cache = null;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -58,8 +55,8 @@ public class SequenceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -134,8 +131,8 @@ public class SequenceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -178,7 +175,6 @@ public class SequenceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -186,7 +182,6 @@ public class SequenceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
     protected ElementGrouping compress(SchemaHandler parent)
@@ -214,13 +209,13 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         cache = ds;
-        children = null;id = null;
+        children = null;
+        id = null;
 
         return ds;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -228,21 +223,21 @@ public class SequenceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Default implementation of a sequence for a parsed xml sequence
      * </p>
-     * @see Sequence
+     *
      * @author dzwiers
      *
+     * @see Sequence
      */
     private static class DefaultSequence implements Sequence {
         // file visible avoids set* methods
@@ -252,7 +247,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         int maxOccurs;
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
@@ -273,7 +267,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Sequence#getChildren()
          */
         public ElementGrouping[] getChildren() {
@@ -281,7 +274,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Sequence#getId()
          */
         public String getId() {
@@ -289,7 +281,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
          */
         public int getMaxOccurs() {
@@ -297,7 +288,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
          */
         public int getMinOccurs() {
@@ -305,7 +295,6 @@ public class SequenceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
          */
         public int getGrouping() {

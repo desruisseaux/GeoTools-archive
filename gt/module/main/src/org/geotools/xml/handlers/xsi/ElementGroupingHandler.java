@@ -29,16 +29,16 @@ import org.xml.sax.SAXException;
  * @author dzwiers www.refractions.net
  */
 public abstract class ElementGroupingHandler extends XSIElementHandler {
-    
     /**
-     * 
      * <p>
-     * This will compress the given element based on it's type and the 
-     * parent schema, allowing for references to be resolved.
+     * This will compress the given element based on it's type and the  parent
+     * schema, allowing for references to be resolved.
      * </p>
      *
      * @param parent
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected abstract ElementGrouping compress(SchemaHandler parent)

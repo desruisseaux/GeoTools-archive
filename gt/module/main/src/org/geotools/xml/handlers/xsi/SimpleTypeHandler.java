@@ -24,7 +24,6 @@ import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,22 +41,20 @@ import java.util.List;
  * @version $Id$
  */
 public class SimpleTypeHandler extends XSIElementHandler {
-    /** NONE  */
+    /** NONE */
     public static final int NONE = 0;
 
-    /** ALL  */
+    /** ALL */
     public static final int ALL = 7;
 
-    /** 'simpleType'  */
+    /** 'simpleType' */
     public final static String LOCALNAME = "simpleType";
-    
     private static int offset = 0;
     private String id;
     private String name;
     private int finaL;
     private XSIElementHandler child; // one of List, Restriction or Union
     private int hashCodeOffset = getOffset();
-    
     private SimpleType cache;
 
     /*
@@ -68,7 +65,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -77,8 +73,8 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -135,8 +131,8 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -162,12 +158,12 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * translates the final attribute to an integer mask
      * </p>
      *
      * @param finaL
+     *
      * @return
      */
     public static int findFinal(String finaL) {
@@ -201,7 +197,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -209,7 +204,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the simpletype's name
      * </p>
@@ -221,12 +215,12 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * compacts the data resolving references.
      * </p>
      *
      * @param parent
+     *
      * @return
      */
     protected SimpleType compress(SchemaHandler parent) {
@@ -237,54 +231,67 @@ public class SimpleTypeHandler extends XSIElementHandler {
         }
 
         Facet[] facets = null;
-        if(child.getHandlerType() == SimpleType.RESTRICTION)
-            facets = getFacets((RestrictionHandler)child);
-                
-        SimpleType[] simpleTypes = getSimpleTypes(child,parent);
-        
-        cache = new DefaultSimpleType(id,name,parent.getTargetNamespace(),child.getHandlerType(),simpleTypes,facets,finaL);
+
+        if (child.getHandlerType() == SimpleType.RESTRICTION) {
+            facets = getFacets((RestrictionHandler) child);
+        }
+
+        SimpleType[] simpleTypes = getSimpleTypes(child, parent);
+
+        cache = new DefaultSimpleType(id, name, parent.getTargetNamespace(),
+                child.getHandlerType(), simpleTypes, facets, finaL);
 
         logger.info("End compressing SimpleType " + getName());
-        id = null;child = null;
+        id = null;
+        child = null;
 
         return cache;
     }
-    
-    static SimpleType[] getSimpleTypes(XSIElementHandler child, SchemaHandler parent) {
+
+    static SimpleType[] getSimpleTypes(XSIElementHandler child,
+        SchemaHandler parent) {
         switch (child.getHandlerType()) {
         case RESTRICTION:
             return getSimpleTypes((RestrictionHandler) child, parent);
+
         case LIST:
             return getSimpleTypes((ListHandler) child, parent);
+
         case UNION:
             return getSimpleTypes((UnionHandler) child, parent);
+
         default:
             throw new RuntimeException(
                 "Should not be here ... child is one of the other three types.");
         }
     }
-    
-    static SimpleType[] getSimpleTypes(RestrictionHandler rest, SchemaHandler parent) {
+
+    static SimpleType[] getSimpleTypes(RestrictionHandler rest,
+        SchemaHandler parent) {
         SimpleType[] children = new SimpleType[1];
+
         if (rest.getChild() != null) {
             children[0] = ((SimpleTypeHandler) rest.getChild()).compress(parent);
         } else {
             children[0] = parent.lookUpSimpleType(rest.getBase());
         }
+
         return children;
     }
+
     static SimpleType[] getSimpleTypes(ListHandler rest, SchemaHandler parent) {
         SimpleType[] children = new SimpleType[1];
+
         if (rest.getSimpleType() != null) {
             children[0] = ((SimpleTypeHandler) rest.getSimpleType()).compress(parent);
         } else {
             children[0] = parent.lookUpSimpleType(rest.getItemType());
         }
+
         return children;
     }
-    
-    static SimpleType[] getSimpleTypes(UnionHandler union, SchemaHandler parent) {
 
+    static SimpleType[] getSimpleTypes(UnionHandler union, SchemaHandler parent) {
         List l = new LinkedList();
 
         if (union.getMemberTypes() != null) {
@@ -304,23 +311,27 @@ public class SimpleTypeHandler extends XSIElementHandler {
 
         return (SimpleType[]) l.toArray(new SimpleType[l.size()]);
     }
-    
-    static Facet[] getFacets(RestrictionHandler rh){
+
+    static Facet[] getFacets(RestrictionHandler rh) {
         List contraints = rh.getConstraints();
-        if(contraints==null || contraints.size()==0)
+
+        if ((contraints == null) || (contraints.size() == 0)) {
             return null;
+        }
+
         Facet[] facets = new Facet[contraints.size()];
         Iterator i = contraints.iterator();
         int index = 0;
-        while(i.hasNext()){
-            FacetHandler fh = (FacetHandler)i.next();
-            facets[index] = new DefaultFacet(fh.getType(),fh.getValue());
+
+        while (i.hasNext()) {
+            FacetHandler fh = (FacetHandler) i.next();
+            facets[index] = new DefaultFacet(fh.getType(), fh.getValue());
         }
+
         return facets;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -328,8 +339,8 @@ public class SimpleTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

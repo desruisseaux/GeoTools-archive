@@ -16,11 +16,6 @@
  */
 package org.geotools.xml.handlers;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.ComplexType;
@@ -29,19 +24,23 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.SAXException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * <p>
- * This class is used to create handlers for child elements based on the 
- * currently defined namespaces. This class is called by the XMLSAXHandler 
- * to help act as a library of prefix -> Schema mappings.
+ * This class is used to create handlers for child elements based on the
+ * currently defined namespaces. This class is called by the XMLSAXHandler  to
+ * help act as a library of prefix -> Schema mappings.
  * </p>
- * 
- * @see org.geotools.xml.XMLSAXHandler
- * @see Schema
  *
  * @author dzwiers www.refractions.net
+ *
+ * @see org.geotools.xml.XMLSAXHandler
+ * @see Schema
  */
 public class ElementHandlerFactory {
     private Logger logger;
@@ -107,16 +106,17 @@ public class ElementHandlerFactory {
     }
 
     /**
-     * Creates an element handler for the element specified by name and 
+     * Creates an element handler for the element specified by name and
      * namespace. Will return null if a suitable handler is not found.
      *
-     * @param namespaceURI 
-     * @param localName 
+     * @param namespaceURI
+     * @param localName
      *
-     * @return 
-     * @see ElementHandlerFactory#createElementHandler(Element)
+     * @return
      *
      * @throws SAXException
+     *
+     * @see ElementHandlerFactory#createElementHandler(Element)
      */
     public XMLElementHandler createElementHandler(String namespaceURI,
         String localName) throws SAXException {
@@ -158,11 +158,11 @@ public class ElementHandlerFactory {
     }
 
     /**
-     * Creates an element handler based on the element provided. 
+     * Creates an element handler based on the element provided.
      *
      * @param eth Element
      *
-     * @return 
+     * @return
      *
      * @throws SAXException
      */

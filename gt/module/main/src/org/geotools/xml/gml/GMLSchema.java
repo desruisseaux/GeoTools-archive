@@ -35,13 +35,11 @@ import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
-
 import javax.naming.OperationNotSupportedException;
 
 
@@ -424,6 +422,13 @@ public class GMLSchema implements Schema {
         return uri;
     }
 
+    /**
+     * @see org.geotools.xml.schema.Schema#getPrefix()
+     */
+    public String getPrefix() {
+        return "gml";
+    }
+
     static class AttributeList {
         static final Attribute[] attributes = {
                 new GMLAttribute("remoteSchema",
@@ -683,12 +688,11 @@ public class GMLSchema implements Schema {
         public Type getParent() {
             return null;
         }
-        
+
         /**
-         * 
          * @see org.geotools.xml.schema.ComplexType#cache()
          */
-        public boolean cache(Element e, Map m){
+        public boolean cache(Element e, Map m) {
             return true;
         }
     }
@@ -696,9 +700,9 @@ public class GMLSchema implements Schema {
     /**
      * <p>
      * An instance of this class represents a GML attribute. This
-     * implementation contains some constant data pertinent to the GML
-     * Schema, and some configurable data depending on the GML attribute
-     * being represented.
+     * implementation contains some constant data pertinent to the GML Schema,
+     * and some configurable data depending on the GML attribute being
+     * represented.
      * </p>
      *
      * @author dzwiers
@@ -961,47 +965,58 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute,
+         *      java.lang.Object, java.util.Map)
          */
-        public AttributeValue toAttribute(Attribute attribute, Object value, Map hints) {
+        public AttributeValue toAttribute(Attribute attribute, Object value,
+            Map hints) {
             final String[] enumeration = {
                     "inapplicable", "unknown", "unavailable", "missing"
                 };
 
             if (Arrays.binarySearch(enumeration, value) < 0) {
                 // not found
-                return new DefaultAttributeValue(attribute,null);
+                return new DefaultAttributeValue(attribute, null);
             }
-            return new DefaultAttributeValue(attribute,value.toString());
+
+            return new DefaultAttributeValue(attribute, value.toString());
         }
 
         /**
-         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
+         *      java.lang.Object, java.util.Map)
          */
-        public boolean canCreateAttributes(Attribute attribute, Object value, Map hints) {
+        public boolean canCreateAttributes(Attribute attribute, Object value,
+            Map hints) {
             final String[] enumeration = {
                     "inapplicable", "unknown", "unavailable", "missing"
                 };
-                return Arrays.binarySearch(enumeration, value) < 0;
+
+            return Arrays.binarySearch(enumeration, value) < 0;
         }
 
         /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             final String[] enumeration = {
                     "inapplicable", "unknown", "unavailable", "missing"
                 };
-                return Arrays.binarySearch(enumeration, value) < 0;
+
+            return Arrays.binarySearch(enumeration, value) < 0;
         }
 
         /**
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, org.geotools.xml.PrintHandler,
+         *      java.util.Map)
          */
-        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            output.startElement(element.getNamespace(),element.getName(),null);
+        public void encode(Element element, Object value, PrintHandler output,
+            Map hints) throws IOException, OperationNotSupportedException {
+            output.startElement(element.getNamespace(), element.getName(), null);
             output.characters(value.toString());
-            output.endElement(element.getNamespace(),element.getName());
+            output.endElement(element.getNamespace(), element.getName());
         }
 
         /**
@@ -1015,7 +1030,7 @@ public class GMLSchema implements Schema {
          * @see org.geotools.xml.schema.SimpleType#getParents()
          */
         public SimpleType[] getParents() {
-            return new SimpleType[] {XSISimpleTypes.String.getInstance(),};
+            return new SimpleType[] { XSISimpleTypes.String.getInstance(), };
         }
 
         /**
@@ -1023,18 +1038,11 @@ public class GMLSchema implements Schema {
          */
         public Facet[] getFacets() {
             return new Facet[] {
-                    new DefaultFacet(Facet.ENUMERATION,"inapplicable"),
-                    new DefaultFacet(Facet.ENUMERATION,"unknown"),
-                    new DefaultFacet(Facet.ENUMERATION,"unavailable"),
-                    new DefaultFacet(Facet.ENUMERATION,"missing"),
+                new DefaultFacet(Facet.ENUMERATION, "inapplicable"),
+                new DefaultFacet(Facet.ENUMERATION, "unknown"),
+                new DefaultFacet(Facet.ENUMERATION, "unavailable"),
+                new DefaultFacet(Facet.ENUMERATION, "missing"),
             };
         }
-    }
-
-    /**
-     * @see org.geotools.xml.schema.Schema#getPrefix()
-     */
-    public String getPrefix() {
-        return "gml";
     }
 }

@@ -34,60 +34,56 @@ import org.xml.sax.SAXNotRecognizedException;
  * @version $Id$
  */
 public abstract class FacetHandler extends XSIElementHandler {
-//    /** ENUMERATION  */
-//    public static final int ENUMERATION = 1;
-//
-//    /** FRACTIONDIGITS  */
-//    public static final int FRACTIONDIGITS = 2;
-//
-//    /** LENGTH  */
-//    public static final int LENGTH = 4;
-//
-//    /** MAXEXCLUSIVE  */
-//    public static final int MAXEXCLUSIVE = 8;
-//
-//    /** MAXINCLUSIVE  */
-//    public static final int MAXINCLUSIVE = 16;
-//
-//    /** MAXLENGTH  */
-//    public static final int MAXLENGTH = 32;
-//
-//    /** MINEXCLUSIVE  */
-//    public static final int MINEXCLUSIVE = 64;
-//
-//    /** MININCLUSIVE  */
-//    public static final int MININCLUSIVE = 128;
-//
-//    /** MINLENGTH  */
-//    public static final int MINLENGTH = 264;
-//
-//    /** PATTERN  */
-//    public static final int PATTERN = 512;
-//
-//    /** TOTALDIGITS  */
-//    public static final int TOTALDIGITS = 1024;
-    
+    //    /** ENUMERATION  */
+    //    public static final int ENUMERATION = 1;
+    //
+    //    /** FRACTIONDIGITS  */
+    //    public static final int FRACTIONDIGITS = 2;
+    //
+    //    /** LENGTH  */
+    //    public static final int LENGTH = 4;
+    //
+    //    /** MAXEXCLUSIVE  */
+    //    public static final int MAXEXCLUSIVE = 8;
+    //
+    //    /** MAXINCLUSIVE  */
+    //    public static final int MAXINCLUSIVE = 16;
+    //
+    //    /** MAXLENGTH  */
+    //    public static final int MAXLENGTH = 32;
+    //
+    //    /** MINEXCLUSIVE  */
+    //    public static final int MINEXCLUSIVE = 64;
+    //
+    //    /** MININCLUSIVE  */
+    //    public static final int MININCLUSIVE = 128;
+    //
+    //    /** MINLENGTH  */
+    //    public static final int MINLENGTH = 264;
+    //
+    //    /** PATTERN  */
+    //    public static final int PATTERN = 512;
+    //
+    //    /** TOTALDIGITS  */
+    //    public static final int TOTALDIGITS = 1024;
     private String value;
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return getHandlerType() * ((value == null)
-        ? 1 : value.hashCode());
+        return getHandlerType() * ((value == null) ? 1 : value.hashCode());
     }
 
     /**
-     * 
      * <p>
      * Return the int mask for the facet type.
      * </p>
@@ -97,7 +93,6 @@ public abstract class FacetHandler extends XSIElementHandler {
     public abstract int getType();
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -105,8 +100,8 @@ public abstract class FacetHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -115,36 +110,35 @@ public abstract class FacetHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-//        id = atts.getValue("", "id");
-//
-//        if (id == null) {
-//            id = atts.getValue(namespaceURI, "id");
-//        }
-
+        //        id = atts.getValue("", "id");
+        //
+        //        if (id == null) {
+        //            id = atts.getValue(namespaceURI, "id");
+        //        }
         value = atts.getValue("", "value");
 
         if (value == null) {
             value = atts.getValue(namespaceURI, "value");
         }
-//
-//        String fixed = atts.getValue("", "fixed");
-//
-//        if (fixed == null) {
-//            fixed = atts.getValue(namespaceURI, "fixed");
-//        }
-//
-//        if (!((fixed == null) || "".equalsIgnoreCase(fixed))) {
-//            this.fixed = Boolean.getBoolean(fixed);
-//        }
+
+        //
+        //        String fixed = atts.getValue("", "fixed");
+        //
+        //        if (fixed == null) {
+        //            fixed = atts.getValue(namespaceURI, "fixed");
+        //        }
+        //
+        //        if (!((fixed == null) || "".equalsIgnoreCase(fixed))) {
+        //            this.fixed = Boolean.getBoolean(fixed);
+        //        }
     }
 
     /**
-     * 
      * <p>
      * Returns the Facet Value
      * </p>

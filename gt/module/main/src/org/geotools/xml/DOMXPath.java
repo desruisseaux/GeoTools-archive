@@ -40,12 +40,15 @@ public class DOMXPath extends XPath {
     }
 
     /**
-     * Returns the value of the first TEXT_NODE.  The whitespace is deleted from the value
+     * Returns the value of the first TEXT_NODE.  The whitespace is deleted
+     * from the value
      *
-     * @param path The list of the nodes from the root (Not necessarily doc node) and the identified
-     * node.  Only the last node is actually used in the calculation.
+     * @param path The list of the nodes from the root (Not necessarily doc
+     *        node) and the identified node.  Only the last node is actually
+     *        used in the calculation.
      *
-     * @return the value of the first TEXT_NODE.  The whitespace is deleted from the value
+     * @return the value of the first TEXT_NODE.  The whitespace is deleted
+     *         from the value
      */
     protected Object solve(List path) {
         Node node = (Node) path.get(path.size() - 1);
@@ -64,11 +67,13 @@ public class DOMXPath extends XPath {
     }
 
     /**
-     * returns an iterator that iterates through all the o's children that are Element objects
+     * returns an iterator that iterates through all the o's children that are
+     * Element objects
      *
      * @param o A Node element
      *
-     * @return an iterator that iterates through all the o's children that are Element objects
+     * @return an iterator that iterates through all the o's children that are
+     *         Element objects
      */
     protected Iterator getChildren(Object o) {
         final Node n = (Node) o;
@@ -113,7 +118,6 @@ public class DOMXPath extends XPath {
                 next = findNext();
             }
         }
-
 
         public boolean hasNext() {
             return (next == null) ? false : true;

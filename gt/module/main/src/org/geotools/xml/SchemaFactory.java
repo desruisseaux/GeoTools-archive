@@ -1,27 +1,20 @@
 /*
- * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2002, Geotools
- * Project Managment Committee (PMC) This library is free software; you can
- * redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; version 2.1 of
- * the License. This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
- * General Public License for more details.
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.xml;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
@@ -31,15 +24,28 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 
 /**
  * SchemaFactory purpose.
+ * 
  * <p>
  * This is the main entry point into the XSI parsing routines.
  * </p>
+ * 
  * <p>
  * Example Use:
- * 
  * <pre><code>
  * 
  *  
@@ -49,9 +55,8 @@ import org.xml.sax.SAXException;
  *   
  *  
  * </code></pre>
- * 
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
@@ -100,17 +105,18 @@ public class SchemaFactory {
 
     /**
      * Returns an instance of the desired class. There is no provision for: a)
-     * same instances each call b) different instances each call c) this factory
-     * being thread safe
-     * 
+     * same instances each call b) different instances each call c) this
+     * factory being thread safe
+     *
      * @param targetNamespace
-     * @param desiredSchema
-     *            URI the uri of which you want a schema instance.
+     * @param desiredSchema URI the uri of which you want a schema instance.
+     *
      * @return Schema an instance of the desired schema.
+     *
      * @throws SAXException
      */
     public static Schema getInstance(String targetNamespace, URI desiredSchema)
-            throws SAXException {
+        throws SAXException {
         return getInstance(targetNamespace, desiredSchema, Level.WARNING);
     }
 
@@ -119,9 +125,12 @@ public class SchemaFactory {
      * otherwise. targetNamespaces which can be found are either hard-coded
      * namespaces (SchemaFactory.properties), have already been parsed or were
      * registered.
-     * 
+     *
      * @param targetNamespace
-     * @return @see registerSchema(Strin,Schema)
+     *
+     * @return
+     *
+     * @see registerSchema(Strin,Schema)
      */
     public synchronized static Schema getInstance(String targetNamespace) {
         Schema r = (Schema) schemas.get(targetNamespace);
@@ -135,8 +144,7 @@ public class SchemaFactory {
 
             try {
                 Class c = cl.loadClass((String) mappings.get(targetNamespace));
-                r = (Schema) c.getConstructor(new Class[0]).newInstance(
-                        new Object[0]);
+                r = (Schema) c.getConstructor(new Class[0]).newInstance(new Object[0]);
                 schemas.put(targetNamespace, r);
 
                 return r;
@@ -150,31 +158,29 @@ public class SchemaFactory {
 
     /**
      * Returns an instance of the desired class. There is no provision for: a)
-     * same instances each call b) different instances each call c) this factory
-     * being thread safe
-     * 
-     * @param targetNamespace
-     *            The targetNamespace to search for.
-     * @param desiredSchema
-     *            URI the uri of which you want a schema instance.
-     * @param level
-     *            Level
+     * same instances each call b) different instances each call c) this
+     * factory being thread safe
+     *
+     * @param targetNamespace The targetNamespace to search for.
+     * @param desiredSchema URI the uri of which you want a schema instance.
+     * @param level Level
+     *
      * @return Schema an instance of the desired schema.
-     * @throws SAXException
-     *             When something goes wrong
+     *
+     * @throws SAXException When something goes wrong
      */
-    public synchronized static Schema getInstance(String targetNamespace, URI desiredSchema,
-            Level level) throws SAXException {
+    public synchronized static Schema getInstance(String targetNamespace,
+        URI desiredSchema, Level level) throws SAXException {
         if ((targetNamespace == null) || "".equals(targetNamespace)
                 || (schemas.get(targetNamespace) == null)) {
             if (mappings.containsKey(targetNamespace)) {
                 ClassLoader cl = SchemaFactory.class.getClassLoader();
 
                 try {
-                    Class c = cl.loadClass((String) mappings
-                            .get(targetNamespace));
-                    schemas.put(targetNamespace, c.getConstructor(new Class[0])
-                            .newInstance(new Object[0]));
+                    Class c = cl.loadClass((String) mappings.get(
+                                targetNamespace));
+                    schemas.put(targetNamespace,
+                        c.getConstructor(new Class[0]).newInstance(new Object[0]));
                 } catch (Exception e) {
                     throw new SAXException(e);
                 }
@@ -197,8 +203,8 @@ public class SchemaFactory {
                 schemas.put(targetNamespace, contentHandler.getSchema());
             }
         } else {
-            if (!((Schema) schemas.get(targetNamespace))
-                    .includesURI(desiredSchema)) {
+            if (!((Schema) schemas.get(targetNamespace)).includesURI(
+                        desiredSchema)) {
                 Schema sh = (Schema) schemas.get(targetNamespace);
                 setParser();
 
@@ -229,13 +235,13 @@ public class SchemaFactory {
 
     /**
      * Registers a Schema instance with the factory. A clone is NOT created
-     * within this method. The Schema passed in is associated with the specified
-     * targetNamespace. The Schema is not tested to ensure the intended
-     * targetNamespace (schema.getTargetNamespace()) is equal to
-     * targetNamespace. The ramifications is that you may hack wildly within the
-     * repository, but we aware you may have some 'undocumented features' as a
-     * result (odd Schemas being returned).
-     * 
+     * within this method. The Schema passed in is associated with the
+     * specified targetNamespace. The Schema is not tested to ensure the
+     * intended targetNamespace (schema.getTargetNamespace()) is equal to
+     * targetNamespace. The ramifications is that you may hack wildly within
+     * the repository, but we aware you may have some 'undocumented features'
+     * as a result (odd Schemas being returned).
+     *
      * @param targetNamespace
      * @param schema
      */
@@ -263,63 +269,48 @@ public class SchemaFactory {
     }
 
     /**
-     * The Schema will contain references to the elements within the two Schemas
-     * provided in the constructor. In most cases this is used to incorporate
-     * additional definitions into a targetNamespace by parsing an additional
-     * schema file.
-     * 
+     * The Schema will contain references to the elements within the two
+     * Schemas provided in the constructor. In most cases this is used to
+     * incorporate additional definitions into a targetNamespace by parsing an
+     * additional schema file.
+     *
      * @author dzwiers
+     *
      * @see Schema
      */
     private static class MergedSchema implements Schema {
         /*
          * This is all fairly self explanatory.
-         * 
+         *
          * @see Schema
          */
         private AttributeGroup[] attributeGroups;
-
         private Attribute[] attributes;
-
         private int block;
-
         private int finaL;
-
         private ComplexType[] complexTypes;
-
         private Element[] elements;
-
         private Group[] groups;
-
         private String id;
-
         private String version;
         private String prefix;
-
         private String targetNamespace;
-
         private Schema[] imports;
-
         private SimpleType[] simpleTypes;
-
         private boolean aForm;
-
         private boolean eForm;
-
         private URI uri;
 
         /**
          * This completes the merge of two schemas, s1 and s2. When there is a
          * conflict in data between the two schemas, s1 is assumed to be
          * correct.
-         * 
-         * @param s1
-         *            Schema (Tie Winner)
-         * @param s2
-         *            Schema (Tie Loser)
-         * @throws SAXException
-         *             When some thing bad happens (for example merging two
-         *             targetNamespaces)
+         *
+         * @param s1 Schema (Tie Winner)
+         * @param s2 Schema (Tie Loser)
+         *
+         * @throws SAXException When some thing bad happens (for example
+         *         merging two targetNamespaces)
          */
         public MergedSchema(Schema s1, Schema s2) throws SAXException {
             if ((s1.getId() == null) || s1.getId().equals("")) {
@@ -339,12 +330,12 @@ public class SchemaFactory {
                 targetNamespace = s2.getTargetNamespace();
             } else {
                 if ((s2.getTargetNamespace() != null)
-                        && !s1.getTargetNamespace().equals(
-                                s2.getTargetNamespace())) {
+                        && !s1.getTargetNamespace().equals(s2
+                            .getTargetNamespace())) {
                     throw new SAXException(
-                            "cannot merge two target namespaces. "
-                                    + s1.getTargetNamespace() + " "
-                                    + s2.getTargetNamespace());
+                        "cannot merge two target namespaces. "
+                        + s1.getTargetNamespace() + " "
+                        + s2.getTargetNamespace());
                 } else {
                     targetNamespace = s1.getTargetNamespace();
                 }
@@ -557,20 +548,21 @@ public class SchemaFactory {
 
             URI u1 = s1.getURI();
 
-
             URI u2 = s2.getURI();
 
-            if(u1 == null){
+            if (u1 == null) {
                 uri = u2;
-            }else{
-                if(u2 ==null)
+            } else {
+                if (u2 == null) {
                     uri = u1;
-                else
+                } else {
                     uri = u2.relativize(u1);
+                }
             }
-            if(s1.getPrefix()==null || s1.getPrefix().equals("")){
+
+            if ((s1.getPrefix() == null) || s1.getPrefix().equals("")) {
                 prefix = s2.getPrefix();
-            }else{
+            } else {
                 prefix = s1.getPrefix();
             }
         }
@@ -690,8 +682,8 @@ public class SchemaFactory {
         public URI getURI() {
             return uri;
         }
-        
-        public String getPrefix(){
+
+        public String getPrefix() {
             return prefix;
         }
     }

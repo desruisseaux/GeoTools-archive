@@ -54,7 +54,6 @@ public class SchemaHandler extends XSIElementHandler {
 
     /** 'schema' */
     public final static String LOCALNAME = "schema";
-    
     private String id;
     private String prefix;
     private String targetNamespace;
@@ -74,11 +73,9 @@ public class SchemaHandler extends XSIElementHandler {
     private HashSet simpleTypes;
     private URI uri;
     private Schema schema = null;
-    
     private HashMap prefixCache;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -89,47 +86,54 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
+     *      java.lang.String)
      */
     public void startPrefixMapping(String pref, String uri)
-            throws SAXException {
-        if(targetNamespace == null){
-            if(prefixCache ==null)
+        throws SAXException {
+        if (targetNamespace == null) {
+            if (prefixCache == null) {
                 prefixCache = new HashMap();
-            prefixCache.put(uri,pref);
-        }else{
+            }
+
+            prefixCache.put(uri, pref);
+        } else {
             // we have already started
-            if(targetNamespace.equals(uri))
+            if (targetNamespace.equals(uri)) {
                 prefix = pref;
+            }
         }
     }
-    
+
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-
         // targetNamespace
         targetNamespace = atts.getValue("", "targetNamespace");
 
         if (targetNamespace == null) {
             targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
         }
-        
-        if(prefixCache!=null && targetNamespace!=null && (!targetNamespace.equals(""))){
+
+        if ((prefixCache != null) && (targetNamespace != null)
+                && (!targetNamespace.equals(""))) {
             Iterator i = prefixCache.keySet().iterator();
-            while(i!=null && i.hasNext()){
-                String uriT = (String)i.next();
-                if(targetNamespace.equals(uriT)){
-                    prefix = (String)prefixCache.get(uriT);
+
+            while ((i != null) && i.hasNext()) {
+                String uriT = (String) i.next();
+
+                if (targetNamespace.equals(uriT)) {
+                    prefix = (String) prefixCache.get(uriT);
                     i = null;
                 }
             }
         }
+
         prefixCache = null;
-        
+
         // attributeFormDefault
         String attributeFormDefault = atts.getValue("", "attributeFormDefault");
 
@@ -184,8 +188,8 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -309,7 +313,6 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -317,13 +320,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * creates a smaller, more compact version of the schema
      * </p>
      *
      * @param thisURI
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Schema compress(URI thisURI) throws SAXException {
@@ -331,11 +335,12 @@ public class SchemaHandler extends XSIElementHandler {
             return schema; // already compressed.
         }
 
-        if (uri==null) {
+        if (uri == null) {
             uri = thisURI;
-        }else{
-            if(thisURI!=null)
+        } else {
+            if (thisURI != null) {
                 uri = thisURI.resolve(uri);
+            }
         }
 
         Iterator it = null;
@@ -353,10 +358,11 @@ public class SchemaHandler extends XSIElementHandler {
                 cs = SchemaFactory.getInstance(targetNamespace, incURI,
                         logger.getLevel());
 
-                if(uri!=null)
+                if (uri != null) {
                     uri = incURI.resolve(uri);
-                else
+                } else {
                     uri = incURI;
+                }
 
                 // already compressed
                 addSchema(cs);
@@ -509,7 +515,7 @@ public class SchemaHandler extends XSIElementHandler {
                 }
             }
         }
-        
+
         attributeGroups = attributes = complexTypes = simpleTypes = elements = groups = imports = includes = redefines = null;
 
         return schema;
@@ -553,12 +559,12 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package classes
      * </p>
      *
      * @param qName
+     *
      * @return
      */
     protected SimpleType lookUpSimpleType(String qName) {
@@ -566,8 +572,10 @@ public class SchemaHandler extends XSIElementHandler {
         // for now just strip it ...
         qName = qName.substring(qName.indexOf(":") + 1);
 
-        if(schema != null)
-            return lookUpSimpleType(qName,schema,new LinkedList());
+        if (schema != null) {
+            return lookUpSimpleType(qName, schema, new LinkedList());
+        }
+
         Iterator it;
 
         if (simpleTypes != null) {
@@ -653,13 +661,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected ComplexType lookUpComplexType(String qName)
@@ -669,10 +678,12 @@ public class SchemaHandler extends XSIElementHandler {
         qName = qName.substring(qName.indexOf(":") + 1);
         logger.finest("LocalName is " + qName);
 
-        if(schema != null)
-            return lookUpComplexType(qName,schema,new LinkedList());
+        if (schema != null) {
+            return lookUpComplexType(qName, schema, new LinkedList());
+        }
+
         Iterator it;
-            it = complexTypes.iterator();
+        it = complexTypes.iterator();
 
         while (it.hasNext()) {
             Object o = it.next();
@@ -747,13 +758,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Element lookUpElement(String qName) throws SAXException {
@@ -762,9 +774,10 @@ public class SchemaHandler extends XSIElementHandler {
         logger.finest("looking for element " + qName);
         qName = qName.substring(qName.indexOf(":") + 1);
 
-        if(schema != null)
-            return lookupElement(qName,schema,new LinkedList());
-        
+        if (schema != null) {
+            return lookupElement(qName, schema, new LinkedList());
+        }
+
         Iterator it = elements.iterator();
 
         while (it.hasNext()) {
@@ -852,13 +865,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Group lookUpGroup(String qName) throws SAXException {
@@ -866,9 +880,10 @@ public class SchemaHandler extends XSIElementHandler {
         // for now just strip it ...
         qName = qName.substring(qName.indexOf(":") + 1);
 
+        if (schema != null) {
+            return lookUpGroup(qName, schema, new LinkedList());
+        }
 
-        if(schema != null)
-            return lookUpGroup(qName,schema,new LinkedList());
         Iterator it = groups.iterator();
 
         while (it.hasNext()) {
@@ -943,13 +958,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for the package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected AttributeGroup lookUpAttributeGroup(String qName)
@@ -958,9 +974,10 @@ public class SchemaHandler extends XSIElementHandler {
         // for now just strip it ...
         qName = qName.substring(qName.indexOf(":") + 1);
 
-        if(schema != null)
-            return lookUpAttributeGroup(qName,schema,new LinkedList());
-        
+        if (schema != null) {
+            return lookUpAttributeGroup(qName, schema, new LinkedList());
+        }
+
         Iterator it = attributeGroups.iterator();
 
         while (it.hasNext()) {
@@ -1033,13 +1050,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Attribute lookUpAttribute(String qName) throws SAXException {
@@ -1047,9 +1065,10 @@ public class SchemaHandler extends XSIElementHandler {
         // for now just strip it ...
         qName = qName.substring(qName.indexOf(":") + 1);
 
-        if(schema != null)
-            return lookUpAttribute(qName,schema,new LinkedList());
-        
+        if (schema != null) {
+            return lookUpAttribute(qName, schema, new LinkedList());
+        }
+
         Iterator it = attributes.iterator();
 
         while (it.hasNext()) {
@@ -1090,13 +1109,14 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * convinience method for package
      * </p>
      *
      * @param qName
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Type lookUpType(String qName) throws SAXException {
@@ -1104,11 +1124,14 @@ public class SchemaHandler extends XSIElementHandler {
         // for now just strip it ...
         qName = qName.substring(qName.indexOf(":") + 1);
 
-        if(schema != null){
-            Type t = lookUpSimpleType(qName,schema,new LinkedList());
-            t = t!=null?t:lookUpComplexType(qName,schema,new LinkedList());
+        if (schema != null) {
+            Type t = lookUpSimpleType(qName, schema, new LinkedList());
+            t = (t != null) ? t
+                            : lookUpComplexType(qName, schema, new LinkedList());
+
             return t;
         }
+
         Iterator it;
 
         if (simpleTypes != null) {
@@ -1261,17 +1284,19 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         URI tempuri = s.getURI();
-        if(uri == null){
-            uri = tempuri;
-        }else{
-            if(tempuri != null)
-                uri = tempuri.resolve(uri);
-        }
 
-        
+        if (uri == null) {
+            uri = tempuri;
+        } else {
+            if (tempuri != null) {
+                uri = tempuri.resolve(uri);
+            }
+        }
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the targetNamespace.
      */
     public String getTargetNamespace() {
@@ -1279,7 +1304,6 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -1287,21 +1311,21 @@ public class SchemaHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Default implementation of a Schema for a parsed schema.
      * </p>
-     * @see Schema
+     *
      * @author dzwiers
      *
+     * @see Schema
      */
     private static class DefaultSchema implements Schema {
         // file visible to avoid set* methods
@@ -1323,7 +1347,6 @@ public class SchemaHandler extends XSIElementHandler {
         String prefix;
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#isAttributeFormDefault()
          */
         public boolean isAttributeFormDefault() {
@@ -1331,7 +1354,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getAttributeGroups()
          */
         public AttributeGroup[] getAttributeGroups() {
@@ -1339,7 +1361,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getAttributes()
          */
         public Attribute[] getAttributes() {
@@ -1347,7 +1368,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getBlockDefault()
          */
         public int getBlockDefault() {
@@ -1355,7 +1375,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getComplexTypes()
          */
         public ComplexType[] getComplexTypes() {
@@ -1363,7 +1382,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#isElementFormDefault()
          */
         public boolean isElementFormDefault() {
@@ -1371,7 +1389,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getElements()
          */
         public Element[] getElements() {
@@ -1379,7 +1396,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getFinalDefault()
          */
         public int getFinalDefault() {
@@ -1387,7 +1403,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getId()
          */
         public String getId() {
@@ -1395,7 +1410,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getImports()
          */
         public Schema[] getImports() {
@@ -1403,7 +1417,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getSimpleTypes()
          */
         public SimpleType[] getSimpleTypes() {
@@ -1411,7 +1424,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getTargetNamespace()
          */
         public String getTargetNamespace() {
@@ -1419,7 +1431,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getURI()
          */
         public URI getURI() {
@@ -1427,7 +1438,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getVersion()
          */
         public String getVersion() {
@@ -1435,7 +1445,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#getGroups()
          */
         public Group[] getGroups() {
@@ -1443,7 +1452,6 @@ public class SchemaHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Schema#includesURI(java.net.URI)
          */
         public boolean includesURI(URI uri) {

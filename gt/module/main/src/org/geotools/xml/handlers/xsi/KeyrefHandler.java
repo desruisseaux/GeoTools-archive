@@ -28,10 +28,9 @@ import java.util.List;
  * KeyrefHandler purpose.
  * 
  * <p>
- * represents a 'keyref' element. This class is not currently used asside 
- * from as a placeholder.
+ * represents a 'keyref' element. This class is not currently used asside  from
+ * as a placeholder.
  * </p>
- * 
  * TODO use this class semantically
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
@@ -39,9 +38,8 @@ import java.util.List;
  * @version $Id$
  */
 public class KeyrefHandler extends XSIElementHandler {
-    /** 'keyref'  */
+    /** 'keyref' */
     public final static String LOCALNAME = "keyref";
-    
     private String id;
     private String name;
     private String refer; //TODO check for referential support when using this type
@@ -49,7 +47,6 @@ public class KeyrefHandler extends XSIElementHandler {
     private List fields;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -58,8 +55,8 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -97,8 +94,8 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -122,7 +119,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -130,7 +126,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns a list of child field elements
      * </p>
@@ -142,7 +137,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the id attribute
      * </p>
@@ -154,7 +148,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the name attribute
      * </p>
@@ -166,7 +159,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the refer attribute
      * </p>
@@ -178,7 +170,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the child selector element
      * </p>
@@ -190,7 +181,6 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -198,8 +188,8 @@ public class KeyrefHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

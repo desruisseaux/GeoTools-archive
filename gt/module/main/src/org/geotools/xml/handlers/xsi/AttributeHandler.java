@@ -17,7 +17,8 @@
 package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
-import org.geotools.xml.schema.Attribute;import org.geotools.xml.schema.DefaultAttribute;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -45,18 +46,17 @@ import org.xml.sax.SAXNotRecognizedException;
  * @version $Id$
  */
 public class AttributeHandler extends XSIElementHandler {
-    /** 'attribute'  */
+    /** 'attribute' */
     public final static String LOCALNAME = "attribute";
 
-    /** OPTIONAL  */
+    /** OPTIONAL */
     public static final int OPTIONAL = 0;
 
-    /** PROHIBITED  */
+    /** PROHIBITED */
     public static final int PROHIBITED = 1;
 
-    /** REQUIRED  */
+    /** REQUIRED */
     public static final int REQUIRED = 2;
-    
     private static int offset = 0;
     private String id;
     private String name;
@@ -77,7 +77,6 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -87,8 +86,8 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -114,8 +113,8 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -170,7 +169,6 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -178,12 +176,12 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Convert the 'use' attribute to an int mask
      * </p>
      *
      * @param use
+     *
      * @return
      */
     public static int findUse(String use) {
@@ -203,12 +201,12 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * converts an int mask representing use to the string representation
      * </p>
      *
      * @param use
+     *
      * @return
      */
     public static String writeUse(int use) {
@@ -228,7 +226,6 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Returns the attribute name
      * </p>
@@ -240,13 +237,14 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * creates a smaller simpler version
      * </p>
      *
      * @param parent
+     *
      * @return
+     *
      * @throws SAXException
      */
     protected Attribute compress(SchemaHandler parent)
@@ -261,6 +259,7 @@ public class AttributeHandler extends XSIElementHandler {
         String def = this.def;
         String fixed = this.fixed;
         int use = this.use;
+
         if (simpleType != null) {
             st = simpleType.compress(parent);
         } else {
@@ -289,15 +288,15 @@ public class AttributeHandler extends XSIElementHandler {
             }
         }
 
-        cache = new DefaultAttribute(id, name, parent.getTargetNamespace(),st,use,def,fixed,false);
+        cache = new DefaultAttribute(id, name, parent.getTargetNamespace(), st,
+                use, def, fixed, false);
 
         id = type = ref = null;
-        
+
         return cache;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -305,8 +304,8 @@ public class AttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

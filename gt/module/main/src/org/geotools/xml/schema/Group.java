@@ -79,5 +79,11 @@ public interface Group extends ElementGrouping {
      * @return
      */
     public String getName();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  
+     */
     public String getNamespace();
 }

@@ -66,5 +66,11 @@ public interface AttributeGroup {
      * @return
      */
     public String getName();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  
+     */
     public String getNamespace();
 }

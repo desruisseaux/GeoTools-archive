@@ -38,18 +38,15 @@ import java.util.List;
  * @version $Id$
  */
 public class ChoiceHandler extends ElementGroupingHandler {
-    /** 'choice'  */
+    /** 'choice' */
     public final static String LOCALNAME = "choice";
-    
     private String id;
     private int minOccurs;
     private int maxOccurs;
     private List children; // element, group, choice, sequence, any
-
     private Choice cache = null;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -58,8 +55,8 @@ public class ChoiceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -126,12 +123,13 @@ public class ChoiceHandler extends ElementGroupingHandler {
                 return gh;
             }
         }
+
         return null;
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -162,7 +160,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -170,7 +167,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
     protected ElementGrouping compress(SchemaHandler parent)
@@ -195,7 +191,7 @@ public class ChoiceHandler extends ElementGroupingHandler {
         }
 
         cache = dc;
-        
+
         id = null;
         children = null;
 
@@ -203,7 +199,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -211,21 +206,21 @@ public class ChoiceHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Implementation of a Choice
      * </p>
-     * @see Choice
+     *
      * @author dzwiers
      *
+     * @see Choice
      */
     private static class DefaultChoice implements Choice {
         // file visible to avoid set* methods
@@ -235,24 +230,26 @@ public class ChoiceHandler extends ElementGroupingHandler {
         int minOccurs;
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
-            if (children == null) 
+            if (children == null) {
                 return null;
-            
+            }
+
             for (int i = 0; i < children.length; i++) {
                 Element t = children[i].findChildElement(name);
+
                 if (t != null) { // found it
+
                     return t;
                 }
             }
+
             return null;
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Choice#getChildren()
          */
         public ElementGrouping[] getChildren() {
@@ -260,7 +257,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Choice#getId()
          */
         public String getId() {
@@ -268,7 +264,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
          */
         public int getMaxOccurs() {
@@ -276,7 +271,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
          */
         public int getMinOccurs() {
@@ -284,7 +278,6 @@ public class ChoiceHandler extends ElementGroupingHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
          */
         public int getGrouping() {

@@ -16,19 +16,18 @@
  */
 package org.geotools.xml.handlers;
 
-import java.util.Map;
-
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import java.util.Map;
 
 
 /**
  * <p>
- * This is a default Handler which is used in case a handler cannot be 
- * created for an arbitry element. Note: this handler does not perform 
- * and parsing on the current element or it's children.
+ * This is a default Handler which is used in case a handler cannot be  created
+ * for an arbitry element. Note: this handler does not perform  and parsing on
+ * the current element or it's children.
  * </p>
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
@@ -36,9 +35,7 @@ import org.xml.sax.SAXException;
  * @version $Id$
  */
 public class IgnoreHandler extends XMLElementHandler {
-
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getElement()
      */
     public Element getElement() {
@@ -46,7 +43,6 @@ public class IgnoreHandler extends XMLElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#characters(java.lang.String)
      */
     public void characters(String text) throws SAXException {
@@ -57,13 +53,12 @@ public class IgnoreHandler extends XMLElementHandler {
      * @see schema.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName, Map hints)
-        throws SAXException {
+    public XMLElementHandler getHandler(String namespaceURI, String localName,
+        Map hints) throws SAXException {
         return this;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getValue()
      */
     public Object getValue() {
@@ -71,7 +66,6 @@ public class IgnoreHandler extends XMLElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getName()
      */
     public String getName() {
@@ -79,8 +73,8 @@ public class IgnoreHandler extends XMLElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName, Map hints)
         throws SAXException {
@@ -88,8 +82,8 @@ public class IgnoreHandler extends XMLElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes attr) throws SAXException {

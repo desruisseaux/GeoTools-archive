@@ -16,39 +16,48 @@
  */
 package org.geotools.xml.gml;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.logging.Logger;
-
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+
 
 /**
  * <p>
- * Feature Buffer ... acts as a FeatureReader by making itself as a seperate 
+ * Feature Buffer ... acts as a FeatureReader by making itself as a seperate
  * thread prior starting execution with the SAX Parser.
  * </p>
  *
  * @author dzwiers
  */
-public class FCBuffer extends Thread implements FeatureReader{
+public class FCBuffer extends Thread implements FeatureReader {
     /** Last feature is in the buffer */
     public static final int FINISH = -1;
+
+    /** DOCUMENT ME!  */
     public static final int STOP = -2;
-    
+
+    /** DOCUMENT ME!  */
     protected Logger logger = Logger.getLogger("org.geotools.xml.gml");
-    
+
     // positive number is the number of feature to parse before yield
+
+    /** DOCUMENT ME!  */
     protected int state = 0;
     private Feature[] features;
-    private int end,size,head;
+    private int end;
+    private int size;
+    private int head;
     private URI document; // for run
+    private FeatureType featureType;
+    private SAXException exception = null;
 
     /*
      * Should not be called
@@ -59,6 +68,7 @@ public class FCBuffer extends Thread implements FeatureReader{
     /**
      * Creates a new FCBuffer object.
      *
+     * @param document DOCUMENT ME!
      * @param capacity buffer feature capacity
      */
     protected FCBuffer(URI document, int capacity) {
@@ -66,114 +76,137 @@ public class FCBuffer extends Thread implements FeatureReader{
         this.document = document;
         end = size = head = 0;
     }
-    
+
     /**
-     * 
-     * 
+     * DOCUMENT ME!
+     *
      * @return The buffer size
      */
-    public int getSize(){
+    public int getSize() {
         return size;
     }
 
     /**
-     * 
-     * 
+     * DOCUMENT ME!
+     *
      * @return The buffer capacity
      */
-    public int getCapacity(){
+    public int getCapacity() {
         return features.length;
     }
-    
+
     /**
-     * 
      * <p>
-     * Adds a feature to the buffer 
+     * Adds a feature to the buffer
      * </p>
      *
      * @param f Feature to add
+     *
      * @return false if unable to add the feature
      */
-    protected boolean addFeature(Feature f){
-        if(featureType == null)
+    protected boolean addFeature(Feature f) {
+        if (featureType == null) {
             featureType = f.getFeatureType();
-        if(size >= features.length)
+        }
+
+        if (size >= features.length) {
             return false;
+        }
+
         features[end] = f;
         end++;
-        if(end == features.length)
+
+        if (end == features.length) {
             end = 0;
+        }
+
         size++;
+
         return true;
     }
-    
+
     /**
      * <p>
-     * The prefered method of using this class, this will return the Feature 
+     * The prefered method of using this class, this will return the Feature
      * Reader for the document specified, using the specified buffer capacity.
      * </p>
      *
      * @param document URL to parse
-     * @param capacity 
+     * @param capacity
+     *
      * @return
      */
-    public static FeatureReader getFeatureReader(URI document, int capacity){
-        FCBuffer fc = new FCBuffer(document,capacity);
+    public static FeatureReader getFeatureReader(URI document, int capacity) {
+        FCBuffer fc = new FCBuffer(document, capacity);
         fc.start(); // calls run
+
         return fc;
     }
-    
-    private FeatureType featureType;
-    
+
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        while(featureType==null && state!=FINISH)
+        while ((featureType == null) && (state != FINISH))
             yield(); // let the parser run ... this is being called from 
-        			 // the original thread
-        if(state==FINISH)
+
+        // the original thread
+        if (state == FINISH) {
             return null;
-        else
+        } else {
             return featureType;
+        }
     }
 
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-        if(exception != null){
+    public Feature next()
+        throws IOException, IllegalAttributeException, NoSuchElementException {
+        if (exception != null) {
             state = STOP;
             throw new IOException(exception.toString());
         }
-        size --;
-        Feature f =  features[head++];
-        if(head == features.length)
+
+        size--;
+
+        Feature f = features[head++];
+
+        if (head == features.length) {
             head = 0;
+        }
+
         return f;
     }
 
-    private SAXException exception = null;
-    
     /**
      * @see org.geotools.data.FeatureReader#hasNext()
      */
     public boolean hasNext() throws IOException {
-        if(exception instanceof StopException)
+        if (exception instanceof StopException) {
             return false;
-        if(exception != null)
+        }
+
+        if (exception != null) {
             throw new IOException(exception.toString());
-        logger.finest("hasNext "+size);
-        while (size<=1 && state != FINISH){
+        }
+
+        logger.finest("hasNext " + size);
+
+        while ((size <= 1) && (state != FINISH)) {
             logger.finest("waiting for parser");
             Thread.yield();
         }
-        if(state == FINISH)
+
+        if (state == FINISH) {
             return !(size == 0);
-        if(size == 0){
+        }
+
+        if (size == 0) {
             state = STOP;
             throw new IOException("There was an error");
         }
+
         return true;
     }
 
@@ -183,28 +216,37 @@ public class FCBuffer extends Thread implements FeatureReader{
     public void close() throws IOException {
         state = STOP; // note for the sax parser
     }
+
     /**
      * @see java.lang.Runnable#run()
      */
     public void run() {
         HashMap hints = new HashMap();
-        hints.put(GMLComplexTypes.STREAM_HINT,this);
-        try{
-            DocumentFactory.getInstance(document,hints);
+        hints.put(GMLComplexTypes.STREAM_HINT, this);
+
+        try {
+            DocumentFactory.getInstance(document, hints);
+
             // start parsing until buffer part full, then yield();
-        }catch(StopException e){
+        } catch (StopException e) {
             exception = e;
             state = STOP;
-        }catch(SAXException e){
+        } catch (SAXException e) {
             exception = e;
             state = STOP;
         }
-        
     }
 }
 
-class StopException extends SAXException{
-    StopException(){
+
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.9 $
+ */
+class StopException extends SAXException {
+    StopException() {
         super("Stopping");
     }
 }

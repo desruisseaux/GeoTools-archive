@@ -27,30 +27,31 @@ import org.xml.sax.SAXException;
  * <p>
  * Represents an 'anyAttribute' element in an xml schema
  * </p>
- * 
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
  */
 public class AnyAttributeHandler extends XSIElementHandler {
-    /** 'anyAttribute'  */
+    /** 'anyAttribute' */
     public final static String LOCALNAME = "anyAttribute";
-    
-//    private String id;
+
+    //    private String id;
     private String namespace;
-//    private int processContents;
+
+    //    private int processContents;
 
     /**
      * @see Object#hashCode()
      */
     public int hashCode() {
-        return LOCALNAME.hashCode() * ((namespace == null) ? 1 : namespace.hashCode());
+        return LOCALNAME.hashCode() * ((namespace == null) ? 1
+                                                           : namespace.hashCode());
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -58,34 +59,32 @@ public class AnyAttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-//        id = atts.getValue("", "id");
-//
-//        if (id == null) {
-//            id = atts.getValue(namespaceURI, "id");
-//        }
-
+        //        id = atts.getValue("", "id");
+        //
+        //        if (id == null) {
+        //            id = atts.getValue(namespaceURI, "id");
+        //        }
         namespace = atts.getValue("", "namespace");
 
         if (namespace == null) {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
 
-//        String processContents = atts.getValue("", "processContents");
-//
-//        if (processContents == null) {
-//            processContents = atts.getValue(namespaceURI, "processContents");
-//        }
-//
-//        this.processContents = AnyHandler.findProcess(processContents);
+        //        String processContents = atts.getValue("", "processContents");
+        //
+        //        if (processContents == null) {
+        //            processContents = atts.getValue(namespaceURI, "processContents");
+        //        }
+        //
+        //        this.processContents = AnyHandler.findProcess(processContents);
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -94,14 +93,14 @@ public class AnyAttributeHandler extends XSIElementHandler {
 
     /**
      * Returns the values of the namespace attribute
+     *
+     * @return
      */
     public String getNamespace() {
         return namespace;
     }
 
-
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -109,8 +108,8 @@ public class AnyAttributeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

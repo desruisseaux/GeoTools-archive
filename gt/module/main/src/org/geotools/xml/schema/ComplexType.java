@@ -16,9 +16,9 @@
  */
 package org.geotools.xml.schema;
 
+import org.xml.sax.Attributes;
 import java.util.Map;
 
-import org.xml.sax.Attributes;
 
 /**
  * <p>
@@ -31,7 +31,6 @@ import org.xml.sax.Attributes;
  * @author dzwiers www.refractions.net
  */
 public interface ComplexType extends Type {
-
     /**
      * <p>
      * This is used to represent the heirarchy represented within an xml schema
@@ -39,114 +38,118 @@ public interface ComplexType extends Type {
      * first attempt to create a real (non Object[]) value of the element. For
      * more information see getValue.
      * </p>
-     * 
-     * @see Type#getValue(Element, ElementValue[], Attributes)
+     *
      * @return
+     *
+     * @see Type#getValue(Element, ElementValue[], Attributes)
      */
     public Type getParent();
-    
+
     /**
-     * Returns true when the complexType should be considered abstract, as 
-     * defined by the XML schema of which this complex type definition is a 
+     * Returns true when the complexType should be considered abstract, as
+     * defined by the XML schema of which this complex type definition is a
      * part.
      *
-     * @return 
+     * @return
      */
     public boolean isAbstract();
 
     /**
-     * This methos represents the potential 'anyAttribute' declaration's 
+     * This methos represents the potential 'anyAttribute' declaration's
      * namespace attribute which may occur within a complex type definition.
      *
-     * @return 
+     * @return
      */
     public String getAnyAttributeNameSpace();
 
     /**
-     * The set of attributes required by this complex type declaration. As 
-     * per the xml schema definition, there is not an implied order to the 
-     * attributes. For performance reasons an implementor may wich to order 
+     * The set of attributes required by this complex type declaration. As  per
+     * the xml schema definition, there is not an implied order to the
+     * attributes. For performance reasons an implementor may wich to order
      * the attributes from most common to least commonly used attributes.
      *
-     * @return 
+     * @return
      */
     public Attribute[] getAttributes();
 
     /**
-     * Specifies a mask which denotes which substitution mechanisms may be 
-     * used for this complex type definition. 
+     * Specifies a mask which denotes which substitution mechanisms may be
+     * used for this complex type definition.
+     *
+     * @return
      *
      * @see Schema#EXTENSION
      * @see Schema#RESTRICTION
      * @see Schema#ALL
-     *
-     * @return 
      */
     public int getBlock();
 
     /**
-     * Returns the child element representing the structure of nested 
-     * child nodes (if any are allowed).
-     * 
-     * @see ElementGrouping
+     * Returns the child element representing the structure of nested  child
+     * nodes (if any are allowed).
      *
      * @return
+     *
+     * @see ElementGrouping
      */
     public ElementGrouping getChild();
 
     /**
-     * Convinience method used to search this type's children for the 
+     * Convinience method used to search this type's children for the
      * requested element by localName.
      *
      * @param name the element's localName to search for.
      *
-     * @return 
+     * @return
      */
     public Element findChildElement(String name);
 
     /**
-     * Specifies a mask which denotes which substitution mechanisms prohibited 
-     * for use by child definitions of this complex type. 
+     * Specifies a mask which denotes which substitution mechanisms prohibited
+     * for use by child definitions of this complex type.
+     *
+     * @return
      *
      * @see Schema#EXTENSION
      * @see Schema#RESTRICTION
      * @see Schema#ALL
-     *
-     * @return 
      */
     public int getFinal();
 
     /**
-     * Returns the xml schema id of this complexType if one 
-     * exists, null otherwise.
+     * Returns the xml schema id of this complexType if one  exists, null
+     * otherwise.
      *
-     * @return 
+     * @return
      */
     public String getId();
 
     /**
-     * Returns true if this complexType allows mixed content (Child elements 
-     * and a String value). 
+     * Returns true if this complexType allows mixed content (Child elements
+     * and a String value).
      *
-     * @return 
+     * @return
      */
     public boolean isMixed();
 
     /**
-     * This method is used to publish whether this complexType is at the root 
-     * of an inheritance tree, or a leaf within an inheritance tree. This method
-     * should return true when the complexType is not a root of an inheritance 
-     * tree.
+     * This method is used to publish whether this complexType is at the root
+     * of an inheritance tree, or a leaf within an inheritance tree. This
+     * method should return true when the complexType is not a root of an
+     * inheritance  tree.
      *
-     * @return 
+     * @return
      */
     public boolean isDerived();
-    
+
     /**
-     * This method is a directive to the parser whether to keep the data around in 
-     * memory for post processing. Generally this should return True, except when 
-     * streaming.
-     * 
+     * This method is a directive to the parser whether to keep the data around
+     * in  memory for post processing. Generally this should return True,
+     * except when  streaming.
+     *
+     * @param element DOCUMENT ME!
+     * @param hints DOCUMENT ME!
+     *
      * @return True, except when streaming the element.
      */
     public boolean cache(Element element, Map hints);

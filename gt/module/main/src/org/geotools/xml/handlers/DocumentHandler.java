@@ -16,13 +16,12 @@
  */
 package org.geotools.xml.handlers;
 
-import java.util.Map;
-
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
+import java.util.Map;
 
 
 /**
@@ -48,7 +47,6 @@ public class DocumentHandler extends XMLElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getElement()
      */
     public Element getElement() {
@@ -56,19 +54,19 @@ public class DocumentHandler extends XMLElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName, Map hints)
         throws SAXException {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName, Map hints)
-        throws SAXException {
+    public XMLElementHandler getHandler(String namespaceURI, String localName,
+        Map hints) throws SAXException {
         if (xeh != null) {
             throw new SAXNotRecognizedException(
                 "XML Documents may only have one top-level element");
@@ -80,15 +78,14 @@ public class DocumentHandler extends XMLElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes attr) throws SAXException {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getValue()
      */
     public Object getValue() throws SAXException {
@@ -96,7 +93,6 @@ public class DocumentHandler extends XMLElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XMLElementHandler#getName()
      */
     public String getName() {

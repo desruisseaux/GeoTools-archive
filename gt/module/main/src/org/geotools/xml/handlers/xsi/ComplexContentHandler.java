@@ -30,15 +30,13 @@ import org.xml.sax.SAXNotRecognizedException;
  * @author dzwiers www.refractions.net
  */
 public class ComplexContentHandler extends XSIElementHandler {
-    /** 'complexContent'  */
+    /** 'complexContent' */
     public static final String LOCALNAME = "complexContent";
-    
     private String id;
     private String mixed;
     private Object child;
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -47,8 +45,8 @@ public class ComplexContentHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -66,8 +64,8 @@ public class ComplexContentHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -105,21 +103,19 @@ public class ComplexContentHandler extends XSIElementHandler {
 
         return null;
     }
-    
+
     /**
-     * 
      * <p>
      * getter for the complexContent's child
      * </p>
      *
      * @return
      */
-    public Object getChild(){
+    public Object getChild() {
         return child;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -127,16 +123,15 @@ public class ComplexContentHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
-       return DEFAULT;
+        return DEFAULT;
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {

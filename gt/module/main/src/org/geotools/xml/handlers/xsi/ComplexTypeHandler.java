@@ -34,7 +34,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -42,7 +41,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import javax.naming.OperationNotSupportedException;
 
 
@@ -52,27 +50,26 @@ import javax.naming.OperationNotSupportedException;
  * <p>
  * Represents a ComplexType element
  * </p>
- * 
+ *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
  * @version $Id$
  */
 public class ComplexTypeHandler extends XSIElementHandler {
-    /** 'complexType'  */
+    /** 'complexType' */
     public final static String LOCALNAME = "complexType";
 
-    /** NONE  */
+    /** NONE */
     public static final int NONE = 0;
 
-    /** EXTENSION  */
+    /** EXTENSION */
     public static final int EXTENSION = 1;
 
-    /** RESTRICTION  */
+    /** RESTRICTION */
     public static final int RESTRICTION = 2;
 
-    /** ALL  */
+    /** ALL */
     public static final int ALL = 4;
-    
     private static int offset = 0;
     private String id;
     private String name;
@@ -84,7 +81,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     private AnyAttributeHandler anyAttribute;
     private Object child; //should be either a ComplexType or a SimpleType,
     private int hashCodeOffset = getOffset();
-    
     private ComplexType cache = null;
 
     /*
@@ -95,7 +91,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -105,8 +100,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -240,8 +235,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -302,7 +297,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -310,13 +304,17 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     // Group, Sequence, All Choice
+
     /**
      * <p>
      * Converts a 'block' attribute value into an int mask
      * </p>
-     * 
-     * @param String block
+     *
+     * @param block block
+     *
      * @return int
+     *
+     * @throws SAXException
      */
     public static int findBlock(String block) throws SAXException {
         if ((block == null) || "".equalsIgnoreCase(block)) {
@@ -340,12 +338,12 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Reverses the translation from mask to String
      * </p>
      *
      * @param block
+     *
      * @return
      */
     public static String writeBlock(int block) {
@@ -365,13 +363,14 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * Converts a 'final' attribute value to an int mask
      * </p>
      *
      * @param finaL
+     *
      * @return
+     *
      * @throws SAXException
      */
     public static int findFinal(String finaL) throws SAXException {
@@ -383,13 +382,13 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
-     * reverses the conversion of an int mask representing the 'final' 
+     * reverses the conversion of an int mask representing the 'final'
      * attribute to String
      * </p>
      *
      * @param finaL
+     *
      * @return
      */
     public static String writeFinal(int finaL) {
@@ -397,7 +396,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the complexType's name
      * </p>
@@ -409,14 +407,16 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * <p>
      * compresses the inheritance tree, caching a more efficient copy.
      * </p>
      *
      * @param parent
+     *
      * @return
+     *
      * @throws SAXException
+     * @throws NullPointerException
      */
     protected ComplexType compress(SchemaHandler parent)
         throws SAXException {
@@ -493,7 +493,12 @@ public class ComplexTypeHandler extends XSIElementHandler {
                             }
                         }
                     }
-                    SimpleType st = new DefaultSimpleType(id,name,parent.getTargetNamespace(),SimpleType.RESTRICTION,SimpleTypeHandler.getSimpleTypes(rest,parent),SimpleTypeHandler.getFacets(rest),finaL);
+
+                    SimpleType st = new DefaultSimpleType(id, name,
+                            parent.getTargetNamespace(),
+                            SimpleType.RESTRICTION,
+                            SimpleTypeHandler.getSimpleTypes(rest, parent),
+                            SimpleTypeHandler.getFacets(rest), finaL);
                     dct.parent = st;
                     dct.simple = true;
                 }
@@ -643,12 +648,12 @@ public class ComplexTypeHandler extends XSIElementHandler {
         attrDecs = null;
         anyAttribute = null;
         child = null;
-        
+
         return cache;
     }
 
     /*
-     * Helper method that removes a level of indirection through combining 
+     * Helper method that removes a level of indirection through combining
      * the levels into more compact representations
      */
     private ElementGrouping loadNewEG(ElementGrouping eg, ExtensionHandler ext,
@@ -729,7 +734,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -737,25 +741,24 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
     }
 
     /**
-     * 
-     * <p> 
-     * implementation of a default sequence with some 
-     * extra logic in the constructors.
+     * <p>
+     * implementation of a default sequence with some  extra logic in the
+     * constructors.
      * </p>
-     * @see Sequence
+     *
      * @author dzwiers
      *
+     * @see Sequence
      */
     private static class DefaultSequence implements Sequence {
-        
         ElementGrouping[] children;
         String id;
         int maxOccurs;
@@ -769,10 +772,10 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
         /**
          * <p>
-         * Combines the specified Sequence with the element grouping into 
-         * a new Sequence
+         * Combines the specified Sequence with the element grouping into  a
+         * new Sequence
          * </p>
-         * 
+         *
          * @param sequence
          * @param eg
          */
@@ -824,7 +827,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
          * <p>
          * Combines the Choice with the ElementGrouping to form a new Sequence
          * </p>
-         * 
+         *
          * @param sequence
          * @param eg
          */
@@ -846,7 +849,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Sequence#getChildren()
          */
         public ElementGrouping[] getChildren() {
@@ -854,7 +856,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Sequence#getId()
          */
         public String getId() {
@@ -862,7 +863,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
          */
         public int getMaxOccurs() {
@@ -870,7 +870,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
          */
         public int getMinOccurs() {
@@ -878,7 +877,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#getGrouping()
          */
         public int getGrouping() {
@@ -886,7 +884,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
@@ -908,13 +905,13 @@ public class ComplexTypeHandler extends XSIElementHandler {
     }
 
     /**
-     * 
-     * <p> 
+     * <p>
      * Default implementation of a ComplexType
      * </p>
-     * @see ComplexType
+     *
      * @author dzwiers
      *
+     * @see ComplexType
      */
     private static class DefaultComplexType implements ComplexType {
         boolean isDerived = false;
@@ -931,17 +928,14 @@ public class ComplexTypeHandler extends XSIElementHandler {
         boolean abstracT;
         boolean mixed;
 
-        
         /**
-         * 
          * @see org.geotools.xml.schema.ComplexType#cache()
          */
-        public boolean cache(Element e, Map m){
+        public boolean cache(Element e, Map m) {
             return true;
         }
-        
+
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getNamespace()
          */
         public String getNamespace() {
@@ -949,7 +943,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getParent()
          */
         public Type getParent() {
@@ -957,7 +950,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#isDerived()
          */
         public boolean isDerived() {
@@ -965,7 +957,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
@@ -973,7 +964,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#isAbstract()
          */
         public boolean isAbstract() {
@@ -981,7 +971,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getBlock()
          */
         public int getBlock() {
@@ -989,7 +978,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
@@ -997,7 +985,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getFinal()
          */
         public int getFinal() {
@@ -1005,7 +992,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#isMixed()
          */
         public boolean isMixed() {
@@ -1013,7 +999,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getName()
          */
         public String getName() {
@@ -1021,7 +1006,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getAnyAttributeNameSpace()
          */
         public String getAnyAttributeNameSpace() {
@@ -1029,7 +1013,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#getId()
          */
         public String getId() {
@@ -1037,8 +1020,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
-         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element, org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
+         * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
+         *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
@@ -1048,7 +1031,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
             if (isDerived || simple) {
                 try {
-                    Object v = parent.getValue(element, value, attrs,hints);
+                    Object v = parent.getValue(element, value, attrs, hints);
 
                     return v; // this means it's meant to be extended ... and so should already include the extensions.
                 } catch (SAXNotSupportedException snse) {
@@ -1076,7 +1059,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.Type#getInstanceType()
          */
         public Class getInstanceType() {
@@ -1084,7 +1066,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * 
          * @see org.geotools.xml.xsi.ComplexType#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
@@ -1092,21 +1073,27 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             return false;
         }
 
         /**
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element,
+         *      java.lang.Object, org.geotools.xml.PrintHandler,
+         *      java.util.Map)
          */
-        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            if(parent.canEncode(element,value,hints)){
-                parent.encode(element,value,output,hints);
-            }else{
-                throw new OperationNotSupportedException("This is a generic schema element -- cannot print yet");
-            	// TODO fix this
+        public void encode(Element element, Object value, PrintHandler output,
+            Map hints) throws IOException, OperationNotSupportedException {
+            if (parent.canEncode(element, value, hints)) {
+                parent.encode(element, value, output, hints);
+            } else {
+                throw new OperationNotSupportedException(
+                    "This is a generic schema element -- cannot print yet");
+
+                // TODO fix this
             }
         }
     }

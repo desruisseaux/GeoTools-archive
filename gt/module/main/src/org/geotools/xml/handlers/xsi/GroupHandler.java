@@ -37,9 +37,8 @@ import org.xml.sax.SAXNotRecognizedException;
  * @version $Id$
  */
 public class GroupHandler extends ElementGroupingHandler {
-    /** 'group'  */
+    /** 'group' */
     public final static String LOCALNAME = "group";
-    
     private static int offset = 0;
     private String id;
     private String name;
@@ -48,7 +47,6 @@ public class GroupHandler extends ElementGroupingHandler {
     private int minOccurs = 1;
     private ElementGroupingHandler child; // one of 'all', 'choice', or 'sequence'
     private int hashCodeOffset = getOffset();
-    
     private Group cache = null;
 
     /*
@@ -59,7 +57,6 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -68,8 +65,8 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
+     *      java.lang.String)
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
@@ -123,8 +120,8 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
+     *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
@@ -173,7 +170,6 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getLocalName()
      */
     public String getLocalName() {
@@ -181,7 +177,6 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * <p>
      * returns the group's name
      * </p>
@@ -193,7 +188,6 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIHandlers.ElementGroupingHandler#compress(org.geotools.xml.XSIHandlers.SchemaHandler)
      */
     protected ElementGrouping compress(SchemaHandler parent)
@@ -206,7 +200,8 @@ public class GroupHandler extends ElementGroupingHandler {
         String name = this.name;
         int minOccurs = this.minOccurs;
         int maxOccurs = this.maxOccurs;
-        ElementGrouping child = (this.child == null) ? null : this.child.compress(parent); // deal with all/choice/sequnce
+        ElementGrouping child = (this.child == null) ? null
+                                                     : this.child.compress(parent); // deal with all/choice/sequnce
 
         if (ref != null) {
             Group g = parent.lookUpGroup(ref);
@@ -222,15 +217,15 @@ public class GroupHandler extends ElementGroupingHandler {
             }
         }
 
-        cache = new DefaultGroup(id,name,parent.getTargetNamespace(),child,minOccurs,maxOccurs);
-        
+        cache = new DefaultGroup(id, name, parent.getTargetNamespace(), child,
+                minOccurs, maxOccurs);
+
         child = null;
 
         return cache;
     }
 
     /**
-     * 
      * @see org.geotools.xml.XSIElementHandler#getHandlerType()
      */
     public int getHandlerType() {
@@ -238,8 +233,8 @@ public class GroupHandler extends ElementGroupingHandler {
     }
 
     /**
-     * 
-     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String, java.lang.String)
+     * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
+     *      java.lang.String)
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
