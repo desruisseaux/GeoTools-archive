@@ -277,7 +277,7 @@ public class MetadataSource {
         final String className = getClassName(type);
         MetadataResult result = (MetadataResult) statements.get(type);
         if (result == null) {
-            result = new MetadataResult(connection, query, getTableName(className));
+            result = new MetadataResult(connection, codeQuery, getTableName(className));
             statements.put(type, result);
         }
         final String name = result.getString(code);
