@@ -379,8 +379,8 @@ ${required}"/>
 
 
             <!-- add optional plugins seperatly -->
-            <loadfile property="release.optional" srcFile="plugin/release.txt"/>
-            <u:tokenize var="list2" delim=",">${release.optional}</u:tokenize>
+            <loadfile property="release.optional.plugins" srcFile="plugin/release.txt"/>
+            <u:tokenize var="list2" delim=",">${release.optional.plugins}</u:tokenize>
             <j:set var="todo" value=""/>        
             <j:forEach items="${list2}" var="item">
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
@@ -392,8 +392,8 @@ ${required}"/>
 
 
             <!-- add optional extensions seperatly -->
-            <loadfile property="release.optional" srcFile="ext/release.txt"/>
-            <u:tokenize var="list3" delim=",">${release.optional}</u:tokenize>
+            <loadfile property="release.optional.ext" srcFile="ext/release.txt"/>
+            <u:tokenize var="list3" delim=",">${release.optional.ext}</u:tokenize>
             <j:set var="todo" value=""/>        
             <j:forEach items="${list3}" var="item">
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
@@ -402,8 +402,8 @@ ${required}"/>
             <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveExtSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
 
             <!-- add optional demos seperatly -->
-            <loadfile property="release.optional" srcFile="demo/release.txt"/>
-            <u:tokenize var="list4" delim=",">${release.optional}</u:tokenize>
+            <loadfile property="release.optional.demo" srcFile="demo/release.txt"/>
+            <u:tokenize var="list4" delim=",">${release.optional.demo}</u:tokenize>
             <j:set var="todo" value=""/>        
             <j:forEach items="${list4}" var="item">
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
