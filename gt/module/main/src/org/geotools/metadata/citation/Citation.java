@@ -38,6 +38,21 @@ import org.geotools.resources.Utilities;
  */
 public class Citation implements org.opengis.metadata.citation.Citation, Serializable {
     /**
+     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
+     */
+    public static Citation OPEN_GIS = new Citation("OpenGIS consortium");
+
+    /**
+     * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
+     */
+    public static Citation EPSG = new Citation("European Petroleum Survey Group");
+
+    /**
+     * The <A HREF="http://www.geotools.org">Geotools</A> project.
+     */
+    public static Citation GEOTOOLS = new Citation("Geotools");
+
+    /**
      * An immutable empty array of strings.
      */
     private static final String[] EMPTY = new String[0];

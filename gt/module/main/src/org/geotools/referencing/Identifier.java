@@ -188,6 +188,42 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
     }
 
     /**
+     * Constructs an identifier from an authority and code informations. This is a convenience
+     * constructor for commonly-used parameters. If more control are wanted (for example adding
+     * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
+     *
+     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
+     *        or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param codespace The code space, or <code>null</code> if none.
+     * @param code      The code. This parameter is mandatory.
+     * @param version   The version, or <code>null</code> if none.
+     */
+    public Identifier(final Citation authority,
+                      final String   codespace,
+                      final String   code,
+                      final String   version)
+    {
+        this(toMap(authority, codespace, code, version));
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static final Map toMap(final Citation authority,
+                                   final String   codespace,
+                                   final String   code,
+                                   final String   version)
+    {
+        final Map properties = new HashMap();
+        properties.put("authority", authority);
+        properties.put("codespace", codespace);
+        properties.put("code",      code     );
+        properties.put("version",   version  );
+        return properties;
+    }
+
+    /**
      * Implementation of the constructor. The remarks in the <code>properties</code> will be
      * parsed only if the <code>parseRemarks</code> argument is set to <code>true</code>.
      *
