@@ -100,7 +100,7 @@ public interface FeatureValidation extends Validation {
      * @param type FeatureTypeInfo schema of feature
      * @param results coallate results information
      *
-     * @return True if all the features pass this test.
+     * @return True if feature passes this test.
      */
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) throws Exception;

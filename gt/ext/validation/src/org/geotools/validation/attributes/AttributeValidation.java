@@ -73,7 +73,17 @@ public class AttributeValidation extends DefaultFeatureValidation {
      */
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) {
-        return false;
+    	int surface = ((Integer) feature.getAttribute("surface")).intValue();
+    	int speed = ((Integer) feature.getAttribute("speed")).intValue();
+    	if( surface == 1 && speed > 110 ){
+    		results.error( feature, "speed over 110");
+    		return false;
+    	}
+    	if( surface == 2 && speed > 110 ){
+    		results.error( feature, "speed over 70");
+    		return false;
+    	}
+        return true;
     }
 
     /**

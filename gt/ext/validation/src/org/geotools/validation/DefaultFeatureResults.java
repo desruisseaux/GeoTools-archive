@@ -14,10 +14,10 @@ import org.geotools.validation.Validation;
 import org.geotools.validation.ValidationResults;
 
 
-final class DefaultFeatureResults implements ValidationResults {
+public final class DefaultFeatureResults implements ValidationResults {
 	Validation trial;
-	List error = new ArrayList();
-	List warning = new ArrayList();
+	public List error = new ArrayList();
+	public List warning = new ArrayList();
 	public void setValidation(Validation validation) {
 		trial = validation;									
 	}
