@@ -815,7 +815,7 @@ public abstract class RenderedMarks extends RenderedLayer {
      * @param  event The mouse event.
      * @return The tool tip text for the current mark, or <code>null</code> if none.
      */
-    final String getToolTipText(final GeoMouseEvent event) {
+    protected final String getToolTipText(final GeoMouseEvent event) {
         return (String) getObject(event, 0);
     }
 
@@ -827,7 +827,7 @@ public abstract class RenderedMarks extends RenderedLayer {
      * @param  event The mouse event.
      * @return The action for the current mark, or <code>null</code> if none.
      */
-    final Action getAction(final GeoMouseEvent event) {
+    protected final Action getAction(final GeoMouseEvent event) {
         return (Action) getObject(event, 1);
     }
 

@@ -683,7 +683,7 @@ public class RenderedMapScale extends RenderedLegend {
     /**
      * Returns the map scale as a tool tip text.
      */
-    String getToolTipText(final GeoMouseEvent event) {
+    protected String getToolTipText(final GeoMouseEvent event) {
         final String name = getName(getLocale());
         if (name != null) {
             return name;

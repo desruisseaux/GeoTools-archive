@@ -796,7 +796,7 @@ public class RenderedGeometries extends RenderedLayer {
      * @return The tool tip text, or <code>null</code> if there
      *         in no tool tips for this location.
      */
-    String getToolTipText(final GeoMouseEvent event) {
+    protected String getToolTipText(final GeoMouseEvent event) {
         if (geometry != null) {
             final Point2D point = event.getMapCoordinate(null);
             if (point != null) {

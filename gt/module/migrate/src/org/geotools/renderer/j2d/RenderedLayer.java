@@ -799,7 +799,7 @@ public abstract class RenderedLayer {
      *
      * @see Renderer#getToolTipText
      */
-    String getToolTipText(final GeoMouseEvent event) {
+    protected String getToolTipText(final GeoMouseEvent event) {
         return null;
     }
 
@@ -815,7 +815,7 @@ public abstract class RenderedLayer {
      * @param  event The mouse event.
      * @return The action for the layer, or <code>null</code> if none.
      */
-    Action getAction(final GeoMouseEvent event) {
+    protected Action getAction(final GeoMouseEvent event) {
         return null;
     }
 
