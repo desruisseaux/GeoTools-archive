@@ -416,7 +416,7 @@ public class ArcGridReader  implements GridCoverageReader {
    *
    * @return the coordinate system for GridCoverage creation
    */
-  private CoordinateReferenceSystem getCoordinateSystem() {
+  private CoordinateReferenceSystem getCoordinateSystem(){
 
     //getting path of the per file
     File outProj = null;
@@ -480,7 +480,7 @@ public class ArcGridReader  implements GridCoverageReader {
 
 	//	is it null? Then we gor for wgs84
     if(this.coordinateSystem==null)
-      this.coordinateSystem= org.geotools.referencing.crs.GeographicCRS.WGS84;
+      this.coordinateSystem= ArcGridFormat.getDefaultCRS();
 
 
     return this.coordinateSystem;

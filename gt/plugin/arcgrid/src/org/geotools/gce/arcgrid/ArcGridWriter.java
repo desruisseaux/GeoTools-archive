@@ -233,7 +233,7 @@ public class ArcGridWriter
     }
   }
 
-  private void writeCRSInfo(CoordinateReferenceSystem crs) throws IOException {
+  private void writeCRSInfo(CoordinateReferenceSystem crs) throws IOException,org.opengis.referencing.NoSuchAuthorityCodeException {
 
 
 
@@ -241,7 +241,7 @@ public class ArcGridWriter
     if (crs == null) {
 
       //default gcs wgs84
-      crs = org.geotools.referencing.crs.GeographicCRS.WGS84;
+      crs = ArcGridFormat.getDefaultCRS();
 
 
     }

@@ -78,7 +78,7 @@ public class ArcGridFormat
               "crs",
               CoordinateReferenceSystem.class, //calss of the object we will pass
               null, //list of valid values not provided
-              GeographicCRS.WGS84//default value
+              ArcGridFormat.getDefaultCRS()//default value
                                                     );
   /** Indicates whether the arcgrid data is compressed with GZIP */
   public static final ParameterDescriptor COMPRESS = new ParameterDescriptor(
@@ -236,5 +236,16 @@ public class ArcGridFormat
   public ParameterValueGroup getWriteParameters() {
     return writeParameters;
   }
-
+  /**
+   * getDefaultCRS
+   */
+  static CoordinateReferenceSystem getDefaultCRS() {
+      try{
+          return org.geotools.referencing.CRS.decode("EPSG:4326");
+      }
+      catch(org.opengis.referencing.NoSuchAuthorityCodeException e)
+      {
+          return GeographicCRS.WGS84;
+      }
+    }
 }
