@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata.test;
+package org.geotools.metadata;
 
 import java.util.List;
 

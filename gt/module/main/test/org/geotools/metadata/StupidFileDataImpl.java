@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.geotools.metadata.test;
+package org.geotools.metadata;
 
 import org.geotools.metadata.AbstractMetadata;
 

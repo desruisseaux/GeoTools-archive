@@ -1,5 +1,4 @@
-
-package org.geotools.metadata.test;
+package org.geotools.metadata;
 
 import java.io.IOException;
 

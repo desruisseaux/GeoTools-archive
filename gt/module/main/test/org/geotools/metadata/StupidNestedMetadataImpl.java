@@ -14,9 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata.test;
+package org.geotools.metadata;
 
-import org.geotools.metadata.Metadata;
+import org.geotools.metadata.AbstractMetadata;
+
+
 
 /**
  * TODO type description
@@ -24,7 +26,22 @@ import org.geotools.metadata.Metadata;
  * @author jeichar
  *
  */
-public interface StupidNestedMetadata extends Metadata {
-    StupidFileData getFileData();
-    String getData();
+public class StupidNestedMetadataImpl extends AbstractMetadata implements
+        StupidNestedMetadata {
+
+    /** 
+     * @see org.geotools.metadata.StupidNestedMetadata#getData()
+     */
+    public String getData() {
+        return "Hello this is data";
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.metadata.StupidNestedMetadata#getFileData()
+     */
+    public StupidFileData getFileData() {
+        // TODO Auto-generated method stub
+        return new StupidFileDataImpl();
+    }
+
 }

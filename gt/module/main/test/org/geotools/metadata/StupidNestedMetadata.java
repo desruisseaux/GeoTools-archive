@@ -14,11 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata.test;
+package org.geotools.metadata;
 
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.geotools.metadata.Metadata;
 
 /**
  * TODO type description
@@ -26,18 +24,7 @@ import junit.framework.TestSuite;
  * @author jeichar
  *
  */
-public class AllTests {
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(AllTests.suite());
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Test for org.geotools.metadata");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(XPathTest.class);
-        suite.addTestSuite(QueryTest.class);
-        //$JUnit-END$
-        return suite;
-    }
+public interface StupidNestedMetadata extends Metadata {
+    StupidFileData getFileData();
+    String getData();
 }
