@@ -49,6 +49,8 @@ import org.opengis.referencing.FactoryException;
  * </p> 
  * @version $Id$
  * @author Jody Garnett
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.AUTOCRSAuthorityFactory}.
  */
 public class CoordinateSystemAUTOFactory extends CoordinateSystemAuthorityFactory {
     /**

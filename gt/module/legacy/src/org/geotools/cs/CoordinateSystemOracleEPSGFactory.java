@@ -40,6 +40,8 @@ import java.util.regex.Pattern;
  *
  * @version $Id$
  * @author John Grange
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryForOracle}.
  */
 public class CoordinateSystemOracleEPSGFactory extends CoordinateSystemModifiedEPSGFactory {
     /**
