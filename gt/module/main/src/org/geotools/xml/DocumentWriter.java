@@ -1329,7 +1329,7 @@ public class DocumentWriter {
                 }
             }
 
-            writer.write("</");
+            writer.write("<");
             writer.write(prefix + localName);
 
             if (firstElement) {
@@ -1349,7 +1349,7 @@ public class DocumentWriter {
                 }
             }
 
-            writer.write(">");
+            writer.write("/>");
             // TODO format here
             writer.write("\n");
         }
