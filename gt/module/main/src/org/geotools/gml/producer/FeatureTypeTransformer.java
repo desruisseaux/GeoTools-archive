@@ -324,17 +324,21 @@ public class FeatureTypeTransformer extends TransformerBase {
             throws SAXException {
             int length = AttributeType.UNBOUNDED;
             if(attribute.getRestriction()!=null && attribute.getRestriction()!=Filter.ALL && attribute.getRestriction()!=Filter.NONE){
+            	try{
             	Filter f = attribute.getRestriction();
             	if(f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL){
             		CompareFilter cf = (CompareFilter)f;
             		Expression e = cf.getLeftValue();
             		if(e!= null && e instanceof LengthFunction){
-            			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString(),AttributeType.UNBOUNDED);
+            			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
             		}else{
             			if(cf.getRightValue() instanceof LengthFunction){
-            				length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString(),AttributeType.UNBOUNDED);
+            				length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
             			}
             		}
+            	}
+            	}catch(Throwable t){
+            		length = AttributeType.UNBOUNDED;
             	}
             }
 
