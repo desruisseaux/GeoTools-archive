@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-jdbc</name>
+  <id>jdbc-geometryless</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>Generic (geometryless) DataStore  Implementation</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>The JDBC module contains an implementation of the
+  DataStore interface (found in data), as well as the older DataSource
+  interface (found in core), for use with any JDBC data store without spatial objects</description>
+  <developers>
+    <developer>
+      <name>Rob Atkinson</name>
+      <id></id>
+      <email>rob@socialchange.net.au</email>
+      <organization>Social Change Online</organization>
+             <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  
+
+  </developers>
+  <dependencies>
+   <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+   <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+      <type>test</type>
+      <url>http://junit.org/</url>
+    </dependency>
+    <dependency>
+      <id>mockrunner</id>
+      <version>0.2</version>
+      <type>test</type>
+      <url>http://mockrunner.sourceforge.net/</url>
+    </dependency>
+    <dependency>
+        <artifactId>mysql-connector-java</artifactId>
+        <groupId>mysql</groupId>
+        <version>3.0.9</version>
+    </dependency>
+  </dependencies>
+  <build>
+  <unitTest>
+    <!-- This section excludes the tests -->
+    <excludes>
+      <exclude>**/M*.java</exclude>
+       <exclude>**/JDBCTestSuite.java</exclude>
+       <exclude>**/JDBCDataStoreAPITest.java</exclude>
+  
+    </excludes>
+    <!-- End exclude tests -->
+     <resources>
+        <resource>
+            <directory>${basedir}/test</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.txt</include>
+            </includes>
+        </resource>
+    </resources>
+  </unitTest>
+  </build>
+</project>

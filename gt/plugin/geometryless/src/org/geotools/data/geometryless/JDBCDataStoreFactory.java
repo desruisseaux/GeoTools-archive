@@ -1,0 +1,319 @@
+/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
+ * This code is licensed under the GPL 2.0 license, availible at the root
+ * application directory.
+ */
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.data.geometryless;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataSourceMetadataEnity;
+import org.geotools.data.jdbc.ConnectionPool;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.logging.Logger;
+
+/**
+ * Creates a Geometryless JDBC based on the conection params.
+ * 
+ * <p>
+ * This factory should be registered in the META-INF/ folder, under services/
+ * in the DataStoreFactorySpi file.
+ * </p>
+ *
+ * @author Rob Atkinson, Social Change Online
+ */
+public class JDBCDataStoreFactory
+    implements org.geotools.data.DataStoreFactorySpi {
+    	
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+
+
+    /** Specified JDBC driver class. */
+    static final Param  DRIVER = new Param("driver", String.class,
+            "Java Class name of installed driver", true, "");
+            
+               /** Specified JDBC driver class calling URL */
+   static final Param  URLPREFIX  = new Param("urlprefix", String.class,
+            "eg jdbc:mysql://", true, "");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param DBTYPE = new Param("dbtype", String.class,
+            "must be 'jdbc'", true, "jdbc");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param HOST = new Param("host", String.class,
+            "db host machine", true, "localhost");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param PORT = new Param("port", String.class,
+            "db connection port", true, "3306");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param DATABASE = new Param("database", String.class,
+            "jdbc database");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param USER = new Param("user", String.class,
+            "user name to login as");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param PASSWD = new Param("passwd", String.class,
+            "password used to login", false);
+
+    /**
+     * Param, package visibiity for JUnit tests.
+     * 
+     * <p>
+     * Example of a non simple Param type where custom parse method is
+     * required.
+     * </p>
+     * 
+     * <p>
+     * When we convert to BeanInfo custom PropertyEditors will be required for
+     * this Param.
+     * </p>
+     */
+    static final Param CHARSET = new Param("charset", Charset.class,
+            "character set", false, Charset.forName("ISO-8859-1")) {
+            public Object parse(String text) throws IOException {
+                return Charset.forName(text);
+            }
+
+            public String text(Object value) {
+                return ((Charset) value).name();
+            }
+        };
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param NAMESPACE = new Param("namespace", String.class,
+            "namespace prefix used", false);
+
+    /** Array with all of the params */
+    static final Param[] arrayParameters = {
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX
+    };
+
+    /**
+     * Creates a new instance of PostgisDataStoreFactory
+     */
+    public JDBCDataStoreFactory() {
+    }
+
+    /**
+     * Checks to see if all the postgis params are there.
+     * 
+     * <p>
+     * Should have:
+     * </p>
+     * 
+     * <ul>
+     * <li>
+     * dbtype: equal to postgis
+     * </li>
+     * <li>
+     * host
+     * </li>
+     * <li>
+     * user
+     * </li>
+     * <li>
+     * passwd
+     * </li>
+     * <li>
+     * database
+     * </li>
+     * <li>
+     * charset
+     * </li>
+     * </ul>
+     * 
+     *
+     * @param params Set of parameters needed for a jdbc data store.
+     *
+     * @return <code>true</code> if dbtype equals jdbc, and contains keys
+     *         for host, user, passwd, and database.
+     */
+    public boolean canProcess(Map params) {
+        Object value;
+
+        if (params != null) {
+            for (int i = 0; i < arrayParameters.length; i++) {
+                if (!(((value = params.get(arrayParameters[i].key)) != null)
+                        && (arrayParameters[i].type.isInstance(value)))) {
+                    if (arrayParameters[i].required) {
+                    	LOGGER.warning("JDBCDataStoreFactory: can Process Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
+                        return (false);
+                    }
+                }
+            }
+        } else {
+                   	LOGGER.warning("JDBCDataStoreFactory: can Process Cannot find params " );
+            return (false);
+        }
+
+  
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("jdbc"))) {
+            return (false);
+        } else {
+            return (true);
+        }
+    }
+
+    /**
+     * Construct a postgis data store using the params.
+     *
+     * @param params The full set of information needed to construct a live
+     *        data source.  Should have  dbtype equal to postgis, as well as
+     *        host, user, passwd, database, and table.
+     *
+     * @return The created DataSource, this may be null if the required
+     *         resource was not found or if insufficent parameters were given.
+     *         Note that canProcess() should have returned false if the
+     *         problem is to do with insuficent parameters.
+     *
+     * @throws IOException See DataSourceException
+     * @throws DataSourceException Thrown if there were any problems creating
+     *         or connecting the datasource.
+     */
+    public DataStore createDataStore(Map params) throws IOException {
+        if (canProcess(params)) {
+        } else {
+            throw new IOException("The parameteres map isn't correct!!");
+        }
+
+        String host = (String) HOST.lookUp(params);
+        String user = (String) USER.lookUp(params);
+        String passwd = (String) PASSWD.lookUp(params);
+        String port = (String) PORT.lookUp(params);
+        String database = (String) DATABASE.lookUp(params);
+        Charset charSet = (Charset) CHARSET.lookUp(params);
+        String namespace = (String) NAMESPACE.lookUp(params);
+        String driver =   (String) DRIVER.lookUp(params);
+        String urlprefix =   (String) URLPREFIX.lookUp(params);
+
+        // Try processing params first so we can get an error message
+        // back to the user
+        //
+        if (!canProcess(params)) {
+            return null;
+        }
+   JDBCConnectionFactory connFact = new JDBCConnectionFactory(host,Integer.parseInt(port), database, driver , urlprefix);
+
+ //  MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,            Integer.parseInt(port), database);
+           
+        connFact.setLogin(user, passwd);
+
+        if (charSet != null) {
+            connFact.setCharSet(charSet.name());
+        }
+
+        ConnectionPool pool;
+
+        try {
+            pool = connFact.getConnectionPool();
+            
+            java.sql.Connection c = pool.getConnection();
+            if( c == null )
+            {
+          	throw new SQLException("Pool created but connection null ");
+            }
+            else {
+             	c.close();
+            }
+        } catch (SQLException e) {
+            throw new DataSourceException("Could not create connection", e);
+        }
+
+        if (namespace != null) {
+            return new JDBCDataStore(pool, namespace);
+        } else {
+            return new JDBCDataStore(pool);
+        }
+    }
+
+    /**
+     * The datastore  cannot create a new database.
+     *
+     * @param params
+     *
+     * @return
+     *
+     * @throws IOException See UnsupportedOperationException
+     * @throws UnsupportedOperationException Cannot create new database
+     */
+    public DataStore createNewDataStore(Map params) throws IOException {
+        throw new UnsupportedOperationException(
+            "Generic JDBC datastore cannot create a new Database");
+    }
+
+    /**
+     * Describe the nature of the datasource constructed by this factory.
+     *
+     * @return A human readable description that is suitable for inclusion in a
+     *         list of available datasources.
+     */
+    public String getDescription() {
+        return "Generic JDBC database";
+    }
+   
+    public String getDisplayName() {
+        return "GeometrylessJDBC";
+    }
+    
+    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+	    String host = (String) HOST.lookUp(params);
+        String user = (String) USER.lookUp(params);
+        String port = (String) PORT.lookUp(params);
+        String database = (String) DATABASE.lookUp(params);
+        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to "+getDisplayName()+" on "+host+" as "+user );
+	}
+    /**
+     * Test to see if this datastore is available, if it has all the
+     * appropriate libraries to construct a datastore.  This datastore just
+     * returns true for now.  This method is used for gui apps, so as to not
+     * advertise data store capabilities they don't actually have.
+     *
+     * @return <tt>true</tt> if and only if this factory is available to create
+     *         DataStores.
+     */
+    public boolean isAvailable() {
+  /*       try {
+             Class.forName(DRIVER);
+        } catch (ClassNotFoundException cnfe) {
+            return false;
+        }
+   */
+        return true;
+    }
+
+    /**
+     * Describe parameters.
+     *
+     * @return
+     *
+     * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
+     */
+    public Param[] getParametersInfo() {
+        return new Param[] {
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX
+        };
+    }
+}
