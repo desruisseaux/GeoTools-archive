@@ -21,7 +21,7 @@ package org.geotools.data.ows;
  * 
  * @author Richard Gould, Refractions Research
  */
-public class Capabilities {
+public class WMSCapabilities {
     private Service service;
     private Request request;
     private Layer[] layers;
