@@ -36,13 +36,22 @@ public interface ResourceKeys
     public static final int DISCONTINUOUS                               =    10;
     public static final int DOWN                                        =    11;
     public static final int EAST                                        =    12;
+    public static final int EASTING                                     =   104;
     public static final int ELLIPSOIDAL                                 =    13;
+    public static final int ELLIPSOIDAL_HEIGHT                          =   105;
     public static final int EXPONENTIAL                                 =    80;
     public static final int FUTURE                                      =    14;
     public static final int GEOCENTRIC                                  =    15;
+    public static final int GEOCENTRIC_RADIUS                           =   106;
     public static final int GEOCENTRIC_TRANSFORM                        =    84;
+    public static final int GEOCENTRIC_X                                =   107;
+    public static final int GEOCENTRIC_Y                                =   108;
+    public static final int GEOCENTRIC_Z                                =   109;
+    public static final int GEODETIC_LATITUDE                           =   110;
+    public static final int GEODETIC_LONGITUDE                          =   111;
     public static final int GEOID_MODEL_DERIVED                         =    16;
     public static final int GMT                                         =    17;
+    public static final int GRAVITY_RELATED_HEIGHT                      =   112;
     public static final int HORIZONTAL                                  =    18;
     public static final int INSIDE                                      =    19;
     public static final int INVERSE_$1                                  =    20;
@@ -54,12 +63,16 @@ public interface ResourceKeys
     public static final int LONGITUDE                                   =    25;
     public static final int NORMAL                                      =    26;
     public static final int NORTH                                       =    27;
+    public static final int NORTHING                                    =   113;
     public static final int ORTHOGRAPHIC_PROJECTION                     =    96;
     public static final int ORTHOMETRIC                                 =    28;
     public static final int OTHER                                       =    29;
     public static final int OUTSIDE                                     =    30;
     public static final int PAST                                        =    31;
     public static final int SOUTH                                       =    32;
+    public static final int SOUTHING                                    =   114;
+    public static final int SPHERICAL_LATITUDE                          =   115;
+    public static final int SPHERICAL_LONGITUDE                         =   116;
     public static final int STEREOGRAPHIC_PROJECTION                    =    33;
     public static final int TEMPORAL                                    =    34;
     public static final int TIME                                        =    35;
@@ -70,6 +83,7 @@ public interface ResourceKeys
     public static final int UTC                                         =    39;
     public static final int VERTICAL                                    =    40;
     public static final int WEST                                        =    42;
+    public static final int WESTING                                     =   117;
 
     public static final int WARNING_AMBIGUOUS_ELLIPSOID                 =    41;
     public static final int WARNING_UNKNOW_PARAMETER_$3                 =    83;
