@@ -18,13 +18,12 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Iterator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
 
+import oracle.jdbc.OracleConnection;
 import oracle.sql.STRUCT;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
@@ -32,7 +31,6 @@ import oracle.sql.CHAR;
 import oracle.sql.CharacterSet;
 import oracle.sql.Datum;
 import oracle.sql.NUMBER;
-import oracle.sql.STRUCT;
 import oracle.sql.StructDescriptor;
 /**
  * Sample use of SDO class for simple JTS Geometry.
@@ -43,9 +41,16 @@ import oracle.sql.StructDescriptor;
  * @author jgarnett
  */
 public class GeometryConverter {
-	protected Connection connection = null;
+	protected OracleConnection connection;
 	GeometryFactory geometryFactory;
     
+	public GeometryConverter( OracleConnection connection ){
+		this( connection, new GeometryFactory() );		
+	}
+	public GeometryConverter( OracleConnection connection, GeometryFactory geometryFactory ){
+		this.geometryFactory = geometryFactory;
+		this.connection = connection;
+	}
     public static final String DATATYPE = "MDSYS.SDO_GEOMETRY";
     /**
      * Used to handle MDSYS.SDO_GEOMETRY.
@@ -92,12 +97,12 @@ public class GeometryConverter {
      * 
      * @see net.refractions.jspatial.Converter#toObject(oracle.sql.STRUCT)
      */
-    public Geometry toGeometry(STRUCT struct) throws SQLException {
+    public Geometry asGeometry(STRUCT sdoGeometry) throws SQLException {
         // Note Returning null for null Datum
-        if( struct == null ) return null;
-        ResultSetMetaData meta = struct.getDescriptor().getMetaData();
+        if( sdoGeometry == null ) return null;
+        ResultSetMetaData meta = sdoGeometry.getDescriptor().getMetaData();
         
-        Datum data[] = struct.getOracleAttributes();
+        Datum data[] = sdoGeometry.getOracleAttributes();
         final int GTYPE = asInteger( data[0], 0 );
         final int SRID = asInteger( data[1], SDO.SRID_NULL );
         final double POINT[] = asDoubleArray( (STRUCT) data[2], Double.NaN );
@@ -121,7 +126,7 @@ public class GeometryConverter {
      * @return STRUCT representing provided Map
      * @see net.refractions.jspatial.Converter#toDataType(java.lang.Object)
      */
-    public STRUCT toDatum(Geometry geom) throws SQLException {
+    public STRUCT toSDO(Geometry geom) throws SQLException {
         if( geom == null) return asEmptyDataType();
         
         int gtype = SDO.gType( geom );
@@ -169,7 +174,7 @@ public class GeometryConverter {
      * 
      * @return <code>null</code> as a SDO_GEOMETRY
      */
-    public STRUCT asEmptyDataType() throws SQLException{
+    protected STRUCT asEmptyDataType() throws SQLException{
         return toSTRUCT( null, DATATYPE );
     }
     
