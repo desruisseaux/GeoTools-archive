@@ -962,8 +962,6 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * {@linkplain #getIdentifiers identifiers} will be the same than the parameter
          * ones.
          *
-         * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
-         * @param targetDimensions Number of dimensions in the target CRS of this operation method.
          * @param parameters The set of parameters (never <code>null</code>).
          */
         public Provider(final ParameterDescriptorGroup parameters) {

@@ -38,6 +38,7 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.ParameterReal;
+import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -341,7 +342,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS, "Exponential")
+                        new Identifier(Citation.GEOTOOLS,
+                            Resources.formatInternational(ResourceKeys.EXPONENTIAL))
                      }, new ParameterDescriptor[] {
                         BASE, SCALE
                      });
@@ -363,16 +365,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(doubleValue(values, BASE),
-                          doubleValue(values, SCALE));
-        }
-
-        /**
-         * Returns the resources key for {@linkplain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation only.
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.EXPONENTIAL;
+            return create(doubleValue(BASE,  values),
+                          doubleValue(SCALE, values));
         }
     }
 }

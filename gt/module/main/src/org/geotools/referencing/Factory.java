@@ -34,7 +34,9 @@ import org.opengis.referencing.datum.*;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.Identifier;
 
 
 /**
@@ -61,38 +63,28 @@ import org.opengis.metadata.citation.Citation;
  *     <th nowrap>Value given to</th>
  *   </tr>
  *   <tr>
- *     <td nowrap>&nbsp;<code>"name"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#NAME_PROPERTY "name"}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
  *     <td nowrap>&nbsp;{@link IdentifiedObject#getName}</td>
  *   </tr>
  *   <tr>
- *     <td nowrap>&nbsp;<code>"remarks"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#REMARKS_PROPERTY "remarks"}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
  *     <td nowrap>&nbsp;{@link IdentifiedObject#getRemarks}</td>
  *   </tr>
  *   <tr>
- *     <td nowrap>&nbsp;<code>"authority"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String} or {@link org.opengis.metadata.citation.Citation}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the first identifier</td>
+ *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#AUTHORITY_PROPERTY "authority"}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain IdentifiedObject#getName name}</td>
  *   </tr>
  *   <tr>
- *     <td nowrap>&nbsp;<code>"code"</code>&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#VERSION_PROPERTY "version"}&nbsp;</td>
  *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getCode} on the first identifier</td>
+ *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain IdentifiedObject#getName name}</td>
  *   </tr>
  *   <tr>
- *     <td nowrap>&nbsp;<code>"codeSpace"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getCodeSpace} on the first identifier</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;<code>"version"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the first identifier</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;<code>"identifiers"</code>&nbsp;</td>
- *     <td nowrap>&nbsp;<code>{@linkplain Identifier}</code>[]&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#IDENTIFIERS_PROPERTY "identifiers"}&nbsp;</td>
+ *     <td nowrap>&nbsp;{@link Identifier} or <code>{@linkplain Identifier}[]</code>&nbsp;</td>
  *     <td nowrap>&nbsp;{@link IdentifiedObject#getIdentifiers}</td>
  *   </tr>
  * </table>
@@ -925,6 +917,6 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * @return An unique instance of the specified object.
      */
     private static Object canonicalize(final org.opengis.referencing.IdentifiedObject info) {
-        return Identifier.POOL.canonicalize(info);
+        return org.geotools.referencing.Identifier.POOL.canonicalize(info);
     }
 }

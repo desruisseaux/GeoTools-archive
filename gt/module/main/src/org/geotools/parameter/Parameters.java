@@ -52,19 +52,6 @@ public class Parameters {
     public static ParameterDescriptorGroup EMPTY_GROUP =
             new org.geotools.parameter.ParameterDescriptorGroup("empty",
             new GeneralParameterDescriptor[0]);
-
-    /**
-     * @deprecated Use <code>group.descriptors().contains(type)</code> instead.
-     */
-    public static boolean allowed(ParameterDescriptorGroup group, GeneralParameterDescriptor type) {
-        List types = group.descriptors();
-        for (final Iterator it=types.iterator(); it.hasNext();) {
-            if (it.next() == type) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     /**
      * Used to handle code that expexted group.getValues().
@@ -115,7 +102,7 @@ public class Parameters {
      * </p>
      * @return true if parameter is valid
      */
-    public static boolean isValid( ParameterValue parameter ){
+    public static boolean isValid(ParameterValue parameter) {
         ParameterDescriptor descriptor = (ParameterDescriptor) parameter.getDescriptor();
         Object value = parameter.getValue();
         Class type = value == null ? Void.TYPE : value.getClass();                

@@ -593,16 +593,21 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group("Ellipsoid_To_Geocentric", "9602");
+        static final ParameterDescriptorGroup PARAMETERS =
+                group("Ellipsoid_To_Geocentric", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Construct the parameters group.
          */
-        static ParameterDescriptorGroup group(final String ogc, final String epsg) {
+        static ParameterDescriptorGroup group(final String ogc,
+                                              final String epsg,
+                                              final int geotools)
+        {
             return group(
                      new Identifier[] {
                         new Identifier(Citation.OPEN_GIS, ogc),
-                        new Identifier(Citation.EPSG,     epsg)
+                        new Identifier(Citation.EPSG,     epsg),
+                        new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
                      }, new ParameterDescriptor[] {
                         SEMI_MAJOR, SEMI_MINOR, DIM
                      });
@@ -632,18 +637,10 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            final int dimGeographic =    intValue(values, DIM);
-            final double  semiMajor = doubleValue(values, SEMI_MAJOR);
-            final double  semiMinor = doubleValue(values, SEMI_MINOR);
+            final int dimGeographic =    intValue(DIM,        values);
+            final double  semiMajor = doubleValue(SEMI_MAJOR, values);
+            final double  semiMinor = doubleValue(SEMI_MINOR, values);
             return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
-        }
-
-        /**
-         * Returns the resources key for {@linkplain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation only.
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.GEOCENTRIC_TRANSFORM;
         }
     }
     
@@ -664,9 +661,11 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
 
         /**
          * The parameters group.
-         * NOTE: The EPSG code seems to be the same than for the direct transform.
+         *
+         * @todo The EPSG code seems to be the same than for the direct transform.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group("Geocentric_To_Ellipsoid", "9602");
+        static final ParameterDescriptorGroup PARAMETERS =
+                group("Geocentric_To_Ellipsoid", "9602", ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
          * Create a provider.

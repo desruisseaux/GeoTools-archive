@@ -102,6 +102,7 @@ public interface ResourceKeys
     public static final int ERROR_DISTANCE_OUT_OF_RANGE_$4              =    74;
     public static final int ERROR_DUPLICATED_VALUES_$1                  =    75;
     public static final int ERROR_ELLIPTICAL_NOT_SUPPORTED              =    76;
+    public static final int ERROR_EMPTY_ARRAY                           =   132;
     public static final int ERROR_END_OF_DATA_FILE                      =    77;
     public static final int ERROR_FILE_DOES_NOT_EXIST_$1                =    78;
     public static final int ERROR_GRID_LOCATIONS_UNEQUAL                =    79;

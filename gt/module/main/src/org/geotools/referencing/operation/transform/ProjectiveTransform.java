@@ -445,11 +445,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final Map properties = new HashMap(4);
-            properties.put("name", "Affine");
-            properties.put("identifiers", new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Affine"),
-                new Identifier(Citation.EPSG,     "9624")
+            final Identifier name = new Identifier(Citation.OPEN_GIS, "Affine");
+            final Map  properties = new HashMap(4, 0.8f);
+            properties.put(NAME_PROPERTY,        name);
+            properties.put(IDENTIFIERS_PROPERTY, name);
+            properties.put(ALIAS_PROPERTY, new Identifier[] {
+                new Identifier(Citation.EPSG, "9624"),
+                new Identifier(Citation.GEOTOOLS,
+                    Resources.formatInternational(ResourceKeys.AFFINE_TRANSFORM))
             });
             PARAMETERS = new MatrixParameterDescriptors(properties);
         }
@@ -470,18 +473,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform createMathTransform(ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
+            values = ensureValidValues(values);
             return create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
-        }
-
-        /**
-         * Returns the resources key for {@linkplain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation only.
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.AFFINE_TRANSFORM;
         }
     }
 }

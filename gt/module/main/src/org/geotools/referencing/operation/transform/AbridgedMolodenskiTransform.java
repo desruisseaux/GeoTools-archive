@@ -424,7 +424,9 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
                         new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
-                        new Identifier(Citation.EPSG,     "9605")
+                        new Identifier(Citation.EPSG,     "9605"),
+                        new Identifier(Citation.GEOTOOLS,
+                            Resources.format(ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
                      }, new ParameterDescriptor[] {
                         DIM, DX, DY, DZ,
                         SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
@@ -439,14 +441,6 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         }
         
         /**
-         * Returns the resources key for {@linkplain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation only.
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM;
-        }
-        
-        /**
          * Creates a math transform from the specified group of parameter values.
          *
          * @param  values The group of parameter values.
@@ -457,20 +451,20 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 throws ParameterNotFoundException 
         {
             final boolean hasHeight;
-            final int dim = intValue(values, Provider.DIM);
+            final int dim = intValue(DIM, values);
             switch (dim) {
                 case 2:  hasHeight=false; break;
                 case 3:  hasHeight=true;  break;
                 default: throw new IllegalArgumentException(Resources.format(
                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
             }
-            return new AbridgedMolodenskiTransform(doubleValue(values, SRC_SEMI_MAJOR),
-                                                   doubleValue(values, SRC_SEMI_MINOR), hasHeight,
-                                                   doubleValue(values, TGT_SEMI_MAJOR),
-                                                   doubleValue(values, TGT_SEMI_MINOR), hasHeight,
-                                                   doubleValue(values, DX),
-                                                   doubleValue(values, DY),
-                                                   doubleValue(values, DZ));
+            return new AbridgedMolodenskiTransform(doubleValue(SRC_SEMI_MAJOR, values),
+                                                   doubleValue(SRC_SEMI_MINOR, values), hasHeight,
+                                                   doubleValue(TGT_SEMI_MAJOR, values),
+                                                   doubleValue(TGT_SEMI_MINOR, values), hasHeight,
+                                                   doubleValue(DX,             values),
+                                                   doubleValue(DY,             values),
+                                                   doubleValue(DZ,             values));
         }
     }
 }

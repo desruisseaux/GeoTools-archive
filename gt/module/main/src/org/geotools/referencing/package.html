@@ -18,5 +18,13 @@
   most interfaced objects are specified to be immutable, there do not need to be any constraints
   on operation sequencing. This means that these interfaces can be used in parallel computing
   environments (e.g. internet servers).</P>
+  
+  <P ALIGN="justify">This package provides a special implementation of
+  {@linkplain org.geotools.referencing.Identifier identifier}, which is also a
+  {@linkplain org.opengis.util.GenericName generic name}. By implementing those two
+  interfaces, it is possible to use the same kind of object for specifying both the
+  {@linkplain org.geotools.referencing.IdentifiedObject#getName main identifier} and the
+  {@linkplain org.geotools.referencing.IdentifiedObject#getAlias aliases} of an
+  {@linkplain org.geotools.referencing.IdentifiedObject identified object}.</P>
   </BODY>
 </HTML>

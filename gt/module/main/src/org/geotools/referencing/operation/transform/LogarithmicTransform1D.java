@@ -38,6 +38,7 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.ParameterReal;
+import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -307,7 +308,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS, "Logarithmic")
+                        new Identifier(Citation.GEOTOOLS,
+                            Resources.formatInternational(ResourceKeys.LOGARITHM))
                      }, new ParameterDescriptor[] {
                         BASE, OFFSET
                      });
@@ -329,16 +331,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(doubleValue(values, BASE),
-                          doubleValue(values, OFFSET));
-        }
-
-        /**
-         * Returns the resources key for {@linkplain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation only.
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.LOGARITHM;
+            return create(doubleValue(BASE,   values),
+                          doubleValue(OFFSET, values));
         }
     }
 }

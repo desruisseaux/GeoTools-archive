@@ -247,7 +247,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * Compares the specified object with this math transform for equality.
      */
     public boolean equals(final Object object) {
-        if (object==this) {
+        if (object == this) {
             // Slight optimization
             return true;
         }

@@ -42,7 +42,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.parameter.Parameters;
 import org.geotools.referencing.Identifier;         // For javadoc
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -143,13 +142,11 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Returns a set of all available {@linkplain MathTransform math transform} methods. Elements in
-     * this set are {@linkplain org.geotools.referencing.operation.OperationMethod operation method}
-     * objects. Their {@link Identifier#getCode identifier codes} are used as argument for
-     * {@linkplain #createParameterizedTransform parameterized transforms creation}.
+     * Returns a set of all available {@linkplain MathTransform math transform} methods. For each
+     * element in this set, the {@linkplain OperationMethod#getName operation method name} is the
+     * classification name to be recognized by the {@link #getDefaultParameters} method.
      *
-     * @return All {@linkplain MathTransform math transform} methods available in this factory,
-     *         as a set of {@link org.geotools.referencing.operation.OperationMethod} objects.
+     * @return All {@linkplain MathTransform math transform} methods available in this factory.
      */
     public Set getAvailableTransforms() {
         return new LazySet(getProviders(MathTransformProvider.class));
@@ -206,7 +203,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * createParameterizedTransform}. The list of available classifications is implementation
      * dependent.
      *
-     * <P>This method always returns clones. Consequently, it is safe to modify the returned
+     * <P>This method always returns new values. Consequently, it is safe to modify the returned
      * parameter values group and give them to <code>{@linkplain #createParameterizedTransform
      * createParameterizedTransform}(parameters)</code>.</P>
      *
@@ -217,6 +214,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *         classification.
      *
      * @see #getAvailableTransforms
+     * @see #createParameterizedTransform
+     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
     public ParameterValueGroup getDefaultParameters(final String classification)
             throws NoSuchIdentifierException
@@ -256,8 +255,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         final MathTransformProvider provider = getProvider(classification);
         MathTransform tr;
         try {
-            tr = provider.createMathTransform(Parameters.array(parameters));
+            tr = provider.createMathTransform(parameters);
         } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        } catch (IllegalStateException exception) {
             throw new FactoryException(exception);
         }
         tr = (MathTransform) pool.canonicalize(tr);
@@ -383,7 +384,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             if (cause instanceof FactoryException) {
                 throw (FactoryException) cause;
             }
-            throw new FactoryException(exception.getLocalizedMessage(), exception);
+            throw new FactoryException(exception);
         }
     }
 

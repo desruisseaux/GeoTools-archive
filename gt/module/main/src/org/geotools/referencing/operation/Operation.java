@@ -108,17 +108,16 @@ public class Operation extends SingleOperation
 
     /**
      * Returns the operation method.
-     *
-     * @return The operation method.
      */
     public OperationMethod getMethod() {
         return method;
     }
 
     /**
-     * Returns the parameter values.
+     * Returns the parameter values, or an empty array if none.
      *
-     * @return The parameter values, or an empty array if none.
+     * @see MathTransformFactory#createParameterizedTransform
+     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
     public GeneralParameterValue[] getParameterValues() {
         return (values!=null) ? (GeneralParameterValue[]) values.clone() : EMPTY_PARAMETER;

@@ -37,7 +37,6 @@ import javax.units.NonSI;
 import javax.units.SI;
 
 // OpenGIS dependencies
-//import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -52,7 +51,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.operation.GeneralMatrix;
-//import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.Utilities;
@@ -89,6 +87,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * on this math transform.
      *
      * @return A copy of the parameter values for this math transform, or <code>null</code>.
+     *
+     * @see org.geotools.referencing.operation.Operation#getParameterValues
      */
     public ParameterValueGroup getParameterValues() {
         return null;

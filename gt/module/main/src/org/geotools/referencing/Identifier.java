@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;   // For javadoc
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
@@ -61,8 +61,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * <P>The {@linkplain GenericName generic name} will be infered from
  * {@linkplain org.opengis.metadata.Identifier identifier} attributes.
  * More specifically, a {@linkplain ScopedName scoped name} will be constructed using the
- * the shortest {@linkplain Citation#getAlternateTitles alternate titles} (or the
- * {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
+ * the shortest authority's {@linkplain Citation#getAlternateTitles alternate titles} (or
+ * the {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
  * {@linkplain ScopedName#getScope scope}, and the {@linkplain #getCode code} as the
  * {@linkplain ScopedName#asLocalName head}. This heuristic rule seems raisonable
  * since, according ISO 19115, the {@linkplain Citation#getAlternateTitles alternate
@@ -145,10 +145,12 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
     private final InternationalString remarks;
 
     /**
-     * The name of this identifier as a generic name.
-     * Will be constructed only when first needed.
+     * The name of this identifier as a generic name. If <code>null</code>, will
+     * be constructed only when first needed. This field is serialized (instead
+     * of being recreated after deserialization) because it may be a user-supplied
+     * value.
      */
-    private transient GenericName name;
+    private GenericName name;
 
     /**
      * Construct an identifier from a set of properties. Keys are strings from the table below.
@@ -194,6 +196,22 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      */
     public Identifier(final Map properties) throws IllegalArgumentException {
         this(properties, true);
+    }
+
+    /**
+     * Constructs an identifier from an authority and code informations. This is a convenience
+     * constructor for commonly-used parameters. If more control are wanted (for example adding
+     * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
+     *
+     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
+     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param code      The code. The {@linkplain Locale#US English name} is used
+     *                  for the code, and the international string is used for the
+     *                  {@linkplain GenericName generic name}.
+     */
+    public Identifier(final Citation authority, final InternationalString code) {
+        this(authority, code.toString(Locale.US));
+        name = getName(authority, code);
     }
 
     /**
@@ -433,37 +451,43 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
     private GenericName getName() {
         // No need to synchronize; this is not a big deal if the name is created twice.
         if (name == null) {
-            if (authority == null) {
-                name = new org.geotools.util.LocalName(code);
-            } else {
-                InternationalString title = authority.getTitle();
-                int length = title.length();
-                final List alt = authority.getAlternateTitles();
-                if (alt != null) {
-                    for (final Iterator it=alt.iterator(); it.hasNext();) {
-                        final InternationalString candidate = (InternationalString) it.next();
-                        final int candidateLength = candidate.length();
-                        if (candidateLength>0 && candidateLength<length) {
-                            title = candidate;
-                            length = candidateLength;
-                        }
-                    }
-                }
-                GenericName scope;
-                synchronized (Identifier.class) {
-                    if (SCOPES == null) {
-                        SCOPES = new WeakValueHashMap();
-                    }
-                    scope = (GenericName) SCOPES.get(title);
-                    if (scope == null) {
-                        scope = new org.geotools.util.LocalName(title);
-                        SCOPES.put(title, scope);
-                    }
-                }
-                name = new org.geotools.util.ScopedName(scope, code);
-            }
+            name = getName(authority, code);
         }
         return name;
+    }
+
+    /**
+     * Constructs a generic name from the specified authority and code.
+     */
+    private static GenericName getName(final Citation authority, final CharSequence code) {
+        if (authority == null) {
+            return new org.geotools.util.LocalName(code);
+        }
+        InternationalString title = authority.getTitle();
+        int length = title.length();
+        final List alt = authority.getAlternateTitles();
+        if (alt != null) {
+            for (final Iterator it=alt.iterator(); it.hasNext();) {
+                final InternationalString candidate = (InternationalString) it.next();
+                final int candidateLength = candidate.length();
+                if (candidateLength>0 && candidateLength<length) {
+                    title = candidate;
+                    length = candidateLength;
+                }
+            }
+        }
+        GenericName scope;
+        synchronized (Identifier.class) {
+            if (SCOPES == null) {
+                SCOPES = new WeakValueHashMap();
+            }
+            scope = (GenericName) SCOPES.get(title);
+            if (scope == null) {
+                scope = new org.geotools.util.LocalName(title);
+                SCOPES.put(title, scope);
+            }
+        }
+        return new org.geotools.util.ScopedName(scope, code);
     }
     
     /**

@@ -127,8 +127,7 @@ import java.util.prefs.Preferences;
  * @version $Id$
  * @author Rueben Schulz 
  *
- * @TODO the transform code does not deal with the case where grids 
- *       cross +- 180 degrees
+ * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
  */
 public class NADCONTransform extends AbstractMathTransform implements Serializable {
 
@@ -201,7 +200,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     private LocalizationGrid gridShift = null;
 
     /**
-     * The {@link gridShift} values as a {@link LocalizationGridTransform2D}.
+     * The {@link #gridShift} values as a {@link LocalizationGridTransform2D}.
      * Used for interpolating shift values.
      */
     private MathTransform gridShiftTransform = null;
@@ -212,11 +211,11 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     /**
      * Constructs a NADCONTransform from the specified grid shift files.
      *
-     * @param latGridName path and name (or just name if {@link GRID_LOCATION}
-     *        is set) to the latitude differenc file. This will have a .las or
+     * @param latGridName path and name (or just name if {@link #GRID_LOCATION}
+     *        is set) to the latitude difference file. This will have a .las or
      *        .laa file extention.
-     * @param longGridName path and name (or just name if {@link GRID_LOCATION}
-     *        is set) to the longitude differenc file. This will have a .los
+     * @param longGridName path and name (or just name if {@link #GRID_LOCATION}
+     *        is set) to the longitude difference file. This will have a .los
      *        or .loa file extention.
      *
      * @throws ParameterNotFoundException if a math transform parameter cannot 
@@ -928,8 +927,8 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
 
     /**
      * The provider for {@link NADCONTransform}. This provider will construct
-     * transforms from {@linkPlain org.geotools.referencing.crs.GeographicCRS
-     * geographic} to {@linkPlain org.geotools.referencing.crs.GeographicCRS
+     * transforms from {@linkplain org.geotools.referencing.crs.GeographicCRS
+     * geographic} to {@linkplain org.geotools.referencing.crs.GeographicCRS
      * geographic} coordinate reference systems.
      *
      * @version $Id$
@@ -945,7 +944,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          */
         public static final ParameterDescriptor LAT_DIFF_FILE 
             = new org.geotools.parameter.ParameterDescriptor(
-                "Latitude_difference_file", "".getClass(), null, "conus.las");
+                "Latitude_difference_file", String.class, null, "conus.las");
         
         /**
          * The operation parameter descriptor for the "Longitude_difference_file" 
@@ -953,12 +952,16 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          */
         public static final ParameterDescriptor LONG_DIFF_FILE 
             = new org.geotools.parameter.ParameterDescriptor(
-                "Longitude_difference_file", new String().getClass(), null, "conus.los");
+                "Longitude_difference_file", String.class, null, "conus.los");
 
-        /** The parameters group. */
+        /**
+         * The parameters group.
+         */
         static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, "NADCON"),
-                    new Identifier(Citation.EPSG,     "9613")
+                    new Identifier(Citation.EPSG,     "9613"),
+                    new Identifier(Citation.GEOTOOLS,
+                        Resources.formatInternational(ResourceKeys.NADCON_TRANSFORM))
                 }, new ParameterDescriptor[] { LAT_DIFF_FILE, LONG_DIFF_FILE });
 
         /**
@@ -966,17 +969,6 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          */
         public Provider() {
             super(2, 2, PARAMETERS);
-        }
-
-        /**
-         * Returns the resources key for {@linkPlain #getName localized name}.
-         * This method is for internal purpose by Geotools implementation
-         * only.
-         *
-         * @return the resource key for this math transform
-         */
-        protected int getLocalizationKey() {
-            return ResourceKeys.NADCON_TRANSFORM;
         }
 
         /**
@@ -991,10 +983,12 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          *         math transform.
          */
         protected MathTransform createMathTransform(ParameterValueGroup values)
-            throws ParameterNotFoundException, FactoryException {
+            throws ParameterNotFoundException, FactoryException
+        {
+            values = ensureValidValues(values);
             return new NADCONTransform(
-                stringValue(values, LAT_DIFF_FILE),
-                stringValue(values, LONG_DIFF_FILE));
+                stringValue(LAT_DIFF_FILE,  values),
+                stringValue(LONG_DIFF_FILE, values));
         }
     }
 }

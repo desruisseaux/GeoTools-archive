@@ -45,6 +45,7 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.resources.XArray;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -53,14 +54,14 @@ import org.geotools.resources.cts.ResourceKeys;
  * An {@linkplain OperationMethod operation method} capable to creates a {@linkplain MathTransform
  * math transform} from set of {@linkplain GeneralParameterValue parameter values}.
  * Implementations of this class should be listed in the following file:
- * <br>
+ *
  * <blockquote>
- * <code>META-INF/services/org.geotools.referencing.operation.OperationProvider</code>
+ * <P><code>META-INF/services/org.geotools.referencing.operation.OperationProvider</code></P>
  * </blockquote>
- * <br>
- * The {@linkplain MathTransformFactory math transform factory} will parse this file in order
+ *
+ * <P>The {@linkplain MathTransformFactory math transform factory} will parse this file in order
  * to gets all available providers on a system. If this file is bundle in many JAR files, the
- * {@link MathTransformFactory math transform factory} will read all of them.
+ * {@link MathTransformFactory math transform factory} will read all of them.</P>
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -90,7 +91,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a math transform provider from a set of properties.
      * The properties map is given unchanged to the
-     * {@linkplain OperationMethod#OperationMethod(Map,int,int,GeneralParameterDescriptor[])
+     * {@linkplain OperationMethod#OperationMethod(Map,int,int,ParameterDescriptorGroup)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -125,69 +126,112 @@ public abstract class MathTransformProvider extends OperationMethod {
      * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
      * {@link org.geotools.metadata.citation.Citation#EPSG} for example.
      *
-     * @param identifiers The operation identifiers. Should contains at least one identifier.
-     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     * <P>The first entry in the <code>identifiers</code> array is both the
+     * {@linkplain ParameterDescriptorGroup#getName main name} and the
+     * {@linkplain ParameterDescriptorGroup#getIdentifier identifiers}.
+     * All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</P>
+     *
+     * @param identifiers  The operation identifier. Most contains at least one entry.
+     * @param parameters   The set of parameters, or <code>null</code> or an empty array if none.
      */
     protected static ParameterDescriptorGroup group(final Identifier[] identifiers,
                                                     final GeneralParameterDescriptor[] parameters)
     {
         ensureNonNull("identifiers", identifiers);
         if (identifiers.length == 0) {
-            // TODO: localize the message.
-            throw new IllegalArgumentException("Empty array");
+            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ARRAY));
         }
-        final GenericName[] alias = new GenericName[identifiers.length];
-        for (int i=0; i<alias.length; i++) {
-            // TODO: create alias here.
+        int count = 0;
+        GenericName[] alias = new GenericName[identifiers.length];
+        for (int i=0; i<identifiers.length; i++) {
+            if (identifiers[i] instanceof GenericName) {
+                alias[count++] = (GenericName) identifiers[i];
+            }
         }
-        final Map properties = new HashMap(4);
+        alias = (GenericName[]) XArray.resize(alias, count);
+        final Map properties = new HashMap(4, 0.8f);
         properties.put(NAME_PROPERTY,        identifiers[0]);
-        properties.put(IDENTIFIERS_PROPERTY, identifiers);
-//        properties.put(ALIAS_PROPERTY,       alias);
+        properties.put(IDENTIFIERS_PROPERTY, identifiers[0]);
+        properties.put(ALIAS_PROPERTY,       alias);
         return new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
     }
 
     /**
-     * Ensure that the given set of parameters contains only valid values. This method
-     * compares all parameter names against the name declared in {@link #parameters} and
-     * thrown an exception if an unknow parameter is found. It also ensure that all values
-     * are assignable to the
+     * Ensures that the given set of parameters contains only valid values.
+     * This method compares all parameter names against the names declared in the
+     * {@linkplain #getParameters operation method parameter descriptor}. If an unknow
+     * parameter name is found, then an {@link InvalidParameterNameException} is thrown.
+     * This method also ensures that all values are assignable to the
      * {@linkplain ParameterDescriptor#getValueClass expected class}, are between the
      * {@linkplain ParameterDescriptor#getMinimumValue minimum} and
      * {@linkplain ParameterDescriptor#getMaximumValue maximum} values and are one of the
      * {@linkplain ParameterDescriptor#getValidValues set of valid values}.
-     * If the value fails any of those tests, then an exception is thrown.
+     * If the value fails any of those tests, then an
+     * {@link InvalidParameterValueException} is thrown.
      *
      * @param  values The parameters values to check.
+     * @return The parameter values to use for {@linkplain MathTransform math transform}
+     *         construction. May be different than the supplied <code>values</code>
+     *         argument if some missing values needed to be filled with default values.
      * @throws InvalidParameterNameException if a parameter name is unknow.
      * @throws InvalidParameterValueException if a parameter has an invalid value.
      */
-    private void ensureValidValues(final Collection/*<GeneralParameterValue>*/ values)
+    protected ParameterValueGroup ensureValidValues(final ParameterValueGroup values)
+            throws InvalidParameterNameException, InvalidParameterValueException
+    {
+        final ParameterDescriptorGroup parameters = getParameters();
+        if (parameters.equals(values.getDescriptor())) {
+            /*
+             * Since the "official" parameter descriptor was used, the descriptor should
+             * have already enforced argument validity. Concequently, there is no need to
+             * performs the check and we will avoid it as a performance enhancement,
+             * unless assertions are enabled.
+             */
+            IllegalArgumentException e;
+            assert (e=assertValidValues(values.values(), parameters))!=null : e;
+            return values;
+        }
+        final Collection asList = values.values();
+        ensureValidValues(asList, parameters);
+        return new FallbackParameterValueGroup(parameters, (GeneralParameterValue[])
+                   asList.toArray(new GeneralParameterValue[asList.size()]));
+    }
+
+    /**
+     * Implementation of <code>ensureValidValues</code>, to be invoked recursively
+     * if the specified values contains sub-groups of values.
+     *
+     * @param  values The parameters values to check.
+     * @param  parameters The <strong>expected</strong> parameter descriptor
+     *         (not the supplied values descriptor).
+     * @throws InvalidParameterNameException if a parameter name is unknow.
+     * @throws InvalidParameterValueException if a parameter has an invalid value.
+     */
+    private static void ensureValidValues(final Collection/*<GeneralParameterValue>*/ values,
+                                          final ParameterDescriptorGroup parameters)
             throws InvalidParameterNameException, InvalidParameterValueException
     {
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (value instanceof ParameterValueGroup) {
-                ensureValidValues(((ParameterValueGroup) value).values());
-                continue;
-            }
-            final String name;
-            final GeneralParameterDescriptor userDescriptor = value.getDescriptor();
-            final Identifier[] identifiers = userDescriptor.getIdentifiers();
-            if (identifiers!=null && identifiers.length!=0) {
-                name = identifiers[0].getCode();
-            } else {
-                name = userDescriptor.getName().getCode();
-            }
+            final String name = value.getDescriptor().getName().getCode();
             final GeneralParameterDescriptor descriptor;
             try {
-                descriptor = getParameters().descriptor(name);
+                descriptor = parameters.descriptor(name);
             } catch (ParameterNotFoundException cause) {
                 final InvalidParameterNameException exception =
                       new InvalidParameterNameException(Resources.format(
                           ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
                 exception.initCause(cause);
                 throw exception;
+            }
+            if (value instanceof ParameterValueGroup) {
+                if (descriptor instanceof ParameterDescriptorGroup) {
+                    ensureValidValues(((ParameterValueGroup) value).values(),
+                                       (ParameterDescriptorGroup) descriptor);
+                    continue;
+                }
+                throw new InvalidParameterNameException(Resources.format(
+                          ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
             }
             if (value instanceof ParameterValue) {
                 org.geotools.parameter.Parameter.ensureValidValue(
@@ -198,115 +242,62 @@ public abstract class MathTransformProvider extends OperationMethod {
     }
 
     /**
-     * Creates a math transform from the specified set of parameter values. The default
-     * implementation ensures that the specified set of values do not contains any parameter
-     * unknow to {@link #parameters}. It also ensures that all values are assignable to the
-     * {@linkplain ParameterDescriptor#getValueClass expected class}, are between the
-     * {@linkplain ParameterDescriptor#getMinimumValue minimum} and
-     * {@linkplain ParameterDescriptor#getMaximumValue maximum} values and are one of the
-     * {@linkplain ParameterDescriptor#getValidValues set of valid values}.
-     * Then it wraps wraps the values in a group and invokes
-     * {@link #createMathTransform(ParameterValueGroup)}.
-     *
-     * @param  values The parameter values.
-     * @return The created math transform.
-     * @throws InvalidParameterNameException if a parameter name is unknow.
-     * @throws InvalidParameterValueException if a parameter has an invalid value.
-     * @throws ParameterNotFoundException if a required parameter was not found.
-     * @throws FactoryException if the math transform can't be created for some other reason
-     *         (for example a required file was not found).
+     * If arguments are invalid, returns the exception instead of throwing it.
+     * This method is for internal use by assertions only; they will wrap the
+     * exception into an {@link AssertionError}.
      */
-    public MathTransform createMathTransform(final GeneralParameterValue[] values)
-            throws InvalidParameterNameException, InvalidParameterValueException,
-                   ParameterNotFoundException, FactoryException
+    private static IllegalArgumentException assertValidValues(
+            final Collection/*<GeneralParameterValue>*/ values,
+            final ParameterDescriptorGroup parameters)
     {
-        ensureValidValues(Arrays.asList(values));
-        final ParameterDescriptorGroup descriptor = getParameters();
-        if (values.length == 1) {
-            final GeneralParameterValue value = values[0];
-            if (value instanceof ParameterValueGroup) {
-                if (descriptor.equals(value.getDescriptor())) {
-                    return createMathTransform((ParameterValueGroup) value);
-                }
-            }
+        try {
+            ensureValidValues(values, parameters);
+        } catch (IllegalArgumentException exception) {
+            return exception;
         }
-        return createMathTransform(new FallbackParameterValueGroup(descriptor, values));
+        return null;
     }
 
     /**
      * Creates a math transform from the specified group of parameter values.
+     * Subclasses should implements this method as in the example below:
+     *
+     * <blockquote><pre>
+     * values = {@linkplain #ensureValidValues ensureValidValues}(values);
+     * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
+     * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
+     * // etc...
+     * </pre></blockquote>
      *
      * @param  values The group of parameter values.
      * @return The created math transform.
+     * @throws InvalidParameterNameException if the values contains an unknow parameter.
      * @throws ParameterNotFoundException if a required parameter was not found.
+     * @throws InvalidParameterValueException if a parameter has an invalid value.
      * @throws FactoryException if the math transform can't be created for some other reason
-     *         (for example a required file was not found). Checked exceptions like
-     *         {@link java.io.IOException} should be wrapped in this exception.
-     *
-     * @todo Make this method public, and specify in the documentation that the implementors
-     *       must invokes <code>ensureValidValues(values)</code> first.
+     *         (for example a required file was not found).
      */
     protected abstract MathTransform createMathTransform(ParameterValueGroup values)
-            throws ParameterNotFoundException, FactoryException;
+            throws InvalidParameterNameException,
+                   ParameterNotFoundException,
+                   InvalidParameterValueException,
+                   FactoryException;
 
     /**
      * Returns the parameter value for the specified operation parameter.
      * This convenience method is used by subclasses for initializing
      * {@linkplain MathTransform math transform} from a set of parameters.
      *
-     * @param  group The parameter value group to search into.
      * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
-     *
-     * @deprecated This is a bad example of what to do.
      */
-    private static ParameterValue getValue(final ParameterValueGroup group,
-                                           final ParameterDescriptor param)
+    private static ParameterValue getValue(final ParameterDescriptor param,
+                                           final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
         return group.parameter(param.getName().getCode());
-    }
-
-    /**
-     * Returns the parameter value for the specified operation parameter.
-     * This convenience method is used by subclasses for initializing
-     * {@linkplain MathTransform math transform} from a set of parameters.
-     *
-     * @param  group The parameter value group to search into.
-     * @param  param The parameter to look for.
-     * @return The requested parameter value.
-     * @throws ParameterNotFoundException if the parameter is not found.
-     *
-     * @deprecated This is a bad example of what to do.
-     */
-    protected static int intValue(final ParameterValueGroup group,
-                                  final ParameterDescriptor param)
-            throws ParameterNotFoundException
-    {
-        return getValue(group, param).intValue();
-    }
-
-    /**
-     * Returns the parameter value for the specified operation parameter.
-     * This convenience method is used by subclasses for initializing
-     * {@linkplain MathTransform math transform} from a set of parameters.
-     *
-     * @param  group The parameter value group to search into.
-     * @param  param The parameter to look for.
-     * @return The requested parameter value.
-     * @throws ParameterNotFoundException if the parameter is not found.
-     *
-     * @todo What to do with unit? (if some action is taken, don't forget to check
-     *       for null units).
-     *
-     * @deprecated This is a bad example of what to do.
-     */
-    protected static double doubleValue(final ParameterValueGroup group,
-                                        final ParameterDescriptor param)
-            throws ParameterNotFoundException
-    {
-        return getValue(group, param).doubleValue();
     }
     
     /**
@@ -314,28 +305,52 @@ public abstract class MathTransformProvider extends OperationMethod {
      * This convenience method is used by subclasses for initializing
      * {@linkplain MathTransform math transform} from a set of parameters.
      *
-     * @param  group The parameter value group to search into.
      * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
-     *
-     * @deprecated This is a bad example of what to do.
      */
-    protected static String stringValue(final ParameterValueGroup group,
-                                       final ParameterDescriptor  param)
+    protected static String stringValue(final ParameterDescriptor param,
+                                        final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        return getValue(group, param).stringValue();
+        return getValue(param, group).stringValue();
     }
 
     /**
-     * Returns the resources key for {@linkplain #getName localized name}.
-     * This method is for internal purpose by Geotools implementation only.
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by subclasses for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
      *
-     * @deprecated No longer used by this method. We need to construct
-     *             an {@link InternationalString} instead.
+     * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
      */
-    protected int getLocalizationKey() {
-        return -1;
+    protected static int intValue(final ParameterDescriptor param,
+                                  final ParameterValueGroup group)
+            throws ParameterNotFoundException
+    {
+        return getValue(param, group).intValue();
+    }
+
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by subclasses for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo What to do with unit? (if some action is taken, don't forget to check
+     *       for null units).
+     */
+    protected static double doubleValue(final ParameterDescriptor param,
+                                        final ParameterValueGroup group)
+            throws ParameterNotFoundException
+    {
+        return getValue(param, group).doubleValue();
     }
 }
