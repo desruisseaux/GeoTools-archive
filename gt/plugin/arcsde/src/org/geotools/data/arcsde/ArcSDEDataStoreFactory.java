@@ -62,7 +62,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 "Minimun number of open connections", false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_CONNECTIONS));
         paramMetadata[8] = new Param("pool.maxConnections", Integer.class,
-                "Maximun number of open connections", false,
+                "Maximun number of open connections (will not work <2)", false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
         paramMetadata[9] = new Param("pool.increment", Integer.class,
                 "Number of connections created on each pool size increment",
