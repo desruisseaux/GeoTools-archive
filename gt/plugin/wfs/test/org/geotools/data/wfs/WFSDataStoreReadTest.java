@@ -155,7 +155,7 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("FT name = "+wfs.getTypeNames()[1]);
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
         assertNotNull("FeatureType was null",ft);
-        assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+        assertTrue(wfs.getTypeNames()[1]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
         }if(post){
         // post
         System.out.println("Post FeatureTypeTest");

@@ -47,6 +47,7 @@ import org.geotools.xml.gml.GMLSchema.GMLAttribute;
 import org.geotools.xml.gml.GMLSchema.GMLComplexType;
 import org.geotools.xml.gml.GMLSchema.GMLElement;
 import org.geotools.xml.gml.GMLSchema.GMLNullType;
+import org.geotools.xml.handlers.xsi.ComplexTypeHandler;
 import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
@@ -6255,7 +6256,8 @@ public class GMLComplexTypes {
         
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
-        typeFactory.addType(attrs[i]);
+        	if(attrs[i]!=null){
+        		typeFactory.addType(attrs[i]);
 
         if ((geometryAttribute == null)
                 && attrs[i].isGeometry()) {
@@ -6264,7 +6266,7 @@ public class GMLComplexTypes {
                 .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                 geometryAttribute = (GeometryAttributeType) attrs[i];
             }
-        }
+        }}
         }
 
         if (geometryAttribute != null) {
@@ -6304,6 +6306,7 @@ public class GMLComplexTypes {
         
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
+        	if(attrs[i]!=null){
             typeFactory.addType(attrs[i]);
 
             if ((geometryAttribute == null)
@@ -6313,7 +6316,7 @@ public class GMLComplexTypes {
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                     geometryAttribute = (GeometryAttributeType) attrs[i];
                 }
-            }
+            }}
         }
 
         if (geometryAttribute != null) {
@@ -6360,8 +6363,28 @@ public class GMLComplexTypes {
     }
     
     private static AttributeType getAttribute(Element eg){
-    	AttributeType at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
-//System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable());
+    	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
+    		return null;
+    	
+    	AttributeType at = null;
+		if(eg.getType() instanceof ComplexType && eg.getType().getInstanceType().equals(Object[].class)){
+			ComplexType ct = (ComplexType)eg.getType();
+//System.out.println(ct.getChild());
+//System.out.println(ct.getParent());
+
+			switch(ct.getChild().getGrouping()){
+			case ElementGrouping.CHOICE:
+			case ElementGrouping.ALL:
+			case ElementGrouping.SEQUENCE:
+			case ElementGrouping.GROUP:
+				List l =  getAttributes(ct.getChild());
+				if(l!=null)
+				return (AttributeType)l.get(0); // HACK
+ 
+		}}
+	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
+//	    	System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable()+" "+eg.getType().getInstanceType()+" "+eg.getType().getNamespace()+":"+eg.getType().getName());
+		
     	return at;
     }
 }

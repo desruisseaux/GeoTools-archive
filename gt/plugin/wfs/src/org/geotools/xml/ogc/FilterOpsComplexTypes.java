@@ -379,7 +379,9 @@ public class FilterOpsComplexTypes {
         		if(fc.getScalarOps()==0 && fc.getSpatialOps()==0)
         			return false;
         	}
-        	return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Filter && ((Filter)value).getFilterType()!=0;
+        	boolean r = (element !=null && element.getType()!=null && getName().equals(element.getType().getName()));
+        	r = (r && value != null && value instanceof Filter && ((Filter)value).getFilterType()!=0);
+        	return r;
         }
         /**
          * Note the assumption is that the comparison of this filter with the WFS capabilities document has already been processed
