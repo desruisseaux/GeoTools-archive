@@ -19,15 +19,19 @@ package org.geotools.data.wms.gce;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
 
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -37,6 +41,8 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
 
 
@@ -50,10 +56,11 @@ public class WMSReader implements GridCoverageReader {
      * Source must be a WebMapServer object
      *
      * @param source
+     * @throws IOException 
      *
      * @throws RuntimeException DOCUMENT ME!
      */
-    public WMSReader(Object source) {
+    public WMSReader(Object source) throws IOException {
         this.source = source;
 
         if (source instanceof WebMapServer) {
@@ -61,6 +68,8 @@ public class WMSReader implements GridCoverageReader {
         } else {
             throw new RuntimeException("source is not of type WebMapServer");
         }
+        
+        this.format = new WMSFormat(wms.getCapabilities());
     }
 
     public Object getSource() {
@@ -91,11 +100,11 @@ public class WMSReader implements GridCoverageReader {
     }
 
     public void skip() throws IOException {
-        // TODO Auto-generated method stub
+        hasNext = false;
     }
 
     public void dispose() throws IOException {
-        // TODO Auto-generated method stub
+        hasNext = false;
     }
 
     public void setFormat(WMSFormat format) {
@@ -106,8 +115,7 @@ public class WMSReader implements GridCoverageReader {
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
 	public Format getFormat() {
-		// TODO Auto-generated method stub
-		return null;
+		return format;
 	}
 
 	/* (non-Javadoc)
@@ -115,10 +123,10 @@ public class WMSReader implements GridCoverageReader {
 	 */
 	public GridCoverage read(GeneralParameterValue[] parameters) throws IllegalArgumentException, IOException {
         GetMapRequest request = wms.createGetMapRequest();
-        String minx = "";
-        String miny = "";
-        String maxx = "";
-        String maxy = "";
+        double minx = 0;
+        double miny = 0; 
+        double maxx = 0;
+        double maxy = 0;
         
         CoordinateReferenceSystem crs = null;
 
@@ -161,25 +169,25 @@ public class WMSReader implements GridCoverageReader {
             ParameterValue value = (ParameterValue) generalValue;
 
             if (paramName.equals("BBOX_MINX")) {
-                minx = ((Double) value.getValue()).toString();
+                minx = ((Double) value.getValue()).doubleValue();
 
                 continue;
             }
 
             if (paramName.equals("BBOX_MINY")) {
-                miny = ((Double) value.getValue()).toString();
+                miny = ((Double) value.getValue()).doubleValue();
 
                 continue;
             }
 
             if (paramName.equals("BBOX_MAXX")) {
-                maxx = ((Double) value.getValue()).toString();
+                maxx = ((Double) value.getValue()).doubleValue();
 
                 continue;
             }
 
             if (paramName.equals("BBOX_MAXY")) {
-                maxy = ((Double) value.getValue()).toString();
+                maxy = ((Double) value.getValue()).doubleValue();
 
                 continue;
             }
@@ -243,22 +251,30 @@ public class WMSReader implements GridCoverageReader {
             throw new IOException("Image cannot be read from:" + response);
         }
 
-//        Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
-//                new double[] { 816000, 2460400 });
-//        
-//        CoordinateSystem cs;
-//        if (crs != null) {
-//        	cs = (CoordinateSystem) crs;
-//        } else {
-//        	cs = GeographicCoordinateSystem.WGS84;
-//        }
+        Envelope envelope = new GeneralEnvelope(new double[] { minx, miny},
+                new double[] { maxx, maxy});
+        
+        if (crs == null) {
+        	crs = GeographicCRS.WGS84; 
+        }
         
 
         hasNext = false;
 
-//        GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
+        GridCoverage coverage = null;
+		try {
+			coverage = new GridCoverageImpl("wmsMap", crs, null, null, image );
+		} catch (OperationNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NoSuchElementException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FactoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-//        return coverage;
-        return null;
+        return coverage;
 	}
 }

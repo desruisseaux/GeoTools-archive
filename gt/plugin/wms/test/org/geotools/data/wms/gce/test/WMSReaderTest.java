@@ -81,8 +81,9 @@ public class WMSReaderTest extends TestCase {
     }
 
     public void testRead() throws Exception {
-        ParameterDescriptorGroup descriptorGroup = (ParameterDescriptorGroup) reader.getFormat()
-                                                         .getReadParameters();
+    	ParameterValueGroup valueGroup = reader.getFormat().getReadParameters();
+    	
+        ParameterDescriptorGroup descriptorGroup =  (ParameterDescriptorGroup) valueGroup.getDescriptor();
 
         List paramDescriptors = descriptorGroup.descriptors();
         GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.size()];
@@ -142,31 +143,31 @@ public class WMSReaderTest extends TestCase {
             }
 
             if (parameterName.equals("SRS")) {
-                value.setValue("EPSG:26904");
+                value.setValue("EPSG:4326");
 
                 continue;
             }
 
             if (parameterName.equals("BBOX_MINX")) {
-                value.setValue(366800.0);
+                value.setValue(-168.67);
 
                 continue;
             }
 
             if (parameterName.equals("BBOX_MINY")) {
-                value.setValue(2170400.0);
+                value.setValue(17.84);
 
                 continue;
             }
 
             if (parameterName.equals("BBOX_MAXX")) {
-                value.setValue(816000.0);
+                value.setValue(-65.15);
 
                 continue;
             }
 
             if (parameterName.equals("BBOX_MAXY")) {
-                value.setValue(2460400.0);
+                value.setValue(71.55);
 
                 continue;
             }
