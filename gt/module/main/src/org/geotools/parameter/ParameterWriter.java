@@ -209,16 +209,25 @@ public class ParameterWriter extends FilterWriter {
         /*
          * Write the operation name (including aliases) before the table.
          */
+        final String lineSeparator = System.getProperty("line.separator", "\n");
         out.write(' ');
         out.write(name);
         GenericName[] alias = group.getAlias();
         if (alias != null) {
+            final int margin = name.length() + 3;
+            int length = margin;
             boolean hasWrote = false;
             final Identifier identifier = group.getName();
             for (int i=0; i<alias.length; i++) {
                 if (!identifier.equals(alias[i])) {
-                    out.write(hasWrote ? "\", \"" : " (alias \"");
-                    out.write(alias[i].toInternationalString().toString(locale));
+                    out.write(hasWrote ? "\", " : " (alias ");
+                    String aliasName = alias[i].toInternationalString().toString(locale);
+                    if ((length += aliasName.length()) >= 100) {
+                        out.write(lineSeparator);
+                        out.write(Utilities.spaces(margin));
+                    }
+                    out.write('"');
+                    out.write(aliasName);
                     hasWrote = true;
                 }
             }
@@ -226,7 +235,6 @@ public class ParameterWriter extends FilterWriter {
                 out.write("\")");
             }
         }
-        final String lineSeparator = System.getProperty("line.separator", "\n");
         out.write(lineSeparator);
         /*
          * Format the table header (i.e. column names).
@@ -420,8 +428,15 @@ public class ParameterWriter extends FilterWriter {
                     if (index >= elementNames.length) {
                         elementNames = (String[]) XArray.resize(elementNames, index+1);
                     }
-                    if (elementNames[index] == null) {
-                        elementNames[index] = name.toInternationalString().toString(locale);
+                    final String oldName = elementNames[index];
+                    final String newName = name.toInternationalString().toString(locale);
+                    if (oldName==null || oldName.length()>newName.length()) {
+                        /*
+                         * Keep the shortest string, since it is often a code used
+                         * for identification (e.g. EPSG code). It also help to fit
+                         * the table in the window's width.
+                         */
+                        elementNames[index] = newName;
                     }
                 }
             }
