@@ -1071,8 +1071,8 @@ public class GeotoolsFactory extends AbstractFactory
         //       Since we share a single instance of this parser, we must
         //       synchronize.
         if (parser == null) {
-            parser = new Parser(Symbols.DEFAULT, this, this, this,
-                     FactoryFinder.getMathTransformFactory());
+            parser = new Parser(Symbols.DEFAULT, FactoryFinder.getDatumFactory(), this, this,
+                                                 FactoryFinder.getMathTransformFactory());
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);
