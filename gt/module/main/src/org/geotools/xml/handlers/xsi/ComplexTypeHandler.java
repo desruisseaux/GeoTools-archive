@@ -940,14 +940,14 @@ public class ComplexTypeHandler extends XSIElementHandler {
             case ElementGrouping.SEQUENCE:
                 children = ((Sequence) child).getChildren();
                 l = new LinkedList();
-
+                if(children!=null){
                 for (int i = 0; i < children.length; i++) {
                     Element[] t = getChildElements(children[i]);
 
                     if (t != null) {
                         l.addAll(Arrays.asList(t));
                     }
-                }
+                }}
 
                 return (l.size() > 0)
                 ? (Element[]) l.toArray(new Element[l.size()]) : null;
