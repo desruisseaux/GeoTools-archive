@@ -409,16 +409,21 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     private Feature getRowFromIterator(Iterator iter, String idName, int id) {
         Feature result = null;
         Feature currentFeature;
-        Number value;
+        int value = -1;
 
         while (iter.hasNext()) {
             currentFeature = (Feature) iter.next();
-            value = (Number) currentFeature.getAttribute(idName);
+            try {
+                value = Integer.parseInt(currentFeature.getAttribute(idName).toString());
 
-            if ((value != null) && (id == value.intValue())) {
-                result = currentFeature;
+                if (id == value) {
+                    result = currentFeature;
 
-                break;
+                    break;
+                }
+            } catch (NumberFormatException exc) {
+                // If this happens, the data is invalid so dumping a stack trace seems reasonable
+                exc.printStackTrace();
             }
         }
 
