@@ -63,7 +63,7 @@ public class WMSParameterMaker {
                 "Value contains the version of the WMS server to be used");
 
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, String.class, validValues, null, null, null, null);
+                String.class, validValues, null, null, null, null, true);
 
         return param;
     }
@@ -73,9 +73,9 @@ public class WMSParameterMaker {
                 "Value contains the desired format");
 
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, String.class,
+                String.class,
                 capabilities.getRequest().getGetMap().getFormatStrings(), null,
-                null, null, null);
+                null, null, null, true);
 
         return param;
     }
@@ -87,7 +87,7 @@ public class WMSParameterMaker {
         String[] validValues = { getMap };
 
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, String.class, validValues, getMap, null, null, null);
+                String.class, validValues, getMap, null, null, null, true);
 
         return param;
     }
@@ -102,7 +102,7 @@ public class WMSParameterMaker {
         Object[] validValues = (Object[]) srs.toArray();
 
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, String.class, validValues, null, null, null, null);
+                String.class, validValues, null, null, null, null, true);
 
         return param;
     }
@@ -119,7 +119,7 @@ public class WMSParameterMaker {
         Map properties = fillProperties("WIDTH",
                 "Value contains the width, in pixels, of the requested map");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, Integer.class, null, null, new Integer(1), null, null);
+                Integer.class, null, null, new Integer(1), null, null, true);
 
         return param;
     }
@@ -128,7 +128,7 @@ public class WMSParameterMaker {
         Map properties = fillProperties("HEIGHT",
                 "Value contains the height, in pixels, of the requested map");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, Integer.class, null, null, new Integer(1), null, null);
+                Integer.class, null, null, new Integer(1), null, null, true);
 
         return param;
     }
@@ -151,9 +151,9 @@ public class WMSParameterMaker {
 
             Map layerProperties = fillProperties(layer.getName(), "");
 
-            layerParams[i] = new ParameterDescriptor(layerProperties, false,
+            layerParams[i] = new ParameterDescriptor(layerProperties,
                     String.class, layer.getValidStyles().toArray(), null, null,
-                    null, null);
+                    null, null, false);
         }
 
         GeneralParameterDescriptor param = new ParameterDescriptorGroup(properties,
@@ -167,7 +167,7 @@ public class WMSParameterMaker {
                 "Value contains the " + coordDescriptor
                 + " value for the bounding box");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                true, Double.class, null, null, null, null, null);
+                Double.class, null, null, null, null, null, true);
 
         return param;
     }
@@ -193,8 +193,8 @@ public class WMSParameterMaker {
                 "Value indicates map transparency");
         Boolean[] validValues = { new Boolean(true), new Boolean(false) };
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                false, Boolean.class, validValues, new Boolean(false), null,
-                null, null);
+                Boolean.class, validValues, new Boolean(false), null,
+                null, null, false);
 
         return param;
     }
@@ -203,7 +203,7 @@ public class WMSParameterMaker {
         Map properties = fillProperties("BGCOLOR",
                 "Value indicates map background colour in hex format (0xRRGGBB)");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                false, String.class, null, "0xFFFFFF", null, null, null);
+                String.class, null, "0xFFFFFF", null, null, null, false);
 
         return param;
     }
@@ -215,7 +215,7 @@ public class WMSParameterMaker {
         String[] validValues = { defaultValue };
 
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                false, String.class, validValues, defaultValue, null, null, null);
+                String.class, validValues, defaultValue, null, null, null, false);
 
         //TODO Fix exceptions later
         //param.validValues = new TreeSet(capabilities..getException().getFormats());
@@ -226,7 +226,7 @@ public class WMSParameterMaker {
         Map properties = fillProperties("TIME",
                 "Value indicates the time value desired");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                false, String.class, null, null, null, null, null);
+                String.class, null, null, null, null, null, false);
 
         return param;
     }
@@ -235,7 +235,7 @@ public class WMSParameterMaker {
         Map properties = fillProperties("ELEVATION",
                 "Value indicates the elevation value desired");
         GeneralParameterDescriptor param = new ParameterDescriptor(properties,
-                false, String.class, null, null, null, null, null);
+                String.class, null, null, null, null, null, false);
 
         return param;
     }

@@ -21,11 +21,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.parameter.ParameterDescriptorGroup;
+import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 

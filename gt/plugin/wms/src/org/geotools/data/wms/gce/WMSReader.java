@@ -22,33 +22,24 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
-import org.geotools.gc.GridCoverage;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.pt.Envelope;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 
-/**
- * DOCUMENT ME!
- *
- * @author rgould TODO To change the template for this generated type comment
- *         go to Window - Preferences - Java - Code Style - Code Templates
- */
 public class WMSReader implements GridCoverageReader {
     private Object source;
     private boolean hasNext = true;
@@ -72,65 +63,57 @@ public class WMSReader implements GridCoverageReader {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#getFormat()
-     */
-    public Format getFormat() {
-        return format;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#getSource()
-     */
     public Object getSource() {
         return source;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#getMetadataNames()
-     */
     public String[] getMetadataNames() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
-     */
     public String getMetadataValue(String arg0)
         throws IOException, MetadataNameNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#listSubNames()
-     */
     public String[] listSubNames() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#getCurrentSubname()
-     */
     public String getCurrentSubname() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-     */
     public boolean hasMoreGridCoverages() throws IOException {
         return hasNext;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
-     */
-    public GridCoverage read(ParameterValueGroup parameters)
-        throws IllegalArgumentException, IOException {
+    public void skip() throws IOException {
+        // TODO Auto-generated method stub
+    }
+
+    public void dispose() throws IOException {
+        // TODO Auto-generated method stub
+    }
+
+    public void setFormat(WMSFormat format) {
+        this.format = format;
+    }
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
+	 */
+	public Format getFormat() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
+	 */
+	public GridCoverage read(GeneralParameterValue[] parameters) throws IllegalArgumentException, IOException {
         GetMapRequest request = wms.createGetMapRequest();
         String minx = "";
         String miny = "";
@@ -139,11 +122,9 @@ public class WMSReader implements GridCoverageReader {
         
         CoordinateReferenceSystem crs = null;
 
-        List values = parameters.values();
 
-        for (int i = 0; i < values.size(); i++) {
-            GeneralParameterValue generalValue = (GeneralParameterValue) values
-                .get(i);
+        for (int i = 0; i < parameters.length; i++) {
+            GeneralParameterValue generalValue = parameters[i];
 
             String paramName = generalValue.getDescriptor().getName().getCode();
 
@@ -233,11 +214,12 @@ public class WMSReader implements GridCoverageReader {
             
             if (paramName.equals("SRS")) {
             	String srs = value.stringValue();
+
             	try {
-            		crs = FactoryFinder.decode(srs);
-				} catch (FactoryException e) {
+					crs = FactoryFinder.decode(srs);
+				} catch (NoSuchAuthorityCodeException e1) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e1.printStackTrace();
 				}
             }
 
@@ -261,44 +243,22 @@ public class WMSReader implements GridCoverageReader {
             throw new IOException("Image cannot be read from:" + response);
         }
 
-        Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
-                new double[] { 816000, 2460400 });
-        
-        CoordinateSystem cs;
-        if (crs != null) {
-        	cs = (CoordinateSystem) crs;
-        } else {
-        	cs = GeographicCoordinateSystem.WGS84;
-        }
+//        Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
+//                new double[] { 816000, 2460400 });
+//        
+//        CoordinateSystem cs;
+//        if (crs != null) {
+//        	cs = (CoordinateSystem) crs;
+//        } else {
+//        	cs = GeographicCoordinateSystem.WGS84;
+//        }
         
 
         hasNext = false;
 
-        GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
+//        GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
 
-        return coverage;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#skip()
-     */
-    public void skip() throws IOException {
-        // TODO Auto-generated method stub
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageReader#dispose()
-     */
-    public void dispose() throws IOException {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param format
-     */
-    public void setFormat(WMSFormat format) {
-        this.format = format;
-    }
+//        return coverage;
+        return null;
+	}
 }
