@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
 	<pomVersion>3</pomVersion>
+   <extend>${basedir}/../../project.xml</extend>
 	<name>geotools-demos</name>
 	<id>gtdemos_referencing</id>
 	<groupId>gt2</groupId>
