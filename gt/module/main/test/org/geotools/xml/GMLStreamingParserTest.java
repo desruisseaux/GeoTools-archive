@@ -26,6 +26,7 @@ import org.xml.sax.SAXException;
 public class GMLStreamingParserTest extends TestCase {
 
     public void testGTRoadsFeatures() throws SAXException, IOException {
+        FeatureReader fr = null;
         try {
 
             String path = "geoserver/roads.xml";
@@ -36,7 +37,7 @@ public class GMLStreamingParserTest extends TestCase {
             XSISAXHandler.setLogLevel(Level.FINEST);
             XMLElementHandler.setLogLevel(Level.FINEST);
             XSIElementHandler.setLogLevel(Level.FINEST);
-            FeatureReader fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -50,16 +51,21 @@ public class GMLStreamingParserTest extends TestCase {
         } catch (Throwable e) {
             e.printStackTrace();
             fail(e.toString());
+        } finally {
+            if(fr!=null){
+                ((FCBuffer)fr).stop();
+            }
         }
     }
     
     public void testFMERoadsFeatures() throws SAXException, IOException {
+        FeatureReader fr = null;
         try {
             String path = "fme/roads/roads.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            FeatureReader fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -74,16 +80,21 @@ public class GMLStreamingParserTest extends TestCase {
         } catch (Throwable e) {
             e.printStackTrace();
             fail(e.toString());
+        } finally {
+            if(fr!=null){
+                ((FCBuffer)fr).stop();
+            }
         }
     }
     
     public void testFMELakesFeatures() throws SAXException, IOException {
+        FeatureReader fr = null;
         try {
             String path = "fme/lakes/lakes.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            FeatureReader fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -98,10 +109,16 @@ public class GMLStreamingParserTest extends TestCase {
         } catch (Throwable e) {
             e.printStackTrace();
             fail(e.toString());
+        } finally {
+            if(fr!=null){
+                ((FCBuffer)fr).stop();
+            }
         }
     }
     
     public void testFME2StreamsFeatures() throws SAXException, IOException {
+        FeatureReader fr1 = null;
+        FeatureReader fr2 = null;
         try {
             String path = "fme/lakes/lakes.xml";
             File f = TestData.file(this,path);
@@ -111,8 +128,8 @@ public class GMLStreamingParserTest extends TestCase {
             f = TestData.file(this,path);
             URI u2 = f.toURI();
 
-            FeatureReader fr1 = FCBuffer.getFeatureReader(u1,10);
-            FeatureReader fr2 = FCBuffer.getFeatureReader(u2,10);
+            fr1 = FCBuffer.getFeatureReader(u1,10);
+            fr2 = FCBuffer.getFeatureReader(u2,10);
 
             assertNotNull("FeatureReader missing", fr1);
             assertNotNull("FeatureReader missing", fr2);
@@ -143,6 +160,13 @@ public class GMLStreamingParserTest extends TestCase {
         } catch (Throwable e) {
             e.printStackTrace();
             fail(e.toString());
+        } finally {
+            if(fr1!=null){
+                ((FCBuffer)fr1).stop();
+            }
+            if(fr2!=null){
+                ((FCBuffer)fr2).stop();
+            }
         }
     }
 }
