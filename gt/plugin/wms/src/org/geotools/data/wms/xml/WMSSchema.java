@@ -6,6 +6,7 @@
  */
 package org.geotools.data.wms.xml;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -14,6 +15,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.wms.xml.WMSComplexTypes.*;
 import org.geotools.data.wms.xml.WMSDescribeLayerTypes.*;
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
@@ -31,6 +33,9 @@ import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
+import org.geotools.xml.handlers.IgnoreHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * @author Richard Gould
@@ -156,7 +161,10 @@ public class WMSSchema implements Schema {
         
         new WMSElement("WMS_DescribeLayerResponse", WMS_DescribeLayerResponse.getInstance()),
         new WMSElement("LayerDescription", _LayerDescription.getInstance()),
-        new WMSElement("Query", _Query.getInstance())
+        new WMSElement("Query", _Query.getInstance()),
+        
+        
+        new WMSElement(IgnoreHandler.NAME, new WMSSchema.WMSIgnoreType(), 0, Integer.MAX_VALUE)
     };
     
     static final ComplexType[] complexTypes = new ComplexType[] {
@@ -472,6 +480,61 @@ public class WMSSchema implements Schema {
             return new AttributeValueGT(attribute, value.toString());
         }
     }
+    
+    static class WMSIgnoreType implements Type {
+       
+          /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+       */
+      public boolean canEncode(Element element, Object value, Map hints) {
+         // TODO Auto-generated method stub
+         return false;
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+       */
+      public void encode(Element element, Object value, PrintHandler output, Map hints)
+            throws IOException, OperationNotSupportedException {
+         // TODO Auto-generated method stub
+
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+       */
+      public Element findChildElement(String name) {
+         // TODO Auto-generated method stub
+         return null;
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#getInstanceType()
+       */
+      public Class getInstanceType() {
+         // TODO Auto-generated method stub
+         return null;
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#getName()
+       */
+      public String getName() {
+         // TODO Auto-generated method stub
+         return "Ignore";
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#getNamespace()
+       */
+      public URI getNamespace() {
+         return NAMESPACE;
+      }
+      /* (non-Javadoc)
+       * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+       */
+      public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints)
+            throws SAXException, OperationNotSupportedException {
+         // TODO Auto-generated method stub
+         return null;
+      }
+}
+    
     
     static class WMSAttribute extends AttributeGT {
 
