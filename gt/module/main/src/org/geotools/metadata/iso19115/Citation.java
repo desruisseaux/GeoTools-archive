@@ -1,8 +1,12 @@
 package org.geotools.metadata.iso19115;
 
 import java.util.Date;
-import java.util.Locale;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
+import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Series;
@@ -10,174 +14,104 @@ import org.opengis.metadata.citation.Series;
 public class Citation extends MetaData implements
 		org.opengis.metadata.citation.Citation {
 
-	private String[] alternateTitles;
-	private String title;
-	private Date[] dates;
-	private String edition;
+	private List alternateTitles = new ListOf( InternationalString.class );
+	private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
+	
+	private InternationalString title;
+	private Map dates = new HashMap();
+	private InternationalString edition;
 	private Date editionDate;
-	private String[] identifiers;
-	private String[] identifierTypes;
-	private ResponsibleParty[] citedResponsibleParties;
-	private PresentationForm[] presentationForm;
+	private Set identifiers = new SetOf( String.class );
+	private Set identifierTypes = new SetOf( String.class );
+	
+	private Set presentationForm = new SetOf( PresentationForm.class );
 	private Series series;
-	private String otherCitationDetails;
-	private String collectiveTitle;
+	private InternationalString otherCitationDetails;
+	private InternationalString collectiveTitle;
 	private String ISBN;
 	private String ISSN;
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getTitle(java.util.Locale)
-	 */
-	public String getTitle(Locale arg0) {
-		return title;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getAlternateTitles(java.util.Locale)
-	 */
-	public String[] getAlternateTitles(Locale arg0) {
-		return alternateTitles;
-	}
-	public String[] getAlternateTitles() {
-		return alternateTitles;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getDates()
-	 */
-	public Date[] getDates() {
-		return dates;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getEdition(java.util.Locale)
-	 */
-	public String getEdition(Locale arg0) {
-		return edition;
-	}
-	public String getEdition() {
-		return edition;
-	}
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getEditionDate()
-	 */
-	public Date getEditionDate() {
-		return editionDate;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getIdentifiers()
-	 */
-	public String[] getIdentifiers() {
-		return identifiers;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getIdentifierTypes()
-	 */
-	public String[] getIdentifierTypes() {
-		return identifierTypes;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getCitedResponsibleParties()
-	 */
-	public ResponsibleParty[] getCitedResponsibleParties() {
-		return citedResponsibleParties;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getPresentationForm()
-	 */
-	public PresentationForm[] getPresentationForm() {
-		return presentationForm;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getSeries(java.util.Locale)
-	 */
-	public Series getSeries(Locale arg0) {
-		return series;
-	}
-	public Series getSeries() {
-		return series;
-	}
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getOtherCitationDetails(java.util.Locale)
-	 */
-	public String getOtherCitationDetails(Locale arg0) {
-		return otherCitationDetails;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getCollectiveTitle(java.util.Locale)
-	 */
-	public String getCollectiveTitle(Locale arg0) {
-		return collectiveTitle;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getISBN()
-	 */
-	public String getISBN() {
-		return ISBN;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.opengis.metadata.citation.Citation#getISSN()
-	 */
-	public String getISSN() {
-		return ISSN;
-	}
-	
-
-	public String getCollectiveTitle() {
-		return collectiveTitle;
-	}
-	public void setCollectiveTitle(String collectiveTitle) {
-		this.collectiveTitle = collectiveTitle;
-	}
-	public String getOtherCitationDetails() {
-		return otherCitationDetails;
-	}
-	public void setOtherCitationDetails(String otherCitationDetails) {
-		this.otherCitationDetails = otherCitationDetails;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public void setAlternateTitles(String[] alternateTitles) {
-		this.alternateTitles = alternateTitles;
-	}
-	public void setCitedResponsibleParties(
-			ResponsibleParty[] citedResponsibleParties) {
-		this.citedResponsibleParties = citedResponsibleParties;
-	}
-	public void setDates(Date[] dates) {
-		this.dates = dates;
-	}
-	public void setEdition(String edition) {
-		this.edition = edition;
-	}
-	public void setEditionDate(Date editionDate) {
-		this.editionDate = editionDate;
-	}
-	public void setIdentifiers(String[] identifiers) {
-		this.identifiers = identifiers;
-	}
-	public void setISBN(String isbn) {
-		ISBN = isbn;
-	}
-	public void setISSN(String issn) {
-		ISSN = issn;
-	}
-	public void setPresentationForm(PresentationForm[] presentationForm) {
-		this.presentationForm = presentationForm;
-	}
-	public void setSeries(Series series) {
-		this.series = series;
-	}
+    public List getAlternateTitles() {
+        return alternateTitles;
+    }
+    public void setAlternateTitles(List alternateTitles) {
+        this.alternateTitles = alternateTitles;
+    }
+    public Set getCitedResponsibleParties() {
+        return citedResponsibleParties;
+    }
+    public void setCitedResponsibleParties(Set citedResponsibleParties) {
+        this.citedResponsibleParties = citedResponsibleParties;
+    }
+    public InternationalString getCollectiveTitle() {
+        return collectiveTitle;
+    }
+    public void setCollectiveTitle(InternationalString collectiveTitle) {
+        this.collectiveTitle = collectiveTitle;
+    }
+    public Map getDates() {
+        return dates;
+    }
+    public void setDates(Map dates) {
+        this.dates = dates;
+    }
+    public InternationalString getEdition() {
+        return edition;
+    }
+    public void setEdition(InternationalString edition) {
+        this.edition = edition;
+    }
+    public Date getEditionDate() {
+        return editionDate;
+    }
+    public void setEditionDate(Date editionDate) {
+        this.editionDate = editionDate;
+    }
+    public Set getIdentifiers() {
+        return identifiers;
+    }
+    public void setIdentifiers(Set identifiers) {
+        this.identifiers = identifiers;
+    }
+    public Set getIdentifierTypes() {
+        return identifierTypes;
+    }
+    public void setIdentifierTypes(Set identifierTypes) {
+        this.identifierTypes = identifierTypes;
+    }
+    public String getISBN() {
+        return ISBN;
+    }
+    public void setISBN(String isbn) {
+        ISBN = isbn;
+    }
+    public String getISSN() {
+        return ISSN;
+    }
+    public void setISSN(String issn) {
+        ISSN = issn;
+    }
+    public InternationalString getOtherCitationDetails() {
+        return otherCitationDetails;
+    }
+    public void setOtherCitationDetails(InternationalString otherCitationDetails) {
+        this.otherCitationDetails = otherCitationDetails;
+    }
+    public Set getPresentationForm() {
+        return presentationForm;
+    }
+    public void setPresentationForm(Set presentationForm) {
+        this.presentationForm = presentationForm;
+    }
+    public Series getSeries() {
+        return series;
+    }
+    public void setSeries(Series series) {
+        this.series = series;
+    }
+    public InternationalString getTitle() {
+        return title;
+    }
+    public void setTitle(InternationalString title) {
+        this.title = title;
+    }
 }
