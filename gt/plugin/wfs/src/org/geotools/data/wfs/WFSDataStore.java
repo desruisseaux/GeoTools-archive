@@ -246,6 +246,8 @@ public class WFSDataStore extends AbstractDataStore {
         if (featureTypeCache.containsKey(typeName)) {
             return (FeatureType) featureTypeCache.get(typeName);
         }
+        
+        // TODO sanity check for request with capabilities obj
 
         FeatureType t = null;
 

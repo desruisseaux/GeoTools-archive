@@ -1390,6 +1390,7 @@ public class DocumentWriter {
             schemaLocs = (schemaLocs == null) ? new HashMap() : schemaLocs;
 
             for (int i = 0; i < imports.length; i++) {
+                if(imports[i] !=null){
                 if (imports[i] == schema) {
                     writer.write(" xmlns=\"" + schema.getTargetNamespace()
                         + "\"");
@@ -1423,7 +1424,7 @@ public class DocumentWriter {
                         }
                     }
                 }
-            }
+            }}
 
             s = s.trim();
 
