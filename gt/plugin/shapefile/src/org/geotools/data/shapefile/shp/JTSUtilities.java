@@ -322,4 +322,36 @@ public class JTSUtilities {
     }
     return type;
   }
+
+    /**
+     * Determine the default ShapeType for a featureClass.  Shapetype will be the 2D shapetype.
+     *
+     * @param featureClass                The Geometry to examine.
+     * @return The best ShapeType.
+     * @throws ShapefileException If theres a problem, like a bogus feature class.
+     */
+    public static final ShapeType getShapeType(Class featureClass)
+            throws ShapefileException {
+                                                                                                                              
+        ShapeType type = null;
+                                                                                                                              
+        if (Point.class.equals(featureClass)) {
+           type = ShapeType.POINT;
+        }
+        else if (MultiPoint.class.equals(featureClass)) {
+           type = ShapeType.MULTIPOINT;
+        }
+        else if (Polygon.class.equals(featureClass) || MultiPolygon.class.equals(featureClass)) {
+           type = ShapeType.POLYGON;
+        }
+        else if (LineString.class.equals(featureClass) || MultiLineString.class.equals(featureClass)) {
+                    type = ShapeType.ARC;
+        }
+                                                                                                                              
+        if (type == null) {
+            throw new ShapefileException("Cannot handle geometry class : " + (featureClass == null ? "null" : featureClass.getName()));
+        }
+        return type;
+    }
+
 }

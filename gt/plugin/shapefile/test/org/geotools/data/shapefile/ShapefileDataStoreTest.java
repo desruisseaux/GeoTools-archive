@@ -230,6 +230,28 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             }
         }
     }
+
+    public void testWriteShapefileWithNoRecords() throws Exception {
+        //create a FeatureType
+        AttributeType thePolygon = AttributeTypeFactory.newAttributeType("a", Polygon.class);
+        AttributeType attributeB = AttributeTypeFactory.newAttributeType("b", String.class);
+ 
+        FeatureType featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]{thePolygon, attributeB}, "whatever");
+
+        File tempFile = getTempFile();
+        ShapefileDataStore shapefileDataStore = new ShapefileDataStore(tempFile.toURL());
+        shapefileDataStore.createSchema(featureType);
+        FeatureWriter featureWriter = shapefileDataStore.getFeatureWriter(shapefileDataStore.getTypeNames()[0], Transaction.AUTO_COMMIT);
+
+        //don't add any features to the data store....
+
+        //this should create a shapefile with no records. Not sure about the semantics of this,
+        //but it's meant to be used in the context of a FeatureCollection iteration,
+        //where the FeatureCollection has nothing in it.
+        featureWriter.close();
+    }
+
+
     
     private FeatureCollection createFeatureCollection() throws Exception {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");

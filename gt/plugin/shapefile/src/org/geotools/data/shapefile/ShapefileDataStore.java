@@ -1005,6 +1005,17 @@ public class ShapefileDataStore extends AbstractFileDataStore {
          * @throws IOException DOCUMENT ME!
          */
         protected void flush() throws IOException {
+            //not sure the check for records <=0 is necessary,
+            //but if records > 0 and shapeType is null there's probably
+            //another problem.
+            if(records <= 0 && shapeType == null)
+            {
+                GeometryAttributeType geometryAttributeType = featureType.getDefaultGeometry();
+                                                                                
+                Class featureType = geometryAttributeType.getType();
+                shapeType = JTSUtilities.getShapeType(featureType);
+            }
+
             shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
             
             dbfHeader.setNumRecords(records);
