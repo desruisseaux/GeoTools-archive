@@ -18,6 +18,7 @@ package org.geotools.data;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.net.URI;
 
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.cs.AxisInfo;
@@ -59,8 +60,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * @author Jody Garnett, Refractions Research
  */
-public class FeatureSourceMetadataEnity extends AbstractMetadataEntity {
+public class FeatureTypeMetadataEnity extends AbstractMetadataEntity {
     DataStore store;
+    URI namespace;
     String typeName;
     InternationalString displayName;
     InternationalString description;
@@ -69,7 +71,7 @@ public class FeatureSourceMetadataEnity extends AbstractMetadataEntity {
     int count;
     Envelope bounds;
     
-    public FeatureSourceMetadataEnity( DataStore store, String typeName ){
+    public FeatureTypeMetadataEnity( DataStore store, URI namespace, String typeName ){
         this.store = store;
         this.typeName = typeName;
         this.displayName = new InternationalString( typeName.substring(0,1).toUpperCase() + typeName.substring(1).toLowerCase() );
@@ -94,6 +96,9 @@ public class FeatureSourceMetadataEnity extends AbstractMetadataEntity {
     }
     public InternationalString getDescription() {
         return description;
+    }
+    public URI getNamespace(){
+        return namespace;
     }
     public String getTypeName() {
         return typeName;
