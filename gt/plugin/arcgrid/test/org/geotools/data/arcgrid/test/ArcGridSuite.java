@@ -25,6 +25,7 @@ public class ArcGridSuite extends TestCase {
     suite.addTestSuite(ArcGridHeaderTest.class);
     suite.addTestSuite(ArcGridRenderTest.class);
     suite.addTestSuite(ArcGridReaderTest.class);
+    suite.addTestSuite(ArcGridReadWriteTest.class);
     suite.addTestSuite(ServiceTest.class);
     
     return suite;
