@@ -54,8 +54,11 @@ package org.geotools.ct;
  * @see MathTransform#derivative
  * @see MathTransform#transform(CoordinatePoint,CoordinatePoint)
  * @see CoordinateTransformationFactory#createFromCoordinateSystems
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.TransformException} in
+ *             the {@link org.opengis.referencing.operation} package.
  */
-public class TransformException extends Exception {
+public class TransformException extends org.opengis.referencing.operation.TransformException {
     /**
      * Serial number for interoperability with different versions.
      */

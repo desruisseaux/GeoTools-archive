@@ -101,8 +101,11 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see Latitude
  * @see Longitude
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.measure.AngleFormat}
+ *             in the {@link org.geotools.measure} package.
  */
 public class AngleFormat extends Format {
     /**

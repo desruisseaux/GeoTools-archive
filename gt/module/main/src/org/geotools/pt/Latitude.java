@@ -38,11 +38,14 @@ package org.geotools.pt;
  * A latitude angle. Positive latitudes are North, while negative
  * latitudes are South. This class has no direct OpenGIS equivalent.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Longitude
  * @see AngleFormat
+ *
+ * @deprecated Replaced by {@link org.geotools.measure.Latitude}
+ *             in the {@link org.geotools.measure} package.
  */
 public final class Latitude extends Angle {
     /**

@@ -43,8 +43,12 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id: MismatchedDimensionException.java,v 1.3 2003/05/13 10:58:49 desruisseaux Exp $
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.opengis.spatialschema.geometry.MismatchedDimensionException}.
  */
-public class MismatchedDimensionException extends IllegalArgumentException {
+public class MismatchedDimensionException extends
+        org.opengis.spatialschema.geometry.MismatchedDimensionException
+{
     /**
      * Creates new exception without detail message.
      */

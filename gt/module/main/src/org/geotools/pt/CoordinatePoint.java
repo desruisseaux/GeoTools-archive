@@ -56,6 +56,9 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see org.opengis.pt.PT_CoordinatePoint
  * @see java.awt.geom.Point2D
+ *
+ * @deprecated Replaced by {@link org.geotools.geometry.DirectPosition}
+ *             in the {@link org.geotools.geometry} package.
  */
 public class CoordinatePoint implements Dimensioned, Cloneable, Serializable {
     /**

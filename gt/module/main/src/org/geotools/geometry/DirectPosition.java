@@ -244,6 +244,8 @@ public class DirectPosition implements org.opengis.spatialschema.geometry.Direct
      *
      * @param  point The new coordinate for this point.
      * @throws MismatchedDimensionException if this coordinate point is not two-dimensional.
+     *
+     * @task TODO: Check axis order.
      */
     public void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ordinates.length != 2) {
@@ -279,6 +281,8 @@ public class DirectPosition implements org.opengis.spatialschema.geometry.Direct
      * This is a convenience method for interoperability with Java2D.
      *
      * @throws IllegalStateException if this coordinate point is not two-dimensional.
+     *
+     * @task TODO: Check axis order.
      */
     public Point2D toPoint2D() throws IllegalStateException {
         if (ordinates.length == 2) {

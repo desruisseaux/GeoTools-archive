@@ -39,11 +39,14 @@ package org.geotools.pt;
  * negative longitudes are West. This class has no direct
  * OpenGIS equivalent.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Latitude
  * @see AngleFormat
+ *
+ * @deprecated Replaced by {@link org.geotools.measure.Longitude}
+ *             in the {@link org.geotools.measure} package.
  */
 public final class Longitude extends Angle {
     /**

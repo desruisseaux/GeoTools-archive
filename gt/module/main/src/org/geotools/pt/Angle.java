@@ -50,12 +50,15 @@ import org.geotools.resources.ClassChanger;
  * to bring one line or plane into coincidence with another,
  * generally measured in degrees, sexagesimal degrees or grads.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Latitude
  * @see Longitude
  * @see AngleFormat
+ *
+ * @deprecated Replaced by {@link org.geotools.measure.Angle}
+ *             in the {@link org.geotools.measure} package.
  */
 public class Angle implements Comparable, Serializable {
     /**
