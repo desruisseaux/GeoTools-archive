@@ -19,9 +19,6 @@ package org.geotools.data.vpf;
 import java.io.File;
 import java.io.IOException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.Map;
 
 import org.geotools.data.DataSourceMetadataEnity;
@@ -43,6 +40,7 @@ import org.geotools.data.DataStoreFactorySpi;
 public class VPFDataStoreFactory implements DataStoreFactorySpi {
     public VPFDataStoreFactory() {
     }
+    
     public String getDisplayName() {
         return "Vector Product Format";
     }
@@ -102,7 +100,9 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
         return create(params);
     }
     
-    public static final Param DIR = new Param( "dir", File.class, "Directory containing dht file", true );    
+    public static final Param DIR = new Param( "dir", File.class, "Directory containing dht file", true );
+    //public static final Param TYPE = new Param()
+    
     public Param[] getParametersInfo() {
         return new Param[] { DIR,  };
     }

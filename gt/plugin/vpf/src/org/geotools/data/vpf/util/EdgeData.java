@@ -47,8 +47,7 @@ public class EdgeData extends HashMap {
                 int i = 0;
 
                 while (st.hasMoreTokens()) {
-                    StringTokenizer st2 = new StringTokenizer(st.nextToken(), 
-                                                              ",");
+                    StringTokenizer st2 = new StringTokenizer(st.nextToken(), ",");
                     c[i] = new Coordinate(Double.parseDouble(st2.nextToken()), 
                                           Double.parseDouble(st2.nextToken()));
                     i++;
@@ -64,14 +63,14 @@ public class EdgeData extends HashMap {
                     Object tmp = ((RowField) value).getValue();
 
                     if (tmp instanceof TripletId) {
-                        return super.put(key_s, ((TripletId) tmp).parseBytes());
+                        return super.put(key_s, (TripletId) tmp );
+                    } else if ( tmp instanceof Integer ) {
+                        return super.put(key_s, ((Integer) tmp) );
                     } else {
-                        return super.put(key_s, 
-                                         new TripletData(
-                                                 ((Integer) tmp).intValue()));
+                        System.out.println( "DYNGE I TRIPLETGENERERING!!!" );
                     }
                 } else {
-                    return super.put(key_s, new TripletData());
+                    return super.put(key_s, null );
                 }
             }
         }

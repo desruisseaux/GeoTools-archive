@@ -16,8 +16,9 @@
  */
 package org.geotools.data.vpf.io;
 
-import org.geotools.data.vpf.util.*;
+//import org.geotools.data.vpf.util.*;
 
+import org.geotools.data.vpf.exc.VPFDataFormatException;
 
 /**
  * Class TripletId.java is responsible for
@@ -26,13 +27,11 @@ import org.geotools.data.vpf.util.*;
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  * @version 1.0.0
  */
-public class TripletId {
-    /**
-     * Describe variable <code>rawData</code> here.
-     *
+public class TripletId extends Number {
+    /** 
+     * The raw data that can be decomposed into as many as three separate numbers
      */
     private byte[] rawData = null;
-    private int currentByte = 0;
 
     /**
      * Creates a new <code>TripletId</code> instance.
@@ -43,110 +42,127 @@ public class TripletId {
         rawData = data;
     }
 
-    public byte[] getData() {
-        return rawData;
-    }
-
     /**
      * Describe <code>toString</code> method here.
      *
      * @return a <code>String</code> value
      */
     public String toString() {
-        return (rawData == null)
-               ? "NULL" : new String(rawData, 1, rawData.length - 1);
+        String result = new String();
+        try {
+            if(getIdLength() > 0) {
+                result = new Integer(getId()).toString();
+            }
+            if(getTileIdLength() > 0) {
+                result = result.concat("%").concat(new Integer(getTileId()).toString()).trim();
+            }
+            if(getNextIdLength() > 0) {
+                result = result.concat("%").concat(new Integer(getNextId()).toString()).trim();
+            }
+        } catch (RuntimeException exp) {
+            throw new VPFDataFormatException("This triplet is invalid.", exp);
+        }
+        return result;
     }
 
-    public TripletData parseBytes() {
-        currentByte = 1;
+    private int getIdLength() {
+        return (rawData[0] >> 6) & 3;
+    }
 
-        int[] pieces = new int[3];
-        byte definition = rawData[0];
-        pieces[0] = (definition >> 2) & 3;
-        pieces[1] = (definition >> 4) & 3;
-        pieces[2] = (definition >> 6) & 3;
+    private int getTileIdLength() {
+        return (rawData[0] >> 4) & 3;
+    }
 
-        int size = 0;
+    private int getNextIdLength() {
+        return (rawData[0] >> 2) & 3;
+    }
 
-        for (int i = 0; i < pieces.length; i++) {
-            switch (pieces[i]) {
-            case 0:
-                break;
+    /**
+     * @return Returns the ID, the first number of the triplet 
+     */
+    public int getId() {
+        int result = 0;
+        int length = getIdLength();
+        int piece;
 
-            case 1:
-                size++;
-
-                break;
-
-            case 2:
-                size++;
-
-                break;
-
-            case 3:
-                size++;
-
-                break;
+        if (length > 0) {
+            try {
+                for (int inx = 0; inx < length; inx++) {
+                	piece = rawData[inx + 1];
+                	// Convert bytes from signed to unsigned
+                	if(piece < 0) {
+                		piece += -2 * (Byte.MIN_VALUE);
+                	}
+                    result += piece << (8 * inx);
+                }
+            } catch (RuntimeException exp) {
+                exp.printStackTrace();
+                result = 0;
             }
         }
 
-        switch (size) {
-        case 1:
-            return new TripletData(parseByte(2));
-
-        case 2:
-            return new TripletData(parseByte(2), parseByte(1));
-
-        case 3:
-            return new TripletData(parseByte(2), parseByte(1), parseByte(0));
-
-        default:
-            System.out.println("FUCK OFF");
-        }
-
-        return null;
+        return result;
     }
+    /**
+     * @return Returns the Tile ID, the second number of the triplet 
+     */
+    public int getTileId() {
+        int result = 0;
+        int length = getTileIdLength();
+        int piece;
 
-    private int parseByte(int index) {
-        byte definition = rawData[0];
-        int size = (definition >> ((index + 1) * 2)) & 3;
-        int tmp = 0;
-        int tmpByte;
+        if (length > 0) {
+            int rowIdLength = getIdLength();
 
-        switch (size) {
-        case 1:
-            return fixByte(rawData[currentByte++]);
-
-        case 2:
-            tmp = fixByte(rawData[currentByte++]);
-
-            return (fixByte(rawData[currentByte++]) * 256) + tmp;
-
-        case 3:
-            tmp = fixByte(rawData[currentByte++]);
-            tmp += (fixByte(rawData[currentByte++]) * 256);
-            tmp += (fixByte(rawData[currentByte++]) * 256 * 256);
-
-            return (fixByte(rawData[currentByte++]) * 256 * 256 * 256) + tmp;
+            try {
+                for (int inx = 0; inx < length; inx++) {
+                	piece = rawData[inx + rowIdLength + 1];
+                	if(piece < 0) {
+                		piece += 2 * Byte.MAX_VALUE;
+                	}
+                    result += piece << (8 * inx);
+                }
+            } catch (RuntimeException exp) {
+                exp.printStackTrace();
+                result = 0;
+            }
         }
 
-        return -1;
+        return result;
     }
+    /**
+     * @return Returns the Next ID, the third number of the triplet 
+     */
+    public int getNextId() {
+        int result = 0;
+        int length = getTileIdLength();
+        int piece;
 
-    private int fixByte(byte fixit) {
-        int tmpInt = fixit;
+        if (length > 0) {
+            int prevLength = getIdLength() + getTileIdLength();
 
-        if (fixit < 0) {
-            tmpInt = 256 + fixit;
+            try {
+                for (int inx = 0; inx < length; inx++) {
+                	piece = rawData[inx + prevLength + 1];
+                	if(piece < 0) {
+                		piece += 2 * Byte.MAX_VALUE;
+                	}
+                    result += piece << (8 * inx);
+                }
+            } catch (RuntimeException exp) {
+                exp.printStackTrace();
+                result = 0;
+            }
         }
 
-        return tmpInt;
+        return result;
     }
 
     /**
      * Describe <code>calculateDataSize</code> method here.
      *
      * @param definition a <code>byte</code> value
+     *
      * @return an <code>int</code> value
      */
     public static int calculateDataSize(byte definition) {
@@ -189,5 +205,42 @@ public class TripletId {
         }
 
         return size;
+    }
+	/* (non-Javadoc)
+	 * @see java.lang.Number#doubleValue()
+	 */
+	public double doubleValue() {
+		return new Integer(getId()).doubleValue();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Number#floatValue()
+	 */
+	public float floatValue() {
+		return new Integer(getId()).floatValue();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Number#intValue()
+	 */
+	public int intValue() {
+		return getId();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Number#longValue()
+	 */
+	public long longValue() {
+		return new Integer(getId()).longValue();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Number#byteValue()
+	 */
+    public byte byteValue() {
+        return new Integer(getId()).byteValue();
+    }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Number#shortValue()
+	 */
+    public short shortValue() {
+        return new Integer(getId()).shortValue();
     }
 }

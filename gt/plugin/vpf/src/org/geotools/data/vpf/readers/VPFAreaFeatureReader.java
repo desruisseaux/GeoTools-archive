@@ -170,7 +170,7 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
                 coords_in_ring.clear();
 
                 EdgeData tmpEdge = null;
-                TripletData tmpTriplet = null;
+                TripletId tmpTriplet = null;
                 int start_edge = ((Integer) currentRing.get("start_edge")).intValue();
 
                 int cur_tile = currentTile;
@@ -235,18 +235,39 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
                     edgeRow = (TableRow) edgeInput.readRow(next_row);
                     tmpEdge = readEdge(edgeRow);
 
-                    int right_face = ((TripletData) tmpEdge.get("right_face")).getNext_row_id();
-                    int left_face = ((TripletData) tmpEdge.get("left_face")).getNext_row_id();
-
+                    
+                    int right_face = 0;
+                    int left_face = 0;
+                    
+                    Object r_face = tmpEdge.get("right_face");
+                    Object l_face = tmpEdge.get("left_face");
+                    
+                    if (  r_face instanceof TripletId ) {
+                        right_face = ((TripletId) r_face).getId();
+                    } else if ( r_face instanceof Integer ) {
+                        right_face = ((Integer) r_face).intValue();
+                    } else {
+                        System.out.println( "Error in triplet" );
+                    }
+                    
+                    if (  l_face instanceof TripletId ) {
+                        left_face = ((TripletId) l_face).getId();
+                    } else if (l_face instanceof Integer ) {
+                        left_face = ((Integer) l_face).intValue();
+                    } else {
+                        System.out.println( "Error in triplet" );
+                    }
+                    
+                    
                     if (right_face == cur_face) {
-                        tmpTriplet = (TripletData) tmpEdge.get("right_edge");
+                        tmpTriplet = (TripletId) tmpEdge.get("right_edge");
                         LineString ls = (LineString) tmpEdge.get("coordinates");
 
                         for (int i = 0; i < ls.getNumPoints(); i++) {
                             coords_in_ring.add(ls.getCoordinateN(i));
                         }
                     } else if (left_face == cur_face) {
-                        tmpTriplet = (TripletData) tmpEdge.get("left_edge");
+                        tmpTriplet = (TripletId) tmpEdge.get("left_edge");
 
                         LineString ls = (LineString) tmpEdge.get("coordinates");
 
@@ -261,10 +282,10 @@ public class VPFAreaFeatureReader extends VPFReader implements FileConstants {
                     }
 
                     //next_tile = tmpTriplet.getNext_tile_id();
-                    if (tmpTriplet.getCurrent_row_id() != -1) {
-                        next_row = tmpTriplet.getCurrent_row_id();
+                    if (tmpTriplet.getId() != -1) {
+                        next_row = tmpTriplet.getId();
                     } else {
-                        next_row = tmpTriplet.getNext_row_id();
+                        next_row = tmpTriplet.getNextId();
                     }
 
                     if (next_row == start_edge) {

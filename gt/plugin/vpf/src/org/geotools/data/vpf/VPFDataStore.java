@@ -22,17 +22,10 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStore;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.Query;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-
-import org.geotools.filter.Filter;
 
 
 /**
@@ -49,31 +42,19 @@ public class VPFDataStore extends AbstractDataStore implements DataStore {
         dataBase = new VPFDataBase(file);        
     }
 
-    public VPFFeatureReader getFeatureReader2(String typename)
-                                       throws java.io.IOException {
-        System.out.println("GETFEATUREREADER");
-
-        return new VPFFeatureReader(typename, dataBase, 
-                                    VPFSchemaCreator.getSchema(typename));
+    public VPFFeatureReader getFeatureReader2(String typename) throws java.io.IOException {
+        return new VPFFeatureReader(typename, dataBase, VPFSchemaCreator.getSchema(typename));
     }
 
-    protected FeatureReader getFeatureReader(String typename)
-                                      throws java.io.IOException {
-        System.out.println("GETFEATUREREADER");
-
-        return new VPFFeatureReader(typename, dataBase, 
-                                    VPFSchemaCreator.getSchema(typename));
+    protected FeatureReader getFeatureReader(String typename) throws java.io.IOException {
+        return new VPFFeatureReader(typename, dataBase, VPFSchemaCreator.getSchema(typename));
     }
 
     public FeatureType getSchema(String str) throws IOException {
-        System.out.println("GETSCHEMA");
-
         return VPFSchemaCreator.getSchema(str);
     }
 
     public String[] getTypeNames() {
-        System.out.println("GETTYPENAMES");
-
         return VPFSchemaCreator.getTypeNames();
     }
 }
