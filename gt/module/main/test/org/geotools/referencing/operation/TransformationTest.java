@@ -26,16 +26,18 @@ import junit.framework.TestSuite;
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.PassThroughOperation;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationNotFoundException;
-
-// Geotools dependencies
-import org.geotools.referencing.crs.EngineeringCRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.opengis.referencing.operation.PassThroughOperation;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.Transformation;
 
 
 /**
@@ -83,34 +85,36 @@ public class TransformationTest extends TestTransform {
      * Make sure that <code>createOperation(sourceCRS, targetCRS)</code>
      * returns an identity transform when <code>sourceCRS</code> and <code>targetCRS</code>
      * are identical, and tests the generic CRS.
+     *
+     * @todo uses static imports when we will be allowed to compile with J2SE 1.5.
      */
     public void testGenericTransform() throws FactoryException {
-        assertTrue(opFactory.createOperation(GeographicCRS.WGS84,
-                   GeographicCRS.WGS84).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
-                   EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_3D,
-                   EngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
-                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
-                   EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
-                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(GeographicCRS.WGS84,
-                   EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(EngineeringCRS.GENERIC_2D,
-                   GeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
+                   org.geotools.referencing.crs.GeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
+                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_3D,
+                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
+                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
+                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
+                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
+                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
+                   org.geotools.referencing.crs.GeographicCRS.WGS84).getMathTransform().isIdentity());
         try {
-            opFactory.createOperation(EngineeringCRS.CARTESIAN_2D,
-                                      GeographicCRS.WGS84);
+            opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
+                                      org.geotools.referencing.crs.GeographicCRS.WGS84);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
         try {
-            opFactory.createOperation(GeographicCRS.WGS84,
-                                      EngineeringCRS.CARTESIAN_2D);
+            opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
+                                      org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
@@ -121,45 +125,45 @@ public class TransformationTest extends TestTransform {
      * Tests a transformation with unit conversion.
      */
     public void testUnitConversion() throws Exception {
-        // NOTE: TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] is used here as
-        //       a hack for avoiding datum shift. Shifts will be tested later.
+        // NOTE: TOWGS84[0,0,0,0,0,0,0] is used here as a hack for
+        //       avoiding datum shift. Shifts will be tested later.
         final CoordinateReferenceSystem targetCRS = crsFactory.createFromWKT(
-                "PROJCS[\"TransverseMercator\",\n"                     +
-                "  GEOGCS[\"Sphere\",\n"                               +
-                "    DATUM[\"Sphere\",\n"                              +
-                "      SPHEROID[\"Sphere\", 6370997.0, 0.0],\n"        +
-                "      TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]],\n" +
-                "    PRIMEM[\"Greenwich\", 0.0],\n"                    +
-                "    UNIT[\"degree\", 0.017453292519943295],\n"        +
-                "    AXIS[\"Longitude\", EAST],\n"                     +
-                "    AXIS[\"Latitude\", NORTH]],\n"                    +
-                "  PROJECTION[\"Transverse_Mercator\",\n"              +
-                "    AUTHORITY[\"OGC\",\"Transverse_Mercator\"]],\n"   +
-                "  PARAMETER[\"central_meridian\", 170.0],\n"          +
-                "  PARAMETER[\"latitude_of_origin\", 50.0],\n"         +
-                "  PARAMETER[\"scale_factor\", 0.95],\n"               +
-                "  PARAMETER[\"false_easting\", 0.0],\n"               +
-                "  PARAMETER[\"false_northing\", 0.0],\n"              +
-                "  UNIT[\"feet\", 0.304800609601219],\n"               +
-                "  AXIS[\"x\", EAST],\n"                               +
+                "PROJCS[\"TransverseMercator\",\n"                   +
+                "  GEOGCS[\"Sphere\",\n"                             +
+                "    DATUM[\"Sphere\",\n"                            +
+                "      SPHEROID[\"Sphere\", 6370997.0, 0.0],\n"      +
+                "      TOWGS84[0,0,0,0,0,0,0]],\n"                   +
+                "    PRIMEM[\"Greenwich\", 0.0],\n"                  +
+                "    UNIT[\"degree\", 0.017453292519943295],\n"      +
+                "    AXIS[\"Longitude\", EAST],\n"                   +
+                "    AXIS[\"Latitude\", NORTH]],\n"                  +
+                "  PROJECTION[\"Transverse_Mercator\",\n"            +
+                "    AUTHORITY[\"OGC\",\"Transverse_Mercator\"]],\n" +
+                "  PARAMETER[\"central_meridian\", 170.0],\n"        +
+                "  PARAMETER[\"latitude_of_origin\", 50.0],\n"       +
+                "  PARAMETER[\"scale_factor\", 0.95],\n"             +
+                "  PARAMETER[\"false_easting\", 0.0],\n"             +
+                "  PARAMETER[\"false_northing\", 0.0],\n"            +
+                "  UNIT[\"feet\", 0.304800609601219],\n"             +
+                "  AXIS[\"x\", EAST],\n"                             +
                 "  AXIS[\"y\", NORTH]]\n");
 
         final CoordinateReferenceSystem sourceCRS = crsFactory.createFromWKT(
-                "GEOGCS[\"Sphere\",\n"                               +
-                "  DATUM[\"Sphere\",\n"                              +
-                "    SPHEROID[\"Sphere\", 6370997.0, 0.0],\n"        +
-                "    TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]],\n" +
-                "  PRIMEM[\"Greenwich\", 0.0],\n"                    +
-                "  UNIT[\"degree\", 0.017453292519943295],\n"        +
-                "  AXIS[\"Longitude\", EAST],\n"                     +
+                "GEOGCS[\"Sphere\",\n"                        +
+                "  DATUM[\"Sphere\",\n"                       +
+                "    SPHEROID[\"Sphere\", 6370997.0, 0.0],\n" +
+                "    TOWGS84[0,0,0,0,0,0,0]],\n"              +
+                "  PRIMEM[\"Greenwich\", 0.0],\n"             +
+                "  UNIT[\"degree\", 0.017453292519943295],\n" +
+                "  AXIS[\"Longitude\", EAST],\n"              +
                 "  AXIS[\"Latitude\", NORTH]]\n");
 
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertEquals(sourceCRS, operation.getSourceCRS());
         assertEquals(targetCRS, operation.getTargetCRS());
+        assertTrue  (operation instanceof Projection);
 
-        if (true) return;
-        final ParameterValueGroup param = null;
+        final ParameterValueGroup param = ((Operation) operation).getParameterValues();
         assertEquals("semi_major",     6370997.0, param.parameter("semi_major"        ).doubleValue(), 1E-5);
         assertEquals("semi_minor",     6370997.0, param.parameter("semi_minor"        ).doubleValue(), 1E-5);
         assertEquals("latitude_of_origin",  50.0, param.parameter("latitude_of_origin").doubleValue(), 1E-8);
@@ -167,6 +171,11 @@ public class TransformationTest extends TestTransform {
         assertEquals("scale_factor",        0.95, param.parameter("scale_factor"      ).doubleValue(), 1E-8);
         assertEquals("false_easting",        0.0, param.parameter("false_easting"     ).doubleValue(), 1E-8);
         assertEquals("false_northing",       0.0, param.parameter("false_northing"    ).doubleValue(), 1E-8);
+
+        final MathTransform transform = operation.getMathTransform();
+        assertInterfaced(transform);
+        assertTransformEquals(transform.inverse(), 0, 0, 170, 50);
+        assertTransformEquals(transform, 170, 50, 0, 0);
     }
 
     /**
@@ -198,6 +207,13 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
+
+        final MathTransform transform = operation.getMathTransform();
+        assertInterfaced(transform);
+        assertTransformEquals(transform,  0,   0,  2.3367521703619816, 0.0028940088671177986);
+        assertTransformEquals(transform, 20, -10, -6.663517606186469, 18.00134508026729);
+        // Note: Expected values above were computed with Geotools (not an external library).
+        //       However, it was tested with both Molodenski and Geocentric transformations.
     }
 
     /**
@@ -230,15 +246,23 @@ public class TransformationTest extends TestTransform {
                 "  AXIS[\"Long\",EAST],\n"                                              +
                 "  AUTHORITY[\"EPSG\",\"4267\"]]\n";
 
-        final String Z =
+        final String Z = "VERT_CS[\"ellipsoid Z in meters\",\n"+"" +
+                         "  VERT_DATUM[\"Ellipsoid\",2002],\n"     +
+                         "  UNIT[\"metre\", 1],\n"                 +
+                         "  AXIS[\"Z\",UP]]";
+
+        final String H =
                 "VERT_CS[\"mean sea level height\",\n"                                    +
                 "  VERT_DATUM[\"Mean Sea Level\", 2005, AUTHORITY[\"EPSG\",\"5100\"]],\n" +
                 "  UNIT[\"metre\", 1, AUTHORITY[\"EPSG\",\"9001\"]],\n"                   +
                 "  AXIS[\"Z\",UP], AUTHORITY[\"EPSG\",\"5714\"]]\n";
 
-        final String WGS84_Z = "COMPD_CS[\"Wgs84 with sea-level Z\","+WGS84+","+Z+"]";
-        final String NAD27_Z = "COMPD_CS[\"NAD27 with sea-level Z\","+NAD27+","+Z+"]";
-        final String Z_NAD27 = "COMPD_CS[\"sea-level Z with NAD27\","+Z+","+NAD27+"]";
+        final String WGS84_Z = "COMPD_CS[\"Wgs84 with height Z\","+WGS84+","+Z+"]";
+        final String NAD27_Z = "COMPD_CS[\"NAD27 with height Z\","+NAD27+","+Z+"]";
+        final String Z_NAD27 = "COMPD_CS[\"height Z with NAD27\","+Z+","+NAD27+"]";
+
+        final String WGS84_H = "COMPD_CS[\"Wgs84 with sea-level Z\","+WGS84+","+H+"]";
+        final String NAD27_H = "COMPD_CS[\"NAD27 with sea-level Z\","+NAD27+","+H+"]";
 
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation op;
@@ -249,64 +273,149 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertFalse(op instanceof PassThroughOperation);
+            if (CoordinateOperationFactory.MOLODENSKI != null) {
+                assertTrue(op instanceof Transformation);
+            }
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            // Note: Expected values below were computed with Geotools (not an external library).
+            //       However, it was tested with both Molodenski and Geocentric transformations.
+            assertTransformEquals(mt, 0.0,                   0.0,
+                                      0.001654978796746043,  0.0012755944235822696);
+            assertTransformEquals(mt, 5.0,                   8.0,
+                                      5.001262960018587,     8.001271733843957);
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(Z);
             targetCRS = crsFactory.createFromWKT(Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertFalse(op instanceof PassThroughOperation);
-            assertTrue (mt.isIdentity());
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
+            assertTrue(op instanceof Conversion);
+            assertTrue(mt.isIdentity());
+            assertInterfaced(mt);
         }
-        if (CoordinateOperationFactory.MOLODENSKI != null) {
+        if (true) {
+            sourceCRS = crsFactory.createFromWKT(H);
+            targetCRS = crsFactory.createFromWKT(H);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
+            assertTrue(op instanceof Conversion);
+            assertTrue(mt.isIdentity());
+            assertInterfaced(mt);
+        }
+        if (true) try {
+            sourceCRS = crsFactory.createFromWKT(Z);
+            targetCRS = crsFactory.createFromWKT(H);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            fail();
+        } catch (OperationNotFoundException exception) {
+            // This is the expected exception.
+        }
+        if (true) {
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertTrue(op instanceof PassThroughOperation);
+            if (CoordinateOperationFactory.MOLODENSKI != null) {
+                assertTrue(op instanceof Transformation);
+            }
+            assertTrue(sourceCRS         instanceof CompoundCRS);
+            assertTrue(op.getSourceCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
+            assertTrue(targetCRS         instanceof CompoundCRS);
+            assertTrue(op.getTargetCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
+            assertFalse(sourceCRS.equals(targetCRS));
+            assertFalse(op.getSourceCRS().equals(op.getTargetCRS()));
             assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            // Note: Expected values below were computed with Geotools (not an external library).
+            //       However, it was tested with both Molodenski and Geocentric transformations.
+            assertTransformEquals(mt, 0,                    0,                      0,
+                                      0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
+            assertTransformEquals(mt, 5,                    8,                     20,
+                                      5.0012629560319874,   8.001271729856333,    120.27929787151515);
+            assertTransformEquals(mt, 5,                    8,                    -20,
+                                      5.001262964005206,    8.001271737831601,     80.2792978901416);
         }
-        if (CoordinateOperationFactory.MOLODENSKI != null) {
+        if (true) {
             sourceCRS = crsFactory.createFromWKT(Z_NAD27);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
+            if (CoordinateOperationFactory.MOLODENSKI != null) {
+                assertTrue(op instanceof Transformation);
+            }
+            assertTrue(sourceCRS         instanceof CompoundCRS);
+            assertTrue(op.getSourceCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
+            assertTrue(targetCRS         instanceof CompoundCRS);
+            assertTrue(op.getTargetCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
+            assertFalse(sourceCRS.equals(targetCRS));
+            assertFalse(op.getSourceCRS().equals(op.getTargetCRS()));
             assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            // Note: Expected values below were computed with Geotools (not an external library).
+            //       However, it was tested with both Molodenski and Geocentric transformations.
+            assertTransformEquals(mt, 0,                    0,                      0,
+                                      0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
+            assertTransformEquals(mt, -20,                  5,                      8,
+                                      5.001262964005206,    8.001271737831601,     80.2792978901416);
         }
-        if (true) {
+        if (false) {
+            //
+            // TODO: FAIL (for now) bacause the factory fail to take the 'z' axis in account.
+            //
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
             targetCRS = crsFactory.createFromWKT(WGS84);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertFalse(op instanceof PassThroughOperation);
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
             targetCRS = crsFactory.createFromWKT(Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertFalse(op instanceof PassThroughOperation);
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
         }
         if (true) try {
             sourceCRS = crsFactory.createFromWKT(NAD27);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
-            mt = op.getMathTransform();
-            assertFalse(op instanceof PassThroughOperation);
-            assertFalse(mt.isIdentity());
-            fail();
+            fail("Should not invent values for the 'z' ordinate!");
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
-        if (false) {
-            System.out.println();
-            System.out.println(op);
-            System.out.println(mt);
-            System.out.println();
+        if (true) try {
+            sourceCRS = crsFactory.createFromWKT(NAD27_H);
+            targetCRS = crsFactory.createFromWKT(WGS84_H);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            fail("Should fails unless GEOT-352 has been fixed");
+        } catch (OperationNotFoundException exception) {
+            // This is the expected exception.
+        }
+        if (true) {
+            sourceCRS = crsFactory.createFromWKT(NAD27_H);
+            targetCRS = crsFactory.createFromWKT(H);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertSame(sourceCRS, op.getSourceCRS());
+            assertSame(targetCRS, op.getTargetCRS());
+            assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
         }
     }
 }

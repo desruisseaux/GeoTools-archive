@@ -34,7 +34,11 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
 
+// Geotools dependencies
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -45,6 +49,11 @@ import org.opengis.referencing.operation.MathTransformFactory;
  * @author Martin Desruisseaux
  */
 public abstract class TestTransform extends TestCase {
+    /**
+     * Small values for comparaisons of floating point numbers after transformations.
+     */
+    private static final double EPS = 1E-6;
+
     /**
      * The default datum factory.
      */
@@ -106,6 +115,55 @@ public abstract class TestTransform extends TestCase {
         assertTrue("MathTransform1D", (dim==1) == (transform instanceof MathTransform1D));
         assertTrue("MathTransform2D", (dim==2) == (transform instanceof MathTransform2D));
     }
+
+    /**
+     * Transforms a two-dimensional point and compare the result with the expected value.
+     *
+     * @param transform The transform to test.
+     * @param  x The x value to transform.
+     * @param  y The y value to transform.
+     * @param ex The expected x value.
+     * @param ey The expected y value.
+     */
+    public static void assertTransformEquals(final MathTransform transform,
+                                             final double  x, final double  y,
+                                             final double ex, final double ey)
+            throws TransformException
+    {
+        final DirectPosition2D source = new DirectPosition2D(x,y);
+        final DirectPosition2D target = new DirectPosition2D();
+        assertSame(target, transform.transform(source, target));
+        final String message = "Expected ("+ex+", "+ey+"), "+
+                               "transformed=("+target.x+", "+target.y+")";
+        assertEquals(message, ex, target.x, EPS);
+        assertEquals(message, ey, target.y, EPS);
+    }
+
+    /**
+     * Transforms a three-dimensional point and compare the result with the expected value.
+     *
+     * @param transform The transform to test.
+     * @param  x The x value to transform.
+     * @param  y The y value to transform.
+     * @param  z The z value to transform.
+     * @param ex The expected x value.
+     * @param ey The expected y value.
+     * @param ez The expected z value.
+     */
+    public static void assertTransformEquals(final MathTransform transform,
+                                             final double  x, final double  y, final double  z,
+                                             final double ex, final double ey, final double ez)
+            throws TransformException
+    {
+        final GeneralDirectPosition source = new GeneralDirectPosition(x,y,z);
+        final GeneralDirectPosition target = new GeneralDirectPosition(3);
+        assertSame(target, transform.transform(source, target));
+        final String message = "Expected ("+ex+", "+ey+", "+ez+"), "+
+              "transformed=("+target.ordinates[0]+", "+target.ordinates[1]+", "+target.ordinates[2]+")";
+        assertEquals(message, ex, target.ordinates[0], EPS);
+        assertEquals(message, ey, target.ordinates[1], EPS);
+        assertEquals(message, ez, target.ordinates[2], 1E-2); // Greater tolerance level for Z.
+    }    
 
     /**
      * Compare two arrays of points.

@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.imageio.spi.RegisterableService;
+import javax.imageio.spi.ServiceRegistry;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -271,8 +272,9 @@ public final class FactoryFinder {
      * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
      * @return <code>true</code> if the ordering was set for at least one category.
      */
-    public static boolean setOrdering(final String vendor1, final String vendor2) {
-        return setOrdering(vendor1, vendor2, true);
+    public static boolean setVendorOrdering(final String vendor1, final String vendor2) {
+        return getServiceRegistry().setOrdering(new VendorFilter(vendor1),
+                                                new VendorFilter(vendor2), true);
     }
 
     /**
@@ -284,48 +286,28 @@ public final class FactoryFinder {
      * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
      * @return <code>true</code> if the ordering was unset for at least one category.
      */
-    public static boolean unsetOrdering(final String vendor1, final String vendor2) {
-        return setOrdering(vendor1, vendor2, false);
+    public static boolean unsetVendorOrdering(final String vendor1, final String vendor2) {
+        return getServiceRegistry().setOrdering(new VendorFilter(vendor1),
+                                                new VendorFilter(vendor2), false);
     }
 
     /**
-     * Sets or unsets a pairwise ordering between two vendors. If one or both vendors are not
-     * currently registered, or if the desired ordering is already set/unset, nothing happens
-     * and false is returned.
-     *
-     * @param vendor1 The preferred vendor.
-     * @param vendor2 The vendor to which <code>vendor1</code> is preferred.
-     * @param set     <code>true</code> for setting the ordering, or <code>false</code> for
-     *                unsetting.
+     * A filter for factories provided by a given vendor.
      */
-    private synchronized static boolean setOrdering(final String vendor1, final String vendor2,
-                                                    final boolean set)
-    {
-        boolean done = false;
-        final FactoryRegistry registry = getServiceRegistry();
-        for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
-            final Class category = (Class) categories.next();
-            Factory impl1 = null;
-            Factory impl2 = null;
-            for (final Iterator it=registry.getServiceProviders(category); it.hasNext();) {
-                final Factory factory = (Factory) it.next();
-                final Citation vendor = factory.getVendor();
-                if (org.geotools.metadata.citation.Citation.titleMatches(vendor, vendor1)) {
-                    impl1 = factory;
-                }
-                if (org.geotools.metadata.citation.Citation.titleMatches(vendor, vendor2)) {
-                    impl2 = factory;
-                }
-                if (impl1!=null && impl2!=null && impl1!=impl2) {
-                    if (set) {
-                        done |= registry.setOrdering(category, impl1, impl2);
-                    } else {
-                        done |= registry.unsetOrdering(category, impl1, impl2);
-                    }
-                }
-            }
+    private static final class VendorFilter implements ServiceRegistry.Filter {
+        /** The vendor to filter. */
+        private final String vendor;
+
+        /** Constructs a filter for the given vendor. */
+        public VendorFilter(final String vendor) {
+            this.vendor = vendor;
         }
-        return done;
+
+        /** Returns <code>true</code> if the specified provider is built by the vendor. */
+        public boolean filter(final Object provider) {
+            return org.geotools.metadata.citation.Citation.titleMatches(
+                    ((Factory)provider).getVendor(), vendor);
+        }
     }
 
     /**

@@ -46,11 +46,11 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.Transformation;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Factory;
+import org.geotools.referencing.FactoryHelper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
@@ -122,6 +122,11 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
             org.geotools.referencing.IdentifiedObject.NAME_PROPERTY;
 
     /**
+     * The set of helper methods on factories.
+     */
+    final FactoryHelper helper;
+
+    /**
      * The underlying math transform factory. This factory
      * is used for constructing {@link MathTransform} objects for
      * all {@linkplain CoordinateOperation coordinate operations}.
@@ -142,6 +147,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
         this.mtFactory = mtFactory;
         ensureNonNull("mtFactory", mtFactory);
+        helper = new FactoryHelper(null, null, null, mtFactory);
     }
 
     /**
@@ -173,6 +179,8 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
      * @return The transformation from <code>sourceCS</code> to <code>targetCS</code> as
      *         an affine transform. Only axis orientation and units are taken in account.
      * @throws OperationNotFoundException If the affine transform can't be constructed.
+     *
+     * @see org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
      */
     protected Matrix swapAndScaleAxis(final CoordinateSystem sourceCS,
                                       final CoordinateSystem targetCS)
@@ -249,22 +257,9 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
             throws FactoryException
     {
         final Map properties;
-        final OperationMethod method;
         final MathTransform transform;
-        if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
-            // Special processing for Geotools implementation.
-            final Singleton methods = new Singleton();
-            transform = ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
-                        .createParameterizedTransform(parameters, methods);
-            method = (OperationMethod) methods.get();
-        } else {
-            // Not a geotools implementation. Try to guess the method.
-            // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
-            transform = mtFactory.createParameterizedTransform(parameters);
-            method    = org.geotools.referencing.operation.MathTransformFactory.getMethod(
-                        mtFactory.getAvailableMethods(CoordinateOperation.class),
-                        (ParameterDescriptorGroup) parameters.getDescriptor());
-        }
+        final Singleton method = new Singleton();
+        transform = helper.createParameterizedTransform(parameters, method);
         if (name == DATUM_SHIFT) {
             properties = new HashMap(4);
             properties.put(NAME_PROPERTY, name);
@@ -274,8 +269,8 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
         } else {
             properties = Collections.singletonMap(NAME_PROPERTY, name);
         }
-        return createFromMathTransform(properties, sourceCRS, targetCRS, transform, method,
-                                       Operation.class);
+        return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
+                                       (OperationMethod) method.get(), Operation.class);
     }
 
     /**
@@ -366,17 +361,18 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
-     * Concatenate two operation steps. If an operation is n {@link #AXIS_CHANGE},
+     * Concatenate two operation steps. If an operation is an {@link #AXIS_CHANGE},
      * it will be included as part of the second operation instead of creating an
-     * {@link ConcatenatedOperation}.
+     * {@link ConcatenatedOperation}. If a concatenated operation is created, it
+     * will get an automatically generated name.
      *
      * @param  step1 The first  step, or <code>null</code> for the identity operation.
      * @param  step2 The second step, or <code>null</code> for the identity operation.
      * @return A concatenated operation, or <code>null</code> if all arguments was nul.
      * @throws FactoryException if the operation can't be constructed.
      */
-    final CoordinateOperation concatenate(final CoordinateOperation step1,
-                                          final CoordinateOperation step2)
+    protected CoordinateOperation concatenate(final CoordinateOperation step1,
+                                              final CoordinateOperation step2)
             throws FactoryException
     {
         if (step1==null) return step2;
@@ -411,7 +407,10 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
-     * Concatenate three transformation steps.
+     * Concatenate three transformation steps. If the first and/or the last operation is an
+     * {@link #AXIS_CHANGE}, it will be included as part of the second operation instead of
+     * creating an {@link ConcatenatedOperation}. If a concatenated operation is created, it
+     * will get an automatically generated name.
      *
      * @param  step1 The first  step, or <code>null</code> for the identity operation.
      * @param  step2 The second step, or <code>null</code> for the identity operation.
@@ -419,9 +418,9 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
      * @return A concatenated operation, or <code>null</code> if all arguments were null.
      * @throws FactoryException if the operation can't be constructed.
      */
-    final CoordinateOperation concatenate(final CoordinateOperation step1,
-                                          final CoordinateOperation step2,
-                                          final CoordinateOperation step3)
+    protected CoordinateOperation concatenate(final CoordinateOperation step1,
+                                              final CoordinateOperation step2,
+                                              final CoordinateOperation step3)
             throws FactoryException
     {
         if (step1==null) return concatenate(step2, step3);
@@ -467,7 +466,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
      * Returns the properties of the given object.
      *
      * @todo Delete and replace by a static import when we will be allowed to compile against
-     *       J2SE 1.5. Nnote: there is a bunch of constants in this class that we could
+     *       J2SE 1.5. Note: there is a bunch of constants in this class that we could
      *       simplified as well.
      */
     static Map getProperties(final IdentifiedObject object) {
@@ -568,6 +567,21 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
+     * Returns an error message for "No path found from sourceCRS to targetCRS".
+     * This is used for the construction of {@link OperationNotFoundException}.
+     *
+     * @param  source The source CRS.
+     * @param  target The target CRS.
+     * @return A default error message.
+     */
+    protected static String getErrorMessage(final IdentifiedObject source,
+                                            final IdentifiedObject target)
+    {
+        return Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
+                                getClassName(source), getClassName(target));
+    }
+
+    /**
      * Makes sure an argument is non-null.
      *
      * @param  name   Argument name.
@@ -581,20 +595,5 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
         }
-    }
-
-    /**
-     * Returns an error message for "No path found from sourceCRS to targetCRS".
-     * This is used for the construction of {@link OperationNotFoundException}.
-     *
-     * @param  source The source CRS.
-     * @param  target The target CRS.
-     * @return A default error message.
-     */
-    protected static String getErrorMessage(final IdentifiedObject source,
-                                            final IdentifiedObject target)
-    {
-        return Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
-                                getClassName(source), getClassName(target));
     }
 }

@@ -35,7 +35,6 @@ import java.util.TreeSet;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
@@ -50,7 +49,6 @@ import org.opengis.referencing.operation.Projection;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -235,26 +233,6 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Returns the method for the specified parameters, or <code>null</code> if not found.
-     *
-     * @param  methods The set of methods to search into.
-     * @param  parameters The parameters.
-     * @return The method for the specified parameters, or <code>null</code>.
-     */
-    public static OperationMethod getMethod(final Set                      methods,
-                                            final ParameterDescriptorGroup parameters)
-    {
-        final String classification = parameters.getName().getCode();
-        for (final Iterator it=methods.iterator(); it.hasNext();) {
-            final OperationMethod method = (OperationMethod) it.next();
-            if (IdentifiedObject.nameMatches(method.getParameters(), classification)) {
-                return method;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the math transform provider for the specified operation method.
      * This provider can be used in order to query parameter for a method name
      * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
@@ -331,7 +309,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #getAvailableMethods
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
-            throws FactoryException
+            throws NoSuchIdentifierException, FactoryException
     {
         return createParameterizedTransform(parameters, null);
     }
@@ -352,7 +330,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
                                                       Collection          methods)
-            throws FactoryException
+            throws NoSuchIdentifierException, FactoryException
     {
         final String method = parameters.getDescriptor().getName().getCode();
         final MathTransformProvider provider = getProvider(method);

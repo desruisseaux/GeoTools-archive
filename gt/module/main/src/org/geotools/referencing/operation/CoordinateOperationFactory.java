@@ -68,6 +68,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -283,12 +284,21 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         ////////////////////////////////////////////
         if (sourceCRS instanceof CompoundCRS) {
             final CompoundCRS source = (CompoundCRS) sourceCRS;
-            if (targetCRS instanceof SingleCRS) {
-                final SingleCRS target = (SingleCRS) targetCRS;
-                return createOperationStep(source, target);
-            }
             if (targetCRS instanceof CompoundCRS) {
                 final CompoundCRS target = (CompoundCRS) targetCRS;
+                final CoordinateReferenceSystem target3D = helper.toGeographic3D(target);
+                final CoordinateReferenceSystem source3D = helper.toGeographic3D(source);
+                if (source3D!=source && target3D!=target) {
+                    // TODO: This is a partial fix, which work only if both CRS were CompoundCRS.
+                    //       For now, it is not appropriate to use 3D CRS if the source or target
+                    //       CRS is not a 3D one, because it is then more complicated to reduce
+                    //       a 3D CRS into a 2D or 1D one.
+                    return createOperation(source3D, target3D);
+                }
+                return createOperationStep(source, target);
+            }
+            if (targetCRS instanceof SingleCRS) {
+                final SingleCRS target = (SingleCRS) targetCRS;
                 return createOperationStep(source, target);
             }
         }
@@ -313,7 +323,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             final int dimSource = getDimension(sourceCRS);
             final int dimTarget = getDimension(targetCRS);
             if (dimTarget == dimSource) {
-                final Matrix  matrix    = new GeneralMatrix(dimTarget+1, dimSource+1);
+                final Matrix matrix = new GeneralMatrix(dimTarget+1, dimSource+1);
                 return createFromAffineTransform(IDENTITY, sourceCRS, targetCRS, matrix);
             }
         }
@@ -1138,6 +1148,31 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                     final CoordinateReferenceSystem[] targets)
             throws FactoryException
     {
+        /*
+         * If there is a horizontal (geographic or projected) CRS together with a vertical CRS,
+         * then we can't performs the transformation since the vertical value has an impact on
+         * the horizontal value, and this impact is not taken in account if the horizontal and
+         * vertical components are not together in a 3D geographic CRS.  This case occurs when
+         * the vertical CRS is not a height above the ellipsoid.
+         *
+         * TODO: We can do much better than this hack. We could try to normalize the array of
+         *       source and target CRS by replacing any non-ellipsoidal height by a ellipdoisal
+         *       one, and invokes this 'createOperationStep' recursively (and concatenate the
+         *       results, of course). At the very least, the hack below is a little bit too strict.
+         */
+        if (true) {
+            final SingleCRS horizontalCRS1 = CRSUtilities.getHorizontalCRS(sourceCRS);
+            final VerticalCRS verticalCRS1 = CRSUtilities.getVerticalCRS  (sourceCRS);
+            if (horizontalCRS1!=null && verticalCRS1!=null) {
+                final SingleCRS horizontalCRS2 = CRSUtilities.getHorizontalCRS(targetCRS);
+                final VerticalCRS verticalCRS2 = CRSUtilities.getVerticalCRS  (targetCRS);
+                if ((horizontalCRS2!=null && !equalsIgnoreMetadata(horizontalCRS1, horizontalCRS2))
+                   || (verticalCRS2!=null && !equalsIgnoreMetadata(  verticalCRS1,   verticalCRS2)))
+                {
+                    throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
+                }
+            }
+        }
         /*
          * Try to find operations from source CRSs to target CRSs. All pairwise combinaisons are
          * tried, but the preference is given to CRS in the same order (source[0] with target[0],

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,13 +26,10 @@ package org.geotools.referencing;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
-import javax.units.ConversionException;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -72,17 +69,13 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
-import org.geotools.util.Singleton;
+
 
 
 /**
@@ -146,12 +139,6 @@ import org.geotools.util.Singleton;
  */
 public class ObjectFactory extends Factory implements CSFactory, DatumFactory, CRSFactory {
     /**
-     * The math transform factory to use for creating the conversion of projected CRS.
-     * If null, then a default factory will be created only when first needed.
-     */
-    private MathTransformFactory mtFactory;
-
-    /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
      */
@@ -169,15 +156,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * </pre></blockquote>
      */
     public ObjectFactory() {
-    }
-
-    /**
-     * Construct a factory using the specified math transform factory. The later is used for
-     * the construction of conversion objects in projected CRS.
-     */
-    public ObjectFactory(final MathTransformFactory mtFactory) {
-        IdentifiedObject.ensureNonNull("mtFactory", mtFactory);
-        this.mtFactory = mtFactory;
     }
 
 
@@ -287,7 +265,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a vertical datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  type The type of this vertical datum (often ï¿½geoidalï¿½).
+     * @param  type The type of this vertical datum (often geoidal).
      * @throws FactoryException if the object creation failed.
      */
     public VerticalDatum createVerticalDatum(Map         properties,
@@ -1006,6 +984,8 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @throws FactoryException if the object creation failed.
      *
      * @see #getDefaultParameters
+     *
+     * @deprecated Use {@link FactoryHelper#createProjectedCRS} instead.
      */
     public ProjectedCRS createProjectedCRS(Map                 properties,
                                            GeographicCRS             base,
@@ -1013,66 +993,8 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
                                            CartesianCS          derivedCS)
             throws FactoryException
     {
-        /*
-         * Computes matrix for swapping axis and performing units conversion.
-         * There is one matrix to apply before projection on (longitude,latitude)
-         * coordinates, and one matrix to apply after projection on (easting,northing)
-         * coordinates.
-         */
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final EllipsoidalCS geoCS = (EllipsoidalCS) base.getCoordinateSystem();
-        final Matrix swap1, swap3;
-        try {
-            swap1 = org.geotools.referencing.cs.EllipsoidalCS.swapAndScaleAxis(geoCS,
-                    org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
-            swap3 = org.geotools.referencing.cs.CartesianCS.swapAndScaleAxis(
-                    org.geotools.referencing.cs.CartesianCS.PROJECTED, derivedCS);
-        } catch (IllegalArgumentException cause) {
-            // User-specified axis don't match.
-            throw new FactoryException(cause);
-        } catch (ConversionException cause) {
-            // A Unit conversion is non-linear.
-            throw new FactoryException(cause);
-        }
-        /*
-         * Find the operation method. The math transform factory is likely to know that.
-         * Unfortunatly, there is not a very clear way to get this information in current
-         * GeoAPI. If the math transform factory is the Geotools implementation, we will
-         * use a custom method. Otherwise, a more generic (and slower) algorithm will be used.
-         */
-        if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory();
-        }
-        OperationMethod method = null;
-        final MathTransform step2;
-        if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
-            /*
-             * Geotools implementation : The MathTransformFactory knows which operation method
-             * it used, and add this information for us in the optional collection supplied.
-             */
-            final Singleton methods = new Singleton();
-            step2 = ((org.geotools.referencing.operation.MathTransformFactory)mtFactory)
-                    .createParameterizedTransform(parameters, methods);
-            method = (OperationMethod) methods.get();
-        } else {
-            /*
-             * Non-geotools implementation : iterate over all methods know to the factory.
-             */
-            step2 = mtFactory.createParameterizedTransform(parameters);
-            method = org.geotools.referencing.operation.MathTransformFactory.getMethod(
-                     mtFactory.getAvailableMethods(null),
-                     (ParameterDescriptorGroup) parameters.getDescriptor());
-            // TODO: remove cast when we will be allowed to compile against J2SE 1.5.
-        }
-        /*
-         * Create a concatenation of the matrix computed above and the projection.
-         * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
-         */
-        final MathTransform step1 = mtFactory.createAffineTransform(swap1);
-        final MathTransform step3 = mtFactory.createAffineTransform(swap3);
-        final MathTransform mt    = mtFactory.createConcatenatedTransform(
-                                    mtFactory.createConcatenatedTransform(step1, step2), step3);
-        return createProjectedCRS(properties, method, base, mt, derivedCS);
+        return new FactoryHelper(this, this, this, null).createProjectedCRS(
+                                    properties, base, parameters, derivedCS);
     }
 
     /**
@@ -1081,14 +1003,13 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @param  method The case insensitive name of the method to search for.
      * @return The default parameter values.
      * @throws NoSuchIdentifierException if there is no operation registered for the specified method.
+     *
+     * @deprecated This method will be removed.
      */
     public ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
-        if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory();
-        }
-        return mtFactory.getDefaultParameters(method);
+        return FactoryFinder.getMathTransformFactory().getDefaultParameters(method);
     }
 
     /**
@@ -1118,10 +1039,8 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         //       Since we share a single instance of this parser, we must
         //       synchronize.
         if (parser == null) {
-            if (mtFactory == null) {
-                mtFactory = FactoryFinder.getMathTransformFactory();
-            }
-            parser = new Parser(Symbols.DEFAULT, this, this, this, mtFactory);
+            parser = new Parser(Symbols.DEFAULT, this, this, this,
+                     FactoryFinder.getMathTransformFactory());
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);

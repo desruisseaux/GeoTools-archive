@@ -172,7 +172,7 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
         for (int i=coordinateSystem.getDimension(); --i>=0;) {
             final CoordinateSystemAxis axis = coordinateSystem.getAxis(i);
             final Unit candidate = axis.getUnit();
-            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) {
+            if (NonSI.DEGREE_ANGLE.isCompatible(candidate)) {
                 unit = candidate;
                 if (AxisDirection.EAST.equals(axis.getDirection().absolute())) {
                     break; // Found the longitude axis.

@@ -30,6 +30,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -298,7 +299,9 @@ public class MathTransformParser extends AbstractParser {
          * check.
          */
         if (classification != null) {
-            for (final Iterator it=mtFactory.getAvailableMethods(null).iterator(); it.hasNext();) {
+            for (final Iterator it=mtFactory.getAvailableMethods(CoordinateOperation.class).iterator();
+                                   it.hasNext();)
+            {
                 final OperationMethod method = (OperationMethod) it.next();
                 if (IdentifiedObject.nameMatches(method, classification)) {
                     return method;

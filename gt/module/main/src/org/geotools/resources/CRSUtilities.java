@@ -24,19 +24,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.measure.AngleFormat;
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.util.UnsupportedImplementationException;
+// OpenGIS dependencies
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.GeographicExtent;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -50,11 +43,24 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.measure.AngleFormat;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -245,16 +251,16 @@ public final class CRSUtilities {
      * Returns the first horizontal coordinate reference system found in the given CRS,
      * or <code>null</code> if there is none.
      */
-    public static CoordinateReferenceSystem getHorizontalCRS(final CoordinateReferenceSystem crs) {
+    public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof GeographicCRS || crs instanceof ProjectedCRS) {
             if (crs.getCoordinateSystem().getDimension() == 2) {
-                return crs;
+                return (SingleCRS) crs;
             }
         }
         if (crs instanceof CompoundCRS) {
             final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
             for (int i=0; i<c.length; i++) {
-                final CoordinateReferenceSystem candidate = getHorizontalCRS(c[i]);
+                final SingleCRS candidate = getHorizontalCRS(c[i]);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -555,31 +561,33 @@ public final class CRSUtilities {
      * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in
      * order to obtain this representation, it will be automatically applied.  This string is
      * mostly used for debugging purpose.
-     *
-     * @todo Uncomment the transformation block once CoordinateTransformationFactory is implemented.
      */
     public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
+        Exception exception;
         StringBuffer buffer = new StringBuffer();
         try {
             crs = getCRS2D(crs);
             if (!equalsIgnoreMetadata(org.geotools.referencing.crs.GeographicCRS.WGS84, crs)) {
-                throw new UnsupportedOperationException("Not yet implemented"); // TODO: to remove
-//                final CoordinateTransformation tr = CoordinateTransformationFactory.getDefault().
-//                               createFromCoordinateSystems(cs, GeographicCoordinateSystem.WGS84);
-//                bounds = transform((MathTransform2D) tr.getMathTransform(), bounds, null);
+                final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory()
+                        .createOperation(crs, org.geotools.referencing.crs.GeographicCRS.WGS84);
+                bounds = transform((MathTransform2D) op.getMathTransform(), bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
             buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
             buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');
             buffer = fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
-        } catch (TransformException exception) {
-            buffer.append(Utilities.getShortClassName(exception));
-            final String message = exception.getLocalizedMessage();
-            if (message != null) {
-                buffer.append(": ");
-                buffer.append(message);
-            }
+            return buffer.toString();
+        } catch (TransformException e) {
+            exception = e;
+        } catch (FactoryException e) {
+            exception = e;
+        }
+        buffer.append(Utilities.getShortClassName(exception));
+        final String message = exception.getLocalizedMessage();
+        if (message != null) {
+            buffer.append(": ");
+            buffer.append(message);
         }
         return buffer.toString();
     }
