@@ -36,6 +36,7 @@ import javax.imageio.spi.ServiceRegistry;
 
 import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.io.TableWriter;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
@@ -47,7 +48,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -214,10 +218,36 @@ public final class FactoryFinder {
         throw new NoSuchAuthorityCodeException( "Unabled to locate definition of '"+code+"'"); //$NON-NLS-1$
     }
     
-    public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs){
-        // TODO fill me in
-        return null;
+    /**
+     * Transforms the envelope from its current crs to WGS84 coordinate system. 
+     * @param env The envelope to transform
+     * @param crs The CRS the envelope is currently in.
+     * @return env transformed to be in WGS84 CRS.
+     * @throws OperationNotFoundException
+     * @throws NoSuchElementException
+     * @throws FactoryException
+     * @throws TransformException
+     */
+    public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs) throws OperationNotFoundException, NoSuchElementException, FactoryException, TransformException{
+    	if( crs.equals(GeographicCRS.WGS84) )
+    		return env;
+        MathTransform transform=getCoordinateOperationFactory().createOperation(crs, GeographicCRS.WGS84).getMathTransform();
+        return transform(env, transform);
     }
+    
+    /**
+     * Transforms the Envelope using the MathTransform.
+	 * @param envelope the envelope to transform
+	 * @param transform the transformation to use
+	 * @return a new Envelope
+     * @throws TransformException 
+	 */
+	public static Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
+		double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
+		double[] newcoords=new double[4];
+		transform.transform(coords, 0, newcoords, 0, 4);
+		return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
+	}
     
     /**
      * Returns a set of all available implementations for the {@link AuthorityFactory} interface.
