@@ -1,1 +1,1 @@
-arcsde,geomedia,mysql,gtopo30,oraclespatial,tiger,graph,validation,postgis,shapefile,wms,gml,
+arcsde,geomedia,mysql,gtopo30,oraclespatial,tiger,graph,validation,postgis,shapefile,wms,gml,wfs
