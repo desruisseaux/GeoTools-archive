@@ -16,14 +16,13 @@
  */
 package org.geotools.data.oracle;
 
+import oracle.jdbc.pool.OracleConnectionPoolDataSource;
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.ConnectionPoolManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import oracle.jdbc.pool.OracleConnectionPoolDataSource;
-
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.ConnectionPoolManager;
 
 /**
  * Provides javax.sql.DataSource wrapper around an OracleConnection object.
@@ -35,6 +34,10 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 public class OracleConnectionFactory {
     /** The prefix of an Oracle JDBC url */
     private static final String JDBC_PATH = "jdbc:oracle:thin:@";
+
+    /** The prefix of an Oracle OCI JDBC url */
+    private static final String OCI_PATH = "jdbc:oracle:oci:@";
+
     /** Map that contains Connection Pool Data Sources */
     private static Map dataSources = new HashMap();
 
@@ -48,21 +51,35 @@ public class OracleConnectionFactory {
     private String passwd = "";
 
     /**
-     * Creates a new OracleConnection object that wraps a oracle.jdbc.driver.OracleConnection.
+     * BDT ADDED 2004/08/02 This constructor sets up a connection factor for
+     * OCI connection. The alias refers to values defined by Oracle Net
+     * Configuration assitant and stored in
+     * $ORACLE_HOME/network/admin/tnsnames.ora OCI connection require you to
+     * install the oracle client software. The classes12.jar MUST be taken
+     * from $ORACLE_HOME/jdbc/lib Creates a new OracleConnection object that
+     * wraps a oracle.jdbc.driver.OracleConnection.
+     *
+     * @param alias The host to connect to.
+     */
+    public OracleConnectionFactory(String alias) {
+        dbUrl = OCI_PATH + alias;
+    }
+
+    /**
+     * Creates a new OracleConnection object that wraps a
+     * oracle.jdbc.driver.OracleConnection.
      *
      * @param host The host to connect to.
      * @param port The port number on the host
      * @param instance The instance name on the host
      */
     public OracleConnectionFactory(String host, String port, String instance) {
-        if(instance == null)
-            dbUrl = JDBC_PATH + host + ":" + port;
         dbUrl = JDBC_PATH + host + ":" + port + ":" + instance;
     }
 
     /**
-     * Creates the real OracleConnection. Logs in to the Oracle Database and creates the
-     * OracleConnection object.
+     * Creates the real OracleConnection. Logs in to the Oracle Database and
+     * creates the OracleConnection object.
      *
      * @param user The user name.
      * @param pass The password
@@ -74,10 +91,10 @@ public class OracleConnectionFactory {
     public ConnectionPool getConnectionPool(String user, String pass)
         throws SQLException {
         String poolKey = dbUrl + user + pass;
-        OracleConnectionPoolDataSource poolDataSource = 
-                    (OracleConnectionPoolDataSource) dataSources.get(poolKey);
+        OracleConnectionPoolDataSource poolDataSource = (OracleConnectionPoolDataSource) dataSources
+            .get(poolKey);
 
-        if (poolDataSource  == null) {
+        if (poolDataSource == null) {
             poolDataSource = new OracleConnectionPoolDataSource();
 
             poolDataSource.setURL(dbUrl);
@@ -89,12 +106,13 @@ public class OracleConnectionFactory {
 
         ConnectionPoolManager manager = ConnectionPoolManager.getInstance();
         ConnectionPool connectionPool = manager.getConnectionPool(poolDataSource);
+
         return connectionPool;
     }
 
     /**
-     * Creates the real OracleConnection.  Logs into the database using the credentials provided by
-     * setLogin
+     * Creates the real OracleConnection.  Logs into the database using the
+     * credentials provided by setLogin
      *
      * @return The oracle connection to the data base.
      *
