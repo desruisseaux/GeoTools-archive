@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FilterCapabilities;
+import org.geotools.data.ows.ServiceException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
@@ -45,6 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class FilterComplexTypes {
+    public final static String CACHE_SERVICE_EXCEPTIONS = "FilterComplexTypes.CACHE_SERVICE_EXCEPTIONS";
     public static class Arithmetic_OperatorsType extends FilterComplexType{
         private static final ComplexType instance = new Arithmetic_OperatorsType();
         public static ComplexType getInstance(){return instance;}
@@ -1070,26 +1072,100 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new ServiceExceptionType();
         public static ComplexType getInstance(){return instance;}
         
+//        <xsd:complexType name="ServiceExceptionType">
+//        <xsd:annotation>
+//           <xsd:documentation>
+//              The ServiceExceptionType type defines the ServiceException
+//              element.  The content of the element is an exception message
+//              that the service wished to convey to the client application.
+//           </xsd:documentation>
+//        </xsd:annotation>
+//        <xsd:simpleContent>
+//           <xsd:extension base="xsd:string">
+//              <xsd:attribute name="code" type="xsd:string">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       A service may associate a code with an exception
+//                       by using the code attribute.
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:attribute>
+//              <xsd:attribute name="locator" type="xsd:string">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       The locator attribute may be used by a service to
+//                       indicate to a client where in the client's request
+//                       an exception was encountered.  If the request included
+//                       a 'handle' attribute, this may be used to identify the
+//                       offending component of the request.  Otherwise the 
+//                       service may try to use other means to locate the 
+//                       exception such as line numbers or byte offset from the
+//                       begining of the request, etc ...
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:attribute>
+//           </xsd:extension>
+//        </xsd:simpleContent>
+//     </xsd:complexType>
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("code",XSISimpleTypes.String.getInstance()),
+                new FilterAttribute("locator",XSISimpleTypes.String.getInstance()),
+        };
+        
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
+        
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
+         */
+        public boolean cache(Element element, Map hints) {
+            return hints!=null && hints.containsKey(CACHE_SERVICE_EXCEPTIONS);
+        }
+        
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            if(value==null || element.getType()==null || !getName().equals(element.getType().getName()))
+                throw new SAXNotSupportedException("wrong element type for service exception");
+            
+            String msg = (String)value[0].getValue();
+            String locator = null; 
+            String code = null;
+            
+            locator = attrs.getValue(null,"locator");
+            if(locator == null)
+                locator = attrs.getValue(getNamespace().toString(),"locator");
+            
+            code = attrs.getValue(null,"code");
+            if(code == null)
+                code = attrs.getValue(getNamespace().toString(),"code");
+            
+            ServiceException se = new ServiceException(msg,code == null?0:Integer.parseInt(code.trim()),locator);
+            if(cache(element,hints)){
+                return se;
+            }
+            throw se;
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -1101,8 +1177,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return ServiceException.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
@@ -1123,26 +1198,68 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new ServiceExceptionReportType();
         public static ComplexType getInstance(){return instance;}
         
+//        <xsd:complexType>
+//           <xsd:sequence>
+//              <xsd:element name="ServiceException"
+//                           type="ogc:ServiceExceptionType"
+//                           minOccurs="0" maxOccurs="unbounded">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       The Service exception element is used to describe 
+//                       a service exception.
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:element>
+//           </xsd:sequence>
+//           <xsd:attribute name="version" type="xsd:string" fixed="1.2.0"/>
+//        </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("ServiceException",ServiceExceptionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 0;
+                    }
+                    public int getMaxOccurs(){
+                        return Integer.MAX_VALUE;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("version",XSISimpleTypes.String.getInstance(),0,null,"1.2.0",false),
+        };
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            if(value==null || element.getType()==null || !getName().equals(element.getType().getName()))
+                throw new SAXNotSupportedException("wrong element type for service exception report");
+            
+            ServiceException[] ret = new ServiceException[value.length];
+            for(int i=0;i<ret.length;i++){
+                ret[i] = (ServiceException)value[i].getValue();
+            }
+            
+            return ret;
         }
         /**
          * @see org.geotools.xml.schema.Type#getName()
@@ -1154,8 +1271,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return ServiceException[].class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)

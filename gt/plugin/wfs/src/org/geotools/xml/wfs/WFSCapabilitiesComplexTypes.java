@@ -1664,15 +1664,7 @@ public class WFSCapabilitiesComplexTypes {
                         if(result[0].getGet() == null && t[j].getGet()!=null)
                             result[0].setGet(t[j].getGet());
                         if(result[0].getPost() == null && t[j].getPost()!=null)
-                            result[0].setPost(t[j].getGet());
-//                        if(t[j].getFormats()!=null){
-//                            if(result[0].getFormats() == null){
-//                                result[0].setFormats(t[j].getFormats());
-//                        }else{
-//                                List st = (List)result[0].getFormats();
-//                                ((List)t[j].getFormats()).addAll(st);
-//                            }
-//                        }
+                            result[0].setPost(t[j].getPost());
                     }
                 }else{
                     if(elements[1].getName().equals(value[i].getElement().getName())){
@@ -1685,7 +1677,7 @@ public class WFSCapabilitiesComplexTypes {
                             if(result[1].getGet() == null && t[j].getGet()!=null)
                                 result[1].setGet(t[j].getGet());
                             if(result[1].getPost() == null && t[j].getPost()!=null)
-                                result[1].setPost(t[j].getGet());
+                                result[1].setPost(t[j].getPost());
                             if(t[j].getFormats()!=null){
                                 if(result[1].getFormats() == null){
                                     result[1].setFormats(t[j].getFormats());
@@ -1710,15 +1702,7 @@ public class WFSCapabilitiesComplexTypes {
                                 if(result[2].getGet() == null && t[j].getGet()!=null)
                                     result[2].setGet(t[j].getGet());
                                 if(result[2].getPost() == null && t[j].getPost()!=null)
-                                    result[2].setPost(t[j].getGet());
-//                                if(t[j].getFormats()!=null){
-//                                    if(result[2].getFormats() == null){
-//                                        result[2].setFormats(t[j].getFormats());
-//                                }else{
-//                                    List st = (List)result[0].getFormats();
-//                                    ((List)t[j].getFormats()).addAll(st);
-//                                    }
-//                                }
+                                    result[2].setPost(t[j].getPost());
                             }
                         }else{
                             if(elements[3].getName().equals(value[i].getElement().getName())){
@@ -1731,7 +1715,7 @@ public class WFSCapabilitiesComplexTypes {
                                     if(result[3].getGet() == null && t[j].getGet()!=null)
                                         result[3].setGet(t[j].getGet());
                                     if(result[3].getPost() == null && t[j].getPost()!=null)
-                                        result[3].setPost(t[j].getGet());
+                                        result[3].setPost(t[j].getPost());
                                     if(t[j].getFormats()!=null){
                                         if(result[3].getFormats() == null){
                                             result[3].setFormats(t[j].getFormats());
@@ -1756,7 +1740,7 @@ public class WFSCapabilitiesComplexTypes {
                                         if(result[4].getGet() == null && t[j].getGet()!=null)
                                             result[4].setGet(t[j].getGet());
                                         if(result[4].getPost() == null && t[j].getPost()!=null)
-                                            result[4].setPost(t[j].getGet());
+                                            result[4].setPost(t[j].getPost());
                                         if(t[j].getFormats()!=null){
                                             if(result[4].getFormats() == null){
                                                 result[4].setFormats(t[j].getFormats());
@@ -1781,15 +1765,7 @@ public class WFSCapabilitiesComplexTypes {
                                             if(result[5].getGet() == null && t[j].getGet()!=null)
                                                 result[5].setGet(t[j].getGet());
                                             if(result[5].getPost() == null && t[j].getPost()!=null)
-                                                result[5].setPost(t[j].getGet());
-//                                            if(t[j].getFormats()!=null){
-//                                                if(result[5].getFormats() == null){
-//                                                    result[5].setFormats(t[j].getFormats());
-//                                            }else{
-//                                                List st = (List)result[0].getFormats();
-//                                                ((List)t[j].getFormats()).addAll(st);
-//                                                }
-//                                            }
+                                                result[5].setPost(t[j].getPost());
                                         }
                                     }else{
                                         // error

@@ -113,7 +113,7 @@ public class WFSDataStore extends AbstractDataStore{
  	   OutputStream result = null;
  	   synchronized(Authenticator.class){
  	      Authenticator.setDefault(auth);
- 	      
+ 	      url.setDoOutput(true);
  	      url.connect();
  	      result = url.getOutputStream();
  	      
@@ -352,7 +352,7 @@ System.out.println("GetCaps -- post "+postUrl);
             url += "&VERSION=1.0.0";
 	    }
         if(query.indexOf("REQUEST")==-1){
-            url += "&REQUEST=GetFeatures";
+            url += "&REQUEST=GetFeature";
 	    }
         url += "&TYPENAME="+typeName;
         

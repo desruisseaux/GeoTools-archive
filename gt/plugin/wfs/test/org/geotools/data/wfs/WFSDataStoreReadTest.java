@@ -55,8 +55,9 @@ public class WFSDataStoreReadTest extends TestCase {
         URL url = new URL("http://gws2.pcigeomatics.com/wfs1.0.0/wfs?service=WFS&request=getcapabilities");
         System.out.println("\nGeomatics");
         doFeatureType(url);
-        doFeatureReader(url);
-        doFeatureReaderWithFilter(url);
+        // TODO uncomment when server bug is fixed
+//        doFeatureReader(url);
+//        doFeatureReaderWithFilter(url);
         System.out.println("");
     }
     
@@ -129,7 +130,7 @@ public class WFSDataStoreReadTest extends TestCase {
         String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
-        FeatureReader fr = wfs.getFeatureReader(query,null);
+        FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
 
@@ -142,7 +143,7 @@ public class WFSDataStoreReadTest extends TestCase {
         props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
         query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
-        fr = wfs.getFeatureReader(query,null);
+        fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
     }
