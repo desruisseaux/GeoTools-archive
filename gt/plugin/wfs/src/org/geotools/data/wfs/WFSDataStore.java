@@ -254,7 +254,7 @@ public class WFSDataStore extends AbstractDataStore{
         		url += "?";
             url += "SERVICE=WFS";
         }else{
-            if(query.indexOf("SERVICE")==-1){
+            if(query.indexOf("SERVICE=WFS")==-1){
                 url += "&SERVICE=WFS";
  	        }
         }
@@ -266,7 +266,6 @@ public class WFSDataStore extends AbstractDataStore{
 	    }
         url += "&TYPENAME="+typeName;
         getUrl = new URL(url);
-//System.out.println(getUrl);
         HttpURLConnection hc = (HttpURLConnection)getUrl.openConnection();
         hc.setRequestMethod("GET");
 
@@ -392,7 +391,7 @@ public class WFSDataStore extends AbstractDataStore{
         		url += "?";
             url += "SERVICE=WFS";
         }else{
-            if(query.indexOf("SERVICE")==-1){
+            if(query.indexOf("SERVICE=WFS")==-1){
                 url += "&SERVICE=WFS";
  	        }
         }
