@@ -133,14 +133,14 @@ public class FileMetadataImplTest extends TestCase {
     public void testGetElementString() {
 
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        String element=(String)data.getElement("FileData/Name");
+        String element=(String)data.getElement("fileData/name");
         assertEquals("Stupid",element);
         
         //Test xpath with wildcards
-        List list=(List) data.getElement("FileData/\\w*");
+        List list=(List) data.getElement("fileData/\\w*");
         assertEquals(3,list.size());
 
-        String name=(String) data.getElement("\\w*/Name");
+        String name=(String) data.getElement("\\w*/name");
         assertEquals("Stupid",name);
 
         //Test xpath with wildcards
