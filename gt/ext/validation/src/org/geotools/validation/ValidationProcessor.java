@@ -17,12 +17,12 @@
 package org.geotools.validation;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.validation.IntegrityValidation;
-import org.geotools.validation.ValidationResults;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -274,6 +274,8 @@ public class ValidationProcessor {
     /**
      * runFeatureTests
      * 
+     * Change: Uses a FeatureReader now instead of a FeatureCollection.
+     * 
      * <p>
      * Performs a lookup on the FeatureTypeInfo name to determine what
      * FeatureTests need to be performed. Once these tests are gathered, they
@@ -299,7 +301,7 @@ public class ValidationProcessor {
      *
      * @throws Exception FeatureValidations throw Exceptions
      */
-    public void runFeatureTests(String dsID, FeatureType type, FeatureCollection collection,
+    public void runFeatureTests(String dsID, FeatureType type, FeatureReader reader,
         ValidationResults results) throws Exception {
     	
         // check for any tests that are to be performed on ALL features
@@ -328,11 +330,9 @@ public class ValidationProcessor {
                 FeatureValidation validator = (FeatureValidation) tests.get(i);
                 results.setValidation(validator);
 
-                Iterator it = collection.iterator();
-
-                while (it.hasNext()) // iterate through each feature and run the test on it
+                while (reader.hasNext()) // iterate through each feature and run the test on it
                  {
-                    Feature feature = (Feature) it.next();
+                    Feature feature = (Feature) reader.next();
                     try{
                     	validator.validate(feature, type, results);
                     }catch(Throwable e){
