@@ -61,7 +61,7 @@ public class FeatureSourceRepository implements Repository {
     	for( Iterator i=featuresources.values().iterator(); i.hasNext();){
     		FeatureSource fs = (FeatureSource) i.next();
     		FeatureType schema = fs.getSchema();
-    		prefix.add( schema.getNamespace() );
+    		prefix.add( schema.getNamespaceURI().toString() );
     	}
         return prefix;
     }

@@ -165,7 +165,7 @@ public class WFSTransactionState implements State {
         ns.add(WFSSchema.NAMESPACE.toString());
         i = fts.iterator();
         while(i.hasNext()){
-        	ns.add(ds.getSchema((String)i.next()).getNamespace());
+        	ns.add(ds.getSchema((String)i.next()).getNamespaceURI().toString());
         }
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction

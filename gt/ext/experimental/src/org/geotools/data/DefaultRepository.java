@@ -132,7 +132,7 @@ public class DefaultRepository implements Repository {
     		DataStore ds = (DataStore) i.next();
     		for( Iterator t = types( ds ).values().iterator(); t.hasNext();){
     			FeatureType schema = (FeatureType) t.next();
-    			prefix.add( schema.getNamespace() );
+    			prefix.add( schema.getNamespaceURI().toString() );
     		}
     	}
         return prefix;
