@@ -20,7 +20,7 @@ import java.util.Set;
 
 
 /**
- * Provides a Catalog of available FeatureTypes.
+ * Provides a Repository of available FeatureTypes allowing Catalog metadata queries.
  * 
  * <p>
  * Currently GeoServer is providing requirements:
@@ -34,38 +34,8 @@ import java.util.Set;
  * Provide metadata information on FeatureType
  * </li>
  * </ul>
- * 
- * <p>
- * This class is currently serving as a scratching post for gel our ideas about
- * Catalog requirements.
- * </p>
- * 
- * <p>
- * From Chris Holmes email:
- * </p>
- * 
- * <p>
- * <Code> As for catalog, I looked a bit through ogc catalog specs over the
- * weekend.   I don't know that I like the implementation one too much, I may
- * have to  look at it some more.  But we may borrow some terms from the
- * abstract one.   I need to read it more closely to see how much we can do
- * with it.  But the  concept of a Catalog Entry might work for our catalog.
- * I don't think a  metadata url will be sufficient, but I would like to have
- * a somewhat  abbreviated metadata representation, perhaps a bit more than
- * the ogc  service elements, but less than a full fgdc record, as there are a
- * lot of  elements in that.  Perhaps eventually, but I think we should start
- * out with a Catalog Entry (2.3.4 in the abstract catalog spec).  It
- * 'describes  or summarizes the contents of a set of geospatial data, and is
- * designed to  be queried.  A Catalog Entry is usually a subset of the
- * complete metadata  for the describe geospatial dataset.'  Basically it's
- * the metadata needed  for discovery, the where, what who, when how and why.
- * I have more  thoughts about this, but I think we should hold off until we
- * get the data api together.  If gabriel needs it soon he could go ahead and
- * code  something up that works, and we could figure out how to adapt it to
- * OGC  and our Feature stuff later.</code>
- * </p>
  */
-public interface Catalog {
+public interface Repository {
     /**
      * Retrieve Set of Namespaces prefixes registered by DataStores in this
      * Catalog.
@@ -100,22 +70,13 @@ public interface Catalog {
      *
      * @return Set of available Namespace prefixes.
      */
-    Set getPrefixes();
+    Set getPrefixes() throws IOException;
 
     /**
      * The default Namespace prefix for this Catalog.
      * @return Namespace prefix to be used as a default
      */
-    String getDefaultPrefix();
-    
-    /**
-     * Retrive NamespaceMetaData by prefix.
-     *
-     * @param prefix Namespace prefix
-     *
-     * @return NameSpaceMetaData for prefix
-     */
-    NamespaceMetaData getNamespaceMetaData(String prefix);
+    //String getDefaultPrefix();    
     
     /**
      * Convience method for accessing FeatureSoruce.
@@ -132,7 +93,7 @@ public interface Catalog {
      * @param typeName
      * @return
      */
-    FeatureSource getFeatureSource( String prefix, String typeName ) throws IOException;
+    FeatureSource source( String prefix, String typeName ) throws IOException;
 
     /**
      * Registers all FeatureTypes provided by dataStore with this catalog
@@ -160,7 +121,7 @@ public interface Catalog {
      *
      * @throws IOException If registration fails such as for namespace conflict
      */
-    void registerDataStore(DataStore dataStore) throws IOException;
+    void register( String dataStoreId, DataStore dataStore) throws IOException;
 
     /**
      * Access to the DataStores registed to this Catalog.

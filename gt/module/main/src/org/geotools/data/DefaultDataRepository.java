@@ -17,34 +17,40 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Simple Catalog so we can try out the api.
+ * Quick hack of a DataRepository allows me to bridge the existing DataStore
+ * API with these experiments for a Opperations api.
  * 
- * <p>
- * This class intends to track the Catalog API as it provides more metadata
- * information. It is intended to be an In Memory data structure.
- * </p>
+ * I have used the old DefaultCatalaog as a starting point.
  * 
- * <p>
- * Other projectswill produce more persistent Catalog implementations.
- * GeoServer for instance will back it's Catalog implementation with XML
- * files.
- * </p>
- *
- * @author Jody Garnett, Refractions Research
+ * This also serves as a reminder that we need CrossDataStore functionality
+ * - at least for Locks. And possibly for "Query". 
+ * 
+ * @author Jody Garnett
  */
-public class DefaultCatalog implements Catalog {
-    protected String defaultPrefix = null;
-    protected Map namespaces = new HashMap();
-    protected Set datastores = new HashSet();
+public class DefaultDataRepository implements Repository {	    
+	
+	/** Map of DataStore by dataStoreId */
+    protected SortedMap datastores = new TreeMap();
     
     /**
      * Retrieve prefix set.
@@ -52,42 +58,52 @@ public class DefaultCatalog implements Catalog {
      * @see org.geotools.data.Catalog#getPrefixes()
      * 
      * @return Set of namespace prefixes
+     * @throws IOException
      */
-    public Set getPrefixes() {
-        return Collections.unmodifiableSet( namespaces.keySet() );
+    public Set getPrefixes() throws IOException {
+    	Set prefix = new HashSet();
+    	for( Iterator i=datastores.values().iterator(); i.hasNext();){
+    		DataStore ds = (DataStore) i.next();
+    		for( Iterator t = types( ds ).values().iterator(); t.hasNext();){
+    			FeatureType schema = (FeatureType) t.next();
+    			prefix.add( schema.getNamespace() );
+    		}
+    	}
+        return prefix;
     }
-
-    /**
-     * Retrieve Namespace for prefix.
-     * <p>
-     * This class will lazily create the namespace as required.
-     * </p>
-     * @see org.geotools.data.Catalog#getNamespace(java.lang.String)
-     * 
-     * @param prefix Prefix used for Namespace
-     * @return Namespace associated with Prefix
-     */
-    public synchronized NamespaceMetaData getNamespaceMetaData(String prefix) {
-        if( namespaces.containsKey( prefix)){
-            return (NamespaceMetaData) namespaces.get( prefix );
-        }
-        NamespaceMetaData namespace = createNamespaceMetaData( prefix ); 
-        namespaces.put( prefix, namespace );         
-        return namespace;
+    private SortedSet typeNames( DataStore ds ) throws IOException {
+    	return new TreeSet( Arrays.asList( ds.getTypeNames() ));    	
+    }
+    private SortedMap types( DataStore ds ) throws IOException {
+    	SortedMap map = new TreeMap();
+    	String typeNames[] = ds.getTypeNames();
+    	for( int i=0; i<typeNames.length; i++){
+    		try {
+    			map.put( typeNames[i], ds.getSchema( typeNames[i]));
+    		}
+    		catch (IOException ignore ){
+    			// ignore broken featureType
+    		}
+    	}
+    	return map;
     }
     
-    /**
-     * Default implementation creates DefaultNamespaceMetaData.
-     * <p>
-     * You will need to override this to work with your own Namespace type.
-     * This is the usual Factory method patter, as opposed to the
-     * AbstractFactory used by most GeoTools2 based code.
-     * </p>
-     * @param prefix Prefix used for XML output of namespace 
-     */
-    protected NamespaceMetaData createNamespaceMetaData( String prefix ){
-        return new DefaultNamespaceMetaData( prefix );        
+    /** All FeatureTypes by dataStoreId:typeName 
+     * @throws IOException*/
+    public SortedMap types() throws IOException {
+    	SortedMap map = new TreeMap();
+    	for( Iterator i=datastores.entrySet().iterator(); i.hasNext();){
+    		Map.Entry entry = (Map.Entry) i.next();
+    		String id = (String) entry.getKey();
+    		DataStore ds = (DataStore) entry.getValue();
+    		for( Iterator t = types( ds ).values().iterator(); t.hasNext();){
+    			FeatureType schema = (FeatureType) t.next();
+    			map.put( id+":"+schema.getTypeName(), schema );
+    		}
+    	}
+        return map;
     }
+
     
     /**
      * Implement lockExists.
@@ -101,7 +117,7 @@ public class DefaultCatalog implements Catalog {
         DataStore store;
         LockingManager lockManager;
                 
-        for( Iterator i=datastores.iterator(); i.hasNext(); ){
+        for( Iterator i=datastores.values().iterator(); i.hasNext(); ){
              store = (DataStore) i.next();
              lockManager = store.getLockingManager();
              if( lockManager == null ) continue; // did not support locking
@@ -143,7 +159,7 @@ public class DefaultCatalog implements Catalog {
         LockingManager lockManager;
         
         boolean refresh = false;
-        for( Iterator i=datastores.iterator(); i.hasNext(); ){
+        for( Iterator i=datastores.values().iterator(); i.hasNext(); ){
              store = (DataStore) i.next();
              lockManager = store.getLockingManager();
              if( lockManager == null ) continue; // did not support locking
@@ -182,7 +198,7 @@ public class DefaultCatalog implements Catalog {
         LockingManager lockManager;
                 
         boolean release = false;                
-        for( Iterator i=datastores.iterator(); i.hasNext(); ){
+        for( Iterator i=datastores.values().iterator(); i.hasNext(); ){
              store = (DataStore) i.next();
              lockManager = store.getLockingManager();
              if( lockManager == null ) continue; // did not support locking
@@ -195,21 +211,6 @@ public class DefaultCatalog implements Catalog {
     }
 
     /**
-     * Implement getDefaultPrefix.
-     * <p>
-     * Description ...
-     * </p>
-     * @see org.geotools.data.Catalog#getDefaultPrefix()
-     * 
-     * @return
-     */
-    public String getDefaultPrefix() {
-        return defaultPrefix;
-    }
-    public void setDefaultPrefix( String prefix ){
-        defaultPrefix = prefix;
-    }
-    /**
      * Implement registerDataStore.
      * <p>
      * Description ...
@@ -219,11 +220,14 @@ public class DefaultCatalog implements Catalog {
      * @param dataStore
      * @throws IOException
      */
-    public void registerDataStore(DataStore dataStore) throws IOException {
-        if( datastores.contains( dataStore )){
-            throw new IOException("DataStore already registered with Catalog");
+    public void register(String id, DataStore dataStore) throws IOException {
+        if( datastores.containsKey( id ) ){        	
+            throw new IOException("ID already registered");
         }
-        // TODO: register FeatureTypes with namespace ...
+        if( datastores.containsValue( dataStore ) ){        	
+            throw new IOException("dataStore already registered");
+        }
+        datastores.put( id, dataStore );
     }
 
     /**
@@ -236,31 +240,12 @@ public class DefaultCatalog implements Catalog {
      * @param namespace
      * @return
      */
-    public Set getDataStores(String namespace) {
-        return Collections.unmodifiableSet( datastores );
+    public DataStore datastore(String id ) {
+        return (DataStore) datastores.get( id );
     }
     
     /**
-     * Convience method for Accessing FeatureSource by prefix:typeName.
-     * <p>
-     * This method is part of the public Catalog API. It allows the Validation
-     * framework to be writen using only public Geotools2 interfaces.
-     * </p>
-     * @see org.geotools.data.Catalog#getFeatureSource(java.lang.String, java.lang.String)
-     * 
-     * @param prefix Namespace prefix in which the FeatureType available
-     * @param typeName typeNamed used to identify FeatureType
-     * @return
-     */
-    public FeatureSource getFeatureSource(String prefix, String typeName) throws IOException {
-        NamespaceMetaData namespace = getNamespaceMetaData( prefix );
-        FeatureTypeMetaData featureType = namespace.getFeatureTypeMetaData( typeName );
-        DataStoreMetaData dataStore = featureType.getDataStoreMetaData();
-        
-        return dataStore.getDataStore().getFeatureSource( typeName );       
-    }
-    /**
-     * Access to the set of DataStores in use by GeoServer.
+     * Access to the set of registered DataStores.
      * <p>
      * The provided Set may not be modified :-)
      * </p>
@@ -270,6 +255,10 @@ public class DefaultCatalog implements Catalog {
      * @return
      */
     public Set getDataStores() {
-        return Collections.unmodifiableSet( datastores );
+    	return Collections.unmodifiableSet( new HashSet( datastores.values()) );
+    }
+    public FeatureSource source( String dataStoreId, String typeName ) throws IOException{
+		DataStore ds = datastore( dataStoreId );
+		return  ds.getFeatureSource( typeName );
     }
 }
