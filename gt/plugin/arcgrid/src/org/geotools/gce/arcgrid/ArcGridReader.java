@@ -261,9 +261,11 @@ public class ArcGridReader implements GridCoverageReader {
             coordinateSystem = GeographicCRS.WGS84;
         }
 
+        org.opengis.spatialschema.geometry.Envelope envelope = new GeneralEnvelope(min, max);
+        
         try {
 			//TODO this is not finished
-			return new GridCoverageImpl(name, coordinateSystem, null, null, null);
+			return new GridCoverageImpl(name, coordinateSystem, null, null, null, envelope);
 		} catch (OperationNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
