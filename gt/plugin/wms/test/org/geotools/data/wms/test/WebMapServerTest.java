@@ -18,6 +18,7 @@ package org.geotools.data.wms.test;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
@@ -200,5 +201,19 @@ public class WebMapServerTest extends TestCase {
         WebMapServer wms = new WebMapServer(brokenURL);
         wms.getCapabilities();
         assertNotNull(wms.getProblem());
+    }
+    
+    public void testIterator() {
+        WebMapServer wms = new WebMapServer(serverURL);
+        wms.getCapabilities();
+        
+        Iterator iter = wms.iterator();
+        assertNotNull(iter);
+        
+        while(iter.hasNext()) {
+            Layer layer = (Layer) iter.next();
+            assertNotNull(layer);
+            assertNotNull(layer.getName());
+        }
     }
 }

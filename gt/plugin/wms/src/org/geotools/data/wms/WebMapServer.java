@@ -32,6 +32,10 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 
 import org.jdom.input.SAXBuilder;
+import org.opengis.catalog.Catalog;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.QueryDefinition;
+import org.opengis.catalog.QueryResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,7 +111,7 @@ import java.util.TreeSet;
  * </p>
  * @author Richard Gould, Refractions Research
  */
-public class WebMapServer {
+public class WebMapServer implements Catalog {
 
     /**
      * Returned by getStatus(). Indicates that the server is currently performing a request.
@@ -609,5 +613,53 @@ public class WebMapServer {
         }
 
         return srss;
+    }
+
+    /*
+     **************************************************************************
+     * Catalog Interface Methods
+     **************************************************************************
+     */
+    
+    /* (non-Javadoc)
+     * @see org.opengis.catalog.Catalog#query(org.opengis.catalog.QueryDefinition)
+     */
+    public QueryResult query(QueryDefinition arg0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opengis.catalog.Catalog#add(org.opengis.catalog.CatalogEntry)
+     */
+    public void add(CatalogEntry arg0) throws IllegalStateException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.opengis.catalog.Catalog#remove(org.opengis.catalog.CatalogEntry)
+     */
+    public void remove(CatalogEntry arg0) throws IllegalStateException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * Returns an Iterator that can iterate through all of the layers in
+     * the capabilities. It flattens the hierarchy. Each element is of type Layer.
+     * @return an iterator that will iterate through the layers
+     */
+    public Iterator iterator() {
+        ArrayList layers = new ArrayList();
+        
+        for (int i = 0; i < capabilities.getLayers().length; i++) {
+            Layer layer = capabilities.getLayers()[i];
+            if (layer.getName() != null && layer.getName().length() != 0) { //$NON-NLS-1$
+                layers.add(layer);
+            }
+        }
+        
+        return layers.iterator();
     }
 }
