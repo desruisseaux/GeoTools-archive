@@ -192,6 +192,8 @@
           <directory>${basedir}/test</directory>
           <includes>
             <include>META-INF/</include>
+            <include>**/*.xml</include>
+            <include>**/*.wkt</include>
           </includes>
         </resource>
       </resources>
