@@ -28,7 +28,7 @@ public class MockJDBCDataStore extends JDBCDataStore {
      * @throws DataSourceException
      */
     public MockJDBCDataStore(ConnectionPool connectionPool) throws IOException {
-        super( connectionPool, new JDBCDataStoreConfig() );                
+        super( connectionPool, new JDBCDataStoreConfig("www.refractions.net","test",10000) );                
         typeHandler.setFIDMapper("FEATURE_TYPE1", new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE1"));
 		typeHandler.setFIDMapper("FEATURE_TYPE2", new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE2"));
     }

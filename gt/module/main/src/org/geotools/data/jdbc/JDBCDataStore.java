@@ -1309,11 +1309,13 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      */
     public URI getNameSpace() {
         try {
-            return new URI( config.getNamespace() );
+            if(config.getNamespace()!=null)
+                return new URI( config.getNamespace() );
         } catch (URISyntaxException e) {
             LOGGER.warning( "Could not use namespace "+config.getNamespace()+" - "+e.getMessage() );
             return null;
         }
+        return null;
     }
 
     /**
