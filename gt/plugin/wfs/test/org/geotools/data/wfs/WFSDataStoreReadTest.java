@@ -37,7 +37,7 @@ public class WFSDataStoreReadTest extends TestCase {
     public static WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
-        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(1000000));
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // was 1000000 for debug
         return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
     }
         

@@ -1,7 +1,6 @@
 package org.geotools.data.geometryless.wrapper;
 
 import javax.sql.ConnectionPoolDataSource;
-import javax.sql.PooledConnection;
 
 import java.sql.SQLException;
 
