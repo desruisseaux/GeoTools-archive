@@ -37,6 +37,9 @@ public class Layer implements Comparable {
 
     /** The title is for informative display to a human. */
     private String title;
+    
+    private String _abstract;
+    private String[] keywords;
 
     /** A set of Strings representing SRSs */
     private Set srs = null;
@@ -300,5 +303,32 @@ public class Layer implements Comparable {
     }
     public void setChildren( Layer[] children ) {
         this.children = children;
+    }
+    /**
+     * The abstract contains human-readable information about this layer
+     * @return Returns the _abstract.
+     */
+    public String get_abstract() {
+        return _abstract;
+    }
+    /**
+     * @param _abstract The _abstract to set.
+     */
+    public void set_abstract( String _abstract ) {
+        this._abstract = _abstract;
+    }
+    /**
+     * Keywords are Strings to be used in searches
+     * 
+     * @return Returns the keywords.
+     */
+    public String[] getKeywords() {
+        return keywords;
+    }
+    /**
+     * @param keywords The keywords to set.
+     */
+    public void setKeywords( String[] keywords ) {
+        this.keywords = keywords;
     }
 }

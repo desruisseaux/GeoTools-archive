@@ -172,6 +172,12 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		Layer layer = (Layer) capabilities.getLayerList().get(0);
 		assertNull(layer.getParent());
 		assertEquals(layer.getName(), "DEMO");
+        assertEquals(layer.get_abstract(), "Abstract Test");
+        String[] keywords = layer.getKeywords();
+        assertNotNull(keywords);
+        assertEquals(keywords.length, 2);
+        assertEquals(keywords[0], "word1");
+        assertEquals(keywords[1], "word2");
 		assertEquals(layer.getTitle(), "GMap WMS Demo Server");
 		assertEquals(layer.getSrs().size(), 4);
 		assertTrue(layer.getSrs().contains("EPSG:42304"));

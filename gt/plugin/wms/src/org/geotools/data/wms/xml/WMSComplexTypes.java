@@ -2492,12 +2492,12 @@ public class WMSComplexTypes {
 					layer.setTitle((String) value[i].getValue());
 				}
 
-				// if (sameName(elems[2], value[i])) {
-				// //TODO abstract ignored
-				// }
-				// if (sameName(elems[3], value[i])) {
-				// //TODO keywords ignored
-				// }
+    			if (sameName(elems[2], value[i])) {
+    			    layer.set_abstract((String) value[i].getValue());
+    			}
+    			if (sameName(elems[3], value[i])) {
+    			    layer.setKeywords((String[]) value[i].getValue());
+    			}
 
 				if (sameName(elems[4], value[i])
 						|| sameName(elems[19], value[i])) {
