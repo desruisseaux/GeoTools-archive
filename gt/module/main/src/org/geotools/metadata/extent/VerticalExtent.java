@@ -82,13 +82,13 @@ public class VerticalExtent extends MetadataEntity
      */
     public VerticalExtent(final double minimumValue,
                           final double maximumValue,
-                          final Unit unit,
+                          final Unit   unit,
                           final VerticalDatum verticalDatum)
     {
-        this.minimumValue  = minimumValue;
-        this.maximumValue  = maximumValue;
-        this.unit          = unit;
-        this.verticalDatum = verticalDatum;
+        setMinimumValue (minimumValue );
+        setMaximumValue (maximumValue );
+        setUnit         (unit         );
+        setVerticalDatum(verticalDatum);
     }
 
     /**

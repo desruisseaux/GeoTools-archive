@@ -66,9 +66,9 @@ public class RangeDimension extends MetadataEntity
     /**
      * Set the description of the range of a cell measurement value.
      */
-    public synchronized void setDescriptor(final InternationalString descriptor) {
+    public synchronized void setDescriptor(final InternationalString newValue) {
         checkWritePermission();
-        this.descriptor = descriptor;
+        descriptor = newValue;
     }
 
     /**

@@ -92,10 +92,10 @@ public class GeographicBoundingBox extends GeographicExtent
                                  final double southBoundLatitude,
                                  final double northBoundLatitude)
     {
-        this.westBoundLongitude = westBoundLongitude;
-        this.eastBoundLongitude = eastBoundLongitude;
-        this.southBoundLatitude = southBoundLatitude;
-        this.northBoundLatitude = northBoundLatitude;
+        setWestBoundLongitude( westBoundLongitude);
+        setEastBoundLongitude( eastBoundLongitude);
+        setSouthBoundLatitude(southBoundLatitude );
+        setNorthBoundLatitude(northBoundLatitude );
     }
     
     /**

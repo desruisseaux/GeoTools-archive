@@ -60,7 +60,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * Known Text</cite> (WKT)</A>.
  *
  * A formatter is constructed with a specified locale, which will be used for querying
- * {@linkplain org.geotools.metadata.citation.Citation#getTitle authority titles}.
+ * {@linkplain org.opengis.metadata.citation.Citation#getTitle authority titles}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

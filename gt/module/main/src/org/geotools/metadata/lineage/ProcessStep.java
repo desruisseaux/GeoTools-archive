@@ -41,9 +41,6 @@ import org.geotools.resources.Utilities;
 /**
  * Description of the event, including related parameters or tolerances.
  *
- * Only one of {@linkplain #getStatement statement}, {@linkplain #getProcessSteps process steps}
- * and {@link #getSources sources} should be provided.
- *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
@@ -94,7 +91,7 @@ public class ProcessStep extends MetadataEntity
      * Creates a process step initialized to the given description.
      */
     public ProcessStep(final InternationalString description) {
-        this.description = description;
+        setDescription(description);
     }
     
      /**

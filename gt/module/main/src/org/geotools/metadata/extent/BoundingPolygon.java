@@ -62,7 +62,7 @@ public class BoundingPolygon extends GeographicExtent
      * Creates a bounding polygon initialized to the specified value.
      */
     public BoundingPolygon(final Geometry polygon) {
-        this.polygon = polygon;
+        setPolygon(polygon);
     }
 
     /**

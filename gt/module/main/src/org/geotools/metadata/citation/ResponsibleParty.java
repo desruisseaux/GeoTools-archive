@@ -147,7 +147,7 @@ public class ResponsibleParty extends MetadataEntity
      * Constructs a responsability party with the given role.
      */
     public ResponsibleParty(final Role role) {
-        this.role = role;
+        setRole(role);
     }
 
     /**

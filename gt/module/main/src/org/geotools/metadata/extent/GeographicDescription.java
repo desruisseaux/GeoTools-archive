@@ -60,7 +60,7 @@ public class GeographicDescription extends GeographicExtent
      * Creates a geographic description initialized to the specified value.
      */
      public GeographicDescription(final Identifier geographicIdentifier) {
-         this.geographicIdentifier = geographicIdentifier;
+         setGeographicIdentifier(geographicIdentifier);
      }
      
     /**

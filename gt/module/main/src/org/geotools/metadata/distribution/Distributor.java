@@ -83,8 +83,8 @@ public class Distributor extends MetadataEntity
     /**
      * Creates a distributor with the specified contact.
      */
-    public Distributor(ResponsibleParty distributorContact) {
-        this.distributorContact = distributorContact;
+    public Distributor(final ResponsibleParty distributorContact) {
+        setDistributorContact(distributorContact);
     }
 
     /**

@@ -91,8 +91,8 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      * Creates a format initialized to the given name.
      */
     public Format(final InternationalString name, final InternationalString version) {
-        this.name    = name;
-        this.version = version;
+        setName   (name   );
+        setVersion(version);
     }
 
     /**

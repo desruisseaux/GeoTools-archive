@@ -77,7 +77,7 @@ public class SecurityConstraints extends Constraints
      * Creates a security constraints initialized with the specified classification.
      */
     public SecurityConstraints(final Classification classification) {
-        this.classification = classification;
+        setClassification(classification);
     }
     
     /**

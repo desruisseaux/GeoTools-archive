@@ -69,6 +69,7 @@ public class Citation extends MetadataEntity
     public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
     static {
         OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
+        OPEN_GIS.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OGC")));
         OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
                  org.geotools.metadata.citation.ResponsibleParty.OPEN_GIS));
         OPEN_GIS.freeze();

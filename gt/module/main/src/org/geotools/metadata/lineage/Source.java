@@ -42,9 +42,6 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the source data used in creating the data specified by the scope.
  *
- * Only one of {@linkplain #getStatement statement}, {@linkplain #getProcessSteps process steps}
- * and {@link #getSources sources} should be provided.
- *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
@@ -97,7 +94,7 @@ public class Source extends MetadataEntity
      * Creates a source initialized with the given description.
      */
     public Source(final InternationalString description) {
-        this.description = description;
+        setDescription(description);
     }
 
     /**

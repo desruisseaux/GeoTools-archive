@@ -107,7 +107,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      * Creates an element initialized to the given result.
      */
     public Element(final Result result) {
-        this.result = result;
+        setResult(result);
     }
     
     /**
@@ -143,7 +143,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setMeasureIdentification(final Identifier newValue)  {
         checkWritePermission();
-        this.measureIdentification = newValue;
+        measureIdentification = newValue;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setMeasureDescription(final InternationalString newValue)  {
         checkWritePermission();
-        this.measureDescription = newValue;
+        measureDescription = newValue;
     }
 
     /**
@@ -174,7 +174,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setEvaluationMethodType(final EvaluationMethodType newValue)  {
         checkWritePermission();
-        this.evaluationMethodType = newValue;
+        evaluationMethodType = newValue;
     }
 
     /**
@@ -189,7 +189,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setEvaluationMethodDescription(final InternationalString newValue)  {
         checkWritePermission();
-        this.evaluationMethodDescription = newValue;
+        evaluationMethodDescription = newValue;
     }
 
     /**
@@ -204,7 +204,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setEvaluationProcedure(final Citation newValue) {
         checkWritePermission();
-        this.evaluationProcedure = newValue;
+        evaluationProcedure = newValue;
     }
 
     /**
@@ -255,7 +255,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
      */
     public synchronized void setResult(final Result newValue) {
         checkWritePermission();
-        this.result = newValue;
+        result = newValue;
     }
     
     /**

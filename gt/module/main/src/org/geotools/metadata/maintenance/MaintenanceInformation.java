@@ -94,7 +94,7 @@ public class MaintenanceInformation extends MetadataEntity
      * Creates a maintenance information.
      */
     public MaintenanceInformation(final MaintenanceFrequency maintenanceAndUpdateFrequency) {
-        this.maintenanceAndUpdateFrequency = maintenanceAndUpdateFrequency;
+        setMaintenanceAndUpdateFrequency(maintenanceAndUpdateFrequency);
     }
     
     /**

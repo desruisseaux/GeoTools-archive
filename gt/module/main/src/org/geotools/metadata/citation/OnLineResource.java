@@ -134,7 +134,7 @@ public class OnLineResource extends MetadataEntity
      * Creates an on line resource initialized to the given URL.
      */
      public OnLineResource(final URL linkage) {
-         this.linkage = linkage;
+         setLinkage(linkage);
      }
     
     /**
@@ -254,15 +254,6 @@ public class OnLineResource extends MetadataEntity
      * Returns a string representation of this on line resource.
      */
     public String toString() {
-        final URL linkage = this.linkage;
-        if (linkage != null) try {
-            return URLDecoder.decode(linkage.toExternalForm(), "UTF-8");
-        } catch (UnsupportedEncodingException ignore) {
-            // Fall back on default string.
-        }
-        if (description != null) {
-            return String.valueOf(description);
-        }
-        return "";
+        return linkage.toString();
     }    
 }
