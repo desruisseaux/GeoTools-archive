@@ -28,6 +28,7 @@ import oracle.sql.STRUCT;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
 import oracle.sql.CHAR;
+import oracle.sql.CharacterSet;
 //import oracle.sql.CharacterSet;
 import oracle.sql.Datum;
 import oracle.sql.NUMBER;
