@@ -197,6 +197,8 @@ e.printStackTrace();
      * @see org.geotools.data.FeatureStore#setTransaction(org.geotools.data.Transaction)
      */
     public void setTransaction(Transaction transaction) {
+        if(transaction == null)
+            throw new NullPointerException("Should this not be Transaction.AutoCommit?");
         trans = transaction;
     }
 }

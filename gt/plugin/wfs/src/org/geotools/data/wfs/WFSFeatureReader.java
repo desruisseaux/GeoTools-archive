@@ -20,6 +20,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.gml.FCBuffer;
@@ -240,5 +241,16 @@ public class WFSFeatureReader extends FCBuffer {
         next = null;
 
         return r;
+    }
+    
+    private FeatureType ft = null;
+    public FeatureType getFeatureType() {
+        if(ft!=null)
+            return ft;
+        if(next!=null){
+            ft = next.getFeatureType();
+            return ft;
+        }
+        return super.getFeatureType();
     }
 }
