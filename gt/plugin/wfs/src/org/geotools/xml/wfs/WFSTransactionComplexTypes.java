@@ -1453,7 +1453,7 @@ public class WFSTransactionComplexTypes {
             	}else{
             	if(t[1] instanceof Geometry){
             		// Geometry
-            		GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance().getElements()[0],t[29],output,hints);
+            		GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance().getElements()[0],t[1],output,hints);
             	}else{
             		// primative
             		output.characters(t[1].toString());
