@@ -24,13 +24,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -39,6 +33,15 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**

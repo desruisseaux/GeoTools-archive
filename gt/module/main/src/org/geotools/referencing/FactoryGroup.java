@@ -65,7 +65,7 @@ import org.geotools.util.Singleton;
  * @version $Id
  * @author Martin Desruisseaux
  */
-public class FactoryHelper {
+public class FactoryGroup {
     /**
      * The {@linkplain Datum datum} factory.
      * If null, then a default factory will be created only when first needed.
@@ -101,7 +101,7 @@ public class FactoryHelper {
      * FactoryFinder.{@linkplain FactoryFinder#getMathTransformFactory() MathTransformFactory()};
      * </pre></blockquote>
      */
-    public FactoryHelper() {
+    public FactoryGroup() {
         this(null, null, null, null);
     }
 
@@ -115,15 +115,55 @@ public class FactoryHelper {
      *                     factory.
      * @param    mtFactory The {@linkplain MathTransform math transform} factory.
      */
-    public FactoryHelper(final DatumFactory      datumFactory,
-                         final CSFactory            csFactory,
-                         final CRSFactory          crsFactory,
-                         final MathTransformFactory mtFactory)
+    public FactoryGroup(final DatumFactory      datumFactory,
+                        final CSFactory            csFactory,
+                        final CRSFactory          crsFactory,
+                        final MathTransformFactory mtFactory)
     {
         this.datumFactory = datumFactory;
         this.csFactory    =    csFactory;
         this.crsFactory   =   crsFactory;
         this.mtFactory    =    mtFactory;
+    }
+
+    /**
+     * Returns the {@linkplain Datum datum} factory.
+     */
+    public DatumFactory getDatumFactory() {
+        if (datumFactory == null) {
+            datumFactory = FactoryFinder.getDatumFactory();
+        }
+        return datumFactory;
+    }
+
+    /**
+     * Returns the {@linkplain CoordinateSystem coordinate system} factory.
+     */
+    public CSFactory getCSFactory() {
+        if (csFactory == null) {
+            csFactory = FactoryFinder.getCSFactory();
+        }
+        return csFactory;
+    }
+
+    /**
+     * Returns the {@linkplain CoordinateReferenceSystem coordinate reference system} factory.
+     */
+    public CRSFactory getCRSFactory() {
+        if (crsFactory == null) {
+            crsFactory = FactoryFinder.getCRSFactory();
+        }
+        return crsFactory;
+    }
+
+    /**
+     * Returns the {@linkplain MathTransform math transform} factory.
+     */
+    public MathTransformFactory getMathTransformFactory() {
+        if (mtFactory == null) {
+            mtFactory = FactoryFinder.getMathTransformFactory();
+        }
+        return mtFactory;
     }
 
     /**
@@ -147,9 +187,7 @@ public class FactoryHelper {
             throws NoSuchIdentifierException, FactoryException
     {
         final MathTransform transform;
-        if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory();
-        }
+        final MathTransformFactory mtFactory = getMathTransformFactory();
         if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
             // Special processing for Geotools implementation.
             transform = ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
@@ -213,19 +251,14 @@ public class FactoryHelper {
          * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
          */
         final Singleton methods = new Singleton();
-        if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory();
-        }
+        final MathTransformFactory  mtFactory = getMathTransformFactory();
         final MathTransform step1 = mtFactory.createAffineTransform(swap1);
         final MathTransform step2 = createParameterizedTransform(parameters, methods);
         final MathTransform step3 = mtFactory.createAffineTransform(swap3);
         final MathTransform mt    = mtFactory.createConcatenatedTransform(
                                     mtFactory.createConcatenatedTransform(step1, step2), step3);
-        if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSFactory();
-        }
-        return crsFactory.createProjectedCRS(properties, (OperationMethod) methods.get(),
-                                             base, mt, derivedCS);
+        return getCRSFactory().createProjectedCRS(properties, (OperationMethod) methods.get(),
+                                                  base, mt, derivedCS);
     }
 
     /**
@@ -239,8 +272,10 @@ public class FactoryHelper {
      * @param  crs The compound CRS to converts in a 3D geographic CRS.
      * @return The 3D geographic CRS, or <code>crs</code> if the conversion can't be applied.
      * @throws FactoryException if the object creation failed.
+     *
+     * @todo Consider extensions of this method to projected CRS if it is usefull for GEOT-401.
      */
-    public CoordinateReferenceSystem toGeographic3D(final CompoundCRS crs)
+    public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs)
             throws FactoryException
     {
         final SingleCRS[] components = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(crs);
@@ -292,15 +327,11 @@ public class FactoryHelper {
                 csName  = getTemporaryName(cs);
                 crsName = getTemporaryName(horizontal);
             }
-            if (csFactory == null) {
-                csFactory = FactoryFinder.getCSFactory();
-            }
-            if (crsFactory == null) {
-                crsFactory = FactoryFinder.getCRSFactory();
-            }
+            final  CSFactory  csFactory = getCSFactory();
+            final CRSFactory crsFactory = getCRSFactory();
             final GeographicCRS single;
             single = crsFactory.createGeographicCRS(crsName, (GeodeticDatum) horizontal.getDatum(),
-                     csFactory.createEllipsoidalCS(csName, axis[0], axis[1], axis[2]));
+                      csFactory.createEllipsoidalCS(csName, axis[0], axis[1], axis[2]));
             /*
              * The single CRS has now been created. If it is the only CRS left, returns it.
              * Otherwise (for example a TemporalCRS way still around), build a new compound

@@ -24,6 +24,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.prefs.Preferences;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
@@ -32,12 +42,6 @@ import org.geotools.resources.Formattable;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.XAffineTransform;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
@@ -126,6 +130,13 @@ final class AffineTransform2D extends XAffineTransform
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst) {
         if (ptDst == null) {
             ptDst = new GeneralDirectPosition(2);
+        } else {
+            final int dimension = ptDst.getDimension();
+            if (dimension != 2) {
+                throw new MismatchedDimensionException(Resources.format(
+                          ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                          "ptDst", new Integer(dimension), new Integer(2)));
+            }
         }
         final double[] array = ptSrc.getCoordinates();
         transform(array, 0, array, 0, 1);

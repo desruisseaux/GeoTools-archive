@@ -52,6 +52,7 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
 import org.geotools.renderer.lite.LiteShape;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -98,6 +99,9 @@ public class MathTransformTest extends TestCase {
      */
     private MathTransformFactory factory;
 
+    /**
+     * Expected accuracy for tests on JTS objects.
+     */
     private static final double ACCURACY = 0.03;
 
     /**
@@ -154,16 +158,16 @@ public class MathTransformTest extends TestCase {
             });
         }
         
-        AffineTransform at =new AffineTransform(23.157082917424454, 0.0, 3220.1613428464952,
+        AffineTransform at = new AffineTransform(23.157082917424454, 0.0, 3220.1613428464952,
                 0.0, -23.157082917424457, 1394.4593259871676);
-        MathTransform mt=FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
+        MathTransform mt = factory.createAffineTransform(new GeneralMatrix(at));
         
-        double[] points=new double[]{
+        double[] points = new double[]{
                 -129.992589135802, 55.9226692948365, -129.987254340541,
                 55.9249676996729, -129.982715772093, 55.9308988434656, 
                 -129.989772198265, 55.9289277997662, -129.992589135802, 55.9226692948365 };
         
-        double[] transformedPoints=new double[points.length];
+        double[] transformedPoints = new double[points.length];
         mt.transform(points, 0, transformedPoints, 0, points.length/2);
         at.transform(points, 0, points, 0, points.length/2);
         for( int i = 0; i < transformedPoints.length; i++ ) {

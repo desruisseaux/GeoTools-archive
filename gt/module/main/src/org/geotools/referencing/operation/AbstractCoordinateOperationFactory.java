@@ -50,7 +50,7 @@ import org.opengis.referencing.operation.Transformation;
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Factory;
-import org.geotools.referencing.FactoryHelper;
+import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
@@ -124,7 +124,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     /**
      * The set of helper methods on factories.
      */
-    final FactoryHelper helper;
+    final FactoryGroup helper;
 
     /**
      * The underlying math transform factory. This factory
@@ -147,7 +147,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
         this.mtFactory = mtFactory;
         ensureNonNull("mtFactory", mtFactory);
-        helper = new FactoryHelper(null, null, null, mtFactory);
+        helper = new FactoryGroup(null, null, null, mtFactory);
     }
 
     /**

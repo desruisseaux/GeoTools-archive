@@ -174,8 +174,8 @@ public class TransformationTest extends TestTransform {
 
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
-        assertTransformEquals(transform.inverse(), 0, 0, 170, 50);
-        assertTransformEquals(transform, 170, 50, 0, 0);
+        assertTransformEquals2_2(transform.inverse(), 0, 0, 170, 50);
+        assertTransformEquals2_2(transform, 170, 50, 0, 0);
     }
 
     /**
@@ -210,8 +210,8 @@ public class TransformationTest extends TestTransform {
 
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
-        assertTransformEquals(transform,  0,   0,  2.3367521703619816, 0.0028940088671177986);
-        assertTransformEquals(transform, 20, -10, -6.663517606186469, 18.00134508026729);
+        assertTransformEquals2_2(transform,  0,   0,  2.3367521703619816, 0.0028940088671177986);
+        assertTransformEquals2_2(transform, 20, -10, -6.663517606186469, 18.00134508026729);
         // Note: Expected values above were computed with Geotools (not an external library).
         //       However, it was tested with both Molodenski and Geocentric transformations.
     }
@@ -282,10 +282,10 @@ public class TransformationTest extends TestTransform {
             assertInterfaced(mt);
             // Note: Expected values below were computed with Geotools (not an external library).
             //       However, it was tested with both Molodenski and Geocentric transformations.
-            assertTransformEquals(mt, 0.0,                   0.0,
-                                      0.001654978796746043,  0.0012755944235822696);
-            assertTransformEquals(mt, 5.0,                   8.0,
-                                      5.001262960018587,     8.001271733843957);
+            assertTransformEquals2_2(mt, 0.0,                   0.0,
+                                         0.001654978796746043,  0.0012755944235822696);
+            assertTransformEquals2_2(mt, 5.0,                   8.0,
+                                         5.001262960018587,     8.001271733843957);
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(Z);
@@ -322,6 +322,8 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
+            assertNotSame(sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
             if (CoordinateOperationFactory.MOLODENSKI != null) {
                 assertTrue(op instanceof Transformation);
             }
@@ -335,18 +337,22 @@ public class TransformationTest extends TestTransform {
             assertInterfaced(mt);
             // Note: Expected values below were computed with Geotools (not an external library).
             //       However, it was tested with both Molodenski and Geocentric transformations.
-            assertTransformEquals(mt, 0,                    0,                      0,
-                                      0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
-            assertTransformEquals(mt, 5,                    8,                     20,
-                                      5.0012629560319874,   8.001271729856333,    120.27929787151515);
-            assertTransformEquals(mt, 5,                    8,                    -20,
-                                      5.001262964005206,    8.001271737831601,     80.2792978901416);
+            assertTransformEquals3_3(mt, 0,                    0,                      0,
+                                         0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
+            assertTransformEquals3_3(mt, 5,                    8,                     20,
+                                         5.0012629560319874,   8.001271729856333,    120.27929787151515);
+            assertTransformEquals3_3(mt, 5,                    8,                    -20,
+                                         5.001262964005206,    8.001271737831601,     80.2792978901416);
+            assertTransformEquals3_3(mt,-5,                   -8,                    -20,
+                                        -4.99799698932651,    -7.998735783965731,      9.007854541763663);
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(Z_NAD27);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
+            assertNotSame(sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
             if (CoordinateOperationFactory.MOLODENSKI != null) {
                 assertTrue(op instanceof Transformation);
             }
@@ -360,23 +366,28 @@ public class TransformationTest extends TestTransform {
             assertInterfaced(mt);
             // Note: Expected values below were computed with Geotools (not an external library).
             //       However, it was tested with both Molodenski and Geocentric transformations.
-            assertTransformEquals(mt, 0,                    0,                      0,
-                                      0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
-            assertTransformEquals(mt, -20,                  5,                      8,
-                                      5.001262964005206,    8.001271737831601,     80.2792978901416);
+            assertTransformEquals3_3(mt, 0,                    0,                      0,
+                                         0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
+            assertTransformEquals3_3(mt, -20,                  5,                      8,
+                                         5.001262964005206,    8.001271737831601,     80.2792978901416);
         }
-        if (false) {
-            //
-            // TODO: FAIL (for now) bacause the factory fail to take the 'z' axis in account.
-            //
+        if (true) {
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
             targetCRS = crsFactory.createFromWKT(WGS84);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame(sourceCRS, op.getSourceCRS());
+            assertNotSame(sourceCRS, op.getSourceCRS());
             assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
+            // Note: Expected values below were computed with Geotools (not an external library).
+            //       However, it was tested with both Molodenski and Geocentric transformations.
+            assertTransformEquals3_2(mt, 0,                    0,                      0,
+                                         0.001654978796746043, 0.0012755944235822696);
+            assertTransformEquals3_2(mt, 5,                    8,                     20,
+                                         5.0012629560319874,   8.001271729856333);
+            assertTransformEquals3_2(mt, 5,                    8,                    -20,
+                                         5.001262964005206,    8.001271737831601);
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(NAD27_Z);
@@ -387,12 +398,36 @@ public class TransformationTest extends TestTransform {
             assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
+            assertTransformEquals3_1(mt,  0,  0, 0,   0);
+            assertTransformEquals3_1(mt,  5,  8, 20, 20);
+            assertTransformEquals3_1(mt, -5, -8, 20, 20);
         }
-        if (true) try {
+        if (true) {
             sourceCRS = crsFactory.createFromWKT(NAD27);
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
-            fail("Should not invent values for the 'z' ordinate!");
+            mt = op.getMathTransform();
+            assertSame   (sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
+            assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            // Note: Expected values below were computed with Geotools (not an external library).
+            //       However, it was tested with both Molodenski and Geocentric transformations.
+            assertTransformEquals2_3(mt, 0,                    0,
+                                         0.001654978796746043, 0.0012755944235822696, 66.4042236590758);
+            assertTransformEquals2_3(mt, 5,                    8,
+                                         5.001262960018587,    8.001271733843957,    100.27929787896574);
+        }
+        if (true) try {
+            sourceCRS = crsFactory.createFromWKT(NAD27_H);
+            targetCRS = crsFactory.createFromWKT(NAD27_Z);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertNotSame(sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
+            assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            fail("Should fails unless GEOT-352 has been fixed");
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
@@ -401,6 +436,21 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84_H);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
+            assertNotSame(sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
+            assertFalse(mt.isIdentity());
+            assertInterfaced(mt);
+            fail("Should fails unless GEOT-352 has been fixed");
+        } catch (OperationNotFoundException exception) {
+            // This is the expected exception.
+        }
+        if (true) try {
+            sourceCRS = crsFactory.createFromWKT(NAD27);
+            targetCRS = crsFactory.createFromWKT(WGS84_H);
+            op = opFactory.createOperation(sourceCRS, targetCRS);
+            mt = op.getMathTransform();
+            assertSame   (sourceCRS, op.getSourceCRS());
+            assertNotSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             fail("Should fails unless GEOT-352 has been fixed");
@@ -416,6 +466,9 @@ public class TransformationTest extends TestTransform {
             assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
+            assertTransformEquals3_1(mt,  0,  0, 0,   0);
+            assertTransformEquals3_1(mt,  5,  8, 20, 20);
+            assertTransformEquals3_1(mt, -5, -8, 20, 20);
         }
     }
 }

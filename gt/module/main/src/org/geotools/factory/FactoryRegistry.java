@@ -237,27 +237,32 @@ public class FactoryRegistry extends ServiceRegistry {
      * If one or both services are not currently registered, or if the desired ordering is
      * already set/unset, nothing happens and false is returned.
      *
-     * @param service1 filter for the preferred service.
-     * @param service2 filter for the service to which <code>service1</code> is preferred.
+     * @param base     The base category. Only categories {@linkplain Class#isAssignableFrom
+     *                 assignable} to <code>base</code> will be processed.
      * @param set      <code>true</code> for setting the ordering, or <code>false</code> for
      *                 unsetting.
+     * @param service1 filter for the preferred service.
+     * @param service2 filter for the service to which <code>service1</code> is preferred.
      */
-    public boolean setOrdering(final Filter service1,
-                               final Filter service2,
-                               final boolean set)
+    public boolean setOrdering(final Class  base,
+                               final boolean set,
+                               final Filter service1,
+                               final Filter service2)
     {
         boolean done = false;
         for (final Iterator categories=getCategories(); categories.hasNext();) {
             final Class category = (Class) categories.next();
-            Object impl1 = null;
-            Object impl2 = null;
-            for (final Iterator it=getServiceProviders(category); it.hasNext();) {
-                final Object factory = it.next();
-                if (service1.filter(factory)) impl1 = factory;
-                if (service2.filter(factory)) impl2 = factory;
-                if (impl1!=null && impl2!=null && impl1!=impl2) {
-                    if (set) done |=   setOrdering(category, impl1, impl2);
-                    else     done |= unsetOrdering(category, impl1, impl2);
+            if (base.isAssignableFrom(category)) {
+                Object impl1 = null;
+                Object impl2 = null;
+                for (final Iterator it=getServiceProviders(category); it.hasNext();) {
+                    final Object factory = it.next();
+                    if (service1.filter(factory)) impl1 = factory;
+                    if (service2.filter(factory)) impl2 = factory;
+                    if (impl1!=null && impl2!=null && impl1!=impl2) {
+                        if (set) done |=   setOrdering(category, impl1, impl2);
+                        else     done |= unsetOrdering(category, impl1, impl2);
+                    }
                 }
             }
         }

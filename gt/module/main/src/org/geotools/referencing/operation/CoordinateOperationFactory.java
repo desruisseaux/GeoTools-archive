@@ -25,6 +25,7 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -37,6 +38,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -52,10 +54,12 @@ import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
@@ -68,7 +72,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.BursaWolfParameters;
-import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -107,13 +111,20 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                 } else {
                     operation = null;
                 }
-                // TODO: Note: we can't log a message in class initializer.
+                // TODO: Note: we can't log a message in class initializer. We
+                //       will log later, when the first instance will be created.
+                needLog = true;
             }
         } catch (SecurityException ignore) {
             // Ignore. We will keep the default value.
         }
         MOLODENSKI = operation;
     }
+
+    /**
+     * <code>true</code> if a message should be logged as a result of {@link #MOLODENSKI} setting.
+     */
+    private static boolean needLog;
 
     /**
      * A unit of one millisecond.
@@ -134,6 +145,13 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      */
     public CoordinateOperationFactory(final MathTransformFactory mtFactory) {
         super(mtFactory);
+        if (needLog) {
+            needLog = false;
+            // TODO: localize
+            Logger.getLogger("org.geotools.referencing")
+                  .config("Datum shift method set to \"" + 
+                          (MOLODENSKI!=null ? MOLODENSKI : "Geocentric") + '"');
+        }
     }
 
     /**
@@ -181,6 +199,10 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             }
             if (targetCRS instanceof GeocentricCRS) {
                 final GeocentricCRS target = (GeocentricCRS) targetCRS;
+                return createOperationStep(source, target);
+            }
+            if (targetCRS instanceof VerticalCRS) {
+                final VerticalCRS target = (VerticalCRS) targetCRS;
                 return createOperationStep(source, target);
             }
         }
@@ -286,15 +308,6 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             final CompoundCRS source = (CompoundCRS) sourceCRS;
             if (targetCRS instanceof CompoundCRS) {
                 final CompoundCRS target = (CompoundCRS) targetCRS;
-                final CoordinateReferenceSystem target3D = helper.toGeographic3D(target);
-                final CoordinateReferenceSystem source3D = helper.toGeographic3D(source);
-                if (source3D!=source && target3D!=target) {
-                    // TODO: This is a partial fix, which work only if both CRS were CompoundCRS.
-                    //       For now, it is not appropriate to use 3D CRS if the source or target
-                    //       CRS is not a 3D one, because it is then more complicated to reduce
-                    //       a 3D CRS into a 2D or 1D one.
-                    return createOperation(source3D, target3D);
-                }
                 return createOperationStep(source, target);
             }
             if (targetCRS instanceof SingleCRS) {
@@ -377,9 +390,11 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * @param  crs The geocentric coordinate reference system to normalize.
      * @param  datum The expected datum.
      * @return The normalized coordinate reference system.
+     * @throws FactoryException if the construction of a new CRS was needed but failed.
      */
-    private static GeocentricCRS normalize(final GeocentricCRS crs,
-                                           final GeodeticDatum datum)
+    private GeocentricCRS normalize(final GeocentricCRS crs,
+                                    final GeodeticDatum datum)
+            throws FactoryException
     {
         final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
         final GeodeticDatum candidate = (GeodeticDatum) crs.getDatum();
@@ -393,8 +408,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                 }
             }
         }
-        return new org.geotools.referencing.crs.GeocentricCRS(
-                   getTemporaryName(crs), datum, STANDARD);
+        return helper.getCRSFactory().createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -409,9 +423,11 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * @param  crs The geographic coordinate reference system to normalize.
      * @param  forceGreenwich <code>true</code> for forcing the Greenwich prime meridian.
      * @return The normalized coordinate reference system.
+     * @throws FactoryException if the construction of a new CRS was needed but failed.
      */
-    private static GeographicCRS normalize(final GeographicCRS      crs,
-                                           final boolean forceGreenwich)
+    private GeographicCRS normalize(final GeographicCRS      crs,
+                                    final boolean forceGreenwich)
+            throws FactoryException
     {
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
               GeodeticDatum datum = (GeodeticDatum) crs.getDatum();
@@ -428,8 +444,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * The specified geographic coordinate system doesn't use standard axis
          * (EAST, NORTH) or the greenwich meridian. Create a new one meeting those criterions.
          */
-        return new org.geotools.referencing.crs.GeographicCRS(
-                   getTemporaryName(crs), datum, STANDARD);
+        return helper.getCRSFactory().createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -684,6 +699,33 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
     }
 
     /**
+     * Creates an operation between a geographic and a vertical coordinate reference systems.
+     * The default implementation accepts the conversion only if the geographic CRS is a tri
+     * dimensional one and the vertical CRS is for {@linkplain VerticalDatumType#ELLIPSOIDAL
+     * height above the ellipsoid}. More elaborated operation, like transformation from
+     * ellipsoidal to geoidal height, should be implemented here.
+     *
+     * @param  sourceCRS Input coordinate reference system.
+     * @param  targetCRS Output coordinate reference system.
+     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @throws FactoryException If the operation can't be constructed.
+     *
+     * @todo Implement GEOT-352 here.
+     */
+    protected CoordinateOperation createOperationStep(final GeographicCRS sourceCRS,
+                                                      final VerticalCRS   targetCRS)
+            throws FactoryException
+    {
+        // TODO: remove cast when we will be allowed to compile for J2SE 1.5.
+        if (VerticalDatumType.ELLIPSOIDAL.equals(((VerticalDatum) targetCRS.getDatum()).getVerticalDatumType())) {
+            final Matrix matrix = swapAndScaleAxis(sourceCRS.getCoordinateSystem(),
+                                                   targetCRS.getCoordinateSystem());
+            return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
+        }
+        throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
+    }
+
+    /**
      * Creates an operation between two geographic coordinate reference systems. The default
      * implementation can adjust axis order and orientation (e.g. transforming from
      * <code>(NORTH,WEST)</code> to <code>(EAST,NORTH)</code>), performs units conversion
@@ -779,12 +821,13 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          */
         final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
         final GeocentricCRS stepCRS;
+        final CRSFactory crsFactory = helper.getCRSFactory();
         if (getGreenwichLongitude(targetPM) == 0) {
-            stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
-                          getTemporaryName(targetCRS), targetDatum, STANDARD);
+            stepCRS = crsFactory.createGeocentricCRS(
+                      getTemporaryName(targetCRS), targetDatum, STANDARD);
         } else {
-            stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
-                          getTemporaryName(sourceCRS), sourceDatum, STANDARD);
+            stepCRS = crsFactory.createGeocentricCRS(
+                      getTemporaryName(sourceCRS), sourceDatum, STANDARD);
         }
         final CoordinateOperation step1 = createOperationStep(sourceCRS, stepCRS);
         final CoordinateOperation step2 = createOperationStep(stepCRS, targetCRS);
@@ -1078,16 +1121,47 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * @param  targetCRS Output coordinate reference system.
      * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
      * @throws FactoryException If the operation can't be constructed.
+     *
+     * @todo (GEOT-401) This method work for some simple cases (e.g. no datum change), and give up
+     *       otherwise. Before to give up at the end of this method, we should try the following:
+     *       <ul>
+     *         <li>Maybe <code>sourceCRS</code> uses a non-ellipsoidal height. We should replace
+     *             the non-ellipsoidal height by an ellipsoidal one, create a transformation step
+     *             for that (to be concatenated), and then try again this operation step.</li>
+     *
+     *         <li>Maybe <code>sourceCRS</code> contains some extra axis, like a temporal CRS.
+     *             We should revisit this code in other to lets supplemental ordinates to be
+     *             pass through or removed.</li>
+     *       </ul>
      */
     protected CoordinateOperation createOperationStep(final CompoundCRS sourceCRS,
                                                       final SingleCRS   targetCRS)
             throws FactoryException
     {
-        final CoordinateReferenceSystem[] sources = sourceCRS.getCoordinateReferenceSystems();
+        final SingleCRS[] sources = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(sourceCRS);
         if (sources.length == 1) {
             return createOperation(sources[0], targetCRS);
         }
-        return createOperationStep(sourceCRS, sources, targetCRS, new SingleCRS[] {targetCRS});
+        if (!needsGeodetic3D(sources, targetCRS)) {
+            // No need for a datum change (see 'needGeodetic3D' javadoc).
+            final SingleCRS[] targets = new SingleCRS[] {targetCRS};
+            return createOperationStep(sourceCRS, sources, targetCRS, targets);
+        }
+        /*
+         * There is a change of datum.  It may be a vertical datum change (for example from
+         * ellipsoidal to geoidal height), in which case geographic coordinates are usually
+         * needed. It may also be a geodetic datum change, in which case the height is part
+         * of computation. Try to convert the source CRS into a 3D-geodetic CRS.
+         */
+        final CoordinateReferenceSystem source3D = helper.toGeodetic3D(sourceCRS);
+        if (source3D != sourceCRS) {
+            return createOperation(source3D, targetCRS);
+        }
+        /*
+         * TODO: Search for non-ellipsoidal height, and lets supplemental axis (e.g. time)
+         *       pass through. See javadoc comments above.
+         */
+        throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
     }
     
     /**
@@ -1102,11 +1176,21 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final CoordinateReferenceSystem[] targets = targetCRS.getCoordinateReferenceSystems();
+        final SingleCRS[] targets = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(targetCRS);
         if (targets.length == 1) {
             return createOperation(sourceCRS, targets[0]);
         }
-        return createOperationStep(sourceCRS, new SingleCRS[]{sourceCRS}, targetCRS, targets);
+        /*
+         * This method has almost no chance to succeed (we can't invent ordinate values!) unless
+         * 'sourceCRS' is a 3D-geodetic CRS and 'targetCRS' is a 2D + 1D one. Test for this case.
+         * Otherwise, the 'createOperationStep' invocation will throws the appropriate exception.
+         */
+        final CoordinateReferenceSystem target3D = helper.toGeodetic3D(targetCRS);
+        if (target3D != targetCRS) {
+            return createOperation(sourceCRS, target3D);
+        }
+        final SingleCRS[] sources = new SingleCRS[] {sourceCRS};
+        return createOperationStep(sourceCRS, sources, targetCRS, targets);
     }
 
     /**
@@ -1121,19 +1205,48 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final CoordinateReferenceSystem[] sources = sourceCRS.getCoordinateReferenceSystems();
-        final CoordinateReferenceSystem[] targets = targetCRS.getCoordinateReferenceSystems();
+        final SingleCRS[] sources = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(sourceCRS);
+        final SingleCRS[] targets = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(targetCRS);
         if (targets.length == 1) {
             return createOperation(sourceCRS, targets[0]);
         }
         if (sources.length == 1) { // After 'targets' because more likely to fails to transform.
             return createOperation(sources[0], targetCRS);
         }
+        /*
+         * If the source CRS contains both a geodetic and a vertical CRS, then we can process
+         * only if there is no datum change. If at least one of those CRS appears in the target
+         * CRS with a different datum, then the datum shift must be applied on the horizontal and
+         * vertical components together.
+         */
+        for (int i=0; i<targets.length; i++) {
+            if (needsGeodetic3D(sources, targets[i])) {
+                final CoordinateReferenceSystem source3D = helper.toGeodetic3D(sourceCRS);
+                final CoordinateReferenceSystem target3D = helper.toGeodetic3D(targetCRS);
+                if (source3D!=sourceCRS || target3D!=targetCRS) {
+                    return createOperation(source3D, target3D);
+                }
+                /*
+                 * TODO: Search for non-ellipsoidal height, and lets supplemental axis pass through.
+                 *       See javadoc comments for createOperation(CompoundCRS, SingleCRS).
+                 */
+                throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
+            }
+        }
+        // No need for a datum change (see 'needGeodetic3D' javadoc).
         return createOperationStep(sourceCRS, sources, targetCRS, targets);
     }
 
     /**
      * Implementation of transformation step on compound CRS.
+     *
+     * <strong>NOTE:</strong>
+     * If there is a horizontal (geographic or projected) CRS together with a vertical CRS,
+     * then we can't performs the transformation since the vertical value has an impact on
+     * the horizontal value, and this impact is not taken in account if the horizontal and
+     * vertical components are not together in a 3D geographic CRS.  This case occurs when
+     * the vertical CRS is not a height above the ellipsoid. It must be checked by the
+     * caller before this method is invoked.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  sources   The source CRS components.
@@ -1142,37 +1255,12 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
      * @throws FactoryException If the operation can't be constructed.
      */
-    private CoordinateOperation createOperationStep(final CoordinateReferenceSystem   sourceCRS,
-                                                    final CoordinateReferenceSystem[] sources,
-                                                    final CoordinateReferenceSystem   targetCRS,
-                                                    final CoordinateReferenceSystem[] targets)
+    private CoordinateOperation createOperationStep(final CoordinateReferenceSystem sourceCRS,
+                                                    final SingleCRS[]               sources,
+                                                    final CoordinateReferenceSystem targetCRS,
+                                                    final SingleCRS[]               targets)
             throws FactoryException
     {
-        /*
-         * If there is a horizontal (geographic or projected) CRS together with a vertical CRS,
-         * then we can't performs the transformation since the vertical value has an impact on
-         * the horizontal value, and this impact is not taken in account if the horizontal and
-         * vertical components are not together in a 3D geographic CRS.  This case occurs when
-         * the vertical CRS is not a height above the ellipsoid.
-         *
-         * TODO: We can do much better than this hack. We could try to normalize the array of
-         *       source and target CRS by replacing any non-ellipsoidal height by a ellipdoisal
-         *       one, and invokes this 'createOperationStep' recursively (and concatenate the
-         *       results, of course). At the very least, the hack below is a little bit too strict.
-         */
-        if (true) {
-            final SingleCRS horizontalCRS1 = CRSUtilities.getHorizontalCRS(sourceCRS);
-            final VerticalCRS verticalCRS1 = CRSUtilities.getVerticalCRS  (sourceCRS);
-            if (horizontalCRS1!=null && verticalCRS1!=null) {
-                final SingleCRS horizontalCRS2 = CRSUtilities.getHorizontalCRS(targetCRS);
-                final VerticalCRS verticalCRS2 = CRSUtilities.getVerticalCRS  (targetCRS);
-                if ((horizontalCRS2!=null && !equalsIgnoreMetadata(horizontalCRS1, horizontalCRS2))
-                   || (verticalCRS2!=null && !equalsIgnoreMetadata(  verticalCRS1,   verticalCRS2)))
-                {
-                    throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
-                }
-            }
-        }
         /*
          * Try to find operations from source CRSs to target CRSs. All pairwise combinaisons are
          * tried, but the preference is given to CRS in the same order (source[0] with target[0],
@@ -1238,7 +1326,7 @@ search: for (int j=0; j<targets.length; j++) {
             if (ordered.length == 1) {
                 sourceStepCRS = ordered[0];
             } else {
-                sourceStepCRS = new org.geotools.referencing.crs.CompoundCRS(
+                sourceStepCRS = helper.getCRSFactory().createCompoundCRS(
                                     getTemporaryName(sourceCRS), ordered);
             }
             operation = createFromAffineTransform(AXIS_CHANGES, sourceCRS, sourceStepCRS, select);
@@ -1265,7 +1353,7 @@ search: for (int j=0; j<targets.length; j++) {
             } else if (ordered.length == 1) {
                 targetStepCRS = ordered[0];
             } else {
-                targetStepCRS = new org.geotools.referencing.crs.CompoundCRS(
+                targetStepCRS = helper.getCRSFactory().createCompoundCRS(
                                     getTemporaryName(target), ordered);
             }
             lower  = upper;
@@ -1289,6 +1377,60 @@ search: for (int j=0; j<targets.length; j++) {
         }
         assert upper == dimensions : upper;
         return operation;
+    }
+
+    /**
+     * Returns <code>true</code> if a transformation path from <code>sourceCRS</code> to
+     * <code>targetCRS</code> is likely to requires a tri-dimensional geodetic CRS as an
+     * intermediate step. More specifically, this method returns <code>false</code> if at
+     * lest one of the following conditions is meet:
+     *
+     * <ul>
+     *   <li>The target datum is not a vertical or geodetic one (the two datum that must work
+     *       together). Consequently, a potential datum change is not the caller's business.
+     *       It will be handled by the generic method above.</li>
+     *
+     *   <li>The target datum is vertical or geodetic, but there is no datum change. It is
+     *       better to not try to create 3D-geodetic CRS, since they are more difficult to
+     *       separate in the generic method above.</li>
+     *
+     *   <li>A datum change is required, but source CRS doesn't have both a geodetic
+     *       and a vertical CRS, so we can't apply a 3D datum shift anyway.</li>
+     * </ul>
+     */
+    private static boolean needsGeodetic3D(final SingleCRS[] sourceCRS, final SingleCRS targetCRS) {
+        final boolean targetGeodetic;
+        final Datum targetDatum = targetCRS.getDatum();
+        if (targetDatum instanceof GeodeticDatum) {
+            targetGeodetic = true;
+        } else if (targetDatum instanceof VerticalDatum) {
+            targetGeodetic = false;
+        } else {
+            return false;
+        }
+        boolean horizontal = false;
+        boolean vertical   = false;
+        boolean shift      = false;
+        for (int i=0; i<sourceCRS.length; i++) {
+            final Datum sourceDatum = sourceCRS[i].getDatum();
+            final boolean sourceGeodetic;
+            if (sourceDatum instanceof GeodeticDatum) {
+                horizontal     = true;
+                sourceGeodetic = true;
+            } else if (sourceDatum instanceof VerticalDatum) {
+                vertical       = true;
+                sourceGeodetic = false;
+            } else {
+                continue;
+            }
+            if (!shift && sourceGeodetic==targetGeodetic) {
+                shift = !equalsIgnoreMetadata(sourceDatum, targetDatum);
+                assert Utilities.sameInterfaces(sourceDatum.getClass(),
+                                                targetDatum.getClass(),
+                                                Datum.class);
+            }
+        }
+        return shift && horizontal && vertical;
     }
     
 

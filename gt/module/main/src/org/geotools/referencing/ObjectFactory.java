@@ -985,7 +985,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      *
      * @see #getDefaultParameters
      *
-     * @deprecated Use {@link FactoryHelper#createProjectedCRS} instead.
+     * @deprecated Use {@link FactoryGroup#createProjectedCRS} instead.
      */
     public ProjectedCRS createProjectedCRS(Map                 properties,
                                            GeographicCRS             base,
@@ -993,8 +993,8 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
                                            CartesianCS          derivedCS)
             throws FactoryException
     {
-        return new FactoryHelper(this, this, this, null).createProjectedCRS(
-                                    properties, base, parameters, derivedCS);
+        return new FactoryGroup(this, this, this, null).createProjectedCRS(
+                                properties, base, parameters, derivedCS);
     }
 
     /**

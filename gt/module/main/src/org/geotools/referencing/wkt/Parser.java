@@ -68,7 +68,7 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.FactoryHelper;
+import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -111,7 +111,7 @@ public class Parser extends MathTransformParser {
      * Set of helper methods working on factories. Will be constructed
      * only the first time it is needed.
      */
-    private transient FactoryHelper helper;
+    private transient FactoryGroup helper;
 
     /**
      * The list of {@linkplain AxisDirection axis directions} from their name.
@@ -799,7 +799,7 @@ public class Parser extends MathTransformParser {
             }
             element.close();
             if (helper == null) {
-                helper = new FactoryHelper(datumFactory, csFactory, crsFactory, mtFactory);
+                helper = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
             }
             return helper.createProjectedCRS(properties, geoCRS, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));

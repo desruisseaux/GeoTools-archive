@@ -266,15 +266,16 @@ public final class FactoryFinder {
      * The example below said that an ESRI implementation (if available) is
      * preferred over the Geotools one:
      *
-     * <blockquote><code>FactoryFinder.setOrdering("ESRI", "Geotools");</code></blockquote>
+     * <blockquote><code>FactoryFinder.setVendorOrdering("ESRI", "Geotools");</code></blockquote>
      *
      * @param  vendor1 The preferred vendor.
      * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
      * @return <code>true</code> if the ordering was set for at least one category.
      */
     public static boolean setVendorOrdering(final String vendor1, final String vendor2) {
-        return getServiceRegistry().setOrdering(new VendorFilter(vendor1),
-                                                new VendorFilter(vendor2), true);
+        return getServiceRegistry().setOrdering(Factory.class, true,
+                                                new VendorFilter(vendor1),
+                                                new VendorFilter(vendor2));
     }
 
     /**
@@ -287,8 +288,9 @@ public final class FactoryFinder {
      * @return <code>true</code> if the ordering was unset for at least one category.
      */
     public static boolean unsetVendorOrdering(final String vendor1, final String vendor2) {
-        return getServiceRegistry().setOrdering(new VendorFilter(vendor1),
-                                                new VendorFilter(vendor2), false);
+        return getServiceRegistry().setOrdering(Factory.class, false,
+                                                new VendorFilter(vendor1),
+                                                new VendorFilter(vendor2));
     }
 
     /**
@@ -307,6 +309,60 @@ public final class FactoryFinder {
         public boolean filter(final Object provider) {
             return org.geotools.metadata.citation.Citation.titleMatches(
                     ((Factory)provider).getVendor(), vendor);
+        }
+    }
+
+    /**
+     * Sets a pairwise ordering between two authorities. If one or both authorities are not
+     * currently registered, or if the desired ordering is already set, nothing happens
+     * and <code>false</code> is returned.
+     * <br><br>
+     * The example below said that EPSG {@linkplain AuthorityFactory authority factories}
+     * are preferred over ESRI ones:
+     *
+     * <blockquote><code>FactoryFinder.setAuthorityOrdering("EPSG", "ESRI");</code></blockquote>
+     *
+     * @param  authority1 The preferred authority.
+     * @param  authority2 The authority to which <code>authority1</code> is preferred.
+     * @return <code>true</code> if the ordering was set for at least one category.
+     */
+    public static boolean setAuthorityOrdering(final String authority1, final String authority2) {
+        return getServiceRegistry().setOrdering(AuthorityFactory.class, true,
+                                                new AuthorityFilter(authority1),
+                                                new AuthorityFilter(authority2));
+    }
+
+    /**
+     * Unsets a pairwise ordering between two authorities. If one or both authorities are not
+     * currently registered, or if the desired ordering is already unset, nothing happens
+     * and <code>false</code> is returned.
+     *
+     * @param  authority1 The preferred authority.
+     * @param  authority2 The vendor to which <code>authority1</code> is preferred.
+     * @return <code>true</code> if the ordering was unset for at least one category.
+     */
+    public static boolean unsetAuthorityOrdering(final String authority1, final String authority2) {
+        return getServiceRegistry().setOrdering(AuthorityFactory.class, false,
+                                                new AuthorityFilter(authority1),
+                                                new AuthorityFilter(authority2));
+    }
+
+    /**
+     * A filter for factories provided for a given authority.
+     */
+    private static final class AuthorityFilter implements ServiceRegistry.Filter {
+        /** The authority to filter. */
+        private final String authority;
+
+        /** Constructs a filter for the given authority. */
+        public AuthorityFilter(final String authority) {
+            this.authority = authority;
+        }
+
+        /** Returns <code>true</code> if the specified provider is for the authority. */
+        public boolean filter(final Object provider) {
+            return org.geotools.metadata.citation.Citation.titleMatches(
+                    ((AuthorityFactory)provider).getAuthority(), authority);
         }
     }
 
