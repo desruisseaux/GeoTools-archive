@@ -415,7 +415,8 @@ Module ${module} : ${status}
             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
             <echo message="release report is set to ${release.report}"/>
             <echo file="${release.report}" message="release is ${release.version}"/>
-            <loadfile property="release.required" srcFile="requiredList.txt"/>
+            <!-- <loadfile property="release.required" srcFile="requiredList.txt"/> -->
+            <j:set var="release.required" value="main"/>
             <u:tokenize var="list" delim=",">${release.required}</u:tokenize>
             <j:set var="todo" value=""/>
             <j:set var="required" value=""/>	
@@ -426,7 +427,8 @@ ${required}"/>
             </j:forEach>
             <echo message="reactor list = ${todo}"/>
              <ant:delete dir="${basedir}/target/forMerge"/>
-            <maven:reactor basedir="${basedir}/geotools-src" includes="${todo}" goals="moveLib, moveForMerge, moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+            <maven:reactor basedir="${basedir}/module" includes="${todo}" goals="moveLib,moveForMerge,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
+            <echo message="done with reactor for main"/>
             <ant:mkdir dir="${basedir}/target/binRelease/jars"/>
             <ant:jar destfile="${basedir}/target/binRelease/jars/gt2-main.jar">
                 <ant:fileset dir="${basedir}/target/forMerge"/>
@@ -435,11 +437,7 @@ ${required}"/>
             <echo message="requiredList = ${requiredList}"/>
             <ant:property name="maven.dist.dir" value="${maven.build.dir}/distributions"/>
             <ant:mkdir dir="${maven.dist.dir}"/>
-            
-            <echo message="dist directory is ${maven.dist.dir}"/>
-            <ant:zip longfile="gnu" basedir="${basedir}/target/binRelease" destfile="${maven.dist.dir}/geotools-bin-${release.version}.zip"/>
-            <ant:zip longfile="gnu" basedir="${basedir}/target/srcRelease" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip"/>
-            
+       
             <!-- add optional modules seperatly -->
             <loadfile property="release.optional" srcFile="optionalList.txt"/>
             <u:tokenize var="list2" delim=",">${release.optional}</u:tokenize>
@@ -449,8 +447,12 @@ ${required}"/>
             </j:forEach>
             <echo message="reactor list = ${todo}"/>
             <attainGoal name="moveBuildFiles"/>
-            <maven:reactor basedir="${basedir}/geotools-src" includes="${todo}" goals="moveLib, moveBin, moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
-            
+            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="moveLib,moveBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+                 
+            <echo message="dist directory is ${maven.dist.dir}"/>
+            <ant:zip longfile="gnu" basedir="${basedir}/target/binRelease" destfile="${maven.dist.dir}/geotools-bin-${release.version}.zip"/>
+            <ant:zip longfile="gnu" basedir="${basedir}/target/srcRelease" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip"/>
+          
             
             
         </goal>
@@ -459,11 +461,11 @@ ${required}"/>
             
                 <echo message="working on ${pom.id} for merge"/>
                 
-                <ant:copy todir="../../target/forMerge">
+               <ant:copy todir="../../target/forMerge">
                    <ant:fileset dir="./target/classes">
                      <ant:include name="**/*"/>
                    </ant:fileset>
-                </ant:copy> 
+                </ant:copy>
           </goal>
         
         <goal name="moveLib">
@@ -484,13 +486,13 @@ ${required}"/>
                  <echo file="../../${release.report}" append="true">  OK</echo>   
         </goal>
         
-        <goal name="moveBin">
+        <goal name="movePluginBin">
             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
             <echo file="../../${release.report}" append="true">
             add ${pom.id} jar - </echo>
                 <echo message="working on ${pom.id} for binary release"/>
                 <attainGoal name="jar:jar"/> 
-                <ant:copy tofile="../../target/binRelease/jars/gt2-${pom.artifactId}.jar">
+                <ant:copy tofile="../../target/binRelease/plugin/gt2-${pom.artifactId}.jar">
                    <ant:fileset dir="./target">
                      <ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
                    </ant:fileset>
