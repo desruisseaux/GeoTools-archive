@@ -123,7 +123,7 @@ public class ReprojectFeatureResults implements FeatureResults {
         if (results instanceof ReprojectFeatureResults) {
             ReprojectFeatureResults reproject = (ReprojectFeatureResults) results;
             this.results = reproject.getOrigin();
-            this.transform = JTS.concatenate(reproject.transform,
+            this.transform = FactoryFinder.getMathTransformFactory().createConcatenatedTransform(reproject.transform,
                     transform);
         }
     }

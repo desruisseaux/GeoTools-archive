@@ -1,6 +1,6 @@
 package org.geotools.geometry.jts;
 
-import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -27,7 +27,7 @@ public class DefaultCoordinateSequenceTransformer implements
      * @see org.geotools.geometry.jts.CoordinateSequenceTransformer#transform(com.vividsolutions.jts.geom.CoordinateSequence, org.geotools.ct.MathTransform2D)
      */
     public CoordinateSequence transform(CoordinateSequence cs,
-            MathTransform2D transform) throws TransformException {
+            MathTransform transform) throws TransformException {
         Coordinate[] scs = cs.toCoordinateArray();
         Coordinate[] tcs = new Coordinate[scs.length];
         if(coords.length < (scs.length * 2))

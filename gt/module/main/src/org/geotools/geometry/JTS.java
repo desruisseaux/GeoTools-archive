@@ -18,10 +18,14 @@
  */
 package org.geotools.geometry;
 
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * JTS Geometry utility methods, bringing geotools to JTS.
@@ -53,18 +57,25 @@ public class JTS {
         transform.transform(coords, 0, newcoords, 0, 4);
         return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
     }
-
-    /**
-     * 
-     * TODO summary sentence for concatenate ...
-     * 
-     * @param transform1
-     * @param transform2
-     * @return
-     * @throws TransformException
-     */
-    public static MathTransform concatenate(MathTransform transform1,MathTransform transform2) throws TransformException {
-        return null;
+    
+    public static GeometryCoordinateSequenceTransformer createGeometryTransformer(){
+    	return new GeometryCoordinateSequenceTransformer();
     }
-
+    
+    public static GeometryCoordinateSequenceTransformer createPreciseGeometryTransformer(){
+    	return new GeometryCoordinateSequenceTransformer(new PreciseCoordinateSequenceTransformer());
+    }
+   
+    public static Geometry transform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+    	GeometryCoordinateSequenceTransformer transformer=createGeometryTransformer();
+    	transformer.setMathTransform(transform);
+		return transformer.transform(geom);
+	}
+    
+	public static Geometry preciseTransform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+    	GeometryCoordinateSequenceTransformer transformer=createPreciseGeometryTransformer();
+    	transformer.setMathTransform(transform);
+		return transformer.transform(geom);	    
+	}
+	
 }

@@ -16,7 +16,7 @@
  */
 package org.geotools.geometry.jts;
 
-import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -31,5 +31,5 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
  */
 public interface CoordinateSequenceTransformer {
     public CoordinateSequence transform(CoordinateSequence cs,
-        MathTransform2D transform) throws TransformException;
+        MathTransform transform) throws TransformException;
 }
