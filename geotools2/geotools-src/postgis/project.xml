@@ -14,7 +14,11 @@
   </versions>
   <package>org.geotools</package>
   <shortDescription>postgis module</shortDescription>
-  <description>postgis module</description>
+  <description>Used extract and edit features from a PostGIS 
+database.  PostGIS was developed by Refractions Research, it 
+is an extension to the excellent Postgresql database, adding 
+support for Geographic objects.  It is open source and 
+freely available.</description>
   <developers>
     <developer>
       <name>Rob Hranac</name>
