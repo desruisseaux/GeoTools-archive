@@ -39,6 +39,8 @@ import java.io.ObjectStreamException;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 final class InverseTransform extends UnitTransform {
     /**

@@ -33,11 +33,11 @@ import org.geotools.geometry.DirectPosition;
 /**
  * Format a {@link CoordinatePoint} in an arbitrary {@link CoordinateSystem}.
  *
- * @version $Id: CoordinateFormat.java,v 1.6 2003/08/04 17:11:18 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.measure.CoordinateFormat}
- *             in the {@link org.geotools.measure} package.
+ *             in the <code>org.geotools.measure</code> package.
  */
 public class CoordinateFormat extends org.geotools.measure.CoordinateFormat {
     /**

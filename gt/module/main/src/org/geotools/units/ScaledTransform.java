@@ -40,6 +40,8 @@ import org.geotools.resources.rsc.ResourceKeys;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 final class ScaledTransform extends UnitTransform {
     /**

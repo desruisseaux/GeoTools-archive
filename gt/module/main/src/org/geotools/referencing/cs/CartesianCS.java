@@ -76,7 +76,7 @@ public class CartesianCS extends ObliqueCartesianCS implements org.opengis.refer
      * <var>{@linkplain CoordinateSystemAxis#GEOCENTRIC_Z z}</var>
      * axis in metres.
      *
-     * @see org.geotools.referencing.crs.SphericalCS#GEOCENTRIC
+     * @see org.geotools.referencing.cs.SphericalCS#GEOCENTRIC
      */
     public static CartesianCS GEOCENTRIC = new CartesianCS("Geocentric",
                     org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,

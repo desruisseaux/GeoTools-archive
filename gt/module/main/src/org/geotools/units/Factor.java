@@ -49,6 +49,8 @@ import org.geotools.util.WeakHashSet;
  * @author Steven R. Emmerson
  * @author Bill Hibbard
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 /*public*/ 
 final class Factor implements Serializable {

@@ -41,6 +41,8 @@ import org.geotools.resources.units.Units;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 /*public*/ 
 abstract class SimpleUnit extends Unit {

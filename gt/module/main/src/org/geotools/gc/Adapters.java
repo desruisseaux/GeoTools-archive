@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gc;
 
@@ -60,10 +47,13 @@ import org.geotools.cv.SampleDimension;
  * {@link org.geotools.gp.Adapters org.geotools.<strong>gp</strong>.Adapters}
  * implementation cover this case.
  *
- * @version $Id: Adapters.java,v 1.12 2003/08/04 19:07:22 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see org.geotools.gp.Adapters#getDefault()
+ *
+ * @deprecated The legacy OpenGIS GC package is deprecated.
+ *             There is no replacement at this time for RMI objects.
  */
 public class Adapters extends org.geotools.cv.Adapters {
     /**
@@ -249,7 +239,7 @@ public class Adapters extends org.geotools.cv.Adapters {
      * invoking {@link #dispose} will also dispose the serializable image,  which may
      * close socket connection.
      *
-     * @version $Id: Adapters.java,v 1.12 2003/08/04 19:07:22 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class ImageProxy extends RenderedImageAdapter {

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.pt;
 
@@ -50,15 +37,14 @@ import org.geotools.resources.cts.ResourceKeys;
  * where <code>numDim</code> is the dimension of the coordinate system
  * the coordinate point belongs in.
  *
- * @version 1.00
- * @author OpenGIS (www.opengis.org)
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see org.opengis.pt.PT_CoordinatePoint
  * @see java.awt.geom.Point2D
  *
  * @deprecated Replaced by {@link org.geotools.geometry.DirectPosition}
- *             in the {@link org.geotools.geometry} package.
+ *             in the <code>org.geotools.geometry</code> package.
  */
 public class CoordinatePoint implements Dimensioned, Cloneable, Serializable {
     /**

@@ -45,6 +45,8 @@ import org.geotools.resources.Utilities;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 public abstract class UnitTransform implements Serializable {
     /**

@@ -93,7 +93,7 @@ import org.geotools.resources.Utilities;
  * java.util.logging.ConsoleHandler.level = FINE
  * </pre></blockquote>
  *
- * @version $Id: MonolineFormatter.java,v 1.14 2003/07/24 14:11:20 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MonolineFormatter extends Formatter {
@@ -276,8 +276,8 @@ public class MonolineFormatter extends Formatter {
      * <code>"logger:long"</code> or <code>"class:long"</code>.
      *
      * The difference between a <code>null</code> and <code>"none"</code> is that <code>null</code>
-     * may be replaced by a default value (see {@link Geotools#init()},   while <code>"none"</code>
-     * means that the user explicitly requested no source.
+     * may be replaced by a default value, while <code>"none"</code> means that the user explicitly
+     * requested no source.
      *
      * @param format The format for displaying the source, or <code>null</code>
      *        to disable source formatting.

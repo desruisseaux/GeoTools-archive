@@ -37,7 +37,7 @@ import java.text.DecimalFormatSymbols;
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.measure.AngleFormat}
- *             in the {@link org.geotools.measure} package.
+ *             in the <code>org.geotools.measure</code> package.
  */
 public class AngleFormat extends org.geotools.measure.AngleFormat {
     /**

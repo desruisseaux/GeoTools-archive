@@ -60,12 +60,12 @@ import javax.units.NonSI;
  * <strong>IMPORTANT: future version will NOT be compatible
  * will this one. Remind, this is a temporary class!</strong>
  *
- * @version $Id: Unit.java,v 1.5 2002/11/04 20:38:59 crotwell Exp $
+ * @version $Id$
  * @author Steven R. Emmerson
  * @author Bill Hibbard
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link javax.units.Unit}
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 public abstract class Unit implements Serializable {
     /**

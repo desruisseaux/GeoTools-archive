@@ -34,7 +34,7 @@ package org.geotools.pt;
  * @see AngleFormat
  *
  * @deprecated Replaced by {@link org.geotools.measure.Angle}
- *             in the {@link org.geotools.measure} package.
+ *             in the <code>org.geotools.measure</code> package.
  */
 public class Angle extends org.geotools.measure.Angle {
     /**

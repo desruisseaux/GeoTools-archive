@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.util;
 
@@ -49,7 +36,7 @@ import org.geotools.resources.Utilities;
  * which remove their entry from the collection when {@link Reference#clear}
  * is invoked.
  *
- * @version $Id: WeakCollectionCleaner.java,v 1.3 2003/08/04 18:21:32 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class WeakCollectionCleaner extends Thread {

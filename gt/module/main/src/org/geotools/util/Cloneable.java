@@ -15,11 +15,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
  */
 package org.geotools.util;
 
@@ -33,7 +28,7 @@ package org.geotools.util;
  * <code>Cloneable</code> interface add this missing method, which avoid the need to
  * cast an interface to its implementation in order to clone it.
  *
- * @version $Id: Cloneable.java,v 1.2 2003/11/12 14:13:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see java.lang.Cloneable

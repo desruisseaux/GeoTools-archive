@@ -94,7 +94,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
      * The properties are given unchanged to the super-class constructor.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
+     *         Available properties are {@linkplain org.geotools.referencing.Factory listed there}.
      *         Properties for the {@link Conversion} object to be created can be specified
      *         with the <code>"conversion."</code> prefix added in front of property names
      *         (example: <code>"conversion.name"</code>).

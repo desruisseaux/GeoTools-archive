@@ -38,8 +38,11 @@ package org.geotools.units;
  * ce type, et nous en avons parfois besoin pour interagir avec des
  * logiciels existants...
  *
- * @version $Id: DMSUnit.java,v 1.2 2002/07/30 17:09:37 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
+ *             This implementation will need to be ported.
  */
 final class DMSUnit extends Unit {
     /**

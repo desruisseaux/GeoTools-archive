@@ -50,6 +50,8 @@ import org.geotools.util.WeakHashSet;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 /*public*/ 
 final class Prefix implements Comparable, Serializable {

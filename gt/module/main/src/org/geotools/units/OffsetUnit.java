@@ -66,6 +66,8 @@ import org.geotools.resources.rsc.ResourceKeys;
  * @author Steven R. Emmerson
  * @author Bill Hibbard
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the {@link javax.units.Unit} framework.
  */
 /*public*/
 final class OffsetUnit extends Unit {

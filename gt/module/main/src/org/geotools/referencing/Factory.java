@@ -111,8 +111,8 @@ public class Factory implements CSFactory, DatumFactory {
 
     /**
      * Construct a default factory. This method is public in order to allows instantiations
-     * from a {@linkplain javax.imageio.ServiceRegistry service registry}. Users should not
-     * instantiate this factory directly, but use one of the following lines instead:
+     * from a {@linkplain javax.imageio.spi.ServiceRegistry service registry}. Users should
+     * not instantiate this factory directly, but use one of the following lines instead:
      *
      * <blockquote><pre>
      * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain FactoryFinder#getDatumFactory getDatumFactory()};

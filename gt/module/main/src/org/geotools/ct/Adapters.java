@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -63,8 +51,11 @@ import javax.media.jai.ParameterListDescriptorImpl;
  * Provide methods for interoperability with OpenGIS CT package.
  * All methods accept null argument. All OpenGIS objects are suitable for RMI use.
  *
- * @version $Id: Adapters.java,v 1.7 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated The legacy OpenGIS CT package is deprecated.
+ *             There is no replacement at this time for RMI objects.
  */
 public class Adapters extends org.geotools.cs.Adapters {
     /**

@@ -157,7 +157,7 @@ public class CoordinateFormat extends Format {
      * Set the coordinate reference system for points to be formatted. The number
      * of dimensions must matched the dimension of points to be formatted.
      *
-     * @param cs The new coordinate system.
+     * @param crs The new coordinate system.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         if (!CRSUtilities.equalsIgnoreMetadata(this.crs, crs)) {
