@@ -50,6 +50,7 @@ import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderSDE;
 import org.geotools.filter.SQLUnpacker;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.EPSGCRSAuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -364,26 +365,35 @@ public class ArcSDEAdapter {
         CoordinateReferenceSystem crs = null;
         SeCoordinateReference seCRS = sdeLayer.getCoordRef();
         String WKT = seCRS.getProjectionDescription();
+        LOGGER.info("About to parse CRS for layer " + sdeLayer.getName() + ": "
+            + WKT);
 
         try {
             LOGGER.info("Se CRS envelope: " + seCRS.getXYEnvelope());
         } catch (SeException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
         }
 
         if ("UNKNOWN".equalsIgnoreCase(WKT)) {
             LOGGER.warning("ArcSDE layer " + sdeLayer.getName()
                 + " does not provides a Coordinate Reference System");
         } else {
-            CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+        	LOGGER.warning("Do not forget to change the hardcoded use of " +
+        			"EPSGCRSAuthorityFactory when we have an embedded " +
+					"EPSG database");
+        	//@REVISIT: generalize this, by now just a quick fix due to
+        	//the epsg factory backed by the EPSG database throwing an error
+            //CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+        	CRSFactory crsFactory = (CRSFactory)EPSGCRSAuthorityFactory.getDefault();
 
             try {
                 crs = crsFactory.createFromWKT(WKT);
+                LOGGER.fine("ArcSDE CRS correctly parsed from layer "
+                    + sdeLayer.getName());
             } catch (FactoryException e) {
-                LOGGER.warning("CRS factory does not knows how to parse " + WKT);
-                throw new DataSourceException("Can't build CRS provided by ArcSDE",
-                    e);
+                String msg = "CRS factory does not knows how to parse the "
+                    + "CRS for layer " + sdeLayer.getName() + ": " + WKT;
+                LOGGER.log(Level.WARNING, msg, e);
+                throw new DataSourceException(msg, e);
             }
         }
 
