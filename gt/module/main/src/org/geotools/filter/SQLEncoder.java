@@ -16,6 +16,7 @@
  */
 package org.geotools.filter;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -23,8 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
 
 
 /**
@@ -50,21 +49,6 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
  *       errors, which is bad. Probably need a generic visitor exception.
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor {
-    //use these when Like is implemented.
-    //The standard SQL multicharacter wild card. 
-    //private static String SQL_WILD_MULTI = "%";
-    //The standard SQL single character wild card.
-    //private static String SQL_WILD_SINGLE = "_";
-    // The escaped version of the single wildcard for the REGEXP pattern. 
-    //private static String escapedWildcardSingle = "\\.\\?";
-    // The escaped version of the multiple wildcard for the REGEXP pattern. 
-    //private static String escapedWildcardMulti = "\\.\\*";
-
-    /** 
-     * Character used to escape database schema, table and column names 
-     */
-    private String sqlNameEscape = "";
-    
     /** error message for exceptions */
     private static final String IO_ERROR = "io problem writing filter";
 
@@ -122,6 +106,19 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         logical.put(new Integer(AbstractFilter.LOGIC_NOT), "NOT");
     }
 
+    //use these when Like is implemented.
+    //The standard SQL multicharacter wild card. 
+    //private static String SQL_WILD_MULTI = "%";
+    //The standard SQL single character wild card.
+    //private static String SQL_WILD_SINGLE = "_";
+    // The escaped version of the single wildcard for the REGEXP pattern. 
+    //private static String escapedWildcardSingle = "\\.\\?";
+    // The escaped version of the multiple wildcard for the REGEXP pattern. 
+    //private static String escapedWildcardMulti = "\\.\\*";
+
+    /** Character used to escape database schema, table and column names */
+    private String sqlNameEscape = "";
+
     /** where to write the constructed string from visiting the filters. */
     protected Writer out;
 
@@ -159,10 +156,11 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
             throw new SQLEncoderException("Filter type not supported");
         }
     }
-    
+
     /**
-     * Sets the FIDMapper that will be used in subsequente visit calls.
-     * There must be a FIDMapper in order to invoke the FIDFilter encoder.
+     * Sets the FIDMapper that will be used in subsequente visit calls. There
+     * must be a FIDMapper in order to invoke the FIDFilter encoder.
+     *
      * @param mapper
      */
     public void setFIDMapper(FIDMapper mapper) {
@@ -449,12 +447,16 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      *
      * @param filter
      *
+     * @throws RuntimeException DOCUMENT ME!
+     *
      * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.FidFilter)
      */
     public void visit(FidFilter filter) {
-        if(mapper == null)
-            throw new RuntimeException("Must set a fid mapper before trying to encode FIDFilters");
-        
+        if (mapper == null) {
+            throw new RuntimeException(
+                "Must set a fid mapper before trying to encode FIDFilters");
+        }
+
         String[] fids = filter.getFids();
         LOGGER.finer("Exporting FID=" + Arrays.asList(fids));
 
@@ -544,10 +546,10 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
                 out.write("'" + literal + "'");
 
                 break;
-                
+
             case Expression.LITERAL_GEOMETRY:
                 visitLiteralGeometry(expression);
-                
+
                 break;
 
             default:
@@ -559,22 +561,28 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     }
 
     /**
-     * Subclasses must implement this method in order to encode geometry filters
-     * according to the specific database implementation
+     * Subclasses must implement this method in order to encode geometry
+     * filters according to the specific database implementation
+     *
      * @param expression
-     */    
-    protected void visitLiteralGeometry(LiteralExpression expression) throws IOException {
-        throw new RuntimeException("Subclasses must implement this method in order to handle geometries");
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws RuntimeException DOCUMENT ME!
+     */
+    protected void visitLiteralGeometry(LiteralExpression expression)
+        throws IOException {
+        throw new RuntimeException(
+            "Subclasses must implement this method in order to handle geometries");
     }
-    
-    
+
     /**
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
      */
     public void visit(GeometryFilter filter) {
-        throw new RuntimeException("Subclasses must implement this method in order to handle geometries");
+        throw new RuntimeException(
+            "Subclasses must implement this method in order to handle geometries");
     }
-    
+
     /**
      * Writes the SQL for the Math Expression.
      *
@@ -609,44 +617,71 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         throw new UnsupportedOperationException(message);
     }
 
-    
-	/**
-	* Sets the SQL name escape string.
-	* <p>
-	* The value of this string is prefixed and appended to table schema names,
-	* table names and column names in an SQL statement to support
-	* mixed-case and non-English names.
-	* Without this, the DBMS may assume a mixed-case name in the query should be treated
-	* as upper-case and an SQLCODE of -204 or 206 may result if the name is not found.
-	* </p>
-	* <p>
-	* Typically this is the double-quote character, ", but may not be for all databases.
-	* <p>
-	* For example, consider the following query:
-	* </p>
-	* <xmp>
-	* SELECT Geom FROM Spear.ArchSites
-	* May be interpreted by the database as:
-	* SELECT GEOM FROM SPEAR.ARCHSITES
-	* 
-	* If the column and table names were actually created using mixed-case, the query
-	* needs to be specified as:
-	* SELECT "Geom" from "Spear"."ArchSites"
-	* </xmp>
-	* 
-	 * @param string the character to be used to escape database names
-	 */
-	public void setSqlNameEscape(String string) {
-		sqlNameEscape = string;
-	}
+    /**
+     * Sets the SQL name escape string.
+     * 
+     * <p>
+     * The value of this string is prefixed and appended to table schema names,
+     * table names and column names in an SQL statement to support mixed-case
+     * and non-English names. Without this, the DBMS may assume a mixed-case
+     * name in the query should be treated as upper-case and an SQLCODE of
+     * -204 or 206 may result if the name is not found.
+     * </p>
+     * 
+     * <p>
+     * Typically this is the double-quote character, ", but may not be for all
+     * databases.
+     * </p>
+     * 
+     * <p>
+     * For example, consider the following query:
+     * </p>
+     * 
+     * <p>
+     * SELECT Geom FROM Spear.ArchSites May be interpreted by the database as:
+     * SELECT GEOM FROM SPEAR.ARCHSITES  If the column and table names were
+     * actually created using mixed-case, the query needs to be specified as:
+     * SELECT "Geom" from "Spear"."ArchSites"
+     * </p>
+     *
+     * @param escape the character to be used to escape database names
+     */
+    public void setSqlNameEscape(String escape) {
+        sqlNameEscape = escape;
+    }
 
-	/**
-	* Surrounds a name with the SQL escape character.
-	* 
-	 * @param name
-	 */
-	public String escapeName(String name) {
-		return sqlNameEscape + name + sqlNameEscape;
-	}
+    /**
+     * Sets the escape character for the column name.
+     *
+     * @param escape The character to be used to escape database names.
+     *
+     * @deprecated Use setSqlNameEscape instead, as it is more aptly named.
+     */
+    public void setColnameEscape(String escape) {
+        sqlNameEscape = escape;
+    }
 
+    /**
+     * Gets the column escape name.
+     *
+     * @return the string to be used to properly escape a db's name.
+     *
+     * @deprecated the escapeName method is preferred over this, it
+     *             automatically returns the name properly escaped, since
+     *             that's all getColnameEscape was being used for.
+     */
+    protected String getColnameEscape() {
+        return sqlNameEscape;
+    }
+
+    /**
+     * Surrounds a name with the SQL escape character.
+     *
+     * @param name
+     *
+     * @return DOCUMENT ME!
+     */
+    public String escapeName(String name) {
+        return sqlNameEscape + name + sqlNameEscape;
+    }
 }
