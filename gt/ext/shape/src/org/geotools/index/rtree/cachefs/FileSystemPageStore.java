@@ -67,9 +67,7 @@ public class FileSystemPageStore extends PageStore {
     private long rootOffset;
     
     /**
-     * Loads an index from the specified <code>File</code>, if the file
-     * doesn't exists or is 0 length, a new index will be created with
-     * default values for maxNodeEntries, minNodeEntries and splitAlgorithm 
+     * Loads an index from the specified <code>File</code>
      * @param file The file that stores the index
      * @throws TreeException
      */
@@ -90,9 +88,10 @@ public class FileSystemPageStore extends PageStore {
             throw new TreeException(e);
         }
     }
-    
+
     /**
-     * 
+     * Create and index with default values, if the file exists then a
+     * <code>TreeException</code> will be thrown.
      * @param file
      * @param def
      * @throws TreeException
@@ -100,12 +99,26 @@ public class FileSystemPageStore extends PageStore {
     public FileSystemPageStore(File file, DataDefinition def)
     throws TreeException
     {
-        this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT);
+        this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT, -1);
     }
-    
+
     /**
-     * Create and index with the specified values, if the file exists then an
-     * <code>RTreeException</code> will be thrown.
+     * Create and index with default values, if the file exists then a
+     * <code>TreeException</code> will be thrown.
+     * @param file
+     * @param def
+     * @param cacheSize the size of the cache
+     * @throws TreeException
+     */
+    public FileSystemPageStore(File file, DataDefinition def, int cacheSize)
+    throws TreeException
+    {
+        this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT, cacheSize);
+    }
+
+    /**
+     * Create and index with the specified values, if the file exists then a
+     * <code>TreeException</code> will be thrown.
      * @param file The file to store the index
      * @param maxNodeEntries
      * @param minNodeEntries
@@ -117,6 +130,27 @@ public class FileSystemPageStore extends PageStore {
                                int maxNodeEntries,
                                int minNodeEntries,
                                short splitAlg)
+    throws TreeException
+    {
+        this(file, def, maxNodeEntries, minNodeEntries, splitAlg, -1);
+    }
+    
+    /**
+     * Create and index with the specified values, if the file exists then a
+     * <code>TreeException</code> will be thrown.
+     * @param file The file to store the index
+     * @param maxNodeEntries
+     * @param minNodeEntries
+     * @param splitAlg
+     * @param cacheSize the size of the cache
+     * @throws TreeException
+     */
+    public FileSystemPageStore(File file,
+                               DataDefinition def,
+                               int maxNodeEntries,
+                               int minNodeEntries,
+                               short splitAlg,
+                               int cacheSize)
     throws TreeException
     {
         super(def, maxNodeEntries, minNodeEntries, splitAlg);
@@ -135,6 +169,10 @@ public class FileSystemPageStore extends PageStore {
         this.params.setMaxNodeEntries(maxNodeEntries);
         this.params.setMinNodeEntries(minNodeEntries);
         this.params.setSplitAlg(splitAlg);
+        
+        if (cacheSize > -1) {
+            this.params.setNodeCacheSize(cacheSize);
+        }
         
         try {
             this.init(file);

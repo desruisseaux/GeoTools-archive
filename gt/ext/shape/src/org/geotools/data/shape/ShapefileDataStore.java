@@ -83,7 +83,7 @@ import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
-import org.geotools.index.rtree.cachefs.FileSystemPageStore;
+import org.geotools.index.rtree.fs.FileSystemPageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

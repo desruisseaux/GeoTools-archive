@@ -144,6 +144,21 @@ public class Parameters {
 		freePages = stack;
 	}
     
+    public synchronized void setNodeCacheSize(int size) throws TreeException {
+        
+        if (this.cache != null) {
+            this.flushCache();
+        }
+        
+        if (size == 0) {
+            this.cache = null;
+        } else if (size < 0) {
+            this.cache = new NodeCache();
+        } else {
+            this.cache = new NodeCache(size);
+        }
+    }
+    
     /**
      * Gets a <code>FileSystemNode</code> from the cache, if the node is
      * non there, a new node will be created and added to the cache.
@@ -152,14 +167,17 @@ public class Parameters {
      * @throws IOException
      * @throws TreeException
      */
-    public FileSystemNode getFromCache(long offset) 
+    public synchronized FileSystemNode getFromCache(long offset) 
     throws IOException, TreeException
     {
         FileSystemNode node = null;
-        node = (FileSystemNode)this.cache.get(new Long(offset));
+        if (this.cache != null) {
+            node = (FileSystemNode)this.cache.get(new Long(offset));
+        }
         
         if (node == null) {
-            return new FileSystemNode(this, offset);
+            node = new FileSystemNode(this, offset);
+            this.putToCache(node);
         }
         
         return node;
@@ -170,8 +188,16 @@ public class Parameters {
      * @param node the <code>FileSystemNode</code> to store
      * @throws TreeException
      */
-    public void putToCache(FileSystemNode node) throws TreeException {
-        this.cache.put(new Long(node.getOffset()), node);
+    public synchronized void putToCache(FileSystemNode node)
+    throws TreeException 
+    {
+        if (this.cache != null) {
+            // If we have a cache store the node, we'll flush it later
+            this.cache.put(new Long(node.getOffset()), node);
+        } else {
+            // Else flush the node to disk
+            node.flush();
+        }
     }
     
     /**
@@ -179,15 +205,21 @@ public class Parameters {
      * @param node the node to remove
      */
 
-    public void removeFromCache(FileSystemNode node) {
-        this.cache.remove(node);
+    public synchronized void removeFromCache(FileSystemNode node) {
+        if (this.cache != null) {
+            this.cache.remove(node);
+        }
     }
     
     /**
      * Flushes all nodes and clears the cache
      * @throws TreeException
      */
-    public void flushCache() throws TreeException {
+    public synchronized void flushCache() throws TreeException {
+        if (this.cache == null) {
+            return;
+        }
+        
         Iterator iter = this.cache.keySet().iterator();
         
         while (iter.hasNext()) {

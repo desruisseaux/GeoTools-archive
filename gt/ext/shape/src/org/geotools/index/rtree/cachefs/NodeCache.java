@@ -44,7 +44,6 @@ public class NodeCache extends LinkedHashMap {
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
-            
         }
         
         return ret;
