@@ -31,17 +31,17 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Espace de couleurs pour les images dont les valeurs
- * de pixels se situent entre deux nombre réels.
+ * Color space for raster backed by floating point numbers ranging between two arbitrary values.
  *
- * NOTE: Actual implementation is a copy of org.geotools.io.image.ScaledColorSpace.
- *       Future implementation will be differents (interpolate in a color table
- *       instead of computing grayscales).
+ * <strong>NOTE:</strong>
+ *       Current implementation is a copy of {@code org.geotools.io.image.ScaledColorSpace}.
+ *       Future implementation will be differents (interpolate in a color table instead of
+ *       computing grayscales).
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class ScaledColorSpace extends ColorSpace {
+final class ScaledColorSpace extends ColorSpace {
     /**
      * Minimal normalized RGB value.
      */

@@ -32,14 +32,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
 
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+// OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.MathTransform;
@@ -49,6 +42,16 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -94,12 +97,12 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     private final MathTransform2D gridToCoordinateSystem2D;
     
     /**
-     * The inverse of <code>gridToCoordinateSystem2D</code>.
+     * The inverse of {@code gridToCoordinateSystem2D}.
      */
     private final MathTransform2D gridFromCoordinateSystem2D;
     
     /**
-     * Construct a new grid geometry from a math transform.
+     * Constructs a new grid geometry from a math transform.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if
      *        none. The lowest valid grid coordinate is zero for {@link BufferedImage}, but may
@@ -132,10 +135,10 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     }
     
     /**
-     * Construct a new grid geometry. An affine transform will be computed automatically
-     * from the specified envelope.  The <code>inverse</code> argument tells whatever or
-     * not an axis should be inversed. Callers will typically set <code>inverse[1]</code>
-     * to <code>true</code> in order to inverse the <var>y</var> axis.
+     * Constructs a new grid geometry. An affine transform will be computed automatically
+     * from the specified envelope.  The {@code reverse} argument tells whatever or
+     * not an axis should be reversed. Callers will typically set {@code reverse[1]}
+     * to {@code true} in order to reverse the <var>y</var> axis.
      *
      * @param gridRange The valid coordinate range of a grid coverage.
      * @param userRange The corresponding coordinate range in user coordinate.
@@ -144,12 +147,11 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      *                  the upper left corner of the first pixel and the rectangle's
      *                  lower right corner must coincide with the lower right corner
      *                  of the last pixel.
-     * @param inverse   Tells whatever or not inverse axis. A {@code null} value
-     *                  inverse no axis.
+     * @param reverse   Tells whatever or not reverse axis. A {@code null} value reverse no axis.
      */
     public GridGeometry(final GridRange gridRange,
                         final Envelope  userRange,
-                        final boolean[] inverse)
+                        final boolean[] reverse)
     {
         this.gridRange = gridRange;
         /*
@@ -160,8 +162,8 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         if (userDim != dimension) {
             throw new MismatchedDimensionException(format(dimension, userDim));
         }
-        if (inverse!=null && inverse.length!=dimension) {
-            throw new MismatchedDimensionException(format(dimension, inverse.length));
+        if (reverse!=null && reverse.length!=dimension) {
+            throw new MismatchedDimensionException(format(dimension, reverse.length));
         }
         /*
          * Prepare elements for the 2D sub-transform. Those
@@ -181,7 +183,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         for (int i=0; i<dimension; i++) {
             double scale = userRange.getLength(i) / gridRange.getLength(i);
             double trans;
-            if (inverse==null || !inverse[i]) {
+            if (reverse==null || !reverse[i]) {
                 trans = userRange.getMinimum(i);
             } else {
                 scale = -scale;
@@ -209,7 +211,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     }
     
     /**
-     * Construct a new two-dimensional grid geometry. A math transform will
+     * Constructs a new two-dimensional grid geometry. A math transform will
      * be computed automatically with an inverted <var>y</var> axis (i.e.
      * <code>gridRange</code> and <code>userRange</code> are assumed to
      * have <var>y</var> axis in opposite direction).
@@ -279,9 +281,9 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     }
 
     /**
-     * Returns the bounding box of "real world" coordinates for this grid geometry. This
-     * envelope is the {@linkplain #getGridRange grid range} {@linkplain #getGridToCoordinateSystem
-     * transformed} to the "real world" coordinate system.
+     * Returns the bounding box of "real world" coordinates for this grid geometry.
+     * This envelope is the {@linkplain #getGridRange grid range}
+     * {@linkplain #getGridToCoordinateSystem transformed} to the "real world" coordinate system.
      *
      * @return The bounding box in "real world" coordinates.
      * @throws InvalidGridGeometryException if the envelope can't be computed.
@@ -331,11 +333,11 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     }
     
     /**
-     * Returns the math transform which allows  for the transformations from grid coordinates to
+     * Returns the math transform which allows for the transformations from grid coordinates to
      * real world earth coordinates. The transform is often an affine transformation. The coordinate
      * reference system of the real world coordinates is given by
-     * {@link org.opengis.coverage.Coverage#getCoordinateReferenceSystem}. If no math transform is
-     * available, this method returns {@code null}.
+     * {@link org.opengis.coverage.Coverage#getCoordinateReferenceSystem}.
+     * If no math transform is available, this method returns {@code null}.
      * <br><br>
      * <strong>Note:</strong> OpenGIS requires that the transform maps <em>pixel centers</em>
      * to real world coordinates. This is different from some other systems that map pixel's
@@ -378,8 +380,8 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
 
     /**
      * Returns the math transform for the two first dimensions of the specified transform.
-     * This method is usefull for extracting the transformation caused by the head CS in
-     * a {@link org.geotools.cs.CompoundCoordinateSystem}, assuming that this head CS is
+     * This method is usefull for extracting the transformation caused by the head CRS in
+     * a {@link org.geotools.cs.CompoundCoordinateSystem}, assuming that this head CRS is
      * a {@link org.geotools.cs.HorizontalCoordinateSystem}.
      *
      * @param  transform The transform.

@@ -61,7 +61,6 @@ import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.NumberRange;
-import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -249,7 +248,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         }
         final Category[] categories = new Category[names.length];
         for (int i=0; i<categories.length; i++) {
-            categories[i] = new Category(SimpleInternationalString.wrap(names[i]), colors[i], i);
+            categories[i] = new Category(names[i], colors[i], i);
         }
         return list(categories, null);
     }
@@ -360,7 +359,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
          *          COLOR: Fetched from 'palette' if available, otherwise use Category default.
          */
         for (int i=0; i<nodataCount; i++) {
-            InternationalString name = null;
+            CharSequence name = null;
             final double padValue = nodata[i];
             final int    intValue = (int) Math.floor(padValue);
             if (intValue>=0 && intValue<nameCount) {
@@ -368,11 +367,11 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                     // This category will be added in step 2 below.
                     continue;
                 }
-                name = SimpleInternationalString.wrap(categories[intValue]);
+                name = categories[intValue];
             }
             final Number value = wrapSample(padValue, type, false);
             if (name == null) {
-                name = new SimpleInternationalString(value.toString());
+                name = value.toString();
             }
             final NumberRange range = new NumberRange(value.getClass(), value, value);
             final Color[] colors = ColorUtilities.subarray(palette, intValue, intValue+1);
@@ -395,7 +394,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                     // sample value.
                     continue;
                 }
-                final InternationalString name = SimpleInternationalString.wrap(categories[lower]);
+                final CharSequence name = categories[lower];
                 Number min = wrapSample(lower,   type, false);
                 Number max = wrapSample(upper-1, type, false);
                 final Class classe;
@@ -496,10 +495,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                 final Color[] colors = ColorUtilities.subarray(palette,
                                                      (int)Math.ceil (minimum),
                                                      (int)Math.floor(maximum));
-                categoryList.add(new Category(
-                    (description!=null) ? SimpleInternationalString.wrap(description)
-                                        : new SimpleInternationalString("(automatic)"),
-                                        colors, range, scale, offset));
+                categoryList.add(new Category((description!=null) ? description : "(automatic)",
+                                              colors, range, scale, offset));
                 needQuantitative = false;
             }
         }

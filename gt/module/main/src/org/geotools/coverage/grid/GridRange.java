@@ -30,6 +30,7 @@ import java.awt.image.RenderedImage;
 import java.io.Serializable;
 import java.util.Arrays;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
@@ -74,14 +75,14 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Construct an initially empty grid range of the specified dimension.
+     * Constructs an initially empty grid range of the specified dimension.
      */
     private GridRange(final int dimension) {
         index = new int[dimension*2];
     }
     
     /**
-     * Construct one-dimensional grid range.
+     * Constructs one-dimensional grid range.
      *
      * @param lower The minimal inclusive value.
      * @param upper The maximal exclusive value.
@@ -92,7 +93,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Construct a new grid range.
+     * Constructs a new grid range.
      *
      * @param lower The valid minimum inclusive grid coordinate.
      *              The array contains a minimum value for each
@@ -118,7 +119,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Construct two-dimensional range defined by a {@link Rectangle}.
+     * Constructs two-dimensional range defined by a {@link Rectangle}.
      */
     public GridRange(final Rectangle rect) {
         index = new int[] {
@@ -129,7 +130,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Construct two-dimensional range defined by a {@link Raster}.
+     * Constructs two-dimensional range defined by a {@link Raster}.
      */
     public GridRange(final Raster raster) {
         final int x = raster.getMinX();
@@ -142,14 +143,14 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Construct two-dimensional range defined by a {@link RenderedImage}.
+     * Constructs two-dimensional range defined by a {@link RenderedImage}.
      */
     public GridRange(final RenderedImage image) {
         this(image, 2);
     }
     
     /**
-     * Construct multi-dimensional range defined by a {@link RenderedImage}.
+     * Constructs multi-dimensional range defined by a {@link RenderedImage}.
      *
      * @param image The image.
      * @param dimension Number of dimensions for this grid range.
