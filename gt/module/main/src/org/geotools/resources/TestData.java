@@ -155,7 +155,32 @@ public class TestData {
         }
         throw new FileNotFoundException("Could not locate test-data: "+path);
     }
-
+    /**
+     * Access to <code>getResource(caller, path)</code> as a {@link File}.
+     * <p>
+     * You can access the test-data directory with:
+     * <pre><code>
+     * TestData.file( MyClass.class, null )
+     * </code></pre>
+     * </p>
+     *
+     * @param caller Calling class used to locate test-data
+     * @param path Path to file in testdata
+     * @return File from test-data
+     * @throws IOException if the file is not found.
+     */
+    public static final File file(final Class caller, final String path) throws IOException {
+        final URL url = getResource(caller, path);
+        if (url != null) {
+            // Based SVGTest
+            final File file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+            if (file.exists()) {
+                return file;
+            }
+        }
+        throw new FileNotFoundException("Could not locate test-data: "+path);
+    }
+    
     /**
      * Creates a temporary file with the given name.
      */

@@ -72,8 +72,7 @@ public class SLDTransformer extends TransformerBase {
             
             if (stroke.getGraphicStroke() != null) {
                 stroke.getGraphicStroke().accept(this);
-            }
-            
+            }                       
             encodeCssParam("stroke", stroke.getColor());
             encodeCssParam("stroke-linecap", stroke.getLineCap());
             encodeCssParam("stroke-linejoin", stroke.getLineJoin());
@@ -130,8 +129,8 @@ public class SLDTransformer extends TransformerBase {
             text.getLabelPlacement().accept(this);
             end("Label");
             
-            text.getHalo().accept(this);
-            text.getFill().accept(this);
+            if( text.getHalo() != null ) text.getHalo().accept(this);
+            if( text.getFill() != null ) text.getFill().accept(this);
             end("TextSymbolizer");
         }
         
@@ -332,6 +331,9 @@ public class SLDTransformer extends TransformerBase {
         }
         
         void encodeCssParam(String name,Expression expression) {
+        	if( expression == null ) {
+        		return; // protect ourselves from things like a null Stroke Color
+        	}
             AttributesImpl atts = new AttributesImpl();
             atts.addAttribute("", "name", "name", "", name);
             start("CssParameter",atts);

@@ -227,8 +227,15 @@ public class ComplexElementHandler extends XMLElementHandler {
             }
         }
         if(count > type.getChild().getMaxOccurs()){
-    		throw new SAXException("Too many elements declared for "
-                    + type.getName());
+        	StringBuffer buf = new StringBuffer();
+        	buf.append("Too many elements for " );
+        	buf.append( type.getName() );
+        	buf.append( ": " );
+        	buf.append( count );
+        	buf.append( " children, " );
+        	buf.append( type.getChild().getMaxOccurs() );
+        	buf.append( " maxOccurs" );        	        		
+    		throw new SAXException( buf.toString() );
         }
 
         if (i != elements.size()) {
@@ -457,6 +464,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         	            // error, so redo
         	            if(eg[t].getMinOccurs()>count){
         	                // not good
+System.out.println("Seq Failed");
         	                return new int[]{index,0}; // not whole sequence
         	            }
         	            t++;
@@ -469,12 +477,14 @@ public class ComplexElementHandler extends XMLElementHandler {
     			// move along and retest that spot
     			if(eg[t].getMinOccurs()>count){
     				// not good
+System.out.println("Seq Failed");
 					return new int[]{index,0}; // not whole sequence
     			}
     			t++;
     			count=0; // next defined type
         	}
         }
+System.out.println("Seq index = "+tIndex+" Matched");
         return new int[]{tIndex,1};
     }
 
