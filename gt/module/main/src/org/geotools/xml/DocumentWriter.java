@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -170,6 +169,7 @@ public class DocumentWriter {
         else
             throw new OperationNotSupportedException("Could not find an appropriate Element to use for encoding of a "+(value==null?null:value.getClass().getName()));
         wch.endDocument();
+        w.flush();
     }
 
     /**
@@ -1307,7 +1307,7 @@ public class DocumentWriter {
 
             writer.write(">");
             // TODO format here
-            writer.write("\n");
+//            writer.write("\n");
         }
 
         public void element(URI namespaceURI, String localName,
@@ -1409,6 +1409,7 @@ public class DocumentWriter {
         public void endDocument() throws IOException {
             // TODO format here
             writer.write("\n");
+            writer.flush();
             
 //            writer.close();
         }

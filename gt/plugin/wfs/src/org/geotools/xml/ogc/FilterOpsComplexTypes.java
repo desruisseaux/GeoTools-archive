@@ -371,6 +371,7 @@ public class FilterOpsComplexTypes {
             // we may only encode one type of filter ...
         	Filter filter = (Filter)value;
         	if(filter == null)return;
+        	if(filter == Filter.NONE)return;
         	if(element != null)
         	output.startElement(element.getNamespace(),element.getName(),null);
         	if(filter instanceof LogicFilter){

@@ -1,6 +1,8 @@
 
 package org.geotools.data.wfs;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +22,7 @@ import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.AbstractDataStore;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ows.FeatureSetDescription;
@@ -28,7 +31,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
-import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
@@ -66,6 +68,9 @@ public class WFSDataStore extends AbstractDataStore{
  	    super(false); // TODO update when writeable
  	    logger.setLevel(Level.WARNING);
  	    
+ 	    // TODO find a better way of adding functionality to the factory ... perhaps putting in your own RootHandler?
+ 	    new WFSSchemaFactory();
+ 	    
  	    if(username!=null && password!=null)
  	        auth = new WFSAuthenticator(username,password,host);
  	    
@@ -86,7 +91,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    if(post == null){
  	        protos = protos | POST_OK;
  	    }else{
- 	        protos = post.booleanValue()?protos | (POST_FIRST+POST_OK):protos;
+ 	        protos = post.booleanValue()?(POST_FIRST+POST_OK):protos|protos;
  	    }
  	}
  	
@@ -97,13 +102,13 @@ public class WFSDataStore extends AbstractDataStore{
  	   InputStream result = null;
  	   synchronized(Authenticator.class){
  	      Authenticator.setDefault(auth);
- 	      
- 	      url.connect();
+
  	      result = url.getInputStream();
+ 	      url.connect();
  	      
  	      Authenticator.setDefault(null);
  	   }
- 	   return result;
+ 	   return new BufferedInputStream(result);
  	}
  	
  	private static OutputStream getOutputStream(HttpURLConnection url, Authenticator auth) throws IOException{
@@ -114,12 +119,12 @@ public class WFSDataStore extends AbstractDataStore{
  	   synchronized(Authenticator.class){
  	      Authenticator.setDefault(auth);
  	      url.setDoOutput(true);
- 	      url.connect();
+// 	      url.connect();
  	      result = url.getOutputStream();
  	      
  	      Authenticator.setDefault(null);
  	   }
- 	   return result;
+ 	   return new BufferedOutputStream(result);
  	}
  	
  	static URL createGetCapabilitiesRequest(URL host){
@@ -211,7 +216,7 @@ public class WFSDataStore extends AbstractDataStore{
     
     private FeatureType getSchemaGet(String typeName) throws SAXException, IOException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
-System.out.println("GetCaps -- get "+getUrl);
+//System.out.println("getSchemaGet -- get "+getUrl);
 		if(getUrl == null)
 		    return null;
         
@@ -233,16 +238,19 @@ System.out.println("GetCaps -- get "+getUrl);
         url += "&TYPENAME="+typeName;
         
         getUrl = new URL(url);
+//System.out.println(getUrl);
         HttpURLConnection hc = (HttpURLConnection)getUrl.openConnection();
         hc.setRequestMethod("GET");
 
  	    InputStream is = getInputStream(hc,auth);
-        Schema schema = SchemaFactory.getInstance(null,is);
+        Schema schema = WFSSchemaFactory.getInstance(null,is);
         Element[] elements = schema.getElements();
         Element element = null;
         
+        String ttname = typeName.substring(typeName.indexOf(":")+1);
         for(int i = 0;i<elements.length && element == null;i++)
-            if(typeName.equals(elements[i].getName()))
+            // HACK -- namspace related -- should be checking ns as opposed to removing prefix
+            if(typeName.equals(elements[i].getName()) || ttname.equals(elements[i].getName()))
                 element = elements[i];
         
         if(element == null)
@@ -253,12 +261,14 @@ System.out.println("GetCaps -- get "+getUrl);
     
     private FeatureType getSchemaPost(String typeName) throws IOException, SAXException {
         URL postUrl = capabilities.getDescribeFeatureType().getPost();
-System.out.println("GetCaps -- post "+postUrl);
+//System.out.println("getSchemaPost -- post "+postUrl);
 		if(postUrl == null)
 		    return null;
+//System.out.println(postUrl);
         
         HttpURLConnection hc = (HttpURLConnection)postUrl.openConnection();
         hc.setRequestMethod("POST");
+	    hc.setDoInput(true);
         OutputStream os = getOutputStream(hc,auth);
         // write request
         
@@ -266,26 +276,32 @@ System.out.println("GetCaps -- post "+postUrl);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
         try{
-            DocumentWriter.writeDocument(typeName,WFSSchema.getInstance(),w,hints);
+            DocumentWriter.writeDocument(new String[]{typeName},WFSSchema.getInstance(),w,hints);
         }catch(OperationNotSupportedException e){
             logger.warning(e.toString());
             throw new SAXException(e);
         }
+        os.flush();
         os.close();
  	    InputStream is = getInputStream(hc,auth);
-        Schema schema = SchemaFactory.getInstance(null,is);
+        Schema schema = WFSSchemaFactory.getInstance(null,is);
         Element[] elements = schema.getElements();
-        if (elements == null)
+        if (elements == null){
             return null; // not found
+        }
         Element element = null;
         
-        for(int i = 0;i<elements.length && element == null;i++)
-            if(typeName.equals(elements[i].getName()))
+        String ttname = typeName.substring(typeName.indexOf(":")+1);
+        for(int i = 0;i<elements.length && element == null;i++){
+            // HACK -- namspace related -- should be checking ns as opposed to removing prefix
+            if(typeName.equals(elements[i].getName()) || ttname.equals(elements[i].getName()))
                 element = elements[i];
+        }
         
         if(element == null)
             return null;
         FeatureType ft = GMLComplexTypes.createFeatureType(element);
+        is.close();
         return ft;
     }
 
@@ -327,11 +343,11 @@ System.out.println("GetCaps -- post "+postUrl);
                 throw new IOException(e.toString());
             }
             
-        if(t.getFeatureType()!=null)
-            return t;
-        
-        if(t.hasNext()) // opportunity to throw exception
+        if(t.hasNext()){ // opportunity to throw exception
+            if(t.getFeatureType()!=null)
+                return t;
             throw new IOException("There are features but no feature type ... odd");
+        }
         return null;
     }
     
@@ -385,15 +401,20 @@ System.out.println("GetCaps -- post "+postUrl);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
         try{
-            DocumentWriter.writeDocument(typeName,WFSSchema.getInstance(),w,hints);
+            Query query = new DefaultQuery(typeName);
+            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),w,hints);
         }catch(OperationNotSupportedException e){
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-
+        os.flush();
+ 	    os.close();
+ 	    
  	    InputStream is = getInputStream(hc,auth);
+ 	    System.out.println("ready?"+is.available());
 
- 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	    
         return ft;
     }
     

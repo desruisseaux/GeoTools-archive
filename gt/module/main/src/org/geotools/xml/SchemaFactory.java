@@ -68,23 +68,28 @@ import javax.xml.parsers.SAXParserFactory;
  * @version $Id$
  */
 public class SchemaFactory {
+    
+    protected static SchemaFactory is = new SchemaFactory();
+    protected static SchemaFactory getInstance(){
+        return is;
+    }
     /*
      * Holds onto instances when they are created ... my version of object
      * pooling Q: is there a better way? might suck up too much memory ... A:
      * not really, but the JVM might be better ... use the class to make
      * instances
      */
-    private static Map schemas = loadSchemas();
+    private Map schemas = loadSchemas();
 
     /*
      * The SAX parser to use if one is required ... isn't loaded until first
      * use.
      */
-    private static SAXParser parser;
+    private SAXParser parser;
 
     /*
      */
-    private static Map loadSchemas(){
+    private Map loadSchemas(){
         schemas = new HashMap();
         
         ClassLoader[] cls = findLoaders();
@@ -132,7 +137,7 @@ public class SchemaFactory {
     }
     
     // stolen from FactoryFinder.findLoaders
-    private static ClassLoader[] findLoaders(){
+    private ClassLoader[] findLoaders(){
         // lets get a class loader. By using the Thread's class loader, we allow
         // for more flexability.
         ClassLoader contextLoader = null;
@@ -191,6 +196,9 @@ public class SchemaFactory {
      * @see registerSchema(Strin,Schema)
      */
     public synchronized static Schema getInstance(URI targetNamespace) {
+        return getInstance().getRealInstance(targetNamespace);
+    }
+    private synchronized Schema getRealInstance(URI targetNamespace) {
         Schema r = (Schema) schemas.get(targetNamespace);
 
         if (r != null) {
@@ -229,12 +237,16 @@ public class SchemaFactory {
      */
     public synchronized static Schema getInstance(URI targetNamespace,
             URI desiredSchema, Level level) throws SAXException {
+        return getInstance().getRealInstance(targetNamespace,desiredSchema,level);
+    }
+    private synchronized Schema getRealInstance(URI targetNamespace,
+            URI desiredSchema, Level level) throws SAXException {
             if (targetNamespace == null
                     || (schemas.get(targetNamespace) == null)) {
 
                     setParser();
 
-                    XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
+                    XSISAXHandler contentHandler = getSAXHandler(desiredSchema);
                     XSISAXHandler.setLogLevel(level);
 
                     try {
@@ -255,7 +267,7 @@ public class SchemaFactory {
                     Schema sh = (Schema) schemas.get(targetNamespace);
                     setParser();
 
-                    XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
+                    XSISAXHandler contentHandler = getSAXHandler(desiredSchema);
                     XSISAXHandler.setLogLevel(level);
 
                     try {
@@ -271,14 +283,22 @@ public class SchemaFactory {
 
             return (Schema) schemas.get(targetNamespace);
         }
-    public synchronized static Schema getInstance(URI targetNamespace,
+    
+    protected XSISAXHandler getSAXHandler(URI uri){
+        return new XSISAXHandler(uri);
+    }
+    public static synchronized Schema getInstance(URI targetNamespace,
+            InputStream is, Level level) throws SAXException {
+        return getInstance().getRealInstance(targetNamespace,is,level);
+    }
+    private synchronized Schema getRealInstance(URI targetNamespace,
             InputStream is, Level level) throws SAXException {
             if (targetNamespace == null
                     || schemas.get(targetNamespace) == null) {
 
                     setParser();
 
-                    XSISAXHandler contentHandler = new XSISAXHandler(null); // no uri
+                    XSISAXHandler contentHandler = getSAXHandler(null); // no uri
                     XSISAXHandler.setLogLevel(level);
 
                     try {
@@ -298,7 +318,7 @@ public class SchemaFactory {
                     Schema sh = (Schema) schemas.get(targetNamespace);
                     setParser();
 
-                    XSISAXHandler contentHandler = new XSISAXHandler(null); // no uri
+                    XSISAXHandler contentHandler = getSAXHandler(null); // no uri
                     XSISAXHandler.setLogLevel(level);
 
                     try {
@@ -318,7 +338,7 @@ public class SchemaFactory {
      * Creates a new Schema from merging the two schemas passed in. for instance
      * information, such as id, or version, s1 takes precedence.
      */
-    private static Schema merge(Schema s1, Schema s2) throws SAXException {
+    private Schema merge(Schema s1, Schema s2) throws SAXException {
         return new MergedSchema(s1, s2);
     }
 
@@ -335,13 +355,16 @@ public class SchemaFactory {
      * @param schema
      */
     public static void registerSchema(URI targetNamespace, Schema schema) {
+        getInstance().registerRealSchema(targetNamespace,schema);
+    }
+    private void registerRealSchema(URI targetNamespace, Schema schema) {
         schemas.put(targetNamespace, schema);
     }
 
     /*
      * convinience method to create an instance of a SAXParser if it is null.
      */
-    private static void setParser() throws SAXException {
+    private void setParser() throws SAXException {
         if (parser == null) {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);

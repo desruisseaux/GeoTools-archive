@@ -152,8 +152,16 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        while ((featureType == null) && (state != FINISH && state != STOP))
+        // TODO put a real counter here
+//        int t = 100;
+        while ((featureType == null) && (state != FINISH && state != STOP)){// && t>0){
             yield(); // let the parser run ... this is being called from 
+//            t --;
+        }
+//        if(t<=0){
+//            exception = new SAXException("Timeout");
+//            state = STOP;
+//        }
 
         // the original thread
         if (state == FINISH || state == STOP) {
@@ -198,7 +206,9 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         logger.finest("hasNext " + size);
 
-        while ((size <= 1) && (state != FINISH) && (state != STOP)) {
+        // TODO put a real counter here
+//        int t=1000;
+        while ((size <= 1) && (state != FINISH) && (state != STOP) ){//&& t>0) {
 
             if (exception != null) {
                 state = STOP;
@@ -206,7 +216,12 @@ public class FCBuffer extends Thread implements FeatureReader {
             }
             logger.finest("waiting for parser");
             Thread.yield();
+//            t --;
         }
+//        if(t<=0){
+//            state = STOP;
+//            throw new IOException("Timeout");
+//        }
 
         if (state == STOP) {
             return false;
@@ -218,6 +233,8 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         if (size == 0) {
             state = STOP;
+            if(exception!=null)
+                throw new IOException(exception.toString());
             throw new IOException("There was an error");
         }
 
@@ -229,6 +246,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      */
     public void close() throws IOException {
         state = STOP; // note for the sax parser
+        // TODO better here !!!
     }
 
     /**

@@ -63,7 +63,7 @@ public class XSISAXHandler extends DefaultHandler {
     private Schema schema = null;
 
     // The root parsing element
-    private RootHandler rootHandler = null;
+    protected RootHandler rootHandler = null;
 
     // the Locator is used for end-user debugging
     private Locator locator;

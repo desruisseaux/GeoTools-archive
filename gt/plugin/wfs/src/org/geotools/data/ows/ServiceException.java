@@ -11,8 +11,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class ServiceException extends SAXException {
-    private int code = 0;
-    public int getCode(){
+    private String code = "";
+    public String getCode(){
         return code;
     }
     private String locator = null;
@@ -23,8 +23,8 @@ public class ServiceException extends SAXException {
     public ServiceException(String msg){
         super(msg);
     }
-    public ServiceException(String msg, int code, String locator){
-        super(msg);
+    public ServiceException(String msg, String code, String locator){
+        super(msg+(code==null?"":code));
         this.code = code;this.locator = locator;
     }
 }

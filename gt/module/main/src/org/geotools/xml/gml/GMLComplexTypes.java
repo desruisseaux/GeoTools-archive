@@ -4076,7 +4076,7 @@ public class GMLComplexTypes {
             if (featureCollectionBuffer.state <= 0) {
                 switch (featureCollectionBuffer.state) {
                 case FCBuffer.STOP:
-                    throw new StopException();
+                    throw new StopException(); // alternative to stop()
 
                 case FCBuffer.FINISH:
                     return;

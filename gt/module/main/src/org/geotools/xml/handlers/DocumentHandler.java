@@ -91,7 +91,7 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getValue()
      */
     public Object getValue() throws SAXException {
-        return xeh.getValue();
+        return xeh==null?null:xeh.getValue();
     }
 
     /**

@@ -77,9 +77,10 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
         if(params.containsKey(USE_GET.key))
             get = (Boolean)USE_GET.lookUp(params);
         if(params.containsKey(USE_POST.key))
-            get = (Boolean)USE_POST.lookUp(params);
-        if(get != null && post != null)
-            throw new IOException("Cannot define both get and post");
+            post = (Boolean)USE_POST.lookUp(params);
+        // sHould be for true only ... TODO fix this up
+//        if(get != null && post != null)
+//            throw new IOException("Cannot define both get and post");
         
         String user,pass; user = pass = null;
         if(params.containsKey(USERNAME.key))

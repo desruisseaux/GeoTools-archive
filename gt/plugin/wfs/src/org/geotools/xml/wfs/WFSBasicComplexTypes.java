@@ -510,8 +510,10 @@ public class WFSBasicComplexTypes {
                 // TODO this is a QName I think ... check it out
                 attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",query.getTypeName());
                 
+                try{
                 if(query.getVersion()!=null && !"".equals(query.getVersion()))
                     attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[2].getName(),null,"string",query.getVersion());
+                }catch(Throwable t){}
                 
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);

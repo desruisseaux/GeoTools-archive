@@ -65,19 +65,25 @@ public class WFSFeatureReader extends FCBuffer {
     public void run() {
         HashMap hints = new HashMap();
         hints.put(GMLComplexTypes.STREAM_HINT, this);
-
+        try{
         try {
             DocumentFactory.getInstance(is, hints, logger.getLevel());
+            is.close();
 
             // start parsing until buffer part full, then yield();
         } catch (StopException e) {
             exception = e;
             state = STOP;
+            is.close();
             yield();
         } catch (SAXException e) {
             exception = e;
             state = STOP;
+            is.close();
             yield();
+        }
+        }catch(IOException e){
+            logger.warning(e.toString());
         }
     }
 }
