@@ -24,6 +24,7 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
@@ -38,6 +39,10 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
@@ -49,6 +54,7 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.MatrixParameterValues;
 import org.geotools.parameter.MatrixParameters;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.ParameterGroupDescriptor;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -115,7 +121,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      *
      * @param matrix The matrix.
      */
-    protected ProjectiveTransform(final Matrix matrix) {
+    protected ProjectiveTransform(final Matrix matrix) {        
         numRow = matrix.getNumRow();
         numCol = matrix.getNumCol();
         elt = new double[numRow*numCol];
@@ -170,7 +176,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      */
     static ParameterValueGroup getParameterValues(final Matrix matrix) {
         final MatrixParameterValues values;
-        values = (MatrixParameterValues) Provider.PARAMETERS.createValue();
+        values = (MatrixParameterValues) Provider.PARAMETERS.createValue();        
         values.setMatrix(matrix);
         return values;
     }
