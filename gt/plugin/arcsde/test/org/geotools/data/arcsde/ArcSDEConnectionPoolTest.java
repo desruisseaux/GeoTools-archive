@@ -35,16 +35,16 @@ import java.util.logging.Logger;
  * @version $Id: ArcSDEConnectionPoolTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDEConnectionPoolTest extends TestCase {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private static Logger LOGGER = Logger.getLogger("org.geotools.data.sde");
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private Map connectionParameters;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ConnectionConfig connectionConfig = null;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ArcSDEConnectionPool pool = null;
 
     /**
@@ -145,14 +145,42 @@ public class ArcSDEConnectionPoolTest extends TestCase {
     }
 
     /**
-     * tests that the ArcSDEConnectionPool can create as many connections as
-     * specified by the <code>"pool.maxConnections"</code> parameter, and no
-     * more than that
+     * Checks that after creation the pool has the specified initial number of
+     * connections.
      *
      * @throws DataSourceException DOCUMENT ME!
      * @throws UnavailableConnectionException DOCUMENT ME!
      */
-    public void testPoolPolicy()
+    public void testInitialCount()
+        throws DataSourceException, UnavailableConnectionException {
+        int MIN_CONNECTIONS = 2;
+        int MAX_CONNECTIONS = 6;
+
+        //override pool.minConnections and pool.maxConnections from
+        //the configured parameters to test the connections' pool
+        //availability
+        Map params = new HashMap(this.connectionParameters);
+        params.put(connectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(MIN_CONNECTIONS));
+        params.put(connectionConfig.MAX_CONNECTIONS_PARAM,
+            new Integer(MAX_CONNECTIONS));
+
+        createPool(params);
+
+        //check that after creation, the pool contains the minimun number
+        //of connections specified
+        assertEquals("after creation, the pool must contain the minimun number of connections specified",
+            MIN_CONNECTIONS, this.pool.getPoolSize());
+    }
+
+    /**
+     * Tests that the pool creation fails if a wrong set of parameters is
+     * passed (i.e. maxConnections is lower than minConnections)
+     *
+     * @throws DataSourceException
+     * @throws UnavailableConnectionException
+     */
+    public void testChecksLimits()
         throws DataSourceException, UnavailableConnectionException {
         int MIN_CONNECTIONS = 2;
         int MAX_CONNECTIONS = 6;
@@ -175,29 +203,136 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         } catch (IllegalArgumentException ex) {
             //it's ok, it is what's expected
             LOGGER.info("pramams assertion passed");
-        } 
+        }
+    }
 
-        params.put(connectionConfig.MAX_CONNECTIONS_PARAM,
+    /**
+     * Tests that the pool populates by chunks of "pool.increment" connections,
+     *
+     * @throws DataSourceException DOCUMENT ME!
+     * @throws UnavailableConnectionException DOCUMENT ME!
+     */
+    public void testIncrement()
+        throws DataSourceException, UnavailableConnectionException {
+        final int MIN_CONNECTIONS = 1;
+        final int INCREMENT = 2;
+        final int MAX_CONNECTIONS = 6;
+
+        //override pool.minConnections and pool.maxConnections from
+        //the configured parameters to test the connections' pool
+        //availability
+        Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(MIN_CONNECTIONS));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
             new Integer(MAX_CONNECTIONS));
-        params.put(connectionConfig.CONNECTIONS_INCREMENT_PARAM, new Integer(1));
+        params.put(ConnectionConfig.CONNECTIONS_INCREMENT_PARAM,
+            new Integer(INCREMENT));
+
         createPool(params);
 
-        //check that after creation, the pool contains the minimun number
-        //of connections specified
-        assertEquals("after creation, the pool must contain the minimun number of connections specified",
-            MIN_CONNECTIONS, this.pool.getPoolSize());
+        int connCount = (MIN_CONNECTIONS + INCREMENT) - 1;
 
-        //try to get the maximun number of connections specified
-        SeConnection[] conns = new SeConnection[MAX_CONNECTIONS];
+        for (int i = 0; i < connCount; i++) {
+            pool.getConnection();
+        }
 
+        assertEquals(MIN_CONNECTIONS + INCREMENT, pool.getPoolSize());
+    }
+
+    /**
+     * Tests that the pool checks that "pool.increment" is lower  than
+     * "pool.maxConnections".
+     *
+     * @throws DataSourceException DOCUMENT ME!
+     * @throws UnavailableConnectionException DOCUMENT ME!
+     */
+    public void testIncrementLowerThanMax()
+        throws DataSourceException, UnavailableConnectionException {
+        final int MIN_CONNECTIONS = 1;
+        final int INCREMENT = 4;
+        final int MAX_CONNECTIONS = 3;
+
+        //override pool.minConnections and pool.maxConnections from
+        //the configured parameters to test the connections' pool
+        //availability
+        Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(MIN_CONNECTIONS));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
+            new Integer(MAX_CONNECTIONS));
+        params.put(ConnectionConfig.CONNECTIONS_INCREMENT_PARAM,
+            new Integer(INCREMENT));
+
+        try {
+            createPool(params);
+            fail(
+                "createPool should have thrown an exception, since increment is greater than max");
+        } catch (IllegalArgumentException iae) {
+            LOGGER.info("It is intentional: " + iae.getMessage());
+        }
+    }
+
+    /**
+     * Tests that the pool populates by chunks of "pool.increment" connections,
+     * but never creates more than "pool.maxConnections".
+     *
+     * @throws DataSourceException DOCUMENT ME!
+     * @throws UnavailableConnectionException DOCUMENT ME!
+     */
+    public void testIncrementNotExceedsMax()
+        throws DataSourceException, UnavailableConnectionException {
+        final int MIN_CONNECTIONS = 1;
+        final int INCREMENT = 3;
+        final int MAX_CONNECTIONS = 3;
+
+        //override pool.minConnections and pool.maxConnections from
+        //the configured parameters to test the connections' pool
+        //availability
+        Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(MIN_CONNECTIONS));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
+            new Integer(MAX_CONNECTIONS));
+        params.put(ConnectionConfig.CONNECTIONS_INCREMENT_PARAM,
+            new Integer(INCREMENT));
+
+        createPool(params);
+
+        //the initial one
+        pool.getConnection();
+
+        //this should create only 2 more connections, not 3 as the increment
+        //parameter states, since the maximun is 3
+        pool.getConnection();
+        assertEquals(MAX_CONNECTIONS, pool.getPoolSize());
+    }
+
+    /**
+     * tests that no more than pool.maxConnections connections can be created,
+     * and once one connection is freed, it is ready to be used again.
+     *
+     * @throws DataSourceException DOCUMENT ME!
+     * @throws UnavailableConnectionException DOCUMENT ME!
+     */
+    public void testMaxConnections()
+        throws DataSourceException, UnavailableConnectionException {
+        final int MIN_CONNECTIONS = 2;
+        final int MAX_CONNECTIONS = 2;
+
+        Map params = new HashMap(this.connectionParameters);
+        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
+            new Integer(MIN_CONNECTIONS));
+        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM,
+            new Integer(MAX_CONNECTIONS));
+        
+        createPool(params);
+
+        SeConnection []conns = new SeConnection[MAX_CONNECTIONS];
+        //try to get the maximun number of connections specified, and do not
+        //release anyone
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            try {
-                conns[i] = pool.getConnection();
-            } catch (UnavailableConnectionException ex) {
-                fail(ex.getMessage());
-            } catch (DataSourceException ex) {
-                fail(ex.getMessage());
-            }
+            conns[i] = pool.getConnection();
         }
 
         //now that the max number of connections is reached, the pool
@@ -209,9 +344,6 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         } catch (UnavailableConnectionException ex) {
             LOGGER.info(
                 "maximun number of connections reached, got an UnavailableConnectionException, it's OK");
-        } catch (Exception ex) {
-            //any other exception is wrong
-            fail(ex.getMessage());
         }
 
         //now, free one and check the same conection is returned on the
@@ -225,28 +357,22 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
     /**
      * a null database name should not be an impediment to create the pool
+     *
      * @throws DataSourceException
      */
-    public void testCreateWithNullDBName()throws DataSourceException{
-    	Map params = new HashMap(this.connectionParameters);
-        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
-            new Integer(1));
-        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
-
+    public void testCreateWithNullDBName() throws DataSourceException {
+        Map params = new HashMap(this.connectionParameters);
         params.remove(ConnectionConfig.INSTANCE_NAME_PARAM);
         createPool(params);
     }
 
     /**
      * an empty database name should not be an impediment to create the pool
+     *
      * @throws DataSourceException
      */
-    public void testCreateWithEmptyDBName()throws DataSourceException{
-    	Map params = new HashMap(this.connectionParameters);
-        params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
-            new Integer(1));
-        params.put(ConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
-
+    public void testCreateWithEmptyDBName() throws DataSourceException {
+        Map params = new HashMap(this.connectionParameters);
         params.put(ConnectionConfig.INSTANCE_NAME_PARAM, "");
         createPool(params);
     }

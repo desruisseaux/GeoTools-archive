@@ -24,7 +24,7 @@ import junit.framework.TestSuite;
 /**
  * geotools2 ArcSDE test suite
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  * @version $Id: ArcSDETestSuite.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
  */
 public class ArcSDETestSuite extends TestCase {
@@ -45,9 +45,12 @@ public class ArcSDETestSuite extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
 
-        suite.addTestSuite(org.geotools.data.arcsde.GeometryBuilderTest.class);
-        suite.addTestSuite(org.geotools.data.arcsde.ArcSDEConnectionPoolTest.class);
-        suite.addTestSuite(org.geotools.data.arcsde.ArcSDEDataStoreTest.class);
+        suite.addTestSuite(ArcSDEJavaApiTest.class);
+        suite.addTestSuite(GeometryBuilderTest.class);
+        suite.addTestSuite(ArcSDEQueryTest.class);
+        suite.addTestSuite(ArcSDEConnectionPoolTest.class);
+        suite.addTestSuite(ArcSDEDataStoreTest.class);
+        suite.addTestSuite(ArcSDEFeatureStoreTest.class);
 
         return suite;
     }

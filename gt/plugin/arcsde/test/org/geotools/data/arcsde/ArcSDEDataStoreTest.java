@@ -99,6 +99,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         this.testData = new TestData();
+        this.testData.setUp();
         this.store = testData.getDataStore();
     }
 
@@ -108,6 +109,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
+        testData.tearDown();
         testData = null;
         super.tearDown();
     }
@@ -431,7 +433,17 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         //the problem described in GEOT-408 arises in attribute reader, so
         //we must to try fetching features
-        results.reader().next();
+        Feature feature = results.reader().next();
+        assertNotNull(feature);
+        //the id must be grabed correctly.
+        //this exercises the fact that although the geometry is not included
+        //in the request, it must be fecthed anyway to obtain the SeShape.getFeatureId()
+        //getID() should throw an exception if the feature is was not grabed (see
+        // ArcSDEAttributeReader.readFID().
+        String id = feature.getID(); 
+        assertNotNull(id);
+        assertFalse(id.endsWith(".-1"));
+        assertFalse(id.endsWith(".0"));
     }
 
     /**
@@ -474,15 +486,6 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertTrue("a fid not included in query was returned: " + fid,
                 fids.contains(fid));
         }
-    }
-
-    /**
-     * Test that all supported geometry filters are working properly
-     *
-     * @throws UnsupportedOperationException DOCUMENT ME!
-     */
-    public void testGeometryFilters() {
-        throw new UnsupportedOperationException("Don't forget to implement");
     }
 
     /**
@@ -575,7 +578,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     /**
      * DOCUMENT ME!
      */
-    public void testBBoxFilterPoints() {
+    public void testBBoxFilterPoints() throws Exception{
         //String uri = getFilterUri("filters.bbox.points.filter");
         //int expected = getExpectedCount("filters.bbox.points.expectedCount");
         int expected = 6;
@@ -585,7 +588,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     /**
      * DOCUMENT ME!
      */
-    public void testBBoxFilterLines() {
+    public void testBBoxFilterLines() throws Exception{
         //String uri = getFilterUri("filters.bbox.lines.filter");
         //int expected = getExpectedCount("filters.bbox.lines.expectedCount");
         int expected = 22;
@@ -595,7 +598,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     /**
      * DOCUMENT ME!
      */
-    public void testBBoxFilterPolygons() {
+    public void testBBoxFilterPolygons() throws Exception{
         //String uri = getFilterUri("filters.bbox.polygons.filter");
         //int expected = getExpectedCount("filters.bbox.polygons.expectedCount");
         int expected = 8;
@@ -657,7 +660,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         FeatureResults results = fsource.getFeatures();
         int count = results.getCount();
-        assertTrue(count > 0);
+        assertTrue("getCount returns " + count, count > 0);
         LOGGER.info("feature count: " + count);
 
         Envelope env1;
@@ -748,26 +751,24 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @param filter DOCUMENT ME!
      * @param fsource DOCUMENT ME!
      * @param expected DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    private void testFilter(Filter filter, FeatureSource fsource, int expected) {
-        try {
-            FeatureResults results = fsource.getFeatures(filter);
-            FeatureCollection fc = results.collection();
-            int resCount = results.getCount();
-            int fCount = fc.size();
-            LOGGER.info("results count: " + resCount + " collection size: "
-                + fCount);
+    private void testFilter(Filter filter, FeatureSource fsource, int expected)
+        throws IOException {
+        FeatureResults results = fsource.getFeatures(filter);
+        FeatureCollection fc = results.collection();
+        int resCount = results.getCount();
+        int fCount = fc.size();
+        LOGGER.info("results count: " + resCount + " collection size: "
+            + fCount);
 
-            Feature f = fc.features().next();
-            LOGGER.info("first feature is: " + f.getID());
+        Feature f = fc.features().next();
+        LOGGER.info("first feature is: " + f);
 
-            String failMsg = "Expected and returned result count does not match";
-            assertEquals(failMsg, expected, fCount);
-            assertEquals(failMsg, expected, resCount);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
+        String failMsg = "Expected and returned result count does not match";
+        assertEquals(failMsg, expected, fCount);
+        assertEquals(failMsg, expected, resCount);
     }
 
     /**
@@ -775,16 +776,13 @@ public class ArcSDEDataStoreTest extends TestCase {
      *
      * @param table DOCUMENT ME!
      * @param expected DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    private void testBBox(String table, int expected) {
-        try {
-            FeatureSource fs = store.getFeatureSource(table);
-            Filter bboxFilter = getBBoxfilter(fs);
-            testFilter(bboxFilter, fs, expected);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            super.fail(ex.getMessage());
-        }
+    private void testBBox(String table, int expected) throws Exception {
+        FeatureSource fs = store.getFeatureSource(table);
+        Filter bboxFilter = getBBoxfilter(fs);
+        testFilter(bboxFilter, fs, expected);
     }
 
     /**

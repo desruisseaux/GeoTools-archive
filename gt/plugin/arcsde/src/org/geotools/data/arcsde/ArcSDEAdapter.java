@@ -18,6 +18,7 @@ package org.geotools.data.arcsde;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeDefs;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
@@ -53,10 +54,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
@@ -366,6 +365,13 @@ public class ArcSDEAdapter {
         SeCoordinateReference seCRS = sdeLayer.getCoordRef();
         String WKT = seCRS.getProjectionDescription();
 
+        try {
+            LOGGER.info("Se CRS envelope: " + seCRS.getXYEnvelope());
+        } catch (SeException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
         if ("UNKNOWN".equalsIgnoreCase(WKT)) {
             LOGGER.warning("ArcSDE layer " + sdeLayer.getName()
                 + " does not provides a Coordinate Reference System");
@@ -385,51 +391,96 @@ public class ArcSDEAdapter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the mapping JTS geometry type for the ArcSDE Shape type given by
+     * the bitmask <code>seShapeType</code>
+     * 
+     * <p>
+     * This bitmask is composed of a combination of the following shape types,
+     * as defined in the ArcSDE Java API:
+     * <pre>
+     *  SE_NIL_TYPE_MASK = 1;
+     *  SE_POINT_TYPE_MASK = 2;
+     *  SE_LINE_TYPE_MASK = 4;
+     *  SE_AREA_TYPE_MASK = 16;
+     *  SE_MULTIPART_TYPE_MASK = 262144;
+     *  </pre>
+     * (Note that the type SE_SIMPLE_LINE_TYPE_MASK is not used)
+     * </p>
      *
      * @param seShapeType DOCUMENT ME!
      *
      * @return DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
     public static Class getGeometryType(int seShapeType) {
-        /*
-           public static final int SE_NIL_TYPE_MASK = 1;
-           public static final int SE_POINT_TYPE_MASK = 2;
-           public static final int SE_LINE_TYPE_MASK = 4;
-           public static final int SE_SIMPLE_LINE_TYPE_MASK = 8;
-           public static final int SE_AREA_TYPE_MASK = 16;
-           public static final int SE_MULTIPART_TYPE_MASK = 262144;
-         */
         Class clazz = com.vividsolutions.jts.geom.Geometry.class;
 
-        if ((seShapeType & SeLayer.SE_POINT_TYPE_MASK) == SeLayer.SE_POINT_TYPE_MASK) {
-            if ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK) {
-                clazz = com.vividsolutions.jts.geom.MultiPoint.class;
+        //in all this assignments, 1 means true and 0 false
+        final int isCollection = ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK)
+            ? 1 : 0;
+
+        final int isPoint = ((seShapeType & SeLayer.SE_POINT_TYPE_MASK) == SeLayer.SE_POINT_TYPE_MASK)
+            ? 1 : 0;
+
+        final int isLineString = (((seShapeType
+            & SeLayer.SE_SIMPLE_LINE_TYPE_MASK) == SeLayer.SE_SIMPLE_LINE_TYPE_MASK)
+            || ((seShapeType & SeLayer.SE_LINE_TYPE_MASK) == SeLayer.SE_LINE_TYPE_MASK))
+            ? 1 : 0;
+
+        final int isPolygon = ((seShapeType & SeLayer.SE_AREA_TYPE_MASK) == SeLayer.SE_AREA_TYPE_MASK)
+            ? 1 : 0;
+
+        boolean isError = false;
+
+        //first check if the shape type supports more than one geometry type.
+        //In that case, it is *highly* recomended that it support all the 
+        //geometry types, so we can safely return Geometry.class. If this is not
+        //the case and the shape type supports just a few geometry types, then
+        //we give it a chance and return Geometry.class anyway, but be aware
+        //that transactions over that layer could fail if a Geometry that is
+        //not supported is tried for insertion.
+        if ((isPoint + isLineString + isPolygon) > 1) {
+            clazz = Geometry.class;
+
+            if (4 < (isCollection + isPoint + isLineString + isPolygon)) {
+                LOGGER.warning(
+                    "Be careful!! we're mapping an ArcSDE Shape type "
+                    + "to the generic Geometry class, but the shape type "
+                    + "does not really allows all geometry types!: "
+                    + "isCollection=" + isCollection + ", isPoint=" + isPoint
+                    + ", isLineString=" + isLineString + ", isPolygon="
+                    + isPolygon);
             } else {
-                clazz = com.vividsolutions.jts.geom.Point.class;
+                LOGGER.info("safely mapping SeShapeType to abstract Geometry");
             }
-        } else if ((seShapeType & SeLayer.SE_SIMPLE_LINE_TYPE_MASK) == SeLayer.SE_SIMPLE_LINE_TYPE_MASK) {
-            if ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK) {
-                clazz = com.vividsolutions.jts.geom.MultiLineString.class;
+        } else if (isCollection == 1) {
+            if (isPoint == 1) {
+                clazz = MultiPoint.class;
+            } else if (isLineString == 1) {
+                clazz = MultiLineString.class;
+            } else if (isPolygon == 1) {
+                clazz = MultiPolygon.class;
             } else {
-                clazz = com.vividsolutions.jts.geom.LineString.class;
+                isError = true;
             }
-        } else if ((seShapeType & SeLayer.SE_LINE_TYPE_MASK) == SeLayer.SE_LINE_TYPE_MASK) {
-            if ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK) {
-                clazz = com.vividsolutions.jts.geom.MultiLineString.class;
+        } else {
+            if (isPoint == 1) {
+                clazz = Point.class;
+            } else if (isLineString == 1) {
+                clazz = LineString.class;
+            } else if (isPolygon == 1) {
+                clazz = Polygon.class;
             } else {
-                clazz = com.vividsolutions.jts.geom.LineString.class;
+                isError = true;
             }
-        } else if ((seShapeType & SeLayer.SE_AREA_TYPE_MASK) == SeLayer.SE_AREA_TYPE_MASK) {
-            if ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK) {
-                /**
-                 * @task TODO: strongly test returning Polygon, it seems that
-                 *       SDE polygons are OGC multipolygons...
-                 */
-                clazz = com.vividsolutions.jts.geom.MultiPolygon.class;
-            } else {
-                clazz = com.vividsolutions.jts.geom.MultiPolygon.class;
-            }
+        }
+
+        if (isError) {
+            throw new IllegalArgumentException("Cannot map the shape type to "
+                + "a Geometry class: isCollection=" + isCollection
+                + ", isPoint=" + isPoint + ", isLineString=" + isLineString
+                + ", isPolygon=" + isPolygon);
         }
 
         return clazz;
@@ -515,13 +566,7 @@ public class ArcSDEAdapter {
                         LOGGER.fine("applying " + sdeSpatialFilters.length
                             + " spatial filters ");
 
-                        try {
-                            sdeQuery.setSpatialConstraints(sdeSpatialFilters);
-                        } catch (SeException ex) {
-                            throw new DataSourceException(
-                                "Cannot apply spatial constraints: "
-                                + ex.getMessage(), ex);
-                        }
+                        sdeQuery.setSpatialConstraints(sdeSpatialFilters);
                     }
                 } catch (Throwable ex) {
                     if (sdeQuery != null) {

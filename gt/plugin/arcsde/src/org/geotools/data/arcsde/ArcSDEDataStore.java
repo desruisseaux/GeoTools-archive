@@ -40,6 +40,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.metadata.extent.GeographicExtent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -380,6 +381,14 @@ class ArcSDEDataStore extends AbstractDataStore {
             };
         table = new SeTable(connection, qualifiedName);
 
+        try {
+            LOGGER.warning(
+                "Remove the line 'table.delete()' for production use!!!");
+            table.delete();
+        } catch (SeException e) {
+            //intentionally do nothing
+        }
+
         LOGGER.info("creating table " + qualifiedName);
 
         //create the table using DBMS default configuration keyword.
@@ -409,27 +418,39 @@ class ArcSDEDataStore extends AbstractDataStore {
         int seShapeTypes = ArcSDEAdapter.guessShapeTypes(geometryAtt);
         layer.setShapeTypes(seShapeTypes);
         layer.setGridSizes(1100, 0, 0);
-        layer.setExtent(new SeExtent(-180, -90, 180, 90));
+        layer.setDescription("Created with GeoTools");
 
         //Define the layer's Coordinate Reference
         CoordinateReferenceSystem crs = geometryAtt.getCoordinateSystem();
+        SeCoordinateReference coordref = getGenericCoordRef();
+        String WKT = null;
 
         if (crs == null) {
             LOGGER.warning("Creating feature type " + qualifiedName
                 + ": the geometry attribute does not supply a coordinate reference system");
         } else {
-            SeCoordinateReference coordref = new SeCoordinateReference();
             LOGGER.info("Creating the SeCoordRef object for CRS " + crs);
-
-            String WKT = crs.toWKT();
+            WKT = crs.toWKT();
             coordref.setCoordSysByDescription(WKT);
-            LOGGER.info("Applying CRS " + coordref.getCoordSysDescription());
-            layer.setCoordRef(coordref);
-            LOGGER.info("CRS applyed to the new layer.");
         }
 
+        SeExtent validCoordRange = null;
+
+        if ((WKT != null) && (WKT.indexOf("GEOGCS") != -1)) {
+            validCoordRange = new SeExtent(-180, -90, 180, 90);
+        } else {
+            validCoordRange = coordref.getXYEnvelope();
+        }
+
+        layer.setExtent(validCoordRange);
+
+        LOGGER.info("Applying CRS " + coordref.getCoordSysDescription());
+        layer.setCoordRef(coordref);
+        LOGGER.info("CRS applyed to the new layer.");
+
+        ///////////////////////////
         //this param is used by ArcSDE for database initialization purposes
-        int estInitFeatCount = 100;
+        int estInitFeatCount = 4;
 
         //this param is used by ArcSDE as an estimation of the average number
         //of points the layer's geometries will have, one never will know what for
@@ -437,6 +458,37 @@ class ArcSDEDataStore extends AbstractDataStore {
         LOGGER.info("Creating the layer...");
         layer.create(estInitFeatCount, estAvgPointsPerFeature);
         LOGGER.info("ArcSDE layer created.");
+    }
+
+    /**
+     * Creates and returns a <code>SeCoordinateReference</code> CRS, though
+     * based on an UNKNOWN CRS, is inclusive enough (in terms of valid
+     * coordinate range and presicion) to deal with most coordintates.
+     * 
+     * <p>
+     * Actually tested to deal with coordinates with 0.0002 units of separation
+     * as well as with large coordinates such as UTM (values greater than
+     * 500,000.00)
+     * </p>
+     * 
+     * <p>
+     * This method is driven by the equally named method in TestData.java
+     * </p>
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws SeException DOCUMENT ME!
+     */
+    private static SeCoordinateReference getGenericCoordRef()
+        throws SeException {
+        //create a sde CRS with a huge value range and 5 digits of presission
+        SeCoordinateReference seCRS = new SeCoordinateReference();
+        int shift = 600000;
+        SeExtent validRange = new SeExtent(-shift, -shift, shift, shift);
+        seCRS.setXYByEnvelope(validRange);
+        LOGGER.info("CRS: " + seCRS.getXYEnvelope());
+
+        return seCRS;
     }
 
     /**
@@ -491,13 +543,17 @@ class ArcSDEDataStore extends AbstractDataStore {
             reader = new DefaultFeatureReader(attReader, resultingSchema) {
                         protected Feature readFeature(AttributeReader atts)
                             throws IllegalAttributeException, IOException {
+                        	ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
+                        	Object [] currAtts = sdeAtts.readAll();
+                        	System.arraycopy(currAtts, 0, attributes, 0, currAtts.length);
+                        	/*
                             for (int i = 0, ii = atts.getAttributeCount();
                                     i < ii; i++) {
                                 attributes[i] = atts.read(i);
-                            }
+                            }*/
 
                             return resultingSchema.create(attributes,
-                                ((ArcSDEAttributeReader) atts).readFID());
+                                sdeAtts.readFID());
                         }
                     };
         } catch (SchemaException ex) {
@@ -743,9 +799,8 @@ class ArcSDEDataStore extends AbstractDataStore {
             LOGGER.info("count: " + count);
 
             return count;
-        } catch (Exception ex) {
-            LOGGER.info("Error calculating count");
-            throw new IOException();
+        } catch (IOException ex) {
+        	throw ex;
         } finally {
             if (sdeQuery != null) {
                 sdeQuery.close();

@@ -27,6 +27,21 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.feature.DefaultFeatureCollections;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -38,13 +53,22 @@ import java.util.logging.Logger;
 /**
  * Provides access to the ArcSDEDataStore test data configuration.
  *
- * @author $author$
- * @version $Revision: 1.9 $
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
  */
 public class TestData {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(TestData.class.getPackage()
                                                                         .getName());
+
+    /** DOCUMENT ME! */
+    static final String COORD_SYS = "GEOGCS[\"WGS 84\","
+        + "DATUM[\"WGS_1984\","
+        + "  SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]],"
+        + "  AUTHORITY[\"EPSG\",\"6326\"]],"
+        + "PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]],"
+        + "UNIT[\"degree\", 0.017453292519943295]," + "AXIS[\"Lon\", EAST],"
+        + "AXIS[\"Lat\", NORTH]," + "AUTHORITY[\"EPSG\",\"4326\"]]";
 
     /** folder used to load test filters */
     private String dataFolder = "/testData/";
@@ -67,12 +91,23 @@ public class TestData {
      */
     private String temp_table;
 
+    /** DOCUMENT ME! */
+    private ArcSDEDataStore dataStore = null;
+
     /**
      * Creates a new TestData object.
      *
      * @throws IOException DOCUMENT ME!
      */
     public TestData() throws IOException {
+    }
+
+    /**
+     * Must be called from inside the test's setUp() method.
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public void setUp() throws IOException {
         URL folderUrl = getClass().getResource("/testData");
         dataFolder = folderUrl.toExternalForm() + "/";
         conProps = new Properties();
@@ -108,6 +143,17 @@ public class TestData {
     }
 
     /**
+     * Must be called from inside the test's tearDown() method.
+     */
+    public void tearDown() {
+        deleteTempTable();
+        dataStore = null;
+
+        ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
+        pfac.clear();
+    }
+
+    /**
      * creates an ArcSDEDataStore using /testData/testparams.properties as
      * holder of datastore parameters
      *
@@ -116,17 +162,14 @@ public class TestData {
      * @throws IOException DOCUMENT ME!
      */
     public ArcSDEDataStore getDataStore() throws IOException {
-        ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
+        if (dataStore == null) {
+            ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
+            ConnectionConfig config = new ConnectionConfig(conProps);
+            ArcSDEConnectionPool pool = pfac.createPool(config);
+            this.dataStore = new ArcSDEDataStore(pool);
+        }
 
-        //clear all previously created connection pools, since it is possible
-        //that a failed test leaves in use connections and affect the next tests
-        pfac.clear();
-
-        ConnectionConfig config = new ConnectionConfig(conProps);
-        ArcSDEConnectionPool pool = pfac.createPool(config);
-        ArcSDEDataStore ds = new ArcSDEDataStore(pool);
-
-        return ds;
+        return dataStore;
     }
 
     /**
@@ -232,13 +275,16 @@ public class TestData {
      * DOCUMENT ME!
      */
     public void deleteTempTable() {
-        ArcSDEConnectionPool pool = null;
+        //only if the datastore was used
+        if (dataStore != null) {
+            ArcSDEConnectionPool pool = null;
 
-        try {
-            pool = getDataStore().getConnectionPool();
-            deleteTempTable(pool);
-        } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            try {
+                pool = getDataStore().getConnectionPool();
+                deleteTempTable(pool);
+            } catch (Exception e) {
+                LOGGER.warning(e.getMessage());
+            }
         }
     }
 
@@ -267,17 +313,25 @@ public class TestData {
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates an ArcSDE feature type names as <code>getTemp_table()</code> on
+     * the underlying database and if <code>insertTestData == true</code> also
+     * inserts some sample values.
      *
-     * @throws Exception DOCUMENT ME!
+     * @param insertTestData wether to insert some sample rows or not
+     *
+     * @throws SeException for any error
+     * @throws IOException DOCUMENT ME!
+     * @throws UnavailableConnectionException DOCUMENT ME!
      */
-    public void createTemptTable() throws Exception {
+    public void createTemptTable(boolean insertTestData)
+        throws SeException, IOException, UnavailableConnectionException {
         ArcSDEConnectionPool connPool = ((ArcSDEDataStore) getDataStore())
             .getConnectionPool();
-        SeConnection conn = connPool.getConnection();
 
         deleteTempTable(connPool);
-        
+
+        SeConnection conn = connPool.getConnection();
+
         try {
             SeColumnDefinition[] coldefs;
 
@@ -291,9 +345,12 @@ public class TestData {
             layer.setTableName(tableName);
 
             coldefs = createBaseTable(conn, table, layer);
-            insertData(layer, conn, coldefs);
-        } catch (Exception e) {
-        	e.printStackTrace();
+
+            if (insertTestData) {
+                insertData(layer, conn, coldefs);
+            }
+        } catch (SeException e) {
+            e.printStackTrace();
             throw e;
         } finally {
             connPool.release(conn);
@@ -305,7 +362,7 @@ public class TestData {
      *
      */
     private static SeColumnDefinition[] createBaseTable(SeConnection conn,
-        SeTable table, SeLayer layer) throws Exception {
+        SeTable table, SeLayer layer) throws SeException {
         SeColumnDefinition[] colDefs = new SeColumnDefinition[6];
 
         /*
@@ -325,7 +382,6 @@ public class TestData {
                 SeColumnDefinition.TYPE_DOUBLE, 15, 4, isNullable);
         colDefs[4] = new SeColumnDefinition("STRING_COL",
                 SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
-   
         colDefs[5] = new SeColumnDefinition("DATE_COL",
                 SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
 
@@ -333,9 +389,7 @@ public class TestData {
          *   Create the table using the DBMS default configuration keyword.
          *   Valid keywords are defined in the dbtune table.
          */
-        System.out.println("\n--> Creating a table using DBMS Default Keyword");
         table.create(colDefs, "DEFAULTS");
-        System.out.println(" - Done.");
 
         /*
          *   Define the attributes of the spatial column
@@ -356,22 +410,20 @@ public class TestData {
         layer.setGridSizes(1100.0, 0.0, 0.0);
         layer.setDescription("Layer Example");
 
-        SeExtent ext = new SeExtent(0.0, 0.0, 10000.0, 10000.0);
-        layer.setExtent(ext);
-
         /*
          *   Define the layer's Coordinate Reference
          */
-        SeCoordinateReference coordref = new SeCoordinateReference();
-        coordref.setXY(0, 0, 100);
+        SeCoordinateReference coordref = getGenericCoordRef();
+
+        //SeExtent ext = new SeExtent(-1000000.0, -1000000.0, 1000000.0, 1000000.0);
+        SeExtent ext = coordref.getXYEnvelope();
+        layer.setExtent(ext);
         layer.setCoordRef(coordref);
 
         /*
          *   Spatially enable the new table...
          */
-        System.out.println("\n--> Adding spatial column \"SHAPE\"...");
         layer.create(3, 4);
-        System.out.println(" - Done.");
 
         return colDefs;
     }
@@ -390,7 +442,7 @@ public class TestData {
      *   1 simple line, 1 line, 1 single part polygon, 1 multipart polygon.
      */
     private static void insertData(SeLayer layer, SeConnection conn,
-        SeColumnDefinition[] colDefs) {
+        SeColumnDefinition[] colDefs) throws SeException {
         // Largest 64 bit signed number = 9223372036854775807
         long long_number = 9223372036854775806L;
 
@@ -417,6 +469,9 @@ public class TestData {
             SeRow row = insert.getRowToSet();
 
             SeCoordinateReference coordref = layer.getCoordRef();
+            LOGGER.info("CRS constraints: " + coordref.getXYEnvelope()
+                + ", presision: " + coordref.getXYUnits());
+
             SeShape shape = new SeShape(coordref);
             Calendar cal = Calendar.getInstance();
 
@@ -431,10 +486,10 @@ public class TestData {
             int rowId = 1;
 
             for (rowId = 1; rowId <= numRectangles; rowId++) {
-                rectangle.setMinX(2000 + (rowId * 500));
-                rectangle.setMinY(2000 + (rowId * 500));
-                rectangle.setMaxX(4000 + (rowId * 500));
-                rectangle.setMaxY(4000 + (rowId * 500));
+                rectangle.setMinX(-1);
+                rectangle.setMinY(-1);
+                rectangle.setMaxX(1);
+                rectangle.setMaxY(1);
                 shape.generateRectangle(rectangle);
 
                 // set the values in the row
@@ -448,7 +503,6 @@ public class TestData {
 
                 // Insert row
                 insert.execute();
-                System.out.println("\tinserted row " + rowId);
             } // End for
 
             /*
@@ -462,7 +516,8 @@ public class TestData {
             SDEPoint[] ptArray = new SDEPoint[points];
 
             for (int i = 0; i < points; i++) {
-                ptArray[i] = new SDEPoint(5000.0 + (i * 10), 5000.0 + (i * 100));
+                ptArray[i] = new SDEPoint(-5000.0 + (i * 10),
+                        -5000.0 + (i * 100));
             }
 
             SeShape line1 = new SeShape(coordref);
@@ -480,7 +535,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             /*
              *   Insert a multipart line
@@ -530,7 +584,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             /*
              *   Insert simple area shape
@@ -540,11 +593,11 @@ public class TestData {
             partOffsets[0] = 0;
             numPts = 5;
             ptArray = new SDEPoint[numPts];
-            ptArray[0] = new SDEPoint(100, 100);
-            ptArray[1] = new SDEPoint(1200, 100);
-            ptArray[2] = new SDEPoint(1200, 200);
-            ptArray[3] = new SDEPoint(100, 200);
-            ptArray[4] = new SDEPoint(100, 100);
+            ptArray[0] = new SDEPoint(-1, 0);
+            ptArray[1] = new SDEPoint(0, 1);
+            ptArray[2] = new SDEPoint(1, 0);
+            ptArray[3] = new SDEPoint(0, -1);
+            ptArray[4] = new SDEPoint(-1, 0);
 
             SeShape polygon = new SeShape(coordref);
             polygon.generatePolygon(numPts, numParts, partOffsets, ptArray);
@@ -563,7 +616,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             /*
              *   Insert single point shape
@@ -589,7 +641,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             /*
              *   Insert a multi part point
@@ -617,7 +668,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             /*
              *   Generate complex area shape
@@ -669,7 +719,6 @@ public class TestData {
 
             // insert row
             insert.execute();
-            System.out.println("\tinserted row " + rowId);
 
             insert.close();
         } catch (SeException e) {
@@ -686,7 +735,255 @@ public class TestData {
 
             System.out.println(e.getSeError().getSdeError());
             System.out.println(e.getSeError().getExtError());
-            e.printStackTrace();
+            throw e;
         }
     } // End method insertData    
+
+    /**
+     * Creates a FeatureCollection with features whose schema adheres to the
+     * one created in <code>createTestData()</code> and returns it.
+     * 
+     * <p>
+     * This schema is something like:
+     * <pre>
+     *  colDefs[0] "INT32_COL", SeColumnDefinition.TYPE_INTEGER, 10, 0, true
+     *  colDefs[1] = "INT16_COL", SeColumnDefinition.TYPE_SMALLINT, 4, 0, true
+     *  colDefs[2] = "FLOAT32_COL", SeColumnDefinition.TYPE_FLOAT, 5, 2, true
+     *  colDefs[3] = "FLOAT64_COL", SeColumnDefinition.TYPE_DOUBLE, 15, 4, true
+     *  colDefs[4] = "STRING_COL", SeColumnDefinition.TYPE_STRING, 25, 0, true
+     *  colDefs[5] = "DATE_COL", SeColumnDefinition.TYPE_DATE, 1, 0, true
+     *  colDefs[6] = "SHAPE", Geometry, 1, 0, true
+     *  </pre>
+     * </p>
+     *
+     * @param jtsGeomType class of JTS geometry to create
+     * @param numFeatures number of features to create.
+     *
+     * @return
+     *
+     * @throws IOException if the schema for te test table cannot be fetched
+     *         from the database.
+     * @throws IllegalAttributeException if the feature type created from the
+     *         test table cannot build a feature with the given attribute
+     *         values.
+     */
+    public FeatureCollection createTestFeatures(Class jtsGeomType,
+        int numFeatures) throws IOException, IllegalAttributeException {
+        FeatureCollection col = DefaultFeatureCollections.newCollection();
+        FeatureType type = getDataStore().getSchema(getTemp_table());
+        Object[] values = new Object[type.getAttributeCount()];
+
+        for (int i = 0; i < numFeatures; i++) {
+            values[0] = new Integer(i);
+
+            //put some nulls
+            values[1] = ((i % 2) == 0) ? null : new Integer(2 * i);
+            values[2] = new Float(0.1 * i);
+            values[3] = new Double(1000 * i);
+            values[4] = "String value #" + i;
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.DAY_OF_MONTH, i);
+            values[5] = cal.getTime();
+            values[6] = createTestGeometry(jtsGeomType, i);
+
+            Feature f = type.create(values);
+            col.add(f);
+        }
+
+        return col;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param geomType DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws UnsupportedOperationException DOCUMENT ME!
+     */
+    private static Geometry createTestGeometry(Class geomType, int index) {
+        Geometry geom = null;
+        GeometryFactory gf = new GeometryFactory();
+
+        if (geomType == Geometry.class) {
+            geom = createTestGenericGeometry(gf, index);
+        } else if (geomType == Point.class) {
+            geom = createTestPoint(gf, index);
+        } else if (geomType == MultiPoint.class) {
+            geom = createTestMultiPoint(gf, index);
+        } else if (geomType == LineString.class) {
+            geom = createTestLineString(gf, index);
+        } else if (geomType == MultiLineString.class) {
+            geom = createTestMultiLineString(gf, index);
+        } else if (geomType == Polygon.class) {
+            geom = createTestPolygon(gf, index);
+        } else if (geomType == MultiPolygon.class) {
+            geom = createTestMultiPolygon(gf, index);
+        } else {
+            throw new UnsupportedOperationException("finish implementing this!");
+        }
+
+        return geom;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static Geometry createTestGenericGeometry(GeometryFactory gf,
+        int index) {
+        if ((index % 6) == 0) {
+            return createTestPoint(gf, index);
+        } else if ((index % 4) == 0) {
+            return createTestMultiPoint(gf, index);
+        } else if ((index % 3) == 0) {
+            return createTestLineString(gf, index);
+        } else if ((index % 2) == 0) {
+            return createTestMultiLineString(gf, index);
+        } else if ((index % 1) == 0) {
+            return createTestPolygon(gf, index);
+        } else {
+            return createTestMultiPolygon(gf, index);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static Point createTestPoint(GeometryFactory gf, int index) {
+        return gf.createPoint(new Coordinate(index, index));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static MultiPoint createTestMultiPoint(GeometryFactory gf, int index) {
+        Coordinate[] coords = {
+                new Coordinate(index, index), new Coordinate(-index, -index)
+            };
+
+        return gf.createMultiPoint(coords);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static LineString createTestLineString(GeometryFactory gf, int index) {
+        Coordinate[] coords = {
+                new Coordinate(0, 0), new Coordinate(++index, -index)
+            };
+
+        return gf.createLineString(coords);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static MultiLineString createTestMultiLineString(
+        GeometryFactory gf, int index) {
+        Coordinate[] coords1 = {
+                new Coordinate(0, 0), new Coordinate(++index, ++index)
+            };
+        Coordinate[] coords2 = {
+                new Coordinate(0, index), new Coordinate(index, 0)
+            };
+        LineString[] lines = {
+                gf.createLineString(coords1), gf.createLineString(coords2)
+            };
+
+        return gf.createMultiLineString(lines);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static Polygon createTestPolygon(GeometryFactory gf, int index) {
+        Coordinate[] coords = {
+                new Coordinate(index, index), new Coordinate(index, index + 1),
+                new Coordinate(index + 1, index + 1),
+                new Coordinate(index + 1, index), new Coordinate(index, index)
+            };
+        LinearRing shell = gf.createLinearRing(coords);
+
+        return gf.createPolygon(shell, null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gf DOCUMENT ME!
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private static MultiPolygon createTestMultiPolygon(GeometryFactory gf,
+        int index) {
+        Polygon[] polys = {
+                createTestPolygon(gf, index), createTestPolygon(gf, 1 + index)
+            };
+
+        MultiPolygon mp = gf.createMultiPolygon(polys);
+        System.out.println(mp);
+
+        return mp;
+    }
+
+    /**
+     * Creates and returns a <code>SeCoordinateReference</code> CRS, though
+     * based on WGS84, is inclusive enough (in terms of valid coordinate range
+     * and presicion) to deal with most coordintates.
+     * 
+     * <p>
+     * Actually tested to deal with coordinates with 0.0002 units of separation
+     * as well as with large coordinates such as UTM (values greater than
+     * 500,000.00)
+     * </p>
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws SeException DOCUMENT ME!
+     */
+    public static SeCoordinateReference getGenericCoordRef()
+        throws SeException {
+        //create a sde CRS with a huge value range and 5 digits of presission
+        SeCoordinateReference seCRS = new SeCoordinateReference();
+        int shift = 100000;
+        SeExtent validRange = new SeExtent(-shift, -shift, shift, shift);
+        seCRS.setXYByEnvelope(validRange);
+        GeometryBuilderTest.LOGGER.info("CRS: " + seCRS.getXYEnvelope());
+
+        return seCRS;
+    }
 }

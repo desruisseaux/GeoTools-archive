@@ -213,7 +213,8 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
                 long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
                 SeObjectId objectID = new SeObjectId(featureId);
-                seDelete.byId(layer.getQualifiedName(), objectID);                
+                seDelete.byId(layer.getQualifiedName(), objectID); 
+                dataStore.fireRemoved(feature);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw new IOException(e.getMessage());
@@ -264,6 +265,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
                 // Now "commit" the changes.
                 insert.execute();
                 insert.close();
+                dataStore.fireAdded(feature);
             } else {
                 // The record is already inserted, so we will be updating
                 // the values associated with the given record.
@@ -287,10 +289,11 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
                 update.execute();
                 update.close();
+
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
-            throw new IOException(e.getMessage());
+            throw new DataSourceException(e.getMessage(), e);
         } finally {
             releaseConnection(connection);
         }
@@ -458,7 +461,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
                 } catch (Exception e) {
                 	String msg = e instanceof SeException? ((SeException)e).getSeError().getErrDesc() : e.getMessage();
                     LOGGER.log(Level.WARNING, msg, e);
-                    throw new IOException(e.getMessage());
+                    throw new DataSourceException(msg, e);
                 }
             } else {
                 row.setShape(index, null);

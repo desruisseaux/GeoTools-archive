@@ -47,19 +47,23 @@ class ArcSDEAttributeReader implements AttributeReader {
     private FeatureType schema;
 
     /** current sde java api row being read */
-    private SeRow currentRow;
+
+    //private SeRow currentRow;
 
     /** the sde java api shape of the current row */
-    private SeShape currentShape;
+
+    //private SeShape currentShape;
+    private Object[] currentValues;
+
+    /** the unique id of the current feature. -1 means the feature id
+     * was not retrieved */
+    private long currentFid = -1;
 
     /**
      * the builder for the geometry type of the schema's default geometry, or
      * null if the geometry attribute is not included in the schema
      */
     private GeometryBuilder geometryBuilder;
-
-    /** index of the geometry attribute in the schema's attributes array */
-    private int geometryTypeIndex = -1;
 
     /**
      * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used
@@ -91,28 +95,16 @@ class ArcSDEAttributeReader implements AttributeReader {
     public ArcSDEAttributeReader(ArcSDEQuery query) throws IOException {
         this.query = query;
         this.schema = query.getSchema();
+        this.currentValues = new Object[schema.getAttributeCount()];
 
         this.fidPrefix = new StringBuffer(schema.getTypeName()).append(".");
         this.fidPrefixLen = fidPrefix.length();
 
         final GeometryAttributeType geomType = schema.getDefaultGeometry();
 
-        //@task REVISIT: put the if statement again when knowing how to
-        //obtain the feature ID if the geometry att was not requested. (needed in readFID())
         if (geomType != null) {
             Class geometryClass = geomType.getType();
             this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
-
-            String geometryTypeName = geomType.getName();
-            AttributeType[] types = schema.getAttributeTypes();
-
-            for (int i = 0; i < types.length; i++) {
-                if (types[i].getName().equals(geometryTypeName)) {
-                    geometryTypeIndex = i;
-
-                    break;
-                }
-            }
         }
     }
 
@@ -146,26 +138,54 @@ class ArcSDEAttributeReader implements AttributeReader {
     public boolean hasNext() throws IOException {
         if (!hasNextAlreadyCalled) {
             try {
-                currentRow = query.fetch();
+                SeRow currentRow = query.fetch();
                 hasNextAlreadyCalled = true;
 
                 //ensure closing the query to release the connection, may be the
                 //user is not so smart to doing it itself
                 if (currentRow == null) {
                     query.close();
-                } else if (geometryTypeIndex > -1) {
-                    //just if the geometry was included in the query.
-                    currentShape = currentRow.getShape(geometryTypeIndex);
+                    currentValues = null;
+                } else {
+                    //number of attributes as defined in the queried featuretype
+                    int attCount = schema.getAttributeCount();
+
+                    //actual number of columns returned. Can be 1 more then
+                    //attCount. In this case, it means the default geometry
+                    //was not included in the query, and the SeShape object
+                    //is returned as the last column since it is the only way
+                    //to fetch the feature id.
+                    int columns = currentRow.getColumns().length;
+                    Object value;
+
+                    for (int i = 0; i < columns; i++) {
+                        value = currentRow.getObject(i);
+
+                        if (value instanceof SeShape) {
+                            SeShape shape = (SeShape) value;
+
+                            //grab the feature id
+                            currentFid = shape.getFeatureId().longValue();
+
+                            //see if the geometry was part of the query
+                            if (columns == attCount) {
+                                value = this.geometryBuilder.construct(shape);
+                                currentValues[i] = value;
+                            }
+                        } else {
+                            currentValues[i] = value;
+                        }
+                    }
                 }
             } catch (SeException ex) {
                 query.close();
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new DataSourceException("Fetching row:" + ex.getMessage(),
-                    ex);
+                LOGGER.log(Level.SEVERE, ex.getSeError().getErrDesc(), ex);
+                throw new DataSourceException("Fetching row:"
+                    + ex.getSeError().getErrDesc(), ex);
             }
         }
 
-        return currentRow != null;
+        return currentValues != null;
     }
 
     /**
@@ -176,46 +196,43 @@ class ArcSDEAttributeReader implements AttributeReader {
      * @throws DataSourceException DOCUMENT ME!
      */
     public void next() throws IOException {
-        hasNextAlreadyCalled = false;
-
-        if (currentRow == null) {
+        if (currentValues == null) {
             throw new DataSourceException("There are no more rows");
         }
+
+        hasNextAlreadyCalled = false;
     }
 
     /**
+     * DOCUMENT ME!
      *
+     * @param index DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException never, since the feature retrieve was done in
+     *         <code>hasNext()</code>
+     * @throws ArrayIndexOutOfBoundsException if <code>index</code> is outside
+     *         the bounds of the schema attribute's count
      */
     public Object read(int index)
         throws IOException, ArrayIndexOutOfBoundsException {
-        try {
-            if (index == geometryTypeIndex) {
-                return geometryBuilder.construct(currentShape);
-            } else {
-                return currentRow.getObject(index);
-            }
-        } catch (SeException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            query.close();
-            throw new DataSourceException("Error retrieveing column " + index
-                + ": " + ex.getMessage(), ex);
-        }
+        return currentValues[index];
+    }
+    
+    public Object[] readAll(){
+    	return currentValues;
     }
 
     /**
      *
      */
     public String readFID() throws IOException {
+    	if(currentFid == -1){
+    		throw new DataSourceException("The feature id was not fetched");
+    	}
         fidPrefix.setLength(fidPrefixLen);
-
-        try {
-            fidPrefix.append(currentShape.getFeatureId().longValue());
-        } catch (SeException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            query.close();
-            throw new DataSourceException("Can't read FID value: "
-                + ex.getMessage(), ex);
-        }
+        fidPrefix.append(currentFid);
 
         return fidPrefix.toString();
     }

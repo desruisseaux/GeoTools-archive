@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * mirroring the java SDE api approach
  * </p>
  *
- * @author Gabriel Roldán
+ * @author Gabriel Rold?n
  */
 public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     /** Standard java logger */
@@ -255,7 +255,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         geom = geom.intersection(layerEnv); // does the work
 
         // Now make an SeShape
-	SeShape filterShape;
+        SeShape filterShape;
         
         //this is a bit hacky, but I don't yet know this code well enough
         //to do it right.  Basically if the geometry collection is completely
