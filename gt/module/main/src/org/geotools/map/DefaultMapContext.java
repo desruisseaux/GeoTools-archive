@@ -42,12 +42,17 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.gc.GridCoverage;
+import org.geotools.geometry.JTS;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -70,7 +75,7 @@ public class DefaultMapContext implements MapContext {
     /** The logger for the map module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.map");
     List layerList = new ArrayList();
-    CoordinateReferenceSystem crs = C.PROMISCUOUS;
+    CoordinateReferenceSystem crs = GeographicCRS.WGS84;
     Envelope areaOfInterest = null;
 
     /** Utility field used by event firing mechanism. */
@@ -491,11 +496,11 @@ public class DefaultMapContext implements MapContext {
 
                     if ((sourceCs != null) && (crs != null)
                             && !sourceCs.equals(crs)) {
-                        MathTransform2D transform = (MathTransform2D) CRSService.reproject(sourceCs,
-                                crs, true);
+                        
+                    	MathTransform2D transform = (MathTransform2D) FactoryFinder.getCoordinateOperationFactory().createOperation(sourceCs,crs);
 
                         if (transform != null) {
-                            env = CRSService.transform(env, transform);
+                            env = JTS.transform(env, transform);
                         }
                     }
                 } catch (TransformException e) {
