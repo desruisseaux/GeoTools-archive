@@ -76,7 +76,7 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
         File dir = (File) DIR.lookUp( params );
         String parent = dir.getParent();
         String name = dir.getName();        
-        return new DataSourceMetadataEnity( parent, name, "VPF" );
+        return new DataSourceMetadataEnity( parent, name, "VPF data source access for " + dir );
     }
 
     /**
