@@ -73,7 +73,10 @@ public class EnvironmentVariableResolver extends AbstractFilterVisitor implement
         Expression output = (Expression)ExpressionBuilder.parse(input);
         return output;
     }
-    
+    /**
+     * Test supplied filter to see if it contains any EnvironmentVariable expressions
+     * @todo: supply implementation, currently always returns true!
+     */
     public boolean needsResolving(Filter f){
         return true;
     }
