@@ -357,7 +357,7 @@ class FIDSQuery implements Query {
         if ((obj == null) || !(obj instanceof Query)) {
             return false;
         }
-
+        if (this == obj) return true;
         Query other = (Query) obj;
 
         return Arrays.equals(getPropertyNames(), other.getPropertyNames())
@@ -486,9 +486,11 @@ class ALLQuery implements Query {
         if ((obj == null) || !(obj instanceof Query)) {
             return false;
         }
-
+        if (this == obj) return true;
+        
         Query other = (Query) obj;
-
+        
+        
         return Arrays.equals(getPropertyNames(), other.getPropertyNames())
         && (retrieveAllProperties() == other.retrieveAllProperties())
         && (getMaxFeatures() == other.getMaxFeatures())
