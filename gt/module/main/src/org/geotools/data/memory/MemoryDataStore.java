@@ -116,6 +116,9 @@ public class MemoryDataStore extends AbstractDataStore {
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Problem using reader", e);
         }
+        finally {
+        	reader.close();
+        }
     }
 
     /**

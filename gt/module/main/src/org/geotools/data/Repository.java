@@ -16,7 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -36,6 +39,12 @@ import java.util.Set;
  * </ul>
  */
 public interface Repository {
+	
+    /**
+     * All FeatureTypes by dataStoreId:typeName 
+     */
+    public SortedMap getTypes();
+    
     /**
      * Retrieve Set of Namespaces prefixes registered by DataStores in this
      * Catalog.
@@ -79,21 +88,13 @@ public interface Repository {
     //String getDefaultPrefix();    
     
     /**
-     * Convience method for accessing FeatureSoruce.
-     * <p>
-     * This method should be equivilient to:
+     * FeatureSoruce access.
      * </p>
-     * <pre><code>
-     * getNameSpaceMetaData( prefix ).getFeatureTypeMetaData().getFeatureSource();
-     * </code></pre>
-     * <p>
-     * I am not sure we should force interfaces to provide convience methods?
-     * </p>
-     * @param prefix
+     * @param dataStoreId
      * @param typeName
      * @return
      */
-    FeatureSource source( String prefix, String typeName ) throws IOException;
+    FeatureSource source( String dataStoreId, String typeName ) throws IOException;
 
     /**
      * Registers all FeatureTypes provided by dataStore with this catalog
@@ -121,14 +122,14 @@ public interface Repository {
      *
      * @throws IOException If registration fails such as for namespace conflict
      */
-    void register( String dataStoreId, DataStore dataStore) throws IOException;
+    //void register( String dataStoreId, DataStore dataStore) throws IOException;
 
     /**
      * Access to the DataStores registed to this Catalog.
      * 
-     * @return Set of registered DataStores
+     * @return Map of registered dataStoreId:DataStore
      */
-    Set getDataStores();
+    Map getDataStores();
 
     //
     // Lock Management

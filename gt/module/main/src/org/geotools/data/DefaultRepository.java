@@ -91,6 +91,33 @@ public class DefaultRepository implements Repository {
 	/** Map of DataStore by dataStoreId */
     protected SortedMap datastores = new TreeMap();
     
+    /* (non-Javadoc)
+	 * @see org.geotools.data.Repository#getTypes()
+	 */
+	public SortedMap getTypes() {
+	    SortedMap map = new TreeMap();
+    	for( Iterator i=datastores.entrySet().iterator(); i.hasNext();){
+    		Map.Entry entry = (Map.Entry) i.next();
+    		String id = (String) entry.getKey();
+    		DataStore ds = (DataStore) entry.getValue();
+    		String typeNames[];
+			try {
+				typeNames = ds.getTypeNames();
+				for( int j=0; j<typeNames.length; j++){
+	    			String typeName = typeNames[j];
+	    			try {
+						map.put( id+":"+typeName, ds.getFeatureSource( typeName ) );
+					} catch (IOException e) {
+						// type was not available after all
+					}
+	    		}
+			}
+			catch (IOException e1) {
+				// apparently this datastores is not working
+			}
+    	}
+        return map;
+	}
     /**
      * Retrieve prefix set.
      * 
@@ -293,8 +320,8 @@ public class DefaultRepository implements Repository {
      * @param namespace
      * @return
      */
-    public Set getDataStores() {
-    	return Collections.unmodifiableSet( new HashSet( datastores.values()) );
+    public Map getDataStores() {
+    	return Collections.unmodifiableMap( datastores );
     }
     public FeatureSource source( String dataStoreId, String typeName ) throws IOException{
 		DataStore ds = datastore( dataStoreId );
