@@ -32,6 +32,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.type.AnnotationFeatureType;
 
 /*
  * VPFFeatureReader.java
@@ -198,6 +199,14 @@ public class VPFFeatureReader
         for(int inx = 0; inx < attributes.length; inx++){
             VPFColumn column = null;
             try {
+                if (attributes[inx].getName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
+                    try{
+                        currentFeature.setAttribute(inx, "nam");
+                    } catch (IllegalAttributeException exc) {
+                        exc.printStackTrace();
+                    }
+                    continue;
+                }
                 column = (VPFColumn) attributes[inx];
                 Object value = null;
                 secondFile = getVPFFile(column); 
@@ -248,6 +257,7 @@ public class VPFFeatureReader
                 }
             }
         }
+
     }
     /**
      * Returns the VPFFile for a particular column.

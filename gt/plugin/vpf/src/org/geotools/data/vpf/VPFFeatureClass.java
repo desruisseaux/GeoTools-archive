@@ -34,6 +34,7 @@ import org.geotools.data.vpf.readers.AreaGeometryFactory;
 import org.geotools.data.vpf.readers.ConnectedNodeGeometryFactory;
 import org.geotools.data.vpf.readers.EntityNodeGeometryFactory;
 import org.geotools.data.vpf.readers.LineGeometryFactory;
+import org.geotools.data.vpf.readers.TextGeometryFactory;
 import org.geotools.data.vpf.readers.VPFGeometryFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -43,6 +44,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.AnnotationFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -87,6 +89,11 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
      * The geometry factory for this feature class
      */
     private VPFGeometryFactory geometryFactory;
+
+    /**
+     * Indicator that the feature type is a text feature.
+     */
+    private boolean textTypeFeature = false;
 
     /**
      * Constructor
@@ -138,8 +145,14 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
                 }
             }
 
+            Vector superTypes = new Vector();
+            // if it's a text geometry feature type add annotation as a super type
+            if (textTypeFeature) {
+                superTypes.add( AnnotationFeatureType.ANNOTATION );
+            }
+            
             featureType = new DefaultFeatureType(cName, "VPF", columns,
-                    new Vector(), gat);
+                    superTypes, gat);
         } catch (IOException exp) {
             //We've already searched the FCS file once successfully
             //So this should never happen
@@ -238,6 +251,9 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
             geometryFactory = new ConnectedNodeGeometryFactory();
         } else if (table.equals(ENTITY_NODE_PRIMITIVE)) {
             geometryFactory = new EntityNodeGeometryFactory();
+        } else if (table.equals(TEXT_PRIMITIVE)) {
+            geometryFactory = new TextGeometryFactory();
+            textTypeFeature = true;
         }
 
         // if an invalid string is returned, there will be no geometry

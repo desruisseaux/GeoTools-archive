@@ -141,8 +141,14 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             }
         }
 
+        Vector superTypes = new Vector();
+        // if it's a text geometry feature type add annotation as a super type
+        if (pathName.endsWith(TEXT_PRIMITIVE)) {
+            superTypes.add( org.geotools.data.vpf.AnnotationFeatureType.ANNOTATION );
+        }
+          
         featureType = new DefaultFeatureType(cPathName, "VPF", columns,
-                new Vector(), gat);
+                superTypes, gat);
     }
 
     /**
@@ -634,6 +640,14 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             coordinates.add(coordinate);
         }
 
+        // Special handling for text primitives per the VPF spec.
+        // The first 2 points are the endpoints of the line, the following
+        // points fill in between the first 2 points.  
+        if (pathName.endsWith(TEXT_PRIMITIVE) && coordinates.size() > 2) {
+            Object o = coordinates.remove(1);
+            coordinates.add(o);
+        }
+
         if (instancesCount == 1) {
             result = factory.createPoint(coordinate);
         } else {
@@ -669,8 +683,11 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         Feature result = null;
         Iterator iter = columns.iterator();
         VPFColumn column;
-        Object[] values = new Object[columns.size()];
-
+        boolean textPrimitive = pathName.endsWith(TEXT_PRIMITIVE);
+        int size = columns.size();
+        if (textPrimitive) size++;
+        Object[] values = new Object[size];
+        
         try {
             for (int inx = 0; inx < columns.size(); inx++) {
                 column = (VPFColumn) columns.get(inx);
@@ -681,6 +698,9 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
                     values[inx] = readFixedSizeData(column.getTypeChar(),
                             column.getElementsNumber());
                 }
+            }
+            if (textPrimitive) {
+                values[size-1] = "nam";
             }
 
             result = featureType.create(values);
@@ -865,7 +885,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     protected byte[] readNumber(int cnt) throws IOException {
         byte[] dataBytes = new byte[cnt];
         inputStream.readFully(dataBytes);
-        
+
         if (byteOrder == LITTLE_ENDIAN_ORDER) {
             dataBytes = DataUtils.toBigEndian(dataBytes);
         }
