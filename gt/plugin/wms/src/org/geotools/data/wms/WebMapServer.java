@@ -291,10 +291,13 @@ public class WebMapServer {
 		DCPType dcpType = (DCPType) getCapabilities().getCapability().getRequest().getGetMap().getDcpTypes().get(0);
 	    Get get = (Get) dcpType.getHttp().getGets().get(0);
 		
-		GetMapRequest request = new GetMapRequest(get.getOnlineResource());
+	//	GetMapRequest request = 
+	//		new GetMapRequest(get.getOnlineResource(),
+	//						  capabilities.getVersion(),
+	//						  );
+	
 		
 		
-		
-		return request;
+		return null;
 	}
 }

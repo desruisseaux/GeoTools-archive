@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.geotools.data.wms.SimpleLayer;
+import org.geotools.data.wms.Utils;
 import org.geotools.data.wms.getCapabilities.Layer;
 import org.geotools.data.wms.getCapabilities.Style;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
@@ -151,37 +152,14 @@ public class WMSParameterMaker {
         param.remarks = "Value contains a list containing multiple SimpleLayer instances, " 
         	           +"representing a layer to be drawn and its style. The Style value "
 					   +"can be empty.";
-        param.availableLayers = new ArrayList();
-        retrieveLayers(capabilities.getCapability().getLayer(), param.availableLayers, null);
+        param.availableLayers = Utils.retrieveLayers(capabilities.getCapability().getLayer());
 
         Identifier id = null;
 
         return param;
 	}	
 	
-	private void retrieveLayers(Layer layer, List availableLayers, Set parentStyles) {
-		Set layerStyles = new TreeSet();
-		Iterator iterator = layer.getStyles().iterator();
-		while (iterator.hasNext()) {
-			Style style = (Style) iterator.next();
-			layerStyles.add(style.getName());
-		}
-		if (parentStyles != null) {
-			layerStyles.addAll(parentStyles);
-		}
-		
-		if (layer.getName() != null && layer.getName() != "") {
-			SimpleLayer simpleLayer = new SimpleLayer(layer.getName(), layerStyles);
-			availableLayers.add(simpleLayer);
-		}
-		
-		if (layer.getSubLayers() != null) {
-			Iterator iter = layer.getSubLayers().iterator();
-			while (iter.hasNext()) {
-				retrieveLayers((Layer) iter.next(), availableLayers, layerStyles);
-			}
-		}
-	}
+
 
 	public GeneralOperationParameter createBBoxMinXReadParam() {
         WMSOperationParameter param = new WMSOperationParameter();
