@@ -12,7 +12,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.opengis.catalog.MetadataEntity;
 
-
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 

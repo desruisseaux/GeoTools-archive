@@ -2,7 +2,7 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>main</name>
+  <name>geotools-main</name>
   <id>main</id>
   <currentVersion>2.1.x</currentVersion>
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
