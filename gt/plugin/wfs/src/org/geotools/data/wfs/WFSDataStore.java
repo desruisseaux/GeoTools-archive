@@ -431,7 +431,7 @@ public class WFSDataStore extends AbstractDataStore{
         hints.put(DocumentWriter.BASE_ELEMENT,FilterSchema.getInstance().getElements()[2]); // Filter
         StringWriter w = new StringWriter();
         try{
-            DocumentWriter.writeDocument(f,FilterSchema.getInstance(),w,hints);
+            DocumentWriter.writeFragment(f,FilterSchema.getInstance(),w,hints);
         }catch(OperationNotSupportedException e){
             logger.warning(e.toString());
             throw new SAXException(e);
