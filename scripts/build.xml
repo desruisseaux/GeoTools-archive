@@ -21,14 +21,14 @@ Target directory structure:
     
 	<!-- GLOBAL PROPERTIES -->
 	<property name="build.compiler.emacs" value="true"/>
-	<property name="cvs.repository" value=":pserver:${user.name}@Lion:/raid/home/pserver" /> 
-    <property name="cvs.package"    value="namematcher" /> 
-  
+	<property name="svn.repository" value="http://svn.geotools.org/geotools/trunk/" /> 
+    <property name="svn.package"    value="scripts" /> 
+
 	<!-- project directories -->
 	<property name="src"        location="src"/>
 	<property name="target"  location="target"/>
 	<property name="build"      location="${target}/classes"/>
-	<property name="testbuild"  location="${target}/tests"/>  
+	<property name="testbuild"  location="${target}/junit"/>  
 	<property name="distbuild"  location="${target}/dist"/>  	
 	<property name="dist"       location="dist"/>
 	<property name="lib"        location="lib"/>
@@ -194,17 +194,5 @@ Target directory structure:
 
 	<target name="all" depends="clean,init,compile,test,jar"
 		    description="Build application" />
-		    
-	<target name="checkout"
-			description="Update package from CVS">
-			
-		<cvs cvsroot="${cvs.repository}" package="${cvs.package}" dest=".." />
-  	</target>
-  	
-	<target name="masterbuild" depends="checkout,compile,test,release"
-  	        description="Cruise control master build" /> 
-  	        
-	<target name="cleanbuild" depends="clean,masterbuild"
-  	      	description="Cruise control clean build" /> 
-  
+		      	  
 </project>

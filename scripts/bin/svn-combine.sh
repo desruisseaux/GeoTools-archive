@@ -4,10 +4,10 @@
 #
 # usage: 
 # svncombine dir1 dir2 destdir version
-# must be executed from within an svn repository dir.
+# must be executed from within an svn workspace dir.
 #
 # assumes svn is installed on commandline
-# assumes destdir is not nested (ie. in this dir)
+# assumes destdir is not nested (ie. in current dir)
 #
 if [ -n $4 ]; then
 svn mkdir temp-merging-directory             # make temp dir
