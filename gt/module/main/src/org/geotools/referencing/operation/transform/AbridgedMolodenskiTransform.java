@@ -29,6 +29,7 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameterGroup;
@@ -36,11 +37,10 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.parameter.ParameterValue;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.referencing.Identifier;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.ParameterRealValue;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -131,6 +131,47 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
 //    {
         
 //    }
+
+    /**
+     * Returns the parameters for this math transform.
+     *
+     * @return The parameters for this math transform.
+     *
+     * @todo 'dim' is not an OpenGIS parameter; this is an addition from Geotools.
+     *       Maybe we should not includes it in the WKT.
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValue dim;
+        if (true) {
+            dim = new org.geotools.parameter.ParameterValue(Provider.DIM);
+            dim.setValue(getDimSource());
+        }
+        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS,
+               new ParameterValue[] {
+                   dim,
+                   new ParameterRealValue(Provider.DX,             dx),
+                   new ParameterRealValue(Provider.DY,             dy),
+                   new ParameterRealValue(Provider.DZ,             dz),
+                   new ParameterRealValue(Provider.SRC_SEMI_MAJOR, a),
+                   new ParameterRealValue(Provider.SRC_SEMI_MINOR, b),
+                   new ParameterRealValue(Provider.TGT_SEMI_MAJOR, a+da),
+                   new ParameterRealValue(Provider.TGT_SEMI_MINOR, b+db)
+               });
+    }
+    
+    /**
+     * Gets the dimension of input points.
+     */
+    public int getDimSource() {
+        return source3D ? 3 : 2;
+    }
+    
+    /**
+     * Gets the dimension of output points.
+     */
+    public final int getDimTarget() {
+        return target3D ? 3 : 2;
+    }
     
     /**
      * Construct an AbridgedMolodenskiTransform from the specified parameters.
@@ -285,20 +326,6 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     }
     
     /**
-     * Gets the dimension of input points.
-     */
-    public int getDimSource() {
-        return source3D ? 3 : 2;
-    }
-    
-    /**
-     * Gets the dimension of output points.
-     */
-    public final int getDimTarget() {
-        return target3D ? 3 : 2;
-    }
-    
-    /**
      * Returns a hash value for this transform.
      */
     public final int hashCode() {
@@ -334,29 +361,6 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                    this.target3D == that.target3D;
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     *
-     * @todo Override {@link #getParameterValues} instead.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        formatter.append("Abridged_Molodenski");
-        formatter.append(new ParameterValue("dim", getDimSource()));
-        formatter.append(new ParameterValue("dx",             dx,   SI.METER));
-        formatter.append(new ParameterValue("dy",             dy,   SI.METER));
-        formatter.append(new ParameterValue("dz",             dz,   SI.METER));
-        formatter.append(new ParameterValue("src_semi_major", a,    SI.METER));
-        formatter.append(new ParameterValue("src_semi_minor", b,    SI.METER));
-        formatter.append(new ParameterValue("tgt_semi_major", a+da, SI.METER));
-        formatter.append(new ParameterValue("tgt_semi_minor", b+db, SI.METER));
-        return "PARAM_MT";
     }
     
     /**

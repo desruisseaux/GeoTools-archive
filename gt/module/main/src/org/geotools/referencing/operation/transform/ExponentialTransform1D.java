@@ -24,6 +24,7 @@ import javax.units.Unit;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameterGroup;
@@ -33,11 +34,10 @@ import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
-import org.geotools.parameter.ParameterValue;
 import org.geotools.referencing.Identifier;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.ParameterRealValue;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -129,6 +129,20 @@ public class ExponentialTransform1D extends AbstractMathTransform
             return LinearTransform1D.create(0, scale);
         }
         return new ExponentialTransform1D(base, scale);
+    }
+
+    /**
+     * Returns the parameters for this math transform.
+     *
+     * @return The parameters for this math transform.
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValue[] parameters = new ParameterValue[scale!=1 ? 2 : 1];
+        switch (parameters.length) {
+            case 2: parameters[1] = new ParameterRealValue(Provider.SCALE, scale); // fall through
+            case 1: parameters[0] = new ParameterRealValue(Provider.BASE,  base);  // fall through
+        }
+        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS, parameters);
     }
     
     /**
@@ -295,27 +309,6 @@ public class ExponentialTransform1D extends AbstractMathTransform
                    Double.doubleToLongBits(this.scale) == Double.doubleToLongBits(that.scale);
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     *
-     * @todo Override {@link #getParameterValues} instead.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        formatter.append("Exponential");
-        formatter.append(new ParameterValue("base", base, null));
-        if (scale != 0) {
-            // TODO: The following is NOT a parameter. For WKT formatting, we should decompose this
-            //       LogarithmicTransform1D into a ConcatenatedTransform using a AffineTransform instead.
-            formatter.append(new ParameterValue("scale", scale, null));
-        }
-        return "PARAM_MT";
     }
     
     /**

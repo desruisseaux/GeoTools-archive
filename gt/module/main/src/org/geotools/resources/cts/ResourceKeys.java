@@ -105,7 +105,9 @@ public interface ResourceKeys
     public static final int ERROR_ILLEGAL_AXIS_ORIENTATION_$2           =    79;
     public static final int ERROR_ILLEGAL_CLASS_$2                      =    80;
     public static final int ERROR_ILLEGAL_CS_DIMENSION_$1               =    81;
+    public static final int ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1   =   119;
     public static final int ERROR_ILLEGAL_ENVELOPE_ORDINATE_$1          =    82;
+    public static final int ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4       =   120;
     public static final int ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1  =    83;
     public static final int ERROR_INCOMPATIBLE_ELLIPSOID_$2             =    84;
     public static final int ERROR_INDEX_OUT_OF_BOUNDS_$1                =    85;

@@ -24,6 +24,7 @@ import javax.units.Unit;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.OperationParameterGroup;
@@ -33,11 +34,10 @@ import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
-import org.geotools.parameter.ParameterValue;
 import org.geotools.referencing.Identifier;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.ParameterRealValue;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -125,6 +125,20 @@ public class LogarithmicTransform1D extends AbstractMathTransform
             return LinearTransform1D.create(0, offset);
         }
         return new LogarithmicTransform1D(base, offset);
+    }
+
+    /**
+     * Returns the parameters for this math transform.
+     *
+     * @return The parameters for this math transform.
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValue[] parameters = new ParameterValue[offset!=0 ? 2 : 1];
+        switch (parameters.length) {
+            case 2: parameters[1] = new ParameterRealValue(Provider.OFFSET, offset); // fall through
+            case 1: parameters[0] = new ParameterRealValue(Provider.BASE,   base);   // fall through
+        }
+        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS, parameters);
     }
     
     /**
@@ -260,27 +274,6 @@ public class LogarithmicTransform1D extends AbstractMathTransform
                    Double.doubleToLongBits(this.offset) == Double.doubleToLongBits(that.offset);
         }
         return false;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        formatter.append("Logarithmic");
-        ParameterValue value = new ParameterValue(Provider.BASE);
-        value.setValue(base);
-        formatter.append(value);
-        if (offset != 0) {
-            value = new ParameterValue(Provider.OFFSET);
-            value.setValue(offset);
-            formatter.append(value);
-        }
-        return "PARAM_MT";
     }
     
     /**

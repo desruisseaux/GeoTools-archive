@@ -61,8 +61,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.parameter.OperationParameter
  * @see org.geotools.parameter.ParameterValueGroup
  */
-final class ParameterRealValue extends GeneralParameterValue
-                            implements org.opengis.parameter.ParameterValue
+public class ParameterRealValue extends GeneralParameterValue
+                             implements org.opengis.parameter.ParameterValue
 {
     /**
      * Serial number for interoperability with different versions.
@@ -92,6 +92,20 @@ final class ParameterRealValue extends GeneralParameterValue
         }
         final Number value = (Number) descriptor.getDefaultValue();
         this.value = (value!=null) ? value.doubleValue() : Double.NaN;
+    }
+
+    /**
+     * Construct a parameter from the specified descriptor and value. This convenience
+     * constructor is equivalents to the one-argument constructor followed by a call to
+     * {@link #setValue(double)}.
+     *
+     * @param  descriptor The abstract definition of this parameter.
+     * @param  value The parameter value.
+     * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
+     */
+    public ParameterRealValue(final OperationParameter descriptor, final double value) {
+        this(descriptor);
+        setValue(value);
     }
 
     /**

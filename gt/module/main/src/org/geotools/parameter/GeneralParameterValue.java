@@ -105,6 +105,24 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
                       ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
         }
     }
+    
+    /**
+     * Makes sure an array element is non-null. This is
+     * a convenience method for subclass constructors.
+     *
+     * @param  name  Argument name.
+     * @param  array User argument.
+     * @param  index Index of the element to check.
+     * @throws IllegalArgumentException if <code>array[i]</code> is null.
+     */
+    static void ensureNonNull(final String name, final Object[] array, final int index)
+        throws IllegalArgumentException
+    {
+        if (array[index] == null) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, name+'['+index+']'));
+        }
+    }
 
     /**
      * Verify that the specified value is of the specified class.

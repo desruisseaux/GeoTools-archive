@@ -142,6 +142,70 @@ public class ParameterTest extends TestCase {
     }
 
     /**
+     * Test parameter values group.
+     */
+    public void testGroup() {
+        final Integer ONE = new Integer(1);
+        final OperationParameter p1, p2, p3;
+        p1 = new OperationParameter(Collections.singletonMap("name", "1"), 1, 1, Integer.class, null, ONE, null, null, null);
+        p2 = new OperationParameter(Collections.singletonMap("name", "2"), 1, 2, Integer.class, null, ONE, null, null, null);
+        p3 = new OperationParameter(Collections.singletonMap("name", "3"), 0, 1, Integer.class, null, ONE, null, null, null);
+        final ParameterValue v1, v2, v3, v1b, v2b, v3b, v1t, v2t, v3t;
+        v1  = new ParameterValue(p1); v1.setValue( 10);
+        v2  = new ParameterValue(p2); v2.setValue( 20);
+        v3  = new ParameterValue(p3); v3.setValue( 30);
+        v1b = new ParameterValue(p1); v1.setValue(-10);
+        v2b = new ParameterValue(p2); v2.setValue(-20);
+        v3b = new ParameterValue(p3); v3.setValue(-30);
+        /*
+         * Test creation without pre-defined parameter group.
+         */
+        final Map properties = Collections.singletonMap("name", "group");
+        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3});
+        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2});
+        new ParameterValueGroup(properties, new ParameterValue[] {v1, v3});
+        new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3, v2b});
+        try {
+            new ParameterValueGroup(properties, new ParameterValue[] {v1, v2, v3, v3b});
+            fail("Parameter 3 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        try {
+            new ParameterValueGroup(properties, new ParameterValue[] {v1, v3, v1b});
+            fail("Parameter 1 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        /*
+         * Test creation with a pre-defined parameter group.
+         */
+        final OperationParameterGroup group =
+              new OperationParameterGroup(properties, new OperationParameter[] {p1, p2, p3});
+        new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3});
+        new ParameterValueGroup(group, new ParameterValue[] {v1, v2});
+        new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3, v2b});
+        try {
+            new ParameterValueGroup(group, new ParameterValue[] {v1, v3});
+            fail("Parameter 2 was mandatory.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        try {
+            new ParameterValueGroup(group, new ParameterValue[] {v1, v2, v3, v3b});
+            fail("Parameter 3 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        try {
+            new ParameterValueGroup(group, new ParameterValue[] {v1, v3, v1b});
+            fail("Parameter 1 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+    }
+
+    /**
      * Tests parameter for a code list. Try to inserts invalid values. Try also to insert a
      * new code list. This operation should fails if the new code list is created after the
      * parameter.

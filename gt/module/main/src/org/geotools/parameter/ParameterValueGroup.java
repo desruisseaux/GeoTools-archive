@@ -24,8 +24,12 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Set;
 import java.util.List;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
@@ -33,6 +37,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterNameException;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
@@ -74,6 +79,8 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * Construct a parameter group from the specified descriptor.
      * All {@linkplain #getValues parameter values} will be initialized
      * to their default value.
+     *
+     * @param descriptor The descriptor for this group.
      */
     public ParameterValueGroup(final OperationParameterGroup descriptor) {
         super(descriptor);
@@ -86,12 +93,33 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
     }
 
     /**
+     * Construct a parameter group from the specified descriptor and list of parameters.
+     *
+     * @param descriptor The descriptor for this group.
+     * @param values The list of parameter values.
+     */
+    public ParameterValueGroup(final OperationParameterGroup descriptor,
+                                     GeneralParameterValue[] values)
+    {
+        super(descriptor);
+        ensureNonNull("values", values);
+        this.values = values = (GeneralParameterValue[]) values.clone();
+        final GeneralOperationParameter[] parameters = descriptor.getParameters();
+        final Map occurences = new LinkedHashMap(Math.round(parameters.length/0.75f)+1, 0.75f);
+        for (int i=0; i<parameters.length; i++) {
+            ensureNonNull("parameters", parameters, i);
+            occurences.put(parameters[i], new int[1]);
+        }
+        ensureValidOccurs(values, occurences);
+    }
+
+    /**
      * Construct a parameter group from the specified list of parameters.
      *
      * @param properties The properties for the
      *        {@linkplain org.geotools.parameter.OperationParameterGroup operation parameter group}
      *        to construct from the list of parameters.
-     * @param values The list of parameters.
+     * @param values The list of parameter values.
      */
     public ParameterValueGroup(final Map properties, final GeneralParameterValue[] values) {
         super(createDescriptor(properties, values));
@@ -106,12 +134,59 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
                                                             final GeneralParameterValue[] values)
     {
         ensureNonNull("values", values);
-        final GeneralOperationParameter[] parameters = new GeneralOperationParameter[values.length];
-        for (int i=0; i<parameters.length; i++) {
-            ensureNonNull("values", values[i]);
-            parameters[i] = values[i].getDescriptor();
+        final Map occurences = new LinkedHashMap(Math.round(values.length/0.75f)+1, 0.75f);
+        for (int i=0; i<values.length; i++) {
+            ensureNonNull("values", values, i);
+            occurences.put(values[i].getDescriptor(), new int[1]);
         }
-        return new org.geotools.parameter.OperationParameterGroup(properties, parameters);
+        ensureValidOccurs(values, occurences);
+        final Set descriptors = occurences.keySet();
+        return new org.geotools.parameter.OperationParameterGroup(properties,
+                                          (GeneralOperationParameter[]) descriptors.toArray(
+                                          new GeneralOperationParameter[descriptors.size()]));
+    }
+
+    /**
+     * Make sure that the number of occurences of each values is inside the expected range.
+     *
+     * @param values The list of parameter values.
+     * @param occurences A map of the number of occurences of a value for each descriptor.
+     *        The key must be {@link GeneralOperationParameter} instances and the values
+     *        must be <code>int[]</code> array of length 1 initialized with the 0 value.
+     */
+    private static void ensureValidOccurs(final GeneralParameterValue[] values,
+                                          final Map occurences)
+    {
+        /*
+         * Count the parameters occurences.
+         */
+        for (int i=0; i<values.length; i++) {
+            ensureNonNull("values", values, i);
+            final GeneralOperationParameter descriptor = values[i].getDescriptor();
+            final int[] count = (int[]) occurences.get(descriptor);
+            if (count == null) {
+                throw new IllegalArgumentException(Resources.format(
+                          ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1,
+                          descriptor.getName(Locale.getDefault())));
+            }
+            count[0]++;
+        }
+        /*
+         * Now check if the occurences are in the expected ranges.
+         */
+        for (final Iterator it=occurences.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry entry = (Map.Entry) it.next();
+            final GeneralOperationParameter descriptor = (GeneralOperationParameter) entry.getKey();
+            final int count = ((int[]) entry.getValue())[0];
+            final int min   = descriptor.getMinimumOccurs();
+            final int max   = descriptor.getMaximumOccurs();
+            if (!(count>=min && count<=max)) {
+                throw new IllegalArgumentException(Resources.format(
+                          ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4,
+                          descriptor.getName(Locale.getDefault()), new Integer(count),
+                          new Integer(min), new Integer(max)));
+            }
+        }
     }
 
     /**
