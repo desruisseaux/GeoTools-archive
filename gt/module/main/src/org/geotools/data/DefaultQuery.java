@@ -52,7 +52,7 @@ public class DefaultQuery implements Query {
     private String typeName;
 
     /** The namespace to get */
-    private URI namespace;
+    private URI namespace =Query.NO_NAMESPACE;
     
     /** The handle associated with this query. */
     private String handle;
@@ -132,7 +132,21 @@ public class DefaultQuery implements Query {
      */
     public DefaultQuery(String typeName, Filter filter, int maxFeatures,
         String[] propNames, String handle) {
+        this(typeName, null, filter, maxFeatures, propNames, handle );
+    }
+    /**
+     * Constructor that sets all fields.
+     *
+     * @param typeName the name of the featureType to retrieve.
+     * @param filter the OGC filter to constrain the request.
+     * @param maxFeatures the maximum number of features to be returned.
+     * @param propNames an array of the properties to fetch.
+     * @param handle the name to associate with the query.
+     */
+    public DefaultQuery(String typeName, URI namespace, Filter filter, int maxFeatures,
+        String[] propNames, String handle) {
         this(typeName, filter);
+        this.namespace = namespace;
         this.properties = propNames;
         this.maxFeatures = maxFeatures;
         this.handle = handle;
