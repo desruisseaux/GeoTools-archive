@@ -91,6 +91,7 @@
       <!-- This section excludes the tests, comment out if your
                  testData/testparams.properties are set correctly -->
       <excludes>
+        <exclude>**/ArcSDEJavaApiTest.java</exclude>
         <exclude>**/ArcSDEDataStoreTest.java</exclude>
         <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
         <exclude>**/ArcSDEFeatureStoreTest.java</exclude>

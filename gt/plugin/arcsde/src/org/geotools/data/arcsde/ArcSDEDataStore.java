@@ -264,12 +264,10 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         final String nonQualifiedTypeName = featureType.getTypeName();
 
-        /*
            if (nonQualifiedTypeName.indexOf('.') != -1) {
                throw new IllegalArgumentException(
                    "Please do not use type names that contains '.' (dots)");
            }
-         */
 
         // Create a new SeTable/SeLayer with the specified attributes....
         SeConnection connection = null;

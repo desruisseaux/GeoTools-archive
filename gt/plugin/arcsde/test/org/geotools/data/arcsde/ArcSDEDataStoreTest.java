@@ -277,6 +277,74 @@ public class ArcSDEDataStoreTest extends TestCase {
     }
 
     /**
+     * Checks that a query returns only the specified attributes.
+     *
+     * @throws IOException
+     * @throws IllegalAttributeException
+     */
+    public void testRestrictsAttributes()
+        throws IOException, IllegalAttributeException {
+        final String typeName = testData.getPoint_table();
+        final DataStore ds = testData.getDataStore();
+        final FeatureType schema = ds.getSchema(typeName);
+        final int queriedAttributeCount = schema.getAttributeCount() - 1;
+        final String[] queryAtts = new String[queriedAttributeCount];
+
+        for (int i = 0; i < queryAtts.length; i++) {
+            queryAtts[i] = schema.getAttributeType(i).getName();
+        }
+
+        //build the query asking for a subset of attributes
+        final Query query = new DefaultQuery(typeName, Filter.NONE, queryAtts);
+
+        FeatureReader reader;
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+
+        FeatureType resultSchema = reader.getFeatureType();
+        assertEquals(queriedAttributeCount, resultSchema.getAttributeCount());
+
+        for (int i = 0; i < queriedAttributeCount; i++) {
+            assertEquals(queryAtts[i],
+                resultSchema.getAttributeType(i).getName());
+        }
+    }
+
+    /**
+     * Checks that arcsde datastore returns featuretypes whose attributes are
+     * exactly in the requested order.
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws IllegalAttributeException DOCUMENT ME!
+     */
+    public void testRespectsAttributeOrder()
+        throws IOException, IllegalAttributeException {
+        final String typeName = testData.getPoint_table();
+        final DataStore ds = testData.getDataStore();
+        final FeatureType schema = ds.getSchema(typeName);
+        final int queriedAttributeCount = schema.getAttributeCount();
+        final String[] queryAtts = new String[queriedAttributeCount];
+
+        //build the attnames in inverse order
+        for (int i = queryAtts.length, j = 0; i > 0; j++) {
+        	--i;
+            queryAtts[j] = schema.getAttributeType(i).getName();
+        }
+
+        //build the query asking for a subset of attributes
+        final Query query = new DefaultQuery(typeName, Filter.NONE, queryAtts);
+
+        FeatureReader reader;
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+
+        FeatureType resultSchema = reader.getFeatureType();
+        assertEquals(queriedAttributeCount, resultSchema.getAttributeCount());
+        for (int i = 0; i < queriedAttributeCount; i++) {
+            assertEquals(queryAtts[i],
+                resultSchema.getAttributeType(i).getName());
+        }
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param r DOCUMENT ME!
@@ -317,7 +385,6 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
         FeatureType retType = reader.getFeatureType();
         assertNotNull(retType.getDefaultGeometry());
-        assertTrue(retType.hasAttributeType("SHAPE"));
         assertTrue(reader.hasNext());
 
         return reader;
@@ -435,12 +502,13 @@ public class ArcSDEDataStoreTest extends TestCase {
         //we must to try fetching features
         Feature feature = results.reader().next();
         assertNotNull(feature);
+
         //the id must be grabed correctly.
         //this exercises the fact that although the geometry is not included
         //in the request, it must be fecthed anyway to obtain the SeShape.getFeatureId()
         //getID() should throw an exception if the feature is was not grabed (see
         // ArcSDEAttributeReader.readFID().
-        String id = feature.getID(); 
+        String id = feature.getID();
         assertNotNull(id);
         assertFalse(id.endsWith(".-1"));
         assertFalse(id.endsWith(".0"));
@@ -577,8 +645,10 @@ public class ArcSDEDataStoreTest extends TestCase {
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testBBoxFilterPoints() throws Exception{
+    public void testBBoxFilterPoints() throws Exception {
         //String uri = getFilterUri("filters.bbox.points.filter");
         //int expected = getExpectedCount("filters.bbox.points.expectedCount");
         int expected = 6;
@@ -587,8 +657,10 @@ public class ArcSDEDataStoreTest extends TestCase {
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testBBoxFilterLines() throws Exception{
+    public void testBBoxFilterLines() throws Exception {
         //String uri = getFilterUri("filters.bbox.lines.filter");
         //int expected = getExpectedCount("filters.bbox.lines.expectedCount");
         int expected = 22;
@@ -597,8 +669,10 @@ public class ArcSDEDataStoreTest extends TestCase {
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    public void testBBoxFilterPolygons() throws Exception{
+    public void testBBoxFilterPolygons() throws Exception {
         //String uri = getFilterUri("filters.bbox.polygons.filter");
         //int expected = getExpectedCount("filters.bbox.polygons.expectedCount");
         int expected = 8;
@@ -756,6 +830,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private void testFilter(Filter filter, FeatureSource fsource, int expected)
         throws IOException {
+    	
         FeatureResults results = fsource.getFeatures(filter);
         FeatureCollection fc = results.collection();
         int resCount = results.getCount();

@@ -630,7 +630,7 @@ public class ArcSDEConnectionPool {
     public ConnectionConfig getConfig() {
         return config;
     }
-
+    
     /**
      * Inner utility class to report the configuration of the ArcSDE service
      * and the underlying RDBMS pointed by a <code>ConnectionConfig</code>
