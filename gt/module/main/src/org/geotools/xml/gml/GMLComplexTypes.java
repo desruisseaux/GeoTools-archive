@@ -47,12 +47,14 @@ import org.geotools.xml.gml.GMLSchema.GMLAttribute;
 import org.geotools.xml.gml.GMLSchema.GMLComplexType;
 import org.geotools.xml.gml.GMLSchema.GMLElement;
 import org.geotools.xml.gml.GMLSchema.GMLNullType;
+import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xLink.XLinkSchema;
@@ -63,6 +65,8 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
@@ -4031,7 +4035,7 @@ public class GMLComplexTypes {
                             elements[k].getName().equals(value[i].getElement().getName())))
                         j = k;
                 }
-                
+System.out.print(j+"");
                 if(j!=-1)
                     values[j] = value[i].getValue();
             }
@@ -4041,7 +4045,7 @@ public class GMLComplexTypes {
             if ((fid == null) || "".equals(fid)) {
                 fid = attrs.getValue(GMLSchema.NAMESPACE, "fid");
             }
-
+System.out.println("\n"+values.length);
             if ((fid != null) || !"".equals(fid)) {
                 try {
                     return ft.create(values, fid);
@@ -6215,24 +6219,77 @@ public class GMLComplexTypes {
 
         GeometryAttributeType geometryAttribute = null;
 
-        Element[] children = ((ComplexType)element.getType()).getChildElements();
+        ElementGrouping child = ((ComplexType)element.getType()).getChild();
+        FeatureType parent = null;
+        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
+            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
         
-        for(int i=0;i<children.length;i++){
-            String name = children[i].getName();
-            Class type = children[i].getType().getInstanceType();
-            boolean nillable = children[i].isNillable();
-//System.out.println("Including "+name+" nillable == "+nillable);
+        if(parent != null && parent.getAttributeTypes()!=null){
+            typeFactory.addTypes(parent.getAttributeTypes());
+            if(parent.getDefaultGeometry()!=null){
+                geometryAttribute = parent.getDefaultGeometry();
+            }
+        }
+        
+        AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
+        for(int i=0;i<attrs.length;i++){
+        typeFactory.addType(attrs[i]);
 
-            AttributeType attributeType = AttributeTypeFactory
-                .newAttributeType(name, type, nillable);
-            typeFactory.addType(attributeType);
+        if ((geometryAttribute == null)
+                && attrs[i].isGeometry()) {
+            if (!attrs[i].getName()
+                             .equalsIgnoreCase(BoxType.getInstance()
+                                                          .getName())) {
+                geometryAttribute = (GeometryAttributeType) attrs[i];
+            }
+        }
+        }
+
+        if (geometryAttribute != null) {
+            typeFactory.setDefaultGeometry(geometryAttribute);
+        }
+
+        try {
+            FeatureType ft = typeFactory.getFeatureType();
+            return ft;
+        } catch (SchemaException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        }
+    }
+    public static FeatureType createFeatureType(ComplexType element) throws SAXException {
+        String ftName = element.getName();
+        String ftNS = element.getNamespace();
+        logger.finest("Creating feature type for " + ftName + ":" + ftNS);
+
+        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
+        typeFactory.setNamespace(ftNS);
+        typeFactory.setName(ftName);
+
+        GeometryAttributeType geometryAttribute = null;
+
+        ElementGrouping child = (element).getChild();
+        FeatureType parent = null;
+        if(element.getParent()instanceof ComplexType)
+            parent = createFeatureType((ComplexType)element.getParent());
+        
+        if(parent != null && parent.getAttributeTypes()!=null){
+            typeFactory.addTypes(parent.getAttributeTypes());
+            if(parent.getDefaultGeometry()!=null){
+                geometryAttribute = parent.getDefaultGeometry();
+            }
+        }
+        
+        AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
+        for(int i=0;i<attrs.length;i++){
+            typeFactory.addType(attrs[i]);
 
             if ((geometryAttribute == null)
-                    && attributeType instanceof GeometryAttributeType) {
-                if (!children[i].getType().getName()
-                                 .equalsIgnoreCase(BoxType.getInstance()
-                                                              .getName())) {
-                    geometryAttribute = (GeometryAttributeType) attributeType;
+                && attrs[i].isGeometry()) {
+                if (!attrs[i].getName()
+                             .equalsIgnoreCase(BoxType.getInstance()
+                                                          .getName())) {
+                    geometryAttribute = (GeometryAttributeType) attrs[i];
                 }
             }
         }
@@ -6243,11 +6300,44 @@ public class GMLComplexTypes {
 
         try {
             FeatureType ft = typeFactory.getFeatureType();
-//System.out.println(ft);
             return ft;
         } catch (SchemaException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
+    }
+    
+    private static List getAttributes(ElementGrouping eg){
+        ElementGrouping[] elems = null;
+    	List l = new LinkedList();
+        
+        switch(eg.getGrouping()){
+        
+        case ElementGrouping.CHOICE:
+            // assume for most cases the first is chosen
+            // TODO make a better solution
+            return getAttributes(((Choice)eg).getChildren()[0]);
+        case ElementGrouping.GROUP:
+            return getAttributes(((Group)eg).getChild());
+        case ElementGrouping.ELEMENT:
+            // AttributeType
+            l.add(getAttribute((Element)eg));
+        	return l;
+            
+        case ElementGrouping.ALL:
+            elems = ((All)eg).getElements();
+        	break;
+        case ElementGrouping.SEQUENCE:
+            elems = ((Sequence)eg).getChildren();
+    	break;
+        }
+    	if(elems!=null)
+        	for(int i=0;i<elems.length;i++)
+        	    l.addAll(getAttributes(elems[i]));
+        return l;
+    }
+    
+    private static AttributeType getAttribute(Element eg){
+        return AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
     }
 }

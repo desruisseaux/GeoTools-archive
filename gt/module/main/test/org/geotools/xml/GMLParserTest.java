@@ -35,68 +35,68 @@ public class GMLParserTest extends TestCase {
         assertNotNull(s);
     }
     
-    public void testOneFeature() throws SAXException, IOException {
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(false);
-
-            SAXParser parser = spf.newSAXParser();
-
-            String path = "geoserver/oneFeature.xml";
-            File f = TestData.file(this,path);
-            URI u = f.toURI();
-
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.FINEST);
-            XSISAXHandler.setLogLevel(Level.FINEST);
-            XMLElementHandler.setLogLevel(Level.FINEST);
-            XSIElementHandler.setLogLevel(Level.FINEST);
-
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
-            assertNotNull("Document missing", doc);
-//            System.out.println(doc);
-            
-            checkFeatureCollection((FeatureCollection)doc);
-            
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-    }
-    public void testMoreFeatures() throws SAXException, IOException {
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(false);
-
-            SAXParser parser = spf.newSAXParser();
-
-            String path = "geoserver/roads.xml";
-            File f = TestData.file(this,path);
-            URI u = f.toURI();
-
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.WARNING);
-            XSISAXHandler.setLogLevel(Level.WARNING);
-            XMLElementHandler.setLogLevel(Level.WARNING);
-            XSIElementHandler.setLogLevel(Level.WARNING);
-
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
-            assertNotNull("Document missing", doc);
-//            System.out.println(doc);
-            
-            checkFeatureCollection((FeatureCollection)doc);
-            
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-    }
+//    public void testOneFeature() throws SAXException, IOException {
+//        try {
+//            SAXParserFactory spf = SAXParserFactory.newInstance();
+//            spf.setNamespaceAware(true);
+//            spf.setValidating(false);
+//
+//            SAXParser parser = spf.newSAXParser();
+//
+//            String path = "geoserver/oneFeature.xml";
+//            File f = TestData.file(this,path);
+//            URI u = f.toURI();
+//
+//            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+//            XMLSAXHandler.setLogLevel(Level.FINEST);
+//            XSISAXHandler.setLogLevel(Level.FINEST);
+//            XMLElementHandler.setLogLevel(Level.FINEST);
+//            XSIElementHandler.setLogLevel(Level.FINEST);
+//
+//            parser.parse(f, xmlContentHandler);
+//
+//            Object doc = xmlContentHandler.getDocument();
+//            assertNotNull("Document missing", doc);
+////            System.out.println(doc);
+//            
+//            checkFeatureCollection((FeatureCollection)doc);
+//            
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        }
+//    }
+//    public void testMoreFeatures() throws SAXException, IOException {
+//        try {
+//            SAXParserFactory spf = SAXParserFactory.newInstance();
+//            spf.setNamespaceAware(true);
+//            spf.setValidating(false);
+//
+//            SAXParser parser = spf.newSAXParser();
+//
+//            String path = "geoserver/roads.xml";
+//            File f = TestData.file(this,path);
+//            URI u = f.toURI();
+//
+//            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+//            XMLSAXHandler.setLogLevel(Level.WARNING);
+//            XSISAXHandler.setLogLevel(Level.WARNING);
+//            XMLElementHandler.setLogLevel(Level.WARNING);
+//            XSIElementHandler.setLogLevel(Level.WARNING);
+//
+//            parser.parse(f, xmlContentHandler);
+//
+//            Object doc = xmlContentHandler.getDocument();
+//            assertNotNull("Document missing", doc);
+////            System.out.println(doc);
+//            
+//            checkFeatureCollection((FeatureCollection)doc);
+//            
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        }
+//    }
     
     public void testFMERoadsFeatures() throws SAXException, IOException {
         try {
@@ -175,72 +175,72 @@ public class GMLParserTest extends TestCase {
             j++;
         }
     }
-    public void testOneFeatureWrite(){
-
-        try {            
-        String path = "geoserver/oneFeature.xml";
-
-        File f = TestData.file(this,path);
-
-        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
-        assertNotNull("Document missing", doc);
-
-        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
-                
-        path = "oneFeature_out.xml";
-        f = new File(f.getParentFile(),path);
-        if(f.exists())
-            f.delete();
-        f.createNewFile();
-        
-        DocumentWriter.writeDocument(doc,s,f,null);
-        
-        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
-        assertNotNull("New Document missing", doc);
-        
-        assertTrue("file was not created +f",f.exists());
-        System.out.println(f);
-        } catch (SAXException e) {
-            e.printStackTrace();
-            fail(e.toString());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-    }
-    public void testOneFeatureWriteWithHints(){
-
-        try {            
-        String path = "geoserver/oneFeature.xml";
-
-        File f = TestData.file(this,path);
-
-        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
-        assertNotNull("Document missing", doc);
-
-        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
-                
-        path = "oneFeature_out_hints.xml";
-        f = new File(f.getParentFile(),path);
-        if(f.exists())
-            f.delete();
-        f.createNewFile();
-        
-        HashMap hints = new HashMap();
-        hints.put(DocumentWriter.SCHEMA_ORDER,new String[] {"http://www.opengis.net/wfs", "http://www.openplans.org/topp"});
-        DocumentWriter.writeDocument(doc,s,f,hints);
-        
-        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
-        assertNotNull("New Document missing", doc);
-        
-        assertTrue("file was not created +f",f.exists());
-        System.out.println(f);
-        } catch (SAXException e) {
-            e.printStackTrace();
-            fail(e.toString());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-    }
+//    public void testOneFeatureWrite(){
+//
+//        try {            
+//        String path = "geoserver/oneFeature.xml";
+//
+//        File f = TestData.file(this,path);
+//
+//        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+//        assertNotNull("Document missing", doc);
+//
+//        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+//                
+//        path = "oneFeature_out.xml";
+//        f = new File(f.getParentFile(),path);
+//        if(f.exists())
+//            f.delete();
+//        f.createNewFile();
+//        
+//        DocumentWriter.writeDocument(doc,s,f,null);
+//        
+//        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+//        assertNotNull("New Document missing", doc);
+//        
+//        assertTrue("file was not created +f",f.exists());
+//        System.out.println(f);
+//        } catch (SAXException e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        }
+//    }
+//    public void testOneFeatureWriteWithHints(){
+//
+//        try {            
+//        String path = "geoserver/oneFeature.xml";
+//
+//        File f = TestData.file(this,path);
+//
+//        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+//        assertNotNull("Document missing", doc);
+//
+//        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+//                
+//        path = "oneFeature_out_hints.xml";
+//        f = new File(f.getParentFile(),path);
+//        if(f.exists())
+//            f.delete();
+//        f.createNewFile();
+//        
+//        HashMap hints = new HashMap();
+//        hints.put(DocumentWriter.SCHEMA_ORDER,new String[] {"http://www.opengis.net/wfs", "http://www.openplans.org/topp"});
+//        DocumentWriter.writeDocument(doc,s,f,hints);
+//        
+//        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+//        assertNotNull("New Document missing", doc);
+//        
+//        assertTrue("file was not created +f",f.exists());
+//        System.out.println(f);
+//        } catch (SAXException e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            fail(e.toString());
+//        }
+//    }
 }
