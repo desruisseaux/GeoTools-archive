@@ -204,8 +204,8 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         } else if (filterType == GEOMETRY_BBOX) {
             Coordinate[] cr = right.getEnvelope().getCoordinates();
             Coordinate[] cl = left.getEnvelope().getCoordinates();
-
-            if (left.getDimension() >= 1) {
+            //if (left.getDimension() >= 1) {  Found bug here, see GEOT-186
+            if (cl.length > 1 && cr.length > 1) {
                 if ((cl[0].x >= cr[0].x) && (cl[2].x <= cr[2].x)
                         && (cl[0].y >= cr[0].y) && (cl[2].y <= cr[2].y)) {
                     // feature contained in the bbox
