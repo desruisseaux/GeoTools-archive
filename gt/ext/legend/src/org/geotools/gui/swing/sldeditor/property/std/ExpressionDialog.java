@@ -264,7 +264,7 @@ public class ExpressionDialog extends JDialog implements SLDEditor {
                 AttributeTypeFactory.newAttributeType("population", Long.class)
             };
 
-        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", "",
+        FeatureType ft = DefaultFeatureTypeFactory.newFeatureType(attributeTypes, "demo", null,
                 false, null, (GeometryAttributeType) geom);
         ExpressionDialog dialog = new ExpressionDialog((Frame) null, false, ft);
         dialog.show();
