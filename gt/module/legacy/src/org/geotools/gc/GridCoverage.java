@@ -76,6 +76,7 @@ import javax.media.jai.util.CaselessStringKey;
 import org.geotools.cs.AxisOrientation;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.ct.AbstractMathTransform;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
 import org.geotools.cv.Category;
@@ -94,6 +95,7 @@ import org.geotools.resources.image.ImageUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
+import org.geotools.coverage.AbstractCoverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.gc.GC_GridCoverage;
 import org.opengis.gc.GC_GridGeometry;
@@ -1658,5 +1660,31 @@ testLinear: for (int i=0; i<numBands; i++) {
         public Interpolation getInterpolation() throws RemoteException {
             return GridCoverage.this.getInterpolation();
         }
+    }
+
+    /**
+     * Mimic a GeoAPI interface as a legacy implementation. This method is provided
+     * as a temporary bridge for using new CRS object with J2D-Renderer for example.
+     */
+    public static GridCoverage fromGeoAPI(final org.opengis.coverage.grid.GridCoverage gc) {
+        if (gc instanceof GridCoverage) {
+            return (GridCoverage) gc;
+        }
+        final SampleDimension[] sd = new SampleDimension[gc.getNumSampleDimensions()];
+        for (int i=0; i<sd.length; i++) {
+            sd[i] = SampleDimension.fromGeoAPI(gc.getSampleDimension(i));
+        }
+        final Object name;
+        if (gc instanceof AbstractCoverage) {
+            name = ((AbstractCoverage) gc).getName();
+        } else {
+            name = gc;
+        }
+        return new GridCoverage(
+                name.toString(),
+                gc.getRenderableImage(0,1).createDefaultRendering(),
+                CoordinateSystem.fromGeoAPI(gc.getCoordinateReferenceSystem()),
+                AbstractMathTransform.fromGeoAPI(gc.getGridGeometry().getGridToCoordinateSystem()),
+                sd, null, null);
     }
 }

@@ -70,6 +70,15 @@ public final class FrameFactory {
      *
      * @param coverage The grid coverage to show.
      */
+    public static void show(final org.opengis.coverage.grid.GridCoverage coverage) {
+        show(GridCoverage.fromGeoAPI(coverage));
+    }
+
+    /**
+     * Show the given grid coverage as an image.
+     *
+     * @param coverage The grid coverage to show.
+     */
     public static void show(final GridCoverage coverage) {
         // Create the frame
         final JFrame frame = new JFrame(coverage.getName(JComponent.getDefaultLocale()));

@@ -496,4 +496,16 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
     public String toString() {
         return CoordinatePoint.toString(this, ord);
     }
+
+    /**
+     * Mimic a GeoAPI interface as a legacy implementation. This method is provided
+     * as a temporary bridge for using new CRS object with J2D-Renderer for example.
+     */
+    public static Envelope fromGeoAPI(final org.opengis.spatialschema.geometry.Envelope envelope) {
+        if (envelope instanceof Envelope) {
+            return (Envelope) envelope;
+        }
+        return new Envelope(envelope.getLowerCorner().getCoordinates(),
+                            envelope.getUpperCorner().getCoordinates());
+    }
 }

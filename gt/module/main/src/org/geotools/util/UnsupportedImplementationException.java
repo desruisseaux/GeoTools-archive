@@ -34,7 +34,7 @@ import org.geotools.resources.Utilities;
  */
 public class UnsupportedImplementationException extends UnsupportedOperationException {
     /**
-     * Construct an exception with the specified detail message.
+     * Constructs an exception with the specified detail message.
      *
      * @param message The detail message.
      */
@@ -43,12 +43,25 @@ public class UnsupportedImplementationException extends UnsupportedOperationExce
     }
 
     /**
-     * Construct an exception with an error message formatted for the specified class.
+     * Constructs an exception with an error message formatted for the specified class.
      *
      * @param classe The unexpected implementation class.
      */
     public UnsupportedImplementationException(final Class classe) {
         // TODO: Provides a localized message.
-        this(Utilities.getShortName(classe));
+        super(Utilities.getShortName(classe));
+    }
+
+    /**
+     * Constructs an exception with an error message formatted for the specified class
+     * and a cause.
+     *
+     * @param classe The unexpected implementation class.
+     * @param cause The cause for the exception.
+     */
+    public UnsupportedImplementationException(final Class classe, final Exception cause) {
+        // TODO: Provides a localized message.
+        super(Utilities.getShortName(classe));
+        initCause(cause); // TODO: use the constructor with cause arg. in J2E 1.5.
     }
 }

@@ -46,6 +46,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.util.UnsupportedImplementationException;
 import org.opengis.ct.CT_MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
@@ -727,6 +728,20 @@ public abstract class AbstractMathTransform implements MathTransform {
          */
         public String toString() {
             return "INVERSE_MT["+AbstractMathTransform.this+']';
+        }
+    }
+
+    /**
+     * Mimic a GeoAPI interface as a legacy implementation. This method is provided
+     * as a temporary bridge for using new CRS object with J2D-Renderer for example.
+     */
+    public static MathTransform fromGeoAPI(final org.opengis.referencing.operation.MathTransform mt)
+            throws UnsupportedImplementationException
+    {
+        try {
+            return MathTransformFactory.getDefault().createFromWKT(mt.toWKT());
+        } catch (org.opengis.referencing.FactoryException e) {
+            throw new UnsupportedImplementationException(mt.getClass(), e);
         }
     }
 }

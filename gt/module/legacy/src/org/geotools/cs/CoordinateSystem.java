@@ -32,6 +32,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.units.Unit;
+import org.geotools.util.UnsupportedImplementationException;
 import org.opengis.cs.CS_AxisInfo;
 import org.opengis.cs.CS_CoordinateSystem;
 import org.opengis.cs.CS_Unit;
@@ -307,5 +308,22 @@ public abstract class CoordinateSystem extends Info
     /** For compatibility with GeoAPI interfaces. */
     public org.opengis.metadata.extent.Extent getValidArea() {
         return null;
+    }
+
+    /**
+     * Mimic a GeoAPI interface as a legacy implementation. This method is provided
+     * as a temporary bridge for using new CRS object with J2D-Renderer for example.
+     */
+    public static CoordinateSystem fromGeoAPI(final CoordinateReferenceSystem crs)
+            throws UnsupportedImplementationException
+    {
+        if (crs instanceof CoordinateSystem) {
+            return (CoordinateSystem) crs;
+        }
+        try {
+            return CoordinateSystemFactory.getDefault().createFromWKT(crs.toWKT());
+        } catch (org.opengis.referencing.FactoryException e) {
+            throw new UnsupportedImplementationException(crs.getClass(), e);
+        }
     }
 }

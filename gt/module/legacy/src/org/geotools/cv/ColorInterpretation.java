@@ -190,9 +190,9 @@ public final class ColorInterpretation extends EnumeratedParameter {
         super(name, value);
         this.key = key;
     }
-    
+
     /**
-     * Return the enum for the specified value.
+     * Returns the enum for the specified value.
      * This method is provided for compatibility with
      * {@link org.opengis.cv.CV_ColorInterpretation}.
      *
@@ -206,7 +206,34 @@ public final class ColorInterpretation extends EnumeratedParameter {
     }
     
     /**
-     * Return the enum for the specified color model and band number.
+     * Returns the enum for the specified name.
+     */
+    public static ColorInterpretation getEnum(final String name) throws NoSuchElementException {
+        for (int i=0; i<ENUMS.length; i++) {
+            if (ENUMS[i].getName().equalsIgnoreCase(name)) {
+                return ENUMS[i];
+            }
+        }
+        throw new NoSuchElementException(name);
+    }
+
+    /**
+     * Return the enum for the specified value.
+     * This method is provided for compatibility with
+     * {@link org.opengis.coverage.ColorInterpretation}.
+     *
+     * @param  value The enum value.
+     * @return The enum for the specified value.
+     * @throws NoSuchElementException if there is no enum for the specified value.
+     */
+    public static ColorInterpretation getEnum(final org.opengis.coverage.ColorInterpretation value)
+            throws NoSuchElementException
+    {
+        return getEnum(value.name());
+    }
+
+    /**
+     * Returns the enum for the specified color model and band number.
      *
      * @param  model The color model.
      * @param  band  The band to query.

@@ -1468,4 +1468,37 @@ public class SampleDimension implements Serializable {
             throw new UnsupportedOperationException("Not yet implemented");
         }
     }
+
+    /**
+     * Mimic a GeoAPI interface as a legacy implementation. This method is provided
+     * as a temporary bridge for using new CRS object with J2D-Renderer for example.
+     */
+    public static SampleDimension fromGeoAPI(final org.opengis.coverage.SampleDimension sd) {
+        if (sd instanceof SampleDimension) {
+            return (SampleDimension) sd;
+        }
+        final int[][] palette = sd.getPalette();
+        final Color[] colors;
+        if (palette != null) {
+            colors = new Color[palette.length];
+            for (int i=0; i<colors.length; i++) {
+                // Assuming RGB. It will be checked in the constructor.
+                final int[] color = palette[i];
+                colors[i] = new Color(color[0], color[1], color[2]);
+            }
+        } else {
+            colors = null;
+        }
+        return new SampleDimension(sd.getDescription().toString(),
+                                   SampleDimensionType.getEnum(sd.getSampleDimensionType()),
+                                   ColorInterpretation.getEnum(sd.getColorInterpretation()),
+                                   colors,
+                                   sd.getCategoryNames(null),
+                                   sd.getNoDataValues(),
+                                   sd.getMinimumValue(),
+                                   sd.getMaximumValue(),
+                                   sd.getScale(),
+                                   sd.getOffset(),
+                                   null/*sd.getUnits()*/); // TODO
+    }
 }

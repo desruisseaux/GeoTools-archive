@@ -66,7 +66,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_BYTE
      */
     public static final SampleDimensionType BIT = new SampleDimensionType("BIT",
-            CV_SampleDimensionType.CV_1BIT, DataBuffer.TYPE_BYTE, (byte)1, false, false);
+            CV_SampleDimensionType.CV_1BIT, DataBuffer.TYPE_BYTE, (byte)1, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_1BIT);
 
     /**
      * 2 bits integers.
@@ -75,7 +76,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_BYTE
      */
     public static final SampleDimensionType DOUBLET = new SampleDimensionType("DOUBLET",
-            CV_SampleDimensionType.CV_2BIT, DataBuffer.TYPE_BYTE, (byte)2, false, false);
+            CV_SampleDimensionType.CV_2BIT, DataBuffer.TYPE_BYTE, (byte)2, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_2BITS);
 
     /**
      * 4 bits integers (also called "quartet" or "half-byte").
@@ -84,7 +86,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_BYTE
      */
     public static final SampleDimensionType NIBBLE = new SampleDimensionType("NIBBLE",
-            CV_SampleDimensionType.CV_4BIT, DataBuffer.TYPE_BYTE, (byte)4, false, false);
+            CV_SampleDimensionType.CV_4BIT, DataBuffer.TYPE_BYTE, (byte)4, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_4BITS);
 
     /**
      * Unsigned 8 bits integers.
@@ -93,7 +96,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_BYTE
      */
     public static final SampleDimensionType UBYTE = new SampleDimensionType("UBYTE",
-            CV_SampleDimensionType.CV_8BIT_U, DataBuffer.TYPE_BYTE, (byte)8, false, false);
+            CV_SampleDimensionType.CV_8BIT_U, DataBuffer.TYPE_BYTE, (byte)8, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_8BITS);
 
     /**
      * Signed 8 bits integers.
@@ -103,7 +107,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_BYTE
      */
     public static final SampleDimensionType BYTE = new SampleDimensionType("BYTE",
-            CV_SampleDimensionType.CV_8BIT_S, DataBuffer.TYPE_BYTE, (byte)8, true, false);
+            CV_SampleDimensionType.CV_8BIT_S, DataBuffer.TYPE_BYTE, (byte)8, true, false,
+            org.opengis.coverage.SampleDimensionType.SIGNED_8BITS);
 
     /**
      * Unsigned 16 bits integers.
@@ -113,7 +118,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_USHORT
      */
     public static final SampleDimensionType USHORT = new SampleDimensionType("USHORT",
-            CV_SampleDimensionType.CV_16BIT_U, DataBuffer.TYPE_USHORT, (byte)16, false, false);
+            CV_SampleDimensionType.CV_16BIT_U, DataBuffer.TYPE_USHORT, (byte)16, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_16BITS);
 
     /**
      * Signed 16 bits integers.
@@ -123,7 +129,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_SHORT
      */
     public static final SampleDimensionType SHORT = new SampleDimensionType("SHORT",
-            CV_SampleDimensionType.CV_16BIT_S, DataBuffer.TYPE_SHORT, (byte)16, true, false);
+            CV_SampleDimensionType.CV_16BIT_S, DataBuffer.TYPE_SHORT, (byte)16, true, false,
+            org.opengis.coverage.SampleDimensionType.SIGNED_16BITS);
 
     /**
      * Unsigned 32 bits integers.
@@ -132,7 +139,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_INT
      */
     public static final SampleDimensionType UINT = new SampleDimensionType("UINT",
-            CV_SampleDimensionType.CV_32BIT_U, DataBuffer.TYPE_INT, (byte)32, false, false);
+            CV_SampleDimensionType.CV_32BIT_U, DataBuffer.TYPE_INT, (byte)32, false, false,
+            org.opengis.coverage.SampleDimensionType.UNSIGNED_32BITS);
 
     /**
      * Signed 32 bits integers.
@@ -142,7 +150,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_INT
      */
     public static final SampleDimensionType INT = new SampleDimensionType("INT",
-            CV_SampleDimensionType.CV_32BIT_S, DataBuffer.TYPE_INT, (byte)32, true, false);
+            CV_SampleDimensionType.CV_32BIT_S, DataBuffer.TYPE_INT, (byte)32, true, false,
+            org.opengis.coverage.SampleDimensionType.SIGNED_32BITS);
 
     /**
      * Simple precision floating point numbers.
@@ -152,7 +161,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_FLOAT
      */
     public static final SampleDimensionType FLOAT = new SampleDimensionType("FLOAT",
-            CV_SampleDimensionType.CV_32BIT_REAL, DataBuffer.TYPE_FLOAT, (byte)32, true, true);
+            CV_SampleDimensionType.CV_32BIT_REAL, DataBuffer.TYPE_FLOAT, (byte)32, true, true,
+            org.opengis.coverage.SampleDimensionType.REAL_32BITS);
 
     /**
      * Double precision floating point numbers.
@@ -162,7 +172,8 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @see DataBuffer#TYPE_DOUBLE
      */
     public static final SampleDimensionType DOUBLE = new SampleDimensionType("DOUBLE",
-            CV_SampleDimensionType.CV_64BIT_REAL, DataBuffer.TYPE_DOUBLE, (byte)64, true, true);
+            CV_SampleDimensionType.CV_64BIT_REAL, DataBuffer.TYPE_DOUBLE, (byte)64, true, true,
+            org.opengis.coverage.SampleDimensionType.REAL_64BITS);
     
     /**
      * Color interpretation by value. Used to
@@ -205,16 +216,24 @@ public final class SampleDimensionType extends EnumeratedParameter {
     private final boolean real;
 
     /**
+     * The GeoAPI code.
+     */
+    private final org.opengis.coverage.SampleDimensionType geoAPI;
+
+    /**
      * Construct a new enum with the specified value.
      */
     private SampleDimensionType(final String  name,   final int     value,
                                 final int     type,   final byte    size,
-                                final boolean signed, final boolean real) {
+                                final boolean signed, final boolean real,
+                                org.opengis.coverage.SampleDimensionType geoAPI)
+    {
         super(name, value);
         this.type   = type;
         this.size   = size;
         this.signed = signed;
         this.real   = real;
+        this.geoAPI = geoAPI;
     }
     
     /**
@@ -228,6 +247,26 @@ public final class SampleDimensionType extends EnumeratedParameter {
      */
     public static SampleDimensionType getEnum(final int value) throws NoSuchElementException {
         if (value>=0 && value<ENUMS.length) return ENUMS[value];
+        throw new NoSuchElementException(String.valueOf(value));
+    }
+
+    /**
+     * Return the enum for the specified value.
+     * This method is provided for compatibility with
+     * {@link org.opengis.coverage.SampleDimensionType}.
+     *
+     * @param  value The enum value.
+     * @return The enum for the specified value.
+     * @throws NoSuchElementException if there is no enum for the specified value.
+     */
+    public static SampleDimensionType getEnum(final org.opengis.coverage.SampleDimensionType value)
+            throws NoSuchElementException
+    {
+        for (int i=0; i<ENUMS.length; i++) {
+            if (ENUMS[i].geoAPI.equals(value)) {
+                return ENUMS[i];
+            }
+        }
         throw new NoSuchElementException(String.valueOf(value));
     }
 
