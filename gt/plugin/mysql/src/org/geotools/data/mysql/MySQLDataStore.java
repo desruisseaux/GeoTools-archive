@@ -64,7 +64,7 @@ public class MySQLDataStore extends JDBCDataStore {
      * @see org.geotools.data.mysql.MySQLConnectionFactory
      */
     public MySQLDataStore(ConnectionPool connectionPool) throws IOException {
-        super(connectionPool);
+        this(connectionPool, null);
     }
 
     /**
@@ -75,7 +75,7 @@ public class MySQLDataStore extends JDBCDataStore {
      */
     public MySQLDataStore(ConnectionPool connectionPool, String databaseSchemaName)
         throws IOException {
-        super(connectionPool, databaseSchemaName);
+        this(connectionPool, databaseSchemaName, null);
     }
 
     /**
