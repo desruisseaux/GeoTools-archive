@@ -100,7 +100,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * <br><br>
  *
  * If a <code>"latitude_of_origin"</code> parameter is supplied and is not consistent with the
- * projection classification (for example a latitude different from ±90° for the polar case),
+ * projection classification (for example a latitude different from &plusmn;90° for the polar case),
  * then the oblique or polar case will be automatically inferred from the latitude. In other
  * words, the latitude of origin has precedence on the projection classification. If ommited,
  * then the default value is 90°N for <code>"Polar_Stereographic"</code> and 0° for

@@ -236,12 +236,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Converts latitudes expressed in degrees to radians. This method
-     * verifies that the latitude is within allowed limits (±90°).
+     * verifies that the latitude is within allowed limits (&plusmn;90°).
      * This method is useful to check the validity of projection parameters,
      * like {@link #setCentralLongitude}.
      *
      * @param  y Latitude, to check, in degrees.
-     * @param  edge <code>true</code> to accept latitudes of ±90°.
+     * @param  edge <code>true</code> to accept latitudes of &plusmn;90°.
      * @return Latitude in radians.
      * @throws IllegalArgumentException if the latitude is invalide.
      */
@@ -257,12 +257,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Converts longitudes expressed in degrees to radians. This method
-     * verifies that the longitue is within allowed limits (±180°).
+     * verifies that the longitue is within allowed limits (&plusmn;180°).
      * This method is used to check the validity of projection parameters,
      * like {@link #setCentralLongitude}.
      *
      * @param  x Longitude, to verify, in degrees.
-     * @param  edge <code>true</code> for accepting longitudes of ±180°.
+     * @param  edge <code>true</code> for accepting longitudes of &plusmn;180°.
      * @return Longitude in radians.
      * @throws IllegalArgumentException if a longitude is invalide.
      */
@@ -277,8 +277,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
 
     /**
-     * Makes sure that the specified longitude stay within ±180 degrees. This methpod should be
-     * invoked after {@link #centralMeridian} had been added or removed to <var>x</var>. This
+     * Makes sure that the specified longitude stay within &plusmn;180 degrees. This methpod should
+     * be invoked after {@link #centralMeridian} had been added or removed to <var>x</var>. This
      * method may add or substract an amount of 360° to <var>x</var>.
      *
      * As a special case, we do not check the range if no rotation were applied on <var>x</var>.

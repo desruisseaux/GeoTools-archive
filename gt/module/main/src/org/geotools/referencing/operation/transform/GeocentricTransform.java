@@ -478,8 +478,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        formatter.append(new ParameterValue("semi_major", a, SI.METER));
-        formatter.append(new ParameterValue("semi_minor", b, SI.METER));
+        formatter.appendParameter("semi_major", a, SI.METER);
+        formatter.appendParameter("semi_minor", b, SI.METER);
         return "Ellipsoid_To_Geocentric";
     }
     

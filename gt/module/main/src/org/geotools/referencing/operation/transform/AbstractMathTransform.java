@@ -228,20 +228,15 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
     
     /**
-     * Makes sure that the specified longitude stay within ±180 degrees. This methpod should be
-     * invoked after coordinates are transformed. This
-     * method may add or substract an amount of 360° to <var>x</var>.
+     * Makes sure that the specified longitude stay within &plusmn;&pi; radians. This methpod
+     * should be invoked after geographic coordinates are transformed. This method may add or
+     * substract some amount of 2&pi; radians to <var>x</var>.
      *
-     * @param  x The longitude.
-     * @return The longitude in the range +/- 180°.
+     * @param  x The longitude in radians.
+     * @return The longitude in the range &plusmn;&pi;.
      */
-    protected double ensureInRange(double x) {
-        if (x > Math.PI) {
-            x -= 2*Math.PI;
-        } else if (x < -Math.PI) {
-            x += 2*Math.PI;
-        }
-        return x;
+    protected static double ensureLongitudeInRange(final double x) {
+        return x + (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
     }
     
     /**
@@ -415,7 +410,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * une transformation affine si c'était demandée, puis retourne
          * une version si possible simplifiée de la forme géométrique.
          */
-        if (postTr!=null) {
+        if (postTr != null) {
             path.transform(postTr);
         }
         return ShapeUtilities.toPrimitive(path);

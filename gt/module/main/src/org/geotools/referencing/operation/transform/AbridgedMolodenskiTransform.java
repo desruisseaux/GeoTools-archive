@@ -21,7 +21,6 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
@@ -43,6 +42,7 @@ import org.geotools.referencing.Identifier;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+
 
 /**
  * The Abridged Molodensky transformation (EPSG code 9605) is a simplified version of the
@@ -70,13 +70,12 @@ import org.geotools.resources.cts.ResourceKeys;
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
- * @version $Id:$
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
 public class AbridgedMolodenskiTransform extends AbstractMathTransform implements Serializable {
-    
     /**
      * Serial number for interoperability with different versions.
      */
@@ -224,7 +223,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 dstPts[dstOff++] = 0.0;
                 dstPts[dstOff++] = (y > 0.0) ? 90.0 : -90.0;
             } else {
-                dstPts[dstOff++] = Math.toDegrees(ensureInRange(x));
+                dstPts[dstOff++] = Math.toDegrees(ensureLongitudeInRange(x));
                 dstPts[dstOff++] = Math.toDegrees(y);
             }
             if (target3D) {
@@ -273,7 +272,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
                 dstPts[dstOff++] = 0.0F;
                 dstPts[dstOff++] = (y > 0.0) ? 90.0F : -90.0F;
             } else {
-                dstPts[dstOff++] = (float) Math.toDegrees(ensureInRange(x));
+                dstPts[dstOff++] = (float) Math.toDegrees(ensureLongitudeInRange(x));
                 dstPts[dstOff++] = (float) Math.toDegrees(y);
             }
             if (target3D) {
@@ -347,14 +346,14 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.append("Abridged_Molodenski");
-        formatter.append(new ParameterValue("dim", getDimSource()));
-        formatter.append(new ParameterValue("dx", dx, SI.METER));
-        formatter.append(new ParameterValue("dy", dy, SI.METER));
-        formatter.append(new ParameterValue("dz", dz, SI.METER));
-        formatter.append(new ParameterValue("src_semi_major", a, SI.METER));
-        formatter.append(new ParameterValue("src_semi_minor", b, SI.METER));
-        formatter.append(new ParameterValue("tgt_semi_major", a+da, SI.METER));
-        formatter.append(new ParameterValue("tgt_semi_minor", b+db, SI.METER));
+        formatter.appendParameter("dim", getDimSource());
+        formatter.appendParameter("dx",             dx,   SI.METER);
+        formatter.appendParameter("dy",             dy,   SI.METER);
+        formatter.appendParameter("dz",             dz,   SI.METER);
+        formatter.appendParameter("src_semi_major", a,    SI.METER);
+        formatter.appendParameter("src_semi_minor", b,    SI.METER);
+        formatter.appendParameter("tgt_semi_major", a+da, SI.METER);
+        formatter.appendParameter("tgt_semi_minor", b+db, SI.METER);
         return super.formatWKT(formatter);
     }
     
@@ -364,7 +363,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
      * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
      * systems.
      *
-     * @version $Id:$
+     * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -433,19 +432,13 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          * Constructs a provider.
          */
         public Provider() {
-            this("Abridged_Molodenski", "9605");
-        }
-
-        /**
-         * Constructs a provider using the specified identifiers.
-         */
-        Provider(final String ogc, final String epsg) {
             super(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, null,  ogc),
-                new Identifier(Citation.EPSG,    "EPSG", epsg)},
+                new Identifier(Citation.OPEN_GIS, null,  "Abridged_Molodenski"),
+                new Identifier(Citation.EPSG,    "EPSG", "9605")},
                 3, 3, 
                 new OperationParameter[] {DIM, DX, DY, DZ,
-                    SRC_SEMI_MAJOR,SRC_SEMI_MINOR,TGT_SEMI_MAJOR,TGT_SEMI_MINOR});
+                                          SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
+                                          TGT_SEMI_MAJOR, TGT_SEMI_MINOR});
         }
         
         /**
@@ -456,18 +449,17 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
             return ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM;
         }
         
-        /** Creates a math transform from the specified group of parameter values.
+        /**
+         * Creates a math transform from the specified group of parameter values.
          *
          * @param  values The group of parameter values.
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
-         *
          */
-        protected MathTransform createMathTransform(ParameterValueGroup values) 
-            throws ParameterNotFoundException 
+        protected MathTransform createMathTransform(final ParameterValueGroup values) 
+                throws ParameterNotFoundException 
         {
-                return new AbridgedMolodenskiTransform(values);
+            return new AbridgedMolodenskiTransform(values);
         }
-        
     }
 }

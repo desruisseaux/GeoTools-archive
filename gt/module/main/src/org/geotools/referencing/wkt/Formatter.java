@@ -298,6 +298,9 @@ public class Formatter {
 
     /**
      * Append a {@linkplain ParameterValue parameter} in WKT form.
+     *
+     * @see #appendParameter(String, int)
+     * @see #appendParameter(String, double, Unit)
      */
     public void append(final GeneralParameterValue parameter) {
         if (parameter instanceof ParameterValueGroup) {
@@ -315,20 +318,82 @@ public class Formatter {
             if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
                 unit = contextualUnit;
             }
-            buffer.append("PARAMETER");
-            buffer.append(OPEN);
-            buffer.append(QUOTE);
-            buffer.append(descriptor.getName(locale));
-            buffer.append(QUOTE);
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
+            final String name = descriptor.getName(locale);
+            final String value;
             if (unit != null) {
-                buffer.append(param.doubleValue(unit));
+                value = String.valueOf(param.doubleValue(unit));
             } else {
-                buffer.append(param.getValue());
+                value = String.valueOf(param.getValue());
             }
-            buffer.append(CLOSE);
+            appendParameter(name, value);
         }
+    }
+
+    /**
+     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
+     *
+     * @param name The parameter name.
+     * @param value The parameter value.
+     *
+     * @see #append(GeneralParameterValue)
+     * @see #appendParameter(String, int)
+     * @see #appendParameter(String, double, Unit)
+     */
+    private void appendParameter(final String name, final String value) {
+        buffer.append("PARAMETER");
+        buffer.append(OPEN);
+        buffer.append(QUOTE);
+        buffer.append(name);
+        buffer.append(QUOTE);
+        buffer.append(SEPARATOR);
+        buffer.append(SPACE);
+        buffer.append(value);
+        buffer.append(CLOSE);
+    }
+
+    /**
+     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
+     *
+     * @param name The parameter name.
+     * @param value The parameter value.
+     *
+     * @see #append(GeneralParameterValue)
+     * @see #appendParameter(String, double, Unit)
+     */
+    public void appendParameter(final String name, final int value) {
+        appendParameter(name, String.valueOf(value));
+    }
+
+    /**
+     * Append the specified <code>name</code>, <code>value</code> pair as a parameter value.
+     *
+     * @param name  The parameter name.
+     * @param value The parameter value.
+     * @param unit  The units for the parameter value, or <code>null</code>.
+     *
+     * @see #append(GeneralParameterValue)
+     * @see #appendParameter(String, int)
+     */
+    public void appendParameter(final String name, final double value, final Unit unit) {
+        appendParameter(name, String.valueOf(value));
+    }
+
+    /**
+     * Append an integer number. A comma (or any other element
+     * separator) will be written before the number if needed.
+     */
+    public void append(final int number) {
+        appendSeparator(false);
+        buffer.append(number);
+    }
+
+    /**
+     * Append a floating point number. A comma (or any other element
+     * separator) will be written before the number if needed.
+     */
+    public void append(final double number) {
+        appendSeparator(false);
+        buffer.append(number);
     }
 
     /**
@@ -360,24 +425,6 @@ public class Formatter {
             }
             buffer.append(CLOSE);
         }
-    }
-
-    /**
-     * Append an integer number. A comma (or any other element
-     * separator) will be written before the number if needed.
-     */
-    public void append(final int number) {
-        appendSeparator(false);
-        buffer.append(number);
-    }
-
-    /**
-     * Append a floating point number. A comma (or any other element
-     * separator) will be written before the number if needed.
-     */
-    public void append(final double number) {
-        appendSeparator(false);
-        buffer.append(number);
     }
 
     /**

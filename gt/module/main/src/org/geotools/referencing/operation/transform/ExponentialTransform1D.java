@@ -306,11 +306,11 @@ public class ExponentialTransform1D extends AbstractMathTransform
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.append("Exponential");
-        formatter.append(new ParameterValue("base", base, null));
+        formatter.appendParameter("base", base, null);
         if (scale != 0) {
             // TODO: The following is NOT a parameter. For WKT formatting, we should decompose this
             //       LogarithmicTransform1D into a ConcatenatedTransform using a AffineTransform instead.
-            formatter.append(new ParameterValue("scale", scale, null));
+            formatter.appendParameter("scale", scale, null);
         }
         return "PARAM_MT";
     }

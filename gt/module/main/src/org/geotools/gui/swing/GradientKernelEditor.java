@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -266,7 +257,7 @@ public class GradientKernelEditor extends JComponent {
          * En utilisant l'identité 1/cos² = (1+tan²), on peut réécrire l'équation comme suit:
          *
          * <blockquote><pre>
-         *     1 / sqrt((x²+y²) * (1 + y²/x²))
+         *     x / (x²+y²)
          * </pre></blockquote>
          *
          * @param size Taille de la matrice. Doit être un nombre positif et impair.
@@ -282,7 +273,7 @@ public class GradientKernelEditor extends JComponent {
                 final int y2 = y*y;
                 for (int x=key; x!=0; x--) {
                     final int x2 = x*x;
-                    final float v = (float) (2/Math.sqrt((x2+y2)*(1+y2/(double)x2)));
+                    final float v = (float) (2.0*x / (x2+y2));
                     if (horizontal) {
                         data[row1-x] = data[row2-x] = -v;
                         data[row1+x] = data[row2+x] = +v;
