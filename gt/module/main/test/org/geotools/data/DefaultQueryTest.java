@@ -53,7 +53,7 @@ public class DefaultQueryTest extends TestCase {
         query.setPropertyNames((List)null);
         assertNull(query.getPropertyNames());
         
-        query = new DefaultQuery(Filter.NONE, new String[]{"foo", "wibble"});
+        query = new DefaultQuery( "Test", Filter.NONE, new String[]{"foo", "wibble"});
         assertNotNull(query.getPropertyNames());
     }
     
@@ -96,7 +96,7 @@ public class DefaultQueryTest extends TestCase {
         query.setFilter(Filter.ALL);
         assertEquals(Filter.ALL, query.getFilter());
         
-        query = new DefaultQuery(Filter.NONE);
+        query = new DefaultQuery( "test", Filter.NONE);
         assertEquals(Filter.NONE, query.getFilter());
     }
     
