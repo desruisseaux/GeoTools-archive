@@ -13,8 +13,10 @@ import javax.swing.WindowConstants;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.stream.StreamGridCoverageExchange;
 import org.geotools.gc.GridCoverage;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -32,6 +34,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
@@ -54,8 +57,9 @@ public class SpearfishSample {
         // URL demURL = (new java.io.File("/path/to/spearfish/dem")).toURL();
         // create the grid coverage reader
         URL url = ArcGridReader.class.getClassLoader().getResource("org/geotools/sampleData/spearfish_dem.asc.gz");
-        Format format = new org.geotools.data.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url);  //should this work also?
-        GridCoverageReader reader = format.getReader(url);
+        GridCoverageExchange gce = new StreamGridCoverageExchange();
+        GridCoverageReader reader = gce.getReader(url);
+        Format format = reader.getFormat();
         
         //get the parameters and set them
         ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
@@ -64,9 +68,6 @@ public class SpearfishSample {
         params.parameter( "GRASS" ).setValue( true );
         
         //read the grid
-        if (reader.hasMoreGridCoverages()) {                 //not yet implemented
-            System.out.println("Reader has a GC to read");   
-        }
         GridCoverage gcDem = reader.read( params );
         
         // ... roads
