@@ -112,6 +112,8 @@ public class sldComplexTypes2 {
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("FeatureTypeConstraint",
                 _FeatureTypeConstraint.getInstance(), null, 1, Element.UNBOUNDED)};
+        
+        private static int FEATURETYPOECONSTRAINT = 0;
     
         private static ElementGrouping child = new SequenceGT(
                 null,
@@ -191,6 +193,8 @@ public class sldComplexTypes2 {
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("Graphic",
                 _Graphic.getInstance(), null, 1, 1)};
+        
+        private static int GRAPHIC = 0;
     
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("Graphic", _Graphic
@@ -268,6 +272,8 @@ public class sldComplexTypes2 {
         private static Attribute[] attrs = null;
         private static Element[] elems = new Element[]{new sldElement("PerpendicularOffset",
                 ParameterValueType.getInstance(), null, 0, 1)};
+        
+        private static int PERPENDICULAROFFSET = 0;
     
         private static ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("PerpendicularOffset",
@@ -897,6 +903,11 @@ public class sldComplexTypes2 {
                         null, 1, 1),
                 new sldElement("AVERAGE", _AVERAGE.getInstance(), null, 1, 1),
                 new sldElement("RANDOM", _RANDOM.getInstance(), null, 1, 1)};
+        
+        private static int LATESTONTOP = 0;
+        private static int EARLIESTONTOP = 1;
+        private static int AVERAGE = 2;
+        private static int RANDOM = 3;
     
         private static ElementGrouping child = new ChoiceGT(elems);
     
@@ -985,6 +996,10 @@ public class sldComplexTypes2 {
                         0, 1),
                 new sldElement("Displacement", _Displacement.getInstance(), null,
                         0, 1)}, 1, 1);
+        
+        private static int ANCHOROINT = 0;
+        private static int DISPLACEMENT = 1;
+        private static int ROTATION = 2;
     
         private _PointPlacement() {
             super(null, child, attrs, elems, null, false, false);
@@ -1459,6 +1474,9 @@ public class sldComplexTypes2 {
                 new sldElement("Service", sldSimpleTypes._Service.getInstance(), null, 1, 1),
                 new sldElement("OnlineResource", _OnlineResource.getInstance(),
                         null, 1, 1)};
+        
+        private static int SERVICE = 0;
+        private static int ONLINERESOURCE = 1;
     
         private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("Service", sldSimpleTypes._Service.getInstance(), null, 1, 1),
@@ -1550,6 +1568,16 @@ public class sldComplexTypes2 {
                         .getInstance()/* simpleType name is double */, null, 0, 1),
                 new sldElement("Symbolizer", SymbolizerType.getInstance(), null, 1,
                         Element.UNBOUNDED)};
+        
+        private static int NAME = 0;
+        private static int TITLE = 1;
+        private static int ABSTRACT = 2;
+        private static int LEGENDGRAPHIC = 3;
+        private static int FILTER = 4;
+        private static int ELSEFILTER = 5;
+        private static int MINSCALEDENOMINATOR = 6;
+        private static int MAXSCALEDENOMINATOR = 7;
+        private static int SYMBOLIZER = 8;
     
         private static ElementGrouping child = new SequenceGT(
                 new ElementGrouping[]{
@@ -1639,6 +1667,9 @@ public class sldComplexTypes2 {
                         .getInstance()/* simpleType name is boolean */, null, 0, 1),
                 new sldElement("ReliefFactor", org.geotools.xml.xsi.XSISimpleTypes.Double
                         .getInstance()/* simpleType name is double */, null, 0, 1)};
+        
+        private static int BRIGHNESSONLY = 0;
+        private static int RELEIFFACTOR = 1;
     
         private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("BrightnessOnly", org.geotools.xml.xsi.XSISimpleTypes.Boolean
@@ -2179,6 +2210,12 @@ public class sldComplexTypes2 {
                         .getInstance()/* simpleType name is boolean */, null, 0, 1),
                 new sldElement("FeatureTypeStyle", _FeatureTypeStyle.getInstance(),
                         null, 1, Element.UNBOUNDED)};
+        
+        private static int NAME = 0;
+        private static int TITLE = 1;
+        private static int ABSTRACT = 2;
+        private static int ISDEFAULT = 3;
+        private static int FEATURETYPESTYLE = 4;
     
         private static ElementGrouping child = new SequenceGT(elems);
     

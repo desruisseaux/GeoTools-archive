@@ -43,14 +43,14 @@ import org.xml.sax.SAXException;
 public class sldComplexTypes {
 
     static class _Histogram extends sldComplexType {
-        private static ComplexType instance = new _Histogram();
+        private static final ComplexType instance = new _Histogram();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _Histogram() {
             super(null, child, attrs, elems, null, false, false);
@@ -115,23 +115,23 @@ public class sldComplexTypes {
         }
     }
     static class _ContrastEnhancement extends sldComplexType {
-        private static ComplexType instance = new _ContrastEnhancement();
+        private static final ComplexType instance = new _ContrastEnhancement();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("Normalize", _Normalize.getInstance(), null, 1, 1),
                 new sldElement("Histogram", sldComplexTypes._Histogram.getInstance(), null, 1, 1),
                 new sldElement("GammaValue", org.geotools.xml.xsi.XSISimpleTypes.Double
                         .getInstance()/* simpleType name is double */, null, 0, 1)};
         
-        private static int NORMALIZE = 0;
-        private static int HISTORGRAM = 1;
-        private static int GAMMAVALUE = 2;
+        private static final int NORMALIZE = 0;
+        private static final int HISTORGRAM = 1;
+        private static final int GAMMAVALUE = 2;
 
-        private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
+        private static final ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new ChoiceGT(null, 0, 1, new ElementGrouping[]{elems[0], elems[1]}),
                 new sldElement("GammaValue", org.geotools.xml.xsi.XSISimpleTypes.Double
                         .getInstance()/* simpleType name is double */, null, 0, 1)}, 1, 1);
@@ -216,7 +216,7 @@ public class sldComplexTypes {
         }
     }
     static class _Displacement extends sldComplexType {
-        private static ComplexType instance = new _Displacement();
+        private static final ComplexType instance = new _Displacement();
         public static ComplexType getInstance() {
             return instance;
         }
@@ -233,18 +233,21 @@ public class sldComplexTypes {
             // TODO fill me in
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("DisplacementX", ParameterValueType.getInstance(),
                         null, 1, 1),
                 new sldElement("DisplacementY", ParameterValueType.getInstance(),
                         null, 1, 1)};
 
-        private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
+        private static final ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("DisplacementX", ParameterValueType.getInstance(),
                         null, 1, 1),
                 new sldElement("DisplacementY", ParameterValueType.getInstance(),
                         null, 1, 1)}, 1, 1);
+        
+        private static final int DISPLACEMENTX = 0;
+        private static final int DISPLACEMENTY = 0;
 
         private _Displacement() {
             super(null, child, attrs, elems, null, false, false);
@@ -297,19 +300,19 @@ public class sldComplexTypes {
         }
     }
     static class _Geometry extends sldComplexType {
-        private static ComplexType instance = new _Geometry();
+        private static final ComplexType instance = new _Geometry();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{new sldElement("PropertyName",
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{new sldElement("PropertyName",
                 org.geotools.xml.filter.FilterComplexTypes.PropertyNameType.getInstance(), null, 1, 1)};
         
         // array positions
-        private static int PROPERTYNAME = 0;
+        private static final int PROPERTYNAME = 0;
 
-        private static ElementGrouping child = new SequenceGT(elems);
+        private static final ElementGrouping child = new SequenceGT(elems);
 
         private _Geometry() {
             super(null, child, attrs, elems, null, false, false);
@@ -388,24 +391,27 @@ public class sldComplexTypes {
         }
     }
     static class _ExternalGraphic extends sldComplexType {
-        private static ComplexType instance = new _ExternalGraphic();
+        private static final ComplexType instance = new _ExternalGraphic();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("OnlineResource", _OnlineResource.getInstance(),
                         null, 1, 1),
                 new sldElement("Format", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 1, 1)};
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{
                         new sldElement("OnlineResource", _OnlineResource
                                 .getInstance(), null, 1, 1),
                         new sldElement("Format", org.geotools.xml.xsi.XSISimpleTypes.String
                                 .getInstance()/* simpleType name is string */, null, 1, 1)}, 1, 1);
 
+        private static final int ONLINERESOURCE = 0;
+        private static final int FORMAT = 1;
+        
         private _ExternalGraphic() {
             super(null, child, attrs, elems, null, false, false);
         }
@@ -469,15 +475,17 @@ public class sldComplexTypes {
         }
     }
     static class _GraphicStroke extends sldComplexType {
-        private static ComplexType instance = new _GraphicStroke();
+        private static final ComplexType instance = new _GraphicStroke();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{new sldElement("Graphic", null, null, 1, 1)};
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{new sldElement("Graphic", null, null, 1, 1)};
+        
+        private static final int GRAPHIC = 0;
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("Graphic", null, null, 1, 1)}, 1, 1);
 
         private _GraphicStroke() {
@@ -543,19 +551,21 @@ public class sldComplexTypes {
         }
     }
     static class _CssParameter extends sldComplexType {
-        private static ComplexType instance = new _CssParameter();
+        private static final ComplexType instance = new _CssParameter();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = new Attribute[]{new AttributeGT(null, "name",
+        private static final Attribute[] attrs = new Attribute[]{new AttributeGT(null, "name",
                 sldSchema.NAMESPACE, org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(),
                 Attribute.REQUIRED, null, null, false)};
 
-        private static Element[] elems = new Element[]{new sldElement("expression",
+        private static final Element[] elems = new Element[]{new sldElement("expression",
                 org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null, 1, 1)};
+        
+        private static final int EXPRESSION = 0;
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("expression",
                         org.geotools.xml.filter.FilterComplexTypes.ExpressionType.getInstance(), null, 1, 1)}, 0, Element.UNBOUNDED);
 
@@ -623,13 +633,13 @@ public class sldComplexTypes {
         }
     }
     static class _Graphic extends sldComplexType {
-        private static ComplexType instance = new _Graphic();
+        private static final ComplexType instance = new _Graphic();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("ExternalGraphic", sldComplexTypes._ExternalGraphic.getInstance(),
                         null, 1, 1),
                 new sldElement("Mark", _Mark.getInstance(), null, 1, 1),
@@ -640,11 +650,11 @@ public class sldComplexTypes {
                         0, 1)};
 
         // array positions
-        private static int EXTERNALGRAPHIC = 0;
-        private static int MARK = 0;
-        private static int OPACITY = 0;
-        private static int SIZE = 0;
-        private static int ROTATION = 0;
+        private static final int EXTERNALGRAPHIC = 0;
+        private static final int MARK = 0;
+        private static final int OPACITY = 0;
+        private static final int SIZE = 0;
+        private static final int ROTATION = 0;
 
         
         /**
@@ -657,7 +667,7 @@ public class sldComplexTypes {
         public Class getInstanceType() {
             return Graphic.class;
         }
-        private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
+        private static final ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new ChoiceGT(null, 0, Element.UNBOUNDED, new ElementGrouping[]{
                         new sldElement("ExternalGraphic", sldComplexTypes._ExternalGraphic
                                 .getInstance(), null, 1, 1),
@@ -744,16 +754,18 @@ public class sldComplexTypes {
         }
     }
     static class _GraphicFill extends sldComplexType {
-        private static ComplexType instance = new _GraphicFill();
+        private static final ComplexType instance = new _GraphicFill();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{new sldElement("Graphic",
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{new sldElement("Graphic",
                 sldComplexTypes._Graphic.getInstance(), null, 1, 1)};
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final int GRPAHIC = 0;
+        
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("Graphic", sldComplexTypes._Graphic
                         .getInstance(), null, 1, 1)}, 1, 1);
 
@@ -819,26 +831,26 @@ public class sldComplexTypes {
         }
     }
     static class _Fill extends sldComplexType {
-        private static ComplexType instance = new _Fill();
+        private static final ComplexType instance = new _Fill();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("GraphicFill", sldComplexTypes._GraphicFill.getInstance(), null, 0,
                         1),
                 new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null,
                         0, Element.UNBOUNDED)};
 
-        private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
+        private static final ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("GraphicFill", sldComplexTypes._GraphicFill.getInstance(), null, 0,
                         1),
                 new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null,
                         0, Element.UNBOUNDED)}, 1, 1);
         
-        private static int GRAPHICFILL = 0;
-        private static int CSSPARAMETER = 1; 
+        private static final int GRAPHICFILL = 0;
+        private static final int CSSPARAMETER = 1; 
 
         private _Fill() {
             super(null, child, attrs, elems, null, false, false);
@@ -918,12 +930,12 @@ public class sldComplexTypes {
         }
     }
     static class _ColorMapEntry extends sldComplexType {
-        private static ComplexType instance = new _ColorMapEntry();
+        private static final ComplexType instance = new _ColorMapEntry();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = new Attribute[]{
+        private static final Attribute[] attrs = new Attribute[]{
                 new AttributeGT(null, "color", sldSchema.NAMESPACE, 
                         org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), 
                         Attribute.REQUIRED, null, null, false),
@@ -938,8 +950,8 @@ public class sldComplexTypes {
                         -1, null, null, false)
                 };
 
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _ColorMapEntry() {
             super(null, child, attrs, elems, null, false, false);
@@ -1004,14 +1016,14 @@ public class sldComplexTypes {
         }
     }
     static class _LATEST_ON_TOP extends sldComplexType {
-        private static ComplexType instance = new _LATEST_ON_TOP();
+        private static final ComplexType instance = new _LATEST_ON_TOP();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _LATEST_ON_TOP() {
             super(null, child, attrs, elems, null, false, false);
@@ -1076,17 +1088,20 @@ public class sldComplexTypes {
         }
     }
     static class _Extent extends sldComplexType {
-        private static ComplexType instance = new _Extent();
+        private static final ComplexType instance = new _Extent();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("Name", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 1, 1),
                 new sldElement("Value", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 1, 1)};
+        
+        private static final int NAME = 0;
+        private static final int VALUE = 1;
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{
                         new sldElement("Name", org.geotools.xml.xsi.XSISimpleTypes.String
                                 .getInstance()/* simpleType name is string */, null, 1, 1),
@@ -1156,20 +1171,24 @@ public class sldComplexTypes {
         }
     }
     static class _FeatureTypeConstraint extends sldComplexType {
-        private static ComplexType instance = new _FeatureTypeConstraint();
+        private static final ComplexType instance = new _FeatureTypeConstraint();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("FeatureTypeName", org.geotools.xml.xsi.XSISimpleTypes.String
                         .getInstance()/* simpleType name is string */, null, 0, 1),
                 new sldElement("Filter", org.geotools.xml.filter.FilterOpsComplexTypes.FilterType
                         .getInstance()/* complexType name is FilterType */, null, 0, 1),
                 new sldElement("Extent", sldComplexTypes._Extent.getInstance(), null, 0, Element.UNBOUNDED)};
 
-        private static ElementGrouping child = new SequenceGT(elems);
+        private static final int FEATURETYPENAME = 0;
+        private static final int FILTER = 1;
+        private static final int EXTENT = 2;
+        
+        private static final ElementGrouping child = new SequenceGT(elems);
 
         private _FeatureTypeConstraint() {
             super(null, child, attrs, elems, null, false, false);
@@ -1234,13 +1253,13 @@ public class sldComplexTypes {
         }
     }
     static class _ChannelSelection extends sldComplexType {
-        private static ComplexType instance = new _ChannelSelection();
+        private static final ComplexType instance = new _ChannelSelection();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("RedChannel", SelectedChannelType.getInstance(),
                         null, 1, 1),
                 new sldElement("GreenChannel", SelectedChannelType.getInstance(),
@@ -1249,8 +1268,13 @@ public class sldComplexTypes {
                         null, 1, 1),
                 new sldElement("GrayChannel", SelectedChannelType.getInstance(),
                         null, 1, 1)};
+        
+        private static final int REDCHANNEL = 0;
+        private static final int GREENCHANNEL = 0;
+        private static final int BLUECHANNEL = 0;
+        private static final int GRAYCHANNEL = 0;
 
-        private static ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
+        private static final ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
                 new SequenceGT(null, new ElementGrouping[]{
                         new sldElement("RedChannel", SelectedChannelType
                                 .getInstance(), null, 1, 1),
@@ -1324,16 +1348,18 @@ public class sldComplexTypes {
         }
     }
     static class _Font extends sldComplexType {
-        private static ComplexType instance = new _Font();
+        private static final ComplexType instance = new _Font();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{new sldElement("CssParameter",
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{new sldElement("CssParameter",
                 sldComplexTypes._CssParameter.getInstance(), null, 0, Element.UNBOUNDED)};
+        
+        private static final int CSSPARAMETER = 0;
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{new sldElement("CssParameter", sldComplexTypes._CssParameter
                         .getInstance(), null, 0, Element.UNBOUNDED)}, 1, 1);
 
@@ -1400,14 +1426,14 @@ public class sldComplexTypes {
         }
     }
     static class _ElseFilter extends sldComplexType {
-        private static ComplexType instance = new _ElseFilter();
+        private static final ComplexType instance = new _ElseFilter();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _ElseFilter() {
             super(null, child, attrs, elems, null, false, false);
@@ -1472,13 +1498,13 @@ public class sldComplexTypes {
         }
     }
     static class _FeatureTypeStyle extends sldComplexType {
-        private static ComplexType instance = new _FeatureTypeStyle();
+        private static final ComplexType instance = new _FeatureTypeStyle();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("Name", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 0, 1),
                 new sldElement("Title", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 0, 1),
                 new sldElement("Abstract", org.geotools.xml.xsi.XSISimpleTypes.String.getInstance(), null, 0, 1),
@@ -1487,8 +1513,15 @@ public class sldComplexTypes {
                 new sldElement("SemanticTypeIdentifier", org.geotools.xml.xsi.XSISimpleTypes.String
                         .getInstance()/* simpleType name is string */, null, 0, Element.UNBOUNDED),
                 new sldElement("Rule", _Rule.getInstance(), null, 1, Element.UNBOUNDED)};
+        
+        private static final int NAME = 0;
+        private static final int TITLE = 1;
+        private static final int ABSTRACT = 2;
+        private static final int FEATURETYPENAME = 3;
+        private static final int SEMANTICTYPEIDENTIFIER = 4;
+        private static final int RULE = 5;
 
-        private static ElementGrouping child = new SequenceGT(elems);
+        private static final ElementGrouping child = new SequenceGT(elems);
 
         private _FeatureTypeStyle() {
             super(null, child, attrs, elems, null, false, false);
@@ -1553,19 +1586,22 @@ public class sldComplexTypes {
         }
     }
     static class _AnchorPoint extends sldComplexType {
-        private static ComplexType instance = new _AnchorPoint();
+        private static final ComplexType instance = new _AnchorPoint();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("AnchorPointX", ParameterValueType.getInstance(),
                         null, 1, 1),
                 new sldElement("AnchorPointY", ParameterValueType.getInstance(),
                         null, 1, 1)};
+        
+        private static final int ANCHORPOINTX = 0;
+        private static final int ANCHORPOINTY = 1;
 
-        private static ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
+        private static final ElementGrouping child = new SequenceGT(null, new ElementGrouping[]{
                 new sldElement("AnchorPointX", ParameterValueType.getInstance(),
                         null, 1, 1),
                 new sldElement("AnchorPointY", ParameterValueType.getInstance(),
@@ -1634,14 +1670,14 @@ public class sldComplexTypes {
         }
     }
     static class _EARLIEST_ON_TOP extends sldComplexType {
-        private static ComplexType instance = new _EARLIEST_ON_TOP();
+        private static final ComplexType instance = new _EARLIEST_ON_TOP();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _EARLIEST_ON_TOP() {
             super(null, child, attrs, elems, null, false, false);
@@ -1706,23 +1742,26 @@ public class sldComplexTypes {
         }
     }
     static class _LabelPlacement extends sldComplexType {
-        private static ComplexType instance = new _LabelPlacement();
+        private static final ComplexType instance = new _LabelPlacement();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("PointPlacement", _PointPlacement.getInstance(),
                         null, 1, 1),
                 new sldElement("LinePlacement", _LinePlacement.getInstance(), null,
                         1, 1)};
 
-        private static ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
+        private static final ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
                 new sldElement("PointPlacement", _PointPlacement.getInstance(),
                         null, 1, 1),
                 new sldElement("LinePlacement", _LinePlacement.getInstance(), null,
                         1, 1)});
+        
+        private static final int POINTPLACEMENT = 0;
+        private static final int LINEPLACEMENT = 1;
 
         private _LabelPlacement() {
             super(null, child, attrs, elems, null, false, false);
@@ -1787,22 +1826,25 @@ public class sldComplexTypes {
         }
     }
     static class _Halo extends sldComplexType {
-        private static ComplexType instance = new _Halo();
+        private static final ComplexType instance = new _Halo();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("Radius", ParameterValueType.getInstance(), null, 0,
                         1), new sldElement("Fill", sldComplexTypes._Fill.getInstance(), null, 0, 1)};
 
-        private static ElementGrouping child = new SequenceGT(null,
+        private static final ElementGrouping child = new SequenceGT(null,
                 new ElementGrouping[]{
                         new sldElement("Radius", ParameterValueType.getInstance(),
                                 null, 0, 1),
                         new sldElement("Fill", sldComplexTypes._Fill.getInstance(), null, 0, 1)},
                 1, 1);
+        
+        private static final int RADIUS = 0;
+        private static final int FILL = 0;
 
         private _Halo() {
             super(null, child, attrs, elems, null, false, false);
@@ -1867,14 +1909,14 @@ public class sldComplexTypes {
         }
     }
     static class _AVERAGE extends sldComplexType {
-        private static ComplexType instance = new _AVERAGE();
+        private static final ComplexType instance = new _AVERAGE();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = null;
-        private static ElementGrouping child = new SequenceGT(null);
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = null;
+        private static final ElementGrouping child = new SequenceGT(null);
 
         private _AVERAGE() {
             super(null, child, attrs, elems, null, false, false);
@@ -1939,19 +1981,22 @@ public class sldComplexTypes {
         }
     }
     static class _ImageOutline extends sldComplexType {
-        private static ComplexType instance = new _ImageOutline();
+        private static final ComplexType instance = new _ImageOutline();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{
                 new sldElement("LineSymbolizer", _LineSymbolizer.getInstance(),
                         null, 1, 1),
                 new sldElement("PolygonSymbolizer", _PolygonSymbolizer
                         .getInstance(), null, 1, 1)};
+        
+        private static final int LINESYMBOLIZER = 0;
+        private static final int POLYGONSYBOLIZER = 1;
 
-        private static ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
+        private static final ElementGrouping child = new ChoiceGT(null, 1, 1, new ElementGrouping[]{
                 new sldElement("LineSymbolizer", _LineSymbolizer.getInstance(),
                         null, 1, 1),
                 new sldElement("PolygonSymbolizer", _PolygonSymbolizer
@@ -2020,16 +2065,18 @@ public class sldComplexTypes {
         }
     }
     static class _ColorMap extends sldComplexType {
-        private static ComplexType instance = new _ColorMap();
+        private static final ComplexType instance = new _ColorMap();
         public static ComplexType getInstance() {
             return instance;
         }
 
-        private static Attribute[] attrs = null;
-        private static Element[] elems = new Element[]{new sldElement("ColorMapEntry",
+        private static final Attribute[] attrs = null;
+        private static final Element[] elems = new Element[]{new sldElement("ColorMapEntry",
                 sldComplexTypes._ColorMapEntry.getInstance(), null, 1, 1)};
+        
+        private static final int COLORMAPENTRY = 0;
 
-        private static ElementGrouping child = new ChoiceGT(null, 0, Element.UNBOUNDED,
+        private static final ElementGrouping child = new ChoiceGT(null, 0, Element.UNBOUNDED,
                 new ElementGrouping[]{new sldElement("ColorMapEntry",
                         sldComplexTypes._ColorMapEntry.getInstance(), null, 1, 1)});
 
