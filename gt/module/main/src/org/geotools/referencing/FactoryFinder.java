@@ -35,6 +35,7 @@ import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
 import org.geotools.cs.NoSuchAuthorityCodeException;
+import org.geotools.feature.FeatureType;
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.Arguments;
@@ -233,6 +234,11 @@ public final class FactoryFinder {
     		return env;
         MathTransform transform=getCoordinateOperationFactory().createOperation(crs, GeographicCRS.WGS84).getMathTransform();
         return transform(env, transform);
+    }
+    
+    public static FeatureType transform(FeatureType ft, CoordinateReferenceSystem crs){
+        // TODO fill me in
+        return null;
     }
     
     /**
