@@ -233,6 +233,8 @@ public class ProcessStep extends MetadataEntity
 
     /**
      * Returns a string representation of this process step.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(description);

@@ -159,6 +159,8 @@ public class Series extends MetadataEntity
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(name);

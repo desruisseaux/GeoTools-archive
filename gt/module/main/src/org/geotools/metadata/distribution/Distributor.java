@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.Collections;
 
 // OpenGIS direct dependencies
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.distribution.StandardOrderProcess;
@@ -92,7 +91,7 @@ public class Distributor extends MetadataEntity
      * Party from whom the resource may be obtained. This list need not be exhaustive.
      */
     public ResponsibleParty getDistributorContact() {
-        return this.distributorContact;
+        return distributorContact;
     }
 
     /**
@@ -100,7 +99,7 @@ public class Distributor extends MetadataEntity
      */
     public synchronized void setDistributorContact(final ResponsibleParty newValue) {
         checkWritePermission();
-        this.distributorContact = newValue;
+        distributorContact = newValue;
     }
 
     /**
@@ -210,6 +209,8 @@ public class Distributor extends MetadataEntity
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(distributorContact);

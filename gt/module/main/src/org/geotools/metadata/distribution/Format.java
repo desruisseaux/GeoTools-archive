@@ -106,8 +106,8 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      * Set the name of the data transfer format(s).
      */
     public synchronized void setName(final InternationalString newValue) {
-        checkWritePermission();
-         this.name = newValue;
+         checkWritePermission();
+         name = newValue;
      }
 
     /**
@@ -122,7 +122,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setVersion(final InternationalString newValue) {
         checkWritePermission();
-        this.version = newValue;
+        version = newValue;
     }
 
     /**
@@ -137,7 +137,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setAmendmentNumber(final InternationalString newValue) {
         checkWritePermission();
-        this.amendmentNumber = newValue;
+        amendmentNumber = newValue;
     }
 
     /**
@@ -152,7 +152,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setSpecification(final InternationalString newValue) {
         checkWritePermission();
-        this.specification = newValue;
+        specification = newValue;
     }
 
     /**
@@ -169,7 +169,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setFileDecompressionTechnique(final InternationalString newValue) {
         checkWritePermission();
-        this.fileDecompressionTechnique = newValue;        
+        fileDecompressionTechnique = newValue;        
     }
 
     /**
@@ -241,6 +241,8 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(name);

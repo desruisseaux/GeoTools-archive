@@ -228,8 +228,8 @@ public class Source extends MetadataEntity
                    Utilities.equals(this.sourceReferenceSystem, that.sourceReferenceSystem ) &&
                    Utilities.equals(this.sourceCitation,        that.sourceCitation        ) &&
                    Utilities.equals(this.sourceExtents,         that.sourceExtents         ) &&
-                   Utilities.equals(this.sourceSteps,           that.sourceSteps           )  &&
-                   (this.scaleDenominator                    == that.scaleDenominator      );
+                   Utilities.equals(this.sourceSteps,           that.sourceSteps           ) &&
+                                   (this.scaleDenominator    == that.scaleDenominator      );
         }
         return false;
     }
@@ -249,6 +249,8 @@ public class Source extends MetadataEntity
 
     /**
      * Returns a string representation of this source.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(description);

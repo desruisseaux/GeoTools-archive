@@ -20,31 +20,64 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.maintenance;
+package org.geotools.metadata.extent;
+
+// OpenGIS direct dependencies
+import org.opengis.spatialschema.geometry.Geometry;
 
 // Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
+import org.geotools.metadata.extent.GeographicExtent;
+import org.geotools.resources.Utilities;
 
 
 /**
- * Description of the class of information covered by the information.
+ * Boundary enclosing the dataset, expressed as the closed set of
+ * (<var>x</var>,<var>y</var>) coordinates of the polygon. The last
+ * point replicates first point.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class ScopeDescription extends MetadataEntity
-       implements org.opengis.metadata.maintenance.ScopeDescription
+public class BoundingPolygon extends GeographicExtent
+       implements org.opengis.metadata.extent.BoundingPolygon
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -5671299759930976286L;
+    private static final long serialVersionUID = 8174011874910887918L;
 
     /**
-     * Creates an initially empty scope description.
+     * The sets of points defining the bounding polygon.
      */
-    public ScopeDescription() {
+    private Geometry polygon;
+
+    /**
+     * Construct an initially empty bounding polygon.
+     */
+    public BoundingPolygon() {
+    }
+
+    /**
+     * Creates a bounding polygon initialized to the specified value.
+     */
+    public BoundingPolygon(final Geometry polygon) {
+        this.polygon = polygon;
+    }
+
+    /**
+     * Returns the sets of points defining the bounding polygon.
+     */
+    public Geometry getPolygon() {
+        return polygon;
+    }
+
+    /**
+     * Returns the sets of points defining the bounding polygon.
+     */
+    public synchronized void setPolygon(final Geometry newValue) {
+        checkWritePermission();
+        polygon = newValue;
     }
     
     /**
@@ -52,39 +85,38 @@ public class ScopeDescription extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
+        polygon = (Geometry) unmodifiable(polygon);
     }
 
     /**
-     * Compare this scope description with the specified object for equality.
+     * Compare this bounding polygon with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeDescription that = (ScopeDescription) object;
-            // TODO once method in ScopeDescription will be defined.
-            return true;
+            final BoundingPolygon that = (BoundingPolygon) object;
+            return Utilities.equals(this.polygon, that.polygon)  ;
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this maintenance information.
+     * Returns a hash code value for this bounding polygon.
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        // TODO once method in ScopeDescription will be defined.
+        if (polygon != null) code ^= polygon.hashCode();
         return code;
     }
 
     /**
-     * Returns a string representation of this maintenance information.
+     * Returns a string representation of this bounding polygon.
      *
      * @todo Provides a more elaborated implementation.
      */
-    public synchronized String toString() {
-        // TODO once method in ScopeDescription will be defined.
-        return "";
-    }
+    public String toString() {
+        return String.valueOf(polygon);
+    }    
 }

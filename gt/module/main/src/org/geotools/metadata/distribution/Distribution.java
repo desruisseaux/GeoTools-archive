@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.Collections;
 
 // OpenGIS direct dependencies
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
@@ -179,6 +178,8 @@ public class Distribution extends MetadataEntity
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(distributionFormats);

@@ -25,9 +25,6 @@ package org.geotools.metadata.content;
 // J2SE extensions
 import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 

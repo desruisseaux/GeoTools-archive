@@ -165,7 +165,7 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
             final Lineage that = (Lineage) object;
             return Utilities.equals(this.statement,    that.statement    ) &&
                    Utilities.equals(this.processSteps, that.processSteps ) &&
-                   Utilities.equals(this.sources,      that.sources      )  ;
+                   Utilities.equals(this.sources,      that.sources      );
         }
         return false;
     }
@@ -183,6 +183,8 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
 
     /**
      * Returns a string representation of this lineage.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(statement);

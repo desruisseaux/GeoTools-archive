@@ -510,6 +510,8 @@ public class Citation extends MetadataEntity
 
     /**
      * Returns a string representation of this citation.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(title);

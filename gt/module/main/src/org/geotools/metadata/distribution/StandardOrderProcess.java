@@ -89,7 +89,7 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
      */
     public synchronized void setFees(final InternationalString newValue) {
         checkWritePermission();
-        this.fees = newValue;
+        fees = newValue;
     }
 
     /**
@@ -105,7 +105,7 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
      */
     public synchronized void setPlannedAvailableDateTime(final Date newValue) {
         checkWritePermission();
-        this.plannedAvailableDateTime = (newValue!=null) ? newValue.getTime() : Long.MIN_VALUE;
+        plannedAvailableDateTime = (newValue!=null) ? newValue.getTime() : Long.MIN_VALUE;
     }
 
     /**
@@ -120,7 +120,7 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
      */
     public synchronized void setOrderingInstructions(final InternationalString newValue) {
         checkWritePermission();
-        this.orderingInstructions = newValue;
+        orderingInstructions = newValue;
     }
 
     /**
@@ -135,7 +135,7 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
      */
     public synchronized void setTurnaround(final InternationalString newValue) {
         checkWritePermission();
-        this.turnaround = newValue;
+        turnaround = newValue;
     }
     
     /**
@@ -157,10 +157,10 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final StandardOrderProcess that = (StandardOrderProcess) object;
-            return Utilities.equals(this.fees,                     that.fees                    ) &&
-                                 (this.plannedAvailableDateTime == that.plannedAvailableDateTime) &&
-                   Utilities.equals(this.orderingInstructions,     that.orderingInstructions    ) &&
-                   Utilities.equals(this.turnaround,               that.turnaround              ) ;
+            return Utilities.equals(fees,                       that.fees                    ) &&
+                                   (plannedAvailableDateTime == that.plannedAvailableDateTime) &&
+                   Utilities.equals(orderingInstructions,       that.orderingInstructions    ) &&
+                   Utilities.equals(turnaround,                 that.turnaround              ) ;
         }
         return false;
     }
@@ -178,6 +178,8 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(orderingInstructions);

@@ -20,55 +20,62 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.content;
+package org.geotools.metadata.extent;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
+// OpenGIS direct dependencies
+import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
+import org.geotools.metadata.extent.GeographicExtent;
 import org.geotools.resources.Utilities;
 
 
 /**
- * Location of the responsible individual or organization.
+ * Description of the geographic area using identifiers.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class RangeDimension extends MetadataEntity
-       implements org.opengis.metadata.content.ContentInformation
+public class GeographicDescription extends GeographicExtent
+       implements org.opengis.metadata.extent.GeographicDescription
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 4365956866782010460L;
+    private static final long serialVersionUID = 7250161161099782176L;
 
     /**
-     * Description of the range of a cell measurement value.
+     * The identifier used to represent a geographic area.
      */
-    private InternationalString descriptor;
-
+    private Identifier geographicIdentifier;
+    
     /**
-     * Construct an initially empty range dimension.
+     * Construct an initially empty geographic description.
      */
-    public RangeDimension() {
+    public GeographicDescription() {
     }
 
     /**
-     * Return the description of the range of a cell measurement value.
+     * Creates a geographic description initialized to the specified value.
      */
-    public InternationalString getDescriptor() {
-        return descriptor;
+     public GeographicDescription(final Identifier geographicIdentifier) {
+         this.geographicIdentifier = geographicIdentifier;
+     }
+     
+    /**
+     * Returns the identifier used to represent a geographic area.
+     */
+    public Identifier getGeographicIdentifier() {
+        return geographicIdentifier;
     }
     
     /**
-     * Set the description of the range of a cell measurement value.
+     * Set the identifier used to represent a geographic area.
      */
-    public synchronized void setDescriptor(final InternationalString descriptor) {
+    public synchronized void setGeographicIdentifier(final Identifier newValue) {
         checkWritePermission();
-        this.descriptor = descriptor;
+        geographicIdentifier = newValue;
     }
 
     /**
@@ -76,40 +83,38 @@ public class RangeDimension extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        descriptor = (InternationalString) unmodifiable(descriptor);
+        geographicIdentifier = (Identifier) unmodifiable(geographicIdentifier);
     }
 
     /**
-     * Compare this range dimension with the specified object for equality.
+     * Compare this GeographicDescription with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (object!=null && object.getClass().equals(getClass())) {
-            final RangeDimension that = (RangeDimension) object;
-            return Utilities.equals(this.descriptor, that.descriptor);
+            final GeographicDescription that = (GeographicDescription) object;
+            return Utilities.equals(this.geographicIdentifier, that.geographicIdentifier);
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this range dimension. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
+     * Returns a hash code value for this geographic description.
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (descriptor != null) code ^= descriptor.hashCode();
+        if (geographicIdentifier != null) code ^= geographicIdentifier.hashCode();
         return code;
     }
 
     /**
-     * Returns a string representation of this range dimension
+     * Returns a string representation of this geographic description.
      *
      * @todo Provides a more elaborated implementation.
      */
     public String toString() {
-        return String.valueOf(descriptor);
-    }             
+        return String.valueOf(geographicIdentifier);
+    }    
 }

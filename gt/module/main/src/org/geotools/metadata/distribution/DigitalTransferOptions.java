@@ -92,7 +92,7 @@ public class DigitalTransferOptions extends MetadataEntity
      */
     public synchronized void setUnitsOfDistribution(final InternationalString newValue) {
         checkWritePermission();
-        this.unitsOfDistribution = newValue;
+        unitsOfDistribution = newValue;
     }
 
     /**
@@ -110,7 +110,7 @@ public class DigitalTransferOptions extends MetadataEntity
      */
     public synchronized void setTransferSize(final Number newValue) {
         checkWritePermission();
-        this.transferSize = newValue;
+        transferSize = newValue;
     }
 
     /**
@@ -146,7 +146,7 @@ public class DigitalTransferOptions extends MetadataEntity
      */
     public synchronized void setOffLine(final Medium newValue) {
         checkWritePermission();
-        this.offLines = newValue;
+        offLines = newValue;
     }
     
     /**
@@ -191,6 +191,8 @@ public class DigitalTransferOptions extends MetadataEntity
 
     /**
      * Returns a string representation of this digital transfer options.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(unitsOfDistribution);

@@ -102,7 +102,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setName(final MediumName newValue) {
         checkWritePermission();
-        this.name = newValue;
+        name = newValue;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setDensityUnits(final Unit newValue) {
         checkWritePermission();
-        this.densityUnits = newValue;
+        densityUnits = newValue;
     }
 
     /**
@@ -134,7 +134,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setVolumes(final Integer newValue) {
         checkWritePermission();
-        this.volumes = newValue;
+        volumes = newValue;
     }
 
     /**
@@ -149,7 +149,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setMediumFormat(final MediumFormat newValue) {
         checkWritePermission();
-        this.mediumFormat = newValue;
+        mediumFormat = newValue;
     }
 
     /**
@@ -164,7 +164,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized void setMediumNote(final InternationalString newValue) {
         checkWritePermission();
-        this.mediumNote = newValue;
+        mediumNote = newValue;
     }
     
     /**
@@ -238,6 +238,8 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
 
     /**
      * Returns a string representation of this series.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(name);

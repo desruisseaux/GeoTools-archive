@@ -571,9 +571,9 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Set information about the frequency of metadata updates, and the scope of those updates.
      */
-    public synchronized void setMetadataMaintenance(MaintenanceInformation maintenanceInformation) {
+    public synchronized void setMetadataMaintenance(final MaintenanceInformation newValue) {
         checkWritePermission();
-        this.fileIdentifier = fileIdentifier;
+        metadataMaintenance = newValue;
     }
      
     /**
@@ -652,6 +652,8 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Returns a string representation of this metadata. The content of this string is
      * implementation dependent and used mostly for debugging purpose.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
         return String.valueOf(contact);

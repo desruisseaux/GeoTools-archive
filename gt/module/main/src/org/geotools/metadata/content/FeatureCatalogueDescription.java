@@ -29,7 +29,6 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 
 // Geotools dependencies

@@ -20,33 +20,62 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.maintenance;
+package org.geotools.metadata.extent;
+
+// OpenGIS direct dependencies
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
- * Description of the class of information covered by the information.
+ * Base class for geographic area of the dataset.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
-public class ScopeDescription extends MetadataEntity
-       implements org.opengis.metadata.maintenance.ScopeDescription
+public class GeographicExtent extends MetadataEntity
+       implements org.opengis.metadata.extent.GeographicExtent
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -5671299759930976286L;
+    private static final long serialVersionUID = -1871146315280869971L;
 
     /**
-     * Creates an initially empty scope description.
+     * Indication of whether the bounding polygon encompasses an area covered by the data
+     * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      */
-    public ScopeDescription() {
+    private boolean inclusion;
+
+   /**
+     * Construct an initially empty GeographicExtent.
+     */
+    public GeographicExtent() {
     }
-    
+
+   /**
+     * Indication of whether the bounding polygon encompasses an area covered by the data
+     * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
+     *
+     * @return <code>true</code> for inclusion, or <code>false</code> for exclusion.
+     */    
+    public boolean getInclusion() {
+        return inclusion;
+    }
+
+    /**
+     * Set whether the bounding polygon encompasses an area covered by the data
+     * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
+     */
+    public synchronized void setInclusion(final boolean newValue) {
+        checkWritePermission();
+        inclusion = newValue;
+    }
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
@@ -55,36 +84,34 @@ public class ScopeDescription extends MetadataEntity
     }
 
     /**
-     * Compare this scope description with the specified object for equality.
+     * Compare this GeographicExtent with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeDescription that = (ScopeDescription) object;
-            // TODO once method in ScopeDescription will be defined.
-            return true;
+            final GeographicExtent that = (GeographicExtent) object;
+            return (this.inclusion == that.inclusion);
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this maintenance information.
+     * Returns a hash code value for this extent.
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        // TODO once method in ScopeDescription will be defined.
+        if (inclusion) code = ~code;
         return code;
     }
 
     /**
-     * Returns a string representation of this maintenance information.
+     * Returns a string representation of this extent.
      *
      * @todo Provides a more elaborated implementation.
      */
-    public synchronized String toString() {
-        // TODO once method in ScopeDescription will be defined.
-        return "";
+    public String toString() {
+        return String.valueOf(inclusion);
     }
 }
