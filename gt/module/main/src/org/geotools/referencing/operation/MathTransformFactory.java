@@ -202,28 +202,59 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
     
     /**
-     * Returns the default parameter values for the specified operation method.
-     * This method always returns clones. It is safe to modify the returned
-     * parameter values and give them to
-     * <code>{@linkplain #createParameterizedTransform createParameterizedTransform}(identifier, parameters)</code>.
+     * Returns the default parameter values for a math transform of the given classification.
+     * The {@linkplain ParameterDescriptorGroup#getName parameter group name} will be the given
+     * classification, in order to allows direct use by {@link #createParameterizedTransform
+     * createParameterizedTransform}. The list of available classifications is implementation
+     * dependent.
      *
-     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code}
-     *         of the operation method to search for (e.g. "Transverse_Mercator").
+     * <P>This method always returns clones. Consequently, it is safe to modify the returned
+     * parameter values group and give them to <code>{@linkplain #createParameterizedTransform
+     * createParameterizedTransform}(parameters)</code>.</P>
+     *
+     * @param  classification The case insensitive classification to search for (e.g.
+     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
      * @return The default parameter values.
-     * @throws NoSuchIdentifierException if there is no transform registered for the specified
-     *         operation method identifier.
+     * @throws NoSuchIdentifierException if there is no transform registered for the specified classification.
      *
      * @see #getAvailableTransforms
-     *
-     * @todo Returns a <code>ParameterValueGroup</code> instead.
      */
-    public GeneralParameterValue[] getDefaultParameters(final String identifier)
+    public ParameterValueGroup getDefaultParameters(final String classification)
             throws NoSuchIdentifierException
     {
-        ParameterDescriptorGroup type = getProvider(identifier).getParameters();
-        ParameterValueGroup group = (ParameterValueGroup) type.createValue();
-        return Parameters.array(group);
+        final ParameterDescriptorGroup type = getProvider(classification).getParameters();
+        return (ParameterValueGroup) type.createValue();
     }
+
+    /**
+     * Creates a transform from a group of parameters. The {@linkplain ParameterDescriptorGroup#getName
+     * parameter group name} is used as the classification name of the transform to construct (e.g.
+     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
+     * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
+     * parameters for cartographic projection transforms. Example:
+     *
+     * <blockquote><pre>
+     * ParameterValueGroup p = factory.getDefaultParameters("Transverse_Mercator");
+     * p.parameter("semi_major").setValue(6378137.000);
+     * p.parameter("semi_minor").setValue(6356752.314);
+     * MathTransform mt = factory.createParameterizedTransform(p);
+     * </pre></blockquote>
+     *
+     * @param  parameters The parameter values.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the classification.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @see #getDefaultParameters
+     * @see #getAvailableTransforms
+     */
+    public MathTransform createParameterizedTransform(final ParameterValueGroup parameters)
+            throws FactoryException
+    {
+        return createParameterizedTransform(parameters.getDescriptor().getName().getCode(),
+                                            Parameters.array(parameters));
+    }    
 
     /**
      * Creates a transform from an {@linkplain org.geotools.referencing.operation.OperationMethod
@@ -244,7 +275,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #getDefaultParameters
      * @see #getAvailableTransforms
      *
-     * @todo Expect a single <code>ParameterValueGroup</code> argument instead.
+     * @deprecated Use {@link #createParameterizedTransform(ParameterValueGroup)} instead.
      */
     public MathTransform createParameterizedTransform(final String identifier,
                                                       final GeneralParameterValue[] parameters)

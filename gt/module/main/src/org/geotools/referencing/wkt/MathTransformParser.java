@@ -131,7 +131,8 @@ public final class MathTransformParser extends AbstractParser {
         final String classification = element.pullString("classification");
         GeneralParameterValue[] parameters;
         try {
-            parameters = mtFactory.getDefaultParameters(classification);
+            // TODO: temporary hack. We should work directly on ParameterValueGroup instead.
+            parameters = org.geotools.parameter.Parameters.array(mtFactory.getDefaultParameters(classification));
         } catch (NoSuchIdentifierException exception) {
             throw element.parseFailed(exception, null);
         }
