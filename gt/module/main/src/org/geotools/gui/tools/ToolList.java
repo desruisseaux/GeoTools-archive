@@ -61,4 +61,12 @@ public interface ToolList extends List {
      * @param tool The new SelectedTtool.
      */
     void setSelectedTool(Tool tool);
+     
+    /**
+     * Set the tool.
+     * Added by Jamison Conley, May 24, 2004
+     *
+     * @param i The index of the selected tool.
+     */  
+    void setSelectedTool(int i);
 }

@@ -107,9 +107,23 @@ public class ToolListImpl extends ArrayList implements ToolList {
 
     /**
      * Set the tool.
+     * Added by Jamison Conley, May 24, 2004
+     *
+     * @param i The index of the selected tool.
+     */  
+    public void setSelectedTool(int i){ 
+        if ((0 <= i) && (i < this.size())){
+            setSelectedTool((Tool) this.get(i));     
+        } else {
+            throw new IllegalArgumentException("Tried to set the selected tool index out of range.  Index must be at least 0 and less than " + this.size());
+        }
+    }
+    
+    /**
+     * Set the tool.
      *
      * @param selectedTool The new tool.
-     */
+     */   
     public void setSelectedTool(Tool selectedTool) {
         if (selectedTool != this.selectedTool) {
             // Stop the old selectedTool from recieving MouseEvents

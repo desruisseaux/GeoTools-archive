@@ -45,6 +45,9 @@ public abstract interface Tool {
     void addMouseListener(Component component, MapContext context)
         throws IllegalArgumentException;
 
+    void addMouseMotionListener(Component component, MapContext context)
+        throws IllegalArgumentException;
+    
     /**
      * Remove all Mouse Listeners from this tool.  This method should be called
      * when this tool is deselected from a MapPane.

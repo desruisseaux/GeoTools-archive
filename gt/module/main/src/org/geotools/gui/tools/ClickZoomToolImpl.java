@@ -96,7 +96,7 @@ public class ClickZoomToolImpl extends AbstractTool implements ClickZoomTool {
 	public void addMouseListener(Component component, MapContext context) {
 		super.addMouseListener(component, context, this);
 	}
-
+              
 	/**
 	 * The factor to zoom in out by, zoomFactor=0.5 means zoom in, zoomFactor=2
 	 * means zoom out. Defaults to 2.
@@ -112,4 +112,9 @@ public class ClickZoomToolImpl extends AbstractTool implements ClickZoomTool {
 	public double getZoomFactor() {
 		return 1 / inverseZoomFactor;
 	}
+        
+        public void addMouseMotionListener(Component component, MapContext context) throws IllegalArgumentException {
+            super.addMouseMotionListener(component, context, this);
+        }
+        
 }

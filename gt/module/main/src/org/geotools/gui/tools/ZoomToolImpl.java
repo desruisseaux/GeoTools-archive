@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gui.tools;
 
@@ -20,15 +21,13 @@ import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
+//import org.geotools.ct.TransformException;
 import org.geotools.gui.swing.event.GeoMouseEvent;
 import org.geotools.map.MapContext;
 import org.geotools.pt.CoordinatePoint;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -146,6 +145,10 @@ public class ZoomToolImpl extends PanToolImpl implements ZoomTool {
      */
     public void addMouseListener(Component component, MapContext context) {
         super.addMouseListener(component, context, this);
+    }
+    
+    public void addMouseMotionListener(Component component, MapContext context) throws IllegalArgumentException {
+        super.addMouseMotionListener(component, context, this);
     }
 
     /**
