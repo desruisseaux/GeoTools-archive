@@ -1,32 +1,24 @@
-<!-- ==================================================================== -->
-<!-- GeoTools additional build goals and modifications                    -->
-<!-- ==================================================================== -->
-<!--
-<project default="build"
--->
-<project  xmlns:j="jelly:core"
-          xmlns:u="jelly:util"
-          xmlns:ant="jelly:ant"
-          xmlns:maven="jelly:maven"
-          xmlns:deploy="deploy"
-          default="info">
+<!-- ========================= -->
+<!-- GeoTools 2.0 build script -->
+<!-- ========================= -->
+<project xmlns:j="jelly:core" xmlns:u="jelly:util" xmlns:ant="jelly:ant" xmlns:maven="jelly:maven" xmlns:deploy="deploy" default="info">
 <!-- ==================================================================
      I N F O
      this is tell people which targets to use, if we could detect
      the directory they are starting it in then we could automate this
      ================================================================== -->
-        <goal name="info">
-                <echo>  
-      Information on Building Geotools 2.1.x
+	<goal name="info">
+		<echo>  
+      Information on Building Geotools 2.1
       -----------------------   
       Make sure you use 'maven build' in the top directory at least once in order
       to build all modules before working on individual ones.
                 
       If building everything use:
         maven build         -- this will try to build all modules regardless
-        maven createRelease -- uses argument: -Drelease.version=2.1.x
-        maven xjavadoc      -- creates a single merged javadoc
-                        
+        maven xjavadoc      -- generate a javadoc set from all modules
+        maven createRelease -- uses argument: -Drelease.version=2.1
+                
       If building a single module use one of:
         maven java:compile -- compile java files in src/
         maven test          -- run unit on test/ results in target/test-resutls
@@ -36,93 +28,63 @@
       For more options use:
         maven -g            -- a lot more options
     </echo>
-    <!-- moved following out of instructions until tested:
-        maven build-fail    - this will stop at the first failure
-        maven allsite       - this will build the web site for all modules
-    -->
-        </goal>
-        <preGoal name="checkstyle:init">
-            <echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
-            <j:set var="maven.checkstyle.properties" value="${basedir}/../../geotools_checks.xml"/>
-        </preGoal>
-        
-        <goal name="mergeTestReports">
-            <echo>merging test reports into higher directory</echo>
-           <ant:copy todir="../../target/test-reports">
-               <ant:fileset dir="target/test-reports">
-               <ant:include name="*.xml"/>
-      </ant:fileset>
-    </ant:copy>
-        </goal>
-        <goal name="build:log">
-                <echo file="../../buildReport.txt" append="true">
+	</goal>
+	<preGoal name="checkstyle:init">
+		<echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
+		<j:set var="maven.checkstyle.properties" value="${basedir}/../../geotools_checks.xml"/>
+	</preGoal>
+	<goal name="mergeTestReports">
+		<echo>merging test reports into higher directory</echo>
+		<ant:copy todir="../../target/test-reports">
+			<ant:fileset dir="target/test-reports">
+				<ant:include name="*.xml"/>
+			</ant:fileset>
+		</ant:copy>
+	</goal>
+	<goal name="build:log">
+		<echo file="../../buildReport.txt" append="true">
     ${pom.id}</echo>
-      <!-- imageurl="file://${basedir}/xdocs/images/${pom.artifactId}.gif"/-->
-        </goal>
-        <postGoal name="clean">
-                <echo file="../../buildReport.txt" append="true">  cleaned</echo>
-        </postGoal>
-        <postGoal name="java:compile">
-                <echo file="../../buildReport.txt" append="true">, compiled</echo>
-        </postGoal>
-        <postGoal name="test:test">
-                <echo file="../../buildReport.txt" append="true">, tested</echo>
-        </postGoal>
-        <postGoal name="jar:install">
-                <tstamp/>
-                <echo file="../../buildReport.txt" append="true">, INSTALLED ${TSTAMP}</echo>
-        </postGoal>
-<!-- ==================================================================
+	</goal>
+	<postGoal name="clean">
+		<echo file="../../buildReport.txt" append="true">  cleaned</echo>
+	</postGoal>
+	<postGoal name="java:compile">
+		<echo file="../../buildReport.txt" append="true">, compiled</echo>
+	</postGoal>
+	<postGoal name="test:test">
+		<echo file="../../buildReport.txt" append="true">, tested</echo>
+	</postGoal>
+	<postGoal name="jar:install">
+		<tstamp/>
+		<echo file="../../buildReport.txt" append="true">, INSTALLED ${TSTAMP}</echo>
+	</postGoal>
+	<!-- ==================================================================
      B U I L D
+     Currently makes use of multiple maven:reactor tags, James is looking into a
+     maven:multiproject replacement
      ================================================================== -->
-        <goal name="build">
-                <tstamp/>
-    <available classname="com.sun.media.imageio.stream.RawImageInputStream"
-               property="imageio.present"/>
-    <ant:available classname="com.sun.media.imageio.stream.RawImageInputStream"
-                   property="imageio.present"/>
-                        <fail unless="imageio.present"
-                        message="JAI ImageIO extension not found.  Please download and install it from: http://java.sun.com/products/java-media/jai/downloads/download-iio.html"/> 
-    <available file="module"
-               property="module.present"/>
-                <fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>
-                <j:set var="gt2home" value="${basedir}"/>
-                <echo>
+	<goal name="build">
+		<tstamp/>
+		<available classname="javax.media.jai.JAI" property="jai.present"/>
+		<ant:available classname="javax.media.jai.JAI" property="jai.present"/>
+		<fail unless="jai.present" message="JAI extension not found.  Please download and install it from: http://java.sun.com/products/java-media/jai/downloads/"/>
+		
+		<available file="module" property="module.present"/>
+		<fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>
+		<j:set var="gt2home" value="${basedir}"/>
+		<echo>
       looking for modules in: ${basedir}/module, ${basedir}/plugin, ${basedir}/ext, ${basedir}/demo
       reporting progress to ${gt2home}
     </echo>
-     <ant:delete dir="target/test-reports"/>
-    <echo file="${basedir}/buildReport.txt"
-          append="false">GeoTools2 module build report ${DSTAMP}</echo>
-    <maven:reactor basedir="${basedir}/module"
-                       includes="*/project.xml"
-                       goals="build:log,clean,jar:install,mergeTestReports"
-                   banner="Building Module"
-                   postProcessing="true"
-                   ignoreFailures="true"/>
-    <maven:reactor basedir="${basedir}/plugin"
-                   includes="*/project.xml"
-                   goals="build:log,clean,jar:install,mergeTestReports"
-                   banner="Building Plugin"
-                   postProcessing="true"
-                   ignoreFailures="true"/>
-    <maven:reactor basedir="${basedir}/ext"
-                   includes="*/project.xml"
-                   goals="build:log,clean,jar:install,mergeTestReports"
-                       banner="Building"
-                       postProcessing="true"
-                       ignoreFailures="true"/>
-    <maven:reactor basedir="${basedir}/demo"
-                   includes="*/project.xml"
-                   goals="build:log,clean,jar:install,mergeTestReports"
-                   banner="Building"
-                   postProcessing="true"
-                   ignoreFailures="true"/>
-                   
-    <loadfile property="build.report"
-               srcFile="${basedir}/buildReport.txt"
-               failonerror="false"/>
-    <echo>
+		<ant:delete dir="target/test-reports"/>
+         
+		<echo file="${basedir}/buildReport.txt" append="false">GeoTools2 module build report ${DSTAMP}</echo>
+		<maven:reactor basedir="${basedir}/module" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building Module" postProcessing="true" ignoreFailures="true"/>
+		<maven:reactor basedir="${basedir}/plugin" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building Plugin" postProcessing="true" ignoreFailures="true"/>
+		<maven:reactor basedir="${basedir}/ext" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building" postProcessing="true" ignoreFailures="true"/>
+		
+		<loadfile property="build.report" srcFile="${basedir}/buildReport.txt" failonerror="false"/>
+		<echo>
   BUILD REPORT (from buildReport.txt):
   ------------
   Sucessfull modules should read 'cleaned, compiled, tested, INSTALLED HHMM'
@@ -137,364 +99,220 @@
 
   If modules cleanded and compiled but were not tested look in the
   /target/test-reports direcotry of your module for details.
-
-
-  You can debug problems from the module directory using 'maven java:compile',
-  'maven test' and 'maven jar:install'.
-
-
-  These build results are available in buildResults.txt
+  For more information see http://geotools.codehaus.org/2+Build
+  
   Maven always says 'Build Sucessful', please check the above report.
       </echo>
-        </goal>
-<!-- ==================================================================
-     B U I L D - F A I L
-     Untested at this time - James is in the process of upgrading
-     ================================================================== -->
-        <goal name="build-fail">
-                <echo>
-      Looking for modules in: ${basedir}/module
-    </echo>
-    <ant:delete dir="target/test-reports"/>
-    <!-- one report folder for convenience of CC -->
-    <maven:reactor basedir="${basedir}/geotools-src"
-                   includes="*/project.xml"
-                   goals="clean,jar:install,mergeTestReports"
-                   banner="Building"
-                   postProcessing="true"
-                   ignoreFailures="false"/>
-    <echo>
-      Looking for modules in: ${basedir}/plugin
-    </echo>
-    <maven:reactor basedir="${basedir}/plugin"
-                   includes="*/project.xml"
-                   goals="clean,jar:install,mergeTestReports"
-                   banner="Building"
-                   postProcessing="true"
-                   ignoreFailures="false"/>
-    <echo>
-      Looking for modules in: ${basedir}/ext
-    </echo>
-    <maven:reactor basedir="${basedir}/ext"
-                   includes="*/project.xml"
-                   goals="clean,jar:install,mergeTestReports"
-                   banner="Building"
-                   postProcessing="true"
-                   ignoreFailures="false"/>
-    <j:set var="ok"
-           value="${reactorProjects}"/>
-    <maven:reactor basedir="${basedir}/module"
-                   includes="*/project.xml"
-                   postProcessing="true"
-                   ignoreFailures="true"/>
-    <j:forEach var="module"
-               items="${reactorProjects}">
-      <j:set var="status"
-             value="failed"/>
-      <j:forEach var="item"
-             items="${ok}">
-                                <j:if test="${item == module}">
-          <j:set var="status"
-                 value="installed"/>
-                                </j:if>
-                        </j:forEach>
-                        <echo>Module ${module} : ${status}</echo>
-                </j:forEach>
-        </goal>
-        <goal name="snapshot">
-                <echo>
-      looking for modules in: ${basedir}/geotools-src
-    </echo>
-    <maven:reactor basedir="${basedir}/geotools-src"
-                   includes="*/project.xml"
-                   goals="clean,jar:deploy-snapshot"
-                   banner="Deploying"
-                   ignoreFailures="true"/>
-                <echo>
-      modules built and deployed:  ${reactorProjects}
-    </echo>
-        </goal>
-<!-- ==================================================================
-     W E B S I T E
-     Untested at this time - James is in the process of upgrading
-     Generate the documentation for each of the common projects
-     ================================================================== -->
-        <preGoal name="site:generate">
-                <attainGoal name="pmd"/>
-        </preGoal>
-   
-
-       <postGoal name="test:test">
-            <echo>merging test reports into higher directory</echo>
-           <ant:copy todir="../../target/test-reports">
-               <ant:fileset dir="target/test-reports">
-               <ant:include name="*.xml"/>
-      </ant:fileset>
-    </ant:copy>
-        </postGoal>
-
-
-
-        <goal name="createRelease">
-            <fail unless="release.version" message="release.version not set"/>
-            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo message="release report is set to ${release.report}"/>
-            <echo file="${release.report}" message="release is ${release.version}"/>
-            <loadfile property="release.required" srcFile="module/release.txt"/>            
-            <u:tokenize var="list" delim=",">${release.required}</u:tokenize>
-            <j:set var="todo" value=""/>
-            <j:set var="required" value=""/>    
-            <j:forEach items="${list}" var="item">
-                <j:set var="todo" value="${item}/project.xml,${todo}"/>
-                <j:set var="required" value="${item}
+	</goal>
+	<postGoal name="test:test">
+		<echo>merging test reports into higher directory</echo>
+		<ant:copy todir="../../target/test-reports">
+			<ant:fileset dir="target/test-reports">
+				<ant:include name="*.xml"/>
+			</ant:fileset>
+		</ant:copy>
+	</postGoal>
+	<goal name="createRelease">
+		<fail unless="release.version" message="release.version not set"/>
+		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+		<echo message="release report is set to ${release.report}"/>
+		<echo file="${release.report}" message="release is ${release.version}"/>
+		<loadfile property="release.required" srcFile="module/release.txt"/>
+		<u:tokenize var="list" delim=",">${release.required}</u:tokenize>
+		<j:set var="todo" value=""/>
+		<j:set var="required" value=""/>
+		<j:forEach items="${list}" var="item">
+			<j:set var="todo" value="${item}/project.xml,${todo}"/>
+			<j:set var="required" value="${item}
 ${required}"/>
-            </j:forEach>
-            <echo message="reactor list = ${todo}"/>
-             <ant:delete dir="${basedir}/target/forMerge"/>
-            <maven:reactor basedir="${basedir}/module" includes="${todo}" goals="moveLib,moveForMerge,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
-            <echo message="done with reactor for main"/>
-            <ant:mkdir dir="${basedir}/target/binRelease/module"/>
-            <ant:jar destfile="${basedir}/target/binRelease/module/gt2-main.jar">
-                <ant:fileset dir="${basedir}/target/forMerge"/>
-            </ant:jar>
-            <ant:property name="requiredList" value="${required}"/>
-            <echo message="requiredList = ${requiredList}"/>
-            <ant:property name="maven.dist.dir" value="${maven.build.dir}/distributions"/>
-            <ant:mkdir dir="${maven.dist.dir}"/>
-
-
-            <!-- add optional plugins seperatly -->
-            <loadfile property="release.optional.plugins" srcFile="plugin/release.txt"/>
-            <u:tokenize var="list2" delim=",">${release.optional.plugins}</u:tokenize>
-            <j:set var="todo" value=""/>        
-            <j:forEach items="${list2}" var="item">
-                <j:set var="todo" value="${item}/project.xml,${todo}"/>
-            </j:forEach>
-            <echo message="plugin reactor list = ${todo}"/>
-            <attainGoal name="moveBuildFiles"/>
-           
-            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="movePluginBin,movePluginSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
-
-
-            <!-- add optional extensions seperatly -->
-            <loadfile property="release.optional.ext" srcFile="ext/release.txt"/>
-            <u:tokenize var="list3" delim=",">${release.optional.ext}</u:tokenize>
-            <j:set var="todo" value=""/>        
-            <j:forEach items="${list3}" var="item">
-                <j:set var="todo" value="${item}/project.xml,${todo}"/>
-            </j:forEach>
-            <echo message="extension reactor list = ${todo}"/>
-            <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveExtSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
-
-            <!-- add optional demos seperatly -->
-            <loadfile property="release.optional.demo" srcFile="demo/release.txt"/>
-            <u:tokenize var="list4" delim=",">${release.optional.demo}</u:tokenize>
-            <j:set var="todo" value=""/>        
-            <j:forEach items="${list4}" var="item">
-                <j:set var="todo" value="${item}/project.xml,${todo}"/>
-            </j:forEach>
-            <echo message="demo reactor list = ${todo}"/>
-            <maven:reactor basedir="${basedir}/demo" includes="${todo}" goals="moveDemoBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
-
-            <echo message="dist directory is ${maven.dist.dir}"/>
-            <ant:zip longfile="gnu" basedir="${basedir}/target/binRelease" destfile="${maven.dist.dir}/geotools-bin-${release.version}.zip"/>
-            <ant:zip longfile="gnu" basedir="${basedir}/target/srcRelease" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip"/>
-        </goal>
-
-
-        <goal name="moveForMerge">
-               <echo message="working on ${pom.id} for merge"/>
-               <ant:copy todir="../../target/forMerge">
-                   <ant:fileset dir="./target/classes">
-                     <ant:include name="**/*"/>
-                   </ant:fileset>
-                </ant:copy>
-          </goal>
-
-
+		</j:forEach>
+		<echo message="reactor list = ${todo}"/>
+		<maven:reactor basedir="${basedir}/module" includes="${todo}" goals="moveLib,moveModuleBin,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
+		<echo message="done with reactor for main"/>
+		<ant:mkdir dir="${basedir}/target/binRelease/module"/>
+                <ant:copy todir="${basedir}/target/binRelease">
+			<ant:fileset dir=".">
+				<ant:include name="LICENSE.txt"/>
+				<ant:include name="README.txt"/>
+                                <ant:include name="README.html"/>
+			</ant:fileset>
+			<ant:filterset>
+				<ant:filter token="DATE" value="${TODAY}"/>
+				<ant:filter token="VERSION" value="${release.version}"/>
+				<ant:filter token="REQUIRED" value="${requiredList}"/>
+				<ant:filter token="PLUGIN" value="${pluginList}"/>
+				<ant:filter token="EXTENTION" value="${extentionList}"/>
+			</ant:filterset>
+		</ant:copy>
+		<ant:property name="requiredList" value="${required}"/>
+		<echo message="requiredList = ${requiredList}"/>
+		<ant:property name="maven.dist.dir" value="${maven.build.dir}/distributions"/>
+		<ant:mkdir dir="${maven.dist.dir}"/>
+		<!-- add optional plugins seperatly -->
+		<loadfile property="release.optional" srcFile="plugin/release.txt"/>
+		<u:tokenize var="list2" delim=",">${release.optional}</u:tokenize>
+		<j:set var="todo" value=""/>
+		<j:set var="plugins" value=""/>
+		<j:forEach items="${list2}" var="item">
+			<j:set var="todo" value="${item}/project.xml,${todo}"/>
+			<j:set var="plugins" value="${item}
+${plugins}"/>
+		</j:forEach>
+		<ant:property name="pluginList" value="${plugins}"/>
+		<echo message="plugin reactor list = ${todo}"/>
+		<attainGoal name="moveBuildFiles"/>
+		<maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="movePluginBin,movePluginSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
+		<!-- add optional extensions seperatly -->
+		<loadfile property="release.ext" srcFile="ext/release.txt"/>
+		<u:tokenize var="list3" delim=",">${release.ext}</u:tokenize>
+		<j:set var="todo" value=""/>
+		<j:set var="extentions" value=""/>
+		<j:forEach items="${list3}" var="item">
+			<j:set var="todo" value="${item}/project.xml,${todo}"/>
+			<j:set var="extentions" value="${item}
+${extentions}"/>
+		</j:forEach>
+		<ant:property name="extentionList" value="${extentions}"/>
+		<echo message="extension reactor list = ${todo}"/>
+		<maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveExtSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
+		<echo message="dist directory is ${maven.dist.dir}"/>
+		<ant:zip longfile="gnu" destfile="${maven.dist.dir}/geotools-bin-${release.version}.zip">
+			<zipfileset dir="${basedir}/target/binRelease" prefix="geotools" filemode="755" includes="**/*"/>
+		</ant:zip>
+		<ant:zip longfile="gnu" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip">
+			<zipfileset dir="${basedir}/target/srcRelease" prefix="geotools" filemode="755" includes="**/*"/>
+		</ant:zip>
+	</goal>
+	
         <goal name="moveLib">
-            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo file="../../${release.report}" append="true">
+		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+		<echo file="../../${release.report}" append="true">
             ${pom.id}</echo>
-                <echo message="working on ${pom.id} to find 3rd party jars to include"/>
-                <j:forEach var="lib" items="${pom.artifacts}">
-                      <j:set var="dep" value="${lib.dependency}"/>
-                    <!--  <j:if test="${dep.getProperty('release.bundle')=='true'}"> -->
-                        <j:if test="${dep.groupId !='gt2'}">
-                         <j:if test="${dep.type =='jar'}">
-                              <ant:copy todir="../../target/binRelease/shared" file="${lib.path}"/>
-                         </j:if>
-                        </j:if>
-                  <!--  </j:if>  -->
-                </j:forEach>
-                 <echo file="../../${release.report}" append="true">  OK</echo>
-        </goal>
+		<echo message="working on ${pom.id} to find 3rd party jars to include"/>
+		<j:forEach var="lib" items="${pom.artifacts}">
+			<j:set var="dep" value="${lib.dependency}"/>
+			<j:if test="${dep.groupId !='gt2'}">
+				<j:if test="${dep.type =='jar'}">
+					<ant:copy todir="../../target/binRelease/shared" file="${lib.path}"/>
+				</j:if>
+			</j:if>
+		</j:forEach>
+		<echo file="../../${release.report}" append="true">  OK</echo>
+	</goal>
         
+        <goal name="moveModuleBin">
+            <j:set var="type" value="module"/>
+            <attainGoal name="moveXBin"/>
+        </goal>
         <goal name="movePluginBin">
-            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo file="../../${release.report}" append="true">
+            <j:set var="type" value="plugin"/>
+            <attainGoal name="moveXBin"/>
+        </goal>
+        <goal name="moveExtBin">
+            <j:set var="type" value="plugin"/>
+            <attainGoal name="moveXBin"/>
+        </goal>
+	<goal name="moveXBin">
+		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+		<echo file="../../${release.report}" append="true">
             add ${pom.id} jar - </echo>
-            
-                <echo message="working on ${pom.id} for binary release"/>
-                
-                <attainGoal name="jar:jar"/>
-                <ant:copy tofile="../../target/binRelease/plugin/${pom.artifactId}/gt2-${pom.artifactId}.jar">
-                   <ant:fileset dir="./target">
-                     <ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
-                   </ant:fileset>
-                </ant:copy>
-                 <echo file="../../${release.report}" append="true">  OK</echo>
-             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo file="../../${release.report}" append="true">
+		<echo message="working on ${pom.id} for binary release"/>
+		<attainGoal name="jar:jar"/>
+		<ant:copy tofile="../../target/binRelease/${type}/${pom.artifactId}/gt2-${pom.artifactId}.jar">
+			<ant:fileset dir="./target">
+				<ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
+			</ant:fileset>
+		</ant:copy>
+		<echo file="../../${release.report}" append="true">  OK</echo>
+		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+		<echo file="../../${release.report}" append="true">
             ${pom.id}</echo>
-                <echo message="working on ${pom.id} to find 3rd party jars to include"/>
-                <j:forEach var="lib" items="${pom.artifacts}">
-                      <j:set var="dep" value="${lib.dependency}"/>
-                    <!--  <j:if test="${dep.getProperty('release.bundle')=='true'}"> -->
-                        <j:if test="${dep.groupId !='gt2'}">
-                         <j:if test="${dep.type =='jar'}">
-                         <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
-                         <j:set var="shareddep" value=""/>
-                         <u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
-                           <j:set var="shareddep" value="found"/>
-                         </u:available>
-                             <j:if test="${shareddep != 'found'}">
-                              <echo message="copy plugin jar"/>
-                                  <ant:copy todir="../../target/binRelease/plugin/${pom.artifactId}/lib" file="${lib.path}"/>
-                             </j:if>
-                              </j:if>
-                        </j:if>
-                  <!--  </j:if>  -->
-                </j:forEach>
-                <echo file="../../target/binRelease/plugin/${pom.artifactId}/readme.txt">
-GeoTools Plugin : ${pom.description}
+		<echo message="working on ${pom.id} to find 3rd party jars to include"/>
+		<j:forEach var="lib" items="${pom.artifacts}">
+			<j:set var="dep" value="${lib.dependency}"/>
+			<j:if test="${dep.groupId !='gt2'}">
+				<j:if test="${dep.type =='jar'}">
+					<echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
+					<j:set var="shareddep" value=""/>
+					<u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
+						<j:set var="shareddep" value="found"/>
+					</u:available>
+					<j:if test="${shareddep != 'found'}">
+						<echo message="copy ${type} jar"/>
+						<ant:copy todir="../../target/binRelease/${type}/${pom.artifactId}/lib" file="${lib.path}"/>
+					</j:if>
+				</j:if>
+			</j:if>
+		</j:forEach>
+		<echo file="../../target/binRelease/${type}/${pom.artifactId}/readme.txt">
+GeoTools Plugin/Extention : ${pom.description}
 
-To use this plugin ensure that gt2-${pom.artifactId}.jar is on your classpath.
+To use this plugin/extention ensure that gt2-${pom.artifactId}.jar is on your classpath.
 If this directory contains a lib folder then the jars it contains must also be included.
 
 Please report bugs and feature requests using ${pom.issueTrackingUrl}.                
 </echo>
-                 <echo file="../../${release.report}" append="true">  Libs Copied</echo>
-        </goal>
-
-
-        <goal name="moveExtBin">
-            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo file="../../${release.report}" append="true">
-            add ${pom.id} jar - </echo>
-                <echo message="working on ${pom.id} ext for binary release"/>
-                <attainGoal name="jar:jar"/>
-                <ant:copy tofile="../../target/binRelease/extension/${pom.artifactId}/gt2-${pom.artifactId}.jar">
-                   <ant:fileset dir="./target">
-                     <ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
-                   </ant:fileset>
-                </ant:copy>
-                 <echo file="../../${release.report}" append="true">  OK</echo>
-                 
-                  <echo message="working on ${pom.id} to find 3rd party jars to include"/>
-                <j:forEach var="lib" items="${pom.artifacts}">
-                      <j:set var="dep" value="${lib.dependency}"/>
-                        <j:if test="${dep.groupId !='gt2'}">
-                         <j:if test="${dep.type =='jar'}">
-                         <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
-                         <j:set var="shareddep" value=""/>
-                         <u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
-                           <j:set var="shareddep" value="found"/>
-                         </u:available>
-                             <j:if test="${shareddep != 'found'}">
-                              <echo message="copy plugin jar"/>
-                                  <ant:copy todir="../../target/binRelease/extension/${pom.artifactId}/lib" file="${lib.path}"/>
-                             </j:if>
-                              </j:if>
-                        </j:if>
-                </j:forEach>
-        </goal>
-
-        <goal name="moveDemoBin">
-            <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
-            <echo file="../../${release.report}" append="true">
-            add ${pom.id} jar - </echo>
-                <echo message="working on ${pom.id} demo for binary release"/>
-                <attainGoal name="jar:jar"/>
-                <ant:copy tofile="../../target/binRelease/demo/${pom.artifactId}/gt2-${pom.artifactId}.jar">
-                   <ant:fileset dir="./target">
-                     <ant:include name="${pom.artifactId}-${pom.currentVersion}.jar"/>
-                   </ant:fileset>
-                </ant:copy>
-                 <echo file="../../${release.report}" append="true">  OK</echo>
-                 
-                  <echo message="working on ${pom.id} to find 3rd party jars to include"/>
-                <j:forEach var="lib" items="${pom.artifacts}">
-                      <j:set var="dep" value="${lib.dependency}"/>
-                        <j:if test="${dep.groupId !='gt2'}">
-                         <j:if test="${dep.type =='jar'}">
-                         <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
-                         <j:set var="shareddep" value=""/>
-                         <u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
-                           <j:set var="shareddep" value="found"/>
-                         </u:available>
-                             <j:if test="${shareddep != 'found'}">
-                              <echo message="copy plugin jar"/>
-                                  <ant:copy todir="../../target/binRelease/demo/${pom.artifactId}/lib" file="${lib.path}"/>
-                             </j:if>
-                              </j:if>
-                        </j:if>
-                 </j:forEach>
-        </goal>
+		<echo file="../../${release.report}" append="true">  Libs Copied</echo>
+	</goal>
+	
+	<goal name="moveBuildFiles">
+		<ant:tstamp/>
+		<ant:copy todir="${basedir}/target/srcRelease">
+			<ant:fileset dir=".">
+				<ant:include name="project.xml"/>
+				<ant:include name="build.properties"/>
+				<ant:include name="geotools_checks.xml"/>
+				<ant:include name="run-maven.xml"/>
+				<ant:include name="maven.xml"/>
+				<ant:include name="README.txt"/>
+                                <ant:include name="README.html"/>
+                                <ant:include name="LICENSE.txt"/>
+			</ant:fileset>
+			<ant:filterset>
+				<ant:filter token="DATE" value="${TODAY}"/>
+				<ant:filter token="VERSION" value="${release.version}"/>
+				<ant:filter token="REQUIRED" value="${requiredList}"/>
+				<ant:filter token="PLUGIN" value="${pluginList}"/>
+				<ant:filter token="EXTENTION" value="${extentionList}"/>
+			</ant:filterset>
+		</ant:copy>
+	</goal>
         
+	<goal name="moveSrc">
+		<j:set var="type" value="module"/>
+                <attainGoal name="moveXSrc"/>
+	</goal>
+        <goal name="moveExtSrc">
+            <j:set var="type" value="ext"/>
+            <attainGoal name="moveXSrc"/>
+	</goal>
+        <goal name="movePluginSrc">
+            <j:set var="type" value="plugin"/>
+            <attainGoal name="moveXSrc"/>
+	</goal>
+        
+        <goal name="moveXSrc">
+        <echo>type is ${type}</echo>
+           <ant:copy todir="../../target/srcRelease/${type}/${pom.artifactId}/">
+			<ant:fileset dir=".">
+				<ant:include name="src/**"/>
+				<ant:include name="test/**"/>
+				<ant:include name="project.xml"/>
+				<ant:include name="maven.xml"/>
+				<ant:include name="build.properties"/>
+				<ant:include name="run-maven.xml"/>
+			</ant:fileset>
+		</ant:copy>
+         </goal>
+	
+        
+        <!--
+  ==============================================================================
+  build the consolidated javadoc
+  ==============================================================================
+  -->
 
-        <goal name="moveBuildFiles">
-            <ant:tstamp/>
-            <ant:copy todir="${basedir}/target/srcRelease">
-               <ant:fileset dir=".">
-                 <ant:include name="project.xml"/>
-                 <ant:include name="build.properties"/>
-                 <ant:include name="run-maven.xml"/>
-                 <ant:include name="maven.xml"/>
-                 <ant:include name="README.txt"/>
-               </ant:fileset>
-               <ant:filterset>
-                 <ant:filter token="DATE" value="${TODAY}"/>
-                 <ant:filter token="VERSION" value="${release.version}"/>
-                 <ant:filter token="REQUIRED" value="${requiredList}"/>
-               </ant:filterset>
-            </ant:copy>
-        </goal>
-
-        <goal name="moveSrc">
-             <ant:copy todir="../../target/srcRelease/module/${pom.artifactId}/">
-               <ant:fileset dir=".">
-                 <ant:include name="src/**"/>
-                 <ant:include name="test/**"/>
-                 <ant:include name="project.xml"/>
-                 <ant:include name="build.properties"/>
-                 <ant:include name="run-maven.xml"/>
-               </ant:fileset>
-             </ant:copy>
-    </goal>
-    <goal name="moveExtSrc">
-             <ant:copy todir="../../target/srcRelease/ext/${pom.artifactId}/">
-               <ant:fileset dir=".">
-                 <ant:include name="src/**"/>
-                 <ant:include name="test/**"/>
-                 <ant:include name="project.xml"/>
-                 <ant:include name="build.properties"/>
-                 <ant:include name="run-maven.xml"/>
-               </ant:fileset>
-             </ant:copy>
-    </goal>
-    <goal name="movePluginSrc">
-             <ant:copy todir="../../target/srcRelease/plugin/${pom.artifactId}/">
-               <ant:fileset dir=".">
-                 <ant:include name="src/**"/>
-                 <ant:include name="test/**"/>
-                 <ant:include name="project.xml"/>
-                 <ant:include name="build.properties"/>
-                 <ant:include name="run-maven.xml"/>
-               </ant:fileset>
-             </ant:copy>
-    </goal>
- <goal name="xjavadoc">
+  <goal name="xjavadoc">
 
     <maven:reactor basedir="${basedir}"
       includes="**/project.xml"
@@ -561,6 +379,5 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
         </j:forEach>
 
     </ant:javadoc>
-    </goal>
-
+  </goal>
 </project>
