@@ -39,6 +39,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSLayerCatalogEntry;
 import org.geotools.data.wms.WMSLayerMetadataEntity;
+import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
@@ -100,7 +101,7 @@ public class WebMapServerTest extends TestCase {
         //request.setVersion("1.1.1");
 
         List simpleLayers = new ArrayList();
-        Layer[] layers = wms.getNamedLayers();
+        Layer[] layers = WMSUtils.getNamedLayers(capabilities);
         Iterator iter = Arrays.asList(layers).iterator();
         int count = -1;
         while (iter.hasNext()) {
@@ -130,7 +131,7 @@ public class WebMapServerTest extends TestCase {
 
         request.setLayers(simpleLayers);
 
-        Set srss = wms.getSRSs();
+        Set srss = WMSUtils.getSRSs(capabilities);
         request.setSRS((String) srss.iterator().next());
         request.setDimensions("400", "400");
 
@@ -162,7 +163,7 @@ public class WebMapServerTest extends TestCase {
         
         GetMapRequest getMapRequest = wms.createGetMapRequest();
 
-        List layers = Arrays.asList(wms.getNamedLayers());
+        List layers = Arrays.asList(WMSUtils.getNamedLayers(capabilities));
         List simpleLayers = new ArrayList();
         Iterator iter = layers.iterator();
         while (iter.hasNext()) {
@@ -188,7 +189,7 @@ public class WebMapServerTest extends TestCase {
         URL url2 = getMapRequest.getFinalURL();
 
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-        request.setQueryLayers(wms.getQueryableLayers());
+        request.setQueryLayers(WMSUtils.getQueryableLayers(capabilities));
         request.setQueryPoint(200, 200);
         request.setInfoFormat("text/html");
         

@@ -42,6 +42,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
+import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
@@ -166,7 +167,7 @@ public class WMS1_0_0Test extends TestCase {
         
         GetMapRequest getMapRequest = wms.createGetMapRequest();
 
-        List layers = Arrays.asList(wms.getNamedLayers());
+        List layers = Arrays.asList(WMSUtils.getNamedLayers(caps));
         List simpleLayers = new ArrayList();
         Iterator iter = layers.iterator();
         while (iter.hasNext()) {
@@ -192,7 +193,7 @@ public class WMS1_0_0Test extends TestCase {
         URL url2 = getMapRequest.getFinalURL();
 
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-        request.setQueryLayers(wms.getQueryableLayers());
+        request.setQueryLayers(WMSUtils.getQueryableLayers(caps));
         request.setQueryPoint(200, 200);
         request.setInfoFormat(caps.getRequest().getGetFeatureInfo().getFormatStrings()[0]);
         

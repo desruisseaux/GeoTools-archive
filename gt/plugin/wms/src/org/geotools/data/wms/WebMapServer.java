@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 
 import org.geotools.catalog.CatalogEntry;
@@ -492,76 +490,6 @@ public class WebMapServer implements Discovery {
         return request;
     }
     
-    /**********************************************************
-     * UTILITY METHODS
-     **********************************************************/
-    
-    /**
-     * Utility method to return each layer that has a name. This method maintains no hierarchy at all.
-     * 
-     * @return An array of Layers, each value has a it's name property set or an empty array if there are none. It will return null if there is no capabilities document
-     * 
-     */
-    public Layer[] getNamedLayers() {
-    	
-    	if (capabilities == null) {
-    		return null;
-    	}
-    	
-        List namedLayersList = new ArrayList();
-        
-        Layer[] layers = capabilities.getLayers();
-
-        for( int i = 0; i < layers.length; i++ ) {
-            if ((layers[i].getName() != null) && (layers[i].getName().length() != 0)) {
-                namedLayersList.add(layers[i]);
-            }
-        }
-
-        Layer[] namedLayers = new Layer[namedLayersList.size()];
-        for (int i = 0; i < namedLayersList.size(); i++) {
-            namedLayers[i] = (Layer) namedLayersList.get(i);
-        }
-        
-        return namedLayers;
-    }
-
-    public Set getQueryableLayers() {
-        Set layers = new TreeSet();
-
-        Layer[] namedLayers = getNamedLayers();
-
-        for( int i = 0; i < namedLayers.length; i++ ) {
-            Layer layer = (Layer) namedLayers[i];
-
-            if (layer.isQueryable()) {
-                layers.add(layer);
-            }
-        }
-
-        return layers;
-    }
-
-    public Set getSRSs() throws IOException {
-        Set srss = new TreeSet();
-
-        Layer[] layers = getCapabilities().getLayers();
-
-        for( int i = 0; i < layers.length; i++ ) {
-            if (layers[i].getSrs() != null) {
-                srss.addAll(layers[i].getSrs());
-            }
-        }
-
-        return srss;
-    }
-
-    /*
-     * ************************************************************************* 
-     * Catalog Interface Methods
-     * *************************************************************************
-     */
-
     /**
      * Metadata search through entries.
      * 

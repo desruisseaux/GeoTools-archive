@@ -31,6 +31,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_0;
+import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
@@ -101,7 +102,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         
         assertNotNull(request);
         
-        Layer[] layers = wms.getNamedLayers();
+        Layer[] layers = WMSUtils.getNamedLayers(wms.getCapabilities());
         SimpleLayer park = null;
         for (int i = 0; i < layers.length; i++) {
             if (layers[i].getName().equals("park")) {
