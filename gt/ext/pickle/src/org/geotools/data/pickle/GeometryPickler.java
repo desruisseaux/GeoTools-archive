@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -20,7 +21,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * The GeometryPickler provides a more efficent serialization of JTS Geometry
@@ -62,7 +62,7 @@ public final class GeometryPickler {
   final int MULTI_LINE = 12;
   final int MULTI_POLY = 13;
   
-  static PrecisionModel pm = new PrecisionModel();
+  static GeometryFactory gf = new GeometryFactory();
   static int srid = 0;
   
   public GeometryPickler() {
@@ -166,14 +166,13 @@ public final class GeometryPickler {
     c.x = in.readDouble();
     c.y = in.readDouble();
     c.z = in.readDouble();
-    return new Point(c,pm,srid);
+    return gf.createPoint(c);
   }
   
   private LineString readLine(ObjectInputStream in, boolean asRing) throws IOException {
     if (asRing)
-      return new LinearRing(readCoords(in),pm,srid);
-    else
-      return new LineString(readCoords(in), pm,srid);
+      return gf.createLinearRing(readCoords(in));
+    return gf.createLineString(readCoords(in));
   }
   
   private Polygon readPoly(ObjectInputStream in) throws IOException {
@@ -185,7 +184,7 @@ public final class GeometryPickler {
       in.readByte();
       interiorRings[i] = (LinearRing) readLine(in,true);
     }
-    return new Polygon(exterior,interiorRings,pm,srid);
+    return gf.createPolygon(exterior,interiorRings);
     
   }
   
@@ -196,7 +195,7 @@ public final class GeometryPickler {
       in.readByte();
       g[i] = readPoint(in); 
     }
-    return new MultiPoint(g, pm,srid);
+    return gf.createMultiPoint(g);
   }
   
   private MultiLineString readMultiLine(ObjectInputStream in) throws IOException {
@@ -206,7 +205,7 @@ public final class GeometryPickler {
       in.readByte();
       g[i] = readLine(in,false); 
     }
-    return new MultiLineString(g, pm,srid);
+    return gf.createMultiLineString(g);
   }
   
   private MultiPolygon readMultiPoly(ObjectInputStream in) throws IOException {
@@ -216,7 +215,7 @@ public final class GeometryPickler {
       in.readByte();
       g[i] = readPoly(in); 
     }
-    return new MultiPolygon(g, pm,srid);
+    return gf.createMultiPolygon(g);
   }
   
   private GeometryCollection readCollection(ObjectInputStream in) throws IOException {
@@ -225,6 +224,6 @@ public final class GeometryPickler {
     for (int i = 0; i < geoms; i++) {
       g[i] = read(in); 
     }
-    return new GeometryCollection(g, pm,srid);
+    return gf.createGeometryCollection(g);
   }
 }
