@@ -18,6 +18,7 @@ package org.geotools.data.ows;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -35,8 +36,8 @@ public class Layer implements Comparable {
     /** The title is for informative display to a human. */
     private String title;
 
-    /** A list of Strings representing SRSs */
-    private List srs;
+    /** A set of Strings representing SRSs */
+    private Set srs;
 
     /**
      * A HashMap representings the bounding boxes on each layer.
@@ -100,11 +101,11 @@ public class Layer implements Comparable {
         this.name = name;
     }
 
-    public List getSrs() {
+    public Set getSrs() {
         return srs;
     }
 
-    public void setSrs(List srs) {
+    public void setSrs(Set srs) {
         this.srs = srs;
     }
 

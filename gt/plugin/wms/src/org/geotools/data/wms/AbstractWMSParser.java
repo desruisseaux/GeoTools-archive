@@ -26,8 +26,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -156,7 +159,7 @@ public abstract class AbstractWMSParser implements WMSParser {
         String parentTitle) throws MalformedURLException {
         String title = layerElement.getChildText("Title"); //$NON-NLS-1$
         String name = layerElement.getChildText("Name"); //$NON-NLS-1$
-        List srsElements = querySRS(layerElement);
+        Set srsElements = querySRS(layerElement);
         List styleElements = queryStyles(layerElement);
 
         boolean queryable = Integer.parseInt(layerElement.getAttributeValue(
@@ -222,18 +225,6 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     /**
-     * List of available SRS for provided layerElement.
-     * <p>
-     * May need to override for WMS1.0.0.
-     * </p>
-     * @param layerElement
-     * @return A List containing Strings representing the layer's SRS values
-     */
-    protected List querySRS(Element layerElement) {
-        return extractStrings(layerElement, "SRS"); //$NON-NLS-1$
-    }
-
-    /**
      * Calls element.getChildren(childName) and iterates through all
      * the children, adding their value into a List which is returned.
      * @param element The element to extract the strings from
@@ -284,112 +275,12 @@ public abstract class AbstractWMSParser implements WMSParser {
         }
     }
 
-    protected String getRequestGetFeatureInfoName() {
-        return "GetFeatureInfo"; //$NON-NLS-1$
-    }
-
-    protected String getRequestGetMapName() {
-        return "GetMap"; //$NON-NLS-1$
-    }
-
-    protected String getRequestGetCapName() {
-        return "GetCapabilities"; //$NON-NLS-1$
-    }
-
-    /**
-     * Parse List<String> from opperation element.
-     * <p>
-     * Values are taken to be mine types? We could restrict this list
-     * to types we know how to deal with (incase image/svg comes up).
-     * I figure we should reflect reality and leave it to
-     * client code - like WMSFormat to cull this list.
-     * </p>
-     * <p>
-     * Normal Mime Types:
-     * <ul>
-     * <li>image/gif
-     * <li>image/jpeg
-     * <li>image/png
-     * <li>image/svg
-     * <li>text/xml - generic XML mime type
-     * <li>application/xml - generic XML mime type
-     * </ul>
-     * </p>
-     * <p>
-     * OGC-specific Mime Types:
-     * <ul>
-     * <li>application/vnd.ogc.wms_xml - WMS Capabilities XML
-     * <li>application/vnd.ogc.gml - Geography Markup Language XML
-     * <li>application/vnd.ogc.se_xml - Service Exception XML
-     * </p>
-     * <p>
-     * Speaking of reality WMS 1.0.0 is unreal - it does not use
-     * mime types (of any form) and makes use of the following
-     * well known formats:
-     * <pre><code>
-     * GIF | JPEG | PNG | WebCGM |
-     * SVG | GML.1 | GML.2 | GML.3 |
-     * WBMP | WMS_XML | MIME | INIMAGE |
-     * TIFF | GeoTIFF | PPM | BLANK
-     * <code></pre>
-     * In the interests of sanity we ask that a WMS 1.0.0 parser
-     * convert these formats to mime types for the rest of the api.
-     * </p>
-     * @param op Opperation Element (like getMap)
-     * @return A List of Strings representing the formats that this operation can be performed with
-     */
-    protected List queryFormats(Element op) {
-        Iterator iter;
-
-        List formats = new ArrayList();
-        List formatElements = op.getChildren("Format"); //$NON-NLS-1$
-        iter = formatElements.iterator();
-
-        while (iter.hasNext()) {
-            Element formatElement = (Element) iter.next();
-            formats.add(formatElement.getValue());
-        }
-
-        return formats;
-    }
-
     protected URL queryPost(Element element) throws MalformedURLException {
         return queryDCPType(element, "Post"); //$NON-NLS-1$
     }
 
     protected URL queryGet(Element element) throws MalformedURLException {
         return queryDCPType(element, "Get"); //$NON-NLS-1$
-    }
-
-    protected URL queryDCPType(Element element, String httpType)
-        throws MalformedURLException {
-        List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
-
-        for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
-            Element dcpTypeElement = (Element) i.next();
-            Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
-
-            Element httpTypeElement = httpElement.getChild(httpType);
-
-            if (httpTypeElement != null) {
-                return parseOnlineResource(httpTypeElement.getChild(
-                        "OnlineResource")); //$NON-NLS-1$
-            }
-        }
-
-        return null;
-    }
-
-    protected URL parseOnlineResource(Element onlineResourceElement)
-        throws MalformedURLException {
-        Namespace xlink = Namespace.getNamespace("xlink", //$NON-NLS-1$
-                "http://www.w3.org/1999/xlink"); //$NON-NLS-1$
-
-        //Element onlineResourceElement = element.getChild(ONLINE_RESOURCE);
-        String onlineResource = onlineResourceElement.getAttributeValue("href", //$NON-NLS-1$
-                xlink);
-
-        return new URL(onlineResource);
     }
 
     /**
@@ -414,52 +305,106 @@ public abstract class AbstractWMSParser implements WMSParser {
         builder.buildService(name, title, onlineResource, description, keywords);
     }
 
-    /**
-     * Takes a Service element, extracts the OnlineResource value and creates
-     * a URL from it.
-     *  
-     * @param serviceElement
-     * @throws MalformedURLException if the OnlineResource element contains an invalid URL
-     * @return a URL containing the value in the OnlineResource element
-     */
-    protected URL queryServiceOnlineResource(Element serviceElement)
-        throws MalformedURLException {
-        return parseOnlineResource(serviceElement.getChild("OnlineResource")); //$NON-NLS-1$
-    }
+    protected Set querySRS(Element layerElement) {
+		Set srss = new TreeSet();
+		
+		List srsElements = layerElement.getChildren("SRS");
+		Iterator iter = srsElements.iterator();
+		while (iter.hasNext()) {
+			Element srsElement = (Element) iter.next();
+	
+			if (srsElement != null) {
+				srss.addAll(Arrays.asList(srsElement.getTextTrim().split(" "))); //$NON-NLS-1$
+			}
+		}
+		
+	    return srss;
+	}
 
-    /**
-     * Takes a Service element and extracts all the keywords from it.
-     * 
-     * @param serviceElement
-     * @return A String[], each element containing a keyword
-     */
-    protected String[] queryKeywords(Element serviceElement) {
-        String[] keywords = null;
-        Element keywordListElement = serviceElement.getChild("KeywordList"); //$NON-NLS-1$
+	protected URL queryServiceOnlineResource(Element serviceElement) throws MalformedURLException {
+	    return new URL(serviceElement.getChildText("OnlineResource")); //$NON-NLS-1$
+	}
 
-        if (keywordListElement != null) {
-            keywords = queryKeywordList(keywordListElement);
-        }
+	protected URL queryDCPType(Element element, String httpType) throws MalformedURLException {
+	    List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
+	
+	    for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
+	        Element dcpTypeElement = (Element) i.next();
+	        Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
+	
+	        Element httpTypeElement = httpElement.getChild(httpType);
+	
+	        if (httpTypeElement != null) {
+	            return new URL((httpTypeElement.getAttributeValue(
+	                    "onlineResource"))); //$NON-NLS-1$
+	        }
+	    }
+	
+	    return null;
+	}
 
-        return keywords;
-    }
+	protected String getRequestGetCapName() {
+	    return "Capabilities"; //$NON-NLS-1$
+	}
 
-    /**
-     * Takes a KeywordList element and extracts all the keywords from it.
-     * 
-     * This is for WMS version 1.1.0 and on.
-     * 
-     * @param keywordListElement
-     * @return A String[], each element containing a keyword
-     */
-    protected String[] queryKeywordList(Element keywordListElement) {
-        String[] keywords = new String[keywordListElement.getChildren().size()];
+	protected String getRequestGetFeatureInfoName() {
+	    return "FeatureInfo"; //$NON-NLS-1$
+	}
 
-        for (int i = 0; i < keywordListElement.getChildren().size(); i++) {
-            Element keyword = (Element) keywordListElement.getChildren().get(i);
-            keywords[i] = keyword.getText();
-        }
+	protected String getRequestGetMapName() {
+	    return "Map"; //$NON-NLS-1$
+	}
 
-        return keywords;
-    }
+	protected String[] queryKeywords(Element serviceElement) {
+	    String keywords = serviceElement.getChildTextTrim("Keywords"); //$NON-NLS-1$
+	
+	    return keywords.split(" "); //$NON-NLS-1$
+	}
+
+	/**
+	 * WMS 1.0 makes use of a different definition of format that what we would like.
+	 * <p>
+	 * KnownFormats for 1.0.0:
+	 * <pre><code>
+	 * GIF | JPEG | PNG | WebCGM |
+	 * SVG | GML.1 | GML.2 | GML.3 |
+	 * WBMP | WMS_XML | MIME | INIMAGE |
+	 * TIFF | GeoTIFF | PPM | BLANK
+	 * </code></pre>
+	 * </p>
+	 * <p>
+	 * Our problem being that queryFormats is expected to return a list of mime types:
+	 * <ul>
+	 * <li>GIF mapped to "image/gif"
+	 * <li>PNG mapped to "image/png"
+	 * <li>JPEG mapped to "image/jpeg"
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * We will need the reverse mapping when need to encode a WMS 1.0.0 request.
+	 * We should probably punt this mapping off to a property file.
+	 * </p>
+	 * @see org.geotools.data.wms.AbstractWMSParser#queryFormats(org.jdom.Element)
+	 */
+	protected List queryFormats(Element op) {
+	    // Example: <Format><PNG /><JPEG /><GML.1 /></Format>
+	    Element formatElement = op.getChild("Format"); //$NON-NLS-1$
+	
+	    Iterator iter;
+	
+	    List formats = new ArrayList();
+	    List formatElements = formatElement.getChildren();
+	    iter = formatElements.iterator();
+	
+	    while (iter.hasNext()) {
+	        Element format = (Element) iter.next();
+	        String mimeType = WMS1_0_0.toMIME(format.getName());
+	
+	        if (mimeType != null) {
+	            formats.add(mimeType);
+	        }
+	    }
+	
+	    return formats;
+	}
 }

@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -162,7 +163,7 @@ public class WMSBuilder {
      * @param styles a List of Strings containing this layer's possible style values
      */
     public void buildLayer(String title, String name, boolean queryable,
-        String parentLayerTitle, List srss, List styles) {
+        String parentLayerTitle, Set srss, List styles) {
         if (layer != null) {
             finishLayer();
         }

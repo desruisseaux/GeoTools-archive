@@ -122,8 +122,8 @@ public class WMS1_0_0Test extends TestCase {
         Layer[] layers = capabilities.getLayers();
         assertEquals(layers[0].getTitle(), "World Map");
         assertEquals(layers[0].getParent(), null);
-        assertEquals(layers[0].getSrs().get(0), "EPSG:4326");
-        assertEquals(layers[0].getSrs().get(1), "EPSG:4327");
+        assertTrue(layers[0].getSrs().contains("EPSG:4326"));
+        assertTrue(layers[0].getSrs().contains("EPSG:4327"));
         assertEquals(layers[1].getTitle(), "Bathymetry");
         assertEquals(layers[1].getName(), "Bathymetry");
         assertEquals(layers[20].getTitle(), "Ocean features");

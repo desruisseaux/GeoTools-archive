@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
 /**
  * @author Richard Gould
  */
-public class GetCapabilitiesRequest extends AbstractRequest {
+public abstract class GetCapabilitiesRequest extends AbstractRequest {
     /**
      * @param onlineResource
      */
@@ -86,17 +86,8 @@ public class GetCapabilitiesRequest extends AbstractRequest {
     }
 
     /**
-     * Default implementation VERSION = 1.1.1
-     * <p>
-     * Subclass can override if needed:
-     * <pre><code>
-     * protected void initVersion(){
-     *   setProperty("WMTVER", "1.0.0");
-     * }
-     * </code></pre>
-     * </p>
+     * Sets up the version number for this request.
+     * Typically something like setProperty("VERSION", "1.1.1");
      */
-    protected void initVersion() {
-        setProperty("VERSION", "1.1.1");
-    }
+    protected abstract void initVersion();
 }

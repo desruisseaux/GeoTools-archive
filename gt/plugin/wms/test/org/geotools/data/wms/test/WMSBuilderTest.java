@@ -16,6 +16,8 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -46,7 +48,7 @@ public class WMSBuilderTest extends TestCase {
         builder.buildGetMapOperation(formats, new URL("http://get.com"),
             new URL("http://post.com"));
 
-        List srss = new ArrayList(2);
+        Set srss = new TreeSet();
         srss.add("EPSG:blah");
         srss.add("EPSG:2");
 
@@ -57,7 +59,7 @@ public class WMSBuilderTest extends TestCase {
         builder.buildLayer("Layer1", "layer1", true, null, srss, styles);
         builder.buildBoundingBox("bork", 1.0, 1.0, 2.0, 2.0);
 
-        srss = new ArrayList(1);
+        srss = new TreeSet();
         srss.add("EPSG:3");
 
         styles = new ArrayList(1);
@@ -75,8 +77,7 @@ public class WMSBuilderTest extends TestCase {
             "image/jpeg");
         assertEquals(capabilities.getLayers()[0].getName(), "layer1");
         assertEquals(capabilities.getLayers()[1].getTitle(), "Layer2");
-        assertEquals((String) capabilities.getLayers()[1].getSrs().get(0),
-            "EPSG:3");
+        assertTrue(capabilities.getLayers()[1].getSrs().contains("EPSG:3"));
 
         BoundingBox bbox = (BoundingBox) capabilities.getLayers()[0].getBoundingBoxes()
                                                                     .get("bork");

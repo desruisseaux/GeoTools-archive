@@ -17,6 +17,7 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.util.InternationalString;
 
 import org.jdom.Document;
 
@@ -72,23 +73,40 @@ public abstract class Specification {
     public abstract GetCapabilitiesRequest createGetCapabilitiesRequest(
         URL server);
 
-    /**
-     * Create parser given document generated from createRequest.
-     * <p>
-     * By allowing the specification to choose a Parser based on the document
-     * we are given an oppertunity to choose a specific parser for several
-     * vendors that generate unusual Capabilities documents.
-     * </p>
-     * <p>
-     * That is even the version number negotiation worked out
-     * with getVersion and createRequest above may not be sufficient to
-     * narrow down our options to a specific parser. Actual document inspection
-     * is required.
-     * </p>
-     * @param document
-     * @return Parser capable of handling provided document
-     * @throws IOException if there is an error reading document
-     */
-    public abstract WMSParser createParser(Document document)
-        throws IOException;
+	protected WMSParser[] parsers;
+
+	/**
+	 * Create a WMSParser capable of parsing a 1.0.0 Capabilities document
+	 * @see org.geotools.data.wms.Specification#createParser(org.jdom.Document)
+	 * @param document a JDOM Document containing the Capabilities to be parsed
+	 * @return a WMSParser that is capable of parsing the provided document
+	 */
+	public WMSParser createParser(Document document) throws IOException {
+	    WMSParser generic = null;
+	    WMSParser custom = null;
+	
+	    for (int i = 0; i < parsers.length; i++) {
+	        int canProcess = parsers[i].canProcess(document);
+	
+	        if (canProcess == WMSParser.GENERIC) {
+	            generic = parsers[i];
+	        } else if (canProcess == WMSParser.CUSTOM) {
+	            custom = parsers[i];
+	        }
+	    }
+	
+	    WMSParser parser = generic;
+	
+	    if (custom != null) {
+	        parser = custom;
+	    }
+	
+	    if (parser == null) {
+	        // Um can we have the name & version number please?
+	        throw new RuntimeException(
+	            new InternationalString("No parsers available to parse that GetCapabilities document").toString());
+	    }
+	
+	    return parser;
+	}
 }

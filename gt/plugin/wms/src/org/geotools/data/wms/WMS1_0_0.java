@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.util.InternationalString;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 
 
 /**
@@ -62,7 +62,6 @@ import org.jdom.Element;
 public class WMS1_0_0 extends Specification {
     static final Map mime = new HashMap();
 
-    //TODO Fill out the rest of these mime types!
     static {
         mime.put("GIF", "image/gif"); //$NON-NLS-1$ //$NON-NLS-2$
         mime.put("PNG", "image/png"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -83,22 +82,12 @@ public class WMS1_0_0 extends Specification {
         mime.put("BLANK", "application/vnd.ogc.se_blank"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private WMSParser[] parsers;
-
     /**
      * Public constructor creates the WMS1_0_0 object.
      */
     public WMS1_0_0() {
         parsers = new WMSParser[1];
         parsers[0] = new Parser();
-    }
-
-    /** 
-     * Expected name attribute for root element
-     * @return the name of the root element for this capabilities specification 
-     */
-    public String getName() {
-        return "WMT_MS_Capabilities"; //$NON-NLS-1$
     }
 
     /**
@@ -149,41 +138,6 @@ public class WMS1_0_0 extends Specification {
         }
 
         return null;
-    }
-
-    /**
-     * Create a WMSParser capable of parsing a 1.0.0 Capabilities document
-     * @see org.geotools.data.wms.Specification#createParser(org.jdom.Document)
-     * @param document a JDOM Document containing the Capabilities to be parsed
-     * @return a WMSParser that is capable of parsing the provided document
-     */
-    public WMSParser createParser(Document document) throws IOException {
-        WMSParser generic = null;
-        WMSParser custom = null;
-
-        for (int i = 0; i < parsers.length; i++) {
-            int canProcess = parsers[i].canProcess(document);
-
-            if (canProcess == WMSParser.GENERIC) {
-                generic = parsers[i];
-            } else if (canProcess == WMSParser.CUSTOM) {
-                custom = parsers[i];
-            }
-        }
-
-        WMSParser parser = generic;
-
-        if (custom != null) {
-            parser = custom;
-        }
-
-        if (parser == null) {
-            // Um can we have the name & version number please?
-            throw new RuntimeException(
-                new InternationalString("No parsers available to parse that GetCapabilities document").toString());
-        }
-
-        return new Parser();
     }
 
     /**
@@ -285,105 +239,6 @@ public class WMS1_0_0 extends Specification {
          */
         public String getVersion() {
             return "1.0.0"; //$NON-NLS-1$
-        }
-
-        /**
-         * WMS 1.0 makes use of a different definition of format that what we would like.
-         * <p>
-         * KnownFormats for 1.0.0:
-         * <pre><code>
-         * GIF | JPEG | PNG | WebCGM |
-         * SVG | GML.1 | GML.2 | GML.3 |
-         * WBMP | WMS_XML | MIME | INIMAGE |
-         * TIFF | GeoTIFF | PPM | BLANK
-         * </code></pre>
-         * </p>
-         * <p>
-         * Our problem being that queryFormats is expected to return a list of mime types:
-         * <ul>
-         * <li>GIF mapped to "image/gif"
-         * <li>PNG mapped to "image/png"
-         * <li>JPEG mapped to "image/jpeg"
-         * </ul>
-         * </p>
-         * <p>
-         * We will need the reverse mapping when need to encode a WMS 1.0.0 request.
-         * We should probably punt this mapping off to a property file.
-         * </p>
-         * @see org.geotools.data.wms.AbstractWMSParser#queryFormats(org.jdom.Element)
-         */
-        protected List queryFormats(Element op) {
-            // Example: <Format><PNG /><JPEG /><GML.1 /></Format>
-            Element formatElement = op.getChild("Format"); //$NON-NLS-1$
-
-            Iterator iter;
-
-            List formats = new ArrayList();
-            List formatElements = formatElement.getChildren();
-            iter = formatElements.iterator();
-
-            while (iter.hasNext()) {
-                Element format = (Element) iter.next();
-                String mimeType = toMIME(format.getName());
-
-                if (mimeType != null) {
-                    formats.add(mimeType);
-                }
-            }
-
-            return formats;
-        }
-
-        protected URL queryDCPType(Element element, String httpType)
-            throws MalformedURLException {
-            List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
-
-            for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
-                Element dcpTypeElement = (Element) i.next();
-                Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
-
-                Element httpTypeElement = httpElement.getChild(httpType);
-
-                if (httpTypeElement != null) {
-                    return new URL((httpTypeElement.getAttributeValue(
-                            "onlineResource"))); //$NON-NLS-1$
-                }
-            }
-
-            return null;
-        }
-
-        protected URL queryServiceOnlineResource(Element serviceElement)
-            throws MalformedURLException {
-            return new URL(serviceElement.getChildText("OnlineResource")); //$NON-NLS-1$
-        }
-
-        protected String[] queryKeywords(Element serviceElement) {
-            String keywords = serviceElement.getChildTextTrim("Keywords"); //$NON-NLS-1$
-
-            return keywords.split(" "); //$NON-NLS-1$
-        }
-
-        protected String getRequestGetCapName() {
-            return "Capabilities"; //$NON-NLS-1$
-        }
-
-        protected String getRequestGetFeatureInfoName() {
-            return "FeatureInfo"; //$NON-NLS-1$
-        }
-
-        protected String getRequestGetMapName() {
-            return "Map"; //$NON-NLS-1$
-        }
-
-        protected List querySRS(Element layerElement) {
-            Element srsElement = layerElement.getChild("SRS"); //$NON-NLS-1$
-
-            if (srsElement != null) {
-                return Arrays.asList(srsElement.getTextTrim().split(" ")); //$NON-NLS-1$
-            }
-
-            return null;
         }
     }
 }

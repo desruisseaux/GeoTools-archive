@@ -123,7 +123,7 @@ public class WMS1_1_1Test extends TestCase {
         assertNull(layer.getName());
         assertEquals(layer.getTitle(), "Microsoft TerraServer Map Server");
         assertEquals(layer.getSrs().size(), 1);
-        assertEquals((String) layer.getSrs().get(0), "EPSG:4326" );
+        assertTrue(layer.getSrs().contains("EPSG:4326" ));
         //TODO Test that latlonBoundingBox works when fixed
         
         assertNull(layer.getParent());
@@ -134,8 +134,8 @@ public class WMS1_1_1Test extends TestCase {
         assertEquals(layer.getName(), "DOQ");
         assertEquals(layer.getTitle(), "USGS Digital Ortho-Quadrangles");
         assertEquals(layer.getSrs().size(), 13);
-        assertEquals(layer.getSrs().get(0), "EPSG:26905");
-        assertEquals(layer.getSrs().get(12), "EPSG:26920");
+        assertTrue(layer.getSrs().contains("EPSG:26905"));
+        assertTrue(layer.getSrs().contains("EPSG:26920"));
         assertEquals(layer.getBoundingBoxes().size(), 13);
         BoundingBox bbox = (BoundingBox) layer.getBoundingBoxes().get("EPSG:26905");
         assertNotNull(bbox);

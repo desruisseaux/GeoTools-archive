@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.data.ows.Layer;
@@ -44,8 +45,8 @@ public class WMSLayerMetadataEntity extends AbstractMetadataEntity {
         return Collections.unmodifiableList(layer.getStyles());
     }
     
-    public List getCRS() {
-        return Collections.unmodifiableList(layer.getSrs());
+    public Set getCRS() {
+        return Collections.unmodifiableSet(layer.getSrs());
     }
     
     public Map getBoundingBoxes() {

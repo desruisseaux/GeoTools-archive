@@ -432,7 +432,7 @@ public class WebMapServer implements Catalog {
                     requestRetriever.join();
 
                     if (capabilities == null) {
-                        issueRequest(new GetCapabilitiesRequest(serverURL),
+                        issueRequest(specification.createGetCapabilitiesRequest(serverURL),
                             false);
                     }
 
