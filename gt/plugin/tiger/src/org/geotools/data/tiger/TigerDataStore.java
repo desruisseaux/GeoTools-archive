@@ -60,16 +60,18 @@ public class TigerDataStore extends AbstractDataStore {
      * @throws IllegalArgumentException DOCUMENT ME!
      */
     public TigerDataStore(String dirName) {
+        this( new File( dirName ));
+    }
+    public TigerDataStore(File dir ) {
         // Do not allow writes
         super(false);
+        directory = dir;
 
-        directory = new File(dirName);
-
-        if (! directory.isDirectory()) {
+        if( !dir.exists() || !dir.isDirectory() ){
             throw new IllegalArgumentException(directory + " is not a directory!");
         }
+    
     }
-
     /**
      * Returns a list of logical tiger files. This routine searches for tiger Type1 (RT1) files in the data store
      * directory and returns the file names. File search is case insensetive so RT1 and rt1 work equally well.

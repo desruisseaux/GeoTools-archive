@@ -51,9 +51,6 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     }
 
     public boolean canProcess(Map params ) {
-        if (!params.containsKey("dir")) {
-            return false;
-        }
         try {
             File file = (File) DIR.lookUp( params );
 

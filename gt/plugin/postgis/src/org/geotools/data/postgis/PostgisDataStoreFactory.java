@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
 
@@ -174,21 +175,24 @@ public class PostgisDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
-        // Try processing params first so we can get an error message
-        // back to the user
+        // lookup will throw error message for
+        // miscoversion or lack of required param
         //
-        if (canProcess(params)) {
-        } else {
-            throw new IOException("The parameteres map isn't correct!!");
-        }
-
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
-
+        // Try processing params first so we can get an error message
+        // back to the user
+        //
+        if (canProcess(params)) {
+            
+        } else {
+            throw new IOException("The parameteres map isn't correct!!");
+        }
+        
         PostgisConnectionFactory connFact = new PostgisConnectionFactory(host,
                 port.toString(), database);
 
@@ -223,7 +227,10 @@ public class PostgisDataStoreFactory
         throw new UnsupportedOperationException(
             "Postgis cannot create a new Database");
     }
-
+    
+    public String getDisplayName() {
+        return "Postgis";
+    }
     /**
      * Describe the nature of the datasource constructed by this factory.
      *
@@ -234,7 +241,13 @@ public class PostgisDataStoreFactory
         return "PostGIS spatial database";
     }
 
-
+	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+	    String host = (String) HOST.lookUp(params);
+        String user = (String) USER.lookUp(params);
+        Integer port = (Integer) PORT.lookUp(params);
+        String database = (String) DATABASE.lookUp(params);
+        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to Postgis database on "+host+" as "+user );
+	}
     /**
      * Determines if the appropriate libraries are present for this datastore
      * factory to successfully produce postgis datastores.  

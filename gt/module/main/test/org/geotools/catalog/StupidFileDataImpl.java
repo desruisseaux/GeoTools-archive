@@ -13,7 +13,7 @@ package org.geotools.catalog;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StupidFileDataImpl extends DefaultMetadataEntity implements
+public class StupidFileDataImpl extends AbstractMetadataEntity implements
         StupidFileData {
 
     /* (non-Javadoc)

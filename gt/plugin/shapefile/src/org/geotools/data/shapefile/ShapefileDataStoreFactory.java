@@ -21,6 +21,7 @@
 package org.geotools.data.shapefile;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -112,6 +113,9 @@ public class ShapefileDataStoreFactory
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    public String getDisplayName() {
+        return "Shapefile";
+    }
     /**
      * Describes the type of data the datastore returned by this factory works
      * with.
@@ -123,6 +127,24 @@ public class ShapefileDataStoreFactory
         return "ESRI(tm) Shapefiles (*.shp)";
     }
 
+    public DataSourceMetadataEnity createMetadata( Map params )
+            throws IOException {
+        
+        URL url = (URL) URLP.lookUp(params);
+        Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
+        
+        String server;
+        String name;
+        if( url.getProtocol().equals("file")){
+            server = "localhost";
+            name = url.getPath();
+        }
+        else {
+            server = url.getHost()+":"+url.getPort();
+            name = url.getFile();
+        }
+        return new DataSourceMetadataEnity( server, name, "Shapefile access for "+url );
+    }
     /**
      * Test to see if this datastore is available, if it has all the
      * appropriate libraries to construct a datastore.  This datastore just

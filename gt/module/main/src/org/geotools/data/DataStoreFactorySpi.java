@@ -21,13 +21,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import org.geotools.catalog.AbstractMetadataEntity;
+import org.geotools.factory.Factory;
 
 /**
  * Constructs a live DataStore from a set of parameters.
  * 
  * <p>
- * An instance of this interface should exist for all data stores which want to
- * take advantage of the dynamic plugin system. In addition to implementing
+ * An instance of this interface should exist for all data stores which want
+ * to take advantage of the dynamic plugin system. In addition to implementing
  * this interface datastores should have a services file:
  * </p>
  * 
@@ -46,13 +48,13 @@ import java.util.Map;
  * </p>
  * 
  * <p>
- * The factories are never called directly by users, instead the
- * DataStoreFinder class is used.The DataStoreFinder may implements the
- * Catalog interface
+ * The factories are never called directly by client code, instead the
+ * DataStoreFinder class is used.
  * </p>
  * 
  * <p>
- * The following example shows how a user might connect to a PostGIS database:
+ * The following example shows how a user might connect to a PostGIS database,
+ * and maintain the resulting datastore in a registry:
  * </p>
  * 
  * <p>
@@ -66,48 +68,113 @@ import java.util.Map;
  * params.put("user","postgis_ro");
  * params.put("passwd","postgis_ro");
  * 
- * DataStoreFinder catalog = DataStoreFinder();
- * catalog.addDataStore("leeds", params);
+ * DefaultRegistry registry = new DefaultRegistry();
+ * registry.addDataStore("leeds", params);
  * 
- * DataStore postgis = catalog.getDataStore( "leeds" );
+ * DataStore postgis = registry.getDataStore( "leeds" );
  * FeatureSource = postgis.getFeatureSource( "table" );
  * </code></pre>
  * </p>
  *
  * @author Jody Garnett, Refractions Research
  */
-public interface DataStoreFactorySpi extends org.geotools.factory.Factory {
+public interface DataStoreFactorySpi extends Factory {
     /**
      * Construct a live data source using the params specifed.
-     *
+     * <p>
+     * You can think of this as setting up a connection to the back
+     * end data source.
+     * </p>
+     * <p>
+     * Magic Params: the following params are magic and are honoured by
+     * convention by the GeoServer and uDig application.
+     * <ul>
+     * <li>"user": is taken to be the user name
+     *     </li>
+     * <li>"passwd": is taken to be the password
+     *     </li>
+     * <li>"namespace": is taken to be the namespace prefix (and will be kept
+     *     in sync with GeoServer namespace management.
+     *     </li>
+     * </ul>
+     * When we eventually move over to the use of OpperationalParam
+     * we will have to find someway to codify this convention.
+     * </p>
+     * 
      * @param params The full set of information needed to construct a live
      *        data store. Typical key values for the map include: url -
      *        location of a resource, used by file reading datasources. dbtype
      *        - the type of the database to connect to, e.g. postgis, mysql
      *
-     * @return The created DataSource, this may be null if the required
+     * @return The created DataStore, this may be null if the required
      *         resource was not found or if insufficent parameters were given.
      *         Note that canProcess() should have returned false if the
      *         problem is to do with insuficent parameters.
      *
-     * @throws IOException if there were any problems creating or connecting
-     *         the datasource.
+     * @throws IOException if there were any problems setting up
+     *         (creating or connecting) the datasource.
      */
     DataStore createDataStore(Map params) throws IOException;
 
+    /**
+     * Construct a simple MetadataEntity providing internationlization information
+     * for the data source that *would* be created by createDataStore.
+     * <p>
+     * Suitable for use by CatalogEntry, unknown if this will make
+     * a DataStore behind the scenes or not. It is possible it will
+     * communicate with the data source though (hense the IOException).
+     * </p>
+     * @param params The full set of information needed to construct a live
+     *        data store
+     * @return MetadataEntity with descriptive information (including
+     *         internationlization support). 
+     * @throws IOException
+     */
+    DataSourceMetadataEnity createMetadata( Map params ) throws IOException;
+    
+    /**
+     * Construct a <b>new</b> data source using the params specified.
+     * <p>
+     * I am not sure how "cool" this idea is; often you need more/different
+     * parameters for DataStore construction (then the params used to
+     * createDataStore).
+     * </p>
+     * 
+     * <p>
+     * Many data sources will not be able to create "new" construct;
+     * you cannot use this method to define a new Database for example.
+     * This is the method you would use to set up a new shapefile though.
+     * </p>
+     * 
+     * @param params The full set of information needed to construct a new
+     *        data store.
+     * @return The created Data Store
+     * @throws IOException IOException for any problems creating the new
+     *         data source.
+     */
     DataStore createNewDataStore(Map params) throws IOException;
 
+    /** 
+     * Name suitable for display to end user.
+     * <p>
+     * A non localized display name for this data store type.
+     * </p>
+     * @return A short name suitable for display in a user interface.
+     */
+    String getDisplayName();
+    
     /**
      * Describe the nature of the datasource constructed by this factory.
-     *
+     * <p>
+     * A non localized description of this data store type.
+     * </p>
      * @return A human readable description that is suitable for inclusion in a
      *         list of available datasources.
      */
     String getDescription();
 
     /**
-     * MetaData about the required Parameters.
-     * 
+     * MetaData about the required Parameters (for createDataStore).
      * <p>
      * Interpretation of FeatureDescriptor values:
      * </p>
@@ -135,13 +202,15 @@ public interface DataStoreFactorySpi extends org.geotools.factory.Factory {
      * return info.getPropertyDescriptors();
      * <code></pre>
      *
-     * @return
+     * @return Param array describing the Map for createDataStore
      */
     Param[] getParametersInfo();
 
     /**
      * Test to see if this factory is suitable for processing the data pointed
-     * to by the param tags. If this datasource requires a number of
+     * to by the params map.
+     * <p>
+     * If this datasource requires a number of
      * parameters then this mehtod should check that they are all present and
      * that they are all valid. If the datasource is a file reading data
      * source then the extentions or mime types of any files specified should
@@ -181,6 +250,7 @@ public interface DataStoreFactorySpi extends org.geotools.factory.Factory {
      * <p>
      * Subclasses may provide specific setAsText()/getAsText() requirements
      * </p>
+     * @deprecated Start to move towards org.geotools.parameter classes
      */
     class Param {
         /** True if Param is required */

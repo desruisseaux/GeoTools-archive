@@ -19,6 +19,7 @@
  */
 package org.geotools.data.tiger;
 
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
@@ -63,9 +64,13 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
      * @throws IOException
      */
     public DataStore createDataStore(Map params) throws IOException {
-        String dirName = (String) params.get("directory");
-
-        return new TigerDataStore(dirName);
+        File file = (File) DIRECTORY.lookUp( params );
+        if( file.exists() && file.isDirectory() ){
+            return new TigerDataStore(file);    
+        }
+        else {
+            throw new IOException();
+        }
     }
 
     /**
@@ -97,6 +102,9 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
         return new TigerDataStore(dirName);
     }
 
+    public String getDisplayName() {
+        return "Tiger";
+    }
     /**
      * getDescription
      *
@@ -106,16 +114,23 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
         return "Data Store for TIGER/Line 2002 Line files.";
     }
 
+    public static final Param DIRECTORY = new Param("directory", File.class,
+    "Directory containing TIGER/Line 2002 files.");
+
+    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+        if( !canProcess( params )){
+            throw new IOException( "Provided params cannot be used to connect");
+        }
+        File dir = (File) DIRECTORY.lookUp( params );
+        return new DataSourceMetadataEnity( dir, "Tiger data source access for " + dir );
+    }
     /**
      * getParametersInfo
      *
      * @return Param[]
      */
     public Param[] getParametersInfo() {
-        Param dir = new Param("directory", String.class,
-                "Directory containing TIGER/Line 2002 files.");
-
-        return new Param[] { dir };
+        return new Param[] { DIRECTORY };
     }
 
     /**
@@ -143,7 +158,11 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
      * @return boolean
      */
     public boolean canProcess(Map params) {
-        return (params != null) && params.containsKey("directory")
-        && params.get("directory") instanceof String;
+        try {
+            File file = (File) DIRECTORY.lookUp( params );
+            return (file.exists() && file.isDirectory());
+        } catch (Exception e) {
+            return false;
+        }        
     }
 }

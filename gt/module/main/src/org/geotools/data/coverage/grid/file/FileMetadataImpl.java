@@ -16,7 +16,7 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.geotools.catalog.DefaultMetadataEntity;
+import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.data.coverage.grid.Format;
 import java.io.File;
 
@@ -27,7 +27,7 @@ import java.io.File;
  * @author jeichar
  *
  */
-public class FileMetadataImpl extends DefaultMetadataEntity implements FileMetadata {
+public class FileMetadataImpl extends AbstractMetadataEntity implements FileMetadata {
     String name;
     String path;
     String extension;

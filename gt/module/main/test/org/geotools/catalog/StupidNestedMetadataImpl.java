@@ -25,7 +25,7 @@ package org.geotools.catalog;
  * @author jeichar
  *
  */
-public class StupidNestedMetadataImpl extends DefaultMetadataEntity implements
+public class StupidNestedMetadataImpl extends AbstractMetadataEntity implements
         StupidNestedMetadata {
 
     /** 

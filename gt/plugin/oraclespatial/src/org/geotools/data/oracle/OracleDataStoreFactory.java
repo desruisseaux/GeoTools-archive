@@ -21,8 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.jdbc.ConnectionPool;
 
 /**
@@ -85,15 +87,47 @@ public class OracleDataStoreFactory
      * @return True if all the required parameters are supplied.
      */
     public boolean canProcess(Map params) {
-        //J-
-        return params.containsKey("dbtype") 
-            && params.get("dbtype").equals("oracle") 
-            && params.containsKey("host") 
-            && params.containsKey("port") 
-            && params.containsKey("user")
-            && params.containsKey("passwd") 
-            && params.containsKey("instance");
-        //J+
+        if (params != null) {
+            Param arrayParameters[] = getParametersInfo();
+            for (int i = 0; i < arrayParameters.length; i++) {
+            	Param param = arrayParameters[i];
+            	Object value;
+            	if( !params.containsKey( param.key ) ){
+            		if( param.required ){
+            			return false; // missing required key!
+            		}
+            		else {
+            			continue;
+            		}
+            	}
+				try {
+					value = param.lookUp( params );
+				} catch (IOException e) {
+					// could not upconvert/parse to expected type!
+					// even if this parameter is not required
+					// we are going to refuse to process
+					// these params
+					return false; 
+				}
+				if( value == null ){					
+					if (param.required) {
+                        return (false);
+                    }
+                }
+				else {
+					if ( !param.type.isInstance( value )){
+						return false; // value was not of the required type
+					}
+				}
+            }
+        } else {
+            return (false);
+        }
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("oracle"))) {
+            return (false);
+        } else {
+            return (true);
+        }
     }
     /**
      * Construct a postgis data store using the params.
@@ -111,21 +145,25 @@ public class OracleDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if (!canProcess(params)) {
-            return null;
-        }
-
         /* There are no defaults here. Calling canProcess verifies that
          * all these variables exist.
          */
-        String host = (String) params.get("host");
-        String port = (String) params.get("port");
-        String instance = (String) params.get("instance");
-        String user = (String) params.get("user");
-        String passwd = (String) params.get("passwd");
-        String schema = (String) params.get("schema");
-        String namespace = (String) params.get("namespace");
-
+        String host = (String) HOST.lookUp( params );
+        String port = (String) PORT.lookUp( params );
+        String instance = (String) INSTANCE.lookUp( params );
+        String user = (String) USER.lookUp( params );
+        String passwd = (String) PASSWD.lookUp( params );
+        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase
+        String namespace = (String) NAMESPACE.lookUp( params );
+        String dbtype = (String) DBTYPE.lookUp( params );
+        
+        if( !"oracle".equals( dbtype )){
+            throw new IOException( "Parameter 'dbtype' must be oracle");
+        }
+        
+        if (!canProcess(params)) {
+            throw new IOException("Cannot connect using provided parameters");
+        }
         try {
             OracleConnectionFactory ocFactory = new OracleConnectionFactory(host, port, instance);
             ocFactory.setLogin(user, passwd);
@@ -149,6 +187,9 @@ public class OracleDataStoreFactory
         throw new UnsupportedOperationException("Oracle cannot create a new Database");
     }
 
+    public String getDisplayName() {
+        return "Oracle";
+    }
     /**
      * Describe the nature of the datastore constructed by this factory.
      *
@@ -158,7 +199,14 @@ public class OracleDataStoreFactory
     public String getDescription() {
         return "Oracle Spatial Database";
     }
-
+	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+	    String host = (String) HOST.lookUp( params );
+        String port = (String) PORT.lookUp( params );
+        String instance = (String) INSTANCE.lookUp( params );
+        String user = (String) USER.lookUp( params );
+        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase        
+        return new DataSourceMetadataEnity( host+":"+port, instance, "Connect to oracle using schema '"+schema+"' as  "+user );
+	}
     /**
      * Returns whether the OracleDataStoreFactory would actually be able to
      * generate a DataStore.  Depends on whether the appropriate libraries
@@ -178,6 +226,48 @@ public class OracleDataStoreFactory
         //check for sdoapi too?
     }
 
+    static final Param DBTYPE = new Param("dbtype", String.class, "This must be 'oracle'.", true,"oracle");
+    static final Param HOST = new Param("host", String.class, "The host name of the server.", true);
+    static final Param PORT = new Param("port", String.class, "The port oracle is running on. " +
+            "(Default is 1521)", true, "1521");    
+    static final Param USER = new Param("user", String.class, "The user name to log in with.", true);
+    static final Param PASSWD = new Param("passwd", String.class, "The password.", true);
+    static final Param INSTANCE = new Param("instance", String.class, "The name of the Oracle instance to connect to.", true);
+    
+    /** Apparently Schema must be uppercase */
+    static final Param SCHEMA = new Param("schema", String.class, "The schema name to narrow down the exposed tables (must be upper case).", false){
+        public Object lookUp(Map map) throws IOException {
+            if (!map.containsKey(key)) {
+                if (required) {
+                    throw new IOException("Parameter " + key + " is required:"
+                        + description);
+                } else {
+                    return null;
+                }
+            }
+            Object value = map.get(key);
+            if (value == null) {
+                return null;
+            }
+            if (value instanceof String) {
+                String text = (String) value;
+                if( text == null ){
+                    return null;
+                }
+                else if( text.equals( text.toUpperCase() ) ){
+                    return text;
+                }
+                else {
+                    throw new IOException("Schema must be supplied in uppercase" );
+                }                
+            }
+            else {
+                throw new IOException( "String required for parameter " + key + ": not "
+                    + value.getClass().getName());
+            }
+        }
+    };
+    static final Param NAMESPACE = new Param("namespace", String.class, "The namespace to give the DataStore", false);
     /**
      * Describe parameters.
      * 
@@ -186,15 +276,14 @@ public class OracleDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[]{
-            new Param("dbtype", String.class, "This must be 'oracle'.", true,"oracle"),            
-            new Param("host", String.class, "The host name of the server.", true),
-            new Param("port", String.class, "The port oracle is running on. " +
-                      "(Default is 1521)", true, "1521"),
-            new Param("user", String.class, "The user name to log in with.", true),
-            new Param("passwd", String.class, "The password.", true),
-            new Param("instance", String.class, "The name of the Oracle instance to connect to.", true),   
-            new Param("schema", String.class, "The schema name to narrow down the exposed tables.", false),
-            new Param("namespace", String.class, "The namespace to give the DataStore", false)
+            DBTYPE,            
+            HOST,
+            PORT,
+            USER,
+            PASSWD,
+            INSTANCE,   
+            SCHEMA,
+            NAMESPACE
         };                
     }
  

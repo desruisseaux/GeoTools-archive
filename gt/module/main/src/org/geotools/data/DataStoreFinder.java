@@ -17,6 +17,7 @@
 package org.geotools.data;
 
 import org.geotools.factory.FactoryFinder;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,11 +47,6 @@ import java.util.logging.Logger;
  * 
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
- * </p>
- * 
- * <p>
- * The use of this class may be hidden by an implementation of the Catalog
- * interface in later release.
  * </p>
  */
 public final class DataStoreFinder {

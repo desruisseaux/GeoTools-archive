@@ -1,5 +1,6 @@
 package org.geotools.data.property;
 
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
@@ -8,10 +9,15 @@ import java.util.Map;
 
 
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
+    
     public DataStore createDataStore(Map params) throws IOException {
         File dir = (File) params.get("directory");
-        
-        return new PropertyDataStore( dir );
+        if( dir.exists() && dir.isDirectory() ){
+            return new PropertyDataStore( dir );
+        }
+        else {
+            throw new IOException("Directory is required");
+        }
     }
     public DataStore createNewDataStore(Map params) throws IOException {
         File dir = (File) params.get("directory");
@@ -28,14 +34,24 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
         }
         return new PropertyDataStore(dir);
     }
+    public String getDisplayName() {
+        return "Properties";
+    }
     public String getDescription() {
         return "Allows access to Java Property files containing Feature information";
     }
+    public DataSourceMetadataEnity createMetadata( Map params )
+            throws IOException {
+        if( !canProcess( params )){
+            throw new IOException( "Provided params cannot be used to connect");
+        }
+        File dir = (File) DIRECTORY.lookUp( params );
+        return new DataSourceMetadataEnity( dir, "Property file access for " + dir );        
+    }    
+    Param DIRECTORY = new Param("directory", File.class,
+            "Directory containting property files", true);
     public Param[] getParametersInfo() {
-        Param directory = new Param("directory", File.class,
-                "Directory containting property files", true);
-
-        return new Param[] { directory, };
+        return new Param[] { DIRECTORY, };
     }
     
 	/**
@@ -56,7 +72,12 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
 	}
     
     public boolean canProcess(Map params) {
-        return (params != null) && params.containsKey("directory")
-        && params.get("directory") instanceof File;
+        try {
+            File file = (File) DIRECTORY.lookUp( params );
+            return file.exists() && file.isDirectory();
+        }
+        catch ( Exception erp ){
+            return false;
+        }        
     }
 }
