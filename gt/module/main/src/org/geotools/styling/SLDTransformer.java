@@ -290,10 +290,10 @@ public class SLDTransformer extends TransformerBase {
         
         public void visit(Style style) {
             start("NamedLayer");
+            start("UserStyle");
             element("Name",style.getName());
             element("Title",style.getTitle());
             element("Abstract",style.getAbstract());
-            start("UserStyle");
             
             FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
             

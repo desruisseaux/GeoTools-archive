@@ -10,6 +10,7 @@ import org.geotools.filter.Expression;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 
 public class SLDParser {
@@ -18,7 +19,8 @@ public class SLDParser {
     .getLogger("org.geotools.styling");
     private static final org.geotools.filter.FilterFactory FILTERFACTORY = org.geotools.filter.FilterFactory
     .createFilterFactory();
-    protected java.io.InputStream instream;
+//    protected java.io.InputStream instream;
+    protected InputSource source;
     private org.w3c.dom.Document dom;
     protected StyleFactory factory;
     private String graphicSt = "Graphic";    // to make pmd to shut up
@@ -86,7 +88,18 @@ public class SLDParser {
      */
     public SLDParser(StyleFactory factory, java.io.InputStream s) {
         this(factory);
-        instream = s;
+        setInput(s);
+    }
+    
+    /**
+     * Creates a new SLDStyle object.
+     *
+     * @param factory The StyleFactory to use to read the file
+     * @param s The inputstream to be read
+     */
+    public SLDParser(StyleFactory factory, java.io.Reader r) {
+        this(factory);
+        setInput(r);
     }
     
     /**
@@ -97,7 +110,7 @@ public class SLDParser {
      * @throws java.io.FileNotFoundException if the file is missing
      */
     public void setInput(String filename) throws java.io.FileNotFoundException {
-        instream = new java.io.FileInputStream(new File(filename));
+        source = new InputSource(new java.io.FileInputStream(new File(filename)));
     }
     
     /**
@@ -108,7 +121,7 @@ public class SLDParser {
      * @throws java.io.FileNotFoundException if the file is missing
      */
     public void setInput(File f) throws java.io.FileNotFoundException {
-        instream = new java.io.FileInputStream(f);
+        source = new InputSource(new java.io.FileInputStream(f));
     }
     
     /**
@@ -119,7 +132,7 @@ public class SLDParser {
      * @throws java.io.IOException If anything goes wrong opening the url
      */
     public void setInput(java.net.URL url) throws java.io.IOException {
-        instream = url.openStream();
+        source = new InputSource(url.openStream());
     }
     
     /**
@@ -128,7 +141,16 @@ public class SLDParser {
      * @param in the inputstream used to read the SLD from
      */
     public void setInput(java.io.InputStream in) {
-        instream = in;
+        source = new InputSource(in);
+    }
+    
+    /**
+     * Sets the input stream to read the SLD from
+     *
+     * @param in the inputstream used to read the SLD from
+     */
+    public void setInput(java.io.Reader in) {
+        source = new InputSource(in);
     }
     
     /**
@@ -145,7 +167,7 @@ public class SLDParser {
         dbf.setNamespaceAware(true);
         try {
             javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-            dom = db.parse(instream);
+            dom = db.parse(source);
         } catch (javax.xml.parsers.ParserConfigurationException pce) {
             throw new RuntimeException(pce);
         } catch (org.xml.sax.SAXException se) {
@@ -215,7 +237,7 @@ public class SLDParser {
         
         try {
             javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-            dom = db.parse(instream);
+            dom = db.parse(source);
             // for our next trick do something with the dom.
        
             NodeList nodes  = findElements(dom, "StyledLayerDescriptor");
@@ -374,7 +396,8 @@ public class SLDParser {
         for (int j = 0; j < children.getLength(); j++) {
             Node child = children.item(j);
             
-            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE) || 
+                    (child.getFirstChild()==null) ) {
                 continue;
             }
 //            System.out.println("The child is: " + child.getNodeName() + " or " + child.getLocalName() + " prefix is " +child.getPrefix());
