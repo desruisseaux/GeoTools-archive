@@ -156,9 +156,6 @@ public class DocumentWriter {
             FileWriter wf = new FileWriter(f2);
             writeSchema(schema, wf, hints2);
             wf.close();
-
-            // would be thrown anyway
-            //                throw new IOException("Schema Cannot be written to "+f2);
         }
 
         FileWriter wf = new FileWriter(f);
@@ -203,8 +200,6 @@ public class DocumentWriter {
             Writer w2 = (Writer) hints.get(WRITE_SCHEMA);
             writeSchema(schema, w2, hints);
 
-            // would be thrown anyway
-            //                throw new IOException("Schema Cannot be written to "+f2);
         }
 
         WriterContentHandler wch = new WriterContentHandler(schema, w, hints); // should deal with xmlns declarations
@@ -1778,7 +1773,9 @@ public class DocumentWriter {
                                 }
                             } catch (URISyntaxException e) {
                                 logger.warning(e.toString());
-                                throw new IOException(e.toString());
+                                IOException t = new IOException(e.toString());
+                                t.initCause(e);
+                                throw t;
                             }
                         }
                     }

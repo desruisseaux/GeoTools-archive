@@ -231,7 +231,9 @@ public class FCBuffer extends Thread implements FeatureReader {
         throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
-            throw new IOException(exception.toString());
+            IOException e = new IOException(exception.toString());
+            e.initCause(exception);
+            throw e;
         }
 
         size--;
@@ -252,7 +254,9 @@ public class FCBuffer extends Thread implements FeatureReader {
         throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
-            throw new IOException(exception.toString());
+            IOException e = new IOException(exception.toString());
+            e.initCause(exception);
+            throw e;
         }
 
         Feature f = features[head];
@@ -268,7 +272,9 @@ public class FCBuffer extends Thread implements FeatureReader {
         }
 
         if (exception != null) {
-            throw new IOException(exception.toString());
+            IOException e = new IOException(exception.toString());
+            e.initCause(exception);
+            throw e;
         }
 
         logger.finest("hasNext " + size);
@@ -279,7 +285,9 @@ public class FCBuffer extends Thread implements FeatureReader {
 
             if (exception != null) {
                 state = STOP;
-                throw new IOException(exception.toString());
+                IOException e = new IOException(exception.toString());
+                e.initCause(exception);
+                throw e;
             }
 
             logger.finest("waiting for parser");
