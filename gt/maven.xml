@@ -1,43 +1,5 @@
 <!-- ==================================================================== -->
-<!-- R E A C T O R                                                        -->
-<!-- ==================================================================== -->
-<!-- This is a template for a reactor that will hopefully allow users     -->
-<!-- to easily set up their own reactors. The best the reactor can do     -->
-<!-- now is take a set of projects and process them according to their    -->
-<!-- sorted dependencies.                                                 -->
-<!--                                                                      -->
-<!-- This particular reactor will take a set of projects and:             -->
-<!--                                                                        -->
-<!-- a) sort the order of processing based on dependencies                -->
-<!-- b) clean                                                             -->
-<!-- c) compile                                                           -->
-<!-- d) run unit tests                                                    -->
-<!-- e) build the project jar                                             -->
-<!-- f) install the project jar in the local repository jar so the        -->
-<!--    subsequent builds may use it.                                     -->
-<!--                                                                      -->
-<!-- In addition to the build, documentation for each of the projects     -->
-<!-- will be produced and a front-end site will be produced using general -->
-<!-- information about the parent project and information gleaned from    -->
-<!-- each of the individual projects. The attempt is to try and           -->
-<!-- alleviate the manual aggregation of specific project information     -->
-<!-- that needs to be present on the front-end site. So you might want    -->
-<!-- to glean the navigation or a short synopsis of each project          -->
-<!-- automatically.                                                       -->
-<!--                                                                      -->
-<!-- The hope is to provide a model and a set of best practices for       -->
-<!-- collaborative development. How to set up a multi-component project   -->
-<!-- like the commons; how to perform meaningful CI on multi-component    -->
-<!-- projects; how to produce meaningful documentation with minimal       -->
-<!-- developer input; how to set up tests; how to manage dependencies;    -->
-<!-- and who knows what else.                                             -->
-<!--                                                                      -->
-<!-- There are a few things coming in the near future that should make    -->
-<!-- the reactor truly useful. We have made some Quartz Jelly tags so     -->
-<!-- that we can schedule reactors using familiar cron-like semantics. We -->
-<!-- also have Werkflow Jelly tags so that we can capture the various     -->
-<!-- states of the reactor and perform arbitrary actions based any        -->
-<!-- number and combination of conditions.                                -->
+<!-- GeoTools additional build goals and modifications                    -->
 <!-- ==================================================================== -->
 <!--
 <project default="build"
@@ -63,6 +25,7 @@
       If building everything use:
         maven build         -- this will try to build all modules regardless
         maven createRelease -- uses argument: -Drelease.version=2.1.x
+        maven xjavadoc      -- creates a single merged javadoc
                         
       If building a single module use one of:
         maven java:compile -- compile java files in src/
@@ -81,9 +44,8 @@
         <preGoal name="checkstyle:init">
             <echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
             <j:set var="maven.checkstyle.properties" value="${basedir}/../../geotools_checks.xml"/>
-
-
         </preGoal>
+        
         <goal name="mergeTestReports">
             <echo>merging test reports into higher directory</echo>
            <ant:copy todir="../../target/test-reports">
@@ -112,8 +74,6 @@
         </postGoal>
 <!-- ==================================================================
      B U I L D
-     Currently makes use of multiple maven:reactor tags, James is looking into a
-     maven:multiproject replacement
      ================================================================== -->
         <goal name="build">
                 <tstamp/>
@@ -262,56 +222,7 @@
         <preGoal name="site:generate">
                 <attainGoal name="pmd"/>
         </preGoal>
-        <goal name="allsite">
-                <maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" goals="site:generate" banner="Generating site for" ignoreFailures="true"/>
-                <j:set var="ok" value="${reactorProjects}"/>
-                <maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" postProcessing="true" ignoreFailures="true"/>
-                <j:forEach var="module" items="${reactorProjects}">
-                        <j:set var="status" value="failed"/>
-                        <j:forEach var="item" items="${ok}">
-                                <j:if test="${item == module}">
-                                        <j:set var="status" value="installed"/>
-                                </j:if>
-                        </j:forEach>
-                        <echo>Module ${module} : ${status}</echo>
-                </j:forEach>
-                <j:file name="${basedir}/xdocs/buildreport.xml" prettyPrint="true">
-                        <document>
-                                <properties>
-                                        <title>Javadoc Report</title>
-                                </properties>
-                                <body>
-                                        <section name="Javadoc Report">
-                                                <p/>
-                                                <source>
-                        The following is a list of all modules and their current status.
-If you are the maintainer of a module which has failed and which is not dependent on a module
-higher in the list which has also failed please try to resolve the issue.  <p/>
-                                                        <j:forEach var="module" items="${reactorProjects}">
-                                                                <j:set var="status" value="failed"/>
-                                                                <j:forEach var="item" items="${ok}">
-                                                                        <j:if test="${item == module}">
-                                                                                <j:set var="status" value="installed"/>
-                                                                        </j:if>
-                                                                </j:forEach>
-Module ${module} : ${status}
-<p/>
-                                                        </j:forEach>
-                                                </source>
-                                        </section>
-                                </body>
-                        </document>
-                </j:file>
-        </goal>
-        <goal name="deploy-allsite">
-                <!--
-      ||
-      || Deploy the documentation for each of the commons projects.
-      ||
-    -->
-                <maven:reactor basedir="${basedir}/geotools-src" includes="*/project.xml" goals="clean,site:deploy" banner="Deploying site for" ignoreFailures="true"/>
-        </goal>
-
+   
 
        <postGoal name="test:test">
             <echo>merging test reports into higher directory</echo>
@@ -322,32 +233,6 @@ Module ${module} : ${status}
     </ant:copy>
         </postGoal>
 
-
-        <!-- ================================================================== -->
-        <!-- Creates a geotools.jar of the core modules.                        -->
-        <!-- Needs more work, this is just an initial stab to get it working.   -->
-        <!-- ================================================================== -->
-    <goal name="coreJar">
-            <echo>Making core geotools.jar</echo>
-            <echo>build must be run first or this will create an empty jar.</echo>
-            <echo>We didn't want it automatically running every time you </echo>
-             <echo>need a new jar.  TODO: figure a better way to do this. </echo>
-              <ant:jar destfile="${basedir}/target/geotools.jar">
-            <ant:fileset dir="${basedir}/geotools-src/core/target/classes"/>
-
-
-             <ant:fileset dir="${basedir}/geotools-src/data/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/defaultcore/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/filter/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/cts-coordtrans/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/gcs-coverage/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/lite-rendering/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/resources/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/sldstyling/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/svgsupport/target/classes"/>
-             <ant:fileset dir="${basedir}/geotools-src/opengis/target/classes"/>
-            </ant:jar>
-        </goal>
 
 
         <goal name="createRelease">
@@ -418,11 +303,7 @@ ${required}"/>
 
 
         <goal name="moveForMerge">
-
-
-                <echo message="working on ${pom.id} for merge"/>
-
-
+               <echo message="working on ${pom.id} for merge"/>
                <ant:copy todir="../../target/forMerge">
                    <ant:fileset dir="./target/classes">
                      <ant:include name="**/*"/>
@@ -448,8 +329,7 @@ ${required}"/>
                 </j:forEach>
                  <echo file="../../${release.report}" append="true">  OK</echo>
         </goal>
-
-
+        
         <goal name="movePluginBin">
             <j:set var="release.report" value="releaseReport-${release.version}.txt"/>
             <echo file="../../${release.report}" append="true">
@@ -514,7 +394,6 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                   <echo message="working on ${pom.id} to find 3rd party jars to include"/>
                 <j:forEach var="lib" items="${pom.artifacts}">
                       <j:set var="dep" value="${lib.dependency}"/>
-                    <!--  <j:if test="${dep.getProperty('release.bundle')=='true'}"> -->
                         <j:if test="${dep.groupId !='gt2'}">
                          <j:if test="${dep.type =='jar'}">
                          <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
@@ -528,7 +407,6 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                              </j:if>
                               </j:if>
                         </j:if>
-                  <!--  </j:if>  -->
                 </j:forEach>
         </goal>
 
@@ -548,7 +426,6 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                   <echo message="working on ${pom.id} to find 3rd party jars to include"/>
                 <j:forEach var="lib" items="${pom.artifacts}">
                       <j:set var="dep" value="${lib.dependency}"/>
-                    <!--  <j:if test="${dep.getProperty('release.bundle')=='true'}"> -->
                         <j:if test="${dep.groupId !='gt2'}">
                          <j:if test="${dep.type =='jar'}">
                          <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
@@ -562,14 +439,11 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                              </j:if>
                               </j:if>
                         </j:if>
-                  <!--  </j:if>  -->
-                </j:forEach>
+                 </j:forEach>
         </goal>
         
 
         <goal name="moveBuildFiles">
-
-
             <ant:tstamp/>
             <ant:copy todir="${basedir}/target/srcRelease">
                <ant:fileset dir=".">
@@ -587,11 +461,7 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
             </ant:copy>
         </goal>
 
-
         <goal name="moveSrc">
-           <!-- <j:set var="stable" value="${maven.module.stable}"/>
-            <j:if test="${stable == true}">
-             <echo message="${pom.id} is stable"/> -->
              <ant:copy todir="../../target/srcRelease/module/${pom.artifactId}/">
                <ant:fileset dir=".">
                  <ant:include name="src/**"/>
@@ -601,12 +471,8 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                  <ant:include name="run-maven.xml"/>
                </ant:fileset>
              </ant:copy>
-            <!-- </j:if> -->
     </goal>
     <goal name="moveExtSrc">
-           <!-- <j:set var="stable" value="${maven.module.stable}"/>
-            <j:if test="${stable == true}">
-             <echo message="${pom.id} is stable"/> -->
              <ant:copy todir="../../target/srcRelease/ext/${pom.artifactId}/">
                <ant:fileset dir=".">
                  <ant:include name="src/**"/>
@@ -616,12 +482,8 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                  <ant:include name="run-maven.xml"/>
                </ant:fileset>
              </ant:copy>
-            <!-- </j:if> -->
     </goal>
     <goal name="movePluginSrc">
-           <!-- <j:set var="stable" value="${maven.module.stable}"/>
-            <j:if test="${stable == true}">
-             <echo message="${pom.id} is stable"/> -->
              <ant:copy todir="../../target/srcRelease/plugin/${pom.artifactId}/">
                <ant:fileset dir=".">
                  <ant:include name="src/**"/>
@@ -631,7 +493,6 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
                  <ant:include name="run-maven.xml"/>
                </ant:fileset>
              </ant:copy>
-            <!-- </j:if> -->
     </goal>
  <goal name="xjavadoc">
 
