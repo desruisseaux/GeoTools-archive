@@ -38,6 +38,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
 
 
 /**
@@ -61,6 +64,7 @@ import java.util.List;
  * @see net.refractions.jspatial.jts
  */
 public final class SDO {
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle.sdo");
     public static final int SRID_NULL = -1;
 
     /** Used to test for Counter Clockwise or Clockwise Linear Rings */
@@ -2268,7 +2272,7 @@ public final class SDO {
      * @param element
      * @param coords
      *
-     * @return
+     * @return Point
      */
     private static Point createPoint(GeometryFactory gf, final int GTYPE,
         final int SRID, final int[] elemInfo, final int element,
@@ -2412,11 +2416,13 @@ public final class SDO {
      * @param triplet Triplet in elemInfo to process as a Polygon
      * @param coords Coordinates to interpret using elemInfo
      *
-     * @return Polygon as encoded by elemInfo
+     * @return Polygon as encoded by elemInfo, or null when faced with and
+     *         encoding that can not be captured by JTS
+     * @throws IllegalArgumentException When faced with an invalid SDO encoding
      */
     private static Polygon createPolygon(GeometryFactory gf, final int GTYPE,
         final int SRID, final int[] elemInfo, final int triplet,
-        CoordinateSequence coords) {
+        CoordinateSequence coords) throws IllegalArgumentException  {
         final int STARTING_OFFSET = STARTING_OFFSET(elemInfo, triplet);
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
@@ -2430,12 +2436,14 @@ public final class SDO {
 
 		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+			throw new IllegalArgumentException("ELEM_INFO inconsistent with ORDINATES");
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
+			throw new IllegalArgumentException("POLYGON or POLYGON_EXTERIOR ETYPE Expected");
+		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
+		    // we cannot represent INTERPRETATION == 2 (curves) using JTS
+		    LOGGER.warning( "Could not create Polygon with INTERPRETATION == 2 (curves)");
 			return null;
-		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3))
-			return null;
-			
+		}
 
         LinearRing exteriorRing = createLinearRing(gf, GTYPE, SRID, elemInfo,
                 triplet, coords);
@@ -2808,9 +2816,9 @@ POLYGONS:
      * @param coords Coordinates to interpret using elemInfo
      * @param N Number of triplets (or -1 for rest)
      *
-     * @return
+     * @return GeometryCollection
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IllegalArgumentException DWhen faced with an encoding error
      */
     private static GeometryCollection createCollection(GeometryFactory gf,
         final int GTYPE, final int SRID, final int[] elemInfo,

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import oracle.jdbc.OracleConnection;
 //import oracle.sdoapi.OraSpatialManager;
@@ -40,6 +41,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  */
 public class OracleDataStore extends JDBCDataStore {
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
+    
     /**
      * @param connectionPool
      * @param config
