@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-wfs</name>
+  <id>wfs</id>
+  <currentVersion>2.1.x</currentVersion>
+  <versions>
+    <version>
+      <id>b1</id>
+      <name>2.1.x</name>
+      <tag>GT_2_0_B6_DEV</tag>
+    </version>
+  </versions>
+  <package>org.geotools</package>
+  <shortDescription>wfs client module</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>wfs client module</description>
+  <mailingLists />
+  <developers>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+	<role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Norman Barker</name>
+      <id>nbarker</id>
+      <email>normanb@comsine.co.uk</email>
+      <organization>ComSine</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+      <properties>
+        <release.bundle>true</release.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>META-INF/</include>
+            <include>**/test-data/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
