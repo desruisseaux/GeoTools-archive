@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
@@ -36,7 +37,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  *
  * @author Jody Garnett, Refractions Research
  */
-public class PostgisDataStoreFactory
+public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
     /** Creates PostGIS-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "org.postgresql.Driver";
@@ -116,40 +117,8 @@ public class PostgisDataStoreFactory
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
-        if (params != null) {
-            for (int i = 0; i < arrayParameters.length; i++) {
-            	Param param = arrayParameters[i];
-            	Object value;
-            	if( !params.containsKey( param.key ) ){
-            		if( param.required ){
-            			return false; // missing required key!
-            		}
-            		else {
-            			continue;
-            		}
-            	}
-				try {
-					value = param.lookUp( params );
-				} catch (IOException e) {
-					// could not upconvert/parse to expected type!
-					// even if this parameter is not required
-					// we are going to refuse to process
-					// these params
-					return false; 
-				}
-				if( value == null ){					
-					if (param.required) {
-                        return (false);
-                    }
-                }
-				else {
-					if ( !param.type.isInstance( value )){
-						return false; // value was not of the required type
-					}
-				}
-            }
-        } else {
-            return (false);
+        if( !super.canProcess( params ) ){
+            return false; // was not in agreement with getParametersInfo
         }
         if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
             return (false);
@@ -184,15 +153,13 @@ public class PostgisDataStoreFactory
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
-        // Try processing params first so we can get an error message
-        // back to the user
-        //
-        if (canProcess(params)) {
-            
-        } else {
-            throw new IOException("The parameteres map isn't correct!!");
-        }
         
+        // Try processing params first so we can get real IO
+        // error message back to the user
+        //
+        if (!canProcess(params)) {
+            throw new IOException("The parameteres map isn't correct!!");
+        }        
         PostgisConnectionFactory connFact = new PostgisConnectionFactory(host,
                 port.toString(), database);
 
@@ -246,7 +213,7 @@ public class PostgisDataStoreFactory
         String user = (String) USER.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
-        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to Postgis database on "+host+" as "+user );
+        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to "+getDisplayName()+" on "+host+" as "+user );
 	}
     /**
      * Determines if the appropriate libraries are present for this datastore
