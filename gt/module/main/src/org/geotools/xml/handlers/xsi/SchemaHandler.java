@@ -358,12 +358,8 @@ public class SchemaHandler extends XSIElementHandler {
             }
         }
 
-        //System.out.println(prefix + ":"+targetNamespace);
-        if (prefix == null) {
-            //System.out.println("prefix is null");
+        if (prefix == null && prefixCache!=null) {
             prefix = (String) prefixCache.get(targetNamespace);
-
-            //System.out.println("prefix is now "+prefix);
         }
 
         Iterator it = null;
