@@ -23,7 +23,7 @@
       <id>dzwiers</id>
       <email>dzwiers@refractions.net</email>
       <organization>Refractions Research</organization>
-      <roles>
+      <roles>  
 	<role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
