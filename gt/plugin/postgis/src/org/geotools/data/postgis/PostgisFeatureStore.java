@@ -17,10 +17,12 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -806,18 +808,28 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             Envelope retEnv = new Envelope();
             Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
             AttributeType[] attributeTypes = schema.getAttributeTypes();
-
+            FeatureType schemaNew = schema;
+            	//DJB: this should ensure that schema has a geometry in it or the bounds query has no chance of working
 			if(!query.retrieveAllProperties()) {
 				try {
-                    schema = DataUtilities.createSubType(schema, query.getPropertyNames());
+                    schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
+                    if (schemaNew.getDefaultGeometry() == null)  // does the schema have a geometry in it?
+                    {
+                    	//uh-oh better get one!
+                    	ArrayList al = new ArrayList (Arrays.asList(query.getPropertyNames()));
+                    	al.add(schema.getDefaultGeometry().getName());
+                    	schemaNew = DataUtilities.createSubType(schema, (String[]) al.toArray(new String[1]) );                    	
+                    }
                 } catch (SchemaException e1) {
                     throw new DataSourceException("Could not create subtype", e1);
                 }
 			}
 			 
-
-            for (int j = 0, n = schema.getAttributeCount(); j < n; j++) {
-                if (attributeTypes[j].isGeometry()) {
+			 attributeTypes = schemaNew.getAttributeTypes();
+				 
+            for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
+                if (Geometry.class.isAssignableFrom(attributeTypes[j].getType())) // same as .isgeometry() - see new featuretype javadoc
+                {
                     String attName = attributeTypes[j].getName();
                     Envelope curEnv = getEnvelope(conn, attName, sqlBuilder, filter);
 
@@ -831,8 +843,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             LOGGER.finer("returning bounds " + retEnv);
 
-            if(schema!=null)
-                return new ReferencedEnvelope(retEnv,schema.getDefaultGeometry().getCoordinateSystem());
+            if(schemaNew!=null)
+                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCoordinateSystem());
             if(query.getCoordinateSystem()!=null)
                 return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
             return new ReferencedEnvelope(retEnv,null);
