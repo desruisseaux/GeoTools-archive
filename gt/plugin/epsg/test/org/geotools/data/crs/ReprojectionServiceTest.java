@@ -18,13 +18,17 @@
  */
 package org.geotools.data.crs;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemAuthorityFactory;
-import org.geotools.data.crs.CRSService;
-
-import org.opengis.referencing.FactoryException;
-
 import junit.framework.TestCase;
+
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.ct.MathTransform;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author Jody Garnett
@@ -41,13 +45,69 @@ public class ReprojectionServiceTest extends TestCase {
 		service = new CRSService();
 	}
 
-	public void testEPSG() throws FactoryException {
+	public void testEPSG42102() throws Exception {
 	    CoordinateSystem bc = service.createCoordinateSystem("EPSG:42102");
 		assertNotNull( "bc", bc );
 	}
-	public void testAUTO() throws FactoryException {	
+    
+	public void testAUTO4200() throws Exception {	
 		CoordinateSystem utm = service.createCoordinateSystem("AUTO:42001,0.0,0.0");
 		assertNotNull( "auto-utm", utm );		
 	}
 
+    public void test4269() throws Exception {
+        CoordinateSystem latlong = service.createCoordinateSystem("EPSG:4269");
+        assertNotNull( "latlong", latlong );
+        latlong = service.createCoordinateSystem("4269");
+        assertNotNull( "latlong", latlong );
+    }
+    
+    public void testTranform() throws Exception {
+        CoordinateSystem bc = service.createCoordinateSystem("EPSG:42102");
+        CoordinateSystem latlong = service.createCoordinateSystem("EPSG:4269");
+        
+        MathTransform transform = CRSService.reproject( bc, latlong, true );
+        
+        // origional bc alberts
+        Polygon poly1 = poly( new double[] {
+                1187128,395268, 1187128,396027,
+                1188245,396027, 1188245,395268,
+                1187128,395268} );
+
+        // transformed
+        Polygon poly2 = poly( new double[] {
+                -123.470095558323,48.5432615620081, -123.469728946766,48.5500959221152,
+                -123.454638288508,48.5497352036088, -123.455007082796,48.5429008916377,
+                -123.470095558323,48.5432615620081} );        
+        
+        Polygon polyAfter = CRSService.transform( poly1, transform );
+        System.out.println( "  actual:"+ polyAfter );
+        System.out.println( "expected:"+ poly2 );        
+        //assertEquals( poly2, polyAfter );
+        
+        Envelope before = poly1.getEnvelopeInternal();
+        Envelope expected = poly2.getEnvelopeInternal();
+        Envelope after = CRSService.transform( before, transform );
+        
+        System.out.println( "  actual:"+ after );
+        System.out.println( "expected:"+ expected );                
+        //assertEquals( expected, after );        
+    }
+    
+    public static GeometryFactory factory = new GeometryFactory();
+    
+    public static Polygon poly( double coords[] ) {
+        return factory.createPolygon( ring( coords ), null );
+    }
+    public static LinearRing ring( double coords[] ) {
+        return factory.createLinearRing( coords( coords ) );
+    }
+    public static CoordinateSequence coords( double coords[] ) {
+        Coordinate array[] = new Coordinate[ coords.length/2 ];
+        for( int i=0; i<array.length; i++ ) {
+            array[i] = new Coordinate( coords[i*2], coords[i*2+1] );
+        }
+        return factory.getCoordinateSequenceFactory().create( array );
+    }
+    
 }
