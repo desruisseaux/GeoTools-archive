@@ -99,7 +99,7 @@ public class SchemaHandler extends XSIElementHandler {
             prefixCache.put(uri, pref);
         } else {
             // we have already started
-            if (targetNamespace.equals(uri)) {
+            if (targetNamespace.equals(uri.toString())) {
                 prefix = pref;
             }
         }
@@ -341,6 +341,12 @@ public class SchemaHandler extends XSIElementHandler {
             if (thisURI != null) {
                 uri = thisURI.resolve(uri);
             }
+        }
+//System.out.println(prefix + ":"+targetNamespace);
+        if(prefix == null){
+//System.out.println("prefix is null");
+			prefix = (String)prefixCache.get(targetNamespace);
+//System.out.println("prefix is now "+prefix);
         }
 
         Iterator it = null;

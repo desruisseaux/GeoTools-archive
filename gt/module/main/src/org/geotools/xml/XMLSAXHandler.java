@@ -225,7 +225,8 @@ public class XMLSAXHandler extends DefaultHandler {
                     String targ = (String) it.next();
                     String prefix = (String) schemaProxy.get(targ);
                     ehf.startPrefixMapping(prefix, targ);
-                    schemaProxy.remove(targ);
+//                    schemaProxy.remove(targ);
+                    it.remove();
                 }
             }
         }

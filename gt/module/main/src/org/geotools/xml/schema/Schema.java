@@ -18,6 +18,8 @@ package org.geotools.xml.schema;
 
 import java.net.URI;
 
+import org.geotools.factory.Factory;
+
 
 /**
  * <p>
@@ -38,10 +40,17 @@ import java.net.URI;
  * orderwithin the sets, except where order is explicitly defined (Sequence,
  * Choice).
  * </p>
+ * 
+ * <p>
+ * This method must be inplemented within extensions: 
+ *  public static Schema getInstance();. It will be used by the Schema factory to 
+ *  load the required extensions into memory.
+ *  </p>
  *
  * @author dzwiers www.refractions.net
  */
-public interface Schema {
+public interface Schema extends Factory{
+    
     /**
      * Used to denote byte masks representing either XML block attributes or
      * XML final attributes.
@@ -245,6 +254,10 @@ public interface Schema {
      * Often this method uses some heuritics on the list of included URIs.
      * This allows one Schema to represent one targetNamespace, but be
      * potentially represented in more than one file.
+     * </p>
+     * 
+     * <p>
+     * Used to determine if the uri should provided should be included in an instance document.
      * </p>
      *
      * @param uri

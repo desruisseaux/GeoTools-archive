@@ -59,6 +59,15 @@ import javax.naming.OperationNotSupportedException;
  * @see Schema
  */
 public class XLinkSchema implements Schema {
+
+
+    private static Schema instance = new XLinkSchema();
+    /**
+     * @see org.geotools.xml.schema.Schema#getInstance()
+     */
+    public static Schema getInstance() {
+        return instance;
+    }
     // local list of attribute declarations
     private static final Attribute[] attributes = loadAttributes();
 
@@ -260,6 +269,13 @@ public class XLinkSchema implements Schema {
         // list of allowable enumeration values
         private static List lookUpTable = loadTable();
 
+
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return null; // will never happen
+        }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element,
          *      java.lang.Object, java.util.Map)
@@ -427,6 +443,13 @@ public class XLinkSchema implements Schema {
             return null;
         }
 
+
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return null; // will never happen
+        }
         /**
          * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
          *      java.lang.Object, java.util.Map)

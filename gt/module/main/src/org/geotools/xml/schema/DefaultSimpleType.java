@@ -80,6 +80,13 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
+     * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+     */
+    public Element findChildElement(String name) {
+        return null; // will never happen
+    }
+
+    /**
      * @see org.geotools.xml.xsi.SimpleType#getFinal()
      */
     public int getFinal() {

@@ -436,7 +436,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
                 }
             }
 
-            return null;
+            return type==null?null:type.findChildElement(name);
         }
 
         /**

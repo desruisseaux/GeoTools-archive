@@ -41,7 +41,6 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.gml.GMLSchema.AttributeList;
 import org.geotools.xml.gml.GMLSchema.GMLAttribute;
 import org.geotools.xml.gml.GMLSchema.GMLComplexType;
@@ -53,7 +52,6 @@ import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
-import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xLink.XLinkSchema;
@@ -313,7 +311,8 @@ public class GMLComplexTypes {
 
     static void encode(Element e, MultiLineString g, PrintHandler output)
         throws IOException {
-        if ((g == null) || (g.getNumPoints() > 0)) {
+
+        if ((g == null) || g.isEmpty()) {
             return;
         }
 
@@ -489,7 +488,7 @@ public class GMLComplexTypes {
 
         Coordinate c = coords[0];
 
-        if (c.z == Double.NaN) {
+        if (Double.isNaN(c.z)) {
             output.characters(c.x + cs + c.y);
         } else {
             output.characters(c.x + cs + c.y + cs + c.z);
@@ -498,7 +497,7 @@ public class GMLComplexTypes {
         for (int i = 1; i < coords.length; i++) {
             c = coords[i];
 
-            if (c.z == Double.NaN) {
+            if (Double.isNaN(c.z)) {
                 output.characters(ts + c.x + cs + c.y);
             } else {
                 output.characters(ts + c.x + cs + c.y + cs + c.z);
@@ -726,6 +725,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class AbstractGeometryType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new AbstractGeometryType();
 
@@ -863,6 +870,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class AbstractGeometryCollectionBaseType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        
         private static final Attribute[] attributes = {
                 new GMLSchema.GMLAttribute("gid",
                     XSISimpleTypes.ID.getInstance()),
@@ -999,6 +1014,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class GeometryAssociationType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elems;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new GeometryAssociationType();
 
@@ -1165,6 +1188,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PointMemberType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PointMemberType();
 
@@ -1338,6 +1369,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class LineStringMemberType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new LineStringMemberType();
 
@@ -1508,6 +1547,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PolygonMemberType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PolygonMemberType();
 
@@ -1681,6 +1728,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class LinearRingMemberType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new LinearRingMemberType();
 
@@ -1853,6 +1908,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PointType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PointType();
 
@@ -2022,6 +2085,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class LineStringType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new LineStringType();
 
@@ -2203,6 +2274,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class LinearRingType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new LinearRingType();
 
@@ -2382,6 +2461,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class BoxType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new BoxType();
 
@@ -2594,6 +2681,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PolygonType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PolygonType();
 
@@ -2760,6 +2855,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class GeometryCollectionType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new GeometryCollectionType();
 
@@ -2909,6 +3012,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiPointType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiPointType();
 
@@ -3061,6 +3172,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiLineStringType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiLineStringType();
 
@@ -3213,6 +3332,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiPolygonType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiPolygonType();
 
@@ -3364,6 +3491,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class CoordType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new CoordType();
 
@@ -3542,6 +3677,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class CoordinatesType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new CoordinatesType();
 
@@ -3639,8 +3782,6 @@ public class GMLComplexTypes {
 
             String val = (String) value[0].getValue();
 
-            //System.out.println("**"+val+"**");
-            //System.out.println("TOUPLE SPLITER = ^^^"+ts+"^^^");
             String[] touples = val.split(ts);
             Coordinate[] coordinates = new Coordinate[touples.length];
 
@@ -3750,6 +3891,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class AbstractFeatureType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // static attribute list
         private static final Attribute[] attributes = {
                 new GMLAttribute("fid", XSISimpleTypes.ID.getInstance(),
@@ -4006,7 +4155,6 @@ public class GMLComplexTypes {
             while ((t != null) && (t != this))
                 t = (t.getParent() instanceof ComplexType)
                     ? (ComplexType) t.getParent() : null;
-
             return t != null;
         }
 
@@ -4019,7 +4167,6 @@ public class GMLComplexTypes {
             Map hints) throws IOException, OperationNotSupportedException {
             if (canEncode(element, value, hints)) {
                 Feature f = (Feature) value;
-
                 if (element == null) {
                     print(f, output, hints);
                 } else {
@@ -4183,6 +4330,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class AbstractFeatureCollectionType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new AbstractFeatureCollectionType();
 
@@ -4368,24 +4523,22 @@ public class GMLComplexTypes {
                 Feature f = i.next();
                 output.startElement(GMLSchema.NAMESPACE, "featureMember", null);
 
-                if (e == null) {
-                    Schema s = SchemaFactory.getInstance(element.getNamespace());
-                    FeatureType ft = f.getFeatureType();
-                    Element[] elems = s.getElements();
-
-                    if ((elems != null) && (ft.getTypeName() != null)) {
-                        for (int j = 0; j < elems.length; j++)
-                            if (ft.getTypeName().equalsIgnoreCase(elems[j]
-                                        .getName())) {
-                                // possible match, check inheritance
-                                if ((elems[j].getType() != null)
-                                        && AbstractFeatureType.getInstance()
-                                                                  .canEncode(elems[j],
-                                            f, hints)) {
-                                    e = elems[j];
-                                    j = elems.length;
-                                }
-                            }
+                if (e == null) { // first time
+                    e = output.findElement(f.getFeatureType().getTypeName());
+                    // should go to an abstract FT eventually
+                    ComplexType t = e.getType() instanceof ComplexType? (ComplexType)e.getType():null;
+                    while(t!=null && t!=AbstractFeatureType.getInstance())
+                        t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
+                    if(t!=AbstractFeatureType.getInstance()){
+                        // not the right element ... try by type
+                        e = output.findElement(value);
+                        // should go to an abstract FT eventually
+                        t = e.getType() instanceof ComplexType? (ComplexType)e.getType():null;
+                        while(t!=null && t!=AbstractFeatureType.getInstance())
+                            t = t.getParent() instanceof ComplexType? (ComplexType)t.getParent():null;
+                        if(t!=AbstractFeatureType.getInstance()){
+                            throw new OperationNotSupportedException("Could not find a correct Element for FeatureType "+f.getFeatureType().getTypeName());
+                        }
                     }
                 }
 
@@ -4400,11 +4553,9 @@ public class GMLComplexTypes {
             }
 
             if (element == null) {
-                output.startElement(GMLSchema.NAMESPACE, "_featureCollection",
-                    null);
+                output.endElement(GMLSchema.NAMESPACE, "_featureCollection");
             } else {
-                output.startElement(element.getNamespace(), element.getName(),
-                    null);
+                output.endElement(element.getNamespace(), element.getName());
             }
         }
     }
@@ -4422,6 +4573,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class GeometryPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new GeometryPropertyType();
 
@@ -4591,6 +4750,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class FeatureAssociationType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new FeatureAssociationType();
 
@@ -4765,6 +4932,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class BoundingShapeType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new BoundingShapeType();
 
@@ -4902,27 +5077,18 @@ public class GMLComplexTypes {
                         element.findChildElement("Box").getType().encode(element
                             .findChildElement("Box"), value, output, hints);
                     }
-                }
-
-                Schema s = SchemaFactory.getInstance(element.getNamespace());
-                Element[] elems = s.getElements();
-
-                if (elems != null) {
-                    for (int i = 0; i < elems.length; i++) {
-                        // TODO check for .equals working
-                        if ((elems[i].getSubstitutionGroup() != null)
-                                && elems[i].getSubstitutionGroup().equals((new GMLSchema())
-                                    .getElements()[41])
-                                && elems[i].getType().canEncode(elems[i],
-                                    value, hints)) {
-                            elems[i].getType().encode(elems[i], value, output,
-                                hints);
-                            output.endElement(element.getNamespace(),
-                                element.getName());
-
-                            return;
-                        }
+                }else{
+                    if(element.getType() instanceof ComplexType){
+                        ComplexType ct = (ComplexType)element.getType();
+                        Element[] elems = ct.getChildElements();
+                        if(elems!=null)
+                        for(int i=0;i<elems.length;i++)
+                            if(elems[i].getType().canEncode(elems[i],value,hints)){
+                                elems[i].getType().encode(elems[i],value,output,hints);
+                                i = elems.length;
+                            }
                     }
+                    // otherwise don't encode
                 }
 
                 BoxType.getInstance().encode(null, value, output, hints);
@@ -4944,6 +5110,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PointPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PointPropertyType();
 
@@ -5094,6 +5268,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class PolygonPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new PolygonPropertyType();
 
@@ -5244,6 +5426,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class LineStringPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new LineStringPropertyType();
 
@@ -5395,6 +5585,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiPointPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiPointPropertyType();
 
@@ -5546,6 +5744,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiLineStringPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiLineStringPropertyType();
 
@@ -5698,6 +5904,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiPolygonPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiPolygonPropertyType();
 
@@ -5850,6 +6064,14 @@ public class GMLComplexTypes {
      * @see ComplexType
      */
     static class MultiGeometryPropertyType extends GMLComplexType {
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        
         // singleton instance
         private static final GMLComplexType instance = new MultiGeometryPropertyType();
 

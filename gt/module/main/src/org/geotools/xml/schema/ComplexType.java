@@ -93,16 +93,7 @@ public interface ComplexType extends Type {
      * @see ElementGrouping
      */
     public ElementGrouping getChild();
-
-    /**
-     * Convinience method used to search this type's children for the
-     * requested element by localName.
-     *
-     * @param name the element's localName to search for.
-     *
-     * @return
-     */
-    public Element findChildElement(String name);
+    public Element[] getChildElements();
 
     /**
      * Specifies a mask which denotes which substitution mechanisms prohibited

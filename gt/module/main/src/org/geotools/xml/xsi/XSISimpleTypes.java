@@ -28,6 +28,7 @@ import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -219,6 +220,14 @@ public class XSISimpleTypes {
      * @author dzwiers
      */
     protected static abstract class XSISimpleType implements SimpleType {
+
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return null;
+        }
+        
         /**
          * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute,
          *      java.lang.Object, java.util.Map)
@@ -334,6 +343,13 @@ public class XSISimpleTypes {
         public Facet[] getFacets() {
             return null;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(java.lang.String name) {
+            return null;
+        }
     }
 
     /**
@@ -345,7 +361,6 @@ public class XSISimpleTypes {
      */
     public static class Integer extends XSISimpleType {
         private static SimpleType instance = new Integer();
-
         /**
          * @see org.geotools.xml.xsi.Type#getName()
          */

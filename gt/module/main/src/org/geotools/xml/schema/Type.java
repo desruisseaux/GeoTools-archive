@@ -112,4 +112,15 @@ public interface Type {
      */
     public void encode(Element element, Object value, PrintHandler output, Map hints) 
     	throws IOException, OperationNotSupportedException;
+
+
+    /**
+     * Convinience method used to search this type's children for the
+     * requested element by localName.
+     *
+     * @param name the element's localName to search for.
+     *
+     * @return
+     */
+    public Element findChildElement(String name);
 }

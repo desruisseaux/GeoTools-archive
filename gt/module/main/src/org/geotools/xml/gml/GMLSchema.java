@@ -54,6 +54,7 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers www.refractions.net
  */
 public class GMLSchema implements Schema {
+    
     /** GML target namespace */
     public static String NAMESPACE = "http://www.opengis.net/gml";
 
@@ -170,7 +171,7 @@ public class GMLSchema implements Schema {
         elements[0] = new GMLElement("_Feature",
                 GMLComplexTypes.AbstractFeatureType.getInstance(), 1, 1, true,
                 null); // gml:AbstractFeatureType
-        elements[1] = new GMLElement("FeatureCollection",
+        elements[1] = new GMLElement("featureCollection",
                 GMLComplexTypes.AbstractFeatureCollectionType.getInstance(), 1,
                 1, true, elements[0]); // gml:AbstractFeatureCollectionType
         elements[2] = new GMLElement("featureMember",
@@ -347,7 +348,7 @@ public class GMLSchema implements Schema {
 
     private static Schema[] loadImports() {
         Schema[] r = new Schema[1];
-        r[0] = SchemaFactory.getInstance(XLinkSchema.NAMESPACE);
+        r[0] = XLinkSchema.getInstance();
 
         if (r[0] == null) {
             // make + register a new one ...
@@ -1044,5 +1045,20 @@ public class GMLSchema implements Schema {
                 new DefaultFacet(Facet.ENUMERATION, "missing"),
             };
         }
+
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return null; // will never happen
+        }
+    }
+
+    private static Schema instance = new GMLSchema();
+    /**
+     * @see org.geotools.xml.schema.Schema#getInstance()
+     */
+    public static Schema getInstance() {
+        return instance;
     }
 }

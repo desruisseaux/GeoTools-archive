@@ -24,6 +24,7 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+
 import java.net.URI;
 
 
@@ -38,6 +39,15 @@ import java.net.URI;
  * @author Norman Barker www.comsine.com
  */
 public class WFSSchema implements Schema {
+
+    private static Schema instance = new WFSSchema();
+    /**
+     * @see org.geotools.xml.schema.Schema#getInstance()
+     */
+    public static Schema getInstance() {
+        return instance;
+    }
+    
     /** DOCUMENT ME!  */
     public static String NAMESPACE = "http://www.opengis.net/wfs";
 

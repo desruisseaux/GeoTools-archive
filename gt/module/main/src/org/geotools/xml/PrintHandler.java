@@ -16,6 +16,8 @@
  */
 package org.geotools.xml;
 
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import java.io.IOException;
 
@@ -109,4 +111,12 @@ public interface PrintHandler {
      * @throws IOException  
      */
     public void endDocument() throws IOException;
+    
+    public Schema getDocumentSchema();
+    
+    public Element findElement(Object value);
+    
+    public Element findElement(String name);
+    
+    public Object getHint(Object key);
 }

@@ -16,6 +16,7 @@
  */
 package org.geotools.xml;
 
+import org.geotools.factory.FactoryFinder;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
@@ -24,13 +25,17 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.SAXException;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -68,7 +73,7 @@ public class SchemaFactory {
      * not really, but the JVM might be better ... use the class to make
      * instances
      */
-    private static Map schemas = new HashMap();
+    private static Map schemas = loadSchemas();
 
     /*
      * The SAX parser to use if one is required ... isn't loaded until first
@@ -77,30 +82,78 @@ public class SchemaFactory {
     private static SAXParser parser;
 
     /*
-     * This contains the mappings of String -> String for pre-defined namespaces
-     * in the form of targetNamespace -> ClassName , where ClassName is a String
-     * representation of the name of a Schema instance of the targetNamespace.
      */
-    private static Map mappings = loadMappings();
+    private static Map loadSchemas(){
+        schemas = new HashMap();
+        
+        ClassLoader[] cls = findLoaders();
+        String serviceId = "META-INF/services/" + Schema.class.getName();
+        for(int i=0;i<cls.length;i++){
+            try{
+            Enumeration e = cls[i].getResources(serviceId);
+            while(e.hasMoreElements()){
+                URL res = (URL)e.nextElement();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(res.openStream(),"UTF-8"));
+                while(rd.ready()){
+                    String factoryClassName = rd.readLine().trim();
+                    try {
+                        Schema s = (Schema)cls[i].loadClass(factoryClassName).getDeclaredMethod("getInstance",new Class[0]).invoke(null,new Object[0]);
+//System.out.println(s.getTargetNamespace());
+                        schemas.put(s.getTargetNamespace(),s);
+                    } catch (IllegalArgumentException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    } catch (SecurityException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    } catch (InvocationTargetException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    } catch (NoSuchMethodException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    } catch (ClassNotFoundException e1) {
+                        // TODO log this
+                        e1.printStackTrace();
+                    }
+                }
+                rd.close();
+            }
+            }catch(IOException e){
+                // TODO log this
+                e.printStackTrace();
+            }
+        }
+        return schemas;
+    }
+    
+    // stolen from FactoryFinder.findLoaders
+    private static ClassLoader[] findLoaders(){
+        // lets get a class loader. By using the Thread's class loader, we allow
+        // for more flexability.
+        ClassLoader contextLoader = null;
 
-    /*
-     * loads the mappings of targetNamespace -> ClassName from
-     * SchemaFactory.properties into the static class Map, mappings.
-     */
-    private static Map loadMappings() {
-        mappings = new HashMap();
-
-        ResourceBundle rb = ResourceBundle.getBundle(SchemaFactory.class
-                .getName());
-        Enumeration e = rb.getKeys();
-
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            String val = rb.getString(key);
-            mappings.put(key, val);
+        try {
+            contextLoader = Thread.currentThread().getContextClassLoader();
+        } catch (SecurityException se) {
         }
 
-        return mappings;
+        ClassLoader systemLoader = FactoryFinder.class.getClassLoader();
+
+        ClassLoader[] classLoaders;
+        if (contextLoader == null || contextLoader == systemLoader) {
+            classLoaders = new ClassLoader[1];
+            classLoaders[0] = systemLoader;
+        } else {
+            classLoaders = new ClassLoader[2];
+            classLoaders[0] = contextLoader;
+            classLoaders[1] = systemLoader;
+        }
+
+        return classLoaders;
     }
 
     /**
@@ -139,19 +192,19 @@ public class SchemaFactory {
             return r;
         }
 
-        if (mappings.containsKey(targetNamespace)) {
-            ClassLoader cl = SchemaFactory.class.getClassLoader();
-
-            try {
-                Class c = cl.loadClass((String) mappings.get(targetNamespace));
-                r = (Schema) c.getConstructor(new Class[0]).newInstance(new Object[0]);
-                schemas.put(targetNamespace, r);
-
-                return r;
-            } catch (Exception e) {
-                return null;
-            }
-        }
+//        if (mappings.containsKey(targetNamespace)) {
+//            ClassLoader cl = SchemaFactory.class.getClassLoader();
+//
+//            try {
+//                Class c = cl.loadClass((String) mappings.get(targetNamespace));
+//                r = (Schema) c.getConstructor(new Class[0]).newInstance(new Object[0]);
+//                schemas.put(targetNamespace, r);
+//
+//                return r;
+//            } catch (Exception e) {
+//                return null;
+//            }
+//        }
 
         return null;
     }
@@ -173,18 +226,18 @@ public class SchemaFactory {
         URI desiredSchema, Level level) throws SAXException {
         if ((targetNamespace == null) || "".equals(targetNamespace)
                 || (schemas.get(targetNamespace) == null)) {
-            if (mappings.containsKey(targetNamespace)) {
-                ClassLoader cl = SchemaFactory.class.getClassLoader();
-
-                try {
-                    Class c = cl.loadClass((String) mappings.get(
-                                targetNamespace));
-                    schemas.put(targetNamespace,
-                        c.getConstructor(new Class[0]).newInstance(new Object[0]));
-                } catch (Exception e) {
-                    throw new SAXException(e);
-                }
-            } else {
+//            if (mappings.containsKey(targetNamespace)) {
+//                ClassLoader cl = SchemaFactory.class.getClassLoader();
+//
+//                try {
+//                    Class c = cl.loadClass((String) mappings.get(
+//                                targetNamespace));
+//                    schemas.put(targetNamespace,
+//                        c.getConstructor(new Class[0]).newInstance(new Object[0]));
+//                } catch (Exception e) {
+//                    throw new SAXException(e);
+//                }
+//            } else {
                 setParser();
 
                 XSISAXHandler contentHandler = new XSISAXHandler(desiredSchema);
@@ -201,7 +254,7 @@ public class SchemaFactory {
                 }
 
                 schemas.put(targetNamespace, contentHandler.getSchema());
-            }
+//            }
         } else {
             if (!((Schema) schemas.get(targetNamespace)).includesURI(
                         desiredSchema)) {

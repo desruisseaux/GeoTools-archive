@@ -7,11 +7,15 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.resources.TestData;
+import org.geotools.xml.gml.GMLSchema;
+import org.geotools.xml.schema.Schema;
+import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -27,6 +31,11 @@ import javax.xml.parsers.SAXParserFactory;
  * @author dzwiers www.refractions.net
  */
 public class GMLParserTester extends TestCase {
+    public void testSchema() throws SAXException, IOException {
+        Schema s = SchemaFactory.getInstance(GMLSchema.NAMESPACE);
+        assertNotNull(s);
+    }
+    
     public void testOneFeature() throws SAXException, IOException {
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -165,6 +174,74 @@ public class GMLParserTester extends TestCase {
             assertNotNull("Feature #"+j+" is null",ft);
             System.out.println("Feature "+j+" : "+ft);
             j++;
+        }
+    }
+    public void testOneFeatureWrite(){
+
+        try {            
+        String path = "geoserver/oneFeature.xml";
+
+        File f = TestData.file(this,path);
+
+        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+        assertNotNull("Document missing", doc);
+
+        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+                
+        path = "oneFeature_out.xml";
+        f = new File(f.getParentFile(),path);
+        if(f.exists())
+            f.delete();
+        f.createNewFile();
+        
+        DocumentWriter.writeDocument(doc,s,f,null);
+        
+        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+        assertNotNull("New Document missing", doc);
+        
+        assertTrue("file was not created +f",f.exists());
+        System.out.println(f);
+        } catch (SAXException e) {
+            e.printStackTrace();
+            fail(e.toString());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail(e.toString());
+        }
+    }
+    public void testOneFeatureWriteWithHints(){
+
+        try {            
+        String path = "geoserver/oneFeature.xml";
+
+        File f = TestData.file(this,path);
+
+        Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+        assertNotNull("Document missing", doc);
+
+        Schema s = SchemaFactory.getInstance("http://www.openplans.org/topp");
+                
+        path = "oneFeature_out_hints.xml";
+        f = new File(f.getParentFile(),path);
+        if(f.exists())
+            f.delete();
+        f.createNewFile();
+        
+        HashMap hints = new HashMap();
+        hints.put(DocumentWriter.SCHEMA_ORDER,new String[] {"http://www.opengis.net/wfs", "http://www.openplans.org/topp"});
+        DocumentWriter.writeDocument(doc,s,f,hints);
+        
+        doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
+        assertNotNull("New Document missing", doc);
+        
+        assertTrue("file was not created +f",f.exists());
+        System.out.println(f);
+        } catch (SAXException e) {
+            e.printStackTrace();
+            fail(e.toString());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail(e.toString());
         }
     }
 }
