@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -181,7 +182,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
         
     }
     
-    public Object createObject(String code) throws FactoryException {
+    public IdentifiedObject createObject(String code) throws FactoryException {
         return createCoordinateReferenceSystem(code);
     }
     
