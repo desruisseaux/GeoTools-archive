@@ -199,8 +199,9 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         }
         final String error;
         final OperationParameter descriptor = (OperationParameter) this.descriptor;
-        if (descriptor.getValueClass().isAssignableFrom(value.getClass())) {
-            error = getClassTypeError();
+        if (!descriptor.getValueClass().isAssignableFrom(value.getClass())) {
+            error = Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
+                    Utilities.getShortClassName(value));
         } else {
             final Comparable minimum = descriptor.getMinimumValue();
             final Comparable maximum = descriptor.getMaximumValue();

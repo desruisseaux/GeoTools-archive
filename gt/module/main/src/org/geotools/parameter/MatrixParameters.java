@@ -112,6 +112,9 @@ public class MatrixParameters extends OperationParameterGroup {
          *       transform will usually not be much more than 5, and the storage scheme
          *       used in this implementation is inefficient  for large amount of matrix
          *       elements.
+         *
+         * Note 2: If the default matrix size (currently 3) is changed, then the number
+         *         of dimensions in ProjectiveTransform.Provider must be updated too.
          */
         this(properties, new OperationParameter[] {
             new org.geotools.parameter.OperationParameter("num_row", 3, 2, 50),

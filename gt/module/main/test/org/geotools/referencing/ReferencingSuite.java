@@ -55,9 +55,10 @@ public class ReferencingSuite extends TestCase {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("All referencing tests");
-//      suite.addTest(CodeListTest.suite());
-        suite.addTest(BasicTest   .suite());
-        suite.addTest(MatrixTest  .suite());
+//      suite.addTest(CodeListTest  .suite());
+        suite.addTest(BasicTest     .suite());
+        suite.addTest(MatrixTest    .suite());
+        suite.addTest(ParameterTest .suite());
         return suite;
     }
 }
