@@ -33,11 +33,11 @@ import java.io.Reader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import java.io.IOException;
 
-/**A simple implementation of the Arc Grid Format Metadata.
+/**A simple implementation of the Arc Grid Format.
  *
  *
  *  @author jeichar
- *  @author simbos  <a href="mailto:simboss_ml@tiscali.it">
+ *  @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class ArcGridFormat
     extends AbstractGridFormat

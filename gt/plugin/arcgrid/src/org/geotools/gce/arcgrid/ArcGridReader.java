@@ -16,51 +16,34 @@
  */
 package org.geotools.gce.arcgrid;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.NoSuchElementException;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import javax.media.jai.*;
 
-import org.geotools.coverage.grid.GridCoverageImpl;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.OperationNotFoundException;
+import java.awt.*;
+import java.awt.color.*;
+import java.awt.image.*;
 
-import com.vividsolutions.jts.geom.Envelope;
-import java.io.File;
-import java.net.URL;
-import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.data.coverage.grid.UnknownFormat;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import javax.media.jai.RasterFactory;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.DataBuffer;
-import java.awt.color.ICC_Profile;
-import java.awt.color.ICC_ColorSpace;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import org.geotools.coverage.grid.*;
+import org.geotools.data.*;
+import org.geotools.data.coverage.grid.stream.*;
+import org.geotools.geometry.*;
+import org.geotools.parameter.*;
 import org.geotools.referencing.wkt.Parser;
+import org.opengis.coverage.*;
+import org.opengis.coverage.grid.*;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.parameter.*;
+import org.opengis.referencing.crs.*;
+import com.vividsolutions.jts.geom.*;
 
 /**
  * This class can read an arc grid data source and create a grid coverage from
  * the data.
  *
  * @author jeichar
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class ArcGridReader  implements GridCoverageReader {
   /**Source object to read from.*/
@@ -89,7 +72,7 @@ public class ArcGridReader  implements GridCoverageReader {
   private ArcGridRaster arcGridRaster = null;
 
   /** A name for the grid coverage. */
-  private String name;
+  private String name="ArcGrid";
 
   /**Creates a new instance of an ArcGridReader.
    *
@@ -262,7 +245,7 @@ public class ArcGridReader  implements GridCoverageReader {
   public GridCoverage read(GeneralParameterValue[] params) throws
       IllegalArgumentException, IOException {
     if(params!=null)
-      setEnvironment("ArcGrid", params);
+    	setEnvironment( params);
 
     return getGridCoverage();
   }
@@ -299,10 +282,9 @@ public class ArcGridReader  implements GridCoverageReader {
    * @throws IOException
    *             Thrown for any other unexpected exception
    */
-  private void setEnvironment(String name, GeneralParameterValue[] params) throws
+  private void setEnvironment( GeneralParameterValue[] params) throws
       InvalidParameterNameException,
       InvalidParameterValueException, IOException {
-    this.name = name;
 
     for (int i = 0; i < params.length; i++) {
       Parameter param = (Parameter) params[i];
@@ -373,11 +355,15 @@ public class ArcGridReader  implements GridCoverageReader {
 
   private GridCoverage createCoverage() throws java.io.IOException {
     java.awt.image.WritableRaster raster = null;
+
+    //  reading the raster of data from the specified source
     raster = openArcGridRaster().readRaster();
 
+    //  getting the coordinate reference system
     CoordinateReferenceSystem coordinateSystem = getCoordinateSystem();
 
-    org.opengis.spatialschema.geometry.Envelope envelope = new GeneralEnvelope(
+    //  building up the envelope
+        GeneralEnvelope envelope = new GeneralEnvelope(
         new double[] {this.arcGridRaster.getXlCorner(),
         this.arcGridRaster.getYlCorner()}
         ,
@@ -385,6 +371,8 @@ public class ArcGridReader  implements GridCoverageReader {
         this.arcGridRaster.getNCols() * this.arcGridRaster.getCellSize(),
         this.arcGridRaster.getYlCorner() +
         this.arcGridRaster.getNRows() * this.arcGridRaster.getCellSize()});
+        
+        envelope.setCoordinateReferenceSystem(coordinateSystem);
 
     try {
       //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -398,12 +386,10 @@ public class ArcGridReader  implements GridCoverageReader {
           false,
           false,//ignored since
           Transparency.OPAQUE);
-      return new GridCoverageImpl(name,
+      return new GridCoverage2D(name,
+            new BufferedImage(cm,raster,false,null),
                                   coordinateSystem,
-                                  null,
-                                  null,
-                                  new BufferedImage(cm,raster,false,null),
-                                  envelope);
+            envelope);
       //////////////////////////////////////////////////////////////////////////////////////////////////
       //
       //TODO this is not finished
@@ -411,15 +397,7 @@ public class ArcGridReader  implements GridCoverageReader {
       //////////////////////////////////////////////////////////////////////////////////////////////////
 
     }
-    catch (OperationNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
     catch (NoSuchElementException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    catch (FactoryException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
@@ -456,7 +434,8 @@ public class ArcGridReader  implements GridCoverageReader {
 	      url = (URL)this.mSource;
               pathname=url.getPath().substring(0,url.getPath().lastIndexOf("/")+1);
 	      name = url.getPath().substring(url.getPath().lastIndexOf("/")+1,url.getPath().length());
-	    }
+	    }else
+	    	throw new Exception("fake exception");
 	    //build up the name
 	    name = pathname +
 	        (name.lastIndexOf(".") > 0 ? name.substring(0, name.indexOf(".")) :
@@ -480,12 +459,12 @@ public class ArcGridReader  implements GridCoverageReader {
 		this.coordinateSystem= null;
 	}
 
-    //is it null the we gor for wgs84?
+	//	is it null? Then we gor for wgs84
     if(this.coordinateSystem==null)
       this.coordinateSystem= org.geotools.referencing.crs.GeographicCRS.WGS84;
 
 
-	return this.coordinateSystem;
+    return this.coordinateSystem;
 
   }
 

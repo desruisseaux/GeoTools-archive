@@ -46,6 +46,7 @@ import org.opengis.catalog.CatalogEntry;
  * Is both a GridCoverageExchange and a Catalog
  *
  * @author $author$
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @version $Revision: 1.9 $
  */
 public class FileSystemGridCoverageExchange extends AbstractCatalog

@@ -5,12 +5,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.LiteralExpressionImpl;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -761,9 +768,9 @@ public class SLDParser {
 				symbolizers.add(parseTextSymbolizer(child));
 			}
 
-			// if (child.getLocalName().equalsIgnoreCase("RasterSymbolizer")) {
-			// //TODO: implement symbolizers.add(parseRasterSymbolizer(Child));
-			// }
+			if (childName.equalsIgnoreCase("RasterSymbolizer")) {
+				symbolizers.add(parseRasterSymbolizer(child));
+			}
 		}
 
 		rule.setSymbolizers((Symbolizer[]) symbolizers
@@ -903,6 +910,267 @@ public class SLDParser {
 		return symbol;
 	}
 
+	
+	/**
+	 * parses the SLD for a text symbolizer
+	 * 
+	 * @param root
+	 *            w3c dom node
+	 * 
+	 * @return the TextSymbolizer
+	 */
+	private RasterSymbolizer parseRasterSymbolizer(Node root) {
+		RasterSymbolizer symbol = factory.getDefaultRasterSymbolizer();
+		// symbol.setGraphic(null);
+
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+
+			if (childName.equalsIgnoreCase(geomSt)) {
+				symbol.setGeometryPropertyName(parseGeometryName(child));
+			}
+
+			if (childName.equalsIgnoreCase("Opacity")) {
+				try {
+					symbol.setOpacity((Expression) ExpressionBuilder
+							.parse(child.getNodeValue()));
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+
+			if (childName.equalsIgnoreCase("ChannelSelection")) {
+				symbol.setChannelSelection(parseChannelSelection(child));
+			}
+
+			if (childName.equalsIgnoreCase("OverlapBehavior")) {
+				try {
+					symbol.setOverlap((Expression) ExpressionBuilder
+							.parse(child.getFirstChild().getNodeValue()));
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+
+			if (childName.equalsIgnoreCase("ColorMap")) {
+				symbol.setColorMap(parseColorMap(child));
+			}
+			
+			if (childName.equalsIgnoreCase("ContrastEnhancement")) {
+				symbol.setContrastEnhancement(parseContrastEnhancement(child));
+			}
+			
+			if (childName.equalsIgnoreCase("ShadedRelief")) {
+				symbol.setShadedRelief(parseShadedRelief(child));
+			}
+			
+			if (childName.equalsIgnoreCase("ImageOutline")) {
+				symbol.setImageOutline(parseLineSymbolizer(child));
+			}			
+		}
+
+		return symbol;
+	}
+
+	private ColorMapEntry parseColorMapEntry(Node root) {
+		ColorMapEntry symbol = factory.createColorMapEntry();
+		
+		Expression exp = null;
+		
+		NamedNodeMap atts = root.getAttributes();
+
+		if( atts.getNamedItem("label") != null ) {
+			symbol.setLabel(atts.getNamedItem("label").getNodeValue());
+		}
+
+		if( atts.getNamedItem("color") != null ) {
+			symbol.setColor(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("color").getNodeValue()));
+		}
+
+		if( atts.getNamedItem("opacity") != null ) {
+			symbol.setOpacity(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("opacity").getNodeValue()));
+		}
+
+		if( atts.getNamedItem("quantity") != null ) {
+			symbol.setQuantity(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("quantity").getNodeValue()));
+		}
+		
+		return symbol;
+	}
+	
+	private ColorMap parseColorMap(Node root) {
+		ColorMap symbol = factory.createColorMap();
+		
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+
+			if (childName.equalsIgnoreCase("ColorMapEntry")) {
+				symbol.addColorMapEntry(parseColorMapEntry(child));
+			}
+		}
+		
+		return symbol;
+	}
+	
+	private SelectedChannelType parseSelectedChannel(Node root) {
+		SelectedChannelType symbol = new SelectedChannelTypeImpl();
+
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+
+			if (childName.equalsIgnoreCase("SourceChannelName")) {
+				symbol.setChannelName(child.getNodeValue());
+			}
+
+			if (childName.equalsIgnoreCase("ContrastEnhancement")) {
+				try {
+					symbol.setContrastEnhancement((Expression) ExpressionBuilder
+							.parse(child.getNodeValue()));
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		}
+
+		return symbol;
+	}
+	
+	private ChannelSelection parseChannelSelection(Node root) {
+		List channels = new LinkedList();  
+		
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+
+			if (childName.equalsIgnoreCase("GrayChannel")) {
+				channels.add(parseSelectedChannel(child));
+			}
+
+			if (childName.equalsIgnoreCase("RedChannel")) {
+				channels.add(parseSelectedChannel(child));
+			}
+
+			if (childName.equalsIgnoreCase("GreenChannel")) {
+				channels.add(parseSelectedChannel(child));
+			}
+
+			if (childName.equalsIgnoreCase("BlueChannel")) {
+				channels.add(parseSelectedChannel(child));
+			}
+		}
+
+		ChannelSelection dap = factory.createChannelSelection((SelectedChannelType[])channels.toArray(new SelectedChannelType[channels.size()]));
+		
+		return dap;
+	}
+	
+	private ContrastEnhancement parseContrastEnhancement(Node root) {
+		ContrastEnhancement symbol = new ContrastEnhancementImpl();
+		
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+			if (childName.equalsIgnoreCase("Normalize")) {
+				symbol.setNormalize();
+			}
+
+			if (childName.equalsIgnoreCase("Histogram")) {
+				symbol.setHistogram();
+			}
+
+			if (childName.equalsIgnoreCase("GammaValue")) {
+				try {
+					symbol.setGammaValue((Expression) ExpressionBuilder
+							.parse(child.getNodeValue()));
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		}
+		
+		return symbol;
+	}
+	
+	private ShadedRelief parseShadedRelief(Node root) {
+		ShadedRelief symbol = new ShadedReliefImpl();
+
+		NodeList children = root.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if (childName == null) {
+				childName = child.getNodeName();
+			}
+			if (childName.equalsIgnoreCase("BrightnessOnly")) {
+				symbol.setBrightnessOnly(Boolean.getBoolean(child.getFirstChild().getNodeValue()));
+			}
+
+			if (childName.equalsIgnoreCase("ReliefFactor")) {
+				try {
+					symbol.setReliefFactor((Expression) ExpressionBuilder
+							.parse(child.getNodeValue()));
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		}
+
+		return symbol;
+	}
+	
 	/**
 	 * parses the SLD for a point symbolizer
 	 * 
@@ -1646,3 +1914,4 @@ public class SLDParser {
 	}
 
 }
+

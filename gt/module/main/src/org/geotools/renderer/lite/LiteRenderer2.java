@@ -579,7 +579,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         for( int i = 0; i < attTypes.length; i++ ) {
             attName = attTypes[i].getName();
 
-            if (attTypes[i].isGeometry() && !atts.contains(attName)) {
+            //if (attTypes[i].isGeometry() && !atts.contains(attName)) {
+            if (!atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
@@ -795,14 +796,18 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             final FeatureTypeStyle[] featureStylers, AffineTransform at,
             CoordinateReferenceSystem destinationCrs ) throws IOException,
             IllegalAttributeException {
-        if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("processing " + featureStylers.length + " stylers");
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("processing " + featureStylers.length + " stylers");
         }
 
         LiteShape2 shape = createPath(null, at);
         transformMap = new HashMap();
 
         for( int i = 0; i < featureStylers.length; i++ ) {
+		        if (LOGGER.isLoggable(Level.FINE)) {
+		            LOGGER.fine("processing style " + i);
+		        }
+
             FeatureTypeStyle fts = featureStylers[i];
 
             // get applicable rules at the current scale
@@ -811,6 +816,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             List elseRuleList = new ArrayList();
 
             for( int j = 0; j < rules.length; j++ ) {
+				        if (LOGGER.isLoggable(Level.FINE)) {
+				            LOGGER.fine("processing rule " + j);
+				        }
+
                 Rule r = rules[j];
 
                 if (isWithInScale(r)) {
@@ -839,10 +848,22 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     }
 
                     boolean doElse = true;
+
+						        if (LOGGER.isLoggable(Level.FINE)) {
+						            LOGGER.fine("trying to read Feature ...");
+						        }
+
                     Feature feature = reader.next();
 
+						        if (LOGGER.isLoggable(Level.FINE)) {
+						            LOGGER.fine("... done: " + feature.toString());
+						        }
 
                     String typeName = feature.getFeatureType().getTypeName();
+
+						        if (LOGGER.isLoggable(Level.FINE)) {
+						            LOGGER.fine("... done: " + typeName);
+						        }
 
                     if ((typeName != null)
                             && (feature.getFeatureType().isDescendedFrom(null,
@@ -850,32 +871,69 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                                     .getFeatureTypeName()))) {
                         // applicable rules
                         for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
+
                             Rule r = (Rule) it.next();
+
+										        if (LOGGER.isLoggable(Level.FINE)) {
+										            LOGGER.fine("applying rule: " + r.toString());
+										        }
 
                             // if this rule applies
                             if (isWithInScale(r) && !r.hasElseFilter()) {
-                                Filter filter = r.getFilter();
+												        if (LOGGER.isLoggable(Level.FINE)) {
+												            LOGGER.fine("this rule applies ...");
+												        }
+                            	
+                            		// if( r != null ) {
+		                                Filter filter = r.getFilter();
+		
+		                                if ((filter == null) || filter.contains(feature)) {
+		                                    doElse = false;
 
-                                if ((filter == null) || filter.contains(feature)) {
-                                    doElse = false;
-
-                                    Symbolizer[] symbolizers = r.getSymbolizers();
-                                    processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                                            at, destinationCrs);
-                                }
+																        if (LOGGER.isLoggable(Level.FINE)) {
+																            LOGGER.fine("processing Symobolizer ...");
+																        }
+		
+		                                    Symbolizer[] symbolizers = r.getSymbolizers();
+		                                    processSymbolizers(graphics, feature, symbolizers, scaleRange,
+		                                            at, destinationCrs);
+		
+																        if (LOGGER.isLoggable(Level.FINE)) {
+																            LOGGER.fine("... done!");
+																        }
+		                                }
+                            		// }
                             }
                         }
 
                         if (doElse) {
                             // rules with an else filter
+										        if (LOGGER.isLoggable(Level.FINE)) {
+										            LOGGER.fine("rules with an else filter");
+										        }
+
                             for( Iterator it = elseRuleList.iterator(); it.hasNext(); ) {
                                 Rule r = (Rule) it.next();
                                 Symbolizer[] symbolizers = r.getSymbolizers();
+
+												        if (LOGGER.isLoggable(Level.FINE)) {
+												            LOGGER.fine("processing Symobolizer ...");
+												        }
+
                                 processSymbolizers(graphics, feature, symbolizers, scaleRange,
                                         at, destinationCrs);
+
+												        if (LOGGER.isLoggable(Level.FINE)) {
+												            LOGGER.fine("... done!");
+												        }
                             }
                         }
                     }
+
+						        if (LOGGER.isLoggable(Level.FINE)) {
+						            LOGGER.fine("feature rendered event ...");
+						        }
+
                     fireFeatureRenderedEvent(feature);
                 } catch (Exception e) {
                     fireErrorEvent(e);
@@ -909,8 +967,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     	LiteShape2 shape=createPath(null, at);
         for( int m = 0; m < symbolizers.length; m++ ) {
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("applying symbolizer " + symbolizers[m]);
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("applying symbolizer " + symbolizers[m]);
             }
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
@@ -1021,10 +1079,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @task make it follow the symbolizer
      */
     private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer ) {
+        LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
         GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
         gcr.paint(graphics);
-        LOGGER.finest("Raster rendered");
+        LOGGER.fine("Raster rendered");
     }
 
     /**

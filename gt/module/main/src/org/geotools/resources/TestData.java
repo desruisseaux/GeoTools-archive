@@ -180,7 +180,7 @@ public class TestData {
         }
         throw new FileNotFoundException("Could not locate test-data: "+path);
     }
-    
+
     /**
      * Creates a temporary file with the given name.
      */
@@ -189,8 +189,8 @@ public class TestData {
         int split = name.lastIndexOf('.');
         String prefix = split == -1 ? name : name.substring(0,split);
         String suffix = split == -1 ? null : name.substring(split+1);
-        File tmp = File.createTempFile( prefix, suffix, testData );
-        tmp.deleteOnExit();    	
+        File tmp = File.createTempFile( prefix, "."+suffix, testData );
+        tmp.deleteOnExit();
         return tmp;
     }
 }

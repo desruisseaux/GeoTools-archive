@@ -18,7 +18,12 @@ package org.geotools.gce.arcgrid;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.CoordinateOperation;
 
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.feature.FeatureCollection;
@@ -32,7 +37,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -41,6 +46,7 @@ import java.io.File;
 import java.net.URL;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 /**
  * ArcGridWriter Supports writing of an ArcGrid GridCoverage to an Desination
@@ -48,7 +54,7 @@ import java.io.FileWriter;
  * with the IOExchange
  *
  * @author jeichar
- * @author simboss
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  *
  */
 public class ArcGridWriter
@@ -172,29 +178,37 @@ public class ArcGridWriter
    * @see ArcGridDataSource#setFeatures(FeatureCollection)
    */
   private void writeGridCoverage(GridCoverage gc) throws DataSourceException {
-
-    ///////////////////////////////////////////////////////////////////////
-    //
-    // to be changed in the future
-    //
-    ///////////////////////////////////////////////////////////////////////
-    java.awt.image.Raster data = ( (GridCoverageImpl) gc).getRenderedImage().
-        getData();
-
-    Envelope env = ( (GridCoverageImpl) gc).getEnvelope();
-    long height = data.getHeight();
-    long width = data.getWidth();
-
-    double xl = env.getLowerCorner().getOrdinate(0);
-    double yl = env.getLowerCorner().getOrdinate(1);
-
-    double cellsize = env.getUpperCorner().getOrdinate(0) -
-        env.getLowerCorner().getOrdinate(0);
-    cellsize = cellsize / width; //rivedi
-
     try {
+      //getting crs from gc
+      CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
+      ///////////////////////////////////////////////////////////////////////
+      //
+      // to be changed in the future
+      //
+      ///////////////////////////////////////////////////////////////////////
+
+      //getting the underlying raster
+      java.awt.image.Raster data = ( (GridCoverage2D) gc).getRenderedImage().
+          getData();
+
+      //getting the envelope
+      GeneralEnvelope env = (GeneralEnvelope) ( (GridCoverage2D) gc).
+          getEnvelope();
+
+
+      long height = data.getHeight();
+      long width = data.getWidth();
+
+      double xl = env.getLowerCorner().getOrdinate(0);
+      double yl = env.getLowerCorner().getOrdinate(1);
+
+      double cellsize = env.getUpperCorner().getOrdinate(0) -
+          env.getLowerCorner().getOrdinate(0);
+      cellsize = cellsize / width; //rivedi
+
+
       //writing crs info
-      writeCRSInfo(gc);
+      writeCRSInfo(crs);
 
       if (format.getWriteParameters().parameter("GRASS").booleanValue()) {
         arcGridRaster = new GRASSArcGridRaster(mWriter);
@@ -214,15 +228,14 @@ public class ArcGridWriter
       ///////////////////////////////////////////////////////////////////////
       data = null;
     }
-    catch (java.io.IOException ioe) {
+    catch (Exception ioe) {
       throw new DataSourceException("IOError writing", ioe);
     }
   }
 
-  private void writeCRSInfo(GridCoverage gc) throws IOException {
+  private void writeCRSInfo(CoordinateReferenceSystem crs) throws IOException {
 
-    //getting crs from gc
-    CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
+
 
     //is it null?
     if (crs == null) {
@@ -230,9 +243,10 @@ public class ArcGridWriter
       //default gcs wgs84
       crs = org.geotools.referencing.crs.GeographicCRS.WGS84;
 
-      //get the destination path
-      //getting the path of this object and the name
+
     }
+    //get the destination path
+    //getting the path of this object and the name
     File outProj = null;
     URL url=null;
     String pathname = null, name = null;
@@ -253,8 +267,11 @@ public class ArcGridWriter
       pathname=url.getPath().substring(0,url.getPath().lastIndexOf("/")+1);
       name = url.getPath().substring(url.getPath().lastIndexOf("/")+1,url.getPath().length());
     }
+    else
+      //do nothing for the moment
+      return;
     //build up the name
-    name = pathname + 
+    name = pathname +
         (name.indexOf(".") > 0 ? name.substring(0, name.indexOf(".")) :
          name) +
         ".prj";

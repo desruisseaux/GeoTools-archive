@@ -32,6 +32,7 @@ import javax.media.jai.RasterFactory;
  * outputs (a variation of the original format...)
  *
  * @author aaime
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class GRASSArcGridRaster extends ArcGridRaster {
     /** Column number tag in the header file */
@@ -79,11 +80,11 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         st.resetSyntax();
         st.eolIsSignificant(true);
         st.whitespaceChars(0,' ');
-		st.whitespaceChars(':', ':');
+        st.whitespaceChars(':', ':');
         st.wordChars('a', 'z');
         st.wordChars('A', 'Z');
         st.wordChars('_', '_');
-		st.wordChars('*', '*');
+        st.wordChars('*', '*');
         st.parseNumbers();
 
         double north = 0;
@@ -96,8 +97,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
             if (st.ttype == StreamTokenizer.TT_WORD) {
                 String key = st.sval;
 
-				if (NO_DATA_MARKER.equalsIgnoreCase(key))
-					break;
+                if (NO_DATA_MARKER.equalsIgnoreCase(key))
+                        break;
 
                 if (st.nextToken() != StreamTokenizer.TT_NUMBER) {
                     throw new IOException("Expected number after " + key);

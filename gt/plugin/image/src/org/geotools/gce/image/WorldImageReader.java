@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -40,28 +40,39 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.geotools.parameter.Parameter;
 
 /**
  * @author rgould
+ * @author simone giannecchini (simboss_ml@tiscali.it)
+ * @author alessio fabiani (alessio.fabiani@gmail.com)
  *
  * Reads a GridCoverage from a given source. WorldImage sources
- * only support one GridCoverage so hasMoreGridCoverages() will 
+ * only support one GridCoverage so hasMoreGridCoverages() will
  * return true until the only GridCoverage is read.
- * 
+ *
  * No metadata is currently supported, so all those methods return null.
  */
 public class WorldImageReader implements GridCoverageReader {
 
-	private Object source;
+    public static int WORLD_WLD = 1;
+    public static int WORLD_META = 2;
+    public static int WORLD_BASE = 3;
+
+    /**Format for this reader*/
+    private Format format=new WorldImageFormat();
+    /*Source to read from*/
+    private Object source;
+
     private boolean gridLeft = true;
 
     /**
      * Construct a new ImageWorldReader to read a GridCoverage from the
      * source object. The source must point to the raster file itself,
      * not the world file.
-     * 
+     *
      * @param source The source of a GridCoverage
-     */    
+     */
 	public WorldImageReader (Object source) {
 		this.source = source;
 	}
@@ -74,7 +85,7 @@ public class WorldImageReader implements GridCoverageReader {
 	 * @return a new WorldImageFormat class
 	 */
 	public Format getFormat() {
-		return new WorldImageFormat();
+		return this.format;
 	}
 
 	/* (non-Javadoc)
@@ -134,7 +145,7 @@ public class WorldImageReader implements GridCoverageReader {
 	 * @see org.geotools.data.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
 	 */
 	/**
-	 * Returns true until read has been called, as World Image files only 
+	 * Returns true until read has been called, as World Image files only
 	 * support one GridCoverage.
 	 */
 	public boolean hasMoreGridCoverages() throws IOException {
@@ -144,111 +155,204 @@ public class WorldImageReader implements GridCoverageReader {
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
-	/**
-	 * Reads an image from the source, then reads the values from the world file
+	/**Reads an image from a source stream.
+         *
+	 * Loads an image from a source stream, then loads the values from the world file
 	 * and constructs a new GridCoverage from this information.
-	 * 
-	 * If it cannot find a world file, it will throw a FileNotFoundException.
-	 * 
-	 * @param parameters WorldImage supports no parameters, it ignores this param
-	 * @return a new GridCoverage read from the source
+	 *
+	 * When reading from a remote stream we do not look for a world fiel but we suppose those information comes from
+         * a different way (xml, gml, pigeon?)
+	 *
+	 * @param parameters WorldImageReader supports no parameters, it just ignores them.
+	 * @return a new GridCoverage read from the source.
 	 */
 	public GridCoverage read( GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
-		
-		URL sourceURL = null;
-		if (source instanceof File) {
-			sourceURL = ((File) source).toURL();
-		} else {
-			sourceURL = (URL) source;
-		}
 
-		String sourceAsString = sourceURL.toExternalForm();
-		int index = sourceAsString.lastIndexOf(".");
-		String base = sourceAsString.substring(0, index);
-		String fileExtension = sourceAsString.substring(index);
-
-		//We can now construct the baseURL from this string.
-		
-		float xPixelSize = 0;
-		float rotation1 = 0;
-		float rotation2 = 0;
-		float yPixelSize = 0;
-		float xLoc = 0;
-		float yLoc = 0;
-		
-        BufferedReader in = null;
-
-        try {
-        	URL worldURL = new URL(base+".wld");
-        	in = new BufferedReader(new InputStreamReader(worldURL.openStream()));
-		} catch (FileNotFoundException e) {
-			//.wld extension not found, go for file based one.
-			URL worldURL = new URL(base+WorldImageFormat.getWorldExtension(fileExtension));
-			in = new BufferedReader(new InputStreamReader(worldURL.openStream()));
-		}
-        
-        String str;
-        index = 0;
-        while ((str = in.readLine()) != null) {
-        	float value = Float.parseFloat(str.trim());
-        	switch(index) {
-        		case 0:
-        			xPixelSize = value;
-        			break;
-        		case 1:
-        			rotation1 = value;
-        			break;
-        		case 2:
-        			rotation2 = value;
-        			break;
-        		case 3:
-        			yPixelSize = value;
-        			break;
-        		case 4:
-        			xLoc = value;
-        			break;
-        		case 5:
-        			yLoc = value;
-        			break;
-        		default:
-        			break;
-        	}
-        	index++;
+        //do we have paramters to use for reading from the specified source
+        if(parameters!=null)
+        {
+            //they will be ignored if we will find a world file
+            this.format.getReadParameters().parameter("crs").setValue(((Parameter)
+                    parameters[0]).getValue());
+            this.format.getReadParameters().parameter("envelope").setValue(((Parameter)
+                    parameters[1]).getValue());
         }
-        in.close();
+        URL sourceURL = null;
 
-		BufferedImage image = null;
-		image = ImageIO.read(sourceURL);
-		
-		CoordinateReferenceSystem crs = GeographicCRS.WGS84;
-		Envelope envelope = null;
-		
-		double xMin = xLoc;
-		double yMax = yLoc;
-		double xMax = xLoc + (image.getWidth()*xPixelSize);
-		double yMin = yLoc + (image.getHeight()*yPixelSize);
+        double xMin = 0.0;
+        double yMax = 0.0;
+        double xMax = 0.0;
+        double yMin = 0.0;
+        float xPixelSize = 0;
+        float rotation1 = 0;
+        float rotation2 = 0;
+        float yPixelSize = 0;
+        float xLoc = 0;
+        float yLoc = 0;
+        int world_type = -1;
+        BufferedImage image = null;
+        CoordinateReferenceSystem crs = GeographicCRS.WGS84;
+        Envelope envelope = null;
 
-		envelope = new GeneralEnvelope(new double[] {xMin, yMin}, new double[] {xMax, yMax});
+        //are we reading from a file?
+        //in such a case we will look for the associated world file
+        if (source instanceof File)
+        {
 
-		gridLeft = false;
-		
-		GridCoverage coverage = null;
-		try {
-			coverage = new GridCoverageImpl(
-					sourceURL.getFile(), crs, null, null, image, envelope);
-		} catch (OperationNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (NoSuchElementException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (FactoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		return coverage;
-	}
+
+            sourceURL = ((File) source).toURL();
+
+            String sourceAsString = sourceURL.toExternalForm();
+            int index = sourceAsString.lastIndexOf(".");
+            String base = sourceAsString.substring(0, index);
+            String fileExtension = sourceAsString.substring(index);
+
+            //We can now construct the baseURL from this string.
+
+
+
+            BufferedReader in = null;
+
+
+            try {
+                URL worldURL = new URL(base + ".wld");
+                in = new BufferedReader(new InputStreamReader(worldURL.
+                        openStream()));
+                world_type = WORLD_WLD;
+            } catch (FileNotFoundException e1) {
+                try {
+                    //.wld extension not found, go for .meta.
+                    URL worldURL = new URL(base + ".meta");
+                    in = new BufferedReader(new InputStreamReader(worldURL.
+                            openStream()));
+                    world_type = WORLD_META;
+                } catch (FileNotFoundException e2) {
+                    //.wld & .meta extension not found, go for file based one.
+                    URL worldURL = new URL(base +
+                                           WorldImageFormat.
+                                           getWorldExtension(fileExtension));
+                    in = new BufferedReader(new InputStreamReader(worldURL.
+                            openStream()));
+                    world_type = WORLD_BASE;
+                }
+            }
+
+            String str;
+            index = 0;
+
+            while ((str = in.readLine()) != null) {
+
+                if (world_type == WORLD_WLD || world_type == WORLD_BASE) {
+                    float value = Float.parseFloat(str.trim());
+                    switch (index) {
+                    case 0:
+                        xPixelSize = value;
+                        break;
+                    case 1:
+                        rotation1 = value;
+                        break;
+                    case 2:
+                        rotation2 = value;
+                        break;
+                    case 3:
+                        yPixelSize = value;
+                        break;
+                    case 4:
+                        xLoc = value;
+                        break;
+                    case 5:
+                        yLoc = value;
+                        break;
+                    default:
+                        break;
+                    }
+                } else if (world_type == WORLD_META) {
+                    String line = str;
+                    rotation1 = 0.0f;
+                    rotation2 = 0.0f;
+                    double value;
+                    switch (index) {
+                    case 1:
+                        value = Double.parseDouble(line.substring(
+                                "Origin Longitude = ".length()));
+                        xMin = value;
+                        break;
+                    case 2:
+                        value = Double.parseDouble(line.substring(
+                                "Origin Latitude = ".length()));
+                        yMin = value;
+                        break;
+                    case 3:
+                        value = Double.parseDouble(line.substring(
+                                "Corner Longitude = ".length()));
+                        xMax = value;
+                        break;
+                    case 4:
+                        value = Double.parseDouble(line.substring(
+                                "Corner Latitude = ".length()));
+                        yMax = value;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                index++;
+            }
+            in.close();
+
+            //building up envelope
+            if (world_type == WORLD_WLD || world_type == WORLD_BASE) {
+                xMin = xLoc;
+                yMax = yLoc;
+                xMax = xLoc + (image.getWidth() * xPixelSize);
+                yMin = yLoc + (image.getHeight() * yPixelSize);
+            }
+
+            envelope = new GeneralEnvelope(new double[] {xMin, yMin},
+                                           new double[] {xMax, yMax});
+
+        }
+        else {
+
+            //well it seems we are not reading from a file
+            //therefore we need the parameters
+            //if(parameters==null)
+                //throw new IllegalArgumentException("To read froma a source which is not a file please provided read parameters!");
+
+            sourceURL = (URL) source;
+            //getting crs
+            crs = (CoordinateReferenceSystem) this.format.getReadParameters().parameter("crs").
+                  getValue();
+            //getting envelope
+            envelope = (Envelope)  this.format.getReadParameters().parameter("envelope").getValue();
+
+            if(envelope==null|| crs==null)
+                throw new IllegalArgumentException("To read froma a source which is not a file please provided read parameters!");
+
+        }
+
+
+        //reading the image as given
+        image = ImageIO.read(sourceURL);
+
+
+        //no more grid left
+        gridLeft = false;
+
+        //building up a coverage
+        GridCoverage coverage = null;
+        try {
+            coverage = new GridCoverage2D(
+                    sourceURL.getFile(), image, crs, envelope);
+        }
+        catch (NoSuchElementException e1) {
+
+            throw new IOException(e1.getMessage());
+
+        }
+        return coverage;
+  }
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.GridCoverageReader#skip()

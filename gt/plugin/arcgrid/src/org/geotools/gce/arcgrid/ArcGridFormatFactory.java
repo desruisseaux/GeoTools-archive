@@ -24,6 +24,7 @@ import org.opengis.coverage.grid.Format;
  * Implementation of the GridCoverageFormat service provider interface for arc grid files.
  *
  * @author aaime
+ *
  */
 public class ArcGridFormatFactory
     implements GridFormatFactorySpi {

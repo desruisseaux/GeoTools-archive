@@ -27,6 +27,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
  * DOCUMENT ME!
  *
 *  @author Jesse Eichar
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @author $author$ (Last Modified)
  * @version $Revision: 1.9 $
  */

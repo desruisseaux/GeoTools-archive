@@ -44,7 +44,7 @@ import org.opengis.coverage.grid.Format;
  * }</code>
  *
  * @author jeichar
- *
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @see AbstractFormatFactory
  */
 public abstract class AbstractGridFormat implements Format {

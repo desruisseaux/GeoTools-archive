@@ -456,8 +456,8 @@ public class ArcGridRaster {
         out.print(NODATA_VALUE); spaces(out, 2); out.println(noData = -9999);
 
         // reset min and max
-        minValue = Double.MAX_VALUE;
-        maxValue = Double.MIN_VALUE;
+        minValue = Double.MIN_VALUE;
+        maxValue = Double.MAX_VALUE;
 
         // a buffer to flush each line to
         // this technique makes things a bit quicker because buffer.append()

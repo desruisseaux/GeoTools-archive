@@ -28,7 +28,7 @@ import org.opengis.coverage.grid.Format;
  * A simple implementation of FileMetadata
  *
  * @author jeichar
- *
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class FileMetadataImpl extends AbstractMetadataEntity implements FileMetadata {
     String name;

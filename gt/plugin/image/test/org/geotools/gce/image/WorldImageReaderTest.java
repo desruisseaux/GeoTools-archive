@@ -9,10 +9,23 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.io.IOException;
 
+import org.geotools.gce.image.*;
 import junit.framework.TestCase;
-
-import org.geotools.coverage.grid.GridCoverageImpl;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JFrame;
+import java.awt.image.BufferedImage;
+import javax.swing.JScrollPane;
+import org.geotools.coverage.grid.GridCoverage2D;
+import javax.media.jai.PlanarImage;
 import org.geotools.resources.TestData;
+import java.net.URL;
+import org.opengis.coverage.grid.Format;
+import org.opengis.parameter.ParameterValueGroup;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.opengis.parameter.GeneralParameterValue;
+import java.awt.BorderLayout;
 
 /**
  * @author rgould
@@ -22,32 +35,47 @@ import org.geotools.resources.TestData;
  */
 public class WorldImageReaderTest extends TestCase {
 
-	WorldImageReader wiReader;
-	
-	/*
-	 * @see TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		File imageFile = TestData.file(this, "etopo.png");
-		wiReader = new WorldImageReader(imageFile);
-	}
+        WorldImageReader wiReader;
+        ParameterValueGroup paramsRead=null;
 
-	/**
-	 * Constructor for WorldImageReaderTest.
-	 * @param arg0
-	 */
-	public WorldImageReaderTest(String arg0) {
-		super(arg0);
-	}
+        /*
+         * @see TestCase#setUp()
+         */
+        protected void setUp() throws Exception {
+                super.setUp();
+                wiReader = new WorldImageReader(new URL("http://java.sun.com/im/logo_java.gif"));
 
-	public void testWorldImageReader() {
-	}
+        }
 
-	public void testRead() throws IOException {
-		org.opengis.coverage.grid.GridCoverage coverage = wiReader.read(null);
-		assertNotNull(coverage);
-		assertNotNull(((GridCoverageImpl)coverage).getRenderedImage());
-		assertNotNull(coverage.getEnvelope());
-	}
+        /**
+         * Constructor for WorldImageReaderTest.
+         * @param arg0
+         */
+        public WorldImageReaderTest(String arg0) {
+                super(arg0);
+        }
+
+        public void testRead() throws IOException {
+            Format readerFormat=wiReader.getFormat();
+            paramsRead = readerFormat.getReadParameters();
+            //setting crs
+            paramsRead.parameter("crs").setValue(GeographicCRS.WGS84);
+            //setting envelope
+            paramsRead.parameter("envelope").setValue(new GeneralEnvelope(
+                    new double[] {10, 42}, new double[] {11, 43}));
+
+            GridCoverage2D coverage = (GridCoverage2D)wiReader.read(null);
+                      //(GeneralParameterValue[]) paramsRead.values().toArray(new GeneralParameterValue[paramsRead.values().size()]));
+            assertNotNull(coverage);
+            assertNotNull(((GridCoverage2D)coverage).getRenderedImage());
+            assertNotNull(coverage.getEnvelope());
+
+            JFrame frame = new JFrame();
+            JLabel label = new JLabel(new ImageIcon( ((PlanarImage)coverage.getRenderedImage()).getAsBufferedImage()));
+            frame.getContentPane().add(label, BorderLayout.CENTER);
+            frame.pack();
+            frame.show();
+
+
+        }
 }

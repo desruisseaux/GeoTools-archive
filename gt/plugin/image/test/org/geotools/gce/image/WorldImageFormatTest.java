@@ -33,26 +33,13 @@ public class WorldImageFormatTest extends TestCase {
 		format = new WorldImageFormat();
 	}
 
-	public void testGetReader() throws MalformedURLException {
-		assertNotNull(format.getReader(new URL("http://something.com/temp.tiff")));
-	}
-
-	public void testGetWriter() throws MalformedURLException {
-		assertNotNull(format.getWriter(new URL("http://something.com/temp.tiff")));
-	}
-
-	public void testAccepts() throws MalformedURLException {
-		assertTrue(format.accepts(new File("c:\temp.gif")));
-		assertTrue(format.accepts(new URL("http://something.com/temp.jpeg")));
-	}
-
 	public void testGetWorldExtension() {
-		assertEquals(WorldImageFormat.getWorldExtension(".png"), ".pgw");
-		assertEquals(WorldImageFormat.getWorldExtension(".gif"), ".gfw");
-		assertEquals(WorldImageFormat.getWorldExtension(".jpg"), ".jgw");
-		assertEquals(WorldImageFormat.getWorldExtension(".jpeg"), ".jgw");
-		assertEquals(WorldImageFormat.getWorldExtension(".tif"), ".tfw");
-		assertEquals(WorldImageFormat.getWorldExtension(".tiff"), ".tfw");
+		assertEquals(WorldImageFormat.getWorldExtension("png"), ".pgw");
+		assertEquals(WorldImageFormat.getWorldExtension("gif"), ".gfw");
+		assertEquals(WorldImageFormat.getWorldExtension("jpg"), ".jgw");
+		assertEquals(WorldImageFormat.getWorldExtension("jpeg"), ".jgw");
+		assertEquals(WorldImageFormat.getWorldExtension("tif"), ".tfw");
+		assertEquals(WorldImageFormat.getWorldExtension("tiff"), ".tfw");
 		
 	}
 

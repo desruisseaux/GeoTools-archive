@@ -45,6 +45,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
  * A simple stateless GridCoverageExchange that will write/read to/from files and streams
  *
  * @author jeichar
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class StreamGridCoverageExchange implements GridCoverageExchange {
     Set formats=new java.util.HashSet();

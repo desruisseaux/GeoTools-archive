@@ -140,6 +140,33 @@ public class SLDTransformer extends TransformerBase {
             end("TextSymbolizer");
         }
         
+        public void visit(RasterSymbolizer raster) {
+            if( raster == null ) return;
+            start("RasterSymbolizer");
+            
+            if( raster.getGeometryPropertyName() != null )
+                encodeGeometryProperty(raster.getGeometryPropertyName());
+
+            if( raster.getOpacity() != null ) {
+                start("Opacity");
+            	filterTranslator.encode(raster.getOpacity());
+            	end("Opacity");
+            }
+
+            if( raster.getOverlap() != null ) {
+                start("OverlapBehavior");
+            	filterTranslator.encode(raster.getOverlap());
+            	end("OverlapBehavior");
+            }
+
+            if( raster.getColorMap() != null ) {
+            	// TODO
+            	//raster.getColorMap().getColorMapEntries()[0]
+            }
+            
+            end("RasterSymbolizer");
+        }
+        
         public void visit(Symbolizer sym) {
             try {
                 contentHandler.startElement("", "!--","!--", NULL_ATTS);
@@ -416,3 +443,4 @@ public class SLDTransformer extends TransformerBase {
     
     
 }
+

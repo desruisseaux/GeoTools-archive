@@ -9,7 +9,7 @@ package org.geotools.gce.arcgrid;
 import java.awt.image.Raster;
 import java.io.File;
 
-import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -63,7 +63,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
 
     void test(TestParams testParam) throws Exception {
 
-    //create a temporary output file
+   //create a temporary output file
     //temporary file to use
     File tmpFile = null;
     if (testParam.compressed)
@@ -80,12 +80,24 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
     Format f = new ArcGridFormat();
 
     //setting general format parameteres to be used later on
-    ParameterValueGroup params = null;
+    ParameterValueGroup params = f.getReadParameters();
+    params.parameter("Compressed").setValue(testParam.compressed);
+    params.parameter("GRASS").setValue(testParam.grass);
+    params = f.getWriteParameters();
+    params.parameter("Compressed").setValue(testParam.compressed);
+    params.parameter("GRASS").setValue(testParam.grass);
 
     /*Step 1 read it*/
 
     //read in the grid coverage
     GridCoverageReader reader = new ArcGridReader((TestData.getResource(this,testParam.fileName )));
+    params = reader.getFormat().getReadParameters();
+
+    //setting params
+    params.parameter("Compressed").setValue(f.getReadParameters().parameter(
+        "Compressed").booleanValue());
+    params.parameter("GRASS").setValue(f.getReadParameters().parameter("GRASS").
+                                       booleanValue());
 
     //reading the coverage
     GridCoverage gc1 = reader.read(null); //
@@ -110,7 +122,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
     //read the grid coverage back in from temp file
     reader = new ArcGridReader(tmpFile);
 
-    //setting params (ATTENTION It is performed just to show how we colud do that, but it is useless here)
+    //setting params
     params = reader.getFormat().getReadParameters();
     params.parameter("Compressed").setValue(f.getReadParameters().parameter(
         "Compressed").booleanValue());
@@ -136,14 +148,12 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
 
         Envelope e1 = gc1.getEnvelope();
         Envelope e2 = gc2.getEnvelope();
-        if (!e1.equals(e2)) {
-            throw new Exception("GridCoverage Envelopes are not equal");
-        }
-
+        if(e1.equals(e2))
+            throw new Exception("GridCoverage Envelopes are not equal" + e1.toString() + e2.toString());
         double[] values1 = null;
         double[] values2 = null;
-        Raster r1 = ((GridCoverageImpl)gc1).getRenderedImage().getData();
-        Raster r2 = ((GridCoverageImpl)gc2).getRenderedImage().getData();
+        Raster r1 = ((GridCoverage2D)gc1).getRenderedImage().getData();
+        Raster r2 = ((GridCoverage2D)gc2).getRenderedImage().getData();
         for(int i=r1.getMinX(); i < r1.getWidth(); i++) {
             for(int j=r1.getMinY(); j<r1.getHeight(); j++) {
                 values1 = r1.getPixel(i,j, values1);
@@ -157,6 +167,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
             }
         }
     }
+
 
   public static final void main(String[] args) throws Exception {
       junit.textui.TestRunner.run(suite(ArcGridReadWriteTest.class));

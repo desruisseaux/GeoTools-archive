@@ -23,7 +23,7 @@ import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
-import org.geotools.coverage.grid.GridCoverageImpl;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
@@ -95,6 +95,10 @@ public final class GridCoverageRenderer {
     public GridCoverageRenderer(GridCoverage gridCoverage) {
         this.gridCoverage = gridCoverage;
 
+        if (gridCoverage instanceof GridCoverage2D) {
+        	image = ((GridCoverage2D) gridCoverage).getRenderedImage();
+        }
+
         if (gridCoverage instanceof RenderedCoverage) {
             image = ((RenderedCoverage) gridCoverage).getRenderedImage();
         } 
@@ -143,7 +147,6 @@ public final class GridCoverageRenderer {
         AffineTransform gridToCoordinate = (AffineTransform) mathTransform;
 
         if (images == null) {
-//  FIXME
             final AffineTransform transform;
             transform = new AffineTransform(gridToCoordinate);
             transform.translate(-0.5, -0.5); // Map to upper-left corner.
@@ -154,6 +157,7 @@ public final class GridCoverageRenderer {
                 image = getGoodImage(image);
                 graphics.drawRenderedImage(image, transform);
             }
+
         } else {
             /*
              * Compute the most appropriate level as a function of the required
