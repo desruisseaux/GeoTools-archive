@@ -45,6 +45,9 @@ public interface Type {
      * forever (so be careful when ignoring data).
      * </p>
      * <p>
+     * If the element had #CData (Nested Child Text), this will appear in the first slot, with a null Element.  
+     * </p>
+     * <p>
      * A SAXNotSupportedException should be thrown when the child's
      * [inherited, default implementation of
      * getValue(ElementValue[],Attributes)] method should be used.

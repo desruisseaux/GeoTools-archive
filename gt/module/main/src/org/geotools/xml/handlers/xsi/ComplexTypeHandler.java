@@ -54,6 +54,12 @@ import org.xml.sax.SAXNotSupportedException;
  * <p>
  * Represents a ComplexType element
  * </p>
+ * <p>
+ * When a specific method of encoding is not specified then the following output will be returned:
+ * 
+ * ElementValue[]{(null,Attributes),(Element,Value)*,(null,String)?}
+ * Where the last element will be included iff there is child text. 
+ * </p>
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
@@ -1041,7 +1047,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
          *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
+            final Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Object[] values = null;
 
             logger.finest("Getting value for " + name);
@@ -1062,15 +1068,29 @@ public class ComplexTypeHandler extends XSIElementHandler {
                 return null;
             }
 
-            values = new Object[value.length];
+            values = new Object[value.length+1];
             logger.finest("Getting value for " + element.getName() + ":" + name);
 
-            for (int i = 0; i < value.length; i++) {
-                values[i] = value[i].getValue();
+            values[0] = new ElementValue(){
+				public Element getElement() {
+					return null;
+				}
+
+				public Object getValue() {
+					return attrs;
+				}
+            	
+            };
+            
+            for (int i = 1; i < value.length; i++) {
+                values[i] = value[i-(isMixed()?0:1)].getValue();
                 logger.finest("*"
                     + ((values[i] != null) ? values[i].getClass().getName()
                                            : "null"));
             }
+            
+            if(isMixed())
+            	values[values.length-1] = value[0];
 
             return values;
         }
