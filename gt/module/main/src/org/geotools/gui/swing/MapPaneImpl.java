@@ -82,6 +82,9 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     /** A transform from screen coordinates to real world coordinates. */
     private AffineTransform dotToCoordinateTransform = new AffineTransform();
 
+    private Envelope selectionBox = null;
+    private Envelope selectionCircle = null;
+    
     /**
      * Create a MapPane. A MapPane marshals the drawing of maps.
      *
@@ -118,6 +121,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             context.addMapLayerListListener(this);
             toolList.addSelectedToolListener(this);
             toolList.getSelectedTool().addMouseListener(this, context);
+            toolList.getSelectedTool().addMouseMotionListener(this, context);
             addComponentListener(this);
 
             // A zero sized mapPane cannot be resized later and doesn't behave
@@ -162,27 +166,41 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
         super.paintComponent(graphics);
 
         try {
-        if (context.getAreaOfInterest() == null) {
-            Envelope bounds = context.getLayerBounds();
+            if (context.getAreaOfInterest() == null) {
+                Envelope bounds = context.getLayerBounds();
 
-            if (bounds != null) {
-                LOGGER.info("AreaOfInterest calculated during rendering");
-                context.setAreaOfInterest(bounds, null);
+                if (bounds != null) {
+                    LOGGER.info("AreaOfInterest calculated during rendering");
+                    context.setAreaOfInterest(bounds, null);
+                }
             }
-        }
 
-        int w = getWidth() - getInsets().left - getInsets().right;
-        int h = getHeight() - getInsets().top - getInsets().bottom;
+            int w = getWidth() - getInsets().left - getInsets().right;
+            int h = getHeight() - getInsets().top - getInsets().bottom;
 
-        // prevent divide by zero errors
-        if (h == 0) {
-            h = 2;
-        }
+            // prevent divide by zero errors
+            if (h == 0) {
+                h = 2;
+            }
 
             // paint only what's needed
             renderer.paint((Graphics2D) graphics,  
                 graphics.getClipBounds(),
                 dotToCoordinateTransform.createInverse());
+            if (selectionCircle != null){
+                System.out.println("Selection circle is: " + selectionCircle);
+                graphics.drawOval((int) Math.round(selectionCircle.getMinX()),
+                                  (int) Math.round(selectionCircle.getMinY()),
+                                  (int) Math.round(selectionCircle.getWidth()),
+                                  (int) Math.round(selectionCircle.getHeight()));
+            }
+            if (selectionBox != null){
+                System.out.println("Selection box is: " + selectionBox);
+                graphics.drawRect((int) Math.round(selectionBox.getMinX()), 
+                                  (int) Math.round(selectionBox.getMinY()), 
+                                  (int) Math.round(selectionBox.getWidth()), 
+                                  (int) Math.round(selectionBox.getHeight()));
+            }
         } catch (java.awt.geom.NoninvertibleTransformException e) {
             LOGGER.warning("Transform error while rendering. Cause is: " +
                 e.getCause());
@@ -302,6 +320,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     private void initialiseTool() {
         if (toolList.getSelectedTool() != null) {
             toolList.getSelectedTool().addMouseListener(this, context);
+            toolList.getSelectedTool().addMouseMotionListener(this, context);
             setCursor(toolList.getSelectedTool().getCursor());
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -404,4 +423,23 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
 	public void layerMoved(MapLayerListEvent event) {
 		repaint(getVisibleRect());
 	}
+
+        public void addBox(Envelope e){
+            selectionBox = e;
+        }
+        
+        public void removeBox(){
+            selectionBox = null;
+        }
+        
+        public void addCircle(Envelope e, double radius){
+            selectionCircle = new Envelope(e.getMinX() - radius,
+                                           e.getMinX() + radius,
+                                           e.getMinY() - radius,
+                                           e.getMinY() + radius);
+        }
+        
+        public void removeCircle(){
+            selectionCircle = null;
+        }
 }
