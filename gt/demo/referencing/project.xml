@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-	<pomVersion>3</pomVersion>
    <extend>${basedir}/../../project.xml</extend>
-	<name>geotools-demos</name>
+	<pomVersion>3</pomVersion>
 	<id>gtdemos_referencing</id>
+	<name>geotools-demos</name>
 	<groupId>gt2</groupId>
-	<logo>/images/${pom.artifactId}.gif</logo>
 	<currentVersion>0.1</currentVersion>
 	<organization>
 		<name>GeoTools</name>
@@ -14,10 +13,11 @@
 	</organization>
 	<inceptionYear>1996</inceptionYear>
 	<package>org.geotools</package>
-	<shortDescription>master project file for demos</shortDescription>
+	<logo>/images/${pom.artifactId}.gif</logo>
 	<gumpRepositoryId>geotools</gumpRepositoryId>
 	<description>Welcome to the homepage of the GeoTool2 demos<p/>
   In the left side bar you should see a list of active demos, visit each for more details.</description>
+	<shortDescription>master project file for demos</shortDescription>
 	<url>http://www.geotools.org/</url>
 	<cvsWebUrl/>
 	<issueTrackingUrl/>
