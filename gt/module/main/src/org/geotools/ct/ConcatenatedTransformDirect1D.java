@@ -32,6 +32,9 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransformDirect1D}
+ *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
                                           implements MathTransform1D

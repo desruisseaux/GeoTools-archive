@@ -16,29 +16,27 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.Serializable;
 import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Resources
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -47,27 +45,12 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransform}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
-class ConcatenatedTransform extends AbstractMathTransform implements Serializable {
+public class ConcatenatedTransform extends AbstractMathTransform implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5772066656987558634L;
-    
-    /**
-     * The math transform factory that created this concatenated transform.
-     * Will be used for creating the inverse transform when needed. This
-     * field is usually not null, except after deserialization. It can't
-     * be serialized since {@link MathTransformFactory} are usually not
-     * serializable.
-     *
-     * @task REVISIT: Not serializing this field may not be the right thing to do if
-     *                a user wants to work with a custom {@link MathTransformFactory}.
-     */
-    private transient MathTransformFactory provider;
     
     /**
      * The first math transform.
@@ -80,24 +63,22 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
     protected final MathTransform transform2;
     
     /**
-     * The inverse transform. This field
-     * will be computed only when needed.
+     * The inverse transform. This field will be computed only when needed.
+     * But it is serialized in order to avoid rounding error if the inverse
+     * transform is serialized instead of the original one.
      */
-    private transient MathTransform inverse;
+    private ConcatenatedTransform inverse;
     
     /**
      * Construct a concatenated transform. This constructor is for subclasses only. To
      * create a concatenated transform, use the factory method {@link #create} instead.
      *
-     * @param provider   The math transform factory that created this concatenated transform.
      * @param transform1 The first math transform.
      * @param transform2 The second math transform.
      */
-    protected ConcatenatedTransform(final MathTransformFactory provider,
-                                    final MathTransform transform1,
+    protected ConcatenatedTransform(final MathTransform transform1,
                                     final MathTransform transform2)
     {
-        this.provider   = provider;
         this.transform1 = transform1;
         this.transform2 = transform2;
         if (!isValid()) {
@@ -116,13 +97,11 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
      * intermediate buffer when performing transformations; they are slower and consume more
      * memory. They are used only as a fallback when a "direct" version can't be created.
      *
-     * @param provider  The math transform factory that created this concatenated transform.
-     * @param tr1       The first math transform.
-     * @param tr2       The second math transform.
-     * @return          The concatenated transform.
+     * @param tr1 The first math transform.
+     * @param tr2 The second math transform.
+     * @return    The concatenated transform.
      */
-    public static ConcatenatedTransform create(final MathTransformFactory provider,
-                                               final MathTransform tr1,
+    public static ConcatenatedTransform create(final MathTransform tr1,
                                                final MathTransform tr2)
     {
         final int dimSource = tr1.getDimSource();
@@ -132,10 +111,10 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
         //
         if (dimSource==1 && dimTarget==1) {
             if (tr1 instanceof MathTransform1D && tr2 instanceof MathTransform1D) {
-                return new ConcatenatedTransformDirect1D(provider, (MathTransform1D)tr1,
-                                                                   (MathTransform1D)tr2);
+                return new ConcatenatedTransformDirect1D((MathTransform1D)tr1,
+                                                         (MathTransform1D)tr2);
             } else {
-                return new ConcatenatedTransform1D(provider, tr1, tr2);
+                return new ConcatenatedTransform1D(tr1, tr2);
             }
         } else
         //
@@ -143,19 +122,19 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
         //
         if (dimSource==2 && dimTarget==2) {
             if (tr1 instanceof MathTransform2D && tr2 instanceof MathTransform2D) {
-                return new ConcatenatedTransformDirect2D(provider, (MathTransform2D)tr1,
-                                                                   (MathTransform2D)tr2);
+                return new ConcatenatedTransformDirect2D((MathTransform2D)tr1,
+                                                         (MathTransform2D)tr2);
             } else {
-                return new ConcatenatedTransform2D(provider, tr1, tr2);
+                return new ConcatenatedTransform2D(tr1, tr2);
             }
         } else
         //
         // Check for the general case.
         //
         if (dimSource==tr1.getDimTarget() && tr2.getDimSource()==dimTarget) {
-            return new ConcatenatedTransformDirect(provider, tr1, tr2);
+            return new ConcatenatedTransformDirect(tr1, tr2);
         } else {
-            return new ConcatenatedTransform(provider, tr1, tr2);
+            return new ConcatenatedTransform(tr1, tr2);
         }
     }
     
@@ -176,7 +155,7 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
      * Check if transforms are compatibles. The default
      * implementation check if transfert dimension match.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return transform1.getDimTarget() == transform2.getDimSource();
     }
     
@@ -197,9 +176,8 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
     /**
      * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
      */
-    public CoordinatePoint transform(final CoordinatePoint ptSrc,
-                                           CoordinatePoint ptDst)
-        throws TransformException
+    public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
+            throws TransformException
     {
         assert isValid();
         //  Note: If we know that the transfert dimension is the same than source
@@ -246,21 +224,15 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
     public synchronized final MathTransform inverse() throws NoninvertibleTransformException {
         assert isValid();
         if (inverse == null) {
-            if (provider == null) {
-                provider = MathTransformFactory.getDefault();
-            }
-            inverse = provider.createConcatenatedTransform(transform2.inverse(),
-                                                           transform1.inverse());
-            if (inverse instanceof ConcatenatedTransform) {
-                ((ConcatenatedTransform) inverse).inverse = this;
-            }
+            inverse = create(transform2.inverse(), transform1.inverse());
+            inverse.inverse = this;
         }
         return inverse;
     }
     
     /**
      * Gets the derivative of this transform at a point. We must delegate to the
-     * {@link #derivative(CoordinatePoint)} version  because  the transformation
+     * {@link #derivative(DirectPosition)} version  because  the transformation
      * steps {@link #transform1} and {@link #transform2} may not be instances of
      * {@link MathTransform2D}. The only class which is allowed to delegate directly
      * to the {@link Point2D} version is {@link ConcatenatedTransformDirect2D}.
@@ -270,7 +242,7 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
     public Matrix derivative(final Point2D point) throws TransformException {
-        return derivative(new CoordinatePoint(point));
+        return derivative(new org.geotools.geometry.DirectPosition(point));
     }
     
     /**
@@ -280,20 +252,20 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
      * @return The derivative at the specified point (never <code>null</code>).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
-    public Matrix derivative(final CoordinatePoint point) throws TransformException {
+    public Matrix derivative(final DirectPosition point) throws TransformException {
         final Matrix matrix1 = transform1.derivative(point);
         final Matrix matrix2 = transform2.derivative(transform1.transform(point, null));
         // Compute "matrix = matrix2 * matrix1". Reuse an existing matrix object
         // if possible, which is always the case when both matrix are square.
         final int numRow = matrix2.getNumRow();
         final int numCol = matrix1.getNumCol();
-        final Matrix matrix;
+        final org.geotools.referencing.operation.Matrix matrix;
         if (numCol == matrix2.getNumCol()) {
-            matrix = matrix2;
-            matrix2.mul(matrix1);
+            matrix = wrap(matrix2);
+            matrix.mul(wrap(matrix1));
         } else {
-            matrix = new Matrix(numRow, numCol);
-            matrix.mul(matrix2, matrix1);
+            matrix = new org.geotools.referencing.operation.Matrix(numRow, numCol);
+            matrix.mul(wrap(matrix2), wrap(matrix1));
         }
         return matrix;
     }
@@ -335,32 +307,31 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public final String toString() {
-        final StringBuffer buffer = new StringBuffer("CONCAT_MT[");
-        addWKT(buffer, this, true);
-        buffer.append(']');
-        return buffer.toString();
+    protected String formatWKT(final Formatter formatter) {
+        addWKT(formatter, transform1);
+        addWKT(formatter, transform2);
+        return "CONCAT_MT";
     }
     
     /**
-     * Append to a string buffer the WKT
-     * for the specified math transform.
+     * Append to a string buffer the WKT for the specified math transform.
      */
-    private static void addWKT(final StringBuffer buffer,
-                               final MathTransform transform,
-                               final boolean first)
+    private static void addWKT(final Formatter formatter,
+                               final MathTransform transform)
     {
         if (transform instanceof ConcatenatedTransform) {
             final ConcatenatedTransform concat = (ConcatenatedTransform) transform;
-            addWKT(buffer, concat.transform1, first);
-            addWKT(buffer, concat.transform2, false);
+            addWKT(formatter, concat.transform1);
+            addWKT(formatter, concat.transform2);
         } else {
-            if (!first) {
-                buffer.append(", ");
-            }
-            buffer.append(transform);
+            formatter.append(transform);
         }
     }
 }

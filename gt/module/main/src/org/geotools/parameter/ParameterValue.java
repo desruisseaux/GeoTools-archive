@@ -134,9 +134,11 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      * Normalize the specified unit into one of "standard" units used in projections.
      */
     private static Unit normalize(final Unit unit) {
-        if (SI.METER          .isCompatible(unit)) return SI.METER;
-        if (NonSI.DAY         .isCompatible(unit)) return NonSI.DAY;
-        if (NonSI.DEGREE_ANGLE.isCompatible(unit)) return NonSI.DEGREE_ANGLE;
+        if (unit != null) {
+            if (SI.METER          .isCompatible(unit)) return SI.METER;
+            if (NonSI.DAY         .isCompatible(unit)) return NonSI.DAY;
+            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) return NonSI.DEGREE_ANGLE;
+        }
         return unit;
     }
 

@@ -40,6 +40,7 @@ import org.geotools.referencing.Info;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 
 
 /**
@@ -154,7 +155,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
              */
             if (i != 0) {
                 final CoordinateReferenceSystem previous = operations[i-1].getTargetCRS();
-                final CoordinateReferenceSystem next     = operations[i  ].getSourceCRS();
+                final CoordinateReferenceSystem next     = op             .getSourceCRS();
                 if (previous!=null && next!=null) {
                     final int dim1 = previous.getCoordinateSystem().getDimension();
                     final int dim2 =     next.getCoordinateSystem().getDimension();
@@ -169,9 +170,13 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
              * Concatenates the math transform.
              */
             if (wantTransform) {
-                // TODO: Apply the concatenation here.
-                transform = op.getMathTransform();
-                throw new UnsupportedOperationException(); // Not yet implemented.
+                final MathTransform step = op.getMathTransform();
+                if (transform == null) {
+                    transform = step;
+                } else {
+                    // TODO: use factory.
+                    transform = ConcatenatedTransform.create(transform, step);
+                }
             }
         }
         if (wantTransform) {

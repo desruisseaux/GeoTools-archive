@@ -16,12 +16,12 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 
 
 /**
@@ -29,9 +29,6 @@ package org.geotools.ct;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransform2D}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class ConcatenatedTransform2D extends ConcatenatedTransform implements MathTransform2D {
     /**
@@ -42,18 +39,16 @@ final class ConcatenatedTransform2D extends ConcatenatedTransform implements Mat
     /**
      * Construct a concatenated transform.
      */
-    public ConcatenatedTransform2D(final MathTransformFactory provider,
-                                   final MathTransform transform1,
+    public ConcatenatedTransform2D(final MathTransform transform1,
                                    final MathTransform transform2)
     {
-        super(provider, transform1, transform2);
+        super(transform1, transform2);
     }
     
     /**
-     * Check if transforms are compatibles
-     * with this implementation.
+     * Check if transforms are compatibles with this implementation.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return super.isValid() && getDimSource()==2 && getDimTarget()==2;
     }
 }

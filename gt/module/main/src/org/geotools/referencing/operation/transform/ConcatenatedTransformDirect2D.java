@@ -16,22 +16,19 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.Matrix;
 
 
 /**
@@ -39,9 +36,6 @@ import java.awt.geom.Point2D;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransformDirect2D}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
                                           implements MathTransform2D
@@ -68,20 +62,18 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
     /**
      * Construct a concatenated transform.
      */
-    public ConcatenatedTransformDirect2D(final MathTransformFactory provider,
-                                         final MathTransform2D transform1,
+    public ConcatenatedTransformDirect2D(final MathTransform2D transform1,
                                          final MathTransform2D transform2)
     {
-        super(provider, transform1, transform2);
+        super(transform1, transform2);
         this.transform1 = transform1;
         this.transform2 = transform2;
     }
     
     /**
-     * Check if transforms are compatibles
-     * with this implementation.
+     * Check if transforms are compatibles with this implementation.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return super.isValid() && getDimSource()==2 && getDimTarget()==2;
     }
     
@@ -110,9 +102,9 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * @return The derivative at the specified point (never <code>null</code>).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
-    public Matrix derivative(final Point2D point) throws TransformException {
-        final Matrix matrix1 = transform1.derivative(point);
-        final Matrix matrix2 = transform2.derivative(transform1.transform(point, null));
+    public org.opengis.referencing.operation.Matrix derivative(final Point2D point) throws TransformException {
+        final Matrix matrix1 = wrap(transform1.derivative(point));
+        final Matrix matrix2 = wrap(transform2.derivative(transform1.transform(point, null)));
         matrix2.mul(matrix1);
         return matrix2;
     }

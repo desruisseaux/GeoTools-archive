@@ -294,7 +294,7 @@ public class Formatter {
                 buffer.append(SEPARATOR);
                 buffer.append(SPACE);
             }
-            // TODO: Remove cast if covariance is allowed.
+            // Covariance: Remove cast if covariance is allowed.
             final OperationParameter descriptor = (OperationParameter) param.getDescriptor();
             Unit unit = descriptor.getUnit();
             if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
@@ -372,6 +372,20 @@ public class Formatter {
             buffer.append(SPACE);
         }
         buffer.append(number);
+    }
+
+    /**
+     * Append a character string. The string will be written between quotes.
+     * A comma (or any other element separator) will be written before the string if needed.
+     */
+    public void append(final String text) {
+        if (buffer.length() != 0) {
+            buffer.append(SEPARATOR);
+            buffer.append(SPACE);
+        }
+        buffer.append(QUOTE);
+        buffer.append(text);
+        buffer.append(QUOTE);
     }
 
     /**

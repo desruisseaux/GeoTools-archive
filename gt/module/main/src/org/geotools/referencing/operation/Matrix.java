@@ -109,6 +109,20 @@ public class Matrix extends GMatrix implements org.opengis.referencing.operation
     /**
      * Constructs a new matrix and copies the initial values from the parameter matrix.
      */
+    public Matrix(final org.opengis.referencing.operation.Matrix matrix) {
+        this(matrix.getNumRow(), matrix.getNumCol());
+        final int height = getNumRow();
+        final int width  = getNumCol();
+        for (int j=0; j<height; j++) {
+            for (int i=0; i<width; i++) {
+                setElement(j, i, matrix.getElement(j, i));
+            }
+        }
+    }
+    
+    /**
+     * Constructs a new matrix and copies the initial values from the parameter matrix.
+     */
     public Matrix(final GMatrix matrix) {
         super(matrix);
     }

@@ -16,51 +16,57 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
 
 
 /**
- * Concatenated transform in which the resulting transform is one-dimensional.
+ * Concatenated transform where both transforms are one-dimensional.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransform1D}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
-final class ConcatenatedTransform1D extends ConcatenatedTransform implements MathTransform1D {
+final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
+                                          implements MathTransform1D
+{
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 8150427971141078395L;
+    private static final long serialVersionUID = 1064398659892864966L;
+    
+    /**
+     * The first math transform. This field is identical
+     * to {@link ConcatenatedTransform#transform1}. Only
+     * the type is different.
+     */
+    private final MathTransform1D transform1;
+    
+    /**
+     * The second math transform. This field is identical
+     * to {@link ConcatenatedTransform#transform1}. Only
+     * the type is different.
+     */
+    private final MathTransform1D transform2;
     
     /**
      * Construct a concatenated transform.
      */
-    public ConcatenatedTransform1D(final MathTransformFactory provider,
-                                   final MathTransform transform1,
-                                   final MathTransform transform2)
+    public ConcatenatedTransformDirect1D(final MathTransform1D transform1,
+                                         final MathTransform1D transform2)
     {
-        super(provider, transform1, transform2);
+        super(transform1, transform2);
+        this.transform1 = transform1;
+        this.transform2 = transform2;
     }
     
     /**
-     * Check if transforms are compatibles
-     * with this implementation.
+     * Check if transforms are compatibles with this implementation.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return super.isValid() && getDimSource()==1 && getDimTarget()==1;
     }
     
@@ -68,21 +74,15 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      * Transforms the specified value.
      */
     public double transform(final double value) throws TransformException {
-        final double[] values = new double[] {value};
-        final double[] buffer = new double[] {transform1.getDimTarget()};
-        transform1.transform(values, 0, buffer, 0, 1);
-        transform2.transform(buffer, 0, values, 0, 1);
-        return values[0];
+        return transform2.transform(transform1.transform(value));
     }
     
     /**
      * Gets the derivative of this function at a value.
      */
     public double derivative(final double value) throws TransformException {
-        final CoordinatePoint p = new CoordinatePoint(1);
-        p.ord[0] = value;
-        final Matrix m = derivative(p);
-        assert m.getNumRow()==1 && m.getNumCol()==1;
-        return m.getElement(0,0);
+        final double value1 = transform1.derivative(value);
+        final double value2 = transform2.derivative(transform1.transform(value));
+        return value2 * value1;
     }
 }

@@ -16,18 +16,13 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.CoordinatePoint;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
@@ -39,9 +34,6 @@ import org.geotools.pt.CoordinatePoint;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransformDirect}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**
@@ -52,18 +44,16 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**
      * Construct a concatenated transform.
      */
-    public ConcatenatedTransformDirect(final MathTransformFactory provider,
-                                       final MathTransform transform1,
+    public ConcatenatedTransformDirect(final MathTransform transform1,
                                        final MathTransform transform2)
     {
-        super(provider, transform1, transform2);
+        super(transform1, transform2);
     }
     
     /**
-     * Check if transforms are compatibles
-     * with this implementation.
+     * Check if transforms are compatibles with this implementation.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return super.isValid() &&
                transform1.getDimSource() == transform1.getDimTarget() &&
                transform2.getDimSource() == transform2.getDimTarget();
@@ -72,8 +62,8 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**
      * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
      */
-    public CoordinatePoint transform(final CoordinatePoint ptSrc,
-                                           CoordinatePoint ptDst)
+    public DirectPosition transform(final DirectPosition ptSrc,
+                                          DirectPosition ptDst)
         throws TransformException
     {
         assert isValid();

@@ -17,12 +17,20 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
-// Miscellaneous
+// J2SE dependencies
 import java.io.Serializable;
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
+import java.awt.geom.AffineTransform;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
@@ -33,9 +41,6 @@ import org.geotools.pt.CoordinatePoint;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.IdentityTransform}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class IdentityTransform extends AbstractMathTransform implements LinearTransform, Serializable {
     /**
@@ -47,12 +52,40 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * The input and output dimension.
      */
     private final int dimension;
+
+    /**
+     * Pool of previously created identity transforms.
+     */
+    private static final LinearTransform[] POOL = new LinearTransform[8];
     
     /**
-     * Construct a transform.
+     * Construct an identity transform of the specified dimension.
      */
-    protected IdentityTransform(final int dimension) {
+    private IdentityTransform(final int dimension) {
         this.dimension = dimension;
+    }
+
+    /**
+     * Construct an identity transform of the specified dimension.
+     */
+    public static LinearTransform create(final int dimension) {
+        // No need to synchronize; not a big deal in a few objects are duplicated.
+        LinearTransform candidate;
+        if (dimension < POOL.length) {
+            candidate = POOL[dimension];
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        switch (dimension) {
+            case 1:  candidate = LinearTransform1D.IDENTITY;                   break;
+            case 2:  candidate = new AffineTransform2D(new AffineTransform()); break;
+            default: candidate = new IdentityTransform(dimension);             break;
+        }
+        if (dimension < POOL.length) {
+            POOL[dimension] = candidate;
+        }
+        return candidate;
     }
     
     /**
@@ -80,7 +113,7 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * Returns a copy of the identity matrix.
      */
     public Matrix getMatrix() {
-        return new Matrix(dimension+1);
+        return new org.geotools.referencing.operation.Matrix(dimension+1);
     }
     
     /**
@@ -88,8 +121,8 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * For an identity transform, the derivative is the
      * same everywhere.
      */
-    public Matrix derivative(final CoordinatePoint point) {
-        return new Matrix(dimension);
+    public Matrix derivative(final DirectPosition point) {
+        return new org.geotools.referencing.operation.Matrix(dimension);
     }
     
     /**
@@ -124,7 +157,7 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * different implementations of the same class.
      */
     public int hashCode() {
-        return 78215634 + dimension;
+        return (int)serialVersionUID + dimension;
     }
     
     /**
@@ -132,7 +165,7 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * this math transform for equality.
      */
     public boolean equals(final Object object) {
-        if (object==this) {
+        if (object == this) {
             // Slight optimization
             return true;
         }
@@ -144,9 +177,14 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public String toString() {
-        return MatrixTransform.toString(getMatrix());
+    protected String formatWKT(final Formatter formatter) {
+        return MatrixTransform.formatWKT(formatter, getMatrix());
     }
 }

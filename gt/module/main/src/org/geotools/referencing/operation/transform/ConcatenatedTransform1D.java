@@ -16,19 +16,17 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
+import org.geotools.geometry.DirectPosition;
 
 
 /**
@@ -36,9 +34,6 @@ import org.geotools.pt.CoordinatePoint;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ConcatenatedTransform1D}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class ConcatenatedTransform1D extends ConcatenatedTransform implements MathTransform1D {
     /**
@@ -49,18 +44,16 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
     /**
      * Construct a concatenated transform.
      */
-    public ConcatenatedTransform1D(final MathTransformFactory provider,
-                                   final MathTransform transform1,
+    public ConcatenatedTransform1D(final MathTransform transform1,
                                    final MathTransform transform2)
     {
-        super(provider, transform1, transform2);
+        super(transform1, transform2);
     }
     
     /**
-     * Check if transforms are compatibles
-     * with this implementation.
+     * Check if transforms are compatibles with this implementation.
      */
-    protected boolean isValid() {
+    boolean isValid() {
         return super.isValid() && getDimSource()==1 && getDimTarget()==1;
     }
     
@@ -79,8 +72,8 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      * Gets the derivative of this function at a value.
      */
     public double derivative(final double value) throws TransformException {
-        final CoordinatePoint p = new CoordinatePoint(1);
-        p.ord[0] = value;
+        final DirectPosition p = new DirectPosition(1);
+        p.ordinates[0] = value;
         final Matrix m = derivative(p);
         assert m.getNumRow()==1 && m.getNumCol()==1;
         return m.getElement(0,0);

@@ -25,6 +25,7 @@ package org.geotools.referencing.operation.transform;
 
 // J2SE and vecmath dependencies
 import java.io.Serializable;
+import java.util.Locale;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.GeneralPath;
@@ -71,6 +72,20 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Construct a math transform.
      */
     protected AbstractMathTransform() {
+    }
+    
+    /**
+     * Returns a human readable name, if available. If no name is available in
+     * the specified locale,   then this method returns a name in an arbitrary
+     * locale. If no name is available in any locale, then this method returns
+     * <code>null</code>. The default implementation always returns <code>null</code>.
+     *
+     * @param  locale The desired locale, or <code>null</code> for a default locale.
+     * @return The transform name localized in the specified locale if possible, or
+     *         <code>null</code> if no name is available in any locale.
+     */
+    String getName(final Locale locale) {
+        return null;
     }
     
     /**
@@ -454,6 +469,17 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                        ((MathTransform1D) this).derivative(point.getOrdinate(0))});
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
+    }
+
+    /**
+     * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
+     */
+    static org.geotools.referencing.operation.Matrix wrap(final Matrix matrix) {
+        if (matrix instanceof org.geotools.referencing.operation.Matrix) {
+            return (org.geotools.referencing.operation.Matrix) matrix;
+        } else {
+            return new org.geotools.referencing.operation.Matrix(matrix);
+        }
     }
     
     /**

@@ -41,6 +41,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.parameter.ParameterValue;
 import org.geotools.referencing.operation.LinearTransform;
 
 
@@ -94,11 +95,18 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * The matrix should be affine, but it will not be verified.
      */
     public static LinearTransform create(final Matrix matrix) {
-        if (matrix.getNumRow() == 3 && matrix.getNumCol() == 3) {
-            // TODO: Invokes some 'wrap' method instead.
-            if (matrix instanceof org.geotools.referencing.operation.Matrix) {
+        final int dimension = matrix.getNumRow();
+        if (dimension == matrix.getNumCol()) {
+            if (matrix.isIdentity()) {
+                return IdentityTransform.create(dimension);
+            }
+            if (dimension == 3) {
                 final org.geotools.referencing.operation.Matrix m;
-                m = (org.geotools.referencing.operation.Matrix) matrix;
+                if (matrix instanceof org.geotools.referencing.operation.Matrix) {
+                    m = (org.geotools.referencing.operation.Matrix) matrix;
+                } else {
+                    m = new org.geotools.referencing.operation.Matrix(matrix);
+                }
                 if (m.isAffine()) {
                     return create(m.toAffineTransform2D());
                 }
@@ -390,37 +398,28 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * Implementation of {@link #formatWKT(Formatter)} for the specified matrix.
      */
     static String formatWKT(final Formatter formatter, final Matrix matrix) {
-        // TODO
+        final int numRow = matrix.getNumRow();
+        final int numCol = matrix.getNumCol();
+        formatter.append("Affine");
+        formatter.append(new ParameterValue("num_row", numRow));
+        formatter.append(new ParameterValue("num_col", numCol));
+        final StringBuffer eltBuf = new StringBuffer("elt_");
+        for (int j=0; j<numRow; j++) {
+            for (int i=0; i<numCol; i++) {
+                final double value = matrix.getElement(j,i);
+                if (value != (i==j ? 1 : 0)) {
+                    eltBuf.setLength(4);
+                    eltBuf.append(j);
+                    eltBuf.append('_');
+                    eltBuf.append(i);
+                    formatter.append(new ParameterValue(eltBuf.toString(), value, null));
+                }
+            }
+        }
         return "PARAM_MT";
     }
     
 // TODO
-//    /**
-//     * Returns the WKT for an affine transform
-//     * using the specified matrix.
-//     */
-//    static String toString(final Matrix matrix) {
-//        final int numRow = matrix.getNumRow();
-//        final int numCol = matrix.getNumCol();
-//        final StringBuffer buffer = paramMT("Affine");
-//        final StringBuffer eltBuf = new StringBuffer("elt_");
-//        addParameter(buffer, "num_row", numRow);
-//        addParameter(buffer, "num_col", numCol);
-//        for (int j=0; j<numRow; j++) {
-//            for (int i=0; i<numCol; i++) {
-//                final double value = matrix.getElement(j,i);
-//                if (value != (i==j ? 1 : 0)) {
-//                    eltBuf.setLength(4);
-//                    eltBuf.append(j);
-//                    eltBuf.append('_');
-//                    eltBuf.append(i);
-//                    addParameter(buffer, eltBuf.toString(), value);
-//                }
-//            }
-//        }
-//        buffer.append(']');
-//        return buffer.toString();
-//    }
 //    
 //    /**
 //     * The provider for {@link MatrixTransform}.

@@ -17,17 +17,20 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.operation.Matrix;
 
 // J2SE dependencies
 import java.io.Serializable;
@@ -40,11 +43,8 @@ import java.io.Serializable;
  * coordinates, then you may wish to convert the height values from feet to
  * meters without affecting the latitude and longitude values.
  *
- * @version 1.00
+ * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.PassThroughTransform}
- *             in the <code>org.geotools.referencing.operation.transform</code> package.
  */
 final class PassThroughTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -69,8 +69,7 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     protected final MathTransform transform;
     
     /**
-     * The inverse transform. This field
-     * will be computed only when needed.
+     * The inverse transform. This field will be computed only when needed.
      */
     private transient PassThroughTransform inverse;
     
@@ -179,16 +178,19 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     /**
      * Gets the derivative of this transform at a point.
      */
-    public Matrix derivative(final CoordinatePoint point) throws TransformException {
+    public org.opengis.referencing.operation.Matrix derivative(final DirectPosition point) throws TransformException {
         final int nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
         final int transDim = transform.getDimSource();
         final int pointDim = point.getDimension();
         if (pointDim != transDim+nSkipped) {
-            throw new MismatchedDimensionException(pointDim, transDim+nSkipped);
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, "point",
+                        new Integer(pointDim), new Integer(transDim+nSkipped)));
         }
-        final CoordinatePoint subPoint = new CoordinatePoint(transDim);
-        System.arraycopy(point.ord, firstAffectedOrdinate, subPoint.ord, 0, transDim);
-        return expand(transform.derivative(subPoint),
+        final org.geotools.geometry.DirectPosition subPoint;
+        subPoint = new org.geotools.geometry.DirectPosition(transDim);
+//TODO  System.arraycopy(point.ord, firstAffectedOrdinate, subPoint.ordinates, 0, transDim);
+        return expand(wrap(transform.derivative(subPoint)),
                       firstAffectedOrdinate, numTrailingOrdinates, 0);
     }
 
@@ -203,10 +205,10 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
      * @param affine 0 if the matrix do not contains translation terms, or 1 if
      *        the matrix is an affine transform with translation terms.
      */
-    static Matrix expand(final Matrix subMatrix,
-                         final int firstAffectedOrdinate,
-                         final int numTrailingOrdinates,
-                         final int affine)
+    static org.opengis.referencing.operation.Matrix expand(final Matrix subMatrix,
+                                                           final int firstAffectedOrdinate,
+                                                           final int numTrailingOrdinates,
+                                                           final int affine)
     {
         final int  nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
         final int    numRow = subMatrix.getNumRow() - affine;
@@ -272,6 +274,7 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
      * Compares the specified object with
      * this math transform for equality.
      */
+// TODO
     public boolean equals(final Object object) {
         if (object==this) {
             return true;
@@ -288,6 +291,7 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
     /**
      * Returns the WKT for this math transform.
      */
+// TODO
     public String toString() {
         final StringBuffer buffer = new StringBuffer("PASSTHROUGH_MT[");
         buffer.append(firstAffectedOrdinate);
