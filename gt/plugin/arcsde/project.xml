@@ -54,14 +54,13 @@
       <version>SNAPSHOT</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
-    <!--
     <dependency>
       <artifactId>jsde_sdk</artifactId>
       <groupId>arcsde</groupId>
       <version>8.3</version>
     </dependency>
-    -->
 
+    <!--
     <dependency>
       <artifactId>jsde_sdk</artifactId>
       <groupId>arcsde</groupId>
@@ -77,6 +76,7 @@
       <groupId>arcsde</groupId>
       <version>9.0</version>
     </dependency>
+    -->
 
     <dependency>
       <id>JTS</id>
