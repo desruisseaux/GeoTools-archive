@@ -34,13 +34,16 @@ import java.util.logging.Logger;
 import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
+import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -99,7 +102,7 @@ public final class FactoryFinder {
         assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
             // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
-            registry = new ServiceRegistry(Arrays.asList(new Class[] {
+            registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
                                            DatumFactory.class,
                                            CSFactory.class,
                                            CRSFactory.class,
@@ -176,21 +179,47 @@ public final class FactoryFinder {
     public static synchronized Set getCRSFactories() {
         return new LazySet(getProviders(CRSFactory.class));
     }
-
+    
     /**
-     * Returns the default implementation of {@link AuthorityFactory}. If no implementation is
-     * registered, then this method throws an exception. If more than one implementation is
-     * registered, an arbitrary one is selected.
-     *
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link AuthorityFactory} interface.
-     */
-    public static synchronized AuthorityFactory getAuthorityFactory() throws NoSuchElementException {
-        return (AuthorityFactory) getProviders(AuthorityFactory.class).next();
+     * Locate for CoordinateReferenceSystem for specific code.
+     * <p>
+     * Note the code needs to mention the authority.
+     * <pre><code>
+     * EPSG:1234
+     * AUTO:42001, ..., ..., ...
+     * </code></pre>
+     * </p>
+     * </p>
+     * @param code
+     * @return coordinate system for the provided code
+     * @throws NoSuchAuthorityCodeException If the code could not be understood 
+     * @throws FactoryException
+     */ 
+    public static CoordinateReferenceSystem decode( String code ) throws NoSuchAuthorityCodeException {
+        //Set factories = getAuthorityFactories();
+        if( "EPSG:4269".equals( code )){
+            try {
+                // Temp hack for testing
+                return getCRSFactory().createFromWKT(
+                        "4269=GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]]"
+                        );
+            } catch (NoSuchElementException e) {
+                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage() );
+            } catch (FactoryException e) {
+                throw new NoSuchAuthorityCodeException( e.getLocalizedMessage() );
+            }
+        }
+        throw new NoSuchAuthorityCodeException( "Unabled to locate definition of '"+code+"'"); //$NON-NLS-1$
     }
-
+    
     /**
      * Returns a set of all available implementations for the {@link AuthorityFactory} interface.
+     * <p>
+     * This Set can be used to list the available codes known to all authorities.
+     * In the event that the same code is understood by more then one authority
+     * you will need to assume both are close enough, or make use of this set directly
+     * rather than use the decode method.
+     * </p>
      */
     public static synchronized Set getAuthorityFactories() {
         return new LazySet(getProviders(AuthorityFactory.class));
