@@ -66,6 +66,7 @@ public interface ResourceKeys
     public static final int NORMAL                                      =    42;
     public static final int NORTH                                       =    43;
     public static final int NORTHING                                    =    44;
+    public static final int OBLIQUE_MERCATOR_PROJECTION                 =   135;
     public static final int ORTHOGRAPHIC_PROJECTION                     =    45;
     public static final int ORTHOMETRIC                                 =    46;
     public static final int OTHER                                       =    47;
@@ -122,6 +123,9 @@ public interface ResourceKeys
     public static final int ERROR_INDEX_OUT_OF_BOUNDS_$1                =    92;
     public static final int ERROR_INSEPARABLE_TRANSFORM                 =    93;
     public static final int ERROR_IN_$1                                 =    94;
+    public static final int ERROR_LAT1_EQ_LAT2                          =   136;
+    public static final int ERROR_LAT1_EQ_ZERO                          =   137;
+    public static final int ERROR_LAT2_EQ_NEG_90                        =   138;
     public static final int ERROR_LATITUDE_OUT_OF_RANGE_$1              =    95;
     public static final int ERROR_LONGITUDE_OUT_OF_RANGE_$1             =    96;
     public static final int ERROR_MATRIX_NOT_REGULAR                    =    97;
@@ -158,4 +162,5 @@ public interface ResourceKeys
     public static final int ERROR_UNSUPPORTED_FILE_TYPE_$2              =   125;
     public static final int ERROR_VALUE_OUT_OF_BOUNDS_$3                =   126;
     public static final int ERROR_VALUE_TEND_TOWARD_INFINITY            =   127;
+    public static final int ERROR_V_INFINITE                            =   139;
 }
