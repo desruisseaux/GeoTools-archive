@@ -756,7 +756,8 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+        	System.out.println("end of filter"+value.length+":"+value[0]);
+            return value[0].getValue();
         }
 
         /**
@@ -1016,13 +1017,29 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws OperationNotSupportedException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException{
+        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	
+        	try {
+        		short type = ComparisonOpsType.findFilterType( element.getName() );        		
+				CompareFilter filter = factory.createCompareFilter( type );
+				filter.addLeftValue( (Expression) value[0].getValue() );
+				filter.addRightValue( (Expression) value[1].getValue() );				
+				return filter;
+			}
+        	catch( ClassCastException expressionRequired ){
+        		throw new SAXException("Illegal filter for "+element, expressionRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**

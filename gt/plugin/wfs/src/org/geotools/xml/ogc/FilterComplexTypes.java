@@ -25,13 +25,16 @@ import javax.naming.OperationNotSupportedException;
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.ServiceException;
 import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.gml.GMLSchema;
+import org.geotools.xml.ogc.FilterOpsComplexTypes.ComparisonOpsType;
 import org.geotools.xml.ogc.FilterSchema.FilterAttribute;
 import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
 import org.geotools.xml.ogc.FilterSchema.FilterElement;
@@ -1320,14 +1323,36 @@ public class FilterComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            // TODO Auto-generated method stub
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	
+        	try {
+        		String string = (String) value[0].getValue(); // the spec says string!
+        		Object literal = string;
+        		try {
+        			if( string.indexOf('.') != -1 ){
+        				literal = new Double( Double.parseDouble( string ) );
+        			}
+        			else {
+        				literal = new Integer( Integer.parseInt( string ) );
+        			}
+        		}
+        		catch( NumberFormatException nonNumber ){
+        			// ignore
+        		}        		
+        		LiteralExpression expr = factory.createLiteralExpression( literal );
+				return expr;
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element, e );
+			} 
         }
 
         /**
@@ -1437,13 +1462,28 @@ public class FilterComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return (value == null) ? "" : value[0].toString();
+            Attributes attrs, Map hints) throws SAXException{
+        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	
+        	try {
+        		String xpath = (String) value[0].getValue();
+        		AttributeExpression expr = factory.createAttributeExpression( null, xpath );
+				return expr;
+			}
+        	catch( ClassCastException expressionRequired ){
+        		throw new SAXException("Illegal xpath for property name "+element, expressionRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
+        	//return (value == null) ? "" : value[0].toString();
         }
 
         /**

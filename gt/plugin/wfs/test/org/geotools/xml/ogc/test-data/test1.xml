@@ -1,4 +1,4 @@
-<Filter>
+<Filter xmlns:gml="http://www.opengis.net/gml">
   <PropertyIsEqualTo>
     <PropertyName>testString</PropertyName>
     <Literal>2</Literal>
