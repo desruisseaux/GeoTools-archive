@@ -19,6 +19,7 @@ package org.geotools.xml.gml;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -65,7 +66,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -516,6 +519,38 @@ public class GMLComplexTypes {
                 output.characters(ts + c.x + cs + c.y + cs + c.z);
             }
         }
+
+        if (e == null) {
+            output.endElement(GMLSchema.NAMESPACE, "coordinates");
+        } else {
+            output.endElement(e.getNamespace(), e.getName());
+        }
+    }
+
+    static void encodeCoords(Element e, Envelope env, PrintHandler output)
+        throws IOException {
+        if ((env == null)) {
+            return;
+        }
+
+        AttributesImpl ai = new AttributesImpl();
+        String dec;
+        String cs;
+        String ts;
+        dec = ".";
+        cs = ",";
+        ts = " ";
+        ai.addAttribute("", "decimal", "", "string", dec);
+        ai.addAttribute("", "cs", "", "string", cs);
+        ai.addAttribute("", "ts", "", "string", ts);
+
+        if (e == null) {
+            output.startElement(GMLSchema.NAMESPACE, "coordinates", ai);
+        } else {
+            output.startElement(e.getNamespace(), e.getName(), ai);
+        }
+
+        output.characters(env.getMinX() + cs + env.getMinY() + ts + env.getMaxX() + cs + env.getMaxY());
 
         if (e == null) {
             output.endElement(GMLSchema.NAMESPACE, "coordinates");
@@ -2682,8 +2717,9 @@ public class GMLComplexTypes {
 
             output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
 
-            Coordinate[] coords = g.getCoordinates();
-            encodeCoords(element, coords, output);
+//            Coordinate[] coords = g.getCoordinates();
+            Envelope e = g.getEnvelopeInternal();
+            encodeCoords(element, e, output);
             output.endElement(GMLSchema.NAMESPACE, element.getName());
         }
     }

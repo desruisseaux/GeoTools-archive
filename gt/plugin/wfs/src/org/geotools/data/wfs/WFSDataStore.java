@@ -8,12 +8,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +58,7 @@ import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * <p> 
@@ -405,7 +408,7 @@ public class WFSDataStore extends AbstractDataStore{
         		url += "&MAXFEATURES="+request.getMaxFeatures();
         	if(request.getFilter()!=null){
         		if(request.getFilter().getFilterType() == Filter.GEOMETRY_BBOX){
-        			url += "&BBOX="+printBBox(((GeometryFilter)request.getFilter()));
+        			url += "&BBOX="+printBBoxGet(((GeometryFilter)request.getFilter()));
         		}else{
         		if(request.getFilter().getFilterType() == Filter.FID){
         			FidFilter ff = (FidFilter)request.getFilter();
@@ -418,11 +421,12 @@ public class WFSDataStore extends AbstractDataStore{
         		}else{
         			// rest
         			if(request.getFilter() != Filter.NONE)
-        			url += "&FILTER="+printFilter(request.getFilter());
+        			url += URLEncoder.encode("&FILTER="+printFilter(request.getFilter()),"UTF-8");
         		}}
         	}
         }
-        
+
+System.out.println(url); // url to request
         getUrl = new URL(url);
         HttpURLConnection hc = (HttpURLConnection)getUrl.openConnection();
         hc.setRequestMethod("GET");
@@ -447,18 +451,29 @@ public class WFSDataStore extends AbstractDataStore{
         return w.toString();
     }
     
-    private String printBBox(GeometryFilter gf) throws IOException, SAXException{
+    private String printBBoxGet(GeometryFilter gf) throws IOException{
     	// ogc filter bbox
-        Map hints = new HashMap();
-        hints.put(DocumentWriter.BASE_ELEMENT,FilterSchema.getInstance().getElements()[24]); // BBOx
-        StringWriter w = new StringWriter();
-        try{
-            DocumentWriter.writeDocument(gf,FilterSchema.getInstance(),w,hints);
-        }catch(OperationNotSupportedException e){
-            logger.warning(e.toString());
-            throw new SAXException(e);
-        }
-        return w.toString();
+//        Map hints = new HashMap();
+//        hints.put(DocumentWriter.BASE_ELEMENT,FilterSchema.getInstance().getElements()[24]); // BBOx
+//        StringWriter w = new StringWriter();
+//        try{
+//            DocumentWriter.writeFragment(gf,FilterSchema.getInstance(),w,hints);
+//        }catch(OperationNotSupportedException e){
+//            logger.warning(e.toString());
+//            throw new SAXException(e);
+//        }
+//        return w.toString();
+    	Envelope e = null;
+    	if(gf.getLeftGeometry().getType() == Expression.LITERAL_GEOMETRY){
+    		e = ((Geometry)((LiteralExpression)gf.getLeftGeometry()).getLiteral()).getEnvelopeInternal();
+    	}else{
+        	if(gf.getRightGeometry().getType() == Expression.LITERAL_GEOMETRY){
+        		e = ((Geometry)((LiteralExpression)gf.getRightGeometry()).getLiteral()).getEnvelopeInternal();
+        	}else{
+        		throw new IOException("Cannot encode BBOX:"+gf);
+        	}
+    	}
+    	return e.getMinX()+","+e.getMinY()+","+e.getMaxX()+","+e.getMaxY();
     }
     
     private WFSFeatureReader getFeatureReaderPost(String typeName, Query query) throws SAXException, IOException{
