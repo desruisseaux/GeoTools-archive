@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -68,14 +68,19 @@ public class RendererTest extends TestCase {
      * Test the rendering using offscreen buffer.
      */
     public void testOffscreenBuffer() throws TransformException {
-        testOffscreenBuffer(ImageType.BUFFERED);
-        testOffscreenBuffer(ImageType.VOLATILE);
+        try{
+            testOffscreenBuffer(ImageType.BUFFERED);
+            testOffscreenBuffer(ImageType.VOLATILE);
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
 
     /**
      * Test the rendering using offscreen buffer.
      */
     private void testOffscreenBuffer(final ImageType type) throws TransformException {
+        try{
         final Pane pane = new Pane();
         pane.renderer.setOffscreenBuffered(50, 150, type);
         for (int i=0; i<300; i+=100) {
@@ -86,6 +91,9 @@ public class RendererTest extends TestCase {
             layer.setZOrder(i); // Try changing z-order after addition.
         }
         pane.display(type.getName());
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
 
     /**

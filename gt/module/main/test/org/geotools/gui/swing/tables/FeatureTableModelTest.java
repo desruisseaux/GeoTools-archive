@@ -7,11 +7,14 @@
 
 package org.geotools.gui.swing.tables;
 
+import java.awt.HeadlessException;
 import java.io.*;
 import java.util.logging.Logger;
 import java.net.*;
 import javax.swing.*;
 import junit.framework.*;
+
+import org.geotools.DefaultCoreSuite;
 import org.geotools.data.*;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.*;
@@ -55,18 +58,22 @@ public class FeatureTableModelTest extends TestCase {
         FeatureCollection table =
             datastore.getFeatureSource( typeName ).getFeatures().collection();
         
-        FeatureTableModel ftm = new FeatureTableModel();
-        ftm.setFeatureCollection(table);
+        try{
+            FeatureTableModel ftm = new FeatureTableModel();
+        	ftm.setFeatureCollection(table);
         
-        JFrame frame = new JFrame();
-        frame.setSize(400,400);
-        JTable jtable = new JTable();
-        jtable.setModel(ftm);
-        JScrollPane scroll = new JScrollPane(jtable);
-        frame.getContentPane().add(scroll,"Center");
-        frame.setVisible(true);
-        Thread.sleep(1000);
-        frame.dispose();
+        	JFrame frame = new JFrame();
+        	frame.setSize(400,400);
+        	JTable jtable = new JTable();
+        	jtable.setModel(ftm);
+        	JScrollPane scroll = new JScrollPane(jtable);
+        	frame.getContentPane().add(scroll,"Center");
+        	frame.setVisible(true);
+        	Thread.sleep(1000);
+        	frame.dispose();
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
     
     /**

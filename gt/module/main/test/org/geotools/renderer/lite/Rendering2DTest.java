@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -209,6 +210,7 @@ public class Rendering2DTest extends TestCase {
     }
     
     public void testSimpleRender()throws Exception {
+        try{
         //same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
     	
@@ -219,6 +221,9 @@ public class Rendering2DTest extends TestCase {
         map.addLayer(ft,style);
         LiteRenderer renderer = new LiteRenderer(map);
         showRender(renderer, 1000);
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
     
     /**
@@ -229,6 +234,7 @@ public class Rendering2DTest extends TestCase {
      * @throws Exception
      */
     public void testDefinitionQuery()throws Exception {
+        try{
     	System.err.println("starting definition query test");
     	final FeatureCollection ft = createTestDefQueryFeatureCollection();
         final Style style = createDefQueryTestStyle();
@@ -315,6 +321,9 @@ public class Rendering2DTest extends TestCase {
         assertEquals(3, results.getSchema().getAttributeCount());
         
         showRender(renderer, 1000);
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
     
     private void showRender(LiteRenderer renderer, long timeOut)
@@ -341,6 +350,7 @@ public class Rendering2DTest extends TestCase {
     }
     
      public void testPixelToWorld()throws Exception {
+         try{
         //same as the datasource test, load in some features into a table
         //System.err.println("starting rendering2DTest");
         // Request extent
@@ -365,6 +375,9 @@ public class Rendering2DTest extends TestCase {
         assertEquals(5d, c.y, 1.0);
        
         frame.dispose();
+         }catch(HeadlessException e){
+             // do nothing
+         }
         
     }
      

@@ -6453,7 +6453,8 @@ public class GMLComplexTypes {
 				}
 
 		}}
-	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());
+			// nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
+	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),(eg.isNillable()||eg.getMinOccurs() == 0));
 //	    	System.out.println("Creating "+eg.getName()+" FT nil?"+at.isNillable()+" Elem nil?"+eg.isNillable()+" "+eg.getType().getInstanceType()+" "+eg.getType().getNamespace()+":"+eg.getType().getName());
 
     	return at;

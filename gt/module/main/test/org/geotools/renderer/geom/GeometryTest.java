@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,6 +34,7 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
+import java.awt.HeadlessException;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
@@ -58,12 +59,12 @@ import org.geotools.renderer.geom.ShapePanel;
  */
 public final class GeometryTest extends TestCase implements ShapePanel.Producer {
     /**
-     * Constante identifiant la méthode à tester.
+     * Constante identifiant la mï¿½thode ï¿½ tester.
      */
     private int method;
 
     /**
-     * Coordonnées des points de contrôles qui ont été explicitement spécifiés.
+     * Coordonnï¿½es des points de contrï¿½les qui ont ï¿½tï¿½ explicitement spï¿½cifiï¿½s.
      */
     private static String[] args;
 
@@ -91,27 +92,31 @@ public final class GeometryTest extends TestCase implements ShapePanel.Producer 
     }
 
     /**
-     * Affiche dans différentes fenêtres des résultats de calculs géométriques.
-     * Cet affichage sert uniquement à vérifier visuellement l'exactitude des
-     * calculs géométriques. Les fenêtres comprendront:
+     * Affiche dans diffï¿½rentes fenï¿½tres des rï¿½sultats de calculs gï¿½omï¿½triques.
+     * Cet affichage sert uniquement ï¿½ vï¿½rifier visuellement l'exactitude des
+     * calculs gï¿½omï¿½triques. Les fenï¿½tres comprendront:
      *
      * <ul>
      *   <li>Deux droites et leur point d'intersection ({@link #intersectionPoint intersectionPoint}).</li>
-     *   <li>Une parabole avec ses points de contrôle  ({@link #fitParabol        fitParabol}).</li>
+     *   <li>Une parabole avec ses points de contrï¿½le  ({@link #fitParabol        fitParabol}).</li>
      *   <li>Un cercle passant par trois points        ({@link #fitCircle         fitCircle}).</li>
      * </ul>
      */
     public void testGeometry(){
+        try{
         //step through the different methods
         for (int i=0; i<=2; i++) {
             GeometryTest test = new GeometryTest(null);
             test.method = i;
             ShapePanel.show(test);
         }
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
 
     /**
-     * Retourne une liste de points et de courbes à afficher.
+     * Retourne une liste de points et de courbes ï¿½ afficher.
      */
     public Object[] getShapes() {
         switch (method) {
@@ -147,7 +152,7 @@ public final class GeometryTest extends TestCase implements ShapePanel.Producer 
                     points[1]
                 };
                 /*
-                 * Note: on peut obtenir les coordonnées
+                 * Note: on peut obtenir les coordonnï¿½es
                  * d'un point arbitraire sur la courbe par:
                  *
                  *  x = 0.5*(ctrlx + 0.5*(x1+x2))

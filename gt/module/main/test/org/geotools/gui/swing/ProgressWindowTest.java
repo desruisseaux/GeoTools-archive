@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,14 +22,15 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2Se dependencies
 import java.awt.*;
+
 import javax.swing.*;
 import java.util.Locale;
 
@@ -85,6 +86,7 @@ public class ProgressWindowTest extends TestCase {
      * Test the progress listener with a progress ranging from 0 to 100%
      */
     public void testProgress() throws InterruptedException {
+        try{
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY-2);
         final ProgressListener progress = new ProgressWindow(null);
         progress.setDescription(description);
@@ -97,5 +99,8 @@ public class ProgressWindowTest extends TestCase {
             }
         }
         progress.complete();
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
 }

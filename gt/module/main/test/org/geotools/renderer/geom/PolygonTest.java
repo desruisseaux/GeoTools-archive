@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.io.PrintWriter;
+import java.awt.HeadlessException;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -82,27 +83,28 @@ public class PolygonTest extends TestCase {
     }
 
     /**
-     * Vérifie le bon fonctionnement de {@link Polygon}. Cette méthode dessinera
+     * Vï¿½rifie le bon fonctionnement de {@link Polygon}. Cette mï¿½thode dessinera
      * une carte imaginaire dans un cadre et placera des points un peu partout.
-     * Les points jaunes sont sensés être à l'intérieur de l'île et les points
-     * gris à l'extérieur.
+     * Les points jaunes sont sensï¿½s ï¿½tre ï¿½ l'intï¿½rieur de l'ï¿½le et les points
+     * gris ï¿½ l'extï¿½rieur.
      * <br><br>
-     * Argument: (optionel) Résolution (en degrés) du cercle à tracer. La valeur
-     *           par défaut est 20. Une valeur plus élevée se traduira par une île
-     *           plus grossière, tandis qu'une valeur plus faible se traduira par
-     *           une île plus finement tracée.
+     * Argument: (optionel) Rï¿½solution (en degrï¿½s) du cercle ï¿½ tracer. La valeur
+     *           par dï¿½faut est 20. Une valeur plus ï¿½levï¿½e se traduira par une ï¿½le
+     *           plus grossiï¿½re, tandis qu'une valeur plus faible se traduira par
+     *           une ï¿½le plus finement tracï¿½e.
      */
     public void testPolyline() throws Exception {
+        try{
         String[] args = new String[0];
         final Arguments arguments = new Arguments(args);
         final int firstPointCount = 4;
         final int  lastPointCount = 4;
         /*
-         * Crée une carte imaginaire. La carte ressemblera à un cercle,
-         * mais des pertubations aléatoires seront ajoutées de façon à
-         * rendre l'île un peu plus irrégulière. L'île créée se trouvera
-         * mémorisée dans un objet <code>GeneralPath</code>, une classe
-         * standard du Java qui servira de témoin puisqu'elle est sensée
+         * Crï¿½e une carte imaginaire. La carte ressemblera ï¿½ un cercle,
+         * mais des pertubations alï¿½atoires seront ajoutï¿½es de faï¿½on ï¿½
+         * rendre l'ï¿½le un peu plus irrï¿½guliï¿½re. L'ï¿½le crï¿½ï¿½e se trouvera
+         * mï¿½morisï¿½e dans un objet <code>GeneralPath</code>, une classe
+         * standard du Java qui servira de tï¿½moin puisqu'elle est sensï¿½e
          * bien fonctionner.
          */
         final PrintWriter  out = arguments.out;
@@ -125,8 +127,8 @@ public class PolygonTest extends TestCase {
         }
         path.closePath();
         /*
-         * Donne quelques informations sur l'île. Les
-         * principales méthodes publiques seront testées.
+         * Donne quelques informations sur l'ï¿½le. Les
+         * principales mï¿½thodes publiques seront testï¿½es.
          */
         final Rectangle2D       clip = new Rectangle2D.Double(100, 100, 200, 200);
         final Polyline      polyline = Polyline.getInstances(path, null)[0];
@@ -151,9 +153,9 @@ public class PolygonTest extends TestCase {
                        new Collection[] {pointSet, Arrays.asList(extrm), subPointSet, clipped.getPoints()},
                        out, arguments.locale);
         /*
-         * Fait apparaître la polyligne dans une fenêtre. Cette fenêtre
-         * offira quelques menus qui permettront à l'utilisateur de
-         * vérifier si des points sont à l'intérieur ou a l'extérieur
+         * Fait apparaï¿½tre la polyligne dans une fenï¿½tre. Cette fenï¿½tre
+         * offira quelques menus qui permettront ï¿½ l'utilisateur de
+         * vï¿½rifier si des points sont ï¿½ l'intï¿½rieur ou a l'extï¿½rieur
          * du polyligne.
          */
         out.println();
@@ -165,11 +167,14 @@ public class PolygonTest extends TestCase {
         ShapePanel.show(clipped ).setTitle("Clipped Polyline (uncompressed)");
         out.flush();
         /*
-         * Fait apparaître aussi un polygone.
+         * Fait apparaï¿½tre aussi un polygone.
          */
         final Polygon polygon = new Polygon(Polyline.getInstances(path, null)[0]);
         polygon.addHole(Polyline.getInstances(reduced(path), null)[0]);
         ShapePanel.show(polygon).setTitle("Polygon (uncompressed)");
+        }catch(HeadlessException e){
+            // do nothing
+        }
     }
 
     /**
