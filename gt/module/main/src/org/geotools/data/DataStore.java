@@ -91,9 +91,23 @@ public interface DataStore {
      * FeatureType schemas may be expensive.
      * </p>
      *
+     * <p>
+     * Warning: this list may not be unique - the types may be
+     * in separate namespaces.
+     * </p>
+     * 
+     * <p>
+     * If you need to worry about such things please consider the use of
+     * the Catalog and CatalogEntry interface - many DataStores support this.
+     * getTypeNames is really a convience method for a Catalog.iterator() where
+     * the name of each entry is returned.
+     * </p>
+     * 
      * @return typeNames for available FeatureTypes.
      */
     String[] getTypeNames() throws IOException;
+    
+    // String[] getTypeNames( URI namespace );
 
     /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
