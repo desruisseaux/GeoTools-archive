@@ -25,6 +25,8 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LengthFunction;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.geotools.feature.type.FeatureAttributeType;
+import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.feature.type.NumericAttributeType;
 import org.geotools.feature.type.TemporalAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
@@ -69,7 +71,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, FeatureType type,
         boolean isNillable) {
             
-        return new DefaultAttributeType.Feature(name, type, isNillable,1,1,null);
+        return new FeatureAttributeType(name, type, isNillable,1,1);
     }
     
     /**
@@ -99,7 +101,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
             return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
-            return new DefaultAttributeType.Geometric(name,clazz,isNillable,1,1, defaultValue,null,f);
+            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,f);
         }
         
         return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,cf);
@@ -124,7 +126,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     			// TODO something
     		}
     		Filter f = cf == null?Filter.ALL:cf;
-            return new DefaultAttributeType.Geometric(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
+            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
             return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
 

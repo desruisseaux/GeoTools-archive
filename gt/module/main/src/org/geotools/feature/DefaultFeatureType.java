@@ -105,9 +105,10 @@ public class DefaultFeatureType implements FeatureType {
                 attributes.add(ancestor.getAttributeType(j));
             }
         }
-        
-        this.types = (AttributeType[]) attributes.toArray(new AttributeType[attributes
-                .size()]);
+        if(attributes.size()!=0)
+            this.types = (AttributeType[]) attributes.toArray(new AttributeType[attributes.size()]);
+        else
+            this.types = new AttributeType[0];
 
         this.defaultGeom = defaultGeom;
         

@@ -54,7 +54,7 @@ public class ChoiceAttributeType implements AttributeType {
 	/**
 	 * @param copy
 	 */
-	protected ChoiceAttributeType(ChoiceAttributeType copy) {
+	public ChoiceAttributeType(ChoiceAttributeType copy) {
 		nill = copy.isNillable();
 		min = copy.getMinOccurs();
 		max = copy.getMaxOccurs();
@@ -63,7 +63,7 @@ public class ChoiceAttributeType implements AttributeType {
 		restriction = copy.getRestriction();
 	}
     // The field for 'Class type' should be added when GT has moved to java 1.5
-    protected ChoiceAttributeType(String name, boolean nillable, int min,
+    public ChoiceAttributeType(String name, boolean nillable, int min,
         int max, AttributeType[] children, Filter restriction) {
         nill = nillable;
         this.min = min;
@@ -73,7 +73,7 @@ public class ChoiceAttributeType implements AttributeType {
     	this.restriction = restriction;
     }
 
-    protected ChoiceAttributeType(String name, boolean nillable,
+    public ChoiceAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
     	this(name, nillable, 1, 1, children,Filter.ALL);
     }

@@ -33,29 +33,32 @@ public class FeatureAttributeType implements AttributeType {
 
 	private final boolean nill;
 	private final int min,max;
+    private final String name;
 	private final FeatureType featureType;
 	
 	
 	/**
 	 * @param copy
 	 */
-	protected FeatureAttributeType(FeatureAttributeType copy) {
+	public FeatureAttributeType(FeatureAttributeType copy) {
 		nill = copy.isNillable();
 		min = copy.getMinOccurs();
 		max = copy.getMaxOccurs();
+        this.name = copy.getName();
 		featureType = copy.getFeatureType();
 	}
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
-    protected FeatureAttributeType(FeatureType featureType, boolean nillable, int min, int max) {
+    public FeatureAttributeType(String name,FeatureType featureType, boolean nillable, int min, int max) {
     	nill = nillable;
     	this.min = min;
     	this.max = max;
+        this.name = name;
     	this.featureType = featureType;
     }
 
-    protected FeatureAttributeType(FeatureType featureType, boolean nillable){
-    	this(featureType, nillable, 1, 1);
+    public FeatureAttributeType(String name,FeatureType featureType, boolean nillable){
+    	this(name,featureType, nillable, 1, 1);
     }
     public Filter getRestriction(){return Filter.NONE;}
     
@@ -64,7 +67,7 @@ public class FeatureAttributeType implements AttributeType {
 	 * @see org.geotools.feature.AttributeType#getName()
 	 */
 	public String getName() {
-		return featureType.getTypeName();
+		return name;
 	}
 
 	/* (non-Javadoc)

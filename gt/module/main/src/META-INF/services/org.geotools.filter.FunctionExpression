@@ -1,4 +1,5 @@
 org.geotools.filter.AreaFunction
 org.geotools.filter.MinFunction
 org.geotools.filter.MaxFunction
+org.geotools.filter.LengthFunction
 org.geotools.filter.function.EqualIntervalFunction

@@ -44,7 +44,7 @@ public class SetAttributeType implements AttributeType {
 	/**
 	 * @param copy
 	 */
-	protected SetAttributeType(SetAttributeType copy) {
+	public SetAttributeType(SetAttributeType copy) {
 		nill = copy.isNillable();
 		min = copy.getMinOccurs();
 		max = copy.getMaxOccurs();
@@ -54,7 +54,7 @@ public class SetAttributeType implements AttributeType {
 	}
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
-    protected SetAttributeType(String name, boolean nillable, int min, int max,
+    public SetAttributeType(String name, boolean nillable, int min, int max,
     		AttributeType[] children, Filter restriction) {
     	nill = nillable;
     	this.min = min;
@@ -64,7 +64,7 @@ public class SetAttributeType implements AttributeType {
     	this.restriction = restriction;
     }
 
-    protected SetAttributeType(String name, boolean nillable,
+    public SetAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
     	this(name, nillable, 1, 1, children,Filter.ALL);
     }

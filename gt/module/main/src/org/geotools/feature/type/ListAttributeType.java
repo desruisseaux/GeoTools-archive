@@ -42,7 +42,7 @@ public class ListAttributeType implements AttributeType {
 	/**
 	 * @param copy
 	 */
-	protected ListAttributeType(ListAttributeType copy) {
+	public ListAttributeType(ListAttributeType copy) {
 		nill = copy.isNillable();
 		min = copy.getMinOccurs();
 		max = copy.getMaxOccurs();
@@ -52,7 +52,7 @@ public class ListAttributeType implements AttributeType {
 	}
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
-    protected ListAttributeType(String name, boolean nillable, int min, int max,
+    public ListAttributeType(String name, boolean nillable, int min, int max,
     		AttributeType[] children, Filter restriction) {
     	nill = nillable;
     	this.min = min;
@@ -62,7 +62,7 @@ public class ListAttributeType implements AttributeType {
     	this.restriction = restriction;
     }
 
-    protected ListAttributeType(String name, boolean nillable,
+    public ListAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
     	this(name, nillable, 1, 1, children,Filter.ALL);
     }

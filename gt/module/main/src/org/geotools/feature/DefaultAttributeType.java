@@ -97,19 +97,17 @@ public class DefaultAttributeType implements AttributeType {
             this.min = min;this.max = max;
             this.defaultValue = defaultValue;
             this.filter = f;
+            if(defaultValue!=null && !type.isAssignableFrom(defaultValue.getClass()))
+                throw new IllegalArgumentException("Default value does not match type");
         }
     protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
             Object defaultValue) {
-            this.name = (name == null) ? "" : name;
-            this.type = (type == null) ? Object.class : type;
-            this.nillable = nillable;
-            this.min = min;this.max = max;
-            this.defaultValue = defaultValue;
+            this(name,type,nillable,min,max,defaultValue,Filter.NONE);
         }
 
     protected DefaultAttributeType(String name, Class type, boolean nillable,
                                    Object defaultValue) {
-	this(name, type, nillable, 1, 1,  defaultValue);
+	this(name, type, nillable, 1, 1,  defaultValue,Filter.NONE);
     }
 
     protected DefaultAttributeType(AttributeType copy) {
@@ -375,203 +373,12 @@ public class DefaultAttributeType implements AttributeType {
         return defaultValue;
     }
 
-    /* This should no longer be needed, as FeatureType implements AttributeType
+    /* (non-Javadoc)
+     * @see org.geotools.feature.AttributeType#getRestriction()
      */
-    static class Feature extends DefaultAttributeType {
-        /** The featureType to use for validation. */
-        private final FeatureType featureType;
-
-        /**
-         * Constructor with name, type and nillable.
-         *
-         * @param name Name of this attribute.
-         * @param type The FeatureType to use for validation.
-         * @param nillable If nulls are allowed for the attribute of this type.
-         * @param defaultValue default value when none is suppled
-         */
-        public Feature(String name, FeatureType type, boolean nillable, int min, int max,
-            Object defaultValue) {
-            super(name, org.geotools.feature.Feature.class, nillable,min,max, 
-                defaultValue);
-            this.featureType = type;
-        }
-        
-        public Object duplicate(Object o) throws IllegalAttributeException {
-            if (o instanceof org.geotools.feature.Feature) {
-                org.geotools.feature.Feature f = (org.geotools.feature.Feature) o;
-                return f.getFeatureType().duplicate(f);
-            }
-            if (o == null)
-                return o;
-            throw new IllegalAttributeException("Could not duplicate " + o.getClass().getName());
-        }
-
-        /**
-         * Whether the tested object is a Feature and its attributes validate
-         * against the featureType.   An IllegalArgumentException reporting
-         * the error in validation is thrown if validation fails..
-         *
-         * @param attribute The object to be tested for validity.
-         *
-         * @throws IllegalArgumentException if the object does not validate.
-         */
-        public void validate(Object attribute) throws IllegalArgumentException {
-            super.validate(attribute);
-
-            org.geotools.feature.Feature att = (org.geotools.feature.Feature) attribute;
-
-            if (att == null) {
-                return;
-            }
-
-            if (!(att.getFeatureType().isDescendedFrom(featureType)
-                    || att.getFeatureType().equals(featureType))) {
-                throw new IllegalArgumentException(
-                    "Not correct FeatureType, expected " + featureType
-                    + " got " + att.getFeatureType());
-            }
-        }
+    public Filter getRestriction() {
+        return filter;
     }
+    private Filter filter;
 
-    /* TODO: revisit this - we want to move stuff out of the hierarchy, but this already
-     * has an interface outside.  We should figure out how we want our defaults vs. our
-     * interfaces for types to live.
-     */
-    public static class Geometric extends DefaultAttributeType
-        implements GeometryAttributeType {
-        /** CoordianteSystem used by this GeometryAttributeType */
-        protected CoordinateReferenceSystem coordinateSystem;
-        protected GeometryFactory geometryFactory;
-        private Filter filter;
-
-        public Geometric(String name, Class type, boolean nillable, int min, int max,
-            Object defaultValue, CoordinateReferenceSystem cs, Filter filter) {
-            super(name, type, nillable,min,max, defaultValue);
-            this.filter = filter;
-            coordinateSystem = cs;
-            geometryFactory = cs == null ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(cs);
-            
-            /*
-            coordinateSystem = (cs != null) ? cs : LocalCoordinateSystem.CARTESIAN;
-            geometryFactory = (cs == LocalCoordinateSystem.CARTESIAN)
-                ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(cs);
-             */
-        }
-
-       public Geometric(String name, Class type, boolean nillable,
-            Object defaultValue, CoordinateReferenceSystem cs,Filter filter) {
-            this(name, type, nillable,1,1, defaultValue, cs,filter);
-       }
-
-        public Geometric(GeometryAttributeType copy, CoordinateReferenceSystem override) {
-            super(copy);
-            coordinateSystem = copy.getCoordinateSystem();
-
-            if (override != null) {
-                coordinateSystem = override;
-            }
-
-            if (coordinateSystem == null) {
-                coordinateSystem = GeocentricCRS.CARTESIAN;
-            }
-            geometryFactory = (coordinateSystem == GeocentricCRS.CARTESIAN)
-                ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(coordinateSystem);            
-        }
-
-        public CoordinateReferenceSystem getCoordinateSystem() {
-            return coordinateSystem;
-        }
-
-        public GeometryFactory getGeometryFactory() {
-            return geometryFactory;
-        }
-
-        public Object parse(Object value) throws IllegalArgumentException {
-            if (value == null) {
-                return value;
-            }
-
-            if (value instanceof Geometry) {
-                return value;
-            }
-
-            // consider wkt/wkb/gml support?
-            throw new RuntimeException(
-                "AttributeGT.Geometric cannot parse " + value);
-        }
-        
-        public Object duplicate(Object o) throws IllegalAttributeException {
-            if (o == null)
-                return o;
-            if (o instanceof Geometry) {
-                return ((Geometry)o).clone();
-            }
-            throw new IllegalAttributeException("Cannot duplicate " + o.getClass().getName());
-        }
-
-		/* (non-Javadoc)
-		 * @see org.geotools.feature.PrimativeAttributeType#getRestriction()
-		 */
-		public Filter getRestriction() {
-			return filter;
-		}
-    }
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getRestriction()
-	 */
-	public Filter getRestriction() {
-		return filter;
-	}
-	private Filter filter;
-}
-
-
-/**
- * Helper class used to force CS information on JTS Geometry
- */
-class CSGeometryFactory extends GeometryFactory {
-    
-    static public GeometryFactory DEFAULT = new GeometryFactory();    
-    static public PrecisionModel DEFAULT_PRECISON_MODEL = new PrecisionModel();
-
-    public CSGeometryFactory(CoordinateReferenceSystem cs) {
-        super(toPrecisionModel(cs), toSRID(cs));
-    }
-
-    public GeometryCollection createGeometryCollection(Geometry[] geometries) {
-        GeometryCollection gc = super.createGeometryCollection(geometries);
-
-        // JTS14
-        //gc.setUserData( cs );
-        return gc;
-    }
-
-    public LinearRing createLinearRing(Coordinate[] coordinates) {
-        LinearRing lr = super.createLinearRing(coordinates);
-
-        // JTS14
-        //gc.setUserData( cs );
-        return lr;
-    }
-
-    //
-    // And so on
-    // Utility Functions
-    private static int toSRID(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
-            return 0;
-        }
-
-        // not sure how to tell SRID from CoordinateSystem?
-        return 0;
-    }
-
-    private static PrecisionModel toPrecisionModel(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
-            return DEFAULT_PRECISON_MODEL;
-        }
-
-        return DEFAULT_PRECISON_MODEL;
-    }
 }

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -65,7 +66,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
     	this.id = id;
     	if(featureType == null){
     		List ats = new LinkedList();
-    		ats.add(new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null));
+    		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null),false));
     		featureType = new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);
     	}
     	this.featureType = featureType;
@@ -168,6 +169,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
     public boolean add(Object o) {
     	//TODO check inheritance with FeatureType here!!!
         Feature feature = (Feature) o;
+        feature.setParent(this);
 
         // This cast is neccessary to keep with the contract of Set!
         boolean changed = features.add(feature);
@@ -201,6 +203,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
         List featuresAdded = new ArrayList(c.size());
         while (iter.hasNext()) {
             Feature f = (Feature) iter.next();
+            f.setParent(this);
             boolean added = features.add(f);
             changed |= added;
             
