@@ -12,6 +12,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.resources.TestData;
 
 public class DatasourceTest extends TestCase implements CollectionListener {
 
@@ -32,17 +33,8 @@ public class DatasourceTest extends TestCase implements CollectionListener {
     
     public void testLoad() throws java.lang.Exception {
         System.out.println("testLoad() called");
-        java.net.URL testData = getClass().getResource("/testData/Furizibad.csv");
-//        String dataFolder = System.getProperty("dataFolder");
-//        if(dataFolder==null){
-//            //then we are being run by maven
-//            dataFolder = System.getProperty("basedir");
-//            dataFolder+="/tests/unit/testData";
-//        }
-//        dataFolder = new java.io.File(dataFolder).getAbsolutePath();
-//        String path =new java.io.File(dataFolder,"Furizibad.csv").getCanonicalFile().toString();
-        
-        //DataSource ds = new VeryBasicDataSource(path);
+        java.net.URL testData = TestData.getResource(this, "Furizibad.csv");
+
         DataSource ds = new VeryBasicDataSource(testData);
         Envelope ex = new Envelope(0, 360, 0, 180.0);
         
