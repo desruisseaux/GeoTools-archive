@@ -43,6 +43,8 @@ import org.geotools.styling.StyleBuilder;
 /**
  * A demonstration of a Map geotools-src\docs\sdocbook\resourcesViewer which uses geotools2.
  *
+ * To run this, set a local shapefile to load data from in the mapPane method
+ *
  * @author Cameron Shorter
  * @author Andrea Aime
  * @version $Id$
@@ -50,7 +52,7 @@ import org.geotools.styling.StyleBuilder;
 public class MapViewerOld {
     /** The class used for identifying for logging. */
     private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.demo.gui.MapViewer");
+            "org.geotools.demo.gui.MapViewerOld");
 
     /** Translates between coordinate systems */
     private Adapters adapters = Adapters.getDefault();
@@ -64,7 +66,7 @@ public class MapViewerOld {
      * @param fc DOCUMENT ME!
      * @param style DOCUMENT ME!
      */
-    public MapViewer(FeatureCollection fc, Style style) {
+    public MapViewerOld(FeatureCollection fc, Style style) {
         initComponents(createMapPane(fc, style));
     }
 
@@ -144,7 +146,8 @@ public class MapViewerOld {
     public static void mapPane() throws Exception {
         // load data from file (USE SOMETHING ON YOUR LOCAL DISK)
         ShapefileDataStore sds = new ShapefileDataStore(new File(
-                    "f:/work/pnnl/data.frame.zone.shp").toURL());
+                    "/home/rschulz/GIS/spatial_data/shapefiles/bc.shp").toURL());
+        //"f:/work/pnnl/data.frame.zone.shp"
         FeatureCollection fc = sds.getFeatureSource(sds.getTypeNames()[0]).getFeatures().collection();
 
         // create the style
@@ -153,6 +156,6 @@ public class MapViewerOld {
                     Color.LIGHT_GRAY, Color.BLACK, 1));
 
         // show the map
-        new MapViewer(fc, simple); //.show();
+        new MapViewerOld(fc, simple); //.show();
     }
 }
