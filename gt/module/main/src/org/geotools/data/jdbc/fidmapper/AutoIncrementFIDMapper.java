@@ -159,4 +159,13 @@ public class AutoIncrementFIDMapper implements FIDMapper {
     public boolean hasAutoIncrementColumns() {
         return true;
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
+	 */
+	public boolean isVolatile()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
