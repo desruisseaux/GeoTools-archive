@@ -16,6 +16,7 @@ import java.util.*;
 
 import junit.framework.*;
 import org.geotools.data.shapefile.*;
+import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
 
 /**
@@ -85,6 +86,16 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         assertEquals("Number of Attributes",253,schema.getAttributeTypes().length);
         assertEquals("Value of statename is wrong",firstFeature(features).getAttribute("STATE_NAME"),"Illinois");
         assertEquals("Value of land area is wrong",((Double)firstFeature(features).getAttribute("LAND_KM")).doubleValue(),143986.61,0.001);
+    }
+    
+    public void testLoadAndCheckParentTypeIsPolygon() throws Exception {
+        FeatureCollection features = loadFeatures(STATE_POP,null);
+        
+        
+        
+        FeatureType schema = firstFeature(features).getFeatureType();
+        assertTrue(schema.isDescendedFrom(BasicFeatureTypes.POLYGON));
+        assertTrue(schema.isDescendedFrom(null,"polygonFeature"));
     }
     
     private ShapefileDataStore createDataStore(File f) throws Exception {
