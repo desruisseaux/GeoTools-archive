@@ -198,8 +198,9 @@ public class VPFFeatureReader implements FeatureReader {
                                         break;
                                     }
                                 }
+                            // If there is a problem, forget about mapping and continue
+                            } catch (IOException exc) {
                             } catch (RuntimeException exc) {
-                                // If there is a problem, forget about mapping and continue
                             }
                         }
                     }
