@@ -132,6 +132,11 @@ public class WMSReaderTest extends TestCase {
 
                 continue;
             }
+            
+            if (parameter.getName(null).equals("VERSION")) {
+                values[i] = new WMSParameterValue("1.1.1", parameter);
+                continue;
+            }
 
             // All of these should be no-ops..because we used the Group to create
             //
