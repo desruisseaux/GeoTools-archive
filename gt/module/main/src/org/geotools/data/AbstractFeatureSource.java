@@ -131,7 +131,8 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @throws IOException DOCUMENT ME!
      */
     public Envelope getBounds() throws IOException {
-        return getBounds(Query.ALL);
+//        return getBounds(Query.ALL); // DZ should this not return just the bounds for this type?
+    	return getBounds(getSchema()==null?Query.ALL:new DefaultQuery(getSchema().getTypeName()));
     }
 
     /**
