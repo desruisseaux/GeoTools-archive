@@ -19,13 +19,12 @@ package org.geotools.gce.arcgrid;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.gc.GridCoverage;
-import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridRange;
 import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -161,11 +160,11 @@ public class ArcGridWriter implements GridCoverageWriter {
      */
     private void writeGridCoverage(GridCoverage gc) throws DataSourceException {
         java.awt.image.Raster data = gc.getRenderedImage().getData();
-        org.geotools.pt.Envelope bounds = gc.getGridGeometry().getEnvelope();
-        double xl = bounds.getMinimum(0);
-        double yl = bounds.getMinimum(1);
-        double cellsize = Math.max((bounds.getMaximum(0) - xl) / data.getWidth(),
-                (bounds.getMaximum(1) - yl) / data.getHeight());
+        GridRange bounds = gc.getGridGeometry().getGridRange();
+        double xl = bounds.getLower(0);
+        double yl = bounds.getLower(1);
+        double cellsize = Math.max((bounds.getUpper(0) - xl) / data.getWidth(),
+                (bounds.getUpper(1) - yl) / data.getHeight());
 
         try {
             if (GRASS) {

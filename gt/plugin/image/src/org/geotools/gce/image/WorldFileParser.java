@@ -18,15 +18,8 @@ package org.geotools.gce.image;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.HorizontalDatum;
 import java.util.logging.*;
-import org.geotools.cv.SampleDimension;
-import org.geotools.io.coverage.AmbiguousPropertyException;
-import org.geotools.io.coverage.PropertyException;
 
 /**
  * Extends the generic property parser to allow for world files which don't bother to have 

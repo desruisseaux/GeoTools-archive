@@ -130,6 +130,11 @@ import org.opengis.util.InternationalString;
  */
 public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage {
     /**
+	 * Comment for <code>serialVersionUID</code>
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Slight number for rounding errors in floating point comparaison.
      */
     private static final float EPS = 1E-5f;

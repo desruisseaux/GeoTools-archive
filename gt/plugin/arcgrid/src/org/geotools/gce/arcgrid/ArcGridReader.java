@@ -20,17 +20,19 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.gc.GridCoverage;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -58,7 +60,7 @@ public class ArcGridReader implements GridCoverageReader {
             Color.RED };
 
     /** The coordinate system associated to the returned GridCoverage */
-    private CoordinateSystem coordinateSystem = GeographicCoordinateSystem.WGS84;
+    private CoordinateReferenceSystem coordinateSystem = GeographicCRS.WGS84;
 
     /** The grid coverage read from the data file */
     private java.lang.ref.SoftReference gridCoverage = null;
@@ -239,13 +241,13 @@ public class ArcGridReader implements GridCoverageReader {
 
         double[] min = new double[] { arcGridRaster.getMinValue() };
         double[] max = new double[] { arcGridRaster.getMaxValue() };
-        CoordinateSystem coordinateSystem = getCoordinateSystem();
+        CoordinateReferenceSystem coordinateSystem = getCoordinateSystem();
 
         if (coordinateSystem == null) {
-            coordinateSystem = GeographicCoordinateSystem.WGS84;
+            coordinateSystem = GeographicCRS.WGS84;
         }
 
-        return new GridCoverage(name, raster, coordinateSystem,
+        return new GridCoverageImpl(name, raster, coordinateSystem,
                 convertEnvelope(getBounds()), min, max, null,
                 new Color[][] { getColors() }, null);
     }
@@ -256,7 +258,7 @@ public class ArcGridReader implements GridCoverageReader {
      * 
      * @return the coordinate system for GridCoverage creation
      */
-    private CoordinateSystem getCoordinateSystem() {
+    private CoordinateReferenceSystem getCoordinateSystem() {
         return this.coordinateSystem;
     }
 
@@ -297,12 +299,12 @@ public class ArcGridReader implements GridCoverageReader {
      * 
      * @return the equivalent geotools envelope
      */
-    private org.geotools.pt.Envelope convertEnvelope(
+    private org.opengis.spatialschema.geometry.Envelope convertEnvelope(
             com.vividsolutions.jts.geom.Envelope source) {
         double[] min = new double[] { source.getMinX(), source.getMinY() };
         double[] max = new double[] { source.getMaxX(), source.getMaxY() };
 
-        return new org.geotools.pt.Envelope(min, max);
+        return new GeneralEnvelope(min, max);
     }
 
     /*
