@@ -20,7 +20,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.catalog.Query;
+import org.geotools.catalog.QueryRequest;
 import org.geotools.resources.TestData;
 
 
@@ -87,7 +87,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		init();
 		
 		Expr expr=Exprs.meta("Name");
-		Query query=new Query(expr);
+		QueryRequest query=new QueryRequest(expr);
 		
 		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
 		assertNotNull(result);
@@ -98,7 +98,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		init();
 
 		Expr expr=Exprs.meta("Name");
-		Query query=new Query(expr);
+		QueryRequest query=new QueryRequest(expr);
 		
 		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
 		

@@ -30,15 +30,15 @@ import org.opengis.catalog.QueryDefinition;
  * @version $Revision: 1.9 $
  */
 public class DefaultQueryDefinition implements QueryDefinition {
-    private Query query;
+    private QueryRequest query;
 
     /**
      * Creates a new DefaultQueryDefinition object.
      *
      * @param query Query to be used to filter catalog entries
      */
-    public DefaultQueryDefinition(Query query) {
-        this.query = query;
+    public DefaultQueryDefinition(QueryRequest queryRequest) {
+        this.query = queryRequest;
     }
 
     /**
@@ -47,7 +47,6 @@ public class DefaultQueryDefinition implements QueryDefinition {
     public boolean accept(CatalogEntry entry) {
         for (Iterator iter = entry.iterator(); iter.hasNext();) {
             MetadataEntity element = (MetadataEntity) iter.next();
-
             try {
                 if (query.accepts(element)) {
                     return true;
@@ -61,7 +60,6 @@ public class DefaultQueryDefinition implements QueryDefinition {
                     "See the Query.accepts()::filter.filter(fakeFeature).  It is not expected to throw an exception...but maybe will one day.");
             }
         }
-
         return false;
     }
 }

@@ -43,27 +43,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jody Garnett, Refractions Research
  * @version 2.1
  */
-public class Query {
+public class QueryRequest {
 	Expr expr;
-	public Query( Expr expr ){
+	public QueryRequest( Expr expr ){
 		this.expr = expr;
-	}
-	public boolean accepts( Feature feature ) throws IOException{
-		MetadataEntity meta = null;
-		
-		// Get metdata for feature
-		// meta = geature.getMetadata();
-		Expr query = null;
-		if( meta != null ){
-			query = expr.resolve( meta );
-		}
-		else {
-			query = expr; 
-		}		
-		Filter filter = query.filter( feature.getFeatureType() );
-		
-		return filter.contains( feature );
-	}
+	}	
 	public boolean accepts( MetadataEntity meta ) throws IOException{
 		Expr query = expr.resolve( meta );
 		Filter filter = query.filter( fakeFeatureType );

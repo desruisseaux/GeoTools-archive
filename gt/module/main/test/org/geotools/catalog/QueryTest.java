@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.catalog.Query;
+import org.geotools.catalog.QueryRequest;
 
 
 /**
@@ -30,11 +30,11 @@ public class QueryTest extends TestCase {
     public void testAcceptsMetadata() throws IOException{
         StupidNestedMetadata mdata=new StupidNestedMetadataImpl();
         Expr expr=Exprs.meta("fileData/name");
-        Query q= new Query(expr);
+        QueryRequest q= new QueryRequest(expr);
         assertTrue(q.accepts(mdata));
         
         expr=Exprs.meta("data");
-        q= new Query(expr);
+        q= new QueryRequest(expr);
         assertTrue(q.accepts(mdata));
 
         
