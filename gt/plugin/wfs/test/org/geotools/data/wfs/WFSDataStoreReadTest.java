@@ -226,6 +226,7 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureReader ft = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",ft.hasNext() && ft.getFeatureType()!=null && ft.next()!=null);
+        assertNotNull("CRS missing ",ft.getFeatureType().getDefaultGeometry().getCoordinateSystem());
         ft.close();}
     }
     

@@ -4115,33 +4115,24 @@ public class GMLComplexTypes {
                 int j = -1;
                 for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
                     // TODO use equals
-//System.out.print(k+"");
                     if((ft.getAttributeType(k).getName()==null && value[i].getElement().getName()==null) ||
                             ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
                         j = k;
                 }
-//System.out.print(j+" "+(j!=-1?ft.getAttributeType(j).getName()+"  ":"")+value[i].getElement().getName()+" ** "+value[i].getValue());
-//System.out.println(" ft?"+(j!=-1?ft.getAttributeType(j).isNillable()+"  ":"null")+" elem?"+value[i].getElement().isNillable());
                 if(j!=-1)
                     values[j] = value[i].getValue();
             }
-//for(int i=0;i<values.length;i++){
-//	System.out.print(i+" ** ");
-//	System.out.print(values[i]);
-//	System.out.print(" ? ");
-//	System.out.print(ft.getAttributeType(i).isNillable());
-//	System.out.println();
-//}
 
             String fid = attrs.getValue("", "fid");
 
             if ((fid == null) || "".equals(fid)) {
                 fid = attrs.getValue(GMLSchema.NAMESPACE.toString(), "fid");
             }
-//System.out.println("\n"+values.length);
+
+            Feature rt = null;
             if ((fid != null) || !"".equals(fid)) {
                 try {
-                    return ft.create(values, fid);
+                    rt =  ft.create(values, fid);
                 } catch (IllegalAttributeException e) {
                     logger.warning(e.toString());
                     throw new SAXException(e);
@@ -4149,11 +4140,14 @@ public class GMLComplexTypes {
             }
 
             try {
-                return ft.create(values);
+                if(rt == null)
+                rt = ft.create(values);
             } catch (IllegalAttributeException e1) {
                 logger.warning(e1.toString());
                 throw new SAXException(e1);
             }
+            
+            return rt;
         }
 
         private void stream(Feature feature, FCBuffer featureCollectionBuffer)

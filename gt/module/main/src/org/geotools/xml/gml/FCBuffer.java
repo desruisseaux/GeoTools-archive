@@ -55,6 +55,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     /** DOCUMENT ME! */
     protected int state = 0;
     private Feature[] features;
+
     private int end;
     private int size;
     private int head;
@@ -64,20 +65,6 @@ public class FCBuffer extends Thread implements FeatureReader {
 
     private FCBuffer() {
         // should not be called
-    }
-
-    /**
-     * Creates a new FCBuffer object.
-     *
-     * @param document
-     * @param capacity buffer feature capacity
-     * @param ft Nullable
-     */
-    protected FCBuffer(URI document, int capacity, FeatureType ft) {
-        features = new Feature[capacity];
-        this.document = document;
-        end = size = head = 0;
-        this.ft = ft;
     }
 
     /**
@@ -174,38 +161,18 @@ public class FCBuffer extends Thread implements FeatureReader {
      */
     public static FeatureReader getFeatureReader(URI document, int capacity)
         throws SAXException {
-        FCBuffer fc = new FCBuffer(document, capacity,null);
-        fc.start(); // calls run
-
-        if (fc.exception != null) {
-            throw fc.exception;
-        }
-
-        return fc;
+        return getFeatureReader(document,capacity,1000,null);
     }
     
     public static FeatureReader getFeatureReader(URI document, int capacity, FeatureType ft)
     throws SAXException {
-    FCBuffer fc = new FCBuffer(document, capacity,ft);
-    fc.start(); // calls run
-
-    if (fc.exception != null) {
-        throw fc.exception;
-    }
-
-    return fc;
+        return getFeatureReader(document,capacity,1000,ft);
 }
 
     public static FeatureReader getFeatureReader(URI document, int capacity,
         int timeout) throws SAXException {
-        FCBuffer fc = new FCBuffer(document, capacity, timeout,null);
-        fc.start(); // calls run
 
-        if (fc.exception != null) {
-            throw fc.exception;
-        }
-
-        return fc;
+        return getFeatureReader(document,capacity,timeout,null);
     }
 
     public static FeatureReader getFeatureReader(URI document, int capacity,
@@ -217,6 +184,11 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw fc.exception;
         }
 
+        if(fc.getFeatureType()!=null && fc.getFeatureType().getDefaultGeometry()!=null && fc.getFeatureType().getDefaultGeometry().getCoordinateSystem() == null){
+                // load crs
+//                Feature f = fc.peek();
+                // TODO set crs here.
+        }
         return fc;
     }
 
@@ -268,6 +240,20 @@ public class FCBuffer extends Thread implements FeatureReader {
             head = 0;
         }
 
+        return f;
+    }
+
+    /**
+     * @see org.geotools.data.FeatureReader#next()
+     */
+    public Feature peek()
+        throws IOException, IllegalAttributeException, NoSuchElementException {
+        if (exception != null) {
+            state = STOP;
+            throw new IOException(exception.toString());
+        }
+
+        Feature f = features[head];
         return f;
     }
 

@@ -744,10 +744,11 @@ System.out.println("SCHMEMA GET "+url);
         FeatureSetDescription fsd = getFSD(query.getTypeName());
         
         Envelope maxbbox = fsd.getLatLongBoundingBox();
+        CoordinateReferenceSystem crs = null;
         if(fsd.getSRS()!=null){
             // reproject this
             try {
-                CoordinateReferenceSystem crs = getCRSService().createCRS(fsd.getSRS());
+                crs = getCRSService().createCRS(fsd.getSRS());
                 MathTransform mt = getCRSService().reproject(getCRSService().GEOGRAPHIC,crs,false);
                 maxbbox = getCRSService().transform(maxbbox,mt);
             } catch (FactoryException e) {
@@ -837,28 +838,27 @@ System.out.println("SCHMEMA GET "+url);
         if (t.hasNext()) { // opportunity to throw exception
 
             if (t.getFeatureType() != null) {
-//                if(query.getCoordinateSystemReproject()!=null && t.getFeatureType().getDefaultGeometry()!=null && t.getFeatureType().getDefaultGeometry().getCoordinateSystem()!=null){
-//                    FeatureReader tmp = t;
-//                    try {
-//                        t = new ReprojectFeatureReader(t,query.getCoordinateSystemReproject());
-//                    } catch (CannotCreateTransformException e1) {
-//                        e1.printStackTrace();
-//                        t = tmp;
-//                    } catch (SchemaException e1) {
-//                        e1.printStackTrace();
-//                        t = tmp;
-//                    }
-//                }
                 if (!filters[1].equals( Filter.NONE ) ) {
                     t = new FilteringFeatureReader(t, filters[1]);
                 }
+                FeatureReader tmp = t;
                 if (query.getCoordinateSystem()!=null){
-                    FeatureReader tmp = t;
                     try {
                         t = new ForceCoordinateSystemFeatureReader(t,query.getCoordinateSystem());
                     } catch (SchemaException e) {
                         e.printStackTrace();
                         t = tmp;
+                    }
+                }else{
+                    if(t.getFeatureType().getDefaultGeometry()!= null && crs!=null &&
+                            t.getFeatureType().getDefaultGeometry().getCoordinateSystem()== null){
+                        // set up crs
+                        try {
+                            t = new ForceCoordinateSystemFeatureReader(t,crs);
+                        } catch (SchemaException e) {
+                            e.printStackTrace();
+                            t = tmp;
+                        }
                     }
                 }
             	return t;

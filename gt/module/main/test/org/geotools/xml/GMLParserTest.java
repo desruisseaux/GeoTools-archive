@@ -172,6 +172,7 @@ public class GMLParserTest extends TestCase {
         while(i.hasNext()){
             Feature ft = (Feature)i.next();;
             assertNotNull("Feature #"+j+" is null",ft);
+//            assertNotNull("Feature #"+j+" missing crs ",ft.getFeatureType().getDefaultGeometry().getCoordinateSystem());
 //            System.out.println("Feature "+j+" : "+ft);
             j++;
         }
