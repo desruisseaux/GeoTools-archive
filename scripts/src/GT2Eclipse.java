@@ -59,7 +59,6 @@ import java.util.TreeSet;
  *  maven build
  *  gt2eclipse .
  *  
- * </pre></code>
  * <p>
  * If you are running this from eclipse remember to hit refresh afterwords.
  * </p>
@@ -264,7 +263,10 @@ public class GT2Eclipse {
 						System.out.println("compare " + id + " version "
 								+ version + " against " + v + " - "
 								+ version.compareToIgnoreCase(v));
-						if (version.compareToIgnoreCase(v) < 0) {
+						if (version.indexOf( "SNAPSHOT" ) != -1 ) {
+                            // always use SNAPSHOT
+                        }
+                        else if (version.compareToIgnoreCase(v) < 0) {
 							continue;
 						}
 						System.out.println("  update version to " + jars[j]);
