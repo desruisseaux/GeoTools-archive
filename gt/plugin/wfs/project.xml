@@ -28,15 +28,6 @@
         <role>Java Developer</role>
       </roles>
     </developer>
-    <developer>
-      <name>Norman Barker</name>
-      <id>nbarker</id>
-      <email>normanb@comsine.co.uk</email>
-      <organization>ComSine</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
   </developers>
   <dependencies>
     <dependency>
