@@ -389,10 +389,7 @@ public class XMLReader {
     }
 
     /**
-     * loadValidations purpose.
-     * 
-     * <p>
-     * Loads all the validations in the directory
+     * Loads all the test suites in the validations directory
      * </p>
      *
      * @param validationDir

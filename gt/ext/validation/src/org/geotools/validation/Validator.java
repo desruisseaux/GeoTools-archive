@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataRepository;
+import org.geotools.data.Repository;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -78,7 +78,7 @@ public class Validator
 	
 	private ValidationProcessor validationProcessor;
 	
-	private DataRepository repository;
+	private Repository repository;
 	
 	
 	
@@ -87,7 +87,7 @@ public class Validator
 	 * Validator Constructor
 	 * 
 	 */
-	public Validator(DataRepository repository, ValidationProcessor processor)
+	public Validator(Repository repository, ValidationProcessor processor)
 	{
 		this.repository = repository;
 		validationProcessor = processor;//new ValidationProcessor();

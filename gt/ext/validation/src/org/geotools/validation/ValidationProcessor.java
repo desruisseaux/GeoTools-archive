@@ -19,11 +19,17 @@ package org.geotools.validation;
 import com.vividsolutions.jts.geom.Envelope;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.resources.TestData;
+import org.geotools.validation.dto.ArgumentDTO;
+import org.geotools.validation.dto.PlugInDTO;
+import org.geotools.validation.dto.TestDTO;
+import org.geotools.validation.dto.TestSuiteDTO;
+import org.geotools.validation.xml.ValidationException;
+import org.geotools.validation.xml.XMLReader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,7 +145,7 @@ public class ValidationProcessor {
         featureLookup = new HashMap();
         integrityLookup = new HashMap();        
     }
-
+    
     /**
      * addToLookup
      * 
@@ -342,7 +348,7 @@ public class ValidationProcessor {
             }
         }
     }
-
+    
     /**
      * runIntegrityTests
      * 
@@ -440,5 +446,121 @@ public class ValidationProcessor {
 			}
         }        
     }
+    protected static final Set queryPlugInNames( Map testSuiteDTOs ){
+    	Set plugInNames = new HashSet();
+        
+        Iterator i = testSuiteDTOs.keySet().iterator();
 
+		// go through each test suite
+        // and gather up all the required plugInNames
+        //
+        while (i.hasNext()) 
+        {
+            TestSuiteDTO dto = (TestSuiteDTO) testSuiteDTOs.get(i.next());
+            Iterator j = dto.getTests().keySet().iterator();
+			// go through each test plugIn
+            //
+            while (j.hasNext()) 
+            {
+                TestDTO tdto = (TestDTO) dto.getTests().get(j.next());
+                plugInNames.add(tdto.getPlugIn().getName());
+            }
+        }
+        return plugInNames;
+    }
+    /**
+     * Load testsuites from provided directories.
+     * <p>
+     * This is mostly useful for testing, you may want to write your own
+     * load method with enhanced error reporting.
+     * </p>
+     */
+    public void load( File plugins, File testsuites ) throws Exception {
+    	Map pluginDTOs = XMLReader.loadPlugIns(TestData.file( this, "plugins" ));
+		Map testSuiteDTOs = XMLReader.loadValidations( TestData.file( this, "validation" ), pluginDTOs );
+		load( testSuiteDTOs, pluginDTOs );
+	}
+    /**
+     * Populates this validation processor against the provided DTO objects.
+     * <p>
+     * This method is useful for testing, it is not forgiving and will error out
+     * if things go bad.
+     * </p>
+     * @param testSuitesDTOs
+     * @param plugInDTOs
+     * @throws ValidationException
+     */
+    public void load(Map testSuiteDTOs, Map plugInDTOs) throws Exception {
+        // step 1 make a list required plug-ins
+    	//
+    	Set plugInNames = queryPlugInNames( testSuiteDTOs );
+    	
+        // step 2 set up real plug-ins
+    	// configured with defaults
+    	//
+    	
+    	// (This is a map of PlugIn by name)
+        Map plugIns = new HashMap(plugInNames.size());
+        
+		// go through each plugIn
+        //
+        for( Iterator i = plugInNames.iterator(); i.hasNext();){
+            String plugInName = (String) i.next();
+            PlugInDTO dto = (PlugInDTO) plugInDTOs.get(plugInName);
+            Class plugInClass = null;
+
+            plugInClass = Class.forName(dto.getClassName());
+            if (plugInClass == null) {
+            	throw new ClassNotFoundException("Could class for "+ plugInName+": class "+dto.getClassName()+" not found" );                
+            }
+            Map plugInArgs = dto.getArgs();
+            if (plugInArgs == null) {
+                plugInArgs = new HashMap();
+            }
+            PlugIn plugIn = new PlugIn(plugInName, plugInClass, dto.getDescription(), plugInArgs);
+            plugIns.put(plugInName, plugIn);                            
+        }
+
+        // step 3
+        // set up tests and add to processor
+        //
+        for( Iterator i = testSuiteDTOs.keySet().iterator();i.hasNext();){
+            TestSuiteDTO tdto = (TestSuiteDTO) testSuiteDTOs.get(i.next());
+            Iterator j = tdto.getTests().keySet().iterator();
+
+			// for each TEST in the test suite
+            while (j.hasNext()) 
+            {
+                TestDTO dto = (TestDTO) tdto.getTests().get(j.next());
+
+                // deal with test
+                Map testArgs = dto.getArgs();
+
+                if (testArgs == null) {
+                    testArgs = new HashMap();
+                } else {
+                    Map m = new HashMap();
+                    Iterator k = testArgs.keySet().iterator();
+
+                    while (k.hasNext()) {
+                        ArgumentDTO adto = (ArgumentDTO) testArgs.get(k.next());
+                        m.put(adto.getName(), adto.getValue());
+                    }
+                    testArgs = m;
+                }
+
+                PlugIn plugIn = (org.geotools.validation.PlugIn) plugIns.get(dto.getPlugIn().getName());
+                Validation validation =
+                	plugIn.createValidation(dto.getName(),dto.getDescription(), testArgs);
+
+                if (validation instanceof FeatureValidation) {
+                    addValidation((FeatureValidation) validation);
+                }
+
+                if (validation instanceof IntegrityValidation) {
+                    addValidation((IntegrityValidation) validation);
+                }                
+            }            
+        } // end each test suite
+    }// load method
 }

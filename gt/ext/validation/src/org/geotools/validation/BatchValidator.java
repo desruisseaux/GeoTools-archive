@@ -24,7 +24,8 @@ package org.geotools.validation;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import org.geotools.data.DataRepository;
+import org.geotools.data.DefaultRepository;
+import org.geotools.data.Repository;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -65,7 +66,7 @@ public class BatchValidator {
     private static Properties transProp;
     
     private static Validator validator;
-    private static DataRepository dataRepository;
+    private static Repository dataRepository;
 
 
     public static void main(String[] args) {
@@ -73,7 +74,7 @@ public class BatchValidator {
 
         Map ds = loadDataStores();
         ValidationProcessor v = loadTests();
-		dataRepository = new DataRepository();
+		dataRepository = new DefaultRepository();
         
         runTransactions(ds, v);
     }
