@@ -173,6 +173,16 @@ public interface GetMapRequest extends Request{
      * shall specify exactly the declared Bounding Box values in the GetMap
      * request and the Server may issue a Service Exception otherwise."
      *
+     * NOTE: In WMS 1.3.0, the specification of "EPSG:4326" has the axis
+     * swapped, so a request made in 1.1.1 using "minx,miny,maxx,maxy" would
+     * use "miny,minx,maxy,maxx" in 1.3.0. Only when using EPSG:4326!
+     * 
+     * Currently it is up to the client to do this on there own.
+     * TODO Accept Envelopes and doubles instead of Strings, and perform
+     * the 1.3.0 conversion automatically. Also note that not all servers
+     * may implement this. Should provide an option to use 1.1.1 format even
+     * when using 1.3.0.
+     *
      * @param bbox A string representing a bounding box in the format
      *        "minx,miny,maxx,maxy"
      */
