@@ -3,8 +3,6 @@ package org.geotools.data.wms.xml;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.geotools.xml.gml.GMLSchema;
-import org.geotools.xml.handlers.xsi.SchemaHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
@@ -13,17 +11,7 @@ import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 
-public class OGCSchema implements Schema {
-    
-    private static OGCSchema instance = new OGCSchema();
-    
-    protected OGCSchema() {
-        //do nothing
-    }
-    
-    public static OGCSchema getInstance() {
-        return instance;
-    }
+public class ogcSchema implements Schema {
 
     public static final URI NAMESPACE = loadNS();
     private static URI loadNS() {
@@ -50,7 +38,9 @@ public class OGCSchema implements Schema {
     public Schema[] getImports() {
         if (imports == null) {
             imports = new Schema[]{
-                    GMLSchema.getInstance()
+            // TODO add instance of org.geotools.xml.gml.GMLSchema@df8f5e,
+            // TODO add instance of
+            // org.geotools.xml.handlers.xsi.SchemaHandler$DefaultSchema@16b13c7
             };
         }
         return imports;
@@ -105,15 +95,13 @@ public class OGCSchema implements Schema {
      * TODO comment here
      */
     private static Element[] elements = null;
-    public static final int GET_CAPABILITIES = 0;
-    public static final int GET_MAP = 1;
-    public static final int GET_FEATURE_INFO = 2;
     public Element[] getElements() {
         if (elements == null) {
-            elements = new Element[3];
-            elements[GET_CAPABILITIES] = new ogcElement("GetCapabilities",ogcComplexTypes._GetCapabilities.getInstance(),null,1,1);
-            elements[GET_MAP] = new ogcElement("GetMap", ogcComplexTypes._GetMap.getInstance(), null, 1, 1);
-            elements[GET_FEATURE_INFO] = new ogcElement("ogc:GetFeatureInfo", ogcComplexTypes._GetFeatureInfo.getInstance(), null, 1, 1);
+            elements = new Element[]{
+                    new ogcElement("GetCapabilities",ogcComplexTypes._GetCapabilities.getInstance(),null,1,1),
+                    new ogcElement("GetMap", ogcComplexTypes._GetMap.getInstance(), null, 1, 1),
+                    new ogcElement("ogc:GetFeatureInfo", ogcComplexTypes._GetFeatureInfo.getInstance(), null,
+                            1, 1)};
         }
         return elements;
     }
