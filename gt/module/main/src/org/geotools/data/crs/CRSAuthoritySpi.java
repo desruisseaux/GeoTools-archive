@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.geotools.factory.Factory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 /**
  * This is a marker used to allow CRSService to dynamically locate
@@ -14,6 +15,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * org.geotools.referencing.Factory - that time is not now.
  * </p>
  * @author Jody Garnett
+ *
+ * @deprecated Now replaced by {@link CRSAuthorityFactory}.
  */
 public interface CRSAuthoritySpi extends Factory {
     /**
@@ -41,6 +44,8 @@ public interface CRSAuthoritySpi extends Factory {
      * @param encoding
      * @return CoordinateReferenceSystem for the encoding or null if encoding was unsuitable
      * @throws IOException If the encoding should of been parsable but contained an error
+     *
+     * @deprecated Replaced by {@link CRSAuthorityFactory#createCoordinateReferenceSystem}.
      */
     public CoordinateReferenceSystem decode( String encoding ) throws IOException;
     
