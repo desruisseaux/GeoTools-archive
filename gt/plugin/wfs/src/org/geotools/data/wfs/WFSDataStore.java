@@ -52,12 +52,11 @@ public class WFSDataStore extends AbstractDataStore{
  	}
  	
  	private static synchronized InputStream getInputStream(URL url, Authenticator auth){
- 	    return null;
+ 	    
  	}
  	
  	static URL createGetCapabilitiesRequest(URL host){
  	    // TODO fill me in
- 	    return null;
  	}
 
     /**
@@ -65,7 +64,6 @@ public class WFSDataStore extends AbstractDataStore{
      */
     public String[] getTypeNames() {
         // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -81,7 +79,6 @@ public class WFSDataStore extends AbstractDataStore{
      */
     protected FeatureReader getFeatureReader(String typeName) throws IOException {
         // TODO Auto-generated method stub
-        return null;
     }
     
     private static class WFSAuthenticator extends Authenticator{
