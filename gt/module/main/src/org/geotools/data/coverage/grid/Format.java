@@ -88,5 +88,7 @@ public interface Format {
      */
     GridCoverageWriter getWriter(Object destination);
 
-    boolean accepts(Object input);   
+    boolean accepts(Object input);
+    
+    boolean equals(Format f);
 }

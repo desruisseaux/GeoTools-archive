@@ -1,7 +1,9 @@
 package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,21 +35,22 @@ public class FileMetadataImplTest extends TestCase {
     URL resource;
     File f;
     FileMetadataImpl metadata;
+    URI uri;
     
     protected void setUp() throws Exception{
         super.setUp();
         resource = TestData.getResource(this,"ArcGrid.asc");
         assertNotNull(resource);
+        uri=new URI(URLDecoder.decode(resource.toString(),"UTF-8"));
+        f=new File(uri);
     }
 
     private void init(){
-        f=new File(resource.getFile());
         assertNotNull(f);
         metadata=new FileMetadataImpl( f,  GridFormatFinder.findFormat(f));    	
         assertNotNull(metadata);    }
     
     public void testFileMetadataImpl() {
-        File f=new File(resource.getFile());
         assertNotNull(f);
         assertNotNull(new FileMetadataImpl( f, GridFormatFinder.findFormat(f) ));
     }
@@ -75,7 +78,7 @@ public class FileMetadataImplTest extends TestCase {
     public void testGetFormat() {
     	init();
 //      test begins
-        assertEquals(metadata.getFormat(),GridFormatFinder.findFormat(f));
+        assertTrue(metadata.getFormat().equals(GridFormatFinder.findFormat(f)));
     }
 
     public void testGetLastModified() {

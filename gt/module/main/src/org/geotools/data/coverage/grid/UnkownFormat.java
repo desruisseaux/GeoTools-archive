@@ -104,4 +104,15 @@ public class UnkownFormat implements Format {
     public boolean accepts(Object input) {
         return true;
     }
+
+    /**
+     * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
+     */
+    public boolean equals(Format f) {
+        if (f.getClass() == getClass() )
+            return true;
+        return false;
+    }
+    
+    
 }

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -37,7 +38,7 @@ public class IOExchangeTest extends TestCase{
 	 * Test that various types of source objects return a reader
 	 *  
 	 */
-	public void testGetReader() throws IOException {
+	public void testGetReader() throws Exception {
 		mExchange = IOExchange.getIOExchange();
 		Reader reader;
 		
@@ -49,14 +50,16 @@ public class IOExchangeTest extends TestCase{
 		int char1=reader.read();
 		
 		//Test String
-		String fileString=fileURL.toString();
+		String fileString=URLDecoder.decode(fileURL.toString(),"UTF-8");
 		reader=mExchange.getReader(fileString);
 		assertNotNull(reader);
 		assertTrue(reader.ready());
 		assertEquals(char1,reader.read());
 		
 		//Test File
-		File file=new File(URLDecoder.decode(fileURL.toString(),"UTF-8"));
+		URI uri=new URI(fileString);
+		File file=new File(uri);
+		boolean ex=file.exists();
 		reader=mExchange.getReader(file);
 		assertNotNull(reader);
 		assertTrue(reader.ready());

@@ -106,4 +106,15 @@ public abstract class AbstractGridFormat implements Format {
     public GeneralOperationParameter[] getWriteParameters() {
         return writeParameters;
     }
+    
+
+    /**
+     * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
+     */
+    public boolean equals(Format f) {
+        if (f.getClass() == getClass() )
+            return true;
+        return false;
+    }
+    
 }

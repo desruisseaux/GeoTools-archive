@@ -2,8 +2,9 @@
 package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
@@ -38,21 +39,21 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 	
 		
 	
-	private void init() throws IOException{
+	private void init() throws Exception{
 		URL url=TestData.getResource(this,"ArcGrid.asc");
-		root=new File(url.getFile()).getParentFile();
+		root=new File(new URI(URLDecoder.decode(url.toString(),"UTF-8"))).getParentFile();
 		exchange=new FileSystemGridCoverageExchange();
 		exchange.setRecursive(true);
 		exchange.setDataSource(root);
 	}
 	
 
-	public void testFileSystemGridCoverageExchange()throws IOException {
+	public void testFileSystemGridCoverageExchange()throws Exception {
 		URL url=TestData.getResource(this,"ArcGrid.asc");
 		exchange= new FileSystemGridCoverageExchange();
 		assertNotNull(exchange);
 		
-		exchange.add(new File(url.getFile()));
+		exchange.add(new File(new URI(URLDecoder.decode(url.toString(),"UTF-8"))));
 		Iterator iter=exchange.iterator();
 		assertTrue(iter.hasNext());
 		CatalogEntry f= (CatalogEntry)iter.next();
@@ -67,7 +68,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 	}
 
 
-	public void testGetFormats() throws IOException{
+	public void testGetFormats() throws Exception{
 		init();
 		Format[] formats=exchange.getFormats();
 		assertNotNull(formats);
@@ -81,7 +82,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		assertNotNull(arcgrid);
 	}
 
-	public void testQuery()throws IOException {
+	public void testQuery()throws Exception {
 		init();
 		
 		Expr expr=Exprs.meta("Name");
@@ -92,7 +93,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		assertEquals(2, result.getNumEntries());
 	}
 
-	public void testGetReader() throws IOException {
+	public void testGetReader() throws Exception {
 		init();
 
 		Expr expr=Exprs.meta("Name");
@@ -104,7 +105,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		assertNotNull(reader);
 	}
 
-	public void testGetWriter() throws IOException{
+	public void testGetWriter() throws Exception{
 		init();
 		Format[] formats=exchange.getFormats();
 		GridCoverageWriter writer=exchange.getWriter(root, formats[0]);
