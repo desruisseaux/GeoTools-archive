@@ -48,11 +48,21 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     		} else {
     			url = (URL) source;
     		}
-    		try {
-    			capabilities = WebMapServer.getCapabilities(url);
-    		} catch (JDOMException e) {
-    			throw new RuntimeException ("Data at the URL is not valid XML", e);
-    		}
+
+   			WebMapServer wms = new WebMapServer(url, true);
+   			capabilities = wms.getCapabilities();
+   			if (capabilities == null) {
+   				Exception e = wms.getProblem();
+   				if (e instanceof JDOMException) {
+   					throw new RuntimeException ("Data at the URL is not valid XML", e);
+   				} else if (e instanceof IOException){
+   					throw (IOException) e;
+   				} else if (e instanceof MalformedURLException) {
+   					throw (MalformedURLException) e;
+   				} else if (e instanceof ParseCapabilitiesException) {
+   					throw (ParseCapabilitiesException) e;
+   				}
+   			}
     	} else if (source instanceof WMT_MS_Capabilities) {
     		capabilities = (WMT_MS_Capabilities) source;
     	}
