@@ -84,12 +84,12 @@
      <dependency>
       <artifactId>batik</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <artifactId>batik-gvt</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <artifactId>batik-svg-dom</artifactId>
@@ -99,12 +99,12 @@
      <dependency>
       <artifactId>batik-rasterizer</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <artifactId>batik-dom</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <artifactId>batik-bridge</artifactId>
@@ -114,7 +114,7 @@
     <dependency>
       <artifactId>batik-css</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
      <dependency>
       <artifactId>batik-xml</artifactId>
@@ -124,7 +124,7 @@
     <dependency>
       <artifactId>batik-transcoder</artifactId>
       <groupId>batik</groupId>
-      <version>1.5</version>
+      <version>1.5.1</version>
     </dependency>
   </dependencies>
   <build>
