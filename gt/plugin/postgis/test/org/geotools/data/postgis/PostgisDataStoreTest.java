@@ -48,8 +48,7 @@ public class PostgisDataStoreTest extends TestCase {
     private static String FEATURE_TABLE = "testset"; 
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
-    private DataSource postgis = null;
+    private FilterFactory filterFac = FilterFactory.createFilterFactory();    
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
     private int srid = -1;
