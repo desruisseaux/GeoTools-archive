@@ -26,9 +26,21 @@ import java.io.LineNumberReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Measure;
@@ -38,14 +50,6 @@ import org.geotools.referencing.wkt.Preprocessor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -464,12 +468,20 @@ public class Console extends AbstractConsole {
         update();
         DirectPosition transformedSource = null;
         DirectPosition transformedTarget = null;
+        String         targetException   = null;
         if (transform != null) {
             if (sourcePosition != null) {
                 transformedSource = transform.transform(sourcePosition, null);
             }
-            if (targetPosition != null) {
+            if (targetPosition != null) try {
                 transformedTarget = transform.inverse().transform(targetPosition, null);
+            } catch (NoninvertibleTransformException exception) {
+                targetException = exception.getLocalizedMessage();
+                if (sourcePosition != null) {
+                    final GeneralDirectPosition p;
+                    transformedTarget = p = new GeneralDirectPosition(sourcePosition.getDimension());
+                    Arrays.fill(p.ordinates, Double.NaN);
+                }
             }
         }
         final TableWriter table = new TableWriter(out, 0);
@@ -496,6 +508,10 @@ public class Console extends AbstractConsole {
         }
         table.writeHorizontalSeparator();
         table.flush();
+        if (targetException != null) {
+            out.write(targetException);
+            out.write(lineSeparator);
+        }
     }
 
     /**
@@ -551,7 +567,7 @@ public class Console extends AbstractConsole {
                 return;
             } catch (UnsupportedOperationException ignore) {
                 /*
-                 * Underlying CS do not supports distance computation.
+                 * Underlying CRS do not supports distance computation.
                  * Left the column blank.
                  */
             }
