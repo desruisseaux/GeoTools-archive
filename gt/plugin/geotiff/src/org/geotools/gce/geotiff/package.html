@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package org.geotools.data.geotiff</TITLE>
+  </HEAD>
+  <BODY>
+    A grid coverage exchange to manage the GeoTIFF Revision 1.0 format. 
+
+    <p>
+    This package is going to be &quot;evolutionary&quot;, rather than 
+    &quot;revolutionary&quot;.   As functionality is added to the package, 
+    this page will be updated.  This page should be considered a current 
+    synopsis of the capabilities of the module.  
+
+    <p>
+    <h1>Requirements</h1>
+    This package requires that the runtime environment have access to 
+    Java Advanced Imaging (JAI) and the JAI Image I/O extensions available
+    from <A HREF="http://java.sun.com">Sun</A>.  Specifically, the 
+    <code>GeoTiffFormatFactorySpi</code>
+    will report itself unavailable if any of the following are unavailable:
+    <ul>
+    <li> <code>javax.media.jai.JAI</code>
+    <li> <code>com.sun.media.jai.operator.ImageReadDescriptor</code>
+    <li> <code>com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet</code>
+    </ul>
+    
+    <p>
+    Other classes are of course necessary to successfully read in the GeoTIFF 
+    image.  As they typically come bundled with one or more of the above, 
+    they are assumed to be present if all of the above are present.
+    
+    <p>
+    <h1>Current Functionality</h1>
+    <p>
+    The current iteration of the GeoTIFF plugin will read GeoTIFF files with the 
+    following restrictions:
+    <ul>
+    <li> The coordinate system must be either projected or geographic 
+        (geodetic coordinate systems not supported.)
+    <li> The <code>CoordinateSystemAuthorityFactory</code> must successfully 
+      construct the Coordinate System object.
+    <li> The Raster to Model transformation must be a simple translation.
+    </ul>
+
+    <p>
+    The GeoTIFF plugin currently does not write GeoTIFF files.  The 
+    current obstacles to writing a GeoTIFF file are:
+    <ol>
+    <li> The <CODE>GeoTiffIIOMetadataAdapter</CODE> cannot modify the 
+      IIOMetadata object.
+    <li> No mechanism exists to examine the parameters of a coordinate
+      system and produce an EPSG code.
+    </ol>
+
+    <p>Key features of the package: 
+    <ol>
+    <li>The user may specify the <code>CoordinateSystemAuthorityFactory</code>
+      used to generate coordinate systems from codes found in the metadata.
+    <li>Utilizes the JAI ImageI/O tools to perform the actual file I/O.
+    <li>Interprets metadata retrieved as <code>IIOMetadata</code>.
+    <li>Functionality is logically subdivided:
+      <ul> 
+      <li> Classes required to interface to Geotools.
+      <li> An adapter class to retrieve GeoKeys from the IIOMetadata by
+        symbolic name (<CODE>GeoTiffIIOMetadataAdapter</CODE>).
+      <li> An adapter class to interpret the values in the GeoKeys
+        and create a corresponding coordinate system with a factory
+        (<CODE>GeoTiffCoordinateSystemAdapter</CODE>).
+      </ul>
+    </ol>
+
+    <p>
+    <h1>License Information</h1>
+    The GeoTIFF plugin for Geotools is public domain.  The 
+    <code>GeoTiffIIOMetadataAdapter</code> is Copyright 2004 by 
+    Mike Gelbin and released under a liberal license as noted in that file.
+
+  </BODY>
+</HTML>

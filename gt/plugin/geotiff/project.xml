@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+<!--  <extend>${basedir}/../../project.xml</extend> -->
+  <name>geotools-geotiff</name>
+  <id>geotiff</id>
+  <currentVersion>2.1.x</currentVersion>
+  <versions>
+    <version>
+      <id>alpha1</id>
+      <name>2.1.x</name>
+    </version>
+  </versions>
+  <package>org.geotools</package>
+  <shortDescription>GeoTIFF grid coverage exchange module</shortDescription>
+  <description>Datasource created to read GeoTIFF raster format. </description>
+  <developers>
+    <developer>
+      <name>Bryce Nordgren</name>
+      <id>bnordgren</id>
+      <email>bnordgren@fs.fed.us</email>
+      <organization>USDA Forest Service</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mike Gelbin</name>
+      <id>mgelbin</id>
+      <email>schmeldog@gelbin.org</email>
+      <organization>Unknown</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <artifactId>view</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/*.png</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
