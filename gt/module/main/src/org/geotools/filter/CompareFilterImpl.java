@@ -272,9 +272,7 @@ public class CompareFilterImpl extends AbstractFilterImpl
         if (filterType == COMPARE_NOT_EQUALS) {
             operator = " != ";
         }
-
-        return "[ " + leftValue.toString() + operator + rightValue.toString()
-        + " ]";
+        return "[ " + leftValue + operator + rightValue + " ]";
     }
 
     /**
@@ -288,13 +286,19 @@ public class CompareFilterImpl extends AbstractFilterImpl
      *         otherwise.
      */
     public boolean equals(Object obj) {
-        if (obj instanceof CompareFilterImpl) {
-            CompareFilterImpl cFilter = (CompareFilterImpl) obj;
+        if (obj instanceof CompareFilter) {
+            CompareFilter cFilter = (CompareFilter) obj;
 
-            //todo - check for nulls here, or make immutable.
-            return ((cFilter.getFilterType() == this.filterType)
-            && cFilter.getLeftValue().equals(this.leftValue)
-            && cFilter.getRightValue().equals(this.rightValue));
+            // todo - check for nulls here, or make immutable.
+            //
+            return
+                filterType == cFilter.getFilterType()
+            	&& (    leftValue == cFilter.getLeftValue()
+            			|| (leftValue != null && leftValue.equals( cFilter.getLeftValue() ) )
+            	    )
+            	&& (    rightValue == cFilter.getRightValue()
+            			|| (rightValue != null && rightValue.equals( cFilter.getRightValue() ) )
+            			);            
         } else {
             return false;
         }

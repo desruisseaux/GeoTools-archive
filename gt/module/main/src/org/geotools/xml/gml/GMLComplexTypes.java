@@ -597,6 +597,22 @@ public class GMLComplexTypes {
         public Object getValue() {
             return value;
         }
+        /* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString() {
+			StringBuffer buf = new StringBuffer();
+			if( getElement() != null && getElement().toString() != null){
+				buf.append( getElement().toString() );				
+			}
+			else {
+				buf.append( getClass().getName() );
+			}
+			buf.append("[");
+			buf.append( value );
+			buf.append("]");
+			return buf.toString();
+		}
     }
 
     /**
