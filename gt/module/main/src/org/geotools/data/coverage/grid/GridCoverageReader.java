@@ -33,7 +33,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version 2.0
- *
+ * @deprecated You should use the interfaces provided by GeoApi package
  * @see GridCoverageExchange#getReader
  * @see javax.imageio.ImageReader
  */
