@@ -22,20 +22,35 @@
  */
 package org.geotools.data.arcgrid.test;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.DatumType;
 import org.geotools.cs.LocalDatum;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.arcgrid.ArcGridDataSource;
-import org.geotools.data.arcgrid.ArcGridRaster;
+import org.geotools.data.arcgrid.ArcGridFormat;
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
+import org.geotools.gc.GridCoverage;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
@@ -45,17 +60,11 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.geotools.units.Unit;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import javax.imageio.ImageIO;
+import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -64,9 +73,9 @@ import javax.imageio.ImageIO;
  * @author Christiaan ten Klooster
  */
 public class ArcGridRenderTest extends TestCaseSupport {
-    private static boolean setup = false;
-    private static ArcGridDataSource ds;
+    private static boolean setup = false;    
     private static String dataFolder;
+    private GridCoverageReader reader;
 
     public ArcGridRenderTest(String testName) {
         super(testName);
@@ -81,10 +90,7 @@ public class ArcGridRenderTest extends TestCaseSupport {
             return;
         }
 
-        setup = true;
-
-        URL url = TestData.getResource( this, "ArcGrid.asc");
-        ds = new ArcGridDataSource(url);
+        setup = true;   
 
         // Build the coordinate system
         DatumType.Local type = (DatumType.Local) DatumType.getEnum(DatumType.Local.MINIMUM);
@@ -94,13 +100,15 @@ public class ArcGridRenderTest extends TestCaseSupport {
         CoordinateSystem cs = CoordinateSystemFactory.getDefault().createLocalCoordinateSystem("RD",
                 ld, Unit.METRE, ai);
 
-        ds.setCoordinateSystem(cs);
-
-        if (ds == null) {
-            fail("unable to build datasource " + url);
-        }
-
-        System.out.println("get a datasource " + ds);
+        
+        
+        //ds.setCoordinateSystem(cs);
+        URL url = TestData.getResource( this, "ArcGrid.asc");
+        ArcGridFormat format = new ArcGridFormat();            
+        assertTrue( "Unabled to accept:"+url, format.accepts( url ) );        
+        reader = format.getReader( url );
+        
+        System.out.println("get a reader " + reader);
     }
 
     public void testRenderImage() throws Exception {
@@ -110,10 +118,22 @@ public class ArcGridRenderTest extends TestCaseSupport {
     private void renderImage(String filename)
         throws DataSourceException, FactoryConfigurationError, FileNotFoundException, IOException {
         Filter filter = null;
-        FeatureCollection ft = ds.getFeatures(filter);
+        //FeatureCollection ft = ds.getFeatures(filter);
         MapContext mapContext = new DefaultMapContext();
         StyleFactory sFac = StyleFactory.createStyleFactory();
-        Envelope ex = ds.getBounds();
+        
+        Format format = reader.getFormat();
+        OperationParameterGroup params = format.getReadParameters();
+        ParameterValueGroup values = (ParameterValueGroup) params.createValue();         
+        GridCoverage gc = reader.read( values );
+        Raster raster = gc.getRenderedImage().getData();
+        
+        org.geotools.pt.Envelope ex1 = gc.getEnvelope();
+        DirectPosition p1 = ex1.getLowerCorner();
+        DirectPosition p2 = ex1.getUpperCorner(); 
+        Envelope ex = new Envelope( p1.getOrdinate( 0 ), p1.getOrdinate( 1 ), p2.getOrdinate( 0 ), p2.getOrdinate( 1 ) );
+        
+        
 
         //The following is complex, and should be built from
         //an SLD document and not by hand
@@ -124,14 +144,19 @@ public class ArcGridRenderTest extends TestCaseSupport {
         FeatureTypeStyle fts = sFac.createFeatureTypeStyle(new Rule[] { rule });
         Style style = sFac.createStyle();
         style.setFeatureTypeStyles(new FeatureTypeStyle[] { fts });
-        mapContext.addLayer(ft, style);
+        MapLayer mapLayer;
+                
+        // TODO: get lite renderer to support GC natively
+        // mapContext.addLayer(ft, style);        
 
-        ArcGridRaster arcGridRaster = ds.openArcGridRaster();
-        arcGridRaster.parseHeader();
-
-        int w = arcGridRaster.getNCols();
-        int h = arcGridRaster.getNRows();
-
+        //ArcGridRaster arcGridRaster = ds.openArcGridRaster();
+        //arcGridRaster.parseHeader();
+        
+        //int w = arcGridRaster.getNCols();
+        //int h = arcGridRaster.getNRows();
+        int w = raster.getWidth();
+        int h = raster.getWidth();
+        /*
         LiteRenderer renderer = new LiteRenderer(mapContext);
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -148,6 +173,6 @@ public class ArcGridRenderTest extends TestCaseSupport {
         System.out.println("Writing to " + file.getAbsolutePath());
 
         FileOutputStream out = new FileOutputStream(file);
-        ImageIO.write(image, "JPEG", out);
+        ImageIO.write(image, "JPEG", out);*/
     }
 }

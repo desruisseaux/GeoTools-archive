@@ -6,14 +6,11 @@ package org.geotools.data.arcgrid.test;
  *
  * Created on 04 March 2002, 16:09
  */
-import java.util.HashMap;
 import java.util.Iterator;
 
-import org.geotools.data.DataSource;
-import org.geotools.data.DataSourceFactorySpi;
-import org.geotools.data.DataSourceFinder;
-import org.geotools.data.arcgrid.ArcGridDataSourceFactory;
-import org.geotools.resources.TestData;
+import org.geotools.data.arcgrid.ArcGridFormatFactory;
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.data.coverage.grid.GridFormatFinder;
 
 /**
  *
@@ -31,25 +28,17 @@ public class ServiceTest extends TestCaseSupport {
     junit.textui.TestRunner.run(suite(ServiceTest.class));
   }
   
-  public void testIsAvailable() {
-    Iterator list = DataSourceFinder.getAvailableDataSources();
+  public void testIsAvailable() {      
+    Iterator list = GridFormatFinder.getAvailableFormats();
     boolean found = false;
     while(list.hasNext()){
-      DataSourceFactorySpi fac = (DataSourceFactorySpi)list.next();
-      if(fac instanceof ArcGridDataSourceFactory){
-        found=true;
-        assertNotNull(fac.getDescription());
+      GridFormatFactorySpi fac = (GridFormatFactorySpi)list.next();
+      if(fac instanceof ArcGridFormatFactory){
+        found=true;        
         break;
-      }
+      }      
     }
-    assertTrue("ArcGridDataSourceFactory not registered", found);
+    assertTrue("ArcGridFormatFactory not registered", found);
   }
-  
-  public void testArcGridDataSource() throws Exception{
-    HashMap params = new HashMap();
-    params.put("url", TestData.getResource( this, TEST_FILE).toString());
-    DataSource ds = DataSourceFinder.getDataSource(params);
-    assertNotNull(ds);
-  }
-  
+    
 }
