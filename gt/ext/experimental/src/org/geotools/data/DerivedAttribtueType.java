@@ -20,6 +20,7 @@ public class DerivedAttribtueType implements AttributeType {
     final private boolean nested;
     final private Class type;
     final private boolean nillable;
+    final private int min,max;
     private int length;
     /**
      * Construct <code>DerivedAttribtueType</code>.
@@ -30,11 +31,25 @@ public class DerivedAttribtueType implements AttributeType {
      * @param nested
      */
     public DerivedAttribtueType( String name, Class type, boolean nillable, boolean nested ){
+        this(name,type,nillable,nested,1,1);
+    }
+    
+    public DerivedAttribtueType( String name, Class type, boolean nillable, boolean nested, int minOcc,int maxOcc ){
         this.name = name;
         this.type = type;
         this.nillable = nillable;
         this.nested = nested;
         this.length = -1;
+        this.min = minOcc;
+        this.max = maxOcc;
+    }
+    
+    public int getMinOccurs(){
+        return min;
+    }
+    
+    public int getMaxOccurs(){
+        return max;
     }
     
     /*
@@ -105,6 +120,10 @@ public class DerivedAttribtueType implements AttributeType {
      */
     public int getFieldLength() {
         return length;
+    }
+    
+    public org.geotools.filter.Filter getRestriction(){
+        return null;
     }
 
 }
