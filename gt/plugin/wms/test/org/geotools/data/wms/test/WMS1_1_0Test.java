@@ -14,6 +14,8 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMSParser;
+import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetMapRequest;
 
 /**
  * @author Kefka
@@ -131,6 +133,16 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
 		assertNotNull(layer2.getBoundingBoxes().get("EPSG:42304"));
 	}
 
+    public void testCreateGetMapRequest() throws Exception {
+        WebMapServer wms = new WebMapServer(server, true);
+        WMSCapabilities caps = wms.getCapabilities();
+        GetMapRequest request = wms.createGetMapRequest();
+        request.setFormat("image/jpeg");
+        System.out.println(request.getFinalURL().toExternalForm());
+        
+        assertTrue(request.getFinalURL().toExternalForm().indexOf("image/jpeg") >= 0);
+    }
+    
 	protected void validateLatLonBoundingBox(LatLonBoundingBox llbbox,
 			double minX, double minY, double maxX, double maxY) {
 		assertNotNull(llbbox);

@@ -16,8 +16,11 @@
  */
 package org.geotools.data.wms;
 
+import org.geotools.data.wms.WMS1_1_0.GetMapRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -103,5 +106,20 @@ public class WMS1_1_1 extends WMS1_1_0 {
         public String getVersion() {
             return "1.1.1";
         }
+    }
+    static public class GetMapRequest extends WMS1_1_0.GetMapRequest {
+
+        public GetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions ) {
+            super(onlineResource, availableLayers, availableSRSs, availableFormats, availableExceptions);
+        }
+        
+        protected void initVersion() {
+            setVersion("1.1.1");
+        }
+    }
+    
+    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings,
+            List exceptions ) {
+        return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
     }
 }

@@ -32,6 +32,7 @@ import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
@@ -125,6 +126,16 @@ public class WMS1_0_0Test extends TestCase {
         BoundingBox bbox = (BoundingBox) layers[1].getBoundingBoxes().get("EPSG:4326");
         assertNotNull(bbox);
     }
+    
+    public void testCreateGetMapRequest() throws Exception {
+        CustomWMS wms = new CustomWMS(server, true);
+        WMSCapabilities caps = wms.getCapabilities();
+        GetMapRequest request = wms.createGetMapRequest();
+        request.setFormat("image/jpeg");
+        System.out.println(request.getFinalURL().toExternalForm());
+        
+        assertTrue(request.getFinalURL().toExternalForm().indexOf("JPEG") >= 0);
+    }
 
     protected WMSCapabilities createCapabilities(String capFile)
         throws Exception {
@@ -143,5 +154,22 @@ public class WMS1_0_0Test extends TestCase {
 
     protected void parserCheck(WMSParser parser) {
         assertEquals(parser.getClass(), WMS1_0_0.Parser.class);
+    }
+    
+    private class CustomWMS extends WebMapServer {
+
+        /**
+         * @param serverURL
+         * @param wait
+         */
+        public CustomWMS( URL serverURL, boolean wait ) {
+            super(serverURL, wait);
+            // TODO Auto-generated constructor stub
+        }
+        
+        protected void setupSpecifications() {
+            specs = new Specification[1];
+            specs[0] = new WMS1_0_0();
+        }
     }
 }

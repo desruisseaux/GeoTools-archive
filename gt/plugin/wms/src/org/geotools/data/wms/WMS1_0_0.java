@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 
 
 /**
@@ -190,27 +191,49 @@ public class WMS1_0_0 extends Specification {
         public GetMapRequest(URL onlineResource, 
             SimpleLayer[] availableLayers, Set availableSRSs,
             String[] availableFormats, List availableExceptions) {
-            super(onlineResource, "1.0.0", availableLayers, availableSRSs, //$NON-NLS-1$
+            super(onlineResource, availableLayers, availableSRSs, //$NON-NLS-1$
                 availableFormats, availableExceptions);
         }
 
         protected void initRequest() {
             setProperty("REQUEST", "map"); //$NON-NLS-1$ //$NON-NLS-2$
         }
+        
+        protected void initVersion() {
+            setProperty(VERSION, "1.0.0");
+        }
+        
+        public void setProperty( String name, String value ) {
+            if (name.equals(FORMAT)) {
+                value = getRequestFormat(value);
+            }
+            
+            super.setProperty(name, value);
+        }
+        
+        public void setFormat(String value) {
+            setProperty(FORMAT, value);
+        }
+        
+        protected String getRequestFormat( String format ) {
+            return toFormat(format);
+        }
     }
 
     /**
      * A GetFeatureInfoRequest for a 1.0.0 server
      */
-    static public class GetFeatureInfoRequest
+    //TODO GetFeatureInfo. Maybe I should make it an interface.. and this class would
+    //implement it, while extending GetMapRequest
+/*    static public class GetFeatureInfoRequest
         extends org.geotools.data.wms.request.GetFeatureInfoRequest {
-        /**
+        *//**
          * Constructs a GetFeatureInfoRequest for use with a 1.0.0 server
          * @param onlineResource the URL pointing to the place to execute a GetFeatureInfo request
          * @param getMapRequest a previously executed GetMapRequest that the query will be executed on
          * @param queryableLayers a Set of all the layers that can be queried
          * @param infoFormats all the known formats that can be returned by the request
-         */
+         *//*
         public GetFeatureInfoRequest(URL onlineResource,
             GetMapRequest getMapRequest, Set queryableLayers,
             String[] infoFormats) {
@@ -220,7 +243,12 @@ public class WMS1_0_0 extends Specification {
         protected void initRequest() {
             setProperty("REQUEST", "feature_info"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-    }
+
+        protected void initVersion() {
+            // TODO Auto-generated method stub
+           
+        }
+    }*/
 
     /**
      * A WMSParser capable of parsing 1.0.0 GetCapabilities document
@@ -232,5 +260,12 @@ public class WMS1_0_0 extends Specification {
         public String getVersion() {
             return "1.0.0"; //$NON-NLS-1$
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.wms.Specification#createGetMapRequest(java.net.URL, java.lang.String, org.geotools.data.wms.SimpleLayer[], java.util.Set, java.lang.String[], java.util.List)
+     */
+    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings, List exceptions ) {
+        return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
     }
 }

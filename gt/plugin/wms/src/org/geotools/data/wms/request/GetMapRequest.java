@@ -72,7 +72,7 @@ import java.util.Set;
  *
  * @author Richard Gould, Refractions Research
  */
-public class GetMapRequest extends AbstractRequest {
+public abstract class GetMapRequest extends AbstractRequest {
     public static final String VERSION = "VERSION";
     public static final String ELEVATION = "ELEVATION";
     public static final String TIME = "TIME";
@@ -102,7 +102,7 @@ public class GetMapRequest extends AbstractRequest {
      * @param availableFormats
      * @param availableExceptions DOCUMENT ME!
      */
-    public GetMapRequest(URL onlineResource, String version,
+    public GetMapRequest(URL onlineResource,
         SimpleLayer[] availableLayers, Set availableSRSs,
         String[] availableFormats, List availableExceptions) {
         super(onlineResource);
@@ -114,10 +114,11 @@ public class GetMapRequest extends AbstractRequest {
         this.availableExceptions = availableExceptions;
 
         initRequest();
-        
-        setProperty(VERSION, version);
+        initVersion();
     }
 
+    protected abstract void initVersion();
+    
     protected void initRequest() {
         setProperty(REQUEST, "GetMap");
     }

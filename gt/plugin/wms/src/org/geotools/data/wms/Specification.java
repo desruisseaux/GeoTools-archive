@@ -17,10 +17,13 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.util.InternationalString;
 import org.jdom.Document;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -136,4 +139,6 @@ public abstract class Specification {
 
         return parser;
     }
+
+    public abstract GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings, List exceptions );
 }

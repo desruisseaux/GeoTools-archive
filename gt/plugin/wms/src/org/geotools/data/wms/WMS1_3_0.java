@@ -7,7 +7,10 @@
 package org.geotools.data.wms;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
 
+import org.geotools.data.wms.WMS1_1_1.GetMapRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -38,6 +41,11 @@ public class WMS1_3_0 extends WMS1_1_1 {
 		return new GetCapsRequest(server);
 	}
 	
+    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings,
+            List exceptions ) {
+        return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
+    }
+    
 	public static class GetCapsRequest extends WMS1_1_1.GetCapsRequest {
 
 		public GetCapsRequest(URL urlGetCapabilities) {
@@ -50,6 +58,17 @@ public class WMS1_3_0 extends WMS1_1_1 {
 		protected void initVersion() {
 			setProperty("VERSION", "1.3.0");
 		}
+	}
+	
+	public static class GetMapRequest extends WMS1_1_1.GetMapRequest {
+
+        public GetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions ) {
+            super(onlineResource, availableLayers, availableSRSs, availableFormats, availableExceptions);
+        }
+	    
+        protected void initVersion() {
+            setVersion("1.3.0");
+        }
 	}
 	
 	public static class Parser extends WMS1_1_1.Parser {

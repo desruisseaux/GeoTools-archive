@@ -165,7 +165,7 @@ public class WebMapServer implements Catalog {
     /** Feedback: Why only one? */
     private Thread requestRetriever;
     private AbstractResponse currentResponse;
-    private Specification[] specs;
+    protected Specification[] specs;
     private Specification specification;
 
     /**
@@ -199,11 +199,9 @@ public class WebMapServer implements Catalog {
     public WebMapServer(final URL serverURL, boolean wait) {
         this.serverURL = serverURL;
 
-        specs = new Specification[4];
-        specs[0] = new WMS1_0_0();
-        specs[1] = new WMS1_1_0();
-        specs[2] = new WMS1_1_1();
-        specs[3] = new WMS1_3_0();
+        setupSpecifications();
+        
+
 
         if (wait) {
             return;
@@ -216,6 +214,14 @@ public class WebMapServer implements Catalog {
         }
 
         issueRequest(request, !wait);
+    }
+
+    protected void setupSpecifications() {
+        specs = new Specification[4];
+        specs[0] = new WMS1_0_0();
+        specs[1] = new WMS1_1_0();
+        specs[2] = new WMS1_1_1();
+        specs[3] = new WMS1_3_0();
     }
 
     /**
@@ -630,9 +636,8 @@ public class WebMapServer implements Catalog {
                 "Unable to create a GetMapRequest when the GetCapabilities document has not been retrieved");
         }
 
-        GetMapRequest request = new GetMapRequest(getCapabilities().getRequest()
+        GetMapRequest request = specification.createGetMapRequest(getCapabilities().getRequest()
                                                       .getGetMap().getGet(),
-                getCapabilities().getVersion(),
                 Utils.findDrawableLayers(getCapabilities().getLayers()),
                 getSRSs(),
                 getCapabilities().getRequest().getGetMap().getFormatStrings(),
@@ -640,8 +645,8 @@ public class WebMapServer implements Catalog {
 
         return request;
     }
-
-    public GetFeatureInfoRequest createGetFeatureInfoRequest(
+//TODO GetFeatureInfo
+/*    public GetFeatureInfoRequest createGetFeatureInfoRequest(
         GetMapRequest getMapRequest) {
         if (capabilities == null) {
             throw new RuntimeException(
@@ -663,7 +668,7 @@ public class WebMapServer implements Catalog {
 
         return request;
     }
-
+*/
     private Set getQueryableLayers() {
         Set layers = new TreeSet();
 

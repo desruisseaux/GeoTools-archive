@@ -37,7 +37,7 @@ import java.util.TreeSet;
  *
  * @author Richard Gould, Refractions Research
  */
-public class GetFeatureInfoRequest extends GetMapRequest {
+public abstract class GetFeatureInfoRequest extends GetMapRequest {
     /** A list of type String, each representing a format for the request */
     private List infoFormats;
 
@@ -52,7 +52,7 @@ public class GetFeatureInfoRequest extends GetMapRequest {
 
     public GetFeatureInfoRequest(URL onlineResource, GetMapRequest request,
         Set queryableLayers, String[] infoFormats) {
-        super(onlineResource, "1.1.1",
+        super(onlineResource,
             (SimpleLayer[]) request.getAvailableLayers().toArray(),
             request.getAvailableSRSs(),
             (String[]) request.getAvailableFormats().toArray(),
