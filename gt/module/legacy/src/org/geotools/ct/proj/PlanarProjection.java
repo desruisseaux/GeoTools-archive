@@ -48,6 +48,8 @@ import org.geotools.ct.MissingParameterException;
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/AzimuthalProjection.html">Azimuthal projection on MathWorld</A>
+ *
+ * @deprecated
  */
 public abstract class PlanarProjection extends MapProjection {
     /**

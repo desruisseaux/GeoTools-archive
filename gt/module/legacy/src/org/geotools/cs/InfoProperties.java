@@ -41,6 +41,8 @@ import org.opengis.cs.CS_Info;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.Properties}.
  */
 class InfoProperties implements Map, Serializable {
     /**

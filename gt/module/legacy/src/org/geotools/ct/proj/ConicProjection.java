@@ -54,6 +54,8 @@ import org.geotools.ct.MissingParameterException;
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/ConicProjection.html">Conic projection on MathWorld</A>
+ *
+ * @deprecated
  */
 public abstract class ConicProjection extends MapProjection {
     /**

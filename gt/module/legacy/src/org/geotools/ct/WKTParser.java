@@ -46,6 +46,8 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.wkt.Parser}.
  */
 final class WKTParser extends WKTFormat {
     /**

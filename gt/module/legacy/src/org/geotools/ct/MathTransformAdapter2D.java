@@ -38,6 +38,8 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated No replacement for RMI objects.
  */
 final class MathTransformAdapter2D extends MathTransformAdapter implements MathTransform2D {
     /**

@@ -60,6 +60,8 @@ import org.opengis.ct.CT_DomainFlags;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.ct.CT_DomainFlags
+ *
+ * @deprecated No replacement.
  */
 public final class DomainFlags extends EnumeratedParameter {
     /**

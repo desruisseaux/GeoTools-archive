@@ -45,6 +45,8 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version 1.0
  * @author Martin Desruisseaux
+ *
+ * @deprecated No replacement for RMI objects.
  */
 class MathTransformAdapter extends AbstractMathTransform implements Serializable {
     /**

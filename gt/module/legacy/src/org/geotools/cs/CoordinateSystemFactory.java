@@ -85,6 +85,8 @@ import org.opengis.referencing.FactoryException;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_CoordinateSystemFactory
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.CRSFactory}.
  */
 public class CoordinateSystemFactory {
     /**

@@ -50,7 +50,7 @@ import org.opengis.cs.CS_ProjectionParameter;
  *
  * @see org.opengis.cs.CS_Projection
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.Projection}.
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.OperationMethod}.
  */
 public class Projection extends Info {
     /**

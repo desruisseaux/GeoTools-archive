@@ -51,6 +51,8 @@ import org.opengis.referencing.FactoryException;
  * @author Martin Desruisseaux
  *
  * @see Projection#getValue
+ *
+ * @deprecated Replaced by {@link org.opengis.parameter.ParameterNotFoundException}.
  */
 public class MissingParameterException extends FactoryException {
     /**

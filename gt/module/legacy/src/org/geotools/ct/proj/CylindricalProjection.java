@@ -50,6 +50,8 @@ import org.geotools.ct.MissingParameterException;
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://mathworld.wolfram.com/CylindricalProjection.html">Cylindrical projection on MathWorld</A>
+ *
+ * @deprecated
  */
 public abstract class CylindricalProjection extends MapProjection {
     /**

@@ -37,6 +37,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.MapProjection} provider.
  */
 public abstract class Provider extends MathTransformProvider {
     /**

@@ -55,6 +55,8 @@ import org.opengis.ct.CT_TransformType;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.ct.CT_TransformType
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.Operation} sub interfaces.
  */
 public final class TransformType extends EnumeratedParameter {
     /**

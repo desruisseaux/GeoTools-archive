@@ -56,6 +56,8 @@ import org.opengis.referencing.FactoryException;
  * @see Projection#getClassName
  * @see MathTransformFactory#getMathTransformProvider(String)
  * @see MathTransformFactory#createParameterizedTransform(String,ParameterList)
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.NoSuchIdentifierException}.
  */
 public class NoSuchClassificationException extends FactoryException {
     /**
