@@ -20,20 +20,20 @@ package org.geotools.data.crs;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.cs.PrimeMeridian;
@@ -54,15 +54,15 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.pt.CoordinatePoint;
+import org.geotools.referencing.Factory;
 import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -123,6 +123,7 @@ public class CRSService {
      * </p>
      */ 
 	List authorities = new ArrayList();
+    private Properties crsProperties=new Properties();
 	
 	/**
 	 * Construct a CRSService (will find CRSAuthoritySpi on classpath).
@@ -149,8 +150,28 @@ public class CRSService {
                 System.err.println("Could not register "+factory+":"+t );
             }
         }
+        try {
+            crsProperties.load(getClass().getResource("epsg.properties").openStream());
+        } catch (IOException e) {
+            // TODO Catch e
+        }    
 	}
-		
+	
+	/**
+	 * Returns a list of human readable names that uniquely maps to a WKT that can
+	 * be parsed instantiated by the framework. 
+	 * 
+	 * @return a list of human readable names that uniquely maps to a WKT that can
+	 * be parsed instantiated by the framework.
+	 */
+	public Set getCRSNames(){
+	    return crsProperties.keySet();
+	}
+	
+	public CoordinateReferenceSystem createCRSFromName(String crsName) throws FactoryException{
+            return createCRS("EPSG:"+crsName);
+	}
+	
 	public void register( CoordinateSystemAuthorityFactory factory ){
 	    authorities.add( factory );			
 	}
@@ -218,7 +239,9 @@ public class CRSService {
 	 * @throws FactoryException
 	 */	
 	public CoordinateReferenceSystem createCRS( String code ) throws FactoryException {
-	    return createCoordinateSystem( code );
+	    CRSFactory fc=org.geotools.referencing.FactoryFinder.getCRSFactory();
+	    return fc.createFromWKT(code);
+//	    return createCoordinateSystem( code );
 	}
 	/** 
 	 * A "safe" cast to the old CoordinateSystem class.
