@@ -290,10 +290,18 @@ public class OverlapsIntegrity extends RelationIntegrity
 		int counter = 0;
 		FeatureType ft = featureSourceA.getSchema();
 		
-		//Filter filter = filterBBox(bBox, ft);
+		
+		System.out.println("---------------- In Overlaps Integrity ----------------");
 
-		//FeatureResults featureResults = featureSourceA.getFeatures(filter);
-		FeatureResults featureResults = featureSourceA.getFeatures();
+		FeatureResults featureResults = null;
+		
+		if(bBox != null && !bBox.isNull() && bBox.getHeight() != 0.0 && bBox.getWidth() != 0.0)
+		{
+			Filter filter = filterBBox(bBox, ft);
+			featureResults = featureSourceA.getFeatures(filter);
+		}
+		else
+			featureResults = featureSourceA.getFeatures();
 		
 		FeatureReader fr1 = null;
 		FeatureReader fr2 = null;
@@ -325,7 +333,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 							
 							if (!f1.getID().equals(f2.getID()))	// if they are the same feature, move onto the next one
 							{
-								if(g1.overlaps(g2) != expected || g1.contains(g2) != expected)
+								//if(g1.overlaps(g2) != expected || g1.contains(g2) != expected)
+								if (g1.relate(g2, "1********") != expected)
 								{
 									//results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" overlapped "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
 									if( results != null ){
@@ -334,7 +343,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 									if (showPrintLines)
 									{
 										//System.out.println(f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" overlapped "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
-										System.out.println(f1.getID().substring(8)+ " " + f2.getID().substring(8));
+										System.out.println(f1.getID().substring(11)+ " " + f2.getID().substring(11));
 									}
 									success = false;
 									errors++;
@@ -343,8 +352,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 						}
 					}
 					usedIDs.add(f1.getID());
-					if (counter%countInterval == 0 && showPrintLines)
-						System.out.println("count: " + counter);
+					//if (counter%countInterval == 0 && showPrintLines)
+					//	System.out.println("count: " + counter);
 						
 				}finally{
 					if (fr2 != null)
