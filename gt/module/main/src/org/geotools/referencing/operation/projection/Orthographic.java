@@ -118,11 +118,14 @@ public abstract class Orthographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
+            
+            //values here are in degrees (the standard units for this parameter)
             final double latitudeOfOrigin = Math.abs(
                 doubleValue(Provider.LATITUDE_OF_ORIGIN, parameters));
+            
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
                     return new OrthographicPolar(parameters, descriptors);
                 }
                 // Equatorial case.
