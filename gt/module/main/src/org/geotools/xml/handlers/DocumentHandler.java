@@ -18,6 +18,7 @@ package org.geotools.xml.handlers;
 
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -35,6 +36,7 @@ import java.util.Map;
  * @author dzwiers www.refractions.net
  */
 public class DocumentHandler extends XMLElementHandler {
+    public final static String DEFAULT_NAMESPACE_HINT_KEY = "org.geotools.xml.handlers.DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY";
     private XMLElementHandler xeh = null;
     private ElementHandlerFactory ehf;
 
@@ -72,7 +74,15 @@ public class DocumentHandler extends XMLElementHandler {
             throw new SAXNotRecognizedException(
                 "XML Documents may only have one top-level element");
         }
-
+//System.out.println("HINTS TEST "+hints.containsKey(DEFAULT_NAMESPACE_HINT_KEY));
+        if(hints!=null && hints.containsKey(DEFAULT_NAMESPACE_HINT_KEY)){
+            Object t = hints.get(DEFAULT_NAMESPACE_HINT_KEY);
+            if(t instanceof Schema)
+                ehf.startPrefixMapping("",(Schema)t);
+            else
+                ehf.startPrefixMapping("",t.toString());
+        }
+//System.out.println("HINT WORKING? "+ehf.getNamespace(""));
         xeh = ehf.createElementHandler(namespaceURI, localName);
 
         return xeh;

@@ -196,9 +196,11 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         int i = 0;
         int count =0;
-        int[] i2 = new int[2];i2[1]=1;
+        int[] i2 = new int[2];
+        i2[1]=1;
         while(i<elements.size() && i2[1] == 1){
-        	i2[0] = i;i2[1] = 0;
+        	i2[0] = i;
+        	i2[1] = 0;
             i2 = valid(type.getChild(), i);
             if( i2[1] == 0 && i == i2[0] ){
             	// done running
@@ -207,7 +209,8 @@ public class ComplexElementHandler extends XMLElementHandler {
                         + type.getName());
                 }
             }else{
-            	i = i2[0];count++;
+            	i = i2[0];
+            	count++;
             }
         }
         if(count > type.getChild().getMaxOccurs()){
@@ -465,7 +468,7 @@ public class ComplexElementHandler extends XMLElementHandler {
 
 //System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
-
+        System.out.println("findChildElement("+localName+") was " + (e==null?"null":e.getName()));
         if (e != null) {
             XMLElementHandler r = ehf.createElementHandler(e);
 

@@ -78,6 +78,8 @@ public class ElementHandlerFactory {
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
         logger.finest("URI == '" + uri + "'");
+//System.out.println("Target == '" + targ + "'");
+//System.out.println("URI == '" + uri + "'");
 
         try {
             URI tns = new URI(targ);
@@ -106,6 +108,7 @@ public class ElementHandlerFactory {
     public void startPrefixMapping(String prefix, String targ)
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
+//      System.out.println("Target == '" + targ + "' prefix = "+prefix);
 
         try {
             URI tns = new URI(targ);
@@ -129,6 +132,21 @@ public class ElementHandlerFactory {
     }
 
     /**
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
+     *      java.lang.String)
+     */
+    protected void startPrefixMapping(String prefix, Schema targ)
+        throws SAXException {
+        logger.finest("Target == '" + targ + "'");
+        	if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
+            	defaultNS = targ.getTargetNamespace();
+//System.out.println("DEFAULT NS = "+defaultNS);
+        	}
+            targSchemas.put(targ.getTargetNamespace(), targ);
+            prefixURIs.put(prefix, targ.getTargetNamespace()); 
+    }
+
+    /**
      * Creates an element handler for the element specified by name and
      * namespace. Will return null if a suitable handler is not found.
      *
@@ -143,14 +161,18 @@ public class ElementHandlerFactory {
      */
     public XMLElementHandler createElementHandler(URI namespaceURI,
         String localName) throws SAXException {
+
+//System.out.println("making $"+namespaceURI+"$ -> "+localName);
+
         if (localName == null) {
             return null;
         }
 
-        if (namespaceURI == null) {
+        if (namespaceURI == null || "".equals(namespaceURI.toString())) {
             namespaceURI = defaultNS;
         }
 
+//System.out.println("making pt2 $"+namespaceURI+"$ -> "+localName + " ("+defaultNS+")");
         logger.finest("Trying to create an element handler for " + localName
             + " :: " + namespaceURI);
 

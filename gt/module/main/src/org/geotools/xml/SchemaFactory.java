@@ -114,7 +114,7 @@ public class SchemaFactory {
                                                       .getDeclaredMethod("getInstance",
                                     new Class[0]).invoke(null, new Object[0]);
 
-                            //System.out.println(s.getTargetNamespace());
+//                            System.out.println(s.getTargetNamespace());
                             schemas.put(s.getTargetNamespace(), s);
                         } catch (IllegalArgumentException e1) {
                             // TODO log this
