@@ -238,26 +238,6 @@ public abstract class CoordinateSystem extends Info
         return new Export(adapters);
     }
     
-    public org.opengis.referencing.cs.CoordinateSystem getCoordinateSystem() {
-        throw new UnsupportedOperationException();
-    }    
-    
-    public org.opengis.referencing.datum.Datum getDatum() {
-        throw new UnsupportedOperationException();
-    }    
-    
-    public org.opengis.referencing.Identifier[] getIdentifiers() {
-        throw new UnsupportedOperationException();
-    }    
-    
-    public String getScope(java.util.Locale locale) {
-        throw new UnsupportedOperationException();
-    }
-    
-    public org.opengis.metadata.extent.Extent getValidArea() {
-        throw new UnsupportedOperationException();
-    }
-    
     /////////////////////////////////////////////////////////////////////////
     ////////////////                                         ////////////////
     ////////////////             OPENGIS ADAPTER             ////////////////
@@ -303,5 +283,38 @@ public abstract class CoordinateSystem extends Info
         public PT_Envelope getDefaultEnvelope() throws RemoteException {
             return adapters.export(CoordinateSystem.this.getDefaultEnvelope());
         }
+    }
+
+
+
+
+    /** For compatibility with GeoAPI interfaces. */
+    private transient org.opengis.referencing.cs.CoordinateSystem cs;
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public org.opengis.referencing.cs.CoordinateSystem getCoordinateSystem() {
+        if (cs == null) {
+            final AxisInfo[] axis = new AxisInfo[getDimension()];
+            for (int i=0; i<axis.length; i++) {
+                axis[i] = new AxisInfo(getAxis(i), getUnits(i));
+            }
+            cs = new org.geotools.referencing.cs.CoordinateSystem(getName(null), axis);
+        }
+        return cs;
+    }    
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public org.opengis.referencing.datum.Datum getDatum() {
+        return org.geotools.referencing.datum.EngineeringDatum.UNKNOW;
+    }    
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public String getScope(java.util.Locale locale) {
+        return null;
+    }
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public org.opengis.metadata.extent.Extent getValidArea() {
+        return null;
     }
 }

@@ -36,8 +36,8 @@
 package org.geotools.ct;
 
 // Geotools dependencies
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
 import org.geotools.cs.Projection;
 import org.geotools.cs.FactoryException;
 

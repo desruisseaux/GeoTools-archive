@@ -57,7 +57,7 @@ import javax.media.jai.iterator.RectIterFactory;
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.pt.Envelope;
-import org.geotools.pt.AngleFormat;
+import org.geotools.measure.AngleFormat;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
 import org.geotools.ct.MathTransform;

@@ -26,8 +26,8 @@ import javax.media.jai.ParameterList;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
 import org.geotools.pt.CoordinatePoint;
 
 

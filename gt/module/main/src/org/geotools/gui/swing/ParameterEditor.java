@@ -73,8 +73,8 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RegistryElementDescriptor;
 
 // Geotools dependencies
-import org.geotools.pt.Angle;
-import org.geotools.pt.AngleFormat;
+import org.geotools.measure.Angle;
+import org.geotools.measure.AngleFormat;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gui.Resources;

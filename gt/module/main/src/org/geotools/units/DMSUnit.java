@@ -33,7 +33,7 @@ package org.geotools.units;
 /**
  * Classe représentant des unités d'angle écrit sous la forme "degrés,
  * minutes, secondes". Ce travail ne devrait pas être le travail d'un
- * objet {@link Unit}, mais plutôt celui de {@link org.geotools.pt.AngleFormat}.
+ * objet {@link Unit}, mais plutôt celui de {@link org.geotools.measure.AngleFormat}.
  * Mais la base de données EPSG insiste pour utiliser des nombres de
  * ce type, et nous en avons parfois besoin pour interagir avec des
  * logiciels existants...

@@ -86,10 +86,10 @@ import java.util.Arrays;
 import java.util.Locale;
 
 // Geotools dependencies
-import org.geotools.pt.Angle;
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
-import org.geotools.pt.AngleFormat;
+import org.geotools.measure.Angle;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.AngleFormat;
 
 // Resources
 import org.geotools.resources.SwingUtilities;

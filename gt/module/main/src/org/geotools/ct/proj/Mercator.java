@@ -41,7 +41,7 @@ import java.util.Locale;
 import java.awt.geom.Point2D;
 
 // Geotools dependencies
-import org.geotools.pt.Latitude;
+import org.geotools.measure.Latitude;
 import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransformProvider; // For Javadoc 

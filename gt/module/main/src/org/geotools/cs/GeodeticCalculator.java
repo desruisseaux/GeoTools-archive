@@ -38,10 +38,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 // Geotools dependencies
 import org.geotools.cs.Ellipsoid;
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.CoordinateFormat;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.CoordinateFormat;
+import org.geotools.geometry.DirectPosition;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.ShapeUtilities;
@@ -266,8 +266,8 @@ public class GeodeticCalculator {
     private String getNoConvergenceErrorMessage() {
         final CoordinateFormat format = new CoordinateFormat();
         return Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
-               format.format(new CoordinatePoint(Math.toDegrees(long1), Math.toDegrees(lat1))),
-               format.format(new CoordinatePoint(Math.toDegrees(long2), Math.toDegrees(lat2))));
+               format.format(new DirectPosition(Math.toDegrees(long1), Math.toDegrees(lat1))),
+               format.format(new DirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
     }
 
     /**

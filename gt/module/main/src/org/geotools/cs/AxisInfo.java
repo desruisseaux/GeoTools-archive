@@ -40,9 +40,15 @@ import java.util.Locale;
 import java.io.Serializable;
 
 // Geotools dependencies
+import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+
+// OpenGIS dependencies
+import org.opengis.referencing.Identifier;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 
 /**
@@ -55,7 +61,7 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see org.opengis.cs.CS_AxisInfo
  */
-public class AxisInfo implements Serializable {
+public class AxisInfo implements CoordinateSystemAxis, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -121,6 +127,9 @@ public class AxisInfo implements Serializable {
      * @see org.opengis.cs.CS_AxisInfo#orientation
      */
     public final AxisOrientation orientation;
+
+    /** For compatibility with GeoAPI interfaces. */
+    private final Unit unit;
     
     /**
      * Construct an AxisInfo.
@@ -133,8 +142,18 @@ public class AxisInfo implements Serializable {
     public AxisInfo(final String name, final AxisOrientation orientation) {
         this.name        = name;
         this.orientation = orientation;
+        this.unit        = null;
         Info.ensureNonNull("name",        name);
         Info.ensureNonNull("orientation", orientation);
+    }
+    
+    /**
+     * Construct an AxisInfo.
+     */
+    AxisInfo(final AxisInfo toCopy, final Unit unit) {
+        name        = toCopy.name;
+        orientation = toCopy.orientation;
+        this.unit   = unit;
     }
     
     /**
@@ -190,6 +209,34 @@ public class AxisInfo implements Serializable {
         }
         buffer.append(']');
         return buffer.toString();
+    }
+
+    /** For compatibility with GeoAPI interfaces. */
+    public String getAbbreviation() {
+        return name;
+    }
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public AxisDirection getDirection() {
+        return orientation.direction;
+    }
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public Identifier[] getIdentifiers() {
+        return Info.EMPTY_IDENTIFIERS;
+    }
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public String getRemarks(Locale locale) {
+        return null;
+    }
+    
+    /** For compatibility with GeoAPI interfaces. */
+    public javax.units.Unit getUnit() {
+        if (unit != null) {
+            return unit.toJSR108();
+        }
+        throw new UnsupportedOperationException();
     }
     
     /**

@@ -44,8 +44,8 @@ import org.opengis.cs.CS_GeographicCoordinateSystem;
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.pt.Envelope;
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;

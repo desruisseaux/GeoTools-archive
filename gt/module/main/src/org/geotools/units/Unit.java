@@ -46,6 +46,10 @@ import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.units.Quantities;
 import org.geotools.resources.units.Units;
 
+// JSR-108 to replace this package
+import javax.units.SI;
+import javax.units.NonSI;
+
 
 /**
  * Placeholder for future <code>Unit</code> class. This
@@ -60,6 +64,8 @@ import org.geotools.resources.units.Units;
  * @author Steven R. Emmerson
  * @author Bill Hibbard
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link javax.units.Unit}
  */
 public abstract class Unit implements Serializable {
     /**
@@ -81,49 +87,67 @@ public abstract class Unit implements Serializable {
     /**
      * Convenience constant for base unit of angle.
      * Not a SI unit, but provides here for convenience.
+     *
+     * @deprecated Replaced by {@link SI#RADIAN}.
      */
     public static final Unit RADIAN = get("rad");
     
     /**
      * Convenience constant for unit of angle.
      * Not a SI unit, but provides here for convenience.
+     *
+     * @deprecated Replaced by {@link NonSI#DEGREE_ANGLE}.
      */
     public static final Unit DEGREE = get("\u00b0");
     
     /**
      * Convenience constant for base unit of length.
+     *
+     * @deprecated Replaced by {@link SI#METRE}.
      */
     public static final Unit METRE = get("m");
     
     /**
      * Convenience constant for derived unit of length.
+     *
+     * @deprecated Replaced by <code>SI.KILO({@linkplain SI#METRE})</code>.
      */
     public static final Unit KILOMETRE = METRE.scale(1000);
     
     /**
      * Convenience constant for base unit of time.
+     *
+     * @deprecated Replaced by {@link SI#SECOND}.
      */
     public static final Unit SECOND = get("s");
     
     /**
      * Convenience constant for unit of time.
      * Not a SI unit, but provides here for convenience.
+     *
+     * @deprecated Replaced by <code>SI.MILLI({@linkplain SI#SECOND})</code>.
      */
     public static final Unit MILLISECOND = get("ms");
     
     /**
      * Convenience constant for unit of time.
      * Not a SI unit, but provides here for convenience.
+     *
+     * @deprecated Replaced by {@link NonSI#DAY}.
      */
     public static final Unit DAY = get("d");
     
     /**
      * Convenience constant for base unit of mass.
+     *
+     * @deprecated Replaced by {@link SI#KILOGRAM}.
      */
     public static final Unit KILOGRAM = get("kg");
 
     /**
      * Unit of arc-second. Used by the EPSG database.
+     *
+     * @deprecated Replaced by {@link NonSI#SECOND_ANGLE}.
      */
     public static final Unit ARC_SECOND = DEGREE.scale(1.0/3600);
     
@@ -133,7 +157,7 @@ public abstract class Unit implements Serializable {
      * the concatenation of 12°30'00"). In a strict sence, this
      * is a formatting issue rather than an unit transformation
      * issue. Such transformation would be better handle by the
-     * {@link org.geotools.pt.AngleFormat} class. However, this
+     * {@link org.geotools.measure.AngleFormat} class. However, this
      * "unit" appears really often in the EPSG database, and we
      * need it for interoperability with legacy libraries.
      */
@@ -145,11 +169,27 @@ public abstract class Unit implements Serializable {
      * the concatenation of 12°30'00"). In a strict sence, this
      * is a formatting issue rather than an unit transformation
      * issue. Such transformation would be better handle by the
-     * {@link org.geotools.pt.AngleFormat} class. However, this
+     * {@link org.geotools.measure.AngleFormat} class. However, this
      * "unit" appears really often in the EPSG database, and we
      * need it for interoperability with legacy libraries.
      */
     public static final Unit SEXAGESIMAL_DEGREE = (Unit) new DMSUnit(10000).intern();
+
+    /**
+     * Returns this unit as a <code>javax.units</code> object.
+     */
+    public final javax.units.Unit toJSR108() {
+        if (equals(RADIAN     )) return SI.RADIAN;
+        if (equals(DEGREE     )) return NonSI.DEGREE_ANGLE;
+        if (equals(METRE      )) return SI.METER;
+        if (equals(KILOMETRE  )) return SI.KILO(SI.METER);
+        if (equals(SECOND     )) return SI.SECOND;
+        if (equals(MILLISECOND)) return SI.MILLI(SI.SECOND);
+        if (equals(DAY        )) return NonSI.DAY;
+        if (equals(KILOGRAM   )) return SI.KILO(SI.KILOGRAM);
+        if (equals(ARC_SECOND )) return NonSI.SECOND_ANGLE;
+        throw new UnsupportedOperationException(toString());
+    }
     
     /**
      * Symbole des unités de cet objet <code>Unit</code> (par exemple "kg").

@@ -56,9 +56,9 @@ import java.io.Serializable;
 
 // Geotools dependencies
 import org.geotools.units.Unit; // For Javadoc
-import org.geotools.pt.Latitude;
-import org.geotools.pt.Longitude;
-import org.geotools.pt.AngleFormat;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.AngleFormat;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.LocalCoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;

@@ -74,7 +74,7 @@ import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.pt.AngleFormat; // For Javadoc
+import org.geotools.measure.AngleFormat; // For Javadoc
 
 
 /**

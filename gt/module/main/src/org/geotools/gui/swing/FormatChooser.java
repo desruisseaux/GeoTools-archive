@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -60,10 +47,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Geotools dependencies
-import org.geotools.pt.Angle;
-import org.geotools.pt.AngleFormat;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.CoordinateFormat;
+import org.geotools.measure.Angle;
+import org.geotools.measure.AngleFormat;
+import org.geotools.measure.CoordinateFormat;
+import org.geotools.geometry.DirectPosition;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
@@ -278,10 +265,11 @@ public class FormatChooser extends JPanel {
             return new Angle(39.3); // Could be any random value.
         }
         if (format instanceof CoordinateFormat) {
-            final int dimension = ((CoordinateFormat) format).getCoordinateSystem().getDimension();
-            final CoordinatePoint point = new CoordinatePoint(dimension);
+            final int dimension = ((CoordinateFormat) format)
+                            .getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+            final DirectPosition point = new DirectPosition(dimension);
             for (int i=0; i<dimension; i++) {
-                point.ord[i] = (i&1)==0 ? 39.3 : 27.9; // Could be any random value.
+                point.setOrdinate(i, (i&1)==0 ? 39.3 : 27.9); // Could be any random value.
             }
             return point;
         }
@@ -369,7 +357,7 @@ public class FormatChooser extends JPanel {
         }
         if (format instanceof CoordinateFormat) {
             final CoordinateFormat format = (CoordinateFormat) this.format;
-            for (int i=format.getCoordinateSystem().getDimension(); --i>=0;) {
+            for (int i=format.getCoordinateReferenceSystem().getCoordinateSystem().getDimension(); --i>=0;) {
                 final Format sub = format.getFormat(i);
                 if (sub instanceof AngleFormat) {
                     return ((AngleFormat) sub).toPattern();

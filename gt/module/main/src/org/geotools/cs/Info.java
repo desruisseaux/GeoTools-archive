@@ -35,11 +35,14 @@
  */
 package org.geotools.cs;
 
-// OpenGIS dependencies
+// OpenGIS legacy dependencies
 import org.opengis.cs.CS_Info;
 import org.opengis.cs.CS_Unit;
 import org.opengis.cs.CS_LinearUnit;
 import org.opengis.cs.CS_AngularUnit;
+
+// OpenGIS dependencies (GeoAPI)
+import org.opengis.referencing.Identifier;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
@@ -89,11 +92,16 @@ import java.io.Serializable;
  *
  * @see org.opengis.cs.CS_Info
  */
-public class Info implements Serializable {
+public class Info implements org.opengis.referencing.Info, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -391073894118270236L;
+
+    /**
+     * An empty array of identifiers.
+     */
+    static final Identifier[] EMPTY_IDENTIFIERS = new Identifier[0];
     
     /**
      * Set of weak references to existing coordinate systems.
@@ -556,7 +564,13 @@ public class Info implements Serializable {
         proxy = new WeakReference(opengis);
         return opengis;
     }
-    
+
+    /**
+     * For compatibility with GeoAPI interfaces.
+     */
+    public Identifier[] getIdentifiers() {
+        return EMPTY_IDENTIFIERS;
+    }    
     
     
     

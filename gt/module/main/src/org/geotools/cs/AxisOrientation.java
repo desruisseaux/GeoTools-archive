@@ -44,6 +44,9 @@ import java.io.ObjectStreamException;
 import java.util.NoSuchElementException;
 import javax.media.jai.EnumeratedParameter;
 
+// OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection;
+
 // Geotools dependencies
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -91,7 +94,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Other
      */
-    public static final AxisOrientation OTHER = new AxisOrientation("OTHER", CS_AxisOrientationEnum.CS_AO_Other, ResourceKeys.OTHER);
+    public static final AxisOrientation OTHER = new AxisOrientation("OTHER",
+        CS_AxisOrientationEnum.CS_AO_Other, ResourceKeys.OTHER, AxisDirection.OTHER);
     
     /**
      * Increasing ordinates values go North.
@@ -99,14 +103,16 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_North
      */
-    public static final AxisOrientation NORTH = new AxisOrientation("NORTH", CS_AxisOrientationEnum.CS_AO_North, ResourceKeys.NORTH);
+    public static final AxisOrientation NORTH = new AxisOrientation("NORTH",
+            CS_AxisOrientationEnum.CS_AO_North, ResourceKeys.NORTH, AxisDirection.NORTH);
     
     /**
      * Increasing ordinates values go South.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_South
      */
-    public static final AxisOrientation SOUTH = new AxisOrientation("SOUTH", CS_AxisOrientationEnum.CS_AO_South, ResourceKeys.SOUTH);
+    public static final AxisOrientation SOUTH = new AxisOrientation("SOUTH",
+            CS_AxisOrientationEnum.CS_AO_South, ResourceKeys.SOUTH, AxisDirection.SOUTH);
     
     /**
      * Increasing ordinates values go East.
@@ -114,14 +120,16 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_East
      */
-    public static final AxisOrientation EAST = new AxisOrientation("EAST", CS_AxisOrientationEnum.CS_AO_East, ResourceKeys.EAST);
+    public static final AxisOrientation EAST = new AxisOrientation("EAST",
+            CS_AxisOrientationEnum.CS_AO_East, ResourceKeys.EAST, AxisDirection.EAST);
     
     /**
      * Increasing ordinates values go West.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_West
      */
-    public static final AxisOrientation WEST = new AxisOrientation("WEST", CS_AxisOrientationEnum.CS_AO_West, ResourceKeys.WEST);
+    public static final AxisOrientation WEST = new AxisOrientation("WEST",
+            CS_AxisOrientationEnum.CS_AO_West, ResourceKeys.WEST, AxisDirection.WEST);
     
     /**
      * Increasing ordinates values go up.
@@ -129,7 +137,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Up
      */
-    public static final AxisOrientation UP = new AxisOrientation("UP", CS_AxisOrientationEnum.CS_AO_Up, ResourceKeys.UP);
+    public static final AxisOrientation UP = new AxisOrientation("UP",
+            CS_AxisOrientationEnum.CS_AO_Up, ResourceKeys.UP, AxisDirection.UP);
     
     /**
      * Increasing ordinates values go down.
@@ -137,19 +146,22 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Down
      */
-    public static final AxisOrientation DOWN = new AxisOrientation("DOWN", CS_AxisOrientationEnum.CS_AO_Down, ResourceKeys.DOWN);
+    public static final AxisOrientation DOWN = new AxisOrientation("DOWN",
+            CS_AxisOrientationEnum.CS_AO_Down, ResourceKeys.DOWN, AxisDirection.DOWN);
     
     /**
      * Increasing time go toward future.
      * This is used for temporal axis.
      */
-    public static final AxisOrientation FUTURE = new AxisOrientation("FUTURE", 7, ResourceKeys.FUTURE);
+    public static final AxisOrientation FUTURE = new AxisOrientation("FUTURE",
+            7, ResourceKeys.FUTURE, AxisDirection.FUTURE);
     
     /**
      * Increasing time go toward past.
      * This is used for temporal axis.
      */
-    public static final AxisOrientation PAST = new AxisOrientation("PAST", 8, ResourceKeys.PAST);
+    public static final AxisOrientation PAST = new AxisOrientation("PAST",
+            8, ResourceKeys.PAST, AxisDirection.PAST);
     
     /**
      * The last paired value. Paired values are NORTH-SOUTH, EAST-WEST,
@@ -174,6 +186,12 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * The axis order. Used for {@link #compareTo} implementation.
      */
     private static final AxisOrientation[] ORDER = {EAST, NORTH, UP, FUTURE};
+
+    /**
+     * The direction according new (GeoAPI) constants, or <code>null</code> if unknow.
+     * This field is provided for interoperability with new GeoAPI interfaces.
+     */
+    public final AxisDirection direction;
     
     /**
      * Resource key, used for building localized name. This key doesn't need to
@@ -187,9 +205,10 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
     /**
      * Constructs a new enum with the specified value.
      */
-    private AxisOrientation(final String name, final int value, final int key) {
+    private AxisOrientation(final String name, final int value, final int key, final AxisDirection direction) {
         super(name, value);
-        this.key = key;
+        this.key       = key;
+        this.direction = direction;
     }
     
     /**
