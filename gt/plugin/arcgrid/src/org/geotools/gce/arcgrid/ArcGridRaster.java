@@ -391,7 +391,7 @@ public class ArcGridRaster {
                 }
 
                 // set the value at x,y in band 0 to the parsed value
-                raster.setSample(x, y, 0, d);
+                raster.setSample(x, y, 0,(float) d);
             }
         }
 
