@@ -916,7 +916,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         || (colType == Float.class)
                         || (colType == Number.class)) {
                     int l = Math.min(fieldLen, 33);
-                    header.addColumn(colName, 'N', l, l / 2);
+                    int d = Math.max(l - 2, 0);
+                    header.addColumn(colName, 'N', l, d);
                 } else if (java.util.Date.class.isAssignableFrom(colType)) {
                     header.addColumn(colName, 'D', fieldLen, 0);
                 } else if (colType == Boolean.class) {
