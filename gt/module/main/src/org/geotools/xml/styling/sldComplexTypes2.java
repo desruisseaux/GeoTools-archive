@@ -19,6 +19,8 @@ package org.geotools.xml.styling;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -34,6 +36,7 @@ import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
 import org.geotools.styling.LabelPlacement;
+import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.NamedLayer;
@@ -212,8 +215,7 @@ public class sldComplexTypes2 {
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+        	return _Graphic.getInstance().getInstanceType();
         }
         
         
@@ -258,8 +260,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+            return _Graphic.getInstance().getValue(element,value,attrs1,hints);
         }
     }
 
@@ -291,8 +292,7 @@ public class sldComplexTypes2 {
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return LinePlacement.class;
         }
         
         
@@ -335,10 +335,20 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
+
+        	Expression offset = null;
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] == null) || value[i].getElement() == null) {
+                    continue;
+                }
+                Element e = value[i].getElement();
+                if(elems[PERPENDICULAROFFSET].getName().equals(e.getName()))
+                	offset = (Expression)value[i].getValue();
+            }
+        	
+        	LinePlacement dlp = StyleFactory.createStyleFactory().createLinePlacement(offset);
+        	return dlp;
         }
     }
 
@@ -415,8 +425,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
             LineSymbolizer symbol = StyleFactory.createStyleFactory().getDefaultLineSymbolizer();
             // symbol.setGraphic(null);
     
@@ -516,8 +525,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
             Mark symbol = StyleFactory.createStyleFactory().getDefaultMark();
     
             for (int i = 0; i < value.length; i++) {
@@ -620,8 +628,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
                 NamedLayer sld = new NamedLayer();
             
                 for (int i = 0; i < value.length; i++) {
@@ -723,8 +730,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
                 NamedStyle sld = new NamedStyle();
             
                 for (int i = 0; i < value.length; i++) {
@@ -838,8 +844,7 @@ public class sldComplexTypes2 {
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return URL.class;
         }
         
         
@@ -883,9 +888,18 @@ public class sldComplexTypes2 {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
-            return super.getValue(element, value, attrs1, hints);
-            // TODO fill me in
+                throws SAXException {
+        	String href = attrs1.getValue("",attrs[0].getName());
+        	if(href == null || "".equals(href)){
+        		href = attrs1.getValue(attrs[0].getNamespace().toString(),attrs[0].getName());
+        	}
+            try {
+				return new URL(href);
+			} catch (MalformedURLException e) {
+				SAXException ee = new SAXException(e.getMessage());
+				ee.initCause(e);
+				throw ee;
+			}
         }
     }
 
@@ -2354,8 +2368,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
     
             for (int i = 0; i < value.length; i++) {
                 if ((value[i] == null) || value[i].getElement() == null) {
@@ -2450,8 +2463,7 @@ public class sldComplexTypes2 {
          * @return
          * @throws OperationNotSupportedException
          */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
-                throws OperationNotSupportedException, SAXException {
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
             org.geotools.styling.SelectedChannelType symbol = new org.geotools.styling.SelectedChannelTypeImpl();
     
             for (int i = 0; i < value.length; i++) {
@@ -2493,8 +2505,7 @@ public class sldComplexTypes2 {
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return Symbolizer.class;
         }
         
         
@@ -2508,8 +2519,8 @@ public class sldComplexTypes2 {
          * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
+            // abstract type ...
             return super.canEncode(element, value, hints);
-            // TODO fill me in
         }
         /**
          *  encode ...
@@ -2523,8 +2534,8 @@ public class sldComplexTypes2 {
          */
         public void encode( Element element, Object value, PrintHandler output, Map hints )
                 throws OperationNotSupportedException {
+            // abstract type ...
             super.encode(element, value, output, hints);
-            // TODO fill me in
         }
         /**
          *  getValue ...
