@@ -16,23 +16,14 @@
  */
 package org.geotools.data.postgis;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -59,6 +50,7 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -68,15 +60,23 @@ import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Postgis DataStore implementation.
@@ -86,7 +86,8 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    private static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.data.postgis");
 
     /** The invisible column to use as the fid if no primary key is set */
 
@@ -145,43 +146,38 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected final boolean useGeos;
     public final int OPTIMIZE_MODE;
 
-    protected PostgisDataStore(ConnectionPool connPool) throws IOException {
+    protected PostgisDataStore(ConnectionPool connPool)
+        throws IOException {
         this(connPool, (String) null);
     }
 
-    protected PostgisDataStore(ConnectionPool connPool, String namespace) throws IOException {
+    protected PostgisDataStore(ConnectionPool connPool, String namespace)
+        throws IOException {
         this(connPool, null, namespace);
     }
 
-    protected PostgisDataStore(ConnectionPool connPool, String schema, String namespace)
-        throws IOException {
-        this(
-            connPool,
-            new JDBCDataStoreConfig(namespace, schema, new HashMap(), new HashMap()),
-            OPTIMIZE_SQL);
+    protected PostgisDataStore(ConnectionPool connPool, String schema,
+        String namespace) throws IOException {
+        this(connPool,
+            new JDBCDataStoreConfig(namespace, schema, new HashMap(),
+                new HashMap()), OPTIMIZE_SQL);
     }
 
-    protected PostgisDataStore(
-        ConnectionPool connPool,
-        String schema,
-        String namespace,
-        int optimizeMode)
-        throws IOException {
-        this(
-            connPool,
-            new JDBCDataStoreConfig(namespace, schema, new HashMap(), new HashMap()),
-            OPTIMIZE_SQL);
+    protected PostgisDataStore(ConnectionPool connPool, String schema,
+        String namespace, int optimizeMode) throws IOException {
+        this(connPool,
+            new JDBCDataStoreConfig(namespace, schema, new HashMap(),
+                new HashMap()), OPTIMIZE_SQL);
     }
 
-    public PostgisDataStore(
-        ConnectionPool connectionPool,
-        JDBCDataStoreConfig config,
-        int optimizeMode)
-        throws IOException {
+    public PostgisDataStore(ConnectionPool connectionPool,
+        JDBCDataStoreConfig config, int optimizeMode) throws IOException {
         super(connectionPool, config);
 
         useGeos = getUseGeos();
         OPTIMIZE_MODE = optimizeMode;
+        // use the specific postgis fid mapper factory
+        setFIDMapperFactory(new PostgisFIDMapperFactory());
     }
 
     /**
@@ -236,7 +232,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             DatabaseMetaData meta = conn.getMetaData();
             String[] tableType = { "TABLE" };
-            ResultSet tables = meta.getTables(null, config.getDatabaseSchemaName(), "%", tableType);
+            ResultSet tables = meta.getTables(null,
+                    config.getDatabaseSchemaName(), "%", tableType);
 
             while (tables.next()) {
                 String tableName = tables.getString(TABLE_NAME_COL);
@@ -251,8 +248,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
             conn = null;
 
-            String message =
-                "Error querying database for list of tables:" + sqlException.getMessage();
+            String message = "Error querying database for list of tables:"
+                + sqlException.getMessage();
             throw new DataSourceException(message, sqlException);
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
@@ -290,10 +287,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(
-        final FeatureType requestType,
-        final Filter filter,
-        final Transaction transaction)
+    public FeatureReader getFeatureReader(final FeatureType requestType,
+        final Filter filter, final Transaction transaction)
         throws IOException {
         String typeName = requestType.getTypeName();
         FeatureType schemaType = getSchema(typeName);
@@ -310,8 +305,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             // featureType is a proper subset and will require reTyping
             //
             String[] names = attributeNames(requestType, filter);
-            query =
-                new DefaultQuery(typeName, filter, Query.DEFAULT_MAX, names, "getFeatureReader");
+            query = new DefaultQuery(typeName, filter, Query.DEFAULT_MAX,
+                    names, "getFeatureReader");
         } else {
             // featureType is not compatiable
             //
@@ -330,7 +325,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         return reader;
     }
-
 
     /**
      * DOCUMENT ME!
@@ -353,7 +347,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @throws IOException If we can't get the schema.
      */
-    protected String[] attributeNames(FeatureType featureType, Filter filter) throws IOException {
+    protected String[] attributeNames(FeatureType featureType, Filter filter)
+        throws IOException {
         String typeName = featureType.getTypeName();
         FeatureType origional = getSchema(typeName);
         SQLBuilder sqlBuilder = getSqlBuilder(typeName);
@@ -364,8 +359,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
 
         String[] typeAttributes = DataUtilities.attributeNames(featureType);
-        String[] filterAttributes =
-            DataUtilities.attributeNames(sqlBuilder.getPostQueryFilter(filter));
+        String[] filterAttributes = DataUtilities.attributeNames(sqlBuilder
+                .getPostQueryFilter(filter));
 
         if ((filterAttributes == null) || (filterAttributes.length == 0)) {
             // no filter attributes required
@@ -399,7 +394,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         // HACK: geos should be integrated with the sql encoder, not a 
         // seperate class.
-        SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos() : new SQLEncoderPostgis();
+        SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos()
+                                            : new SQLEncoderPostgis();
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
 
         if (info.getSchema().getDefaultGeometry() != null) {
@@ -424,17 +420,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
      */
-    protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
+    protected int determineSRID(String tableName, String geometryColumnName)
+        throws IOException {
         Connection dbConnection = null;
 
         try {
-            String sqlStatement =
-                "SELECT srid FROM GEOMETRY_COLUMNS WHERE "
-                    + "f_table_name='"
-                    + tableName
-                    + "' AND f_geometry_column='"
-                    + geometryColumnName
-                    + "';";
+            String sqlStatement = "SELECT srid FROM GEOMETRY_COLUMNS WHERE "
+                + "f_table_name='" + tableName + "' AND f_geometry_column='"
+                + geometryColumnName + "';";
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
 
             Statement statement = dbConnection.createStatement();
@@ -446,11 +439,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 return retSrid;
             } else {
-                String mesg =
-                    "No geometry column row for srid in table: "
-                        + tableName
-                        + ", geometry column "
-                        + geometryColumnName;
+                String mesg = "No geometry column row for srid in table: "
+                    + tableName + ", geometry column " + geometryColumnName;
                 throw new DataSourceException(mesg);
             }
         } catch (SQLException sqle) {
@@ -544,7 +534,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @throws IOException If an error occurs processing the ResultSet.
      */
-    protected AttributeType buildAttributeType(ResultSet metadataRs) throws IOException {
+    protected AttributeType buildAttributeType(ResultSet metadataRs)
+        throws IOException {
         try {
             final int TABLE_NAME = 3;
             final int COLUMN_NAME = 4;
@@ -579,19 +570,16 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @task This should probably take a Transaction, so if things mess up then
      *       we can rollback.
      */
-    AttributeType getGeometryAttribute(String tableName, String columnName) throws IOException {
+    AttributeType getGeometryAttribute(String tableName, String columnName)
+        throws IOException {
         Connection dbConnection = null;
 
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
 
-            String sqlStatement =
-                "SELECT type FROM GEOMETRY_COLUMNS WHERE "
-                    + "f_table_name='"
-                    + tableName
-                    + "' AND f_geometry_column='"
-                    + columnName
-                    + "';";
+            String sqlStatement = "SELECT type FROM GEOMETRY_COLUMNS WHERE "
+                + "f_table_name='" + tableName + "' AND f_geometry_column='"
+                + columnName + "';";
             LOGGER.fine("geometry sql statement is " + sqlStatement);
 
             String geometryType = null;
@@ -606,15 +594,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             }
 
             if (geometryType == null) {
-                String msg =
-                    " no geometry found in the GEOMETRY_COLUMNS table "
-                        + " for "
-                        + tableName
-                        + " of the postgis install.  A row "
-                        + "for "
-                        + columnName
-                        + " is required  "
-                        + " for geotools to work correctly";
+                String msg = " no geometry found in the GEOMETRY_COLUMNS table "
+                    + " for " + tableName + " of the postgis install.  A row "
+                    + "for " + columnName + " is required  "
+                    + " for geotools to work correctly";
                 throw new DataSourceException(msg);
             }
 
@@ -624,7 +607,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             return AttributeTypeFactory.newAttributeType(columnName, type);
         } catch (SQLException sqe) {
-            throw new IOException("An SQL exception occurred: " + sqe.getMessage());
+            throw new IOException("An SQL exception occurred: "
+                + sqe.getMessage());
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
@@ -648,18 +632,22 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 con.setAutoCommit(false);
                 st = con.createStatement();
 
-                StringBuffer statementSQL = new StringBuffer("CREATE TABLE " + tableName + " (");
+                StringBuffer statementSQL = new StringBuffer("CREATE TABLE "
+                        + tableName + " (");
 
                 if (!fidMapper.returnFIDColumnsAsAttributes()) {
                     for (int i = 0; i < fidMapper.getColumnCount(); i++) {
                         int val = fidMapper.getColumnType(i);
-                        String typeName = getSQLTypeName(fidMapper.getColumnType(i));
+                        String typeName = getSQLTypeName(fidMapper
+                                .getColumnType(i));
 
                         if (typeName.equals("VARCHAR")) {
-                            typeName = typeName + "(" + fidMapper.getColumnSize(i) + ")";
+                            typeName = typeName + "("
+                                + fidMapper.getColumnSize(i) + ")";
                         }
 
-                        statementSQL.append(fidMapper.getColumnName(i) + " " + typeName + ",");
+                        statementSQL.append(fidMapper.getColumnName(i) + " "
+                            + typeName + ",");
                     }
                 }
 
@@ -678,9 +666,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 for (int i = 0; i < attributeType.length; i++) {
                     if (attributeType[i].isGeometry()) {
-                        GeometryAttributeType geomAttribute =
-                            (GeometryAttributeType) attributeType[i];
-                        CoordinateReferenceSystem refSys = geomAttribute.getCoordinateSystem();
+                        GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
+                        CoordinateReferenceSystem refSys = geomAttribute
+                            .getCoordinateSystem();
                         int SRID = -1;
 
                         if (refSys != null) {
@@ -696,25 +684,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                         String dbName = rs.getString(1);
                         rs.close();
 
-                        statementSQL =
-                            new StringBuffer(
-                                "INSERT INTO GEOMETRY_COLUMNS VALUES ("
-                                    + "'',"
-                                    + "'"
-                                    + dbName
-                                    + "',"
-                                    + "'"
-                                    + tableName
-                                    + "',"
-                                    + "'"
-                                    + attributeType[i].getName()
-                                    + "',"
-                                    + "2,"
-                                    + SRID
-                                    + ","
-                                    + "'"
-                                    + CLASS_MAPPINGS.get(geomAttribute.getType()).toString()
-                                    + "')");
+                        statementSQL = new StringBuffer(
+                                "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
+                                + "'" + dbName + "'," + "'" + tableName + "',"
+                                + "'" + attributeType[i].getName() + "',"
+                                + "2," + SRID + "," + "'"
+                                + CLASS_MAPPINGS.get(geomAttribute.getType())
+                                                .toString() + "')");
                         System.out.println(statementSQL);
                         st.execute(statementSQL.toString());
                     }
@@ -828,32 +804,34 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         Class typeClass = (Class) TYPE_MAPPINGS.get(new Integer(typeCode));
 
         if (typeClass == null) {
-            throw new RuntimeException("Uknown type " + typeCode + " please update TYPE_MAPPINGS");
+            throw new RuntimeException("Uknown type " + typeCode
+                + " please update TYPE_MAPPINGS");
         }
 
         String typeName = (String) CLASS_MAPPINGS.get(typeClass);
 
         if (typeName == null) {
-            throw new RuntimeException(
-                "Uknown type name for class "
-                    + typeClass.getName()
-                    + " please update CLASS_MAPPINGS");
+            throw new RuntimeException("Uknown type name for class "
+                + typeClass.getName() + " please update CLASS_MAPPINGS");
         }
 
         return typeName;
     }
 
-    private StringBuffer makeSqlCreate(AttributeType[] attributeType) throws IOException {
+    private StringBuffer makeSqlCreate(AttributeType[] attributeType)
+        throws IOException {
         StringBuffer buf = new StringBuffer("");
 
         for (int i = 0; i < attributeType.length; i++) {
             String typeName = null;
 
-            if ((typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getType())) != null) {
+            if ((typeName = (String) CLASS_MAPPINGS.get(
+                            attributeType[i].getType())) != null) {
                 if (attributeType[i].isGeometry()) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
-                    typeName = typeName + "(" + attributeType[i].getFieldLength() + ")";
+                    typeName = typeName + "("
+                        + attributeType[i].getFieldLength() + ")";
                 }
 
                 if (!attributeType[i].isNillable()) {
@@ -881,7 +859,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
      */
-    private boolean tablePresent(String table, Connection con) throws IOException {
+    private boolean tablePresent(String table, Connection con)
+        throws IOException {
         final int TABLE_NAME_COL = 3;
         Connection conn = null;
         List list = new ArrayList();
@@ -891,14 +870,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             DatabaseMetaData meta = conn.getMetaData();
             String[] tableType = { "TABLE" };
-            ResultSet tables = meta.getTables(null, config.getDatabaseSchemaName(), "%", tableType);
+            ResultSet tables = meta.getTables(null,
+                    config.getDatabaseSchemaName(), "%", tableType);
 
             while (tables.next()) {
                 String tableName = tables.getString(TABLE_NAME_COL);
 
-                if (allowTable(tableName)
-                    && (tableName != null)
-                    && (tableName.equalsIgnoreCase(table))) {
+                if (allowTable(tableName) && (tableName != null)
+                        && (tableName.equalsIgnoreCase(table))) {
                     return (true);
                 }
             }
@@ -908,8 +887,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
             conn = null;
 
-            String message =
-                "Error querying database for list of tables:" + sqlException.getMessage();
+            String message = "Error querying database for list of tables:"
+                + sqlException.getMessage();
             throw new DataSourceException(message, sqlException);
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
@@ -960,7 +939,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String, org.geotools.feature.FeatureType)
      */
-    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
+    public void updateSchema(String typeName, FeatureType featureType)
+        throws IOException {
         // TODO Auto-generated method stub
     }
 
@@ -973,7 +953,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
+    public FeatureSource getFeatureSource(String typeName)
+        throws IOException {
         LOGGER.fine("get Feature source called on " + typeName);
 
         if (OPTIMIZE_MODE == OPTIMIZE_SQL) {
@@ -1002,17 +983,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * DOCUMENT ME!
      *
      * @param fReader
-     * @param writer
      * @param queryData
      *
      * @return
      *
      * @throws IOException DOCUMENT ME!
      */
-    protected JDBCFeatureWriter createFeatureWriter(
-        FeatureReader fReader,
-        QueryData queryData)
-        throws IOException {
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
+        QueryData queryData) throws IOException {
         return new PostgisFeatureWriter(fReader, queryData);
     }
 
@@ -1049,8 +1027,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName,
+        Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.NONE, transaction);
     }
 
@@ -1087,9 +1065,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
-        throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL, transaction);
+    public FeatureWriter getFeatureWriterAppend(String typeName,
+        Transaction transaction) throws IOException {
+        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL,
+                transaction);
 
         while (writer.hasNext()) {
             writer.next(); // this would be a use for skip then :-)
@@ -1105,7 +1084,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeType type,
+        QueryData queryData) {
         return new WKTAttributeIO();
     }
 
