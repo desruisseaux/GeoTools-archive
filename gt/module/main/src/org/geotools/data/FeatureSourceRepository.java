@@ -52,7 +52,7 @@ public class FeatureSourceRepository implements Repository {
     /**
      * All FeatureTypes by dataStoreId:typeName 
      */
-	public SortedMap getTypes() {
+	public SortedMap getFeatureSources() {
 		return Collections.unmodifiableSortedMap( featuresources );
 	}
     /**

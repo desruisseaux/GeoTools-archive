@@ -41,9 +41,9 @@ import java.util.TreeMap;
 public interface Repository {
 	
     /**
-     * All FeatureTypes by dataStoreId:typeName 
+     * All FeatureSources by typeRef ( aka dataStoreId:typeName) 
      */
-    public SortedMap getTypes();
+    public SortedMap getFeatureSources();
     
     /**
      * Retrieve Set of Namespaces prefixes registered by DataStores in this

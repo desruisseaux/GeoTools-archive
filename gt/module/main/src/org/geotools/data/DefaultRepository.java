@@ -94,7 +94,7 @@ public class DefaultRepository implements Repository {
     /* (non-Javadoc)
 	 * @see org.geotools.data.Repository#getTypes()
 	 */
-	public SortedMap getTypes() {
+	public SortedMap getFeatureSources() {
 	    SortedMap map = new TreeMap();
     	for( Iterator i=datastores.entrySet().iterator(); i.hasNext();){
     		Map.Entry entry = (Map.Entry) i.next();
