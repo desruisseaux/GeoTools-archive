@@ -40,11 +40,11 @@ import java.util.List;
  */
 ///@UML (identifier="CG_Catalog")
 public interface Discovery {
+    
     /**
-     * Searches through the catalog and finds the {@linkplain CatalogEntry catalog entries}
-     * that match the query.
+     * Searches through the catalog and finds the entries that that match the query.
      * 
-     * @param  query A {@linkplain QueryDefinition query definition} used to select
+     * @param  query A {@linkplain QueryRequest query definition} used to select
      *         {@linkplain CatalogEntry catalog entries}.
      * @return {@linkplain QueryResult Query result} containing all matching
      *         {@linkplain CatalogEntry catalog entries}.
@@ -53,16 +53,19 @@ public interface Discovery {
      *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
      *      Catalog Services </A> Specification
      */
-    List query(QueryDefinition query); // really a List<CatalogEntry> 
+    List search(QueryRequest query); // really a List<CatalogEntry> 
 
     /**
-     * Creates an iterator that traverses through catalog.
+     * Entire contens of catalog.
+     * <p>
+     * Shortcut for query( QueryDefinition.ALL )
+     * <M/p>
      *
-     * @return An iterator which can be used to traverse the catalog.
+     * @return Traverse the entire catalog.
      *
      * @UML inferred from section 3.1.1.1.2 <i>Other Functions on Catalog </i> in the
      *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
      *      Catalog Services </A> Specification
      */
-    //Iterator/*<CatalogEntry>*/ iterator();
+    List entries();
 }

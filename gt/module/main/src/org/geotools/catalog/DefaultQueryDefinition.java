@@ -48,7 +48,7 @@ public class DefaultQueryDefinition implements QueryDefinition {
         for (Iterator iter = entry.iterator(); iter.hasNext();) {
             MetadataEntity element = (MetadataEntity) iter.next();
             try {
-                if (query.accepts(element)) {
+                if (query.match(element)) {
                     return true;
                 }
             } catch (IOException ie) {

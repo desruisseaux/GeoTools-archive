@@ -45,12 +45,28 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class QueryRequest {
 	Expr expr;
-	public QueryRequest( Expr expr ){
+    public static QueryRequest ALL = new QueryRequest( null ) {
+        public boolean accepts( MetadataEntity meta ) {
+            return true;
+        }
+    };
+    public QueryRequest( Expr expr ){
 		this.expr = expr;
 	}	
-	public boolean accepts( MetadataEntity meta ) throws IOException{
-		Expr query = expr.resolve( meta );
-		Filter filter = query.filter( fakeFeatureType );
+    public boolean match( Object bean ) throws IOException{
+        if( bean instanceof MetadataEntity ) {
+            return matchMetadata( (MetadataEntity) bean );
+        }        
+        else {
+            return matchBean( bean );
+        }        
+    }
+    protected boolean matchBean( Object bean ) throws IOException{
+        return false; // need Jese to implement XPATH bean lookup
+    }
+    protected boolean matchMetadata( MetadataEntity meta ) throws IOException{
+        Expr query = expr.resolve( meta );
+        Filter filter = query.filter( fakeFeatureType );
 		return filter.contains( fakeFeature );
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
