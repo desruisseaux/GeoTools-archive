@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-image</name>
+  <id>image</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>Imagedatasource module</shortDescription>
+  <description>Imagedatasource module</description>
+  <developers>
+    <developer>
+      <name>Ian Turton</name>
+      <id>iant</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>units</id>
+      <version>0.01</version>
+      <url>http://jsr-108.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>        
+  </dependencies>
+  
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/test-data/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>  
+</project>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-gml</name>
+  <id>gml</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>gml module</shortDescription>
+  <description>Used extract features from a GML file. The GML parser was 
+  developed by Refractions Research and conforms to gml 2.x. The spec is 
+  availiable at the ogc website.</description>
+  <developers>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+ 
+    <dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+      <url>http://logging.apache.org/log4j/docs/</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+       <resources>
+          <resource>
+              <directory>${basedir}/test</directory>
+              <includes>
+                  <include>**/*.properties</include>
+              </includes>
+          </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

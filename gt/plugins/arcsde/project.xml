@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-arcsde</name>
+  <id>arcsde</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>arcsde datasource module</shortDescription>
+  <description>arcsde datasource module</description>
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@users.sourceforge.net</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Dillard</name>
+      <id>csdillard</id>
+      <email>cdillard@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jake Fear</name>
+      <id>jfear</id>
+      <email>jfear@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <artifactId>jsde_sdk</artifactId>
+      <groupId>arcsde</groupId>
+      <version>8.3</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <!-- This section excludes the tests, comment out if your
+                 testData/testparams.properties are set correctly -->
+      <excludes>
+        <exclude>**/ArcSDEDataStoreTest.java</exclude>
+        <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
+        <exclude>**/FilterTest.java</exclude>
+      </excludes>
+      <!-- End exclude tests -->
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/*.properties</include>
+            <include>**/*.wkt</include>
+            <include>**/*.xml</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

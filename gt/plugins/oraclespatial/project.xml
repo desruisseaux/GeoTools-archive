@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-oraclespatial</name>
+  <id>oracle-spatial</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>Oracle Spatial Module</shortDescription>
+  <description>Oracle Spatial Module</description>
+  <developers>
+    <developer>
+      <name>Sean Geoghegan</name>
+      <id>seangeo</id>
+      <email>sean.geoghegan@dsto.defence.gov.au</email>
+      <organization>Defence Science and Technology
+      Organisation</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simon Rass</name>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+    <dependency>
+      <artifactId>shapefile</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <!-- Use this when you dont have classes12 and sdoapi -->
+    <dependency>
+      <artifactId>dummy_spatial</artifactId>
+      <groupId>oracle</groupId>
+      <version>8.1.8</version>
+    </dependency>
+    <!-- End -->
+    <!-- Commented out so we can build using the dummy_spatial jar 
+        <dependency>
+          <artifactId>sdoapi</artifactId>
+          <groupId>oracle</groupId>
+          <version>8.1.7</version>
+        </dependency>
+        <dependency>
+          <artifactId>classes</artifactId>
+          <groupId>oracle</groupId>
+          <version>12</version>
+        </dependency>-->
+    <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency> 
+  </dependencies>
+  <build>
+    <unitTest>
+      <!-- This section excludes the tests -->
+      <excludes>
+        <exclude>**/*Test.java</exclude>
+        <exclude>**/QuickOracleTest.java</exclude>
+      </excludes>
+      <!--  End exclude tests -->
+      <!-- This section includes the tests.
+                 Uncomment to run tests.         
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+             End test includes -->
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>testData/</include>
+            <include>**/test-date/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

@@ -1,0 +1,231 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.data.vpf;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.AbstractSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
+import org.geotools.data.vpf.file.VPFFile;
+import org.geotools.data.vpf.file.VPFFileFactory;
+import org.geotools.data.vpf.ifc.FileConstants;
+import org.geotools.data.vpf.ifc.VPFCoverageIfc;
+import org.geotools.feature.Feature;
+import org.geotools.feature.SchemaException;
+
+/**
+ * A VPF coverage. This class constructs and contains both feature
+ * classes and feature types. 
+ * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
+ *
+ */
+public class VPFCoverage implements FileConstants, VPFCoverageIfc {
+    /**
+     * The description attribute of the coverage
+     */
+    private final String description;
+
+    /** List of feature classes part of this coverage */
+    private final List featureClasses = new Vector();
+
+    /** List of feature types part of this coverage */
+    private final List featureTypes = new Vector(25);
+
+    /** The owning library */
+    private final VPFLibrary library;
+    /** Path name for the directory containing this coverage */
+    private final String pathName;
+    /**
+     * The topology level (0-3)
+     */
+    private final int topologyLevel;
+
+    /**
+     * Constructor
+     *
+     * @param cModule the owning module (needed for navigability to tiles)
+     * @param cDirectoryName path to directory containing coverage
+     * @param cTopologyLevel the topology level (0-3)
+     *
+     * @throws IOException if the directory does not contain a valid FCS file
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    public VPFCoverage(VPFLibrary cLibrary, Feature feature, String cDirectoryName)
+        throws IOException, SchemaException {
+    	topologyLevel = Short.parseShort(feature.getAttribute(FIELD_LEVEL).toString());
+        library = cLibrary;
+        description = feature.getAttribute(VPFCoverageIfc.FIELD_DESCRIPTION).toString();
+        pathName = cDirectoryName.concat(File.separator).concat(feature.getAttribute(FIELD_COVERAGE_NAME).toString());
+        discoverFeatureClasses();
+        discoverFeatureTypes();
+    }
+
+    /**
+     * Builds feature classes for the coverage
+     *
+     * @throws SQLException
+     */
+    private void discoverFeatureClasses() throws IOException, SchemaException{
+        VPFFeatureClass featureClass = null;
+        boolean hasFeatureClass;
+        String fcsFileName = pathName + File.separator + TABLE_FCS;
+        AbstractSet featureClassNames = new HashSet();
+        String featureClassName;
+
+        // We need to record all of the possible files 
+        // for each of the feature classes in this coverage
+        VPFFile file =  VPFFileFactory.getInstance().getFile(fcsFileName);
+
+        // We might want to grab the FCS list and pass it to the feature class
+        // constructor just to save time.
+        Iterator iter = file.readAllRows().iterator();
+
+        while (iter.hasNext()) {
+            Feature row = (Feature) iter.next();
+            featureClassName = row.getAttribute("feature_class").toString().trim();
+            featureClass = new VPFFeatureClass(this, featureClassName,
+                    pathName);
+            featureClasses.add(featureClass);
+        }
+    }
+
+    /**
+     * Builds feature types for each feature class
+     */
+    private void discoverFeatureTypes() {
+        try {
+            Iterator charVDTIter = getCharVDT().readAllRows().iterator();
+
+            while (charVDTIter.hasNext()) {
+                // Figure out which featureClass owns it
+                Feature row = (Feature) charVDTIter.next();
+                if(!row.getAttribute("attribute").toString().trim().toLowerCase().equals("f_code")){
+                	continue;
+                }
+                String tableFileName = row.getAttribute("table").toString().trim();
+
+                // We need to go through all of this
+                // so that entries match what is in FCS
+                String featureClassName = tableFileName.substring(0, tableFileName.indexOf("."));
+                Iterator featureClassIter = featureClasses.iterator();
+
+                while (featureClassIter.hasNext()) {
+                    VPFFeatureClass featureClass = (VPFFeatureClass) featureClassIter.next();
+
+                    if (featureClassName.equals(featureClass.getTypeName())) {
+                        VPFFeatureType featureType = new VPFFeatureType(featureClass, row);
+                        featureTypes.add(featureType);
+
+                        break;
+                    }
+                }
+            }
+        } catch (IOException exc) {
+            // If there is no char.vdt, 
+            // we can assume there is only one feature type and only one feature class
+            VPFFeatureClass coverageClass = (VPFFeatureClass) featureClasses
+                .get(0);
+            VPFFeatureType featureType = new VPFFeatureType(coverageClass);
+            featureTypes.add(featureType);
+        }
+    }
+
+    /**
+     * Look for a char.vdt
+     *
+     * @return a TableInputStream for the char.vdt for this coverage
+     *
+     * @throws IOException on any IO problems, particularly not being able to find the char.vdt file
+     */
+    private VPFFile getCharVDT() throws IOException {
+        VPFFile charvdtInputStream = null;
+        String charvdtFileName = pathName + File.separator
+            + CHARACTER_VALUE_DESCRIPTION_TABLE;
+        charvdtInputStream = VPFFileFactory.getInstance()
+                                           .getFile(charvdtFileName);
+
+        return charvdtInputStream;
+    }
+
+    /**
+     * Returns the feature classes in the coverage
+     *
+     * @return the feature classes in the coverage
+     */
+    public List getFeatureClasses() {
+        return featureClasses;
+    }
+
+    /**
+     * Returns the feature types for this coverage
+     *
+     * @return a <code>List</code> of the feature types
+     */
+    public List getFeatureTypes() {
+        return featureTypes;
+    }
+
+    /**
+     * Returns the owning Module (When refactored this will be the
+     * VPFDataSource))
+     *
+     * @return the owning Module
+     */
+    public VPFLibrary getLibrary() {
+        return library;
+    }
+
+    /**
+     * Returns the coverage name
+     *
+     * @return the coverage name
+     */
+    public String getName() {
+        String result = pathName.substring(pathName.lastIndexOf(
+                    File.separator) + 1);
+
+        return result;
+    }
+
+    /**
+     * Returns the name of the path of the directory containing the coverage
+     *
+     * @return the path of the directory containing the coverage
+     */
+    public String getPathName() {
+        return pathName;
+    }
+	/**
+	 * @return Returns the topologyLevel.
+	 */
+	public int getTopologyLevel() {
+		return topologyLevel;
+	}
+    /*
+     *  (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return "VPF Coverage " + getName() + ". " + description + "\n" + 
+               "Topology level " + topologyLevel;
+    }
+}

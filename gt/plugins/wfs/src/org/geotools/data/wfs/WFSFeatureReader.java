@@ -1,0 +1,89 @@
+
+package org.geotools.data.wfs;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.HashMap;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.gml.FCBuffer;
+import org.geotools.xml.gml.GMLComplexTypes;
+import org.xml.sax.SAXException;
+
+/**
+ * <p> 
+ * DOCUMENT ME!
+ * </p>
+ * @author dzwiers
+ *
+ */
+public class WFSFeatureReader extends FCBuffer {
+    
+    private InputStream is = null;
+    private WFSFeatureReader(InputStream is, int capacity, int timeout){
+        //document may be null
+        super(null,capacity,timeout);
+        this.is = is;
+    }
+    
+    public static FeatureReader getFeatureReader(URI document, int capacity, int timeout) throws SAXException {
+        HttpURLConnection hc;
+        try {
+            hc = (HttpURLConnection)document.toURL().openConnection();
+            WFSFeatureReader fc = new WFSFeatureReader(hc.getInputStream(), capacity, timeout);
+        	fc.start(); // calls run
+
+            if(fc.exception != null)
+                throw fc.exception;
+            
+        	return fc;
+        } catch (MalformedURLException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        } catch (IOException e) {
+            logger.warning(e.toString());
+            throw new SAXException(e);
+        }
+    }
+    
+    public static WFSFeatureReader getFeatureReader(InputStream is, int capacity, int timeout) throws SAXException {
+        WFSFeatureReader fc = new WFSFeatureReader(is, capacity, timeout);
+        fc.start(); // calls run
+        if(fc.exception != null)
+            throw fc.exception;
+        return fc;
+    }
+
+
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+        HashMap hints = new HashMap();
+        hints.put(GMLComplexTypes.STREAM_HINT, this);
+        try{
+        try {
+            DocumentFactory.getInstance(is, hints, logger.getLevel());
+            is.close();
+
+            // start parsing until buffer part full, then yield();
+        } catch (StopException e) {
+            exception = e;
+            state = STOP;
+            is.close();
+            yield();
+        } catch (SAXException e) {
+            exception = e;
+            state = STOP;
+            is.close();
+            yield();
+        }
+        }catch(IOException e){
+            logger.warning(e.toString());
+        }
+    }
+}

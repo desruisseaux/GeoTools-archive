@@ -1,0 +1,1364 @@
+
+package org.geotools.xml.ogc;
+
+import java.io.IOException;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.data.ows.FilterCapabilities;
+import org.geotools.data.ows.ServiceException;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.MathExpression;
+import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Any;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.Choice;
+import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAny;
+import org.geotools.xml.schema.DefaultChoice;
+import org.geotools.xml.schema.DefaultSequence;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
+import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Sequence;
+import org.geotools.xml.schema.Type;
+import org.geotools.xml.xsi.XSISimpleTypes;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.helpers.AttributesImpl;
+import org.geotools.xml.gml.GMLSchema;
+import org.geotools.xml.ogc.FilterSchema.FilterAttribute;
+import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
+import org.geotools.xml.ogc.FilterSchema.FilterElement;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+/**
+ * <p> 
+ * DOCUMENT ME!
+ * </p>
+ * @author dzwiers
+ *
+ */
+public class FilterComplexTypes {
+    public final static String CACHE_SERVICE_EXCEPTIONS = "FilterComplexTypes.CACHE_SERVICE_EXCEPTIONS";
+    public static class Arithmetic_OperatorsType extends FilterComplexType{
+        private static final ComplexType instance = new Arithmetic_OperatorsType();
+        public static ComplexType getInstance(){return instance;}
+        
+        private static Element[] elements = {
+                new FilterElement("Simple_Arithmetic",EmptyType.getInstance()),
+                new FilterElement("Functions",FunctionsType.getInstance())
+        };
+        private static Choice choice = new DefaultChoice(elements){
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
+       
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return choice;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null)
+                throw new SAXException("Parameter missing for Comparison_OperatorsType");
+            if(value.length < 1)
+                throw new SAXException("Missing child element");
+            
+            int t = FilterCapabilities.NO_OP;
+            for(int i=0;i<value.length;i++){
+                t = t | FilterCapabilities.findOperation(value[i].getElement().getName());
+            }
+            return new Integer(t);
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Comparison_OperatorsType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Integer.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }public static class Comparison_OperatorsType extends FilterComplexType{
+        private static final ComplexType instance = new Comparison_OperatorsType();
+        public static ComplexType getInstance(){return instance;}
+       
+        private static Element[] elements = {
+                new FilterElement("Simple_Comparisons",EmptyType.getInstance()),
+                new FilterElement("Like",EmptyType.getInstance()),
+                new FilterElement("Between",EmptyType.getInstance()),
+                new FilterElement("NullCheck",EmptyType.getInstance()),
+        };
+        
+        private static Choice choice = new DefaultChoice(elements) {
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return choice;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null)
+                throw new SAXException("Parameter missing for Comparison_OperatorsType");
+            if(value.length < 1)
+                throw new SAXException("Missing child element");
+            
+            int t = FilterCapabilities.NO_OP;
+            for(int i=0;i<value.length;i++){
+                t = t | FilterCapabilities.findOperation(value[i].getElement().getName());
+            }
+            return new Integer(t);
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Comparison_OperatorsType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Integer.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class Function_NameType extends FilterComplexType{
+        private static final ComplexType instance = new Function_NameType();
+        public static ComplexType getInstance(){return instance;}
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+                /**
+         * @see org.geotools.xml.schema.ComplexType#getParent()
+         */
+        public Type getParent() {
+            return XSISimpleTypes.String.getInstance();
+        }
+/**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Function_NameType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class Function_NamesType extends FilterComplexType{
+        private static final ComplexType instance = new Function_NamesType();
+        public static ComplexType getInstance(){return instance;}
+
+        private static Element[] elements = new Element[] {
+                new FilterElement("Function_Name", Function_NameType.getInstance()),
+        };
+        private static Sequence seq = new DefaultSequence(elements){
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Function_NamesType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class FunctionsType extends FilterComplexType{
+        private static final ComplexType instance = new FunctionsType();
+        public static ComplexType getInstance(){return instance;}
+
+        private static Element[] elements = new Element[] {
+               new FilterElement("Function_Names",Function_NamesType.getInstance()),
+        };
+        private static Sequence seq = new DefaultSequence(elements);
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "FunctionsType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class Filter_CapabilitiesType extends FilterComplexType{
+        private static final ComplexType instance = new Filter_CapabilitiesType();
+        public static ComplexType getInstance(){return instance;}
+        
+        private static Element[] elements = new Element[]{
+                new FilterElement("Spatial_Capabilities", Spatial_CapabilitiesType.getInstance()),
+                new FilterElement("Scalar_Capabilities", Scalar_CapabilitiesType.getInstance())
+        };
+        
+        private static Sequence seq = new DefaultSequence(elements);
+        
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null)
+                throw new SAXException("Parameter missing for Filter_Capabilities Type");
+            if(value.length!=2)
+                throw new SAXException("Either there is an extra child, or too few child elements");
+            
+            FilterCapabilities fc = new FilterCapabilities();
+
+            if(elements[0].getName().equals(value[0].getElement().getName())){
+                fc.setSpatialOps(((Integer)value[0].getValue()).intValue());
+                if(elements[1].getName().equals(value[1].getElement().getName())){
+                    fc.setScalarOps(((Integer)value[1].getValue()).intValue());
+                }else{
+                    throw new SAXException("Unknown element"+value[1].getElement().getName());
+                }
+            }else{
+            if(elements[1].getName().equals(value[0].getElement().getName())){
+                fc.setScalarOps(((Integer)value[0].getValue()).intValue());
+                if(elements[0].getName().equals(value[1].getElement().getName())){
+                	fc.setSpatialOps(((Integer)value[1].getValue()).intValue());
+            	}else{
+                	throw new SAXException("Unknown element"+value[1].getElement().getName());
+            	}
+            }else{
+                // error
+                throw new SAXException("Unknown element"+value[0].getElement().getName());
+            }}
+            
+            return fc;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+//            return "Filter_CapabilitiesType";
+            return "";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return FilterCapabilities.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+    }
+    public static class Scalar_CapabilitiesType extends FilterComplexType{
+        private static final ComplexType instance = new Scalar_CapabilitiesType();
+        public static ComplexType getInstance(){return instance;}
+        
+        private static Element[] elements = {
+                new FilterElement("Logical_Operators",EmptyType.getInstance()),
+                new FilterElement("Comparison_Operators",Comparison_OperatorsType.getInstance()),
+                new FilterElement("Arithmetic_Operators",Arithmetic_OperatorsType.getInstance()),
+        };
+
+        private static Choice choice = new DefaultChoice(elements){
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return choice;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null)
+                throw new SAXException("Missing paramters for Scalar_CapabilitiesType");
+            if(value.length<1)
+                throw new SAXException("Missing child value elements");
+            int val = FilterCapabilities.NO_OP;
+            for(int i=0;i<value.length;i++){
+                if(elements[0].getName().equals(value[i].getElement().getName())){
+                    // logical ops
+                    val = val | FilterCapabilities.LOGICAL;
+                }else{
+                if(elements[1].getName().equals(value[i].getElement().getName())){
+                    // comparison ops
+                    val = val | ((Integer)value[i].getValue()).intValue();
+                }else{
+                if(elements[2].getName().equals(value[i].getElement().getName())){
+                    // arithmetic ops
+                    val = val | ((Integer)value[i].getValue()).intValue();
+                }else{
+                    // error
+                    throw new SAXException("Invalid child element: "+value[i].getElement().getName());
+                }}}
+            }
+            return new Integer(val);
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Scalar_CapabilitiesType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Integer.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class Spatial_CapabilitiesType extends FilterComplexType{
+        private static final ComplexType instance = new Spatial_CapabilitiesType();
+        public static ComplexType getInstance(){return instance;}
+        
+        private static Element[] elements = {
+                new FilterElement("Spatial_Operators",Spatial_OperatorsType.getInstance()),
+        };
+        private static Sequence seq = new DefaultSequence(elements);
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null || value.length!=1)
+                throw new SAXException("Invalid parameters specified for Spatial_CapabilitiesType");
+            if(elements[0].getName().equals(value[0].getElement().getName()))
+                return (Integer)value[0].getValue();
+            throw new SAXException("Invalid child element: "+value[0].getElement().getName());
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Spatial_CapabilitiesType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Integer.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class Spatial_OperatorsType extends FilterComplexType{
+        private static final ComplexType instance = new Spatial_OperatorsType();
+        public static ComplexType getInstance(){return instance;}
+
+        private static Element[] elements = {
+                new FilterElement("BBOX",EmptyType.getInstance()),
+                new FilterElement("Equals",EmptyType.getInstance()),
+                new FilterElement("Disjoint",EmptyType.getInstance()),
+                new FilterElement("Intersect",EmptyType.getInstance()),
+                new FilterElement("Touches",EmptyType.getInstance()),
+                new FilterElement("Crosses",EmptyType.getInstance()),
+                new FilterElement("Within",EmptyType.getInstance()),
+                new FilterElement("Contains",EmptyType.getInstance()),
+                new FilterElement("Overlaps",EmptyType.getInstance()),
+                new FilterElement("Beyond",EmptyType.getInstance()),
+                new FilterElement("DWithin",EmptyType.getInstance())
+        };
+        private static Choice choice = new DefaultChoice(elements){
+            public int getMaxOccurs(){
+                return Integer.MAX_VALUE;
+            }
+        };
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return choice;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elements;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(element == null || value == null)
+                throw new SAXException("Missing parameter for Spatial_OperatorsType");
+            if(value.length < 1)
+                throw new SAXException("Atleast one child element is required");
+            
+            int v = FilterCapabilities.NO_OP;
+            for(int i=0;i<value.length;i++){
+                v = v | FilterCapabilities.findOperation(value[i].getElement().getName());
+            }
+            
+            return new Integer(v);
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Spatial_OperatorsType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Integer.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class ExpressionType extends FilterComplexType implements org.geotools.filter.ExpressionType{
+//    	<xsd:complexType name="ExpressionType" abstract="true"/>
+        private static final ComplexType instance = new ExpressionType();
+        public static ComplexType getInstance(){return instance;}
+        
+        public boolean isAbstract(){
+            return true;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ExpressionType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Expression.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
+        			return false;
+        	}
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            Expression e = (Expression)value;
+            switch(e.getType()){
+            case ATTRIBUTE:
+            case ATTRIBUTE_DOUBLE:
+            case ATTRIBUTE_GEOMETRY:
+            case ATTRIBUTE_INTEGER:
+            case ATTRIBUTE_STRING:
+            case ATTRIBUTE_UNDECLARED:
+                PropertyNameType.getInstance().encode(new FilterElement("PropertyName",PropertyNameType.getInstance()),e,output,hints);
+                return;
+            case FUNCTION:
+                FunctionType.getInstance().encode(element!=null?element:new FilterElement("Function",FunctionType.getInstance()),e,output,hints);
+                return;
+            case LITERAL_DOUBLE:
+            case LITERAL_GEOMETRY:
+            case LITERAL_INTEGER:
+            case LITERAL_STRING:
+                LiteralType.getInstance().encode(element!=null?element:new FilterElement("Literal",LiteralType.getInstance()),e,output,hints);
+                return;
+            case MATH_ADD:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Add",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_DIVIDE:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Div",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_MULTIPLY:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Mul",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_SUBTRACT:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Sub",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            }
+            throw new OperationNotSupportedException("Expression "+e+" type not found");
+        }
+    }
+    public static class BinaryOperatorType extends FilterComplexType{
+        private static final ComplexType instance = new BinaryOperatorType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="BinaryOperatorType">
+//        <xsd:complexContent>
+//          <xsd:extension base="ogc:ExpressionType">
+//            <xsd:sequence>
+//              <xsd:element ref="ogc:expression" minOccurs="2" maxOccurs="2"/>
+//            </xsd:sequence>
+//          </xsd:extension>
+//        </xsd:complexContent>
+//      </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("expression",ExpressionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 2;
+                    }
+                    public int getMaxOccurs(){
+                        return 2;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elems;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "BinaryOperatorType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return MathExpression.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC)!= FilterCapabilities.SIMPLE_ARITHMETIC)
+        			return false;
+        	}
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof MathExpression;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            MathExpression me = (MathExpression)value;
+            output.startElement(element.getNamespace(),element.getName(),null);
+            elems[0].getType().encode(null,me.getLeftValue(),output,hints);
+            elems[0].getType().encode(null,me.getRightValue(),output,hints);
+            output.endElement(element.getNamespace(),element.getName());
+        }
+    }
+    public static class FunctionType extends FilterComplexType{
+        private static final ComplexType instance = new FunctionType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="FunctionType">
+//          <xsd:complexContent>
+//            <xsd:extension base="ogc:ExpressionType">
+//              <xsd:sequence>
+//                <xsd:element ref="ogc:expression"
+//                             minOccurs="0" maxOccurs="unbounded"/>
+//              </xsd:sequence>
+//              <xsd:attribute name="name" type="xsd:string" use="required"/>
+//            </xsd:extension>
+//          </xsd:complexContent>
+//        </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("expression",ExpressionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 0;
+                    }
+                    public int getMaxOccurs(){
+                        return Integer.MAX_VALUE;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("name",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED),
+        };
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elems;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "FunctionType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return FunctionExpression.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.FUNCTIONS)!= FilterCapabilities.FUNCTIONS)
+        			return false;
+        	}
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof FunctionExpression;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            FunctionExpression me = (FunctionExpression)value;
+            AttributesImpl ai = new AttributesImpl();
+            ai.addAttribute(element.getNamespace().toString(),"name",null,"string",me.getName());
+            output.startElement(element.getNamespace(),element.getName(),ai);
+            for(int i=0;i<me.getArgCount();i++)
+                elems[0].getType().encode(null,me.getArgs()[i],output,hints);
+            output.endElement(element.getNamespace(),element.getName());
+        }
+    }
+    public static class LiteralType extends FilterComplexType{
+        private static final ComplexType instance = new LiteralType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="LiteralType">
+//        <xsd:complexContent mixed="true">
+//          <xsd:extension base="ogc:ExpressionType">
+//            <xsd:sequence>
+//              <xsd:any minOccurs="0"/>
+//            </xsd:sequence>
+//          </xsd:extension>
+//        </xsd:complexContent>
+//        </xsd:complexType>
+        
+        private static Any any = new DefaultAny(null,0,1);
+        
+        private static Sequence seq = new DefaultSequence(new ElementGrouping[]{any,});
+        
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "LiteralType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return LiteralExpression.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LiteralExpression;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                return;
+            LiteralExpression me = (LiteralExpression)value;
+            AttributesImpl ai = new AttributesImpl();
+            output.startElement(element.getNamespace(),element.getName(),ai);
+            
+            switch(me.getType()){
+            case LiteralExpression.LITERAL_GEOMETRY:
+                if(me.getLiteral() instanceof Geometry){
+                    GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance().getElements()[29],me.getLiteral(),output,hints);
+                	break;
+                }
+            case LiteralExpression.LITERAL_DOUBLE:
+            case LiteralExpression.LITERAL_INTEGER:
+            case LiteralExpression.LITERAL_STRING:
+                output.characters(me.getLiteral().toString());
+            	break;
+            }
+            
+            output.endElement(element.getNamespace(),element.getName());
+        }
+    }
+    public static class PropertyNameType extends FilterComplexType{
+        private static final ComplexType instance = new PropertyNameType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="PropertyNameType">
+//          <xsd:complexContent mixed="true">
+//            <xsd:extension base="ogc:ExpressionType"/>
+//          </xsd:complexContent>
+//        </xsd:complexType>
+        
+
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            return value==null?"":value[0].toString();
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "PropertyNameType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return AttributeExpression.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return (value instanceof AttributeExpression || value instanceof String) && element.getType()!=null && getName().equals(element.getType().getName());
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            if(!canEncode(element,value,hints))
+                throw new OperationNotSupportedException("Cannot encode "+(element==null?"null":element.getName())+" "+(element==null?"null":element.getNamespace().toString())+" "+(value == null?null:value.getClass().getName()));
+                        
+            output.startElement(element.getNamespace(),element.getName(),null);
+            if(value instanceof String){
+                output.characters((String)value);
+            }else{
+                AttributeExpression name = (AttributeExpression)value;
+                output.characters(name.getAttributePath());
+            }
+            output.endElement(element.getNamespace(),element.getName());
+        }
+    }
+    public static class ServiceExceptionType extends FilterComplexType{
+        private static final ComplexType instance = new ServiceExceptionType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="ServiceExceptionType">
+//        <xsd:annotation>
+//           <xsd:documentation>
+//              The ServiceExceptionType type defines the ServiceException
+//              element.  The content of the element is an exception message
+//              that the service wished to convey to the client application.
+//           </xsd:documentation>
+//        </xsd:annotation>
+//        <xsd:simpleContent>
+//           <xsd:extension base="xsd:string">
+//              <xsd:attribute name="code" type="xsd:string">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       A service may associate a code with an exception
+//                       by using the code attribute.
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:attribute>
+//              <xsd:attribute name="locator" type="xsd:string">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       The locator attribute may be used by a service to
+//                       indicate to a client where in the client's request
+//                       an exception was encountered.  If the request included
+//                       a 'handle' attribute, this may be used to identify the
+//                       offending component of the request.  Otherwise the 
+//                       service may try to use other means to locate the 
+//                       exception such as line numbers or byte offset from the
+//                       begining of the request, etc ...
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:attribute>
+//           </xsd:extension>
+//        </xsd:simpleContent>
+//     </xsd:complexType>
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("code",XSISimpleTypes.String.getInstance()),
+                new FilterAttribute("locator",XSISimpleTypes.String.getInstance()),
+        };
+        
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+        
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
+         */
+        public boolean cache(Element element, Map hints) {
+            return hints!=null && hints.containsKey(CACHE_SERVICE_EXCEPTIONS);
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(value==null || element.getType()==null || !getName().equals(element.getType().getName()))
+                throw new SAXNotSupportedException("wrong element type for service exception");
+            
+            String msg = (String)value[0].getValue();
+            String locator = null; 
+            String code = null;
+            
+            locator = attrs.getValue(null,"locator");
+            if(locator == null)
+                locator = attrs.getValue(getNamespace().toString(),"locator");
+            
+            code = attrs.getValue(null,"code");
+            if(code == null)
+                code = attrs.getValue(getNamespace().toString(),"code");
+            
+//            ServiceException se = new ServiceException(msg,code == null?0:Integer.parseInt(code.trim()),locator);
+            ServiceException se = new ServiceException(msg,code,locator);
+            if(cache(element,hints)){
+                return se;
+            }
+            throw se;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ServiceExceptionType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return ServiceException.class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class ServiceExceptionReportType extends FilterComplexType{
+        private static final ComplexType instance = new ServiceExceptionReportType();
+        public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType>
+//           <xsd:sequence>
+//              <xsd:element name="ServiceException"
+//                           type="ogc:ServiceExceptionType"
+//                           minOccurs="0" maxOccurs="unbounded">
+//                 <xsd:annotation>
+//                    <xsd:documentation>
+//                       The Service exception element is used to describe 
+//                       a service exception.
+//                    </xsd:documentation>
+//                 </xsd:annotation>
+//              </xsd:element>
+//           </xsd:sequence>
+//           <xsd:attribute name="version" type="xsd:string" fixed="1.2.0"/>
+//        </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("ServiceException",ServiceExceptionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 0;
+                    }
+                    public int getMaxOccurs(){
+                        return Integer.MAX_VALUE;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("version",XSISimpleTypes.String.getInstance(),0,null,"1.2.0",false),
+        };
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return seq;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return elems;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            if(value==null || element.getType()==null || !getName().equals(element.getType().getName()))
+                throw new SAXNotSupportedException("wrong element type for service exception report");
+            
+            ServiceException[] ret = new ServiceException[value.length];
+            for(int i=0;i<ret.length;i++){
+                ret[i] = (ServiceException)value[i].getValue();
+            }
+            
+            return ret;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ServiceExceptionReportType";
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return ServiceException[].class;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            // TODO Auto-generated method stub
+            throw new OperationNotSupportedException();
+        }
+    }
+    public static class EmptyType extends FilterComplexType{
+        private static EmptyType instance = new EmptyType();
+        public static EmptyType getInstance(){return instance;}
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue(Element element, ElementValue[] value, Attributes attrs, Map hints) throws SAXException, SAXNotSupportedException {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+
+        /**
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+    }
+}
