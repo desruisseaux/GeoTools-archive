@@ -24,6 +24,9 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
+import org.geotools.renderer.lite.CustomGlyphRenderer;
+import org.geotools.renderer.lite.GlyphRenderer;
+import org.geotools.renderer.lite.SVGGlyphRenderer;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
@@ -67,9 +70,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +120,10 @@ public class SLDStyleFactory {
 
     /** This one is used as the observer object in image tracks */
     private static final Canvas obs = new Canvas();
-
+    
+    /** This one holds the list of glyphRenderers that can convert glyphs into an image */
+    private static List glyphRenderers = new ArrayList();
+    
     static { //static block to populate the lookups
         joinLookup.put("miter", new Integer(BasicStroke.JOIN_MITER));
         joinLookup.put("bevel", new Integer(BasicStroke.JOIN_BEVEL));
@@ -148,6 +156,17 @@ public class SLDStyleFactory {
         wellKnownMarks.add("star");
         wellKnownMarks.add("x");
         wellKnownMarks.add("arrow");
+        
+        /** 
+         * Initialize the gliph renderers array with the default ones
+         */
+        glyphRenderers.add(new CustomGlyphRenderer());
+
+        try {
+            glyphRenderers.add(new SVGGlyphRenderer());
+        } catch (Exception e) {
+            LOGGER.warning("Will not support SVG External Graphics " + e);
+        }
     }
 
     /** Parsed SVG glyphs */
@@ -172,6 +191,24 @@ public class SLDStyleFactory {
 
         return supportedGraphicFormats;
     }
+    
+    private long hits;
+    
+    private long requests;
+    
+    
+    public double getHitRatio() {
+        return (double) hits/ (double) requests;
+    }
+    
+    public long getHits() {
+        return hits;
+    }
+    
+    public long getRequests() {
+        return requests;
+    }
+    
 
     /**
      * <p>
@@ -196,8 +233,12 @@ public class SLDStyleFactory {
 
         SymbolizerKey key = new SymbolizerKey(symbolizer, scaleRange);
         style = (Style2D) staticSymbolizers.get(key);
+        
+        requests++;
 
-        if (style == null) {
+        if (style != null) {
+            hits++;
+        } else {
             style = createStyleInternal(f, symbolizer, scaleRange);
 
             // if known dynamic symbolizer return the style
@@ -350,8 +391,23 @@ public class SLDStyleFactory {
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.finer("rendering External graphic");
                 }
+                
+                ExternalGraphic eg = (ExternalGraphic) symbols[i];
+                BufferedImage img = null;
+                
+                // first see if any glyph renderers can handle this 
+                for(Iterator it = glyphRenderers.iterator(); it.hasNext() && (img == null); ) {
+                    GlyphRenderer r = (GlyphRenderer) it.next();
 
-                BufferedImage img = getImage((ExternalGraphic) symbols[i], size); //size is only a hint
+                    if (r.canRender(eg.getFormat())) {
+                        img = r.render(sldGraphic, eg, feature);
+                    }
+                }
+
+                // if no-one of the glyph renderers can handle the eg, try to load it as an external image
+                if(img == null) {
+                    img = getImage(eg, size); //size is only a hint
+                }
 
                 if (img == null) {
                     continue;
@@ -414,6 +470,7 @@ public class SLDStyleFactory {
 
         return retval;
     }
+
 
     Style2D createTextStyle(Feature feature, TextSymbolizer symbolizer, Range scaleRange) {
         TextStyle2D ts2d = new TextStyle2D();
