@@ -679,7 +679,7 @@ public class SchemaFactory {
 
             for (int i = 0; i < i2.length; i++)
                 if (!m.containsKey(i2[i].getTargetNamespace())) {
-                    m.put(i2[i].getName(), i2[i]);
+                    m.put(i2[i].getTargetNamespace(), i2[i]);
                 }
 
             imports = new Schema[m.size()];

@@ -463,6 +463,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         logger.finest("Starting search for element handler " + localName
             + " :: " + namespaceURI);
 
+//System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
 
         if (e != null) {

@@ -326,6 +326,7 @@ public class SimpleTypeHandler extends XSIElementHandler {
         while (i.hasNext()) {
             FacetHandler fh = (FacetHandler) i.next();
             facets[index] = new DefaultFacet(fh.getType(), fh.getValue());
+            index++;
         }
 
         return facets;

@@ -51,6 +51,7 @@ public class DefaultGroup implements Group {
         ElementGrouping child, int min, int max) {
         this.id = id;
         this.name = name;
+        name.toCharArray();
         this.namespace = namespace;
         this.child = child;
         this.min = min;
@@ -110,6 +111,8 @@ public class DefaultGroup implements Group {
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
+System.out.println("DefaultGroup "+this.name+" "+this.namespace);
+System.out.println("DefaultGroup ... "+child.getClass().getName());
         return (child == null) ? null : child.findChildElement(name);
     }
 }

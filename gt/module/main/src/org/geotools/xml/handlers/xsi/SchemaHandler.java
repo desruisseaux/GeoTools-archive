@@ -591,16 +591,40 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @return
      */
-    protected SimpleType lookUpSimpleType(String qName) {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        qName = qName.substring(qName.indexOf(":") + 1);
-
-        if (schema != null) {
-            return lookUpSimpleType(qName, schema, new LinkedList());
+    protected SimpleType lookUpSimpleType(String qname) {
+        int index = qname.indexOf(":");
+        String localName,prefix;
+        localName = prefix = null;
+        if(index>=0){
+            localName = qname.substring(index + 1);
+            prefix = qname.substring(0,index);
+        }else{
+            prefix = "";
+            localName = qname;
         }
-
+        logger.finest("prefix is " + prefix);
+        logger.finest("localName is " + localName);
         Iterator it;
+        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+            if(schema!=null)
+                return lookUpSimpleType(localName, schema, new LinkedList());
+        }else{
+            if(imports!=null){
+            it = imports.iterator();
+//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+            while (it.hasNext()) {
+                Schema s = (Schema) it.next();
+                String ns = s.getTargetNamespace().toString();
+//System.out.println(ns);
+                String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                    SimpleType st = lookUpSimpleType(localName, s, new LinkedList());
+                	if (st != null) {
+                	    return st;
+                	}
+                }
+            }}
+        }
 
         if (simpleTypes != null) {
             it = simpleTypes.iterator();
@@ -611,36 +635,23 @@ public class SchemaHandler extends XSIElementHandler {
                 if (o instanceof SimpleTypeHandler) {
                     SimpleTypeHandler sst = (SimpleTypeHandler) o;
 
-                    if (qName.equalsIgnoreCase(sst.getName())) {
+                    if (localName.equalsIgnoreCase(sst.getName())) {
                         return sst.compress(this);
                     }
                 } else {
                     SimpleType sst = (SimpleType) o;
 
-                    if (qName.equalsIgnoreCase(sst.getName())) {
+                    if (localName.equalsIgnoreCase(sst.getName())) {
                         return sst;
                     }
                 }
             }
         }
 
-        SimpleType sti = XSISimpleTypes.find(qName);
+        SimpleType sti = XSISimpleTypes.find(qname);
 
         if (sti != null) {
             return sti;
-        }
-
-        if (imports != null) {
-            it = imports.iterator();
-
-            while (it.hasNext()) {
-                Schema s = (Schema) it.next();
-                SimpleType st = lookUpSimpleType(qName, s, new LinkedList());
-
-                if (st != null) {
-                    return st;
-                }
-            }
         }
 
         return null;
@@ -715,6 +726,7 @@ public class SchemaHandler extends XSIElementHandler {
             if(schema!=null)
                 return lookUpComplexType(localName, schema, new LinkedList());
         }else{
+            if(imports!=null){
             it = imports.iterator();
 //System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
@@ -728,7 +740,7 @@ public class SchemaHandler extends XSIElementHandler {
                 	    return ct;
                 	}
                 }
-            }
+            }}
         }
 
         it = complexTypes.iterator();
@@ -805,17 +817,57 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @throws SAXException
      */
-    protected Element lookUpElement(String qName) throws SAXException {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        logger.finest("looking for element " + qName);
-        qName = qName.substring(qName.indexOf(":") + 1);
+    protected Element lookUpElement(String qname) throws SAXException {
+        int index = qname.indexOf(":");
+        String localName,prefix;
+        localName = prefix = null;
+        if(index>=0){
+            localName = qname.substring(index + 1);
+            prefix = qname.substring(0,index);
+        }else{
+            prefix = "";
+            localName = qname;
+        }
+        logger.finest("prefix is " + prefix);
+        logger.finest("localName is " + localName);
 
-        if (schema != null) {
-            return lookupElement(qName, schema, new LinkedList());
+        Iterator it;
+        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+            if(schema!=null)
+                return lookupElement(localName, schema, new LinkedList());
+        }else{if(imports!=null){
+            it = imports.iterator();
+//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+            while (it.hasNext()) {
+                Schema s = (Schema) it.next();
+                String ns = s.getTargetNamespace().toString();
+//System.out.println(ns);
+                String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                    Element ct = lookupElement(localName, s, new LinkedList());
+                	if (ct != null) {
+                	    return ct;
+                	}
+                }
+            }}
+        if(includes!=null){
+            it = includes.iterator();
+//          System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+                      while (it.hasNext()) {
+                          Schema s = (Schema) it.next();
+                          String ns = s.getTargetNamespace().toString();
+//          System.out.println(ns);
+                          String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                          if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                              Element ct = lookupElement(localName, s, new LinkedList());
+                          	if (ct != null) {
+                          	    return ct;
+                          	}
+                          }
+                      }}
         }
 
-        Iterator it = elements.iterator();
+        it = elements.iterator();
 
         while (it.hasNext()) {
             Object o = it.next();
@@ -823,44 +875,17 @@ public class SchemaHandler extends XSIElementHandler {
             if (o instanceof ElementTypeHandler) {
                 ElementTypeHandler sst = (ElementTypeHandler) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return (Element) sst.compress(this);
                 }
             } else {
                 Element sst = (Element) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst;
                 }
             }
         }
-
-        if (imports != null) {
-            it = imports.iterator();
-
-            while (it.hasNext()) {
-                Schema s = (Schema) it.next();
-                Element e = lookupElement(qName, s, new LinkedList());
-
-                if (e != null) {
-                    return e;
-                }
-            }
-        }
-
-        if (includes != null) {
-            it = includes.iterator();
-
-            while (it.hasNext()) {
-                Schema s = (Schema) it.next();
-                Element e = lookupElement(qName, s, new LinkedList());
-
-                if (e != null) {
-                    return e;
-                }
-            }
-        }
-
         return null;
     }
 
@@ -912,16 +937,44 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @throws SAXException
      */
-    protected Group lookUpGroup(String qName) throws SAXException {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        qName = qName.substring(qName.indexOf(":") + 1);
-
-        if (schema != null) {
-            return lookUpGroup(qName, schema, new LinkedList());
+    protected Group lookUpGroup(String qname) throws SAXException {
+        int index = qname.indexOf(":");
+        String localName,prefix;
+        localName = prefix = null;
+        if(index>=0){
+            localName = qname.substring(index + 1);
+            prefix = qname.substring(0,index);
+        }else{
+            prefix = "";
+            localName = qname;
+        }
+        logger.finest("prefix is " + prefix);
+        logger.finest("localName is " + localName);
+        
+        Iterator it;
+        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+            if(schema!=null)
+                return lookUpGroup(localName, schema, new LinkedList());
+        }else{
+            if(imports!=null){
+            it = imports.iterator();
+//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+            while (it.hasNext()) {
+                Schema s = (Schema) it.next();
+                String ns = s.getTargetNamespace().toString();
+//System.out.println(ns);
+                String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                    Group ct = lookUpGroup(localName, s, new LinkedList());
+                	if (ct != null) {
+                	    return ct;
+                	}
+                }
+            }}
         }
 
-        Iterator it = groups.iterator();
+        if(groups!=null){
+        it = groups.iterator();
 
         while (it.hasNext()) {
             Object o = it.next();
@@ -929,28 +982,17 @@ public class SchemaHandler extends XSIElementHandler {
             if (o instanceof GroupHandler) {
                 GroupHandler sst = (GroupHandler) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return (Group) sst.compress(this);
                 }
             } else {
                 Group sst = (Group) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst;
                 }
             }
-        }
-
-        it = imports.iterator();
-
-        while (it.hasNext()) {
-            Schema s = (Schema) it.next();
-            Group e = lookUpGroup(qName, s, new LinkedList());
-
-            if (e != null) {
-                return e;
-            }
-        }
+        }}
 
         return null;
     }
@@ -1005,17 +1047,45 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @throws SAXException
      */
-    protected AttributeGroup lookUpAttributeGroup(String qName)
+    protected AttributeGroup lookUpAttributeGroup(String qname)
         throws SAXException {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        qName = qName.substring(qName.indexOf(":") + 1);
-
-        if (schema != null) {
-            return lookUpAttributeGroup(qName, schema, new LinkedList());
+        int index = qname.indexOf(":");
+        String localName,prefix;
+        localName = prefix = null;
+        if(index>=0){
+            localName = qname.substring(index + 1);
+            prefix = qname.substring(0,index);
+        }else{
+            prefix = "";
+            localName = qname;
+        }
+        logger.finest("prefix is " + prefix);
+        logger.finest("localName is " + localName);
+        
+        Iterator it;
+        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+            if(schema!=null)
+                return lookUpAttributeGroup(localName, schema, new LinkedList());
+        }else{
+            if(imports!=null){
+            it = imports.iterator();
+//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+            while (it.hasNext()) {
+                Schema s = (Schema) it.next();
+                String ns = s.getTargetNamespace().toString();
+//System.out.println(ns);
+                String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                    AttributeGroup ct = lookUpAttributeGroup(localName, s, new LinkedList());
+                	if (ct != null) {
+                	    return ct;
+                	}
+                }
+            }}
         }
 
-        Iterator it = attributeGroups.iterator();
+        if(attributeGroups!=null){
+        it = attributeGroups.iterator();
 
         while (it.hasNext()) {
             Object o = it.next();
@@ -1023,28 +1093,17 @@ public class SchemaHandler extends XSIElementHandler {
             if (o instanceof AttributeGroupHandler) {
                 AttributeGroupHandler sst = (AttributeGroupHandler) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst.compress(this);
                 }
             } else {
                 AttributeGroup sst = (AttributeGroup) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst;
                 }
             }
-        }
-
-        it = imports.iterator();
-
-        while (it.hasNext()) {
-            Schema s = (Schema) it.next();
-            AttributeGroup e = lookUpAttributeGroup(qName, s, new LinkedList());
-
-            if (e != null) {
-                return e;
-            }
-        }
+        }}
 
         return null;
     }
@@ -1063,9 +1122,10 @@ public class SchemaHandler extends XSIElementHandler {
             Attribute[] sts = s.getAttributes();
 
             for (int i = 0; (sts != null) && (i < sts.length); i++) {
+                if(sts[i]!=null && sts[i].getName()!=null){
                 if (localName.equalsIgnoreCase(sts[i].getName())) {
                     return sts[i];
-                }
+                }}
             }
         }
 
@@ -1097,16 +1157,44 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @throws SAXException
      */
-    protected Attribute lookUpAttribute(String qName) throws SAXException {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        qName = qName.substring(qName.indexOf(":") + 1);
+    protected Attribute lookUpAttribute(String qname) throws SAXException {
+        int index = qname.indexOf(":");
+        String localName,prefix;
+        localName = prefix = null;
+        if(index>=0){
+            localName = qname.substring(index + 1);
+            prefix = qname.substring(0,index);
+        }else{
+            prefix = "";
+            localName = qname;
+        }
+        logger.finest("prefix is " + prefix);
+        logger.finest("localName is " + localName);
 
-        if (schema != null) {
-            return lookUpAttribute(qName, schema, new LinkedList());
+        Iterator it;
+        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+            if(schema!=null)
+                return lookUpAttribute(localName, schema, new LinkedList());
+        }else{
+            if(imports!=null){
+            it = imports.iterator();
+//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
+            while (it.hasNext()) {
+                Schema s = (Schema) it.next();
+                String ns = s.getTargetNamespace().toString();
+//System.out.println(ns);
+                String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
+                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                    Attribute ct = lookUpAttribute(localName, s, new LinkedList());
+                	if (ct != null) {
+                	    return ct;
+                	}
+                }
+            }}
         }
 
-        Iterator it = attributes.iterator();
+        if(attributes!=null){
+        it = attributes.iterator();
 
         while (it.hasNext()) {
             Object o = it.next();
@@ -1114,33 +1202,17 @@ public class SchemaHandler extends XSIElementHandler {
             if (o instanceof AttributeHandler) {
                 AttributeHandler sst = (AttributeHandler) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst.compress(this);
                 }
             } else {
                 Attribute sst = (Attribute) o;
 
-                if (qName.equalsIgnoreCase(sst.getName())) {
+                if (localName.equalsIgnoreCase(sst.getName())) {
                     return sst;
                 }
             }
-        }
-
-        if (imports != null) {
-            it = imports.iterator();
-
-            if (it != null) {
-                while (it.hasNext()) {
-                    Schema s = (Schema) it.next();
-
-                    Attribute e = lookUpAttribute(qName, s, new LinkedList());
-
-                    if (e != null) {
-                        return e;
-                    }
-                }
-            }
-        }
+        }}
 
         return null;
     }
@@ -1156,85 +1228,11 @@ public class SchemaHandler extends XSIElementHandler {
      *
      * @throws SAXException
      */
-    protected Type lookUpType(String qName) throws SAXException {
-        // TODO add qName support ... ie prefix mappings
-        // for now just strip it ...
-        qName = qName.substring(qName.indexOf(":") + 1);
-
-        if (schema != null) {
-            Type t = lookUpSimpleType(qName, schema, new LinkedList());
-            t = (t != null) ? t
-                            : lookUpComplexType(qName, schema, new LinkedList());
-
-            return t;
-        }
-
-        Iterator it;
-
-        if (simpleTypes != null) {
-            it = simpleTypes.iterator();
-
-            while (it.hasNext()) {
-                Object t = it.next();
-
-                if (t instanceof SimpleTypeHandler) {
-                    if (qName.equalsIgnoreCase(
-                                ((SimpleTypeHandler) t).getName())) {
-                        return ((SimpleTypeHandler) t).compress(this);
-                    }
-                } else {
-                    if (qName.equalsIgnoreCase(((SimpleType) t).getName())) {
-                        return ((SimpleType) t);
-                    }
-                }
-            }
-        }
-
-        if (complexTypes != null) {
-            it = complexTypes.iterator();
-
-            while (it.hasNext()) {
-                Object t = it.next();
-
-                if (t instanceof ComplexTypeHandler) {
-                    if (qName.equalsIgnoreCase(
-                                ((ComplexTypeHandler) t).getName())) {
-                        return ((ComplexTypeHandler) t).compress(this);
-                    }
-                } else {
-                    if (qName.equalsIgnoreCase(((ComplexType) t).getName())) {
-                        return ((ComplexType) t);
-                    }
-                }
-            }
-        }
-
-        SimpleType sti = XSISimpleTypes.find(qName);
-
-        if (sti != null) {
-            return sti;
-        }
-
-        if (imports != null) {
-            it = imports.iterator();
-
-            while (it.hasNext()) {
-                Schema s = (Schema) it.next();
-                SimpleType st = lookUpSimpleType(qName, s, new LinkedList());
-
-                if (st != null) {
-                    return st;
-                }
-
-                ComplexType ct = lookUpComplexType(qName, s, new LinkedList());
-
-                if (ct != null) {
-                    return ct;
-                }
-            }
-        }
-
-        return null;
+    protected Type lookUpType(String qname) throws SAXException {
+        Type t = null;
+        t = lookUpComplexType(qname);
+        t = t==null?lookUpSimpleType(qname):t;
+        return t;
     }
 
     /*

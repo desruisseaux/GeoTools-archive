@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.DefaultGroup;
 import org.geotools.xml.schema.ElementGrouping;
@@ -145,16 +147,16 @@ public class GroupHandler extends ElementGroupingHandler {
 
         name = atts.getValue("", "name");
 
-        if (name == null) {
+        if (name == null || "".equals(name)) {
             name = atts.getValue(namespaceURI, "name");
         }
 
         ref = atts.getValue("", "ref");
 
-        if (ref == null) {
+        if (ref == null || "".equals(ref)) {
             ref = atts.getValue(namespaceURI, "ref"); // mutally exclusive with
         }
-
+System.out.println("REF ^^^ ="+ref);
         // name ...
         if ((min != null) && !"".equalsIgnoreCase(min)) {
             minOccurs = Integer.parseInt(min);
@@ -198,14 +200,16 @@ public class GroupHandler extends ElementGroupingHandler {
 
         String id = this.id;
         String name = this.name;
+        URI uri = parent.getTargetNamespace();
         int minOccurs = this.minOccurs;
         int maxOccurs = this.maxOccurs;
         ElementGrouping child = (this.child == null) ? null
-                                                     : this.child.compress(parent); // deal with all/choice/sequnce
-
+              : this.child.compress(parent); // deal with all/choice/sequnce
+System.out.println("***** "+name+":::"+child);
         if (ref != null) {
+System.out.println("Group Ref = "+ref);
             Group g = parent.lookUpGroup(ref);
-
+System.out.println("GroupHandler.compress()" + (g==null?"null":g.getClass().getName()));
             if (g != null) {
                 if ((id == null) || "".equalsIgnoreCase(id)) {
                     id = g.getId();
@@ -213,11 +217,15 @@ public class GroupHandler extends ElementGroupingHandler {
 
                 minOccurs = g.getMinOccurs();
                 maxOccurs = g.getMaxOccurs();
+                name = g.getName();
+                uri = g.getNamespace();
+                
                 child = (g.getChild() == null) ? null : g.getChild();
             }
         }
+System.out.println("$$$$$");
 
-        cache = new DefaultGroup(id, name, parent.getTargetNamespace(), child,
+        cache = new DefaultGroup(id, name, uri, child,
                 minOccurs, maxOccurs);
 
         child = null;

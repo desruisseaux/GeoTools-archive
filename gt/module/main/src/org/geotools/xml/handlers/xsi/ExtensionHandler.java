@@ -75,22 +75,6 @@ public class ExtensionHandler extends XSIElementHandler {
 
                 return ah;
             }
-
-            // anyattribute
-            //            if (AnyAttributeHandler.LOCALNAME.equalsIgnoreCase(localName)) {
-            //                AnyAttributeHandler ah = new AnyAttributeHandler();
-            //
-            //                if (anyAttribute == null) {
-            //                    anyAttribute = ah;
-            //                } else {
-            //                    throw new SAXNotRecognizedException(getLocalName()
-            //                        + " may only have one '"
-            //                        + AnyAttributeHandler.LOCALNAME + "' declaration.");
-            //                }
-            //
-            //                return ah;
-            //            }
-            // attribute
             if (AttributeHandler.LOCALNAME.equalsIgnoreCase(localName)) {
                 if (attributeDec == null) {
                     attributeDec = new LinkedList();
@@ -140,6 +124,7 @@ public class ExtensionHandler extends XSIElementHandler {
                         + " may only have one '" + GroupHandler.LOCALNAME
                         + "' declaration.");
                 }
+                return ah;
             }
 
             // sequence

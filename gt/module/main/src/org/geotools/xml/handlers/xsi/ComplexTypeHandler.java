@@ -422,6 +422,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
     protected ComplexType compress(SchemaHandler parent)
         throws SAXException {
         logger.info("Start compressing ComplexType " + getName());
+//System.out.println("Start compressing ComplexType " + getName());
 
         if (cache != null) {
             return cache;
@@ -548,9 +549,13 @@ public class ComplexTypeHandler extends XSIElementHandler {
                             + ((ct == null) ? null
                                             : (ct.getName() + ":::"
                             + ct.getNamespace())) + " for " + name);
+//System.out.println("Looked up " + ext.getBase()+ " and found "+ ((ct == null) ? null: (ct.getName() + ":::"+ ct.getNamespace())) + " for " + name);
 
-                        ElementGrouping eg = ct.getChild();
-                        dct.child = loadNewEG(eg, ext, parent); // note should override element def only ... not spot
+                        ElementGrouping extensionBaseType = ct.getChild();
+//System.out.println(ext.getChild()==null?"null":ext.getChild().getClass().getName());
+//System.out.println("compressing ... LocalName = "+this.name);
+						ElementGrouping extensionChild =  ((ElementGroupingHandler)ext.getChild()).compress(parent);
+                        dct.child = loadNewEG(extensionBaseType,extensionChild, parent); // note should override element def only ... not spot
                     } else {
                         dct.child = ct.getChild();
                     }
@@ -657,79 +662,43 @@ public class ComplexTypeHandler extends XSIElementHandler {
      * Helper method that removes a level of indirection through combining
      * the levels into more compact representations
      */
-    private ElementGrouping loadNewEG(ElementGrouping eg, ExtensionHandler ext,
+    private ElementGrouping loadNewEG(ElementGrouping extensionBaseType, ElementGrouping extensionChild,
         SchemaHandler parent) throws SAXException {
-        if (eg == null) {
-            logger.finest("ElementGrouping eg is null in loadNewEG");
+        if (extensionChild == null) {
 
-            ElementGrouping r = ((ElementGroupingHandler) ext.getChild())
-                .compress(parent);
-
-            if (r.getGrouping() == ElementGrouping.GROUP) {
-                return ((Group) r).getChild();
+            if (extensionBaseType.getGrouping() == ElementGrouping.GROUP) {
+                return ((Group) extensionBaseType).getChild();
             }
 
-            return r;
+            return extensionBaseType;
         }
 
-        switch (eg.getGrouping()) {
-        case ElementGrouping.ALL:
-            logger.finest("ElementGrouping eg is ALL in loadNewEG");
-
-            if (ext.getChild() != null) {
-                throw new SAXException(
-                    "Types extending a complexType containing the ALL element may not add element declarations.");
-            }
-
-            return eg;
+        switch (extensionBaseType.getGrouping()) {
 
         case ElementGrouping.CHOICE:
             logger.finest("ElementGrouping eg is CHOICE in loadNewEG");
 
-            if (ext.getChild() != null) {
-                return new DefaultSequence((Choice) eg,
-                    ((ElementGroupingHandler) ext.getChild()).compress(parent));
-            }
-
+                return new DefaultSequence((Choice) extensionBaseType,
+                    ((ElementGroupingHandler) extensionChild).compress(parent));
+                
         case ElementGrouping.GROUP:
             logger.finest("ElementGrouping eg is GROUP in loadNewEG");
 
-            if (ext.getChild() != null) {
-                Group g = (Group) eg;
+                Group baseGroup = (Group) extensionBaseType;
 
-                if (g.getChild() == null) {
-                    return (ElementGrouping) ext.getChild();
+                if (baseGroup.getChild() == null) {
+                    return extensionChild;
                 }
-
-                if (g.getChild().getGrouping() == ElementGrouping.ALL) {
-                    if (ext.getChild() != null) {
-                        throw new SAXException(
-                            "Types extending a complexType containing the ALL element may not add element declarations.");
-                    }
-
-                    return g.getChild();
-                }
-
-                if (g.getChild().getGrouping() == ElementGrouping.SEQUENCE) {
-                    return new DefaultSequence((Sequence) g.getChild(),
-                        ((ElementGroupingHandler) ext.getChild()).compress(
-                            parent));
-                }
-
-                return new DefaultSequence((Choice) g.getChild(),
-                    ((ElementGroupingHandler) ext.getChild()).compress(parent));
-            }
+                return loadNewEG(baseGroup.getChild(),extensionChild,parent);
 
         case ElementGrouping.SEQUENCE:
             logger.finest("ElementGrouping eg is SEQUENCE");
 
-            if (ext.getChild() != null) {
-                return new DefaultSequence((Sequence) eg,
-                    ((ElementGroupingHandler) ext.getChild()).compress(parent));
-            }
+//System.out.println("ComplexTypeHandler name="+this.name);
+                return new DefaultSequence((Sequence) extensionBaseType,extensionChild);
 
         default:
-            return eg;
+            return extensionBaseType;
         }
     }
 
@@ -890,10 +859,9 @@ public class ComplexTypeHandler extends XSIElementHandler {
             if (children == null) {
                 return null;
             }
-
             for (int i = 0; i < children.length; i++) {
                 Element t = children[i].findChildElement(name);
-
+//                System.out.println("ComplexTypeHandler.DefaultSequence ["+i+"] ... "+(children[i] == null?null:children[i].getClass().getName()));
                 if (t != null) { // found it
 
                     return t;
@@ -1131,7 +1099,10 @@ public class ComplexTypeHandler extends XSIElementHandler {
          * @see org.geotools.xml.xsi.ComplexType#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
-            return (child == null) ? null : child.findChildElement(name);
+//System.out.println("ComplexTypeHandler.DefaultComplexType ... "+this.name+" ... "+(child == null?null:child.getClass().getName()));
+            Element e = (child == null) ? null : child.findChildElement(name);
+            e = e==null?(parent==null?null:parent.findChildElement(name)):e;
+            return e;
         }
 
         /**

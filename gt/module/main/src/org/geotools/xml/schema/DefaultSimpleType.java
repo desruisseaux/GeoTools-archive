@@ -71,6 +71,11 @@ public class DefaultSimpleType implements SimpleType {
         this.parents = parents;
         this.type = type;
         this.constraints = constraints;
+        if(constraints!=null){
+            for(int i=0;i<constraints.length;i++)
+                if(constraints[i] == null)
+                    throw new NullPointerException(name+" constraint #"+i+" is null");
+        }
     }
 
     /**
@@ -218,7 +223,7 @@ public class DefaultSimpleType implements SimpleType {
 
         String val = (String) value.getValue();
 
-        if (constraints[0].getFacetType() == Facet.ENUMERATION) {
+        if (val !=null && constraints[0].getFacetType() == Facet.ENUMERATION) {
             for (int i = 0; i < constraints.length; i++) {
                 if (val.equalsIgnoreCase(constraints[i].getValue())) {
                     ElementValue[] t = new ElementValue[1];
