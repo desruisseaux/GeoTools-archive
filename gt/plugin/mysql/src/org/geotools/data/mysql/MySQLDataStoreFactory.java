@@ -21,6 +21,7 @@
 package org.geotools.data.mysql;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
@@ -239,7 +240,9 @@ public class MySQLDataStoreFactory
         throw new UnsupportedOperationException(
             "Postgis cannot create a new Database");
     }
-
+    public String getDisplayName() {
+        return "MySQL";
+    }
     /**
      * Describe the nature of the datasource constructed by this factory.
      *
@@ -247,9 +250,15 @@ public class MySQLDataStoreFactory
      *         list of available datasources.
      */
     public String getDescription() {
-        return "PostGIS spatial database";
+        return "MySQL Database";
     }
-
+    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+        String host = (String) HOST.lookUp(params);
+        String user = (String) USER.lookUp(params);
+        Integer port = (Integer) PORT.lookUp(params);
+        String database = (String) DATABASE.lookUp(params);
+        return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
+    }
     /**
      * Test to see if this datastore is available, if it has all the
      * appropriate libraries to construct a datastore.  This datastore just
