@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.geotools.util.URLEncoder2;
-
 
 /**
  * A class that provides functionality for performing basic requests
