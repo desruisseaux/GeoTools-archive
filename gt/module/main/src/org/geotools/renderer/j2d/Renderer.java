@@ -68,6 +68,7 @@ import javax.media.jai.PlanarImage; // For Javadoc
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.cs.Ellipsoid;
@@ -82,7 +83,6 @@ import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.NoninvertibleTransformException;
 import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.gp.GridCoverageProcessor;
 import org.geotools.units.UnitException;

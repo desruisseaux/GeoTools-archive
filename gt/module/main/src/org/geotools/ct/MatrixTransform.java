@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -57,7 +45,7 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * Transforms multi-dimensional coordinate points using a {@link Matrix}.
  *
- * @version $Id: MatrixTransform.java,v 1.9 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  */
@@ -385,7 +373,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
     /**
      * The provider for {@link MatrixTransform}.
      *
-     * @version $Id: MatrixTransform.java,v 1.9 2003/08/04 17:11:17 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Provider extends MathTransformProvider {

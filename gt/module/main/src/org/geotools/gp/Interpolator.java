@@ -44,13 +44,13 @@ import javax.media.jai.ParameterListDescriptorImpl;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.gc.GridCoverage;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.cv.CannotEvaluateException;
 import org.geotools.cv.PointOutsideCoverageException;
-import org.geotools.ct.NoninvertibleTransformException;
 
 
 /**

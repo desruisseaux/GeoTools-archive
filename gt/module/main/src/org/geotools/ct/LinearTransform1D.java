@@ -28,6 +28,7 @@ import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;

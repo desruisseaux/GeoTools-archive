@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -40,12 +28,17 @@ package org.geotools.ct;
  * Thrown when {@link MathTransform#inverse} is
  * invoked but the transform can't be inverted.
  *
- * @version $Id: NoninvertibleTransformException.java,v 1.3 2003/05/13 10:58:48 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see MathTransform#inverse
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.NoninvertibleTransformException}
+ *             in the <code>org.opengis.referencing.operation</code> package.
  */
-public class NoninvertibleTransformException extends TransformException {
+public class NoninvertibleTransformException extends 
+             org.opengis.referencing.operation.NoninvertibleTransformException
+ {
     /**
      * Serial number for interoperability with different versions.
      */

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -40,6 +28,9 @@ import org.opengis.ct.CT_TransformType;
 import org.opengis.ct.CT_MathTransform;
 import org.opengis.ct.CT_CoordinateTransformation;
 import org.opengis.cs.CS_CoordinateSystem;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.cs.Info;
@@ -69,7 +60,7 @@ import java.lang.ref.Reference;
  * If the transformation depends on empirically derived parameters (as in datum
  * transformations), then this is an ISO transformation.
  *
- * @version $Id: CoordinateTransformation.java,v 1.8 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
@@ -371,7 +362,7 @@ public class CoordinateTransformation extends Info {
      * {@link UnsupportedOperationException}). This class
      * is suitable for RMI use.
      *
-     * @version $Id: CoordinateTransformation.java,v 1.8 2003/08/04 17:11:17 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     final class Export extends UnicastRemoteObject implements CT_CoordinateTransformation {

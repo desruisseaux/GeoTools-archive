@@ -30,7 +30,6 @@ import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;

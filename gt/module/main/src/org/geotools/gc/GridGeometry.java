@@ -47,6 +47,7 @@ import org.opengis.ct.CT_MathTransform;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
 import org.geotools.pt.Matrix;
@@ -57,7 +58,6 @@ import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.cv.CannotEvaluateException;
-import org.geotools.ct.NoninvertibleTransformException;
 import org.geotools.cs.FactoryException;
 
 // Resources

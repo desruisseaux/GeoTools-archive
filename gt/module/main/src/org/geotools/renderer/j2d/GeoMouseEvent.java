@@ -24,7 +24,6 @@ package org.geotools.renderer.j2d;
 import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.NoninvertibleTransformException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;

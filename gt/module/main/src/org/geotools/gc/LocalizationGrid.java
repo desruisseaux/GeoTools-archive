@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gc;
 
@@ -115,7 +102,7 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  * FrameFactory.show(coverage);
  * </pre></blockquote>
  *
- * @version $Id: LocalizationGrid.java,v 1.10 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  *

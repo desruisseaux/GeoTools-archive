@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -52,7 +40,7 @@ import java.awt.geom.AffineTransform;
 /**
  * Transforms two-dimensional coordinate points using an {@link AffineTransform}.
  *
- * @version $Id: AffineTransform2D.java,v 1.5 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class AffineTransform2D extends XAffineTransform implements MathTransform2D, LinearTransform {

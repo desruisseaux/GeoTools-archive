@@ -33,6 +33,7 @@ import javax.media.jai.PerspectiveTransform; // For JavaDoc
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // OpenGIS dependencies
 import org.opengis.pt.PT_Matrix;

@@ -32,7 +32,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.IllegalPathStateException;
-import java.awt.geom.NoninvertibleTransformException;
 
 // Collections
 import java.util.List;
