@@ -101,7 +101,6 @@ public class WFSDataStore extends AbstractDataStore {
     
     private int bufferSize = 10;
     private int timeout = 3000;
-    private Map featureTypeCache = new HashMap();
 
     /**
      * Construct <code>WFSDataStore</code>.
@@ -187,24 +186,15 @@ public class WFSDataStore extends AbstractDataStore {
         InputStream result = null;
         
         if(auth == null){
-            result = url.getInputStream();
             url.connect();
         }else{
             synchronized (Authenticator.class) {
                 Authenticator.setDefault(auth);
-
-                try {
-                    result = url.getInputStream();
-                } catch (MalformedURLException e) {
-                    WFSDataStoreFactory.logger.warning(e.toString());
-                    throw e;
-                }
-
                 url.connect();
-
                 Authenticator.setDefault(null);
             }
         }
+        result = url.getInputStream();
 
         return new BufferedInputStream(result);
     }
@@ -267,6 +257,7 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     private String[] typeNames = null;
+    private Map featureTypeCache = new HashMap();
     /**
      * @see org.geotools.data.AbstractDataStore#getTypeNames()
      */
@@ -334,7 +325,7 @@ public class WFSDataStore extends AbstractDataStore {
             throw io;
         
         //set crs?
-        FeatureSetDescription fsd = getFSD(typeName);
+        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,typeName);
         String crsName = null;
         String ftName = null;
         crsName = fsd.getSRS();
@@ -343,7 +334,7 @@ public class WFSDataStore extends AbstractDataStore {
         CoordinateReferenceSystem crs;
         try {
             if(crsName!=null){
-                crs = getCRSService().createCRS(crsName);
+                crs = WFSDataStoreFactory.getCRSService().createCRS(crsName);
             	t = CRSService.transform(t,crs);
             }
         } catch (FactoryException e) {
@@ -369,20 +360,6 @@ public class WFSDataStore extends AbstractDataStore {
         return t;
     }
     
-    private FeatureSetDescription getFSD(String typename){
-        List l = capabilities.getFeatureTypes();
-        Iterator i = l.iterator();
-        String crsName = null;
-
-        while (i.hasNext() && crsName==null) {
-                FeatureSetDescription fsd = (FeatureSetDescription) i.next();
-                if (typename.equals(fsd.getName()) || (fsd.getName()!=null && typename.equals(fsd.getName().substring(typename.indexOf(':')+1)))) {
-                    return fsd;
-                }
-        }
-        return null;
-    }
-
     //  protected for testing
     protected FeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
@@ -531,12 +508,6 @@ public class WFSDataStore extends AbstractDataStore {
         is.close();
 
         return ft;
-    }
-    private CRSService crsService;
-    private CRSService getCRSService(){
-        if(crsService == null)
-            crsService = new CRSService();
-        return crsService;
     }
 
     //  protected for testing
@@ -782,14 +753,14 @@ public class WFSDataStore extends AbstractDataStore {
         
         query = new DefaultQuery(query);
         // TODO modify bbox requests here
-        FeatureSetDescription fsd = getFSD(query.getTypeName());
+        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,query.getTypeName());
         
         Envelope maxbbox = fsd.getLatLongBoundingBox();
         CoordinateReferenceSystem crs = null;
         if(fsd.getSRS()!=null){
             // reproject this
             try {
-                crs = getCRSService().createCRS(fsd.getSRS());
+                crs = WFSDataStoreFactory.getCRSService().createCRS(fsd.getSRS());
                 MathTransform mt = CRSService.reproject(CRSService.GEOGRAPHIC,crs,false);
                 maxbbox = CRSService.transform(maxbbox,mt);
             } catch (FactoryException e) {

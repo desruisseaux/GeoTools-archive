@@ -18,6 +18,8 @@ package org.geotools.data.ows;
 
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
+
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -40,6 +42,20 @@ public class WFSCapabilities {
     private String vendorSpecificCapabilities;
     private FilterCapabilities filterCapabilities;
 
+    public static FeatureSetDescription getFeatureSetDescription(WFSCapabilities capabilities, String typename){
+        List l = capabilities.getFeatureTypes();
+        Iterator i = l.iterator();
+        String crsName = null;
+
+        while (i.hasNext() && crsName==null) {
+                FeatureSetDescription fsd = (FeatureSetDescription) i.next();
+                if (typename.equals(fsd.getName()) || (fsd.getName()!=null && typename.equals(fsd.getName().substring(typename.indexOf(':')+1)))) {
+                    return fsd;
+                }
+        }
+        return null;
+    }
+    
     /**
      * DOCUMENT ME!
      *

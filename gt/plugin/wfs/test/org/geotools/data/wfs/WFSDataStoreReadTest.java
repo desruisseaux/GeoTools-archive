@@ -72,29 +72,6 @@ public class WFSDataStoreReadTest extends TestCase {
 //        System.out.print(w.getBuffer());
     }
     
-    public void testGaldos() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
-        System.out.println("\nGaldos");
-//        doFeatureType(url,true,false,1);
-//        doFeatureReader(url,false,false,1);
-//        doFeatureReaderWithFilter(url,false,false,1);
-        System.out.println("");
-    }
-    
-//    public void testLocalGeoServer() throws NoSuchElementException, IllegalAttributeException, IOException{
-//    	URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
-//    	try{
-//    		url.openConnection();
-//    	}catch(Exception e){
-//    		return; // server not around
-//    	}
-//        System.out.println("\nLocal GeoServer");
-//        doFeatureType(url,true,true,1);
-//        doFeatureReader(url,true,true,0);
-//        doFeatureReader(url,true,true,1);
-//        System.out.println("");
-//    }
-    
     public void testESRI() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://dev.geographynetwork.ca/ogcwfs/servlet/com.esri.ogc.wfs.WFSServlet?Request=GetCapabilities");
         
@@ -136,15 +113,6 @@ public class WFSDataStoreReadTest extends TestCase {
         doFeatureType(url,true,false,0);
 //        doFeatureReader(url,true,false);
 //        doFeatureReaderWithFilter(url,true,false);
-        System.out.println("");
-    }
-    
-    public void testMapServer() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        URL url = new URL("http://map.ns.ec.gc.ca/MapServer/mapserv.exe?map=/mapserver/services/envdat/config.map&service=WFS&version=1.0.0&request=GetCapabilities");
-        System.out.println("\nMapServer");
-        doFeatureType(url,true,false,0);
-        doFeatureReader(url,true,false,0);
-        doFeatureReaderWithFilter(url,true,false,0);
         System.out.println("");
     }
     

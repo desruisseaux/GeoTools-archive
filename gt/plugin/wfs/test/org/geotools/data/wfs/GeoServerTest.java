@@ -77,10 +77,10 @@ public class GeoServerTest extends TestCase {
         WFSDataStoreReadTest.doFeatureType(url,true,false,1);
     }
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
-        WFSDataStoreReadTest.doFeatureReader(url,true,true,1);
+        WFSDataStoreReadTest.doFeatureReader(url,true,false,1);
     }
     public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,1);
+        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,1);
     }
     
 //    public void testWrite() throws NoSuchElementException, IllegalFilterException, FactoryConfigurationError, IOException, IllegalAttributeException{

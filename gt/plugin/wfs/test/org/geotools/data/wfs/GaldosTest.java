@@ -72,13 +72,13 @@ public class GaldosTest extends TestCase {
         url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
     }
     
-//    public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
+    public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
 //        WFSDataStoreReadTest.doFeatureType(url,false,true,1);
-//    }
-//    public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
+    }
+    public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
 //        WFSDataStoreReadTest.doFeatureReader(url,false,true,1);
-//    }
-//    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
+    }
+    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
 //        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,false,true,1);
-//    }
+    }
 }

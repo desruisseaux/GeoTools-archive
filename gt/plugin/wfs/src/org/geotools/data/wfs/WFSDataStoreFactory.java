@@ -18,6 +18,7 @@ package org.geotools.data.wfs;
 
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
+import org.geotools.data.crs.CRSService;
 import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URL;
@@ -252,5 +253,11 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      */
     public boolean isAvailable() {
         return true;
+    }
+    private static CRSService crsService;
+    public static CRSService getCRSService(){
+        if(crsService == null)
+            crsService = new CRSService();
+        return crsService;
     }
 }
