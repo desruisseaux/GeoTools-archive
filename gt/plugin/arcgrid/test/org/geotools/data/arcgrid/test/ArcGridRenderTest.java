@@ -37,6 +37,7 @@ import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
@@ -82,7 +83,7 @@ public class ArcGridRenderTest extends TestCaseSupport {
 
         setup = true;
 
-        URL url = getTestResource("ArcGrid.asc");
+        URL url = TestData.getResource( this, "ArcGrid.asc");
         ds = new ArcGridDataSource(url);
 
         // Build the coordinate system
@@ -142,8 +143,8 @@ public class ArcGridRenderTest extends TestCaseSupport {
         AffineTransform at = renderer.worldToScreenTransform(dataArea, paintArea);
         renderer.paint(g, paintArea, at);
 
-        java.net.URL base = getClass().getResource("testData/");
-        File file = new File(java.net.URLDecoder.decode(base.getPath(), "UTF-8"), filename);
+        java.net.URL base = TestData.getResource( this, null );
+        File file = new File(java.net.URLDecoder.decode( base.getPath(), "UTF-8"), filename);
         System.out.println("Writing to " + file.getAbsolutePath());
 
         FileOutputStream out = new FileOutputStream(file);

@@ -10,6 +10,7 @@ package org.geotools.data.arcgrid.test;
 import java.net.URL;
 
 import org.geotools.data.arcgrid.ArcGridRaster;
+import org.geotools.resources.TestData;
 
 /**
  * @author Christiaan ten Klooster
@@ -25,8 +26,7 @@ public class ArcGridHeaderTest extends TestCaseSupport {
 	}
 
 	public void testHeaderSource() throws Exception {
-		
-		URL url = getTestResource("ArcGrid.asc");
+	    URL url = TestData.getResource( this, "ArcGrid.asc" );		
 		ArcGridRaster header = new ArcGridRaster(url);
         header.parseHeader();
 		assertEquals("ncols", header.getNCols(), 233);

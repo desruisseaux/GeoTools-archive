@@ -13,6 +13,7 @@ import org.geotools.data.DataSource;
 import org.geotools.data.DataSourceFactorySpi;
 import org.geotools.data.DataSourceFinder;
 import org.geotools.data.arcgrid.ArcGridDataSourceFactory;
+import org.geotools.resources.TestData;
 
 /**
  *
@@ -46,7 +47,7 @@ public class ServiceTest extends TestCaseSupport {
   
   public void testArcGridDataSource() throws Exception{
     HashMap params = new HashMap();
-    params.put("url", getTestResource(TEST_FILE).toString());
+    params.put("url", TestData.getResource( this, TEST_FILE).toString());
     DataSource ds = DataSourceFinder.getDataSource(params);
     assertNotNull(ds);
   }

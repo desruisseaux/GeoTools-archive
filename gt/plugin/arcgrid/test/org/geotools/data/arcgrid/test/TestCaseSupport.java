@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
 
+import org.geotools.resources.TestData;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -23,14 +25,7 @@ public abstract class TestCaseSupport extends TestCase {
   /** Creates a new instance of TestCaseSupport */
   public TestCaseSupport(String name) {
     super(name);
-  }
-  
-  protected URL getTestResource(String name) {
-    URL r = TestCaseSupport.class.getResource("testData/" + name);
-    if (r == null)
-      throw new RuntimeException("Could not locate resource : " + name);
-    return r;
-  }
+  }  
   
   protected InputStream getTestResourceAsStream(String name) {
     InputStream in = TestCaseSupport.class.getResourceAsStream("testData/" + name);

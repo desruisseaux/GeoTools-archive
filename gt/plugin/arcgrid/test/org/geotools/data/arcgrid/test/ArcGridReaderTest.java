@@ -8,6 +8,7 @@ import java.net.URL;
 import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.resources.TestData;
 import org.opengis.parameter.OperationParameter;
 import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterValue;
@@ -42,7 +43,7 @@ public class ArcGridReaderTest extends TestCaseSupport {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        url = getTestResource(TESTFILE);
+        url = TestData.getResource( this, TESTFILE );        
         format=(new ArcGridFormatFactory()).createFormat();
         reader = format.getReader(url);
     }
@@ -71,7 +72,8 @@ public class ArcGridReaderTest extends TestCaseSupport {
      * format
      */
     public void testGZIPReadStringParameterArray() throws Exception {
-        reader=format.getReader(getTestResource(GZIP_TESTFILE));
+        URL gzipUrl = TestData.getResource( this, GZIP_TESTFILE );
+        reader=format.getReader( gzipUrl );
         OperationParameterGroup params = format.getReadParameters();
         ParameterValueGroup values = (ParameterValueGroup) params.createValue();
         
