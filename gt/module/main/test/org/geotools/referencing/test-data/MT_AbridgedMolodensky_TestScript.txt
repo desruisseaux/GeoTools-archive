@@ -1,5 +1,4 @@
 //AbridgedMolodenskyTransformation tests
-//Note that z values (third dimention) are not yet tested here.
 //the following test points are outside of the valid regions for these datums
 //Calculations were done with ArcGIS 8.3, calculations for Z were done
 //with a spreadsheet (OO.o)
