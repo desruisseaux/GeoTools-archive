@@ -385,7 +385,7 @@ public class MathTransformTest extends TestCase {
         } else {
             parameters.parameter("base").setValue(random.nextDouble()*4 + 0.1);
         }
-        return (MathTransform1D) factory.createParameterizedTransform(classification, parameters);
+        return (MathTransform1D) factory.createParameterizedTransform(parameters);
     }
 
     /**
@@ -474,7 +474,7 @@ public class MathTransformTest extends TestCase {
         final ParameterValueGroup parameters = factory.getDefaultParameters(classification);
         parameters.parameter("base").setValue(base);
         final MathTransform1D direct =
-             (MathTransform1D) factory.createParameterizedTransform(classification, parameters);
+             (MathTransform1D) factory.createParameterizedTransform(parameters);
         final MathTransform1D inverse = (MathTransform1D) direct.inverse();
         final DirectPosition1D point = new DirectPosition1D();
         for (int i=0; i<expected.length; i++) {

@@ -973,7 +973,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      *
-     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,String,ParameterValueGroup,CartesianCS)}
+     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)}
      *             for concistency with the rest of the API, which work with {@link ParameterValueGroup}
      *             rather than an array of {@link GeneralParameterValue}.
      */
@@ -994,7 +994,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
                 throw new UnsupportedOperationException();        
             }
         }
-        return createProjectedCRS(properties, geoCRS, method, group, cs);
+        return createProjectedCRS(properties, geoCRS, group, cs);
     }
 
     /**
@@ -1004,7 +1004,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Geographic coordinate reference system to base projection on.
-     * @param  methodName The name of the method for the projection.
      * @param  parameters The parameter values to give to the projection.
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
@@ -1013,7 +1012,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      */
     public ProjectedCRS createProjectedCRS(Map                 properties,
                                            GeographicCRS             base,
-                                           String              methodName,
                                            ParameterValueGroup parameters,
                                            CartesianCS          derivedCS)
             throws FactoryException
@@ -1057,16 +1055,17 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
              */
             final Singleton methods = new Singleton();
             step2 = ((org.geotools.referencing.operation.MathTransformFactory)mtFactory)
-                    .createParameterizedTransform(methodName, parameters, methods);
+                    .createParameterizedTransform(parameters, methods);
             method = (OperationMethod) methods.get();
         } else {
             /*
              * Non-geotools implementation : iterate over all methods know to the factory.
              */
-            step2 = mtFactory.createParameterizedTransform(methodName, parameters);
+            step2 = mtFactory.createParameterizedTransform(parameters);
+            final String classification = parameters.getDescriptor().getName().getCode();
             for (final Iterator it=mtFactory.getAvailableMethods(null).iterator(); it.hasNext();) {
                 final OperationMethod candidate = (OperationMethod) it.next();
-                if (IdentifiedObject.nameMatches(candidate, methodName)) {
+                if (IdentifiedObject.nameMatches(candidate, classification)) {
                     method = candidate;
                     break;
                 }

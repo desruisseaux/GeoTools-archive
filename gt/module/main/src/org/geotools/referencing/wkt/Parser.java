@@ -464,9 +464,9 @@ public class Parser extends MathTransformParser {
                                                 final Unit      angularUnit)
         throws ParseException
     {                
-        final Element element = parent.pullElement("PROJECTION");
-               classification = element.pullString("name");
-        final Map  properties = parseAuthority(element, classification);
+        final Element       element = parent.pullElement("PROJECTION");
+        final String classification = element.pullString("name");
+        final Map        properties = parseAuthority(element, classification);
         element.close();
         /*
          * Set the list of parameters.  NOTE: Parameters are defined in
@@ -791,7 +791,7 @@ public class Parser extends MathTransformParser {
                 axis1 = createAxis("Y", AxisDirection.NORTH, linearUnit);
             }
             element.close();
-            return crsFactory.createProjectedCRS(properties, geoCRS, classification, projection,
+            return crsFactory.createProjectedCRS(properties, geoCRS, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);

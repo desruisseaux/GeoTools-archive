@@ -170,8 +170,7 @@ public class CreationTest extends TestCase {
         out.println(cartCS); // No WKT for coordinate systems
             
         final ProjectedCRS projCRS;
-        projCRS = crsFactory.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS,
-                                                "Transverse_Mercator", param, cartCS);
+        projCRS = crsFactory.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, param, cartCS);
         out.println();
         out.println("create Coodinate System....9: ");
         out.println(projCRS.toWKT());
@@ -198,7 +197,7 @@ public class CreationTest extends TestCase {
             }
             final MathTransform mt;
             try {
-                mt = mtFactory.createParameterizedTransform(classification, param);
+                mt = mtFactory.createParameterizedTransform(param);
             } catch (FactoryException e) {
                 // Probably not a map projection. This test is mostly about projection, so ignore.
                 continue;

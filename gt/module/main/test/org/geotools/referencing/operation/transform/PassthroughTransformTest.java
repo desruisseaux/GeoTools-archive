@@ -87,7 +87,7 @@ public class PassthroughTransformTest extends TransformationTest {
      */
     public void testPassthrough() throws FactoryException, TransformException {
         final ParameterValueGroup param = mtFactory.getDefaultParameters("Exponential");
-        runTest(mtFactory.createParameterizedTransform("Exponential", param));
+        runTest(mtFactory.createParameterizedTransform(param));
     }
 
     /**

@@ -35,7 +35,7 @@
 {@link javax.media.jai.ParameterList} parameters = factory.getMathTransformProvider("Mercator_1SP").getParameterList();
 parameters.setParameter("semi_major", 6378137.0);
 parameters.setParameter("semi_minor", 6356752.314);
-{@link org.geotools.ct.MathTransform} projection = factory.createParameterizedTransform("Mercator_1SP", parameters);
+{@link org.geotools.ct.MathTransform} projection = factory.createParameterizedTransform(parameters);
     </PRE></BLOCKQUOTE>
 
     <P ALIGN="justify">The "Mercator_1SP" string is the classification name for

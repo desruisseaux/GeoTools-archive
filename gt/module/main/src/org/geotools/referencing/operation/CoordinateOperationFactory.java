@@ -1177,7 +1177,7 @@ public class CoordinateOperationFactory extends Factory
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normSourceCRS.getCoordinateSystem().getDimension());
-        transform = factory.createParameterizedTransform("Ellipsoid_To_Geocentric", param);
+        transform = factory.createParameterizedTransform(param);
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep    (    sourceCRS, normSourceCRS);
@@ -1211,7 +1211,7 @@ public class CoordinateOperationFactory extends Factory
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normTargetCRS.getCoordinateSystem().getDimension());
-        transform = factory.createParameterizedTransform("Geocentric_To_Ellipsoid", param);
+        transform = factory.createParameterizedTransform(param);
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep    (    sourceCRS, normSourceCRS);

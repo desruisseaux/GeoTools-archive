@@ -163,13 +163,13 @@ public class BasicTest extends TestCase {
 
         parameters.parameter("semi_major").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
         parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMinorAxis());
-        transform = factory.createParameterizedTransform("Mercator_1SP", parameters);
+        transform = factory.createParameterizedTransform(parameters);
         sourceCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
         parameters.parameter("false_easting" ).setValue(1000);
         parameters.parameter("false_northing").setValue(2000);
-        transform = factory.createParameterizedTransform("Mercator_1SP", parameters);
+        transform = factory.createParameterizedTransform(parameters);
         targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
@@ -181,7 +181,7 @@ public class BasicTest extends TestCase {
         }), conversion);
 
         parameters.parameter("scale_factor").setValue(2);
-        transform = factory.createParameterizedTransform("Mercator_1SP", parameters);
+        transform = factory.createParameterizedTransform(parameters);
         targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
 
@@ -193,7 +193,7 @@ public class BasicTest extends TestCase {
         }), conversion);
 
         parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
-        transform = factory.createParameterizedTransform("Mercator_1SP", parameters);
+        transform = factory.createParameterizedTransform(parameters);
         targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
         conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);

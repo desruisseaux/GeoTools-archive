@@ -63,7 +63,7 @@ public class MathTransformParser extends AbstractParser {
      * The classification of the last math transform or projection parsed,
      * or <code>null</code> if none.
      */
-    String classification;
+    private String classification;
 
     /**
      * The method for the last math transform passed.
@@ -200,9 +200,9 @@ public class MathTransformParser extends AbstractParser {
         try {
             if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
                 return ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
-                       .createParameterizedTransform(classification, parameters, method);
+                       .createParameterizedTransform(parameters, method);
             }
-            return mtFactory.createParameterizedTransform(classification, parameters);
+            return mtFactory.createParameterizedTransform(parameters);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }

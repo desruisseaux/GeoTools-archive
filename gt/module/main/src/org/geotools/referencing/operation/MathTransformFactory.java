@@ -290,7 +290,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *
      * <P>This method creates new parameter instances at every call. It is intented to be modified
      * by the user before to be passed to <code>{@linkplain #createParameterizedTransform
-     * createParameterizedTransform}(method, parameters)</code>.</P>
+     * createParameterizedTransform}(parameters)</code>.</P>
      *
      * @param  method The case insensitive name of the method to search for.
      * @return The default parameter values.
@@ -310,34 +310,15 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
 
     /**
      * Creates a transform from a group of parameters. The method name is inferred from
-     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}.
-     *
-     * @param  parameters The parameter values.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the method.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     *
-     * @deprecated Use {@link #createParameterizedTransform(String,ParameterValueGroup)} instead.
-     */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
-            throws FactoryException
-    {
-        return createParameterizedTransform(parameters.getDescriptor().getName().getCode(),
-                                            parameters);
-    }
-
-    /**
-     * Creates a transform from a group of parameters. Example:
+     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}. Example:
      *
      * <blockquote><pre>
      * ParameterValueGroup p = factory.getDefaultParameters("Transverse_Mercator");
      * p.parameter("semi_major").setValue(6378137.000);
      * p.parameter("semi_minor").setValue(6356752.314);
-     * MathTransform mt = factory.createParameterizedTransform("Transverse_Mercator", p);
+     * MathTransform mt = factory.createParameterizedTransform(p);
      * </pre></blockquote>
      *
-     * @param  method The case insensitive name of the method to search for.
      * @param  parameters The parameter values.
      * @return The parameterized transform.
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
@@ -347,11 +328,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #getDefaultParameters
      * @see #getAvailableMethods
      */
-    public MathTransform createParameterizedTransform(final String method,
-                                                      ParameterValueGroup parameters)
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws FactoryException
     {
-        return createParameterizedTransform(method, parameters, null);
+        return createParameterizedTransform(parameters, null);
     }
 
     /**
@@ -360,7 +340,6 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
-     * @param  method The case insensitive name of the method to search for.
      * @param  parameters The parameter values.
      * @param  methods A collection where to add the operation method that apply to the transform,
      *                 or <code>null</code> if none.
@@ -369,11 +348,11 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
      */
-    public MathTransform createParameterizedTransform(String              method,
-                                                      ParameterValueGroup parameters,
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
                                                       Collection          methods)
             throws FactoryException
     {
+        final String method = parameters.getDescriptor().getName().getCode();
         final MathTransformProvider provider = getProvider(method);
         MathTransform tr;
         try {
