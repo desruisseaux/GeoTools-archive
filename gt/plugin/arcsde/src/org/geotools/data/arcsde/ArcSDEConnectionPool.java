@@ -88,10 +88,10 @@ public class ArcSDEConnectionPool {
                                                                                     .getName());
 
     /** default number of connections a pool creates at first population */
-    public static final int DEFAULT_CONNECTIONS = 1;
+    public static final int DEFAULT_CONNECTIONS = 2;
 
     /** default number of maximun allowable connections a pool can hold */
-    public static final int DEFAULT_MAX_CONNECTIONS = 1;
+    public static final int DEFAULT_MAX_CONNECTIONS = 2;
 
     /** default number of connections a pool increments by */
     public static final int DEFAULT_INCREMENT = 1;
@@ -150,7 +150,6 @@ public class ArcSDEConnectionPool {
         }
 
         this.config = config;
-        LOGGER.info("just created SDE connection pool: " + config);
         LOGGER.fine("populating ArcSDE connection pool");
 
         synchronized (mutex) {
@@ -172,8 +171,6 @@ public class ArcSDEConnectionPool {
             int actualCount = getPoolSize();
             int increment = (actualCount == 0) ? minConnections
                                                : config.getIncrement().intValue();
-            LOGGER.info("creating " + increment + " new SDE connections");
-
             int actual = 0;
 
             while ((actual++ < increment)
@@ -203,25 +200,75 @@ public class ArcSDEConnectionPool {
     }
 
     /**
+     * This method does not just release a connection, it 'recycles' it, 
+     * to make a completely new connection.  This is due to a nasty problem
+     * with <i>some</i> arcsde instances on <i>some</i> datastores, only when
+     * spatial constraints are used.  They seem to poison the connection.
+     * So this is a half decent work around, which probably slows things a bit,
+     * but also makes it work.
+     */
+    public void recycle(SeConnection seConnection) throws DataSourceException {
+	if (seConnection == null) {
+	    LOGGER.fine("trying to recycle a null connection");
+	    return;
+        }
+
+        synchronized (mutex) {
+	    LOGGER.finer("trying to recycle seconnection: " + seConnection);
+	    LOGGER.finer("used is: " + usedConnections + "\navailable is " + availableConnections);
+	    //added to force close
+	    try {
+	    seConnection.close();
+	    } catch (SeException sex) {
+		LOGGER.fine("trouble closing seconnection: " + sex.getMessage());
+		sex.printStackTrace();
+	    }
+	    if (usedConnections.contains(seConnection)) {
+		usedConnections.remove(seConnection);
+	    }
+	    if (availableConnections.contains(seConnection)) {
+		LOGGER.fine("trying to recycle an already freed connection, " +
+			    "getting rid of the free one...");
+		availableConnections.remove(seConnection);
+	    } 
+
+	    SeConnection newConnection = null;
+                try {
+                    newConnection = newConnection();
+                    availableConnections.add(newConnection);
+                    LOGGER.fine("recycled new connection to pool: " + newConnection);
+                } catch (SeException ex) {
+                    throw new DataSourceException("Can't create connection to "
+                        + config.getServerName() + ": " + ex.getMessage(), ex);
+                }
+            LOGGER.fine(seConnection + " freed" + ", added " + newConnection);
+        }
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param seConnection DOCUMENT ME!
      */
     public void release(SeConnection seConnection) {
         if (seConnection == null) {
-            return;
+	    LOGGER.fine("trying to release a null connection");
+	    return;
         }
 
         synchronized (mutex) {
-            usedConnections.remove(seConnection);
-
+	    LOGGER.fine("trying to release a seconnection: " + seConnection);
+	    LOGGER.finer("used is: " + usedConnections + "\navailable is " + availableConnections);
+	    usedConnections.remove(seConnection);
             if (availableConnections.contains(seConnection)) {
                 LOGGER.fine("trying to free an already freed connection...");
             } else {
                 availableConnections.add(seConnection);
             }
-
-            LOGGER.fine(seConnection + " freed");
+	    
+	    LOGGER.fine(seConnection + "freed, after release used is: " + 
+			usedConnections + 
+			"\navailable is " + availableConnections);
         }
     }
 
@@ -257,7 +304,7 @@ public class ArcSDEConnectionPool {
             }
 
             closed = true;
-            LOGGER.info("SDE connection pool closed. " + (used + available)
+            LOGGER.fine("SDE connection pool closed. " + (used + available)
                 + " connections freed");
         }
     }
@@ -475,7 +522,10 @@ public class ArcSDEConnectionPool {
             conn = getConnection();
             layers = conn.getLayers();
         } catch (SeException ex) {
-            throw new DataSourceException("Error querying the layers list", ex);
+            throw new DataSourceException("Error querying the layers list"
+					  + ex.getSeError().getSdeError() +
+					  " (" + ex.getSeError().getErrDesc()
+					  + ") ", ex);
         } catch (UnavailableConnectionException ex) {
             throw new DataSourceException("No free connection found to query the layers list",
                 ex);

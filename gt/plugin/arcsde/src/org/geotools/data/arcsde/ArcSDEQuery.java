@@ -16,14 +16,6 @@
  */
 package org.geotools.data.arcsde;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.GeometryEncoderException;
-
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -37,6 +29,12 @@ import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+import org.geotools.filter.GeometryEncoderException;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 
 /**
@@ -57,6 +55,12 @@ public class ArcSDEQuery {
     private SeQuery query;
     private SeSqlConstruct sqlConstruct;
     private FilterSet filters;
+    private SeConnection connection = null;
+    /** This field is a bit of a hack, to help with GEOT-264.  It seems spatial
+	queries on some installs get stale, so I added code to recycle 
+	connections.  With this we optimize a bit to only recycle on queries
+	that use spatial constraints. */
+    private boolean spatialConstraintsSet = false;
 
     /**
      * Creates a new SDEQuery object.
@@ -75,10 +79,14 @@ public class ArcSDEQuery {
         this.connectionPool = pool;
         this.sqlConstruct = sqlConstruct;
 
-        SeConnection connection = null;
+
 
         try {
             connection = this.connectionPool.getConnection();
+	    LOGGER.fine("constructing new sql query with connection: " +
+			connection + ", propnames: " + 
+			java.util.Arrays.asList(getPropertyNames()) +
+			" sqlConstruct: " + sqlConstruct);
             this.query = new SeQuery(connection, getPropertyNames(),
                     sqlConstruct);
         } catch (SeException seEx) {
@@ -92,7 +100,7 @@ public class ArcSDEQuery {
             throw new DataSourceException("Can't create a SDE query: "
                 + ex.getMessage(), ex);
         } finally {
-            connectionPool.release(connection);
+            //connectionPool.release(connection);
         }
     }
 
@@ -163,14 +171,15 @@ public class ArcSDEQuery {
      */
     public int calculateResultCount() throws DataSourceException {
         int count = -1;
-        SeConnection connection = null;
+        //SeConnection connection = null;
 
-        try {
+        /*try {
             connection = connectionPool.getConnection();
         } catch (UnavailableConnectionException ex) {
             throw new DataSourceException(ex.getMessage(), ex);
-        }
-
+	    }*/
+        LOGGER.fine("about to calculate result count");
+	SeQuery countQuery = null;
         try {
             if (!filters.getGeometryFilter().equals(Filter.NONE)) {
                 count = countResults(connection);
@@ -179,11 +188,24 @@ public class ArcSDEQuery {
                     "Using the count(*) optimized result count calculation");
 
                 String[] columns = { "count(*)" };
-                SeQuery countQuery = null;
+                //SeQuery countQuery = null;
                 countQuery = new SeQuery(connection, columns, sqlConstruct);
                 countQuery.prepareQuery();
                 countQuery.execute();
-                count = countQuery.fetch().getInteger(0).intValue();
+
+                Object countObj = countQuery.fetch().getObject(0);
+                LOGGER.finer("class for count is " + countObj.getClass());
+                LOGGER.finer("the object is " + countObj);
+
+                if (countObj instanceof Number) {
+                    return ((Number) countObj).intValue();
+                } else {
+                    throw new DataSourceException("count was not a number"
+                        + ", could not count, object is " + countObj
+                        + " of class " + countObj.getClass());
+                }
+
+                //count = countQuery.fetch().getInteger(0).intValue();
             }
         } catch (DataSourceException ex) {
             throw ex;
@@ -191,8 +213,15 @@ public class ArcSDEQuery {
             throw new DataSourceException("Error obtaining result count: "
                 + ex.getMessage(), ex);
         } finally {
-            connectionPool.release(connection);
-        }
+            try {
+                if (countQuery != null) {
+                    countQuery.close();
+                }
+            } catch (SeException ex) {
+                LOGGER.warning(ex.getMessage());
+            }
+            //connectionPool.release(connection);
+	    }
 
         return count;
     }
@@ -225,9 +254,11 @@ public class ArcSDEQuery {
 
         try {
             countQuery = new SeQuery(connection, cols, sqlConstruct);
-            connectionPool.release(connection);
+            LOGGER.fine("not freeing connection here...");
+            //connectionPool.release(connection);
             countQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
                 geometryFilters);
+            spatialConstraintsSet = true;
             countQuery.prepareQuery();
             countQuery.execute();
 
@@ -273,10 +304,10 @@ public class ArcSDEQuery {
             //we can't reuse the fetching query because the extent can't
             //be calculated if the stream is opened
             SeQuery extentQuery = null;
-            SeConnection connection = null;
+            //SeConnection connection = null;
 
             try {
-                connection = connectionPool.getConnection();
+                //connection = connectionPool.getConnection();
                 extentQuery = new SeQuery(connection, getPropertyNames(),
                         sqlConstruct);
 
@@ -284,6 +315,7 @@ public class ArcSDEQuery {
                     SeFilter[] geometryFilters = filters.createSpatialFilters();
                     extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
                         false, geometryFilters);
+	                spatialConstraintsSet = true;
                 }
 
                 SeQueryInfo sdeQueryInfo = new SeQueryInfo();
@@ -297,7 +329,7 @@ public class ArcSDEQuery {
                 throw new DataSourceException(
                     "Can't consult the query extent: " + ex.getMessage(), ex);
             } finally {
-                connectionPool.release(connection);
+                //connectionPool.release(connection);
 
                 try {
                     if (extentQuery != null) {
@@ -312,7 +344,7 @@ public class ArcSDEQuery {
         envelope = new Envelope(extent.getMinX(), extent.getMaxX(),
                 extent.getMinY(), extent.getMaxY());
 
-        return envelope;
+		return envelope; 
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -326,19 +358,33 @@ public class ArcSDEQuery {
      */
     public void close() {
         try {
-            /*
-               if ( (connectionPool != null) && (connection != null)) {
-                 connectionPool.release(connection);
-                 connection = null;
-                 connectionPool = null;
-               }
-             */
+	    LOGGER.finer("close called on ArcSDEQuery: " + toString());
             if (query != null) {
                 query.close();
             }
+
+               if ( (connectionPool != null) && (connection != null)) {
+		    if (spatialConstraintsSet) {
+			LOGGER.finer("recycling connection: " + connection); 
+			connectionPool.recycle(connection);
+		    } else {
+			LOGGER.finer("releasing connection: " + connection);
+			connectionPool.release(connection);
+		    }
+                 connection = null;
+                 connectionPool = null;
+               }
+		
+            
         } catch (SeException ex) {
-            LOGGER.warning("Trying to close an SeQuery: " + ex.getMessage());
-        }
+            LOGGER.warning("Trying to close an SeQuery: " + ex.getMessage()
+                + ex.getSeError().getSdeError() + " ("
+                + ex.getSeError().getErrDesc() + ")");
+	    ex.printStackTrace();
+        } catch (DataSourceException dse) {
+	    LOGGER.warning("error with connectionPool: " + dse.getMessage());
+	    dse.printStackTrace();
+	}
     }
 
     /**
@@ -623,5 +669,12 @@ public class ArcSDEQuery {
     public void setSpatialConstraints(SeFilter[] filters)
         throws SeException {
         query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false, filters);
+        spatialConstraintsSet = true;
     }
+
+    public String toString() {
+	return "Schema: " + schema.getTypeName() + ", query: " + query +
+	    " obj: " + super.toString();
+    }
+
 }
