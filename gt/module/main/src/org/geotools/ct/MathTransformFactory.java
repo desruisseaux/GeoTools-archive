@@ -67,7 +67,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.DescriptorNaming;
-import org.geotools.resources.JAIUtilities;
+import org.geotools.resources.image.JAIUtilities;
 
 
 /**

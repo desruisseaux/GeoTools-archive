@@ -72,7 +72,7 @@ import javax.media.jai.util.Range;
 // Resources
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.ComponentColorModelJAI;
+import org.geotools.resources.image.ComponentColorModelJAI;
 
 
 /**

@@ -55,8 +55,8 @@ import javax.media.jai.FloatDoubleColorModel;
 import org.geotools.util.WeakValueHashMap;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.ComponentColorModelJAI;
-import org.geotools.resources.ColorUtilities;
+import org.geotools.resources.image.ColorUtilities;
+import org.geotools.resources.image.ComponentColorModelJAI;
 
 
 /**

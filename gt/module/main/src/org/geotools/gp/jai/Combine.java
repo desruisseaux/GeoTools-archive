@@ -50,7 +50,7 @@ import javax.vecmath.MismatchedSizeException;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.resources.ImageUtilities;
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**

@@ -73,11 +73,11 @@ import org.geotools.util.NumberRange;
 import org.geotools.resources.XMath;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.ColorUtilities;
 import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.ColorUtilities;
 
 
 /**

@@ -46,7 +46,7 @@ import junit.framework.*;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.resources.ColorUtilities;
+import org.geotools.resources.image.ColorUtilities;
 
 
 /**

@@ -38,6 +38,7 @@ import org.geotools.pt.*;
 import org.geotools.cs.*;
 import org.geotools.ct.*;
 import org.geotools.resources.*;
+import org.geotools.resources.image.*;
 
 // JUnit dependencies
 import junit.framework.Test;

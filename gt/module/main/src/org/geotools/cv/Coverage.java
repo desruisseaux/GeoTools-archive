@@ -96,10 +96,10 @@ import org.geotools.cs.AxisOrientation;
 // Resources
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.ImageUtilities;
 import org.geotools.resources.XAffineTransform;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**

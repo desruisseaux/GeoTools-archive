@@ -33,7 +33,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.resources;
+package org.geotools.resources.image;
 
 // J2SE dependencies
 import java.awt.image.RasterFormatException;
@@ -51,6 +51,9 @@ import javax.media.jai.iterator.WritableRectIter;
  *
  * @version $Id: DualRectIter.java,v 1.2 2003/08/04 19:07:23 desruisseaux Exp $
  * @author Martin Desruisseaux
+ *
+ * @task REVISIT: This implementation is referenced in a public API.
+ *                Consider moving it somewhere else.
  */
 public final class DualRectIter implements WritableRectIter {
     /**

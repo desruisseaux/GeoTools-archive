@@ -78,10 +78,10 @@ import org.geotools.pt.Dimensioned;
 // Resources
 import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.JAIUtilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.image.JAIUtilities;
 
 
 /**

@@ -52,7 +52,7 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.ComponentSampleModelJAI;
 
 // Geotools dependencies
-import org.geotools.resources.ComponentColorModelJAI;
+import org.geotools.resources.image.ComponentColorModelJAI;
 
 
 /**

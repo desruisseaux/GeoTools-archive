@@ -59,9 +59,9 @@ import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
-import org.geotools.resources.DualRectIter;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.DualRectIter;
 
 
 /**

@@ -47,7 +47,7 @@ import javax.media.jai.ParameterListDescriptorImpl;
 import org.geotools.cv.Category;
 import org.geotools.gc.GridCoverage;
 import org.geotools.cv.SampleDimension;
-import org.geotools.resources.ColorUtilities;
+import org.geotools.resources.image.ColorUtilities;
 
 
 /**

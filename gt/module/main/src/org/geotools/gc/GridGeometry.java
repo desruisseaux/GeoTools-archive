@@ -72,10 +72,10 @@ import org.geotools.cs.FactoryException;
 
 // Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.JAIUtilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.JAIUtilities;
 
 
 /**

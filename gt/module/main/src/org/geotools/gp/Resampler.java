@@ -80,12 +80,12 @@ import org.geotools.ct.CoordinateTransformationFactory;
 // Resources
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
-import org.geotools.resources.JAIUtilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.ImageUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.JAIUtilities;
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**

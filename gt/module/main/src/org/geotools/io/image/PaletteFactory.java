@@ -57,9 +57,9 @@ import java.util.ArrayList;
 // Resources
 import org.geotools.io.LineFormat;
 import org.geotools.io.DefaultFileFilter;
-import org.geotools.resources.ColorUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.ColorUtilities;
 
 
 /**

@@ -30,7 +30,7 @@
  *             Institut Maurice-Lamontagne
  *             mailto:osl@osl.gc.ca
  */
-package org.geotools.resources;
+package org.geotools.resources.image;
 
 // J2SE dependencies
 import java.awt.Color;
@@ -38,6 +38,9 @@ import java.awt.color.ColorSpace;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
+
+// Geotools dependencies
+import org.geotools.resources.XMath;
 
 
 /**

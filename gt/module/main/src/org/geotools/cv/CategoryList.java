@@ -1103,7 +1103,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     /**
      * Transform a raster. Only the current band in <code>iterator</code> will be transformed.
      * The transformed value are write back in the <code>iterator</code>. If a different
-     * destination raster is wanted, a {@link org.geotools.resources.DualRectIter} may be used.
+     * destination raster is wanted, a {@link org.geotools.resources.image.DualRectIter}
+     * may be used.
      *
      * @param  iterator An iterator to iterate among the samples to transform.
      * @throws RasterFormatException if a problem occurs during the transformation.

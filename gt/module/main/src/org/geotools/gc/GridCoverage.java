@@ -118,9 +118,9 @@ import org.geotools.util.WeakHashSet;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.ImageUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**

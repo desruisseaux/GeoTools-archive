@@ -53,6 +53,8 @@ import java.awt.geom.AffineTransform;
  *
  * @version $Id: CTSUtilities.java,v 1.16 2003/06/25 13:22:49 desruisseaux Exp $
  * @author Martin Desruisseaux
+ *
+ * @deprecated Use {@link CRSUtilities} instead.
  */
 public final class CTSUtilities {
     /**

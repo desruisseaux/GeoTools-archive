@@ -51,7 +51,7 @@ import javax.media.jai.WritablePropertySource;
 import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.ColorUtilities;
+import org.geotools.resources.image.ColorUtilities;
 
 
 /**

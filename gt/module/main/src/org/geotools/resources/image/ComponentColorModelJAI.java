@@ -33,7 +33,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.resources;
+package org.geotools.resources.image;
 
 // J2SE dependencies
 import java.awt.color.ColorSpace;
