@@ -23,13 +23,11 @@
 package org.geotools.referencing.crs;
 
 // J2SE dependencies
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 // OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.Datum;
@@ -42,6 +40,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.SingleOperation;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -163,31 +162,13 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
          * accurate than the one inferred from the MathTransform.
          */
         org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
-        /*
-         * Constructs the conversion from all the information above. The ProjectedCRS subclass
-         * will overrides the createConversion method in order to create a projection instead.
-         */
-        this.conversionFromBase = createConversion(
-                /* properties */ new UnprefixedMap(properties, "conversion."),
-                /* sourceCRS  */ base,
-                /* targetCRS  */ this,
-                /* transform  */ baseToDerived,
-                /* method     */ method);
-    }
-
-    /**
-     * Wraps the specified arguments in a {@link Conversion} object. Class {@link ProjectedCRS}
-     * will overrides this method in order to wraps the arguments in a  in a {@link Projection}
-     * object instead.
-     */
-    Conversion createConversion(final Map                       properties,
-                                final CoordinateReferenceSystem sourceCRS,
-                                final CoordinateReferenceSystem targetCRS,
-                                final MathTransform             transform,
-                                final OperationMethod           method)
-    {
-        return new org.geotools.referencing.operation.Conversion(properties,
-                    sourceCRS, targetCRS, transform, method);
+        this.conversionFromBase = (Conversion) SingleOperation.create(
+            /* properties */ new UnprefixedMap(properties, "conversion."),
+            /* sourceCRS  */ base,
+            /* targetCRS  */ this,
+            /* transform  */ baseToDerived,
+            /* method     */ method,
+            /* type       */ (this instanceof ProjectedCRS) ? Projection.class : Conversion.class);
     }
 
     /**

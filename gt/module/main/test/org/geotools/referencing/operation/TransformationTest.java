@@ -29,6 +29,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.PassThroughOperation;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
@@ -196,5 +198,74 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
+    }
+
+    /**
+     * Tests transformations involving compound CRS.
+     */
+    public void testCompoundCRS() throws Exception {
+        final String WGS84 =
+                "GEOGCS[\"WGS 84\",\n"                                                  +
+                "  DATUM[\"WGS_1984\",\n"                                               +
+                "    SPHEROID[\"WGS 84\", 6378137, 298.257223563,\n"                    +
+                "      AUTHORITY[\"EPSG\",\"7030\"]],\n"                                +
+                "    TOWGS84[0,0,0,0,0,0,0],\n"                                         +
+                "    AUTHORITY[\"EPSG\",\"6326\"]],\n"                                  +
+                "  PRIMEM[\"Greenwich\", 0, AUTHORITY[\"EPSG\",\"8901\"]],\n"           +
+                "  UNIT[\"DMSH\",0.0174532925199433, AUTHORITY[\"EPSG\",\"9108\"]],\n"  +
+                "  AXIS[\"Lat\",NORTH],\n"                                              +
+                "  AXIS[\"Long\",EAST],\n"                                              +
+                "  AUTHORITY[\"EPSG\",\"4326\"]]\n";
+
+        final String NAD27 =
+                "GEOGCS[\"NAD27\",\n"                                                   +
+                "  DATUM[\"North_American_Datum_1927\",\n"                              +
+                "    SPHEROID[\"Clarke 1866\", 6378206.4, 294.978698213901,\n"          +
+                "      AUTHORITY[\"EPSG\",\"7008\"]],\n"                                +
+                "    TOWGS84[-3,142,183,0,0,0,0],\n"                                    +
+                "    AUTHORITY[\"EPSG\",\"6267\"]],\n"                                  +
+                "  PRIMEM[\"Greenwich\", 0, AUTHORITY[\"EPSG\",\"8901\"]],\n"           +
+                "  UNIT[\"DMSH\",0.0174532925199433, AUTHORITY[\"EPSG\",\"9108\"]],\n"  +
+                "  AXIS[\"Lat\",NORTH],\n"                                              +
+                "  AXIS[\"Long\",EAST],\n"                                              +
+                "  AUTHORITY[\"EPSG\",\"4267\"]]\n";
+
+        final String Z =
+                "VERT_CS[\"mean sea level height\",\n"                                    +
+                "  VERT_DATUM[\"Mean Sea Level\", 2005, AUTHORITY[\"EPSG\",\"5100\"]],\n" +
+                "  UNIT[\"metre\", 1, AUTHORITY[\"EPSG\",\"9001\"]],\n"                   +
+                "  AXIS[\"Z\",UP], AUTHORITY[\"EPSG\",\"5714\"]]\n";
+
+        final String WGS84_Z = "COMPD_CS[\"Wgs84 with sea-level Z\","+WGS84+","+Z+"]";
+        final String NAD27_Z = "COMPD_CS[\"NAD27 with sea-level Z\","+NAD27+","+Z+"]";
+        final String Z_NAD27 = "COMPD_CS[\"sea-level Z with NAD27\","+Z+","+NAD27+"]";
+
+        CoordinateReferenceSystem sourceCRS, targetCRS;
+        CoordinateOperation op;
+        MathTransform mt;
+
+        sourceCRS = crsFactory.createFromWKT(NAD27);
+        targetCRS = crsFactory.createFromWKT(WGS84);
+        op = opFactory.createOperation(sourceCRS, targetCRS);
+        mt = op.getMathTransform();
+        assertFalse(op instanceof PassThroughOperation);
+        assertFalse(mt.isIdentity());
+
+        sourceCRS = crsFactory.createFromWKT(Z);
+        targetCRS = crsFactory.createFromWKT(Z);
+        op = opFactory.createOperation(sourceCRS, targetCRS);
+        mt = op.getMathTransform();
+        assertFalse(op instanceof PassThroughOperation);
+        assertTrue (mt.isIdentity());
+
+        if (true) return;
+        sourceCRS = crsFactory.createFromWKT(NAD27_Z);
+        targetCRS = crsFactory.createFromWKT(WGS84_Z);
+        op = opFactory.createOperation(sourceCRS, targetCRS);
+        mt = op.getMathTransform();
+        assertTrue(op instanceof PassThroughOperation);
+        assertFalse(mt.isIdentity());
+        
+System.out.println(mt.toWKT());
     }
 }

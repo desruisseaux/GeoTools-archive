@@ -19,20 +19,22 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-
 import javax.vecmath.GMatrix;
 
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**

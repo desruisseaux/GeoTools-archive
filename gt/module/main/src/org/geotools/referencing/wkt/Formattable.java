@@ -91,7 +91,6 @@ public class Formattable {
         Formatter formatter = DEFAULT_FORMATTER;
         if (formatter == null) {
             formatter = new Formatter(new Symbols(Locale.getDefault()), getIndentation());
-            formatter.usesClassname = true;
             DEFAULT_FORMATTER = formatter;
         }
         synchronized (formatter) {
@@ -224,6 +223,7 @@ public class Formattable {
      * @see #toString
      */
     protected String formatWKT(final Formatter formatter) {
+        formatter.setInvalidWKT();
         return Utilities.getShortClassName(this);
     }
 

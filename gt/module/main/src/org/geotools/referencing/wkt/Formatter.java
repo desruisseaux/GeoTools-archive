@@ -140,11 +140,6 @@ public class Formatter {
     private boolean invalidWKT;
 
     /**
-     * True if the formatter should use class name instead of "GEOCS", "DATUM", etc. keywords.
-     */
-    boolean usesClassname;
-
-    /**
      * Creates a new instance of the formatter with the default symbols.
      */
     public Formatter() {
@@ -258,13 +253,6 @@ public class Formatter {
         indent(+1);
         lineChanged = false;
         String keyword = formattable.formatWKT(this);
-        if (usesClassname) {
-            keyword = Utilities.getShortClassName(formattable);
-            final int inner = keyword.indexOf('.');
-            if (inner >= 0) {
-                keyword = keyword.substring(0, inner);
-            }
-        }
         buffer.insert(base, keyword);
         /*
          * Formats the AUTHORITY[<name>,<code>] entity, if there is one. The entity
@@ -460,7 +448,7 @@ public class Formatter {
     public void append(final Unit unit) {
         if (unit != null) {
             appendSeparator(lineChanged);
-            buffer.append(usesClassname ? "Unit" : "UNIT");
+            buffer.append("UNIT");
             buffer.append(symbols.open);
             buffer.append(symbols.quote);
             if (NonSI.DEGREE_ANGLE.equals(unit)) {

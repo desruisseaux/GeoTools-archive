@@ -275,6 +275,6 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.append(getLegacyDatumType());
-        return super.formatWKT(formatter);
+        return Utilities.getShortClassName(this);
     }
 }

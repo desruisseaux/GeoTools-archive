@@ -234,6 +234,26 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
+     * Returns the method for the specified parameters, or <code>null</code> if not found.
+     *
+     * @param  methods The set of methods to search into.
+     * @param  parameters The parameters.
+     * @return The method for the specified parameters, or <code>null</code>.
+     */
+    public static OperationMethod getMethod(final Set                      methods,
+                                            final ParameterDescriptorGroup parameters)
+    {
+        final String classification = parameters.getName().getCode();
+        for (final Iterator it=methods.iterator(); it.hasNext();) {
+            final OperationMethod method = (OperationMethod) it.next();
+            if (IdentifiedObject.nameMatches(method.getParameters(), classification)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the math transform provider for the specified operation method.
      * This provider can be used in order to query parameter for a method name
      * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),

@@ -531,8 +531,17 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * This method provides different methods for different matrix sizes.
          */
         protected OperationMethod getMethod(final MathTransform mt) {
-            final int sourceDimensions = mt.getSourceDimensions();
-            final int targetDimensions = mt.getTargetDimensions();
+            return getMethod(mt.getSourceDimensions(),
+                             mt.getTargetDimensions());
+        }
+
+        /**
+         * Returns the operation method for the specified source and target dimensions.
+         * This method provides different methods for different matrix sizes.
+         */
+        public static OperationMethod getMethod(final int sourceDimensions,
+                                                final int targetDimensions)
+        {
             if (sourceDimensions == targetDimensions) {
                 final int i = sourceDimensions - 1;
                 if (i>=0 && i<methods.length) {

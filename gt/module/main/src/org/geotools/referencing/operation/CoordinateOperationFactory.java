@@ -36,6 +36,7 @@ import javax.vecmath.SingularMatrixException;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -60,15 +61,16 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.Transformation;
+import org.opengis.referencing.operation.SingleOperation;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -79,6 +81,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.util.Singleton;
 import org.geotools.util.WeakHashSet;
 
 
@@ -169,8 +172,7 @@ public class CoordinateOperationFactory extends Factory
         if (equalsIgnoreMetadata(sourceCRS, targetCRS)) {
             final int dim = sourceCRS.getCoordinateSystem().getDimension();
             assert   dim == targetCRS.getCoordinateSystem().getDimension() : dim;
-            return createFromMathTransform(sourceCRS, targetCRS,
-                   factory.createAffineTransform(new GeneralMatrix(dim+1)));
+            return createFromAffineTransform(sourceCRS, targetCRS, new GeneralMatrix(dim+1));
         }
         /////////////////////////////////////////////////////////////////////
         ////                                                             ////
@@ -323,8 +325,7 @@ public class CoordinateOperationFactory extends Factory
             final int dimTarget = targetCRS.getCoordinateSystem().getDimension();
             if (dimTarget == dimSource) {
                 final Matrix  matrix    = new GeneralMatrix(dimTarget+1, dimSource+1);
-                MathTransform transform = factory.createAffineTransform(matrix);
-                return createFromMathTransform(sourceCRS, targetCRS, transform);
+                return createFromAffineTransform(sourceCRS, targetCRS, matrix);
             }
         }
         throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
@@ -363,7 +364,7 @@ public class CoordinateOperationFactory extends Factory
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
     ////////////                                                         ////////////
-    ////////////               C O N C A T E N A T I O N S               ////////////
+    ////////////    C O N C A T E N A T I O N S  /  C R E A T I O N S    ////////////
     ////////////                                                         ////////////
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
@@ -409,16 +410,10 @@ public class CoordinateOperationFactory extends Factory
                    "CRS 1 =" + step1.getTargetCRS() + '\n' +
                    "CRS 2 =" + step2.getSourceCRS();
         }
-        final MathTransform mt1 = step1.getMathTransform();
+        final MathTransform mt1 = step1.getMathTransform(); if (mt1.isIdentity()) return step2;
+        final MathTransform mt2 = step2.getMathTransform(); if (mt2.isIdentity()) return step1;
         final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
-        if (mt1.isIdentity() && equalsIgnoreMetadata(sourceCRS, step2.getSourceCRS())) {
-            return step2;
-        }
-        final MathTransform mt2 = step2.getMathTransform();
         final CoordinateReferenceSystem targetCRS = step2.getTargetCRS();
-        if (mt2.isIdentity() && equalsIgnoreMetadata(step1.getTargetCRS(), targetCRS)) {
-            return step1;
-        }
         return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
                                            new CoordinateOperation[] {step1, step2});
     }
@@ -444,21 +439,78 @@ public class CoordinateOperationFactory extends Factory
         assert equalsIgnoreMetadata(step2.getTargetCRS(), step3.getSourceCRS()) : step3;
 
         final MathTransform mt1 = step1.getMathTransform();
-        final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
-        if (mt1.isIdentity() && equalsIgnoreMetadata(sourceCRS, step2.getSourceCRS())) {
-            return concatenate(step2, step3);
-        }
+        if (mt1.isIdentity()) return concatenate(step2, step3);
         final MathTransform mt2 = step2.getMathTransform();
-        if (mt2.isIdentity()) {
-            return concatenate(step1, step3);
-        }
+        if (mt2.isIdentity()) return concatenate(step1, step3);
         final MathTransform mt3 = step3.getMathTransform();
+        if (mt3.isIdentity()) return concatenate(step1, step2);
+        final CoordinateReferenceSystem sourceCRS = step1.getSourceCRS();
         final CoordinateReferenceSystem targetCRS = step3.getTargetCRS();
-        if (mt3.isIdentity() && equalsIgnoreMetadata(step2.getTargetCRS(), targetCRS)) {
-            return concatenate(step1, step2);
-        }
         return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
                                            new CoordinateOperation[] {step1, step2, step3});
+    }
+
+    /**
+     * Creates a coordinate operation from a matrix, which usually describes an affine tranform.
+     * A default {@link OperationMethod} object is given to this transform.
+     */
+    private CoordinateOperation createFromAffineTransform(
+                                  final CoordinateReferenceSystem sourceCRS,
+                                  final CoordinateReferenceSystem targetCRS,
+                                  final Matrix                    matrix)
+            throws FactoryException
+    {
+        final MathTransform transform = factory.createAffineTransform(matrix);
+        return createFromMathTransform(getTemporaryName(sourceCRS, targetCRS),
+                sourceCRS, targetCRS, transform,
+                ProjectiveTransform.Provider.getMethod(transform.getSourceDimensions(),
+                                                       transform.getTargetDimensions()));
+    }
+
+    /**
+     * Creates a coordinate operation from a set of parameters.
+     * The operation method is inferred automatically, if possible.
+     */
+    private CoordinateOperation createFromParameters(
+                                  final CoordinateReferenceSystem sourceCRS,
+                                  final CoordinateReferenceSystem targetCRS,
+                                  final ParameterValueGroup      parameters)
+            throws FactoryException
+    {
+        final OperationMethod method;
+        final MathTransform transform;
+        if (factory instanceof org.geotools.referencing.operation.MathTransformFactory) {
+            // Special processing for Geotools implementation.
+            final Singleton methods = new Singleton();
+            transform = ((org.geotools.referencing.operation.MathTransformFactory) factory)
+                        .createParameterizedTransform(parameters, methods);
+            method = (OperationMethod) methods.get();
+        } else {
+            // Not a geotools implementation. Try to guess the method.
+            // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
+            transform = factory.createParameterizedTransform(parameters);
+            method    = org.geotools.referencing.operation.MathTransformFactory.getMethod(
+                        factory.getAvailableMethods(CoordinateOperation.class),
+                        (ParameterDescriptorGroup) parameters.getDescriptor());
+        }
+        return createFromMathTransform(getTemporaryName(sourceCRS, targetCRS),
+                                       sourceCRS, targetCRS, transform, /*method*/null);
+        // TODO: debugging in progress (replace 'null' by 'method' once TransformationTest pass).
+    }
+
+    /**
+     * Creates a coordinate operation from a math transform without operation method.
+     * This method will be removed from this class when all operation creation will
+     * be able to provides a method.
+     */
+    private CoordinateOperation createFromMathTransform(
+                                  final CoordinateReferenceSystem sourceCRS,
+                                  final CoordinateReferenceSystem targetCRS,
+                                  final MathTransform             transform)
+            throws FactoryException
+    {
+        return createFromMathTransform(getTemporaryName(sourceCRS, targetCRS),
+                                       sourceCRS, targetCRS, transform, null);
     }
 
     /**
@@ -470,13 +522,16 @@ public class CoordinateOperationFactory extends Factory
      * @param  sourceCRS The source coordinate reference system.
      * @param  targetCRS The destination coordinate reference system.
      * @param  transform The math transform.
+     * @param  method    The operation method, or <code>null</code>.
      * @return A coordinate transform using the specified math transform.
      * @throws FactoryException if the operation can't be constructed.
      */
     private CoordinateOperation createFromMathTransform(
+                                  final Map                       properties,
                                   final CoordinateReferenceSystem sourceCRS,
                                   final CoordinateReferenceSystem targetCRS,
-                                  final MathTransform             transform)
+                                  final MathTransform             transform,
+                                  final OperationMethod           method)
             throws FactoryException
     {
         CoordinateOperation operation;
@@ -488,40 +543,59 @@ public class CoordinateOperationFactory extends Factory
                 return operation;
             }
         }
-        final String name = getName(sourceCRS) + " \u21E8 " + getName(targetCRS);
-        operation = createFromMathTransform(Collections.singletonMap(
-                    org.geotools.referencing.IdentifiedObject.NAME_PROPERTY, name),
-                    sourceCRS, targetCRS, transform);
+        operation = org.geotools.referencing.operation.SingleOperation.create(properties,
+                    sourceCRS, targetCRS, transform, method, CoordinateOperation.class);
+        operation = (CoordinateOperation) pool.canonicalize(operation);
         return operation;
     }
 
     /**
-     * Constructs a coordinate operation from a set of properties. Subclasses can override this
-     * method in order to control the operation creation process.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the source coordinate reference system
-     *                  to positions in the target coordinate reference system.
-     * @throws FactoryException if the operation can't be constructed.
-     *
-     * @see org.geotools.referencing.operation.CoordinateOperation#CoordinateOperation(Map,
-     *      CoordinateReferenceSystem, CoordinateReferenceSystem, MathTransform)
-     *
-     * @todo Constructs {@link Conversion} or {@link Transformation} when possible.
+     * Replace a concatenated operation by a single operation, if possible.
+     * This replacement will be done if only if the concatenated operation
+     * contains exactly one non-linear operation. In this case, all linear
+     * operations are assumed minor adjustement (e.g. axis swapping, units
+     * conversions) and are hidden. The hidden operations will still apply
+     * but will not be visible as a <code>ConcatenatedOperation</code>; the
+     * concatenations will be internal to the math transform only.
+     * <br><br>
+     * This simplification is sometime necessary in order to give an operation
+     * to a {@link PassThroughOperation}.
      */
-    protected CoordinateOperation createFromMathTransform(final Map                      properties,
-                                                          final CoordinateReferenceSystem sourceCRS,
-                                                          final CoordinateReferenceSystem targetCRS,
-                                                          final MathTransform             transform)
+    private CoordinateOperation simplify(final ConcatenatedOperation operation)
             throws FactoryException
     {
-        CoordinateOperation operation;
-        operation = new org.geotools.referencing.operation.SingleOperation(
-                        properties, sourceCRS, targetCRS, transform);
-        operation = (CoordinateOperation) pool.canonicalize(operation);
-        return operation;
+        final SingleOperation[] ops = operation.getOperations();
+        Operation nonlinear = null;
+        for (int i=0; i<ops.length; i++) {
+            final SingleOperation op = ops[i];
+            if (!(op.getMathTransform() instanceof LinearTransform)) {
+                if (op instanceof Operation) {
+                    final Operation o = (Operation) op;
+                    if (!nameMatches(o.getMethod(), "Affine")) {
+                        if (nonlinear != null) {
+                            return operation;
+                        }
+                        nonlinear = o;
+                    }
+                }
+            }
+        }
+        if (nonlinear == null) {
+            return operation;
+        }
+        /*
+         * Found one and only one non-linear operation. Concatenates all math transforms
+         * and returns a single operation with the same method than the non-linear one.
+         */
+        MathTransform transform = null;
+        for (int i=0; i<ops.length; i++) {
+            final MathTransform mt = ops[i].getMathTransform();
+            transform = (transform==null) ? mt : factory.createConcatenatedTransform(transform, mt);
+        }
+        return createFromMathTransform(getProperties(nonlinear),
+                                       operation.getSourceCRS(),
+                                       operation.getTargetCRS(),
+                                       transform, nonlinear.getMethod());
     }
 
 
@@ -853,8 +927,7 @@ public class CoordinateOperationFactory extends Factory
             final double translation = matrix.getElement(0, translationColumn);
             matrix.setElement(0, translationColumn, translation+epochShift);
         }
-        final MathTransform transform = factory.createAffineTransform(matrix);
-        return createFromMathTransform(sourceCRS, targetCRS, transform);
+        return createFromAffineTransform(sourceCRS, targetCRS, matrix);
     }
     
     /**
@@ -878,11 +951,10 @@ public class CoordinateOperationFactory extends Factory
             throw new OperationNotFoundException(getErrorMessage(sourceDatum, targetDatum));
         }
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final VerticalCS    sourceCS  = (VerticalCS) sourceCRS.getCoordinateSystem();
-        final VerticalCS    targetCS  = (VerticalCS) targetCRS.getCoordinateSystem();
-        final Matrix        matrix    = swapAndScaleAxis(sourceCS, targetCS);
-        final MathTransform transform = factory.createAffineTransform(matrix);
-        return createFromMathTransform(sourceCRS, targetCRS, transform);
+        final VerticalCS  sourceCS = (VerticalCS) sourceCRS.getCoordinateSystem();
+        final VerticalCS  targetCS = (VerticalCS) targetCRS.getCoordinateSystem();
+        final Matrix      matrix   = swapAndScaleAxis(sourceCS, targetCS);
+        return createFromAffineTransform(sourceCRS, targetCRS, matrix);
     }
 
     /**
@@ -923,8 +995,7 @@ public class CoordinateOperationFactory extends Factory
             final EllipsoidalCS sourceCS = (EllipsoidalCS) sourceCRS.getCoordinateSystem();
             final EllipsoidalCS targetCS = (EllipsoidalCS) targetCRS.getCoordinateSystem();
             final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS, sourcePM, targetPM);
-            MathTransform transform = factory.createAffineTransform(matrix);
-            return createFromMathTransform(sourceCRS, targetCRS, transform);
+            return createFromAffineTransform(sourceCRS, targetCRS, matrix);
         }
         /*
          * If the two geographic CRS use different datum, transform from the
@@ -979,8 +1050,7 @@ public class CoordinateOperationFactory extends Factory
          */
         final Matrix linear = createLinearConversion(sourceCRS, targetCRS);
         if (linear != null) {
-            final MathTransform transform = factory.createAffineTransform(linear);
-            return createFromMathTransform(sourceCRS, targetCRS, transform);
+            return createFromAffineTransform(sourceCRS, targetCRS, linear);
         }
         /*
          * Apply the transformation in 3 steps (the 3 arrows below):
@@ -1095,8 +1165,7 @@ public class CoordinateOperationFactory extends Factory
                  * conversions.
                  */
                 final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS);
-                final MathTransform transform = factory.createAffineTransform(matrix);
-                return createFromMathTransform(sourceCRS, targetCRS, transform);
+                return createFromAffineTransform(sourceCRS, targetCRS, matrix);
             }
             // Prime meridians are differents. Performs the full transformation.
         }
@@ -1140,8 +1209,7 @@ public class CoordinateOperationFactory extends Factory
         } catch (SingularMatrixException cause) {
             throw new OperationNotFoundException(getErrorMessage(sourceDatum, targetDatum), cause);
         }
-        final MathTransform transform = factory.createAffineTransform(matrix);
-        return createFromMathTransform(sourceCRS, targetCRS, transform);
+        return createFromAffineTransform(sourceCRS, targetCRS, matrix);
     }
 
     /**
@@ -1183,12 +1251,11 @@ public class CoordinateOperationFactory extends Factory
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normSourceCRS.getCoordinateSystem().getDimension());
-        transform = factory.createParameterizedTransform(param);
 
         final CoordinateOperation step1, step2, step3;
-        step1 = createOperationStep    (    sourceCRS, normSourceCRS);
-        step2 = createFromMathTransform(normSourceCRS, normTargetCRS, transform);
-        step3 = createOperationStep    (normTargetCRS,     targetCRS);
+        step1 = createOperationStep (    sourceCRS, normSourceCRS);
+        step2 = createFromParameters(normSourceCRS, normTargetCRS, param);
+        step3 = createOperationStep (normTargetCRS,     targetCRS);
         return concatenate(step1, step2, step3);
     }
 
@@ -1217,12 +1284,11 @@ public class CoordinateOperationFactory extends Factory
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normTargetCRS.getCoordinateSystem().getDimension());
-        transform = factory.createParameterizedTransform(param);
 
         final CoordinateOperation step1, step2, step3;
-        step1 = createOperationStep    (    sourceCRS, normSourceCRS);
-        step2 = createFromMathTransform(normSourceCRS, normTargetCRS, transform);
-        step3 = createOperationStep    (normTargetCRS,     targetCRS);
+        step1 = createOperationStep (    sourceCRS, normSourceCRS);
+        step2 = createFromParameters(normSourceCRS, normTargetCRS, param);
+        step3 = createOperationStep (normTargetCRS,     targetCRS);
         return concatenate(step1, step2, step3);
     }
 
@@ -1284,8 +1350,7 @@ public class CoordinateOperationFactory extends Factory
             indices[i] = lower+i;
         }
         final Matrix        select = ProjectiveTransform.createSelectMatrix(index, indices);
-        final MathTransform filter = factory.createAffineTransform(select);
-        return concatenate(createFromMathTransform(sourceCRS, singleCRS, filter), operation);
+        return concatenate(createFromAffineTransform(sourceCRS, singleCRS, select), operation);
     }
     
     /**
@@ -1333,9 +1398,114 @@ public class CoordinateOperationFactory extends Factory
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        // TODO: not yet implemented.
-        throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
+        final CoordinateReferenceSystem[] sources = sourceCRS.getCoordinateReferenceSystems();
+        final CoordinateReferenceSystem[] targets = targetCRS.getCoordinateReferenceSystems();
+        if (targets.length == 1) {
+            return createOperation(sourceCRS, targets[0]);
+        }
+        if (sources.length == 1) { // After 'targets' because more likely to fails to transform.
+            return createOperation(sources[0], targetCRS);
+        }
+        /*
+         * Try to find operations from source CRSs to target CRSs. All pairwise combinaisons are
+         * tried, but the preference is given to CRS in the same order (source[0] with target[0],
+         * source[1] with target[1], etc.). Operations found are stored in 'steps', but are not
+         * yet given to pass through transforms. We need to know first if some ordinate values
+         * need reordering (for matching the order of target CRS) if any ordinates reordering and
+         * source ordinates drops are required.
+         */
+        final CoordinateReferenceSystem[] ordered = new CoordinateReferenceSystem[targets.length];
+        final CoordinateOperation[]       steps   = new CoordinateOperation      [targets.length];
+        final boolean[]                   done    = new boolean                  [sources.length];
+        final int[]                       indices = new int[getDimension(sourceCRS)];
+        int count=0, dimensions=0;
+search: for (int j=0; j<targets.length; j++) {
+            int lower, upper=0;
+            final CoordinateReferenceSystem target = targets[j];
+            OperationNotFoundException cause = null;
+            for (int i=0; i<sources.length; i++) {
+                final CoordinateReferenceSystem source = sources[i];
+                lower  = upper;
+                upper += getDimension(source);
+                if (done[i]) continue;
+                try {
+                    steps[count] = createOperation(source, target);
+                } catch (OperationNotFoundException exception) {
+                    // No operation path for this pair.
+                    // Search for an other pair.
+                    if (cause==null || i==j) {
+                        cause = exception;
+                    }
+                    continue;
+                }
+                ordered[count++] = source;
+                while (lower < upper) {
+                    indices[dimensions++] = lower++;
+                }
+                done[i] = true;
+                continue search;
+            }
+            /*
+             * No source CRS was found for current target CRS.
+             * Concequently, we can't get a transformation path.
+             */
+            throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS), cause);
+        }
+        /*
+         * A transformation has been found for every source and target CRS pairs.
+         * Some reordering of ordinate values may be needed. Prepare it now as an
+         * affine transform. This transform also drop source dimensions not used
+         * for any target coordinates.
+         */
+        assert count == targets.length : count;
+        while (count!=0 && steps[--count].getMathTransform().isIdentity());
+        CoordinateOperation  operation = null;
+        CoordinateReferenceSystem sourceStepCRS = sourceCRS;
+        final GeneralMatrix select = new GeneralMatrix(dimensions+1, indices.length+1);
+        select.setZero();
+        select.setElement(dimensions, indices.length, 1);
+        for (int j=0; j<indices.length; j++) {
+            select.setElement(indices[j], j, 1);
+        }
+        if (!select.isIdentity()) {
+            sourceStepCRS = new org.geotools.referencing.crs.CompoundCRS(
+                                getTemporaryName(sourceCRS), ordered);
+            operation = createFromAffineTransform(sourceCRS, sourceStepCRS, select);
+        }
+        /*
+         * Now creates the pass through transforms for each transformation steps found above.
+         * We get (or construct temporary) source and target CRS for this step. They will be
+         * given to the constructor of the pass through operation, after the construction of
+         * pass through transform.
+         */
+        int lower, upper=0;
+        for (int i=0; i<targets.length; i++) {
+                  CoordinateOperation       step   = steps  [i];
+            final CoordinateReferenceSystem source = ordered[i];
+            final CoordinateReferenceSystem target = targets[i];
+            final CoordinateReferenceSystem targetStepCRS;
+            MathTransform mt = step.getMathTransform();
+            ordered[i] = target; // Used for the construction of targetStepCRS.
+            if (i >= count) {
+                targetStepCRS = targetCRS;
+            } else if (mt.isIdentity()) {
+                targetStepCRS = sourceStepCRS;
+            } else {
+                targetStepCRS = new org.geotools.referencing.crs.CompoundCRS(
+                                    getTemporaryName(target), ordered);
+            }
+            lower  = upper;
+            upper += getDimension(source);
+            mt            = factory.createPassThroughTransform(lower, mt, dimensions-upper);
+            step          = new PassThroughOperation(getProperties(step),
+                            sourceStepCRS, targetStepCRS, (Operation)step, mt);
+            operation     = (operation==null) ? step : concatenate(operation, step);
+            sourceStepCRS = targetStepCRS;
+        }
+        assert upper == dimensions : upper;
+        return operation;
     }
+    
 
 
 
@@ -1424,6 +1594,9 @@ public class CoordinateOperationFactory extends Factory
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
      * @return <code>true</code> if both objects are equals.
+     *
+     * @todo This method may be insuffisient, since it will returns <code>false</code> for
+     *       two different implementations, even if they encapsulate the same data values.
      */
     private static boolean equalsIgnoreMetadata(final IdentifiedObject object1,
                                                 final IdentifiedObject object2)
@@ -1461,6 +1634,13 @@ public class CoordinateOperationFactory extends Factory
      */
     private static boolean nameMatches(final IdentifiedObject object, final String name) {
         return org.geotools.referencing.IdentifiedObject.nameMatches(object, name);
+    }
+
+    /**
+     * Returns the properties of the given object.
+     */
+    private static Map getProperties(final IdentifiedObject object) {
+        return org.geotools.referencing.IdentifiedObject.getProperties(object);
     }
 
     /**

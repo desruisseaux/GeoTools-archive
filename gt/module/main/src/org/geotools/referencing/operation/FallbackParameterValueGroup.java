@@ -22,12 +22,15 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.Collections;
 
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
+
+// Geotools dependencies
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.IdentifiedObject;
 
 
 /**

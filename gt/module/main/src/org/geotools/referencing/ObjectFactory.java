@@ -25,16 +25,13 @@ package org.geotools.referencing;
 // J2SE dependencies and extensions
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import javax.units.ConversionException;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -74,15 +71,12 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.util.Singleton;
@@ -1062,14 +1056,10 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
              * Non-geotools implementation : iterate over all methods know to the factory.
              */
             step2 = mtFactory.createParameterizedTransform(parameters);
-            final String classification = parameters.getDescriptor().getName().getCode();
-            for (final Iterator it=mtFactory.getAvailableMethods(null).iterator(); it.hasNext();) {
-                final OperationMethod candidate = (OperationMethod) it.next();
-                if (IdentifiedObject.nameMatches(candidate, classification)) {
-                    method = candidate;
-                    break;
-                }
-            }
+            method = org.geotools.referencing.operation.MathTransformFactory.getMethod(
+                     mtFactory.getAvailableMethods(null),
+                     (ParameterDescriptorGroup) parameters.getDescriptor());
+            // TODO: remove cast when we will be allowed to compile against J2SE 1.5.
         }
         /*
          * Create a concatenation of the matrix computed above and the projection.

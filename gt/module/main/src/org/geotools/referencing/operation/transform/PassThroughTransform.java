@@ -46,14 +46,6 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo This implementation is not really needed. We should concatenate the sub-transform
- *       with a ProjectiveTransform backed by a non-square matrix instead; it would provide
- *       more flexibility (especially toward subsequent concatenation). We could keep this
- *       implementation without 'sub-transform' as an optimization of ProjectiveTransform
- *       in the special case of passthrough transform. It would not need to be a public class
- *       however. We could provide a 'createPassThroughTransform' convenience method right
- *       into ProjectiveTransform for use by the GridCoverage package.
  */
 public class PassThroughTransform extends AbstractMathTransform implements Serializable {
     /**

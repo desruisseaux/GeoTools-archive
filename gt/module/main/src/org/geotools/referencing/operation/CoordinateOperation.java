@@ -28,17 +28,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+// OpenGIS dependencies
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.quality.PositionalAccuracy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.crs.GeneralDerivedCRS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.quality.PositionalAccuracy;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -351,9 +354,8 @@ public class CoordinateOperation extends IdentifiedObject
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        formatter.append(sourceCRS);
-        formatter.append(targetCRS);
-        formatter.append(transform);
+        formatter.append(sourceCRS.getName().getCode());
+        formatter.append(targetCRS.getName().getCode());
         return super.formatWKT(formatter);
     }
 }

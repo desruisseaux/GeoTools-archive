@@ -26,6 +26,7 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.Map;
 
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;

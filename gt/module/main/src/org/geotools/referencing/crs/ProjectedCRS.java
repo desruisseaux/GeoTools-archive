@@ -35,7 +35,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CartesianCS;
@@ -126,23 +125,6 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
             throws MismatchedDimensionException
     {
         super(properties, method, base, baseToDerived, derivedCS);
-    }
-
-    /**
-     * Wraps the specified arguments in a {@link Projection} object. This method is invoked
-     * by {@link GeneralDerivedCRS} constructor in order to construct a {@link Conversion}
-     * object of the right kind.
-     *
-     * @todo Check the Projection subclasses (PlanarProjection, ConicProjection, etc.)
-     */
-    Conversion createConversion(final Map                       properties,
-                                final CoordinateReferenceSystem sourceCRS,
-                                final CoordinateReferenceSystem targetCRS,
-                                final MathTransform             transform,
-                                final OperationMethod           method)
-    {
-        return new org.geotools.referencing.operation.Projection(properties,
-                    sourceCRS, targetCRS, transform, method);
     }
 
     /**

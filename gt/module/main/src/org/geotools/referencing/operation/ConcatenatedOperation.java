@@ -29,17 +29,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.SingleOperation;
+
+// Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
