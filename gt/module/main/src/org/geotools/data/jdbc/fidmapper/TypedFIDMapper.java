@@ -16,16 +16,18 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
 
+import org.geotools.feature.Feature;
+
+
 
 /**
- * This fidmapper just takes another fid mapper and builds fids  based on the
- * wrapped FIDMapper by prefixing them with the feature type name, that is,
- * the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt pattern.
- *
+ * This fidmapper just takes another fid mapper and builds fids 
+ * based on the wrapped FIDMapper by prefixing them with the feature
+ * type name, that is, the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt
+ * pattern.
  * @author wolf
  */
 public class TypedFIDMapper extends AbstractFIDMapper {
@@ -35,10 +37,16 @@ public class TypedFIDMapper extends AbstractFIDMapper {
     /**
      * Creates a new TypedFIDMapper object.
      *
-     * @param wrapped
-     * @param featureTypeName
+     * @param FIDColumn 
+     * @param featureTypeName 
      */
     public TypedFIDMapper(FIDMapper wrapped, String featureTypeName) {
+        if(wrapped == null)
+            throw new IllegalArgumentException("The wrapped feature mapper cannot be null");
+        
+        if(featureTypeName == null)
+            throw new IllegalArgumentException("The featureTypeName cannot be null");
+        
         this.wrapped = wrapped;
         this.featureTypeName = featureTypeName;
     }
@@ -123,11 +131,9 @@ public class TypedFIDMapper extends AbstractFIDMapper {
     }
 
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
-     *      org.geotools.feature.Feature)
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection, org.geotools.feature.Feature)
      */
-    public String createID(Connection conn, Feature feature)
-        throws IOException {
+    public String createID(Connection conn, Feature feature) throws IOException {
         return featureTypeName + "." + wrapped.createID(conn, feature);
     }
 
@@ -135,6 +141,6 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
      */
     public void initSupportStructures() {
-        wrapped.initSupportStructures();
+        wrapped.initSupportStructures();        
     }
 }
