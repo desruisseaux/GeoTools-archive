@@ -22,6 +22,7 @@
 package org.geotools.data.shapefile.shp;
 
 import com.vividsolutions.jts.geom.*;
+
 import java.nio.ByteBuffer;
 
 
@@ -141,12 +142,22 @@ public class MultiLineHandler implements ShapeHandler {
       
       length = finish - start;
       
-      Coordinate[] points = new Coordinate[length];
+      // Lines may be either composed of 0, 2 or more coordinates, but not just one. 
+      // since some tools produce such files, we work around it by duplicating the single
+      // coordinate
+      Coordinate[] points = null;
+      if(length == 1)
+          points = new Coordinate[2];
+      else
+          points = new Coordinate[length];
       
       for (int i = 0; i < length; i++) {
         points[i] = coords[offset];
         offset++;
       }
+      
+      if(length == 1)
+          points[1] = (Coordinate) points[0].clone();
       
       lines[part] = geometryFactory.createLineString(points);
     }
