@@ -16,24 +16,23 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -151,7 +150,7 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 	
 	
     public void testCreateGetFeatureInfoRequest() throws Exception {
-        URL featureURL = new URL("http://www.demis.nl/mapserver/request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
+        URL featureURL = new URL("http://demo.cubewerx.com/cipi12/cubeserv/cubeserv.cgi?service=wms&request=getcapabilities");
         WebMapServer wms = getCustomWMS(featureURL);
         WMSCapabilities caps = wms.getCapabilities();
         assertNotNull(caps);
@@ -159,50 +158,52 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         
         GetMapRequest getMapRequest = wms.createGetMapRequest();
 
-        List simpleLayers = getMapRequest.getAvailableLayers();
-        Iterator iter = simpleLayers.iterator();
-        while (iter.hasNext()) {
-                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-                Object[] styles = simpleLayer.getValidStyles().toArray();
-                if (styles.length == 0) {
-                        simpleLayer.setStyle("");
-                        continue;
-                }
-                Random random = new Random();
-                int randomInt = random.nextInt(styles.length);
-                simpleLayer.setStyle((String) styles[randomInt]);
-        }
-        getMapRequest.setLayers(simpleLayers);
+        getMapRequest.setProperty(GetMapRequest.LAYERS, "ETOPO2:Foundation");
+//        List simpleLayers = getMapRequest.getAvailableLayers();
+//        Iterator iter = simpleLayers.iterator();
+//        while (iter.hasNext()) {
+//                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+//                Object[] styles = simpleLayer.getValidStyles().toArray();
+//                if (styles.length == 0) {
+//                        simpleLayer.setStyle("");
+//                        continue;
+//                }
+//                Random random = new Random();
+//                int randomInt = random.nextInt(styles.length);
+//                simpleLayer.setStyle((String) styles[randomInt]);
+//        }
+//        getMapRequest.setLayers(simpleLayers);
 
         getMapRequest.setSRS("EPSG:4326");
         getMapRequest.setDimensions("400", "400");
         getMapRequest.setFormat("image/png");
-
-        getMapRequest.setBBox("-114.01268,59.4596930,-113.26043,60.0835794");
+//        http://demo.cubewerx.com/cipi12/cubeserv/cubeserv.cgi?INFO_FORMAT=text/html&LAYERS=ETOPO2:Foundation&FORMAT=image/png&HEIGHT=400&J=200&REQUEST=GetFeatureInfo&I=200&BBOX=-34.12087,15.503481,1.8462441,35.6043956&WIDTH=400&STYLES=&SRS=EPSG:4326&QUERY_LAYERS=ETOPO2:Foundation&VERSION=1.3.0
+        getMapRequest.setBBox("-34.12087,15.503481,1.8462441,35.6043956");
         URL url2 = getMapRequest.getFinalURL();
 
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-        request.setQueryLayers(request.getQueryableLayers());
+//        request.setQueryLayers(request.getQueryableLayers());
+        request.setProperty(GetFeatureInfoRequest.QUERY_LAYERS, "ETOPO2:Foundation");
         request.setQueryPoint(200, 200);
-        request.setInfoFormat("text/swf");
+        request.setInfoFormat("text/html");
         
         System.out.println(request.getFinalURL());
 
 //     TODO   Currently this server rtreturns code 400 !?
-        /*GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request);
+        GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request);
         System.out.println(response.getContentType());
-        assertTrue( response.getContentType().indexOf("text/plain") != -1 );
+        assertTrue( response.getContentType().indexOf("text/html") != -1 );
         BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
         String line;
 
         boolean textFound = false;
         while ((line = in.readLine()) != null) {
             System.out.println(line);
-            if (line.indexOf("Wood Buffalo National Park") != -1) {
+            if (line.indexOf("89360") != -1) {
                 textFound = true;
             }
         }
-        assertTrue(textFound);*/
+        assertTrue(textFound);
 
         
     }

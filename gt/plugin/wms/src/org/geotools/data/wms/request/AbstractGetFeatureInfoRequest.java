@@ -56,7 +56,7 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
      */
     public URL getFinalURL() {
         Iterator iter = queryLayers.iterator();
-        String queryLayerString = ""; //$NON-NLS-1$
+        String queryLayerString = properties.getProperty(QUERY_LAYERS) == null ? "" : properties.getProperty(QUERY_LAYERS); //$NON-NLS-1$
 
         while( iter.hasNext() ) {
             Layer layer = (Layer) iter.next();

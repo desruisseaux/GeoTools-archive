@@ -310,6 +310,7 @@ public class WebMapServer implements Discovery {
     }
 
     private static WMSCapabilities parseCapabilities( URL url ) throws SAXException, IOException {
+        System.out.println(url);
         Map hints = new HashMap();
         hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
 
