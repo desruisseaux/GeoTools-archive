@@ -308,7 +308,7 @@ public class SLDTransformer extends TransformerBase {
         public void visit(FeatureTypeStyle fts) {
             start("FeatureTypeStyle");
             if(fts.getName()!=null){
-                element("FeatureTypeName",fts.getName());
+                element("FeatureTypeName",fts.getFeatureTypeName());
             }
             Rule[] rules = fts.getRules();
             
