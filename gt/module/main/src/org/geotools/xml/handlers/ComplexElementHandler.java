@@ -502,7 +502,7 @@ System.out.println("Elements.size == "+elements.size());
 //System.out.println("ComplexElementHandler ... "+type.getClass().getName());
         Element e = type.findChildElement(localName);
 //        System.out.println("findChildElement("+localName+") was " + (e==null?"null":e.getName()));
-        if (e != null && namespaceURI.equals(e.getNamespace())) {
+        if (e != null && (namespaceURI.equals(e.getNamespace()) || (ehf.defaultNS!=null && ehf.defaultNS.equals(e.getNamespace())))) {
             XMLElementHandler r = ehf.createElementHandler(e);
 
             if (type.cache(r.getElement(), hints)) {

@@ -2113,27 +2113,27 @@ public class WMSComplexTypes {
         private static final WMSComplexType instance = new _LayerType();
 
         private static Element[] elems = new Element[]{
-                new WMSElement("Name", XSISimpleTypes.String.getInstance(), 0, 1),
+                new WMSElement("Name", XSISimpleTypes.String.getInstance(), 0, 1), // 0
                 new WMSElement("Title", XSISimpleTypes.String.getInstance()),
                 new WMSElement("Abstract", XSISimpleTypes.String.getInstance(), 0, 1),
                 new WMSElement("KeywordList", _KeywordListType.getInstance(), 0, 1),
                 new WMSElement("CRS", XSISimpleTypes.String.getInstance(), 0, Integer.MAX_VALUE),
-                new WMSElement("EX_GeographicBoundingBox", _EX_GeographicBoundingBoxType.getInstance(), 0, 1),
+                new WMSElement("EX_GeographicBoundingBox", _EX_GeographicBoundingBoxType.getInstance(), 0, 1),//5
                 new WMSElement("BoundingBox", _BoundingBoxType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("Dimension", _DimensionType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("Extent", _ExtentType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("Attribution", _AttributionType.getInstance(), 0, 1),
-                new WMSElement("AuthorityURL", _AuthorityURLType.getInstance(), 0, Integer.MAX_VALUE),
+                new WMSElement("AuthorityURL", _AuthorityURLType.getInstance(), 0, Integer.MAX_VALUE),//10
                 new WMSElement("Identifier", _IdentifierType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("MetadataURL", _MetadataURLType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("DataURL", _DataURLType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("FeatureListURL", _FeatureListURLType.getInstance(), 0, Integer.MAX_VALUE),
-                new WMSElement("Style", _StyleType.getInstance(), 0, Integer.MAX_VALUE),
+                new WMSElement("Style", _StyleType.getInstance(), 0, Integer.MAX_VALUE), // 15
                 new WMSElement("MinScaleDenominator", XSISimpleTypes.Double.getInstance(), 0, 1),
                 new WMSElement("MaxScaleDenominator", XSISimpleTypes.Double.getInstance(), 0, 1),
                 new WMSElement("Layer", _LayerType.getInstance(), 0, Integer.MAX_VALUE),
                 new WMSElement("SRS", XSISimpleTypes.String.getInstance(), 0, Integer.MAX_VALUE),
-                new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance(), 0, 1),
+                new WMSElement("LatLonBoundingBox", _LatLonBoundingBoxType.getInstance(), 0, 1), //20
                 new WMSElement("ScaleHint", _ScaleHintType.getInstance(), 0, 1)
                 };
         	

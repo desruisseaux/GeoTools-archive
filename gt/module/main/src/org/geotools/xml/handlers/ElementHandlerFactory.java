@@ -48,7 +48,7 @@ public class ElementHandlerFactory {
     private Logger logger;
     private Map targSchemas = new HashMap(); // maps prefix -->> Schema
     private Map prefixURIs = new HashMap(); // maps prefix -->> URI
-    private URI defaultNS = null;
+    protected URI defaultNS = null;
 
     /**
      * Creates a new ElementHandlerFactory object.
