@@ -61,7 +61,9 @@ import org.geotools.resources.cts.Resources;
  *
  * For the 1SP case the latitude of origin is used as the standard parallel (SP). 
  * To use a 1SP with a latitude of origin different from the SP, use the 2SP
- * and set both the SP1 and SP2 to the single SP. 
+ * and set both the SP1 and SP2 to the single SP. Alternatively, the "standard_parallel_2" 
+ * parameter is optional and will be given the same value as "standard_parallel_1" 
+ * if not set (creating a 1 standard parallel projection). 
  * <br><br>
  *
  * <strong>References:</strong><ul>
@@ -89,9 +91,14 @@ public class LambertConformal extends MapProjection{
     private static final double BELGE_A = 0.00014204313635987700;
 
     /**
-     * Standards parallels in radians, for {@link #getParameterValues} implementation.
+     * Standards parallel 1 in radians, for {@link #getParameterValues} implementation.
      */
-    protected final double phi1, phi2;
+    private final double phi1;
+    
+    /**
+     * Standards parallel 2 in radians, for {@link #getParameterValues} implementation.
+     */
+    private double phi2;
     
     /**
      * Internal variables for computation.
@@ -193,11 +200,11 @@ public class LambertConformal extends MapProjection{
                     new Identifier(Citation.EPSG,     "Latitude of 2nd standard parallel"),
                     new Identifier(Citation.GEOTIFF,  "StdParallel2")
                 },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
+                Double.NaN, -90, 90, NonSI.DEGREE_ANGLE);
         
         /**
          * The parameters group.
-         * @task REVISIT: ESRI also included the scale factor as a parameter
+         * @task REVISIT: ESRI also includes a scale factor parameter
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Lambert_Conformal_Conic_2SP"),
@@ -302,11 +309,10 @@ public class LambertConformal extends MapProjection{
      * @param  sp2 <code>true</code> for 2SP, or <code>false</code> for 1SP.
      * @param  belgium <code>true</code> for the Belgium 2SP case.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
-     *
-     * @task REVISIT: set phi2 = phi1 if no SP2 value is given by user (an 1sp projection)
      */
-    public LambertConformal(final ParameterValueGroup parameters, final Collection expected,
-                            final boolean sp2, final boolean belgium) 
+    LambertConformal(final ParameterValueGroup parameters, final Collection expected,
+                     final boolean sp2, final boolean belgium) 
+            throws ParameterNotFoundException
     {
         //Fetch parameters 
         super(parameters, expected);
@@ -314,7 +320,12 @@ public class LambertConformal extends MapProjection{
         this.belgium     = belgium;
         if (sp2) {
             phi1 = doubleValue(expected, Provider2SP.STANDARD_PARALLEL_1, parameters);
+            ensureLatitudeInRange(Provider2SP.STANDARD_PARALLEL_1, phi1, true);
             phi2 = doubleValue(expected, Provider2SP.STANDARD_PARALLEL_2, parameters);
+            if (Double.isNaN(phi2)) {
+                phi2 = phi1;
+            }
+            ensureLatitudeInRange(Provider2SP.STANDARD_PARALLEL_2, phi2, true);
         } else {
             if (belgium) {
                 throw new IllegalArgumentException();
