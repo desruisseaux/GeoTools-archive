@@ -108,7 +108,6 @@ public class Mercator extends MapProjection {
                 new Identifier(Citation.EPSG,     "Mercator (1SP)"),
                 new Identifier(Citation.EPSG,     "9804"),
                 new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
-                new Identifier(Citation.ESRI,     "Mercator"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
