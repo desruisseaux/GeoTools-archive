@@ -28,6 +28,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -150,9 +151,10 @@ public class WFSDataStoreWriteTest extends TestCase {
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
-    	AttributeType at = ft.getAttributeType(0);
+    	AttributeType at = ft.getAttributeType("LAND_KM");
+    	assertNotNull("Attribute LAND_KM does not exist",at);
     	
-    	CompareFilter f = FilterFactory.createFilterFactory().createCompareFilter(Filter.COMPARE_EQUALS);
+    	CompareFilter f = FilterFactory.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
     	f.addLeftValue(FilterFactory.createFilterFactory().createAttributeExpression(ft,at.getName()));
     	f.addRightValue(FilterFactory.createFilterFactory().createLiteralExpression("3"));
 
@@ -160,6 +162,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	FeatureReader fr = fs.getFeatures(f).reader();
     	
     	int count1 = 0;
+    	if(fr!=null)
     	while(fr.hasNext()){
     		count1 ++; fr.next();
     	}
@@ -173,7 +176,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	while(fr.hasNext()){
     		count2 ++; fr.next();
     	}
-    	assertTrue(count2>count1);
+    	assertTrue("Read 1 == "+count1+" Read 2 == "+count2,count2>count1);
 
     	System.out.println("Update Commit");
     	t.commit();

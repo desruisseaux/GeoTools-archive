@@ -67,7 +67,7 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers
  */
 public class FilterOpsComplexTypes {
-    private static void encodeExpr(Expression expr, PrintHandler output,
+    protected static void encodeExpr(Expression expr, PrintHandler output,
         Map hints) throws OperationNotSupportedException, IOException {
         int i = 0;
 
@@ -113,7 +113,8 @@ public class FilterOpsComplexTypes {
         case Expression.ATTRIBUTE_GEOMETRY:
         case Expression.ATTRIBUTE_UNDECLARED:
         case Expression.ATTRIBUTE:
-            i = 36;
+//            i = 36;
+        	i = 34;
 
             break;
 
@@ -124,8 +125,9 @@ public class FilterOpsComplexTypes {
         }
 
         if (i != 0) {
-            FilterSchema.getInstance().getElements()[i].getType().encode(FilterSchema.getInstance()
-                                                                                     .getElements()[i],
+//System.out.println("Encoding Expr "+FilterSchema.getInstance().getElements()[i].getName());
+            FilterSchema.getInstance().getElements()[i].getType().
+				encode(FilterSchema.getInstance().getElements()[i],
                 expr, output, hints);
         }
     }

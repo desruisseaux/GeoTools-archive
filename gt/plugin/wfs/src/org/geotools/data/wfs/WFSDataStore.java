@@ -22,28 +22,18 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
-import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterVisitor;
-import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
-import org.geotools.filter.NullFilter;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.gml.GMLComplexTypes;
@@ -70,7 +60,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
@@ -98,6 +87,7 @@ public class WFSDataStore extends AbstractDataStore {
     private Map featureTypeCache = new HashMap();
 
     private WFSDataStore() {
+    	// not called
     }
 
     WFSDataStore(URL host, Boolean get, Boolean post, String username,
@@ -508,11 +498,11 @@ public class WFSDataStore extends AbstractDataStore {
             }
 
             if (request.getFilter() != null) {
-                if (request.getFilter().getFilterType() == Filter.GEOMETRY_BBOX) {
+                if (request.getFilter().getFilterType() == FilterType.GEOMETRY_BBOX) {
                     url += ("&BBOX="
                     + printBBoxGet(((GeometryFilter) request.getFilter())));
                 } else {
-                    if (request.getFilter().getFilterType() == Filter.FID) {
+                    if (request.getFilter().getFilterType() == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
 
                         if ((ff.getFids() != null) && (ff.getFids().length > 0)) {
@@ -579,11 +569,11 @@ public class WFSDataStore extends AbstractDataStore {
     private String printBBoxGet(GeometryFilter gf) throws IOException {
         Envelope e = null;
 
-        if (gf.getLeftGeometry().getType() == Expression.LITERAL_GEOMETRY) {
+        if (gf.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
             e = ((Geometry) ((LiteralExpression) gf.getLeftGeometry())
                 .getLiteral()).getEnvelopeInternal();
         } else {
-            if (gf.getRightGeometry().getType() == Expression.LITERAL_GEOMETRY) {
+            if (gf.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
                 e = ((Geometry) ((LiteralExpression) gf.getRightGeometry())
                     .getLiteral()).getEnvelopeInternal();
             } else {
@@ -614,17 +604,18 @@ public class WFSDataStore extends AbstractDataStore {
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
 
-        //Writer sw = new StringWriter();
-        //try{
-        //    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
-        //}catch(OperationNotSupportedException e){
-        //    logger.warning(e.toString());
-        //    throw new SAXException(e);
-        //}
-        //System.out.println("WFS FILTER START");
-        //System.out.println(sw);
-        //System.out.println("WFS FILTER END");
-        //System.out.println("FILTER WAS "+query.getFilter());
+//        Writer sw = new StringWriter();
+//        try{
+//            DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
+//        }catch(OperationNotSupportedException e){
+//            logger.warning(e.toString());
+//            throw new SAXException(e);
+//        }
+//        System.out.println("WFS FILTER START");
+//        System.out.println(sw);
+//        System.out.println("WFS FILTER END");
+//        System.out.println("FILTER WAS "+query.getFilter());
+        
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
                 hints);
@@ -678,7 +669,10 @@ public class WFSDataStore extends AbstractDataStore {
     public FeatureReader getFeatureReader(Query query, Transaction transaction)
         throws IOException {
         WFSFeatureReader t = null;
-
+        Filter[] filters = splitFilters(query,transaction); // [server][post] 
+        
+        query = new DefaultQuery(query);
+        ((DefaultQuery)query).setFilter(filters[0]);
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
             try {
                 t = getFeatureReaderPost(query, transaction);
@@ -718,7 +712,10 @@ public class WFSDataStore extends AbstractDataStore {
         if (t.hasNext()) { // opportunity to throw exception
 
             if (t.getFeatureType() != null) {
-                return t;
+            	if (!filters[1].equals( Filter.NONE ) ) {
+            		return new FilteringFeatureReader(t, filters[1]);
+                }
+            	return t;
             }
 
             throw new IOException(
@@ -756,68 +753,59 @@ public class WFSDataStore extends AbstractDataStore {
         return super.getBounds(query);
     }
 
-    /**
-     * @see org.geotools.data.AbstractDataStore#getUnsupportedFilter(java.lang.String,
-     *      org.geotools.filter.Filter)
-     */
-    protected Filter getUnsupportedFilter(String typeName, Filter filter) {
-        if (typeName == null) {
-            return filter;
-        }
-
-        if (Filter.NONE == filter) {
-            return Filter.NONE;
-        }
-
-        FeatureType ft;
-
-        try {
-            ft = getSchema(typeName);
-        } catch (IOException e) {
-            logger.warning(e.getMessage());
-
-            return filter;
-        }
-
-        if (ft == null) {
-            return filter;
-        }
-
-        List fts = capabilities.getFeatureTypes(); //FeatureSetDescription
+    private Filter[] splitFilters(Query q, Transaction t) throws IOException{
+    	// have to figure out which part of the request the server is capable of after removing the parts in the update / delete actions
+    	// [server][post]
+    	if(q.getFilter() == null)
+    		return new Filter[]{Filter.NONE,Filter.NONE};
+    	if(q.getTypeName() == null || t == null)
+    		return new Filter[]{Filter.NONE,q.getFilter()};
+    	
+    	FeatureType ft = getSchema(q.getTypeName());
+    	
+    	List fts = capabilities.getFeatureTypes(); //FeatureSetDescription
         boolean found = false;
-
         for (int i = 0; i < fts.size(); i++)
             if (fts.get(i) != null) {
                 FeatureSetDescription fsd = (FeatureSetDescription) fts.get(i);
-
-                if (typeName.equals(fsd.getName())) {
+                if (ft.getTypeName().equals(fsd.getName())) {
                     found = true;
                 } else {
                     String fsdName = (fsd.getName() == null) ? null
-                                                             : fsd.getName()
-                                                                  .substring(fsd.getName()
-                                                                                .indexOf(":")
-                            + 1);
-
-                    if (typeName.equals(fsdName)) {
+                        : fsd.getName().substring(fsd.getName()
+                        .indexOf(":") + 1);
+                    if (ft.getTypeName().equals(fsdName)) {
                         found = true;
                     }
                 }
             }
 
         if (!found) {
-            logger.warning("Could not find typeName: " + typeName);
-
-            return filter;
+            logger.warning("Could not find typeName: " + ft.getTypeName());
+            return new Filter[]{Filter.NONE,q.getFilter()};
         }
-
+        WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
         WFSFilterVisitor wfsfv = new WFSFilterVisitor(capabilities
-                .getFilterCapabilities(), ft);
-        filter.accept(wfsfv);
+                .getFilterCapabilities(), ft, state);
+        q.getFilter().accept(wfsfv);
 
-        Filter f = wfsfv.getFilter();
+        Filter[] f = new Filter[2]; 
+        f[0] = wfsfv.getFilterPre(); // server
+        f[1] = wfsfv.getFilterPost();
 
-        return (f == null) ? Filter.NONE : f;
+        return f;
+    }
+    
+    /**
+     * @see org.geotools.data.AbstractDataStore#getUnsupportedFilter(java.lang.String,
+     *      org.geotools.filter.Filter)
+     */
+    protected Filter getUnsupportedFilter(String typeName, Filter filter) {
+        try {
+			return splitFilters(new DefaultQuery(typeName,filter),Transaction.AUTO_COMMIT)[1];
+		} catch (IOException e) {
+			return filter;
+		}
     }
 
     /* (non-Javadoc)
@@ -835,614 +823,12 @@ public class WFSDataStore extends AbstractDataStore {
         return new WFSFeatureSource(this, getSchema(typeName));
     }
 
-    public static class WFSFilterVisitor implements FilterVisitor {
-        private Stack stack = new Stack();
-        private FilterCapabilities fcs = null;
-        private FeatureType parent = null;
-
-        private WFSFilterVisitor() {
-        }
-
-        WFSFilterVisitor(FilterCapabilities fcs, FeatureType wfsds) {
-            this.fcs = fcs;
-            parent = wfsds;
-        }
-
-        Filter getFilter() {
-            if (stack.isEmpty()) {
-                return Filter.NONE;
-            }
-
-            if (stack.size() > 1) {
-                logger.warning("Too many stack items after run: "
-                    + stack.size());
-            }
-
-            return stack.isEmpty() ? null : (Filter) stack.pop();
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
-         */
-        public void visit(Filter filter) {
-            if (Filter.NONE == filter) {
-                return;
-            }
-
-            if (!stack.isEmpty()) {
-                stack.push(filter);
-                logger.warning(
-                    "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
-            } else {
-                switch (filter.getFilterType()) {
-                case Filter.BETWEEN:
-                    visit((BetweenFilter) filter);
-
-                    break;
-
-                case Filter.COMPARE_EQUALS:
-                case Filter.COMPARE_GREATER_THAN:
-                case Filter.COMPARE_GREATER_THAN_EQUAL:
-                case Filter.COMPARE_LESS_THAN:
-                case Filter.COMPARE_LESS_THAN_EQUAL:
-                case Filter.COMPARE_NOT_EQUALS:
-                    visit((BetweenFilter) filter);
-
-                    break;
-
-                case Filter.FID:
-                    visit((BetweenFilter) filter);
-
-                    break;
-
-                case Filter.GEOMETRY_BBOX:
-                case Filter.GEOMETRY_BEYOND:
-                case Filter.GEOMETRY_CONTAINS:
-                case Filter.GEOMETRY_CROSSES:
-                case Filter.GEOMETRY_DISJOINT:
-                case Filter.GEOMETRY_DWITHIN:
-                case Filter.GEOMETRY_EQUALS:
-                case Filter.GEOMETRY_INTERSECTS:
-                case Filter.GEOMETRY_OVERLAPS:
-                case Filter.GEOMETRY_TOUCHES:
-                case Filter.GEOMETRY_WITHIN:
-                    visit((GeometryFilter) filter);
-
-                    break;
-
-                case Filter.LIKE:
-                    visit((LikeFilter) filter);
-
-                    break;
-
-                case Filter.LOGIC_AND:
-                case Filter.LOGIC_NOT:
-                case Filter.LOGIC_OR:
-                    visit((LogicFilter) filter);
-
-                    break;
-
-                case Filter.NULL:
-                    visit((NullFilter) filter);
-
-                    break;
-
-                default:
-                    stack.push(filter);
-                    logger.warning(
-                        "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
-
-                    break;
-                }
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
-         */
-        public void visit(BetweenFilter filter) {
-            if ((fcs.getScalarOps() & FilterCapabilities.BETWEEN) == FilterCapabilities.BETWEEN) {
-                int i = stack.size();
-                filter.getLeftValue().accept(this);
-
-                if (i < stack.size()) {
-                    stack.pop();
-                    stack.push(filter);
-
-                    return;
-                }
-
-                filter.getMiddleValue().accept(this);
-
-                if (i < stack.size()) {
-                    stack.pop();
-                    stack.push(filter);
-
-                    return;
-                }
-
-                filter.getRightValue().accept(this);
-
-                if (i < stack.size()) {
-                    stack.pop();
-                    stack.push(filter);
-
-                    return;
-                }
-            } else {
-                stack.push(filter);
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
-         */
-        public void visit(CompareFilter filter) {
-            // supports it as a group -- no need to check the type
-            if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS) != FilterCapabilities.SIMPLE_COMPARISONS) {
-                stack.push(filter);
-
-                return;
-            }
-
-            int i = stack.size();
-            filter.getLeftValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-
-                return;
-            }
-
-            filter.getRightValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-
-                return;
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
-         */
-        public void visit(GeometryFilter filter) {
-            switch (filter.getFilterType()) {
-            case Filter.GEOMETRY_BBOX:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.BBOX) != FilterCapabilities.BBOX) {
-                    if ((parent.getDefaultGeometry() == null)
-                            || (parent.getDefaultGeometry().getCoordinateSystem() == null)) {
-                        stack.push(filter);
-
-                        return;
-                    }
-
-                    if (filter.getLeftGeometry().getType() == Expression.LITERAL_GEOMETRY) {
-                        LiteralExpression le = (LiteralExpression) filter
-                            .getLeftGeometry();
-
-                        if ((le == null) || (le.getLiteral() == null)
-                                || !(le.getLiteral() instanceof Geometry)) {
-                            stack.push(filter);
-
-                            return;
-                        }
-
-                        Geometry bbox = (Geometry) le.getLiteral();
-
-                        if ((!parent.getDefaultGeometry().getCoordinateSystem()
-                                        .equals(bbox.getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-                            stack.push(filter);
-
-                            return;
-                        }
-                    } else {
-                        if (filter.getRightGeometry().getType() == Expression.LITERAL_GEOMETRY) {
-                            LiteralExpression le = (LiteralExpression) filter
-                                .getLeftGeometry();
-
-                            if ((le == null) || (le.getLiteral() == null)
-                                    || !(le.getLiteral() instanceof Geometry)) {
-                                stack.push(filter);
-
-                                return;
-                            }
-
-                            Geometry bbox = (Geometry) le.getLiteral();
-
-                            if ((!parent.getDefaultGeometry()
-                                            .getCoordinateSystem().equals(bbox
-                                        .getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-                                stack.push(filter);
-
-                                return;
-                            }
-                        } else {
-                            stack.push(filter);
-
-                            return;
-                        }
-                    }
-                }
-
-                break;
-
-            case Filter.GEOMETRY_BEYOND:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.BEYOND) != FilterCapabilities.BEYOND) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_CONTAINS:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.CONTAINS) != FilterCapabilities.CONTAINS) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_CROSSES:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.CROSSES) != FilterCapabilities.CROSSES) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_DISJOINT:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.DISJOINT) != FilterCapabilities.DISJOINT) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_DWITHIN:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.DWITHIN) != FilterCapabilities.DWITHIN) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_EQUALS:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.EQUALS) != FilterCapabilities.EQUALS) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-            case Filter.GEOMETRY_INTERSECTS:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.INTERSECT) != FilterCapabilities.INTERSECT) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_OVERLAPS:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.OVERLAPS) != FilterCapabilities.OVERLAPS) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_TOUCHES:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.TOUCHES) != FilterCapabilities.TOUCHES) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            case Filter.GEOMETRY_WITHIN:
-
-                if ((fcs.getSpatialOps() & FilterCapabilities.WITHIN) != FilterCapabilities.WITHIN) {
-                    stack.push(filter);
-
-                    return;
-                }
-
-                break;
-
-            default:
-                stack.push(filter);
-
-                return;
-            }
-
-            int i = stack.size();
-            filter.getLeftGeometry().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-
-                return;
-            }
-
-            filter.getRightGeometry().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-
-                return;
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
-         */
-        public void visit(LikeFilter filter) {
-            if ((fcs.getScalarOps() & FilterCapabilities.LIKE) != FilterCapabilities.LIKE) {
-                stack.push(filter);
-
-                return;
-            }
-
-            int i = stack.size();
-            filter.getValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-
-                return;
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
-         */
-        public void visit(LogicFilter filter) {
-            if ((fcs.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
-                stack.push(filter);
-
-                return;
-            }
-
-            if (filter.getFilterType() == Filter.LOGIC_NOT) {
-                // should only have one child
-                int i = stack.size();
-                Iterator it = filter.getFilterIterator();
-
-                if (it.hasNext()) {
-                    ((Filter) it.next()).accept(this);
-
-                    if (i < stack.size()) {
-                        stack.pop();
-                        stack.push(filter);
-                    }
-                }
-            } else {
-                int i = stack.size();
-
-                if (filter.getFilterType() == Filter.LOGIC_OR) {
-                    Filter orReplacement;
-
-                    try {
-                        orReplacement = translateOr(filter);
-                        orReplacement.accept(this);
-                    } catch (IllegalFilterException e) {
-                        stack.push(filter);
-
-                        return;
-                    }
-                } else {
-                    // more than one child
-                    Iterator it = filter.getFilterIterator();
-
-                    while (it.hasNext()) {
-                        ((Filter) it.next()).accept(this);
-                    }
-
-                    //combine the unsupported and add to the top
-                    if (i < stack.size()) {
-                        if (filter.getFilterType() == Filter.LOGIC_AND) {
-                            Filter f = (Filter) stack.pop();
-
-                            while (stack.size() > i)
-                                f.and((Filter) stack.pop());
-
-                            stack.push(f);
-                        } else {
-                            //					if(filter.getFilterType() == Filter.LOGIC_OR){
-                            ////						Filter f = (Filter)stack.pop();
-                            //						while(stack.size()>i)
-                            ////							f.or((Filter)stack.pop());
-                            //							stack.pop(); // or... we can't do the same as and
-                            //						stack.push(filter);
-                            //					}else{
-                            // error?
-                            logger.warning(
-                                "LogicFilter found which is not 'and, or, not");
-
-                            while (stack.size() > i)
-                                stack.pop();
-
-                            stack.push(filter);
-                        } //}
-                    }
-                }
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
-         */
-        public void visit(NullFilter filter) {
-            if ((fcs.getScalarOps() & FilterCapabilities.NULL_CHECK) != FilterCapabilities.NULL_CHECK) {
-                stack.push(filter);
-
-                return;
-            }
-
-            int i = stack.size();
-            filter.getNullCheckValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(filter);
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
-         */
-        public void visit(FidFilter filter) {
-            // TODO figure out how to check that this is top level.
-            // otherwise this is fine
-            if (!stack.isEmpty()) {
-                stack.push(filter);
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
-         */
-        public void visit(AttributeExpression expression) {
-            if (!parent.hasAttributeType(expression.getAttributePath())) {
-                stack.push(expression);
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
-         */
-        public void visit(Expression expression) {
-            stack.push(expression);
-            logger.warning(
-                "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)");
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
-         */
-        public void visit(LiteralExpression expression) {
-            if (expression.getLiteral() == null) {
-                stack.push(expression);
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
-         */
-        public void visit(MathExpression expression) {
-            if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC) != FilterCapabilities.SIMPLE_ARITHMETIC) {
-                stack.push(expression);
-
-                return;
-            }
-
-            int i = stack.size();
-            expression.getLeftValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(expression);
-
-                return;
-            }
-
-            expression.getRightValue().accept(this);
-
-            if (i < stack.size()) {
-                stack.pop();
-                stack.push(expression);
-
-                return;
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
-         */
-        public void visit(FunctionExpression expression) {
-            if ((fcs.getScalarOps() & FilterCapabilities.FUNCTIONS) != FilterCapabilities.FUNCTIONS) {
-                stack.push(expression);
-
-                return;
-            }
-
-            if (expression.getName() == null) {
-                stack.push(expression);
-
-                return;
-            }
-
-            int i = stack.size();
-
-            for (int k = 0; k < expression.getArgCount(); k++) {
-                expression.getArgs()[k].accept(this);
-
-                if (i < stack.size()) {
-                    stack.pop();
-                    stack.push(expression);
-
-                    return;
-                }
-            }
-        }
-
-        public Filter translateOr(LogicFilter filter)
-            throws IllegalFilterException {
-            if (filter.getFilterType() != LogicFilter.LOGIC_OR) {
-                return filter;
-            }
-
-            // a|b == ~~(a|b) negative introduction
-            // ~(a|b) == (~a + ~b) modus ponens
-            // ~~(a|b) == ~(~a + ~b) substitution
-            // a|b == ~(~a + ~b) negative simpilification
-            FilterFactory ff = FilterFactory.createFilterFactory();
-            LogicFilter and = ff.createLogicFilter(Filter.LOGIC_AND);
-            Iterator i = filter.getFilterIterator();
-
-            while (i.hasNext()) {
-                Filter f = (Filter) i.next();
-
-                if (f.getFilterType() == Filter.LOGIC_NOT) {
-                    // simplify it 
-                    and.addFilter((Filter) ((LogicFilter) f).getFilterIterator()
-                                            .next());
-                } else {
-                    and.addFilter(f.not());
-                }
-            }
-
-            return and.not();
-        }
-    }
-
     private static class WFSAuthenticator extends Authenticator {
         private PasswordAuthentication pa;
         private URL host; // this is the getCapabilities url
 
         private WFSAuthenticator() {
+        	// not called
         }
 
         public WFSAuthenticator(String user, String pass, URL host) {
