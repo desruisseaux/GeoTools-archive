@@ -67,6 +67,7 @@ public class DefaultQuery implements Query {
      * No argument constructor.
      */
     public DefaultQuery() {
+        // no arg
     }
 
     /**

@@ -426,7 +426,7 @@ public class DefaultView implements FeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
     public FeatureResults getFeatures(Filter filter) throws IOException {
-        return getFeatures(new DefaultQuery(filter));
+        return getFeatures(new DefaultQuery(schema.getTypeName(),filter));
     }
 
     /**
