@@ -123,12 +123,11 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      *
      * @throws IllegalStateException DOCUMENT ME!
      */
-    private String getLayerName() {
+    private String getLayerName() throws SeException {
         if (sdeLayer == null) {
             throw new IllegalStateException("SDE layer has not been set");
         }
-
-        return sdeLayer.getName();
+        return sdeLayer.getQualifiedName(); //+ "." + sdeLayer.getName();
     }
 
     /**
