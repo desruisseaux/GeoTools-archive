@@ -59,6 +59,8 @@ import org.geotools.pt.CoordinatePoint;
  * </p> 
  * @version $Id$
  * @author Jody Garnett
+ *
+ * @deprecated Replaced by {@linnk org.geotools.referencing.crs.CRSAUTOFactory}.
  */
 public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements CRSAuthoritySpi {
 	/**
