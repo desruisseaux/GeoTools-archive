@@ -23,16 +23,14 @@ package org.geotools.resources;
 import java.awt.image.RenderedImage;
 
 // Geotools dependencies
-import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.SampleDimensionType;
-import org.opengis.coverage.ColorInterpretation;
-import org.opengis.coverage.grid.GridRange;
-import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.coverage.grid.GridCoverage;
-//import org.opengis.coverage.grid.InvalidGridGeometryException;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.referencing.operation.MathTransform; // For Javadoc
-import org.opengis.referencing.operation.MathTransform1D;
+import org.geotools.pt.Envelope;
+import org.geotools.gc.GridRange;
+import org.geotools.gc.GridGeometry;
+import org.geotools.gc.GridCoverage;
+import org.geotools.ct.MathTransform; // For Javadoc
+import org.geotools.ct.MathTransform1D;
+import org.geotools.cv.SampleDimension;
+import org.geotools.gc.InvalidGridGeometryException;
 
 
 /**
@@ -41,12 +39,14 @@ import org.opengis.referencing.operation.MathTransform1D;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link GCSUtilities}.
  */
-public final class GCSUtilities {
+public final class LegacyGCSUtilities {
     /**
      * Do not allows instantiation of this class.
      */
-    private GCSUtilities() {
+    private LegacyGCSUtilities() {
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -58,44 +58,44 @@ public final class GCSUtilities {
     /**
      * Returns <code>true</code> if the specified geometry has a valid grid range.
      */
-//    public static boolean hasGridRange(final GridGeometry geometry) {
-//        if (geometry != null) try {
-//            geometry.getGridRange();
-//            return true;
-//        } catch (InvalidGridGeometryException exception) {
-//            // Ignore.
-//        }
-//        return false;
-//    }
+    public static boolean hasGridRange(final GridGeometry geometry) {
+        if (geometry != null) try {
+            geometry.getGridRange();
+            return true;
+        } catch (InvalidGridGeometryException exception) {
+            // Ignore.
+        }
+        return false;
+    }
 
     /**
      * Returns <code>true</code> if the specified geometry
      * has a valid "grid to coordinate system" transform.
      */
-//    public static boolean hasTransform(final GridGeometry geometry) {
-//        if (geometry != null) try {
-//            geometry.getGridToCoordinateSystem();
-//            return true;
-//        } catch (InvalidGridGeometryException exception) {
-//            // Ignore.
-//        }
-//        return false;
-//    }
+    public static boolean hasTransform(final GridGeometry geometry) {
+        if (geometry != null) try {
+            geometry.getGridToCoordinateSystem();
+            return true;
+        } catch (InvalidGridGeometryException exception) {
+            // Ignore.
+        }
+        return false;
+    }
 
     /**
      * Cast the specified grid range into an envelope. This is sometime used before to transform
      * the envelope using {@link CTSUtilities#transform(MathTransform, Envelope)}.
      */
-//    public static Envelope toEnvelope(final GridRange gridRange) {
-//        final int dimension = gridRange.getDimension();
-//        final double[] lower = new double[dimension];
-//        final double[] upper = new double[dimension];
-//        for (int i=0; i<dimension; i++) {
-//            lower[i] = gridRange.getLower(i);
-//            upper[i] = gridRange.getUpper(i);
-//        }
-//        return new Envelope(lower, upper);
-//    }
+    public static Envelope toEnvelope(final GridRange gridRange) {
+        final int dimension = gridRange.getDimension();
+        final double[] lower = new double[dimension];
+        final double[] upper = new double[dimension];
+        for (int i=0; i<dimension; i++) {
+            lower[i] = gridRange.getLower(i);
+            upper[i] = gridRange.getUpper(i);
+        }
+        return new Envelope(lower, upper);
+    }
 
     /**
      * Cast the specified envelope into a grid range. This is sometime used after the envelope
@@ -114,17 +114,17 @@ public final class GCSUtilities {
      * operation will respect the "grid to coordinate system" transform no matter what the
      * grid range is.
      */
-//    public static GridRange toGridRange(final Envelope envelope) {
-//        final int dimension = envelope.getDimension();
-//        final int[] lower = new int[dimension];
-//        final int[] upper = new int[dimension];
-//        for (int i=0; i<dimension; i++) {
-//            // See "note about conversion of floating point values to integers" in the JavaDoc.
-//            lower[i] = (int)Math.round(envelope.getMinimum(i));
-//            upper[i] = (int)Math.round(envelope.getMaximum(i));
-//        }
-//        return new GridRange(lower, upper);
-//    }
+    public static GridRange toGridRange(final Envelope envelope) {
+        final int dimension = envelope.getDimension();
+        final int[] lower = new int[dimension];
+        final int[] upper = new int[dimension];
+        for (int i=0; i<dimension; i++) {
+            // See "note about conversion of floating point values to integers" in the JavaDoc.
+            lower[i] = (int)Math.round(envelope.getMinimum(i));
+            upper[i] = (int)Math.round(envelope.getMaximum(i));
+        }
+        return new GridRange(lower, upper);
+    }
 
 
 
@@ -140,36 +140,36 @@ public final class GCSUtilities {
      * {@linkplain SampleDimension#getSampleToGeophysics sample to geophysics} transform
      * which is not the identity transform.
      */
-//    public static boolean hasTransform(final SampleDimension[] sampleDimensions) {
-//        for (int i=sampleDimensions.length; --i>=0;) {
-//            MathTransform1D tr = sampleDimensions[i].geophysics(false).getSampleToGeophysics();
-//            if (tr!=null && !tr.isIdentity()) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    public static boolean hasTransform(final SampleDimension[] sampleDimensions) {
+        for (int i=sampleDimensions.length; --i>=0;) {
+            MathTransform1D tr = sampleDimensions[i].geophysics(false).getSampleToGeophysics();
+            if (tr!=null && !tr.isIdentity()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns <code>true</code> if the specified grid coverage or any of its source
      * uses the following image.
      */
-//    public static boolean uses(final GridCoverage coverage, final RenderedImage image) {
-//        if (coverage != null) {
-//            if (coverage.getRenderedImage() == image) {
-//                return true;
-//            }
-//            final GridCoverage[] sources = coverage.getSources();
-//            if (sources != null) {
-//                for (int i=0; i<sources.length; i++) {
-//                    if (uses(sources[i], image)) {
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
+    public static boolean uses(final GridCoverage coverage, final RenderedImage image) {
+        if (coverage != null) {
+            if (coverage.getRenderedImage() == image) {
+                return true;
+            }
+            final GridCoverage[] sources = coverage.getSources();
+            if (sources != null) {
+                for (int i=0; i<sources.length; i++) {
+                    if (uses(sources[i], image)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns the visible band in the specified image. This method fetch the "GC_VisibleBand"

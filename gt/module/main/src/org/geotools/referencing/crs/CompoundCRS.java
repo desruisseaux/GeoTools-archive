@@ -24,6 +24,7 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -34,6 +35,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.Info;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CompoundCS;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -61,15 +64,53 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
     private final CoordinateReferenceSystem[] crs;
 
     /**
+     * Constructs a coordinate reference system from a name and two CRS.
+     *
+     * @param name The name.
+     * @param head The head CRS.
+     * @param tail The tail CRS.
+     */
+    public CompoundCRS(final String name,
+                       final CoordinateReferenceSystem head,
+                       final CoordinateReferenceSystem tail)
+    {
+        this(name, new CoordinateReferenceSystem[] {head, tail});
+    }
+
+    /**
+     * Constructs a coordinate reference system from a name and three CRS.
+     *
+     * @param name The name.
+     * @param head The head CRS.
+     * @param middle The middle CRS.
+     * @param tail The tail CRS.
+     */
+    public CompoundCRS(final String name,
+                       final CoordinateReferenceSystem head,
+                       final CoordinateReferenceSystem middle,
+                       final CoordinateReferenceSystem tail)
+    {
+        this(name, new CoordinateReferenceSystem[] {head, middle, tail});
+    }
+
+    /**
+     * Constructs a coordinate reference system from a name.
+     *
+     * @param name The name.
+     * @param crs The array of coordinate reference system making this compound CRS.
+     */
+    public CompoundCRS(final String name, final CoordinateReferenceSystem[] crs) {
+        this(Collections.singletonMap("name", name), crs);
+    }
+
+    /**
      * Constructs a coordinate reference system from a set of properties.
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.
      */
-    public CompoundCRS(final Map properties,
-                       CoordinateReferenceSystem[] crs)
-    {
+    public CompoundCRS(final Map properties, CoordinateReferenceSystem[] crs) {
         super(properties, null, createCoordinateSystem(crs));
         ensureNonNull("crs", crs);
         this.crs = crs = (CoordinateReferenceSystem[]) crs.clone();
@@ -77,7 +118,8 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
             ensureNonNull("crs", crs, i);
         }
         if (crs.length < 2) {
-            
+            throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_MISSING_PARAMETER_$1, "crs["+crs.length+']'));
         }
     }
 

@@ -96,6 +96,9 @@ import org.geotools.resources.gcs.ResourceKeys;
  *
  * @see SampleDimension
  * @see PiecewiseDescriptor
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.Category}
+ *             in the <code>org.geotools.coverage</code> package.
  */
 public class Category implements Serializable {
     /**

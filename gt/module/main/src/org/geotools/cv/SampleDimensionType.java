@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -60,11 +48,14 @@ import org.geotools.resources.gcs.ResourceKeys;
  * This interface is applicable to any coverage type.
  * For grid coverages, the sample dimension refers to an individual band.
  *
- * @version $Id: SampleDimensionType.java,v 1.4 2003/05/13 10:59:51 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cv.CV_SampleDimensionType
+ *
+ * @deprecated Replaced by {@link org.opengis.coverage.SampleDimensionType} in the
+ *             <code>org.opengis.coverage</code> package.
  */
 public final class SampleDimensionType extends EnumeratedParameter {
     /**

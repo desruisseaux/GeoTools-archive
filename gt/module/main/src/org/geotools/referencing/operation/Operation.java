@@ -80,6 +80,8 @@ public class Operation extends SingleOperation
      * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
      *                  reference system} to positions in the {@linkplain #getTargetCRS target
      *                  coordinate reference system}.
+     * @param method    The operation method.
+     * @param values    The parameter values, or <code>null</code> or an empty array if none.
      */
     public Operation(final Map                      properties,
                      final CoordinateReferenceSystem sourceCRS,

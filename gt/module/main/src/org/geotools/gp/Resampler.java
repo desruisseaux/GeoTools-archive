@@ -71,7 +71,7 @@ import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.image.JAIUtilities;
@@ -301,7 +301,7 @@ final class Resampler extends GridCoverage {
         if (sameCS) {
             step2x = null;
             step2  = MathTransform2D.IDENTITY;
-            if (!GCSUtilities.hasTransform(targetGG)) {
+            if (!LegacyGCSUtilities.hasTransform(targetGG)) {
                 // TargetGG should not be null, otherwise the code above should
                 // have already detected that this resample is not doing anything.
                 targetGG = new GridGeometry(targetGG.getGridRange(),
@@ -350,10 +350,10 @@ final class Resampler extends GridCoverage {
                 targetCoverage=new Resampler(sourceCoverage, targetImage, targetCS, targetEnvelope);
                 targetGG = targetCoverage.getGridGeometry();
             }
-            else if (!GCSUtilities.hasTransform(targetGG)) {
+            else if (!LegacyGCSUtilities.hasTransform(targetGG)) {
                 targetGG = new GridGeometry(targetGG.getGridRange(), targetEnvelope, null);
             }
-            else if (!GCSUtilities.hasGridRange(targetGG)) {
+            else if (!LegacyGCSUtilities.hasGridRange(targetGG)) {
                 final MathTransform step3x = targetGG.getGridToCoordinateSystem();
                 final Envelope gridRange = CTSUtilities.transform(step3x.inverse(), targetEnvelope);
                 for (int i=gridRange.getDimension(); --i>=0;) {
@@ -362,7 +362,7 @@ final class Resampler extends GridCoverage {
                     // 0.5 (use +0.5 for maximum too, not -0.5, since maximum is exclusive).
                     gridRange.setRange(i, gridRange.getMinimum(i)+0.5, gridRange.getMaximum(i)+0.5);
                 }
-                targetGG = new GridGeometry(GCSUtilities.toGridRange(gridRange), step3x);
+                targetGG = new GridGeometry(LegacyGCSUtilities.toGridRange(gridRange), step3x);
             }
             step2 = step2r.inverse();
         }
@@ -387,7 +387,7 @@ final class Resampler extends GridCoverage {
             throw new TransformException(Resources.format(
                                          ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
         }
-        if (!GCSUtilities.hasGridRange(targetGG)) {
+        if (!LegacyGCSUtilities.hasGridRange(targetGG)) {
             final MathTransform xtr;
             final MathTransform step1x = targetGG.getGridToCoordinateSystem();
             final MathTransform step3x = sourceGG.getGridToCoordinateSystem().inverse();
@@ -401,9 +401,9 @@ final class Resampler extends GridCoverage {
             }
             if (xtr != null) {
                 assert getMathTransform2D(xtr, mtFactory).equals(transform) : xtr;
-                Envelope envelope = GCSUtilities.toEnvelope(sourceGG.getGridRange());
+                Envelope envelope = LegacyGCSUtilities.toEnvelope(sourceGG.getGridRange());
                 envelope = CTSUtilities.transform(xtr.inverse(), envelope);
-                targetGG = new GridGeometry(GCSUtilities.toGridRange(envelope), step1x);
+                targetGG = new GridGeometry(LegacyGCSUtilities.toGridRange(envelope), step1x);
             } else {
                 assert transform.isIdentity() : transform;
                 targetGG = sourceGG;
@@ -580,8 +580,8 @@ final class Resampler extends GridCoverage {
                     gridToCoordinateSystem =
                           mtFactory.createConcatenatedTransform(
                           mtFactory.createAffineTransform(
-                             Matrix.createAffineTransform(GCSUtilities.toEnvelope(actualGR),
-                                                          GCSUtilities.toEnvelope(targetGR))),
+                             Matrix.createAffineTransform(LegacyGCSUtilities.toEnvelope(actualGR),
+                                                          LegacyGCSUtilities.toEnvelope(targetGR))),
                                                           gridToCoordinateSystem);
                 }
                 targetGG = new GridGeometry(actualGR, gridToCoordinateSystem);
@@ -784,11 +784,11 @@ final class Resampler extends GridCoverage {
             if (gridGeom != null) {
                 boolean mismatche = false;
                 final GridGeometry actualGeom = coverage.getGridGeometry();
-                if (GCSUtilities.hasGridRange(gridGeom)) {
+                if (LegacyGCSUtilities.hasGridRange(gridGeom)) {
                     mismatche |= !gridGeom.getGridRange().equals(
                                 actualGeom.getGridRange());
                 }
-                if (GCSUtilities.hasTransform(gridGeom)) {
+                if (LegacyGCSUtilities.hasTransform(gridGeom)) {
                     mismatche |= !gridGeom.getGridToCoordinateSystem().equals(
                                 actualGeom.getGridToCoordinateSystem());
                 }

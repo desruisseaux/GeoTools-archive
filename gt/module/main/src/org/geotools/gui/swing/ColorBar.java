@@ -68,7 +68,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 
 // Resources (Note: CTS resources are okay for this class).
 import org.geotools.resources.cts.Resources;
@@ -423,7 +423,7 @@ public class ColorBar extends JComponent {
         if (coverage != null) {
             coverage = coverage.geophysics(false);
             final RenderedImage image = coverage.getRenderedImage();
-            band = coverage.getSampleDimensions()[GCSUtilities.getVisibleBand(image)];
+            band = coverage.getSampleDimensions()[LegacyGCSUtilities.getVisibleBand(image)];
             final ColorModel colors = image.getColorModel();
             if (colors instanceof IndexColorModel) {
                 return setColors(band, (IndexColorModel) colors);

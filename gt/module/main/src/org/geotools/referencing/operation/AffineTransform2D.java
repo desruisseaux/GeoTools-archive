@@ -21,20 +21,24 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
-
-// Resources
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.geometry.XAffineTransform;
+package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**
@@ -42,9 +46,6 @@ import java.awt.geom.AffineTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.AffineTransform2D}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
 final class AffineTransform2D extends XAffineTransform implements MathTransform2D, LinearTransform {
     /**
@@ -91,11 +92,14 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
     /**
      * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
      */
-    public CoordinatePoint transform(final CoordinatePoint ptSrc, CoordinatePoint ptDst) {
-        if (ptDst==null) {
-            ptDst = new CoordinatePoint(2);
+    public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst) {
+        if (ptDst == null) {
+            ptDst = new org.geotools.geometry.DirectPosition(2);
         }
-        transform(ptSrc.ord, 0, ptDst.ord, 0, 1);
+        final double[] array = ptSrc.getCoordinates();
+        transform(array, 0, array, 0, 1);
+        ptDst.setOrdinate(0, array[0]);
+        ptDst.setOrdinate(1, array[1]);
         return ptDst;
     }
     
@@ -103,7 +107,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * Returns this transform as an affine transform matrix.
      */
     public Matrix getMatrix() {
-        return new Matrix(this);
+        return new org.geotools.referencing.operation.Matrix(this);
     }
     
     /**
@@ -112,7 +116,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * same everywhere.
      */
     public Matrix derivative(final Point2D point) {
-        final Matrix matrix = new Matrix(2);
+        final Matrix matrix = new org.geotools.referencing.operation.Matrix(2);
         matrix.setElement(0,0, getScaleX());
         matrix.setElement(1,1, getScaleY());
         matrix.setElement(0,1, getShearX());
@@ -125,7 +129,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * For an affine transform, the derivative is the
      * same everywhere.
      */
-    public Matrix derivative(final CoordinatePoint point) {
+    public Matrix derivative(final DirectPosition point) {
         return derivative((Point2D) null);
     }
     
@@ -149,9 +153,14 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
     }
     
     /**
-     * Returns the WKT for this affine transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public String toString() {
-        return MatrixTransform.toString(new Matrix(this));
+    protected String formatWKT(final Formatter formatter) {
+        return MatrixTransform.formatWKT(formatter, getMatrix());
     }
 }

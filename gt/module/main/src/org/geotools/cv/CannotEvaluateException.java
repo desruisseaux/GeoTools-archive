@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -51,10 +39,13 @@ import org.geotools.resources.gcs.ResourceKeys;
  * This exception is usually invoked by a <code>Coverage.evaluate</code>
  * method, for example when a point is outside the coverage.
  *
- * @version $Id: CannotEvaluateException.java,v 1.2 2003/05/13 10:59:49 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.opengis.coverage.CannotEvaluateException}
+ *             in the <code>org.geotools.coverage</code> package.
  */
-public class CannotEvaluateException extends RuntimeException {
+public class CannotEvaluateException extends org.opengis.coverage.CannotEvaluateException {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -87,7 +78,8 @@ public class CannotEvaluateException extends RuntimeException {
      *         unknown.
      */
     public CannotEvaluateException(final String message, final Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
     }
 
     /**
@@ -113,7 +105,7 @@ public class CannotEvaluateException extends RuntimeException {
      *         unknown.
      */
     public CannotEvaluateException(final CoordinatePoint point, final Throwable cause) {
-        super(Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1, toString(point)), cause);
+        this(Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1, toString(point)), cause);
     }
     
     /**

@@ -107,7 +107,7 @@ import org.geotools.io.LineWriter;
 import org.geotools.util.WeakHashSet;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.image.ImageUtilities;
@@ -585,11 +585,11 @@ public class GridCoverage extends Coverage {
          * pool of shared envelopes will be used in order to recycle existing envelopes.
          */
         final GridRange gridRange;
-        if (GCSUtilities.hasGridRange(gridGeometry)) {
+        if (LegacyGCSUtilities.hasGridRange(gridGeometry)) {
             gridRange = gridGeometry.getGridRange();
         } else {
             gridRange = new GridRange(image, cs.getDimension());
-            if (GCSUtilities.hasTransform(gridGeometry)) {
+            if (LegacyGCSUtilities.hasTransform(gridGeometry)) {
                 gridGeometry=new GridGeometry(gridRange, gridGeometry.getGridToCoordinateSystem());
             }
         }
@@ -1000,7 +1000,7 @@ public class GridCoverage extends Coverage {
         if (inverse != null) {
             return inverse;
         }
-        if (!GCSUtilities.hasTransform(sampleDimensions)) {
+        if (!LegacyGCSUtilities.hasTransform(sampleDimensions)) {
             return inverse=this;
         }
         synchronized (this) {
@@ -1069,7 +1069,7 @@ public class GridCoverage extends Coverage {
             image = op.getSourceImage(0);
         }
         final int                  numBands = image.getNumBands();
-        final int              visibleBand  = GCSUtilities.getVisibleBand(image);
+        final int              visibleBand  = LegacyGCSUtilities.getVisibleBand(image);
         final SampleDimension[] targetBands = (SampleDimension[]) sampleDimensions.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {

@@ -88,8 +88,8 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
         for (int i=0; i<cs.length; i++) {
             count += cs[i].getDimension();
         }
-        count = 0;
         final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[count];
+        count = 0;
         for (int i=0; i<cs.length; i++) {
             final CoordinateSystem c = cs[i];
             final int dim = c.getDimension();

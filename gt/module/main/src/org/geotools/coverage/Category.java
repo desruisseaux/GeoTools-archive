@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 import org.geotools.referencing.operation.Matrix;
+import org.geotools.referencing.operation.LinearTransform1D;
 
 // Resources
 import org.geotools.resources.XMath;
@@ -539,12 +540,7 @@ public class Category implements Serializable {
      *               for initializing {@link #transform} for a qualitative category.
      */
     static MathTransform1D createLinearTransform(final double scale, final double offset) {
-        Matrix matrix = new Matrix(2,2);
-        matrix.setElement(0,0, scale);
-        matrix.setElement(0,1, offset);
-        // TODO: Required CRS implementation not yet available.
-        throw new UnsupportedOperationException();
-//        return (MathTransform1D)MathTransformFactory.getDefault().createAffineTransform(matrix);
+        return LinearTransform1D.create(scale, offset);
     }
 
     /**
@@ -944,9 +940,7 @@ public class Category implements Serializable {
         public Localized(final int key, final Color color, final Byte index) {
             super(Resources.format(key), new Color[]{color},
                   new NumberRange(Byte.class, index, index),
-                  // TODO: Required CRS implementation not yet available.
-                  // MathTransform1D.IDENTITY);
-                  (MathTransform1D)null);
+                  LinearTransform1D.IDENTITY);
             this.key = key;
         }
 

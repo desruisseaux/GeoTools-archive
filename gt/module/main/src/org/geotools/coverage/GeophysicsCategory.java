@@ -28,15 +28,18 @@ import java.awt.Color;
 import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Resources
+// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.LinearTransform1D;
 
 
 /**
@@ -52,15 +55,6 @@ final class GeophysicsCategory extends Category {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7164422654831370784L;
-
-    /**
-     * The identity transform. To be returned by {@link #getSampleToGeophysics}.
-     */
-    static final MathTransform1D IDENTITY = null;
-    // TODO: Required CRS implementation not yet available.
-//    static {
-//        IDENTITY = (MathTransform1D) MathTransformFactory.getDefault().createIdentityTransform(1);
-//    }
     
     /**
      * Creates a new instance of geophysics category.
@@ -137,7 +131,7 @@ final class GeophysicsCategory extends Category {
      * this method returns <code>null</code>.
      */
     public MathTransform1D getSampleToGeophysics() {
-        return isQuantitative() ? IDENTITY : null;
+        return isQuantitative() ? LinearTransform1D.IDENTITY : null;
     }
     
     /**
@@ -163,9 +157,14 @@ final class GeophysicsCategory extends Category {
         if (sampleToGeophysics.isIdentity()) {
             return this;
         }
-        // TODO: Required CRS implementation not yet available.
-//        sampleToGeophysics = (MathTransform1D)MathTransformFactory.getDefault()
-//                .createConcatenatedTransform(inverse.getSampleToGeophysics(), sampleToGeophysics);
+        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
+        try {
+            sampleToGeophysics = (MathTransform1D)factory.createConcatenatedTransform(
+                                 inverse.getSampleToGeophysics(), sampleToGeophysics);
+        } catch (FactoryException exception) {
+            // TODO: Uses Geotools factory instead (so no exception to catch).
+            throw new UnsupportedOperationException();
+        }
         return inverse.rescale(sampleToGeophysics).inverse;
     }
 

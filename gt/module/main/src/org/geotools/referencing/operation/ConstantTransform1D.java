@@ -18,22 +18,10 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Arrays;
@@ -47,9 +35,6 @@ import java.util.Arrays;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.ConstantTransform1D}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
 final class ConstantTransform1D extends LinearTransform1D {
     /**

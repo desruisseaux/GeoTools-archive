@@ -40,8 +40,11 @@ package org.geotools.ct;
  * A one dimensional, identity transform. Output values are identical to input values.
  * This class is really a special case of {@link LinearTransform1D} optimized for speed.
  *
- * @version $Id: IdentityTransform1D.java,v 1.3 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.IdentityTransform1D}
+ *             in the <code>org.geotools.referencing.operation</code> package.
  */
 final class IdentityTransform1D extends LinearTransform1D {
     /**

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -52,7 +40,7 @@ import javax.media.jai.ParameterList;
 // Geotools implementation
 import org.geotools.gc.GridCoverage;
 import org.geotools.cv.SampleDimension;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.image.ColorUtilities;
 
 
@@ -60,7 +48,7 @@ import org.geotools.resources.image.ColorUtilities;
  * Operation applied only on image's colors. This operation work
  * only for source image using an {@link IndexColorModel}.
  *
- * @version $Id: IndexColorOperation.java,v 1.11 2003/07/22 15:24:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 abstract class IndexColorOperation extends Operation {
@@ -90,7 +78,7 @@ abstract class IndexColorOperation extends Operation {
         final GridCoverage     visual = source.geophysics(false);
         final RenderedImage     image = visual.getRenderedImage();
         final SampleDimension[] bands = visual.getSampleDimensions();
-        final int         visibleBand = GCSUtilities.getVisibleBand(image);
+        final int         visibleBand = LegacyGCSUtilities.getVisibleBand(image);
         ColorModel model = image.getColorModel();
         boolean colorChanged = false;
         for (int i=0; i<bands.length; i++) {

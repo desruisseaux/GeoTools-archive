@@ -21,10 +21,11 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
-// Geotools dependencies
-import org.geotools.pt.Matrix;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -36,9 +37,6 @@ import org.geotools.pt.Matrix;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.LinearTransform}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
 public interface LinearTransform extends MathTransform {
     /**

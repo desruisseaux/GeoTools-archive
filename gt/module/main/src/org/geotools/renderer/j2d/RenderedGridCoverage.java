@@ -70,7 +70,7 @@ import org.geotools.gp.CannotReprojectException;
 // Miscellaneous resources
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
 import org.geotools.resources.geometry.XDimension2D;
@@ -316,7 +316,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
             final ColorModel colorModel = coverage.getRenderedImage().getColorModel();
             if (colorModel instanceof IndexColorModel) {
                 final int[] visibleBands = new int[] {
-                    GCSUtilities.getVisibleBand(coverage.getRenderedImage())
+                    LegacyGCSUtilities.getVisibleBand(coverage.getRenderedImage())
                 };
                 coverage = processor.doOperation("SelectSampleDimension", coverage,
                                                  "SampleDimensions", visibleBands);
@@ -911,7 +911,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
                  * chance that it is referenced outside of this class.
                  */
                 final RenderedImage image = coverage.getRenderedImage();
-                if (!GCSUtilities.uses(sourceCoverage.geophysics(false), image)) {
+                if (!LegacyGCSUtilities.uses(sourceCoverage.geophysics(false), image)) {
                     if (images != null) {
                         synchronized (RenderedGridCoverage.class) {
                             sharedImages.remove(coverage);

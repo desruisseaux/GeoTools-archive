@@ -21,25 +21,25 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
-
-// JAI dependencies
-import javax.media.jai.ParameterList;
-
-// Vecmath (Java3D) dependencies
 import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
 // Geotools dependencies and resources
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -48,9 +48,6 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.MatrixTransform}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
 final class MatrixTransform extends AbstractMathTransform implements LinearTransform, Serializable {
     /**
@@ -236,7 +233,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
      * same everywhere.
      */
     public Matrix derivative(final Point2D point) {
-        return derivative((CoordinatePoint)null);
+        return derivative((DirectPosition)null);
     }
     
     /**
@@ -244,8 +241,8 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
      * For a matrix transform, the derivative is the
      * same everywhere.
      */
-    public Matrix derivative(final CoordinatePoint point) {
-        final Matrix matrix = getMatrix();
+    public Matrix derivative(final DirectPosition point) {
+        final org.geotools.referencing.operation.Matrix matrix = getGMatrix();
         matrix.setSize(numRow-1, numCol-1);
         return matrix;
     }
@@ -254,7 +251,14 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
      * Returns a copy of the matrix.
      */
     public Matrix getMatrix() {
-        return new Matrix(numRow, numCol, elt);
+        return getGMatrix();
+    }
+    
+    /**
+     * Returns a copy of the matrix.
+     */
+    private org.geotools.referencing.operation.Matrix getGMatrix() {
+        return new org.geotools.referencing.operation.Matrix(numRow, numCol, elt);
     }
     
     /**
@@ -296,7 +300,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
         if (isIdentity()) {
             return this;
         }
-        final Matrix matrix = getMatrix();
+        final org.geotools.referencing.operation.Matrix matrix = getGMatrix();
         try {
             matrix.invert();
         } catch (SingularMatrixException exception) {
@@ -314,7 +318,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
      * different implementations of the same class.
      */
     public int hashCode() {
-        long code=2563217;
+        long code = (int)serialVersionUID;
         for (int i=elt.length; --i>=0;) {
             code = code*37 + Double.doubleToLongBits(elt[i]);
         }
@@ -326,7 +330,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
      * this math transform for equality.
      */
     public boolean equals(final Object object) {
-        if (object==this) {
+        if (object == this) {
             // Slight optimization
             return true;
         }
@@ -340,92 +344,106 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
     }
     
     /**
-     * Returns the WKT for this math transform.
-     */
-    public String toString() {
-        return toString(getMatrix());
-    }
-    
-    /**
-     * Returns the WKT for an affine transform
-     * using the specified matrix.
-     */
-    static String toString(final Matrix matrix) {
-        final int numRow = matrix.getNumRow();
-        final int numCol = matrix.getNumCol();
-        final StringBuffer buffer = paramMT("Affine");
-        final StringBuffer eltBuf = new StringBuffer("elt_");
-        addParameter(buffer, "num_row", numRow);
-        addParameter(buffer, "num_col", numCol);
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                final double value = matrix.getElement(j,i);
-                if (value != (i==j ? 1 : 0)) {
-                    eltBuf.setLength(4);
-                    eltBuf.append(j);
-                    eltBuf.append('_');
-                    eltBuf.append(i);
-                    addParameter(buffer, eltBuf.toString(), value);
-                }
-            }
-        }
-        buffer.append(']');
-        return buffer.toString();
-    }
-    
-    /**
-     * The provider for {@link MatrixTransform}.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
      *
-     * @version $Id$
-     * @author Martin Desruisseaux
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    static final class Provider extends MathTransformProvider {
-        /**
-         * Create a provider for affine transform.
-         * The default matrix size is 4&times;4.
-         */
-        public Provider() {
-            super("Affine", ResourceKeys.AFFINE_TRANSFORM, null);
-            final int defaultSize = MatrixParameters.DEFAULT_SIZE.intValue();
-            putInt("num_row", defaultSize, MatrixParameters.POSITIVE_RANGE);
-            putInt("num_col", defaultSize, MatrixParameters.POSITIVE_RANGE);
-        }
-    
-        /**
-         * Returns a newly created parameter list. This custom parameter list
-         * is different from the default one in that it is "extensible", i.e.
-         * new parameters may be added if the matrix's size growth.
-         */
-        public ParameterList getParameterList() {
-            return new MatrixParameters();
-        }
-        
-        /**
-         * Returns a transform for the specified parameters.
-         *
-         * @param  parameters The parameter values in standard units.
-         * @return A {@link MathTransform} object of this classification.
-         *
-         * @task REVISIT: Should we invoke {@link MathTransformFactory#createAffineTransform}
-         *       instead? It would force us to keep a reference to {@link MathTransformFactory}
-         *       (and not forget to change the reference if this provider is copied into an
-         *       other factory)...
-         */
-        public MathTransform create(final ParameterList parameters) {
-            final Matrix matrix = MatrixParameters.getMatrix(parameters);
-            if (matrix.isAffine()) {
-                switch (matrix.getNumRow()) {
-                    case 3: return new AffineTransform2D(matrix.toAffineTransform2D());
-                    case 2: return LinearTransform1D.create(matrix.getElement(0,0),
-                                                            matrix.getElement(0,1));
-                }
-            }
-            if (matrix.isIdentity()) {
-                // The 1D and 2D cases have their own optimized identity transform,
-                // which is why this test must come after the 'isAffine()' test.
-                return new IdentityTransform(matrix.getNumRow()-1);
-            }
-            return new MatrixTransform(matrix);
-        }
+    protected String formatWKT(final Formatter formatter) {
+        return formatWKT(formatter, getMatrix());
     }
+
+    /**
+     * Implementation of {@link #formatWKT(Formatter)} for the specified matrix.
+     */
+    static String formatWKT(final Formatter formatter, final Matrix matrix) {
+        // TODO
+        return "PARAM_MT";
+    }
+    
+// TODO
+//    /**
+//     * Returns the WKT for an affine transform
+//     * using the specified matrix.
+//     */
+//    static String toString(final Matrix matrix) {
+//        final int numRow = matrix.getNumRow();
+//        final int numCol = matrix.getNumCol();
+//        final StringBuffer buffer = paramMT("Affine");
+//        final StringBuffer eltBuf = new StringBuffer("elt_");
+//        addParameter(buffer, "num_row", numRow);
+//        addParameter(buffer, "num_col", numCol);
+//        for (int j=0; j<numRow; j++) {
+//            for (int i=0; i<numCol; i++) {
+//                final double value = matrix.getElement(j,i);
+//                if (value != (i==j ? 1 : 0)) {
+//                    eltBuf.setLength(4);
+//                    eltBuf.append(j);
+//                    eltBuf.append('_');
+//                    eltBuf.append(i);
+//                    addParameter(buffer, eltBuf.toString(), value);
+//                }
+//            }
+//        }
+//        buffer.append(']');
+//        return buffer.toString();
+//    }
+//    
+//    /**
+//     * The provider for {@link MatrixTransform}.
+//     *
+//     * @version $Id$
+//     * @author Martin Desruisseaux
+//     */
+//    static final class Provider extends MathTransformProvider {
+//        /**
+//         * Create a provider for affine transform.
+//         * The default matrix size is 4&times;4.
+//         */
+//        public Provider() {
+//            super("Affine", ResourceKeys.AFFINE_TRANSFORM, null);
+//            final int defaultSize = MatrixParameters.DEFAULT_SIZE.intValue();
+//            putInt("num_row", defaultSize, MatrixParameters.POSITIVE_RANGE);
+//            putInt("num_col", defaultSize, MatrixParameters.POSITIVE_RANGE);
+//        }
+//    
+//        /**
+//         * Returns a newly created parameter list. This custom parameter list
+//         * is different from the default one in that it is "extensible", i.e.
+//         * new parameters may be added if the matrix's size growth.
+//         */
+//        public ParameterList getParameterList() {
+//            return new MatrixParameters();
+//        }
+//        
+//        /**
+//         * Returns a transform for the specified parameters.
+//         *
+//         * @param  parameters The parameter values in standard units.
+//         * @return A {@link MathTransform} object of this classification.
+//         *
+//         * @task REVISIT: Should we invoke {@link MathTransformFactory#createAffineTransform}
+//         *       instead? It would force us to keep a reference to {@link MathTransformFactory}
+//         *       (and not forget to change the reference if this provider is copied into an
+//         *       other factory)...
+//         */
+//        public MathTransform create(final ParameterList parameters) {
+//            final Matrix matrix = MatrixParameters.getMatrix(parameters);
+//            if (matrix.isAffine()) {
+//                switch (matrix.getNumRow()) {
+//                    case 3: return new AffineTransform2D(matrix.toAffineTransform2D());
+//                    case 2: return LinearTransform1D.create(matrix.getElement(0,0),
+//                                                            matrix.getElement(0,1));
+//                }
+//            }
+//            if (matrix.isIdentity()) {
+//                // The 1D and 2D cases have their own optimized identity transform,
+//                // which is why this test must come after the 'isAffine()' test.
+//                return new IdentityTransform(matrix.getNumRow()-1);
+//            }
+//            return new MatrixTransform(matrix);
+//        }
+//    }
 }

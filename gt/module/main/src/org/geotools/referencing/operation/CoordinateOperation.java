@@ -93,7 +93,7 @@ public class CoordinateOperation extends Info
      * Version of the coordinate transformation
      * (i.e., instantiation due to the stochastic nature of the parameters).
      */
-    private final String operationVersion;
+    final String operationVersion;
 
     /**
      * Estimate(s) of the impact of this operation on point accuracy, or <code>null</code>

@@ -27,6 +27,10 @@ import java.text.ParseException;
 
 // Geotools dependencies
 import org.geotools.referencing.*;
+import org.geotools.referencing.crs.*;
+import org.geotools.referencing.cs.TemporalCS;
+import org.geotools.referencing.datum.TemporalDatum;
+import org.geotools.geometry.DirectPosition;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -41,7 +45,7 @@ import junit.textui.TestRunner;
  * @version $Id: CoordinateFormatTest.java,v 1.2 2003/05/13 10:58:50 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
-public class BasicTest extends TestCase {
+public class FormatTest extends TestCase {
     /**
      * Run the suite from the command line.
      */
@@ -53,13 +57,13 @@ public class BasicTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(BasicTest.class);
+        return new TestSuite(FormatTest.class);
     }
 
     /**
      * Constructs a test case with the given name.
      */
-    public BasicTest(final String name) {
+    public FormatTest(final String name) {
         super(name);
     }
 
@@ -102,20 +106,18 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test formatting.
-     *
-     * @TODO: enable once TemporalCRS has been implemented.
+     * Test formatting of a 4-dimensional coordinates.
      */
     public void testFormat() {
-//        final Date epoch = new Date(1041375600000L); // January 1st, 2003
-//        final CoordinateReferenceSystem crs = new CompoundCRS("WGS84 3D + time",
-//                new CoordinateReferenceSystem[] {
-//                    GeographicCRS.WGS84,
-//                    TemporalCRS.DAY));
-//        final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
-//        format.setCoordinateReferenceSystem(crs);
-//
-//        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003",
-//                     format.format(new CoordinatePoint(new double[]{23.78, -12.74, 127.9, 3.2})));
+        final Date epoch = new Date(1041375600000L); // January 1st, 2003
+        final TemporalDatum datum = new TemporalDatum("Time", epoch);
+        final CoordinateReferenceSystem crs = new CompoundCRS("WGS84 3D + time",
+                    GeographicCRS.WGS84,
+                    VerticalCRS.ELLIPSOIDAL_HEIGHT,
+                    new TemporalCRS("Time", datum, TemporalCS.DAYS));
+        final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
+        format.setCoordinateReferenceSystem(crs);
+        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003",
+                     format.format(new DirectPosition(new double[]{23.78, -12.74, 127.9, 3.2})));
     }
 }

@@ -21,13 +21,10 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
 // J2SE and vecmath dependencies
-import java.lang.ref.WeakReference;
-import java.lang.ref.Reference;
 import java.io.Serializable;
-import java.util.Locale;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.GeneralPath;
@@ -35,25 +32,25 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.IllegalPathStateException;
 import javax.vecmath.SingularMatrixException;
-import java.rmi.RemoteException;
+import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
-import org.opengis.ct.CT_MathTransform;
-
-// OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.pt.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Resources
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.referencing.wkt.Formattable;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -68,47 +65,12 @@ import org.geotools.resources.geometry.ShapeUtilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractMathTransform}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
-public abstract class AbstractMathTransform implements MathTransform {
-    /**
-     * OpenGIS object returned by {@link #cachedOpenGIS}.
-     * It may be a hard or a weak reference.
-     */
-    private transient Object proxy;
-
-    /**
-     * Construct a math transform which is an adapter for
-     * the specified {@link CT_MathTransform} interface.
-     *
-     * @param opengis The {@link CT_MathTransform} interface. We declare
-     *        a generic {@link Object} in order to avoid too early class
-     *        loading of OpenGIS's interfaces.
-     */
-    AbstractMathTransform(final Object opengis) {
-        proxy = opengis;
-    }
-
+public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**
      * Construct a math transform.
      */
-    public AbstractMathTransform() {
-    }
-    
-    /**
-     * Returns a human readable name, if available. If no name is available in
-     * the specified locale,   then this method returns a name in an arbitrary
-     * locale. If no name is available in any locale, then this method returns
-     * <code>null</code>. The default implementation always returns <code>null</code>.
-     *
-     * @param  locale The desired locale, or <code>null</code> for a default locale.
-     * @return The transform name localized in the specified locale if possible, or
-     *         <code>null</code> if no name is available in any locale.
-     */
-    protected String getName(final Locale locale) {
-        return null;
+    protected AbstractMathTransform() {
     }
     
     /**
@@ -117,6 +79,14 @@ public abstract class AbstractMathTransform implements MathTransform {
      */
     public boolean isIdentity() {
         return false;
+    }
+
+    /**
+     * Construct an error message for the {@link MismatchedDimensionException}.
+     */
+    private static String constructMessage(final int dim1, final int dim2) {
+        return Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                                new Integer(dim1), new Integer(dim2));
     }
     
     /**
@@ -136,15 +106,14 @@ public abstract class AbstractMathTransform implements MathTransform {
      *
      * @see MathTransform2D#transform(Point2D,Point2D)
      */
-    public Point2D transform(final Point2D ptSrc, final Point2D ptDst)
-            throws TransformException
-    {
+    public Point2D transform(final Point2D ptSrc, final Point2D ptDst) throws TransformException {
         if (getDimSource()!=2 || getDimTarget()!=2) {
+            // TODO: provide a localized detail message.
             throw new MismatchedDimensionException();
         }
         final double[] ord = new double[] {ptSrc.getX(), ptSrc.getY()};
         this.transform(ord, 0, ord, 0, 1);
-        if (ptDst!=null) {
+        if (ptDst != null) {
             ptDst.setLocation(ord[0], ord[1]);
             return ptDst;
         } else {
@@ -157,21 +126,36 @@ public abstract class AbstractMathTransform implements MathTransform {
      * in <code>ptDst</code>. The default implementation invokes
      * {@link #transform(double[],int,double[],int,int)}.
      */
-    public CoordinatePoint transform(final CoordinatePoint ptSrc, CoordinatePoint ptDst)
+    public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
     {
-        final int  dimPoint = ptSrc.getDimension();
+              int  dimPoint = ptSrc.getDimension();
         final int dimSource = getDimSource();
         final int dimTarget = getDimTarget();
         if (dimPoint != dimSource) {
-            throw new MismatchedDimensionException(dimPoint, dimSource);
+            throw new MismatchedDimensionException(constructMessage(dimPoint, dimSource));
         }
-        if (ptDst==null) {
-            ptDst = new CoordinatePoint(dimTarget);
-        } else if (ptDst.getDimension() != dimTarget) {
-            throw new MismatchedDimensionException(ptDst.getDimension(), dimTarget);
+        if (ptDst == null) {
+            ptDst = new org.geotools.geometry.DirectPosition(dimTarget);
+        } else {
+            dimPoint = ptDst.getDimension();
+            if (dimPoint != dimTarget) {
+                throw new MismatchedDimensionException(constructMessage(dimPoint, dimTarget));
+            }
         }
-        transform(ptSrc.ord, 0, ptDst.ord, 0, 1);
+        final double[] array;
+        if (dimSource <= dimTarget) {
+            array = ptSrc.getCoordinates();
+        } else {
+            array = new double[dimTarget];
+            for (int i=0; i<dimSource; i++) {
+                array[i] = ptSrc.getOrdinate(i);
+            }
+        }
+        transform(array, 0, array, 0, 1);
+        for (int i=0; i<dimTarget; i++) {
+            ptDst.setOrdinate(i, array[i]);
+        }
         return ptDst;
     }
     
@@ -240,6 +224,7 @@ public abstract class AbstractMathTransform implements MathTransform {
         throws TransformException
     {
         if (getDimSource()!=2 || getDimTarget()!=2) {
+            // TODO: provides a localized detail message.
             throw new MismatchedDimensionException();
         }
         final PathIterator    it = shape.getPathIterator(preTr);
@@ -388,7 +373,7 @@ public abstract class AbstractMathTransform implements MathTransform {
     public Matrix derivative(final Point2D point) throws TransformException {
         final int dimSource = getDimSource();
         if (dimSource != 2) {
-            throw new MismatchedDimensionException(2, dimSource);
+            throw new MismatchedDimensionException(constructMessage(2, dimSource));
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }
@@ -417,23 +402,26 @@ public abstract class AbstractMathTransform implements MathTransform {
      * @throws TransformException if the derivative can't be evaluated at the
      *         specified point.
      */
-    public Matrix derivative(final CoordinatePoint point) throws TransformException {
+    public Matrix derivative(final DirectPosition point) throws TransformException {
         final int dimSource = getDimSource();
         if (point != null) {
             final int dimPoint = point.getDimension();
             if (dimPoint != dimSource) {
-                throw new MismatchedDimensionException(dimPoint, dimSource);
+                throw new MismatchedDimensionException(constructMessage(dimPoint, dimSource));
             }
             if (dimSource == 2) {
-                return derivative(point.toPoint2D());
+                if (point instanceof Point2D) {
+                    return derivative((Point2D) point);
+                }
+//              return derivative(point.toPoint2D());   // TODO: Available in GeoAPI 1.1?
+                return derivative(new Point2D.Double(point.getOrdinate(0), point.getOrdinate(1)));
             }
         } else if (dimSource == 2) {
             return derivative((Point2D)null);
         }
         if (this instanceof MathTransform1D) {
-            return new Matrix(1, 1, new double[] {
-                ((MathTransform1D) this).derivative(point.ord[0])
-            });
+            return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {
+                       ((MathTransform1D) this).derivative(point.getOrdinate(0))});
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }
@@ -508,90 +496,15 @@ public abstract class AbstractMathTransform implements MathTransform {
     }
     
     /**
-     * Returns a string représentation of this transform.
-     * Subclasses should override this method in order to
-     * returns Well Know Text (WKT) instead.
-     */
-    public String toString() {
-        final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
-        buffer.append('[');
-        final String name = getName(null);
-        if (name != null) {
-            buffer.append('"');
-            buffer.append(name);
-            buffer.append("\": ");
-        }
-        buffer.append(getDimSource());
-        buffer.append("D \u2192 "); // Arrow -->
-        buffer.append(getDimTarget());
-        buffer.append("D]");
-        return buffer.toString();
-    }
-    
-    /**
-     * Returns a string buffer initialized with "PARAM_MT"
-     * and a classification name. This is a convenience
-     * method for WKT formatting.
-     */
-    static StringBuffer paramMT(final String classification) {
-        final StringBuffer buffer=new StringBuffer("PARAM_MT[\"");
-        buffer.append(classification);
-        buffer.append('"');
-        return buffer;
-    }
-    
-    /**
-     * Add the <code>", PARAMETER["<name>", <value>]"</code> string
-     * to the specified string buffer. This is a convenience method
-     * for constructing WKT for "PARAM_MT".
-     */
-    static void addParameter(final StringBuffer buffer, final String key, final double value) {
-        buffer.append(", PARAMETER[\"");
-        buffer.append(key);
-        buffer.append("\",");
-        buffer.append(value);
-        buffer.append(']');
-    }
-    
-    /**
-     * Add the <code>", PARAMETER["<name>", <value>]"</code> string
-     * to the specified string buffer. This is a convenience method
-     * for constructing WKT for "PARAM_MT".
-     */
-    static void addParameter(final StringBuffer buffer, final String key, final int value) {
-        buffer.append(", PARAMETER[\"");
-        buffer.append(key);
-        buffer.append("\",");
-        buffer.append(value);
-        buffer.append(']');
-    }
-    
-    /**
-     * Returns an OpenGIS interface for this math transform.
-     * The returned object is suitable for RMI use. This method
-     * look in the cache. If no interface was previously cached,
-     * then this method create a new adapter  and cache the result.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
      *
-     * @param  adapters The originating {@link Adapters}.
-     * @return A {@link CT_MathTransform} object. The returned type
-     *         is a generic {@link Object} in order to avoid too early
-     *         class loading of OpenGIS interface.
-     * @throws RemoteException if the object can't be exported.
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    final Object cachedOpenGIS(final Object adapters) throws RemoteException {
-        if (proxy!=null) {
-            if (proxy instanceof Reference) {
-                final Object ref = ((Reference) proxy).get();
-                if (ref!=null) {
-                    return ref;
-                }
-            } else {
-                return proxy;
-            }
-        }
-        final Object opengis = new MathTransformExport(adapters, this);
-        proxy = new WeakReference(opengis);
-        return opengis;
+    protected String formatWKT(final Formatter formatter) {
+        return "PARAM_MT";
     }
     
     /**
@@ -601,10 +514,12 @@ public abstract class AbstractMathTransform implements MathTransform {
      */
     private static Matrix invert(final Matrix matrix) throws NoninvertibleTransformException {
         try {
-            matrix.invert();
+            ((GMatrix)matrix).invert();
             return matrix;
-        } catch (SingularMatrixException exception) {
-            NoninvertibleTransformException e = new NoninvertibleTransformException(Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+        } catch (RuntimeException exception) {
+            // Catch both SingularMatrixException and ClassCastException
+            NoninvertibleTransformException e = new NoninvertibleTransformException(
+                        Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
             e.initCause(exception);
             throw e;
         }
@@ -628,12 +543,12 @@ public abstract class AbstractMathTransform implements MathTransform {
          *
          * http://developer.java.sun.com/developer/bugParade/bugs/4211550.html
          */
-        private static final long serialVersionUID = -864892964444937416L;
+        private static final long serialVersionUID = 3528274816628012283L;
 
         /**
          * Construct an inverse math transform.
          */
-        public Inverse() {
+        protected Inverse() {
         }
         
         /**
@@ -668,7 +583,7 @@ public abstract class AbstractMathTransform implements MathTransform {
          * implementation compute the inverse of the matrix returned by
          * the enclosing math transform.
          */
-        public Matrix derivative(final CoordinatePoint point) throws TransformException {
+        public Matrix derivative(final DirectPosition point) throws TransformException {
             return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
         }
         
@@ -705,7 +620,7 @@ public abstract class AbstractMathTransform implements MathTransform {
          * math transforms.
          */
         public boolean equals(final Object object) {
-            if (object==this) {
+            if (object == this) {
                 // Slight optimization
                 return true;
             }
@@ -716,13 +631,18 @@ public abstract class AbstractMathTransform implements MathTransform {
                 return false;
             }
         }
-        
+    
         /**
-         * Returns the Well Know Text (WKT)
-         * for this inverse math transform.
+         * Format the inner part of a
+         * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+         * Known Text</cite> (WKT)</A> element.
+         *
+         * @param  formatter The formatter to use.
+         * @return The WKT element name.
          */
-        public String toString() {
-            return "INVERSE_MT["+AbstractMathTransform.this+']';
+        protected String formatWKT(final Formatter formatter) {
+            formatter.append((Formattable) AbstractMathTransform.this);
+            return "INVERSE_MT";
         }
     }
 }

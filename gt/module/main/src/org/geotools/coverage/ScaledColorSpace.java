@@ -21,13 +21,12 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.awt.color.ColorSpace;
-import javax.media.jai.util.Range;
 
-// Resources
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -41,9 +40,6 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.ScaledColorSpace}
- *             in the <code>org.geotools.coverage</code> package.
  */
 public final class ScaledColorSpace extends ColorSpace {
     /**

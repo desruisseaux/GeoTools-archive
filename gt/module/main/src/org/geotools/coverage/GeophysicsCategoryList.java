@@ -21,15 +21,15 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.util.Locale;
 import java.text.NumberFormat;
 import java.text.FieldPosition;
+import javax.units.Unit;
 
 // Resources
-import org.geotools.units.Unit;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 
@@ -45,9 +45,6 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.GeophysicsCategoryList}
- *             in the <code>org.geotools.coverage</code> package.
  */
 final class GeophysicsCategoryList extends CategoryList {
     /**

@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -61,9 +61,6 @@ import org.geotools.resources.image.DualRectIter;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.SampleTranscoder}
- *             in the <code>org.geotools.coverage</code> package.
  */
 final class SampleTranscoder extends PointOpImage {
     /**

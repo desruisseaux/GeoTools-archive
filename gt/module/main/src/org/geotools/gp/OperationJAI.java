@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -73,7 +61,7 @@ import org.geotools.gc.InvalidGridGeometryException;
 import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.image.JAIUtilities;
@@ -104,7 +92,7 @@ import org.geotools.resources.image.ImageUtilities;
  *   <li>{@link #createRenderedImage} (the actual call to {@link JAI#createNS JAI.createNS})</li>
  * </ol>
  *
- * @version $Id: OperationJAI.java,v 1.30 2003/11/22 13:09:18 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class OperationJAI extends Operation {
@@ -651,7 +639,7 @@ public class OperationJAI extends Operation {
                 if (layout == null) {
                     layout = new ImageLayout();
                 }
-                int visibleBand = GCSUtilities.getVisibleBand(source.getRenderedImage());
+                int visibleBand = LegacyGCSUtilities.getVisibleBand(source.getRenderedImage());
                 if (visibleBand >= sampleDims.length) {
                     visibleBand = 0;
                 }
@@ -931,7 +919,7 @@ public class OperationJAI extends Operation {
      *   <li>{@link OperationJAI#deriveUnit}</li>
      * </ul>
      *
-     * @version $Id: OperationJAI.java,v 1.30 2003/11/22 13:09:18 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     protected static final class Parameters {

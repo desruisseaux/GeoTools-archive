@@ -48,6 +48,9 @@ import org.geotools.resources.gcs.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.GeophysicsCategory}
+ *             in the <code>org.geotools.coverage</code> package.
  */
 final class GeophysicsCategory extends Category {
     /**

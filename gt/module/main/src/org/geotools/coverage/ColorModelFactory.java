@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.util.Map;
@@ -39,7 +39,7 @@ import java.awt.image.ComponentColorModel;
 import javax.media.jai.RasterFactory;
 import javax.media.jai.FloatDoubleColorModel;
 
-// Resources
+// Geotools dependencies
 import org.geotools.util.WeakValueHashMap;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -54,9 +54,6 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.ColorModelFactory}
- *             in the <code>org.geotools.coverage</code> package.
  */
 final class ColorModelFactory {
     /**

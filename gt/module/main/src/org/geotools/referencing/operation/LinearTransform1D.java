@@ -21,18 +21,21 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -41,17 +44,15 @@ import org.geotools.pt.CoordinatePoint;
  *
  * <p align="center"><code>y&nbsp;=&nbsp;{@link #offset}&nbsp;+&nbsp;{@link #scale}*x</code></p>
  *
- * This class is really a special case of {@link MatrixTransform} using a 2&times;2 affine
- * transform. However, this specialized <code>LinearTransform1D</code> class is faster.
+ * This class is the same as a 2&times;2 affine transform. However, this specialized
+ * <code>LinearTransform1D</code> class is faster. It is defined there because extensively
+ * used by {@link org.geotools.coverage.Coverage}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.LinearTransform1D}
- *             in the <code>org.geotools.referencing.operation</code> package.
  */
-class LinearTransform1D extends AbstractMathTransform
-                        implements MathTransform1D, LinearTransform, Serializable
+public class LinearTransform1D extends AbstractMathTransform
+                            implements MathTransform1D, LinearTransform, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -59,14 +60,19 @@ class LinearTransform1D extends AbstractMathTransform
     private static final long serialVersionUID = -7595037195668813000L;
 
     /**
+     * The identity transform.
+     */
+    public static final LinearTransform1D IDENTITY = IdentityTransform1D.ONE;
+
+    /**
      * The value which is multiplied to input values.
      */
-    public final double scale;
+    protected final double scale;
     
     /**
      * The value to add to input values.
      */
-    public final double offset;
+    protected final double offset;
 
     /**
      * The inverse of this transform. Created only when first needed.
@@ -99,7 +105,7 @@ class LinearTransform1D extends AbstractMathTransform
             return new ConstantTransform1D(offset);
         }
         if (scale==1 && offset==0) {
-            return IdentityTransform1D.ONE;
+            return IDENTITY;
         }
         return new LinearTransform1D(scale, offset);
     }
@@ -122,7 +128,7 @@ class LinearTransform1D extends AbstractMathTransform
      * Returns this transform as an affine transform matrix.
      */
     public Matrix getMatrix() {
-        return new Matrix(2, 2, new double[] {scale, offset, 0, 1});
+        return new org.geotools.referencing.operation.Matrix(2, 2, new double[] {scale, offset, 0, 1});
     }
     
     /**
@@ -157,8 +163,8 @@ class LinearTransform1D extends AbstractMathTransform
      * coordinate point is required and {@link Double#NaN} may be a legal output value for
      * some users.
      */
-    public Matrix derivative(final CoordinatePoint point) throws TransformException {
-        return new Matrix(1, 1, new double[] {scale});
+    public Matrix derivative(final DirectPosition point) throws TransformException {
+        return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {scale});
     }
     
     /**
@@ -220,14 +226,13 @@ class LinearTransform1D extends AbstractMathTransform
      */
     public int hashCode() {
         long code;
-        code = 78512786 + Double.doubleToRawLongBits(offset);
-        code =  code*37 + Double.doubleToRawLongBits(scale);
+        code = (int)serialVersionUID + Double.doubleToRawLongBits(offset);
+        code =  code*37              + Double.doubleToRawLongBits(scale);
         return (int)(code >>> 32) ^ (int)code;
     }
     
     /**
-     * Compares the specified object with
-     * this math transform for equality.
+     * Compares the specified object with this math transform for equality.
      */
     public boolean equals(final Object object) {
         if (object==this) {
@@ -251,9 +256,14 @@ class LinearTransform1D extends AbstractMathTransform
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public String toString() {
-        return MatrixTransform.toString(getMatrix());
+    protected String formatWKT(final Formatter formatter) {
+        return MatrixTransform.formatWKT(formatter, getMatrix());
     }
 }

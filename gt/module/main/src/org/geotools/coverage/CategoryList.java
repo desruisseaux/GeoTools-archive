@@ -21,38 +21,34 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Comparator;
 import java.util.AbstractList;
-
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RasterFormatException;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 
-// JAI dependencies
+// J2SE Extensions
+import javax.units.Unit;
 import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform1D;
-import org.geotools.pt.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Resources
-import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
@@ -69,9 +65,6 @@ import org.geotools.resources.gcs.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.CategoryList}
- *             in the <code>org.geotools.coverage</code> package.
  */
 class CategoryList extends AbstractList implements MathTransform1D, Comparator, Serializable {
     /**
@@ -853,36 +846,38 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     /**
      * Ensure the specified point is one-dimensional.
      */
-    private static void checkDimension(final CoordinatePoint point) {
+    private static void checkDimension(final DirectPosition point) {
         final int dim = point.getDimension();
         if (dim != 1) {
-            throw new MismatchedDimensionException(dim, 1);
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                      org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                      new Integer(1), new Integer(dim)));
         }
     }
     
     /**
      * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
      */
-    public final CoordinatePoint transform(final CoordinatePoint ptSrc, CoordinatePoint ptDst)
+    public final DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
     {
         checkDimension(ptSrc);
         if (ptDst==null) {
-            ptDst = new CoordinatePoint(1);
+            ptDst = new org.geotools.geometry.DirectPosition(1);
         } else {
             checkDimension(ptDst);
         }
-        ptDst.ord[0] = transform(ptSrc.ord[0]);
+        ptDst.setOrdinate(0, transform(ptSrc.getOrdinate(0)));
         return ptDst;
     }
     
     /**
      * Gets the derivative of this transform at a point.
      */
-    public final Matrix derivative(final CoordinatePoint point) throws TransformException {
+    public final Matrix derivative(final DirectPosition point) throws TransformException {
         checkDimension(point);
-        return new Matrix(1, 1, new double[] {
-            derivative(point.ord[0])
+        return new org.geotools.referencing.operation.Matrix(1, 1, new double[] {
+            derivative(point.getOrdinate(0))
         });
     }
     
