@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-legend</name>
+  <id>legend</id>
+  <currentVersion>2.0-B6-DEV</currentVersion>
+  <shortDescription>Legend module</shortDescription>
+  <description>Legend module.</description>
+  <developers>
+    <developer>
+      <name>Jianhui Jin</name>
+      <id>jianhuijin</id>
+      <email>j.jin@geog.leeds.ac.uk</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>aaime@users.sourceforge.net</email>
+      <organization>University of Modena and Reggio Emilia</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <id>JTS</id>
+      <version>1.4</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+    <dependency>
+      <id>jlfgr</id>
+      <groupId>sun</groupId>
+      <version>1.0</version>
+      <url>http://java.sun.com/developer/techDocs/hi/repository/</url>
+    </dependency>
+    <dependency>
+      <id>opengis+css</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>main</id>
+      <version>2.0-B6-DEV</version>
+      <url>http://www.geotools.org</url>
+    </dependency>
+    <dependency>
+      <artifactId>shapefile</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.0-B5-DEV</version>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.2.1</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/*</include>
+          </includes>
+          <excludes>
+            <exclude>**/*.class</exclude>
+          </excludes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
