@@ -10,7 +10,9 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.validation.spatial.IsValidGeometryValidation;
 
 /**
  * ValidationProcessorTest purpose.
@@ -34,7 +36,7 @@ public class ValidationProcessorTest extends DataTestCase {
 	MemoryDataStore store;
 
 	ValidationProcessor processor;
-	RoadNetworkValidationResults validationResult;
+	RoadNetworkValidationResults results;
 	
 	
 	/**
@@ -53,8 +55,8 @@ public class ValidationProcessorTest extends DataTestCase {
 		store = new MemoryDataStore();
 		store.addFeatures( roadFeatures );
 		store.addFeatures( riverFeatures );
-		processor = new ValidationProcessor();
-		validationResult = new RoadNetworkValidationResults();
+		processor = new ValidationProcessor();		
+		results = new RoadNetworkValidationResults();		
 	}
 
 	/*
@@ -68,28 +70,32 @@ public class ValidationProcessorTest extends DataTestCase {
 
 	public void testIsValidFeatureValidation() throws Exception
 	{
-		// the visitor
-		RoadNetworkValidationResults validationResults = new RoadNetworkValidationResults();
-		processor = new ValidationProcessor(); // was true as param
+		IsValidGeometryValidation geom = new IsValidGeometryValidation();
+		geom.setName( "IsValidGeometry");
+		geom.setDescription("IsValid geomtry test for Junit Test +"+getName());
+		geom.setTypeRef("*");
+		processor.addValidation( geom );
+				
+		// test the correct roads
+		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.collection(this.roadFeatures), results);
+		assertTrue(results.getFailedMessages().length == 0);
 		
-	// test the correct roads
-		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.collection(this.roadFeatures), validationResults);
-		assertTrue(validationResults.getFailedMessages().length == 0);
-		
-	// test the broken road
+		// test the broken road
 		// make an incorrect line
 		try {
 			this.newRoad = this.roadType.create(new Object[] {
 				new Integer(2), line(new int[] { 1, 2, 1, 2}), "r4"
 			}, "road.rd4");
 		} catch (IllegalAttributeException e) {}
+		
 		Feature[] singleRoad = new Feature[1];
 		singleRoad[0] = this.newRoad;
-		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.collection(singleRoad), validationResults);
-		assertTrue(validationResults.getFailedMessages().length > 0);
+		FeatureCollection features = DataUtilities.collection(singleRoad);
+		processor.runFeatureTests( "dataStoreId", this.roadType, features, results);
+		assertTrue( results.getFailedMessages().length > 0 );
 
 
-	// run integrity tests
+		// run integrity tests
 		// make a map of FeatureSources
 		HashMap map = new HashMap();
 		String[] typeNames = this.store.getTypeNames();
@@ -97,8 +103,8 @@ public class ValidationProcessorTest extends DataTestCase {
 			map.put(typeNames[i], this.store.getFeatureSource(typeNames[i]));
 		map.put("newThing", this.store.getFeatureSource(typeNames[0]));
 			
-		processor.runIntegrityTests(null, map, null, validationResults);
-		assertTrue(validationResults.getFailedMessages().length > 0);
+		processor.runIntegrityTests(null, map, null, results);
+		assertTrue(results.getFailedMessages().length > 0);
 		/*
 		String[] messages = validationResults.getFailedMessages();
 		for (int i=0; i<validationResults.getFailedMessages().length; i++)

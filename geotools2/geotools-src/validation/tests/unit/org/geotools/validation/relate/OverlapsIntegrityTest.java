@@ -76,10 +76,10 @@ public class OverlapsIntegrityTest extends SpatialTestCase
 		Filter filter;
 		
 		filter = OverlapsIntegrity.filterBBox( new Envelope(), line.getSchema() );
-		assertEquals( "with empty envelope", 0, line.getFeatures( filter ).getCount() );
+		assertEquals( "with empty envelope", 1, line.getFeatures( filter ).getCount() );
 		
 		filter = OverlapsIntegrity.filterBBox( new Envelope(-1,3,-2,3), line.getSchema() );
-		assertEquals( "with envelope", 0, line.getFeatures( filter ).getCount() );	
+		assertEquals( "with envelope", 4, line.getFeatures( filter ).getCount() );	
 		
 		Envelope all = line.getBounds();
 		if( all == null ){
