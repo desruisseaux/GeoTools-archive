@@ -25,7 +25,7 @@ import java.util.List;
 
 
 /**
- * The query object is used by the {@link DataSource#getFeatures()} method of
+ * The query object is used by the {@link FeatureSource#getFeatures()} method of
  * the DataSource interface, to encapsulate a request.  It defines which
  * feature type  to query, what properties to retrieve and what constraints
  * (spatial and non-spatial) to apply to those properties.  It is designed to
@@ -79,21 +79,6 @@ public class DefaultQuery implements Query {
     public DefaultQuery( String typeName ){
         this( typeName, Filter.NONE );
     }
-    /**
-     * Constructor that sets the filter.
-     * <p>
-     * Using a Query with only a filter, and no typeName, almost always
-     * results in an error.
-     * </p>
-     * <p>
-     * Please use DefaulQuery( typeName, filter ) 
-     * </p>
-     * @param filter the OGC filter to constrain the request.
-     * @deprecated Please use DefaultQuery( typeName, filter ) instead.
-     */
-    public DefaultQuery(Filter filter) {
-        this.filter = filter;
-    }
 
     /**
      * Constructor with typeName and filter.  Note that current datasource
@@ -104,22 +89,18 @@ public class DefaultQuery implements Query {
      * @param filter the OGC filter to constrain the request.
      */
     public DefaultQuery(String typeName, Filter filter) {
-        this(filter);
-        this.typeName = typeName;
+        this( typeName, filter, Query.ALL_NAMES );        
     }
 
     /**
      * Constructor that sets the filter and properties
+     * @param typeName 
      *
      * @param filter the OGC filter to constrain the request.
      * @param properties an array of the properties to fetch.
-     *
-     * @deprecated Use a constructor with the typeName, as datastores depend on
-     *             it.
      */
-    public DefaultQuery(Filter filter, String[] properties) {
-        this(filter);
-        this.properties = properties;
+    public DefaultQuery(String typeName, Filter filter, String[] properties) {
+        this( typeName, null, filter, Query.DEFAULT_MAX, properties, null );        
     }
 
     /**
@@ -139,6 +120,7 @@ public class DefaultQuery implements Query {
      * Constructor that sets all fields.
      *
      * @param typeName the name of the featureType to retrieve.
+     * @param namespace Namespace for provided typeName, or null if unspecified
      * @param filter the OGC filter to constrain the request.
      * @param maxFeatures the maximum number of features to be returned.
      * @param propNames an array of the properties to fetch.
@@ -146,7 +128,8 @@ public class DefaultQuery implements Query {
      */
     public DefaultQuery(String typeName, URI namespace, Filter filter, int maxFeatures,
         String[] propNames, String handle) {
-        this(typeName, filter);
+        this.typeName = typeName;
+        this.filter = filter;
         this.namespace = namespace;
         this.properties = propNames;
         this.maxFeatures = maxFeatures;
@@ -155,7 +138,7 @@ public class DefaultQuery implements Query {
 
     /**
      * Copy contructor, clones the state of a generic Query into a DefaultQuery
-     * @param constraintQuery
+     * @param query
      */
     public DefaultQuery(Query query) {
       this(query.getTypeName(), query.getNamespace(), query.getFilter(), query.getMaxFeatures(),
