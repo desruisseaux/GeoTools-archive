@@ -16,38 +16,42 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
 
-import org.geotools.feature.Feature;
-
-
 
 /**
- * This fidmapper just takes another fid mapper and builds fids 
- * based on the wrapped FIDMapper by prefixing them with the feature
- * type name, that is, the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt
- * pattern.
+ * This fidmapper just takes another fid mapper and builds fids  based on the
+ * wrapped FIDMapper by prefixing them with the feature type name, that is,
+ * the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt pattern.
+ *
  * @author wolf
  */
 public class TypedFIDMapper extends AbstractFIDMapper {
     private String featureTypeName;
-    private FIDMapper wrapped;
+    private FIDMapper wrappedMapper;
 
     /**
      * Creates a new TypedFIDMapper object.
      *
-     * @param FIDColumn 
-     * @param featureTypeName 
+     * @param wrapped
+     * @param featureTypeName
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
     public TypedFIDMapper(FIDMapper wrapped, String featureTypeName) {
-        if(wrapped == null)
-            throw new IllegalArgumentException("The wrapped feature mapper cannot be null");
-        
-        if(featureTypeName == null)
-            throw new IllegalArgumentException("The featureTypeName cannot be null");
-        
-        this.wrapped = wrapped;
+        if (wrapped == null) {
+            throw new IllegalArgumentException(
+                "The wrapped feature mapper cannot be null");
+        }
+
+        if (featureTypeName == null) {
+            throw new IllegalArgumentException(
+                "The featureTypeName cannot be null");
+        }
+
+        this.wrappedMapper = wrapped;
         this.featureTypeName = featureTypeName;
     }
 
@@ -55,7 +59,7 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
      */
     public String getID(Object[] attributes) {
-        return featureTypeName + "." + wrapped.getID(attributes);
+        return featureTypeName + "." + wrappedMapper.getID(attributes);
     }
 
     /**
@@ -64,56 +68,56 @@ public class TypedFIDMapper extends AbstractFIDMapper {
     public Object[] getPKAttributes(String FID) throws IOException {
         int pos = FID.indexOf(".");
 
-        return wrapped.getPKAttributes(FID.substring(pos + 1));
+        return wrappedMapper.getPKAttributes(FID.substring(pos + 1));
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
      */
     public boolean returnFIDColumnsAsAttributes() {
-        return wrapped.returnFIDColumnsAsAttributes();
+        return wrappedMapper.returnFIDColumnsAsAttributes();
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
      */
     public int getColumnCount() {
-        return wrapped.getColumnCount();
+        return wrappedMapper.getColumnCount();
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnName(int)
      */
     public String getColumnName(int colIndex) {
-        return wrapped.getColumnName(colIndex);
+        return wrappedMapper.getColumnName(colIndex);
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnType(int)
      */
     public int getColumnType(int colIndex) {
-        return wrapped.getColumnType(colIndex);
+        return wrappedMapper.getColumnType(colIndex);
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnSize(int)
      */
     public int getColumnSize(int colIndex) {
-        return wrapped.getColumnSize(colIndex);
+        return wrappedMapper.getColumnSize(colIndex);
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnDecimalDigits(int)
      */
     public int getColumnDecimalDigits(int colIndex) {
-        return wrapped.getColumnSize(colIndex);
+        return wrappedMapper.getColumnSize(colIndex);
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
      */
     public boolean isAutoIncrement(int colIndex) {
-        return wrapped.isAutoIncrement(colIndex);
+        return wrappedMapper.isAutoIncrement(colIndex);
     }
 
     /**
@@ -126,21 +130,32 @@ public class TypedFIDMapper extends AbstractFIDMapper {
 
         TypedFIDMapper other = (TypedFIDMapper) object;
 
-        return other.wrapped.equals(wrapped)
+        return other.wrappedMapper.equals(wrappedMapper)
         && (other.featureTypeName == featureTypeName);
     }
 
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection, org.geotools.feature.Feature)
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
+     *      org.geotools.feature.Feature)
      */
-    public String createID(Connection conn, Feature feature) throws IOException {
-        return featureTypeName + "." + wrapped.createID(conn, feature);
+    public String createID(Connection conn, Feature feature)
+        throws IOException {
+        return featureTypeName + "." + wrappedMapper.createID(conn, feature);
     }
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
      */
     public void initSupportStructures() {
-        wrapped.initSupportStructures();        
+        wrappedMapper.initSupportStructures();
+    }
+
+    /**
+     * Returns the base mapper wrapped by this TypedFIDMapper
+     *
+     * @return
+     */
+    public FIDMapper getWrappedMapper() {
+        return wrappedMapper;
     }
 }
