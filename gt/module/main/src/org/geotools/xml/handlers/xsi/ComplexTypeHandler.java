@@ -946,7 +946,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         		for(int i=0;i<children.length;i++){
         		    Element[] t = getChildElements(children[i]);
         		    if(t!=null)
-        		        l.add(Arrays.asList(t));
+        		        l.addAll(Arrays.asList(t));
         		}
         		return l.size()>0?(Element[])l.toArray(new Element[l.size()]):null;
         	case ElementGrouping.ELEMENT:
@@ -960,7 +960,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
     			for(int i=0;i<children.length;i++){
     			    Element[] t = getChildElements(children[i]);
     			    if(t!=null)
-    			        l.add(Arrays.asList(t));
+    			        l.addAll(Arrays.asList(t));
     			}
     			return l.size()>0?(Element[])l.toArray(new Element[l.size()]):null;
             }

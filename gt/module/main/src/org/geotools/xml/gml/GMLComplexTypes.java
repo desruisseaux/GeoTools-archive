@@ -3909,12 +3909,23 @@ public class GMLComplexTypes {
         // static element list
         private static final Element[] elements = {
                 new GMLElement("description",
-                    XSISimpleTypes.String.getInstance(), 0, 1, false, null),
-                new GMLElement("name", XSISimpleTypes.String.getInstance(), 0,
-                    1, false, null),
+                    XSISimpleTypes.String.getInstance(), 0, 1, false, null){
+                    public boolean isNillable() {
+                        return true;
+                    }
+                },
+                new GMLElement("name", XSISimpleTypes.String.getInstance(), 0,1,false,null){
+                    public boolean isNillable() {
+                        return true;
+                    }
+                },
                 new GMLElement("boundedBy",
                     GMLComplexTypes.BoundingShapeType.getInstance(), 0, 1,
-                    false, null),
+                    false, null){
+                        public boolean isNillable() {
+                            return true;
+                        }
+                    },
             };
 
         // static sequence
@@ -4006,10 +4017,24 @@ public class GMLComplexTypes {
                 ft = loadFeatureType(element, value, attrs);
             }
 
-            Object[] values = new Object[value.length];
+            Element[] elements = ((ComplexType)element.getType()).getChildElements();
+            Object[] values = new Object[elements.length];
+            for(int i=0;i<values.length;i++)
+                values[i] = null;
 
-            for (int i = 0; i < value.length; i++)
-                values[i] = value[i].getValue();
+            for (int i = 0; i < value.length; i++){
+                //find index for value
+                int j = -1;
+                for (int k=0;k<elements.length && j==-1;k++){
+                    // TODO use equals
+                    if((elements[k].getName()==null && value[i].getElement().getName()==null ||
+                            elements[k].getName().equals(value[i].getElement().getName())))
+                        j = k;
+                }
+                
+                if(j!=-1)
+                    values[j] = value[i].getValue();
+            }
 
             String fid = attrs.getValue("", "fid");
 
@@ -6196,6 +6221,7 @@ public class GMLComplexTypes {
             String name = children[i].getName();
             Class type = children[i].getType().getInstanceType();
             boolean nillable = children[i].isNillable();
+//System.out.println("Including "+name+" nillable == "+nillable);
 
             AttributeType attributeType = AttributeTypeFactory
                 .newAttributeType(name, type, nillable);
@@ -6217,7 +6243,7 @@ public class GMLComplexTypes {
 
         try {
             FeatureType ft = typeFactory.getFeatureType();
-
+//System.out.println(ft);
             return ft;
         } catch (SchemaException e) {
             logger.warning(e.toString());
