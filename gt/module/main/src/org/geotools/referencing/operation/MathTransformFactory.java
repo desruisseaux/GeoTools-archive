@@ -50,6 +50,7 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.wkt.MathTransformParser;
 
 // Resources
 import org.geotools.util.WeakHashSet;
@@ -392,18 +393,17 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             // Not a big deal if we are not synchronized. If this method is invoked in
             // same time by two different threads, we may have two WKTParser objects
             // for a short time. It doesn't hurt...
-//TODO            parser = new WKTParser(Locale.US, this);
+            parser = new MathTransformParser(Locale.US);
         }
-        throw new FactoryException("Not yet implemented.");
-//        try {
-//            return parser.parseMathTransform(text);
-//        } catch (ParseException exception) {
-//            final Throwable cause = exception.getCause();
-//            if (cause instanceof FactoryException) {
-//                throw (FactoryException) cause;
-//            }
-//            throw new FactoryException(exception.getLocalizedMessage(), exception);
-//        }
+        try {
+            return (MathTransform) parser.parseObject(text);
+        } catch (ParseException exception) {
+            final Throwable cause = exception.getCause();
+            if (cause instanceof FactoryException) {
+                throw (FactoryException) cause;
+            }
+            throw new FactoryException(exception.getLocalizedMessage(), exception);
+        }
     }
 
     /**
