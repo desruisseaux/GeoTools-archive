@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Filter/Expression construction kit - this class starts of chains.
+ * Filter/Expression construction kit - this class starts off chains.
  * <p>
  * I can't take Filter anymore, the turning point was the fact that I
  * needed a FeatureType to make a AttributeExpression. Simply *no*,
@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * information and can do the late binding.
  * </p>
  * <p>
- * On the way we thre we are not going to have the difference between
+ * On the way there we are not going to have the difference between
  * Filter/Expression. Expr can make an Expression, and Expr can make a
  * Filter.
  * </p>
@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *  	Exprs.bbox( extent ).and( Exprs.fids( fidSet ) )
  * <li> There are convience methods that make sense - <br>
  * 		<code>Exprs.bbox( extent ) == geom().disjoint( Expr.literal( extent)).not()</code>
- * <li> Or you have to do by hand - <br>
+ * <li> "Or" you have to do by hand - <br>
  *      <code>Exprs.fid( "road.1234" ).or( Exprs.fid("road.4321) )</code>
  * </ul>
  * </p>
