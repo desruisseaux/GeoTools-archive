@@ -787,6 +787,8 @@ public class WFSDataStore extends AbstractDataStore {
         WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
         WFSFilterVisitor wfsfv = new WFSFilterVisitor(capabilities
                 .getFilterCapabilities(), ft, state);
+
+//System.out.println("STARTING FILTER "+q.getFilter());
         q.getFilter().accept(wfsfv);
 
         Filter[] f = new Filter[2]; 

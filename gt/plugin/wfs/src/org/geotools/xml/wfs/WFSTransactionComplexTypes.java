@@ -56,6 +56,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import com.vividsolutions.jts.geom.Geometry;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -1349,6 +1352,7 @@ public class WFSTransactionComplexTypes {
         //	   </xsd:complexType>
         private static Element[] elems = new Element[] {
                 new WFSElement("Name", XSISimpleTypes.String.getInstance()),
+				// TODO correctly represent the value element
                 new WFSElement("Value", WFSEmptyType.getInstance(), 0, 1, true,
                     null) {
                         public boolean isMixed() {
@@ -1438,7 +1442,23 @@ public class WFSTransactionComplexTypes {
             elems[0].getType().encode(elems[0], t[0], output, hints);
 
             if (t[1] != null) {
-                elems[1].getType().encode(elems[1], t[1], output, hints);
+//                elems[1].getType().encode(elems[1], t[1], output, hints);
+            	
+            	// can only be a primative, geometry or feature for version 2.0
+            	// in the future use output.findElement(t[1]) ... posibly with a newer search order
+            	output.startElement(elems[1].getNamespace(),elems[1].getName(),null);
+            	if(t[1] instanceof Feature){
+            		// Feature
+            		GMLSchema.getInstance().getElements()[0].getType().encode(GMLSchema.getInstance().getElements()[0],t[1],output,hints);
+            	}else{
+            	if(t[1] instanceof Geometry){
+            		// Geometry
+            		GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance().getElements()[0],t[29],output,hints);
+            	}else{
+            		// primative
+            		output.characters(t[1].toString());
+            	}}
+            	output.endElement(elems[1].getNamespace(),elems[1].getName());
             }
 
             output.endElement(element.getNamespace(), element.getName());

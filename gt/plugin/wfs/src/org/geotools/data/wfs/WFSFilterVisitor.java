@@ -67,7 +67,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                + postStack.size());
 	        }
 	
-	        return postStack.isEmpty() ? Filter.NONE : (Filter) postStack.pop();
+	        Filter f = postStack.isEmpty() ? Filter.NONE : (Filter) postStack.pop();
+//System.out.println("POST FILTER = "+f);
+	        return f;
 	    }
 		
 	    Filter getFilterPre() {
@@ -77,10 +79,12 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        if (preStack.size() > 1) {
 	            WFSDataStore.logger.warning("Too many stack items after run: "
-	                + postStack.size());
+	                + preStack.size());
 	        }
 	
-	        return preStack.isEmpty() ? Filter.NONE : (Filter) preStack.pop();
+	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.pop();
+//System.out.println("PRE FILTER = "+f);
+			return f;
 	    }
 	
 	    /**
@@ -90,7 +94,6 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        if (Filter.NONE == filter) {
 	            return;
 	        }
-	
 	        if (!postStack.isEmpty()) {
 	        	postStack.push(filter);
 	            WFSDataStore.logger.warning(

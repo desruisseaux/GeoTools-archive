@@ -156,7 +156,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	
     	CompareFilter f = FilterFactory.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
     	f.addLeftValue(FilterFactory.createFilterFactory().createAttributeExpression(ft,at.getName()));
-    	f.addRightValue(FilterFactory.createFilterFactory().createLiteralExpression("3"));
+    	f.addRightValue(FilterFactory.createFilterFactory().createLiteralExpression(3.0));
 
     	System.out.println("Update Read 1");
     	FeatureReader fr = fs.getFeatures(f).reader();
@@ -174,12 +174,17 @@ public class WFSDataStoreWriteTest extends TestCase {
     	fr = fs.getFeatures(f).reader();
     	int count2 = 0;
     	while(fr.hasNext()){
-    		count2 ++; fr.next();
+    		count2 ++;
+//    		System.out.println(fr.next());
+    		fr.next();
     	}
+//System.out.println("Read 1 == "+count1+" Read 2 == "+count2);
     	assertTrue("Read 1 == "+count1+" Read 2 == "+count2,count2>count1);
 
     	System.out.println("Update Commit");
     	t.commit();
+    	
+    	assertTrue(((WFSTransactionState)t.getState(ds)).getFids()!=null);
 
     	System.out.println("Update Read 3");
     	fr = fs.getFeatures(f).reader();
