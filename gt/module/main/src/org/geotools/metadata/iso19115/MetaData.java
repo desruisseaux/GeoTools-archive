@@ -1,41 +1,58 @@
 package org.geotools.metadata.iso19115;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
-import org.opengis.metadata.ApplicationSchemaInformation;
 import org.opengis.metadata.MetadataExtensionInformation;
 import org.opengis.metadata.PortrayalCatalogueReference;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
-import org.opengis.metadata.content.ContentInformation;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
+import org.opengis.metadata.content.ContentInformation;
 import org.opengis.referencing.ReferenceSystem;
 
 public class MetaData extends AbstractMetaData implements
 		org.opengis.metadata.MetaData {
-
-	private ScopeCode[] hierarchyLevels;
+    /** Set of ScopeCode */
+	private Set hierarchyLevels;
+	
 	private String parentIdentifier;
 	private String characterSet;
-	private String[] hierarchyLevelNames;
+	
+	/** Set of String */
+	private Set hierarchyLevelNames;
+	
 	private ResponsibleParty contact;
 	private Date dateStamp;
-	private SpatialRepresentation[] spatialRepresentationInfo;
-	private ReferenceSystem[] referenceSystemInfo;
-	private Identification[] identificationInfo;
-	private MetadataExtensionInformation[] metadataExtensionInfo;
-	private ContentInformation[] contentInfo;
+	
+	/** Set of SpatialRepresentation */
+	private Set spatialRepresentationInfo;
+	
+	/** Set of ReferenceSystem */
+	private Set referenceSystemInfo;
+	
+	/** Set of Identification */
+	private Set identificationInfo;
+	/** Set of MetadataExtensionInformation */
+	private Set metadataExtensionInfo;
+	/** Set of ContentInformation */ 
+	private Set contentInfo;
 	private Distribution distributionInfo;
-	private DataQuality[] dataQualityInfo;
-	private PortrayalCatalogueReference[] portrayalCatalogueInfo;
-	private Constraints[] metadataConstraints;
+	/** Set of DataQuality */
+	private Set dataQualityInfo;
+	/** Set of PortrayalCatalogueReference */ 
+	private Set portrayalCatalogueInfo;
+	/** Set of Constraints */
+	private Set metadataConstraints;
 	private MaintenanceInformation metadataMaintenance;
-	private ApplicationSchemaInformation[] applicationSchemaInfo;	
+	/** Set of ApplicationSchemaInformation */
+	private Set applicationSchemaInfo;	
 
 	public String getCharacterSet() {
 		return characterSet;
@@ -43,11 +60,21 @@ public class MetaData extends AbstractMetaData implements
 	public String getParentIdentifier() {
 		return parentIdentifier;
 	}
-	public ScopeCode[] getHierarchyLevels() {
-		return hierarchyLevels;
+	public Set getHierarchyLevels() {
+	    if( hierarchyLevels == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( hierarchyLevels );
+	    }
 	}
-	public String[] getHierarchyLevelNames() {
-		return hierarchyLevelNames;
+	public Set getHierarchyLevelNames() {
+		if( hierarchyLevelNames == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( hierarchyLevelNames );
+	    }
 	}
 	public ResponsibleParty getContact() {
 		return contact;
@@ -55,43 +82,93 @@ public class MetaData extends AbstractMetaData implements
 	public Date getDateStamp() {
 		return dateStamp;
 	}
-	public SpatialRepresentation[] getSpatialRepresentationInfo() {
-		return spatialRepresentationInfo;
+	public Set getSpatialRepresentationInfo() {
+		if( spatialRepresentationInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( spatialRepresentationInfo );
+	    }		
 	}
-	public ReferenceSystem[] getReferenceSystemInfo() {
-		return referenceSystemInfo;
+	public Set getReferenceSystemInfo() {
+		if( referenceSystemInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( referenceSystemInfo );
+	    }
 	}
-	public MetadataExtensionInformation[] getMetadataExtensionInfo() {
-		return metadataExtensionInfo;
+	public Set getMetadataExtensionInfo() {
+	    if( metadataExtensionInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( metadataExtensionInfo );
+	    }		
 	}
-	public Identification[] getIdentificationInfo() {
-		return identificationInfo;
+	public Set getIdentificationInfo() {
+	    if( identificationInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( identificationInfo );
+	    }		
 	}
-	public ContentInformation[] getContentInfo() {
-		return contentInfo;
+	public Set getContentInfo() {
+		if( contentInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( contentInfo );
+	    }
 	}
 	public Distribution getDistributionInfo() {
 		return distributionInfo;
 	}
-	public DataQuality[] getDataQualityInfo() {
-		return dataQualityInfo;
+	public Set getDataQualityInfo() {
+		if( dataQualityInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( dataQualityInfo );
+	    }
 	}
-	public PortrayalCatalogueReference[] getPortrayalCatalogueInfo() {
-		return portrayalCatalogueInfo;
+	public Set getPortrayalCatalogueInfo() {
+		if( portrayalCatalogueInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( portrayalCatalogueInfo );
+	    }		
 	}
-	public Constraints[] getMetadataConstraints() {
-		return metadataConstraints;
+	public Set getMetadataConstraints() {
+		if( metadataConstraints == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( metadataConstraints );
+	    }
 	}
-	public ApplicationSchemaInformation[] getApplicationSchemaInfo() {
-		return applicationSchemaInfo;
+	public Set getApplicationSchemaInfo() {
+		if( applicationSchemaInfo == null ){
+	        return Collections.EMPTY_SET;
+	    }
+	    else {
+	        return Collections.unmodifiableSet( applicationSchemaInfo );
+	    }		
 	}
 	public MaintenanceInformation getMetadataMaintenance() {
 		return metadataMaintenance;
 	}
 
-	public void setApplicationSchemaInfo(
-			ApplicationSchemaInformation[] applicationSchemaInfo) {
-		this.applicationSchemaInfo = applicationSchemaInfo;
+	public void setApplicationSchemaInfo( Set applicationSchemaInfo) {
+	    if( this.applicationSchemaInfo == null ){
+	        this.applicationSchemaInfo = new SetOf( ContentInformation.class );	        
+	    }
+	    else {	        
+	        this.applicationSchemaInfo.clear();
+	    }
+	    this.applicationSchemaInfo.addAll( applicationSchemaInfo );		
 	}
 	public void setCharacterSet(String characterSet) {
 		this.characterSet = characterSet;
@@ -99,11 +176,26 @@ public class MetaData extends AbstractMetaData implements
 	public void setContact(ResponsibleParty contact) {
 		this.contact = contact;
 	}
-	public void setContentInfo(ContentInformation[] contentInfo) {
-		this.contentInfo = contentInfo;
+	
+	/** Lazy construction of a SetOf( ContentInformation.class ) for contentInfo */
+	public void setContentInfo(Set contentInfo) {
+	    if( this.contentInfo == null ){
+	        this.contentInfo = new SetOf( ContentInformation.class );	        
+	    }
+	    else {	        
+	        this.contentInfo.clear();
+	    }
+	    this.contentInfo.addAll( contentInfo );
 	}
-	public void setDataQualityInfo(DataQuality[] dataQualityInfo) {
-		this.dataQualityInfo = dataQualityInfo;
+	/** Lazy construction of a SetOf( DataQuality ) for dataQualityInfo */
+	public void setDataQualityInfo(Set dataQualityInfo) {		
+		if( this.dataQualityInfo == null ){
+	        this.dataQualityInfo = new SetOf( DataQuality.class );	        
+	    }
+	    else {	        
+	        this.dataQualityInfo.clear();
+	    }
+	    this.dataQualityInfo.addAll( dataQualityInfo );		
 	}
 	public void setDateStamp(Date dateStamp) {
 		this.dateStamp = dateStamp;
@@ -111,21 +203,50 @@ public class MetaData extends AbstractMetaData implements
 	public void setDistributionInfo(Distribution distributionInfo) {
 		this.distributionInfo = distributionInfo;
 	}
-	public void setHierarchyLevelNames(String[] hierarchyLevelNames) {
-		this.hierarchyLevelNames = hierarchyLevelNames;
+	public void setHierarchyLevelNames(Set hierarchyLevelNames) {
+		if( this.hierarchyLevelNames == null ){
+	        this.hierarchyLevelNames = new SetOf( String.class );	        
+	    }
+	    else {	        
+	        this.hierarchyLevelNames.clear();
+	    }
+	    this.hierarchyLevelNames.addAll( hierarchyLevelNames );
 	}
-	public void setHierarchyLevels(ScopeCode[] hierarchyLevels) {
-		this.hierarchyLevels = hierarchyLevels;
+	public void setHierarchyLevels(Set hierarchyLevels) {
+		if( this.hierarchyLevels == null ){
+	        this.hierarchyLevels = new SetOf( ScopeCode.class );	        
+	    }
+	    else {	        
+	        this.hierarchyLevels.clear();
+	    }
+	    this.hierarchyLevels.addAll( hierarchyLevels );		
 	}
-	public void setIdentificationInfo(Identification[] identificationInfo) {
-		this.identificationInfo = identificationInfo;
+	public void setIdentificationInfo(Set identificationInfo) {		
+		if( this.identificationInfo == null ){
+	        this.identificationInfo = new SetOf( Identification.class );	        
+	    }
+	    else {	        
+	        this.identificationInfo.clear();
+	    }
+	    this.identificationInfo.addAll( identificationInfo );	
 	}
-	public void setMetadataConstraints(Constraints[] metadataConstraints) {
-		this.metadataConstraints = metadataConstraints;
+	public void setMetadataConstraints(Set metadataConstraints) {
+		if( this.metadataConstraints == null ){
+	        this.metadataConstraints = new SetOf( Constraints.class );	        
+	    }
+	    else {	        
+	        this.metadataConstraints.clear();
+	    }
+	    this.metadataConstraints.addAll( metadataConstraints );
 	}
-	public void setMetadataExtensionInfo(
-			MetadataExtensionInformation[] metadataExtensionInfo) {
-		this.metadataExtensionInfo = metadataExtensionInfo;
+	public void setMetadataExtensionInfo( Set metadataExtensionInfo) {
+		if( this.metadataExtensionInfo == null ){
+	        this.metadataExtensionInfo = new SetOf( MetadataExtensionInformation.class );	        
+	    }
+	    else {	        
+	        this.metadataExtensionInfo.clear();
+	    }
+	    this.metadataExtensionInfo.addAll( metadataExtensionInfo );		
 	}
 	public void setMetadataMaintenance(
 			MaintenanceInformation metadataMaintenance) {
@@ -134,15 +255,31 @@ public class MetaData extends AbstractMetaData implements
 	public void setParentIdentifier(String parentIdentifier) {
 		this.parentIdentifier = parentIdentifier;
 	}
-	public void setPortrayalCatalogueInfo(
-			PortrayalCatalogueReference[] portrayalCatalogueInfo) {
-		this.portrayalCatalogueInfo = portrayalCatalogueInfo;
+	public void setPortrayalCatalogueInfo( Set portrayalCatalogueInfo) {
+	    if( this.portrayalCatalogueInfo == null ){
+	        this.portrayalCatalogueInfo = new SetOf( PortrayalCatalogueReference.class );	        
+	    }
+	    else {	        
+	        this.portrayalCatalogueInfo.clear();
+	    }
+	    this.portrayalCatalogueInfo.addAll( portrayalCatalogueInfo );
 	}
-	public void setReferenceSystemInfo(ReferenceSystem[] referenceSystemInfo) {
-		this.referenceSystemInfo = referenceSystemInfo;
+	public void setReferenceSystemInfo( Set referenceSystemInfo) {
+	    if( this.referenceSystemInfo == null ){
+	        this.referenceSystemInfo = new SetOf( ReferenceSystem.class );	        
+	    }
+	    else {	        
+	        this.referenceSystemInfo.clear();
+	    }
+	    this.referenceSystemInfo.addAll( referenceSystemInfo );
 	}
-	public void setSpatialRepresentationInfo(
-			SpatialRepresentation[] spatialRepresentationInfo) {
-		this.spatialRepresentationInfo = spatialRepresentationInfo;
+	public void setSpatialRepresentationInfo( Set spatialRepresentationInfo) {
+	    if( this.spatialRepresentationInfo == null ){
+	        this.spatialRepresentationInfo = new SetOf( SpatialRepresentation.class );	        
+	    }
+	    else {	        
+	        this.spatialRepresentationInfo.clear();
+	    }
+	    this.spatialRepresentationInfo.addAll( spatialRepresentationInfo );
 	}
 }
