@@ -43,13 +43,13 @@ public class BasicGraphSerializerTest extends TestCase {
    * Expected: 1. before and after graph should have same structure.
    *
    */
-  public void test_0() {
+  public void test_0() throws Exception{
     final int nnodes = 100;
     GraphTestUtil.buildNoBifurcations(builder(), nnodes);    
+    File victim = File.createTempFile( "graph", null );
+    victim.deleteOnExit();
     
-    try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
+    m_serializer.setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath() );
       
       m_serializer.write(builder().getGraph());
       
@@ -97,13 +97,6 @@ public class BasicGraphSerializerTest extends TestCase {
         }
       };
       after.visitNodes(visitor);
-      
-      new File(filename).delete();
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-      assertTrue(false);  
-    }
   }
   
   /**
@@ -119,8 +112,9 @@ public class BasicGraphSerializerTest extends TestCase {
     final Map obj2node = (Map)obj[1];    
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
+      File victim = File.createTempFile( "graph", null );
+      victim.deleteOnExit();
+      m_serializer.setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath() );
       
       m_serializer.write(builder().getGraph());
       
@@ -219,8 +213,9 @@ public class BasicGraphSerializerTest extends TestCase {
     assertTrue(builder().getGraph().getEdges().size() == nnodes-3);
     
     try {
-      String filename = System.getProperty("user.dir") + "\tmp.tmp";
-      m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
+        File victim = File.createTempFile( "graph", null );
+        victim.deleteOnExit();
+      m_serializer.setProperty(SerializedReaderWriter.FILENAME, victim.getAbsolutePath());
       
       m_serializer.write(builder().getGraph());
       
