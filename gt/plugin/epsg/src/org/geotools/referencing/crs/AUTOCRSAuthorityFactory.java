@@ -122,7 +122,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
     }
         
     public CoordinateReferenceSystem createCoordinateReferenceSystem(String code) throws FactoryException {
-        final Code c = new Code(code, "CoordinateReferenecSystem");
+        final Code c = new Code(code, "CoordinateReferenceSystem");
 	return factFinder(c).create(c);
     }
         
