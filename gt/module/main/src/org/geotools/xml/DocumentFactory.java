@@ -16,7 +16,6 @@
  */
 package org.geotools.xml;
 
-import org.xml.sax.DTDHandler;
 import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,7 +136,7 @@ public class DocumentFactory {
         try {
             parser.parse(is, xmlContentHandler);
         } catch (IOException e) {
-e.printStackTrace();
+//e.printStackTrace();
             throw new SAXException(e);
         }
 

@@ -119,10 +119,11 @@ public class ComplexElementHandler extends XMLElementHandler {
     }
 
     /**
+     * @param namespaceURI
+     * @param localName
+     * @param hints
      * @throws SAXException
      * @throws OperationNotSupportedException
-     * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
-     *      java.lang.String)
      */
     public void endElement(URI namespaceURI, String localName, Map hints)
         throws OperationNotSupportedException, SAXException {
@@ -262,7 +263,7 @@ System.out.println("Elements.size == "+elements.size());
      * Validates an All tag
      * @see valid(ElementGrouping)
      */
-    private int[] valid(All all, int index) throws SAXException {
+    private int[] valid(All all, int index) {
         Element[] elems = all.getElements();
         int[] r = new int[elems.length];
 
@@ -475,20 +476,29 @@ System.out.println("Elements.size == "+elements.size());
         return new int[]{tIndex,1};
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see schema.XMLElementHandler#startElement(java.lang.String,
-     *      java.lang.String, org.xml.sax.Attributes)
+    /**
+     * 
+     * TODO summary sentence for startElement ...
+     * 
+     * @see org.geotools.xml.XMLElementHandler#startElement(java.net.URI, java.lang.String, org.xml.sax.Attributes)
+     * @param namespaceURI
+     * @param localName
+     * @param attr
      */
-    public void startElement(URI namespaceURI, String localName, Attributes attr)
-        throws SAXException {
+    public void startElement(URI namespaceURI, String localName, Attributes attr) {
         this.attr = new AttributesImpl(attr);
     }
 
     /**
-     * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String,
-     *      java.lang.String)
+     * 
+     * TODO summary sentence for getHandler ...
+     * 
+     * @see org.geotools.xml.XMLElementHandler#getHandler(java.net.URI, java.lang.String, java.util.Map)
+     * @param namespaceURI
+     * @param localName
+     * @param hints
+     * @return XMLElementHandler
+     * @throws SAXException
      */
     public XMLElementHandler getHandler(URI namespaceURI, String localName,
         Map hints) throws SAXException {
@@ -532,9 +542,13 @@ System.out.println("Elements.size == "+elements.size());
     }
 
     /**
+     * 
+     * TODO summary sentence for getValue ...
+     * 
      * @see org.geotools.xml.XMLElementHandler#getValue()
+     * @return Object
      */
-    public Object getValue() throws SAXException {
+    public Object getValue() {
         // endElement sets the value
         return value;
     }
@@ -564,8 +578,6 @@ System.out.println("Elements.size == "+elements.size());
          *
          * @param t Element
          * @param o String
-         *
-         * @see ComplexElementHandler#endElement(String, String)
          */
         public DefaultElementValue(Element t, Object o) {
             this.t = t;
@@ -573,14 +585,22 @@ System.out.println("Elements.size == "+elements.size());
         }
 
         /**
-         * @see org.geotools.xml.xsi.ElementValue#getElement()
+         * 
+         * TODO summary sentence for getElement ...
+         * 
+         * @see org.geotools.xml.schema.ElementValue#getElement()
+         * @return Element
          */
         public Element getElement() {
             return t;
         }
 
         /**
-         * @see org.geotools.xml.xsi.ElementValue#getValue()
+         * 
+         * TODO summary sentence for getValue ...
+         * 
+         * @see org.geotools.xml.schema.ElementValue#getValue()
+         * @return Object
          */
         public Object getValue() {
             return value;

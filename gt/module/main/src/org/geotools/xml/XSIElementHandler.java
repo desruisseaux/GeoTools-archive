@@ -112,7 +112,6 @@ public abstract class XSIElementHandler implements Serializable {
      *
      * @throws SAXException
      *
-     * @see SchemaContentHandler#endElement
      */
     public abstract void endElement(String namespaceURI, String localName)
         throws SAXException;
@@ -127,7 +126,6 @@ public abstract class XSIElementHandler implements Serializable {
      *
      * @throws SAXException
      *
-     * @see SchemaContentHandler#startElement
      */
     public abstract void startElement(String namespaceURI, String localName,
         Attributes attr) throws SAXException;

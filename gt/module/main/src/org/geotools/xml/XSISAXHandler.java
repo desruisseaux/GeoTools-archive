@@ -75,6 +75,7 @@ public class XSISAXHandler extends DefaultHandler {
      * should never be called
      */
     private XSISAXHandler() {
+        /* not used*/
     }
 
     /**
@@ -92,30 +93,25 @@ public class XSISAXHandler extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    public void startPrefixMapping(String arg0, String arg1)
-        throws SAXException {
+    public void startPrefixMapping(String arg0, String arg1){
         rootHandler.startPrefixMapping(arg0, arg1);
     }
 
     /**
      * Implementation of endDocument.
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ContentHandler#endDocument()
      */
-    public void endDocument() throws SAXException {
+    public void endDocument(){
         handlers.pop();
     }
 
     /**
      * Implementation of startDocument.
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ContentHandler#startDocument()
      */
-    public void startDocument() throws SAXException {
+    public void startDocument(){
         try {
             handlers.push(rootHandler);
         } catch (RuntimeException e) {
@@ -235,7 +231,7 @@ public class XSISAXHandler extends DefaultHandler {
      * This method will then return a compressed schema instance.
      * </p>
      *
-     * @return
+     * @return schema
      *
      * @throws SAXException
      */
@@ -252,11 +248,9 @@ public class XSISAXHandler extends DefaultHandler {
      *
      * @param exception
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
-    public void error(SAXParseException exception) throws SAXException {
+    public void error(SAXParseException exception) {
         logger.severe("ERROR " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
             + locator.getLineNumber());
@@ -284,11 +278,9 @@ public class XSISAXHandler extends DefaultHandler {
      *
      * @param exception
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
      */
-    public void warning(SAXParseException exception) throws SAXException {
+    public void warning(SAXParseException exception) {
         logger.warning("WARN " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
             + locator.getLineNumber());
