@@ -145,8 +145,6 @@ public class StyledShapePainter {
 
             renderImage(graphics, coords[0], coords[1],
                 (Image) gs2d.getImage(), gs2d.getRotation(), gs2d.getOpacity());
-        } else if (style instanceof TextStyle2D) {
-        	labelCache.put((TextStyle2D) style, shape);
         } else {
             // if the style is a polygon one, process it even if the polyline is not
             // closed (by SLD specification)

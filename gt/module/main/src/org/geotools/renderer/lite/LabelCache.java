@@ -20,7 +20,11 @@ package org.geotools.renderer.lite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
+import javax.media.jai.util.Range;
+
+import org.geotools.feature.Feature;
 import org.geotools.renderer.style.TextStyle2D;
+import org.geotools.styling.TextSymbolizer;
 
 /**
  * An interface for a label cache. 
@@ -42,7 +46,7 @@ public interface LabelCache {
 	 * @param textStyle The TextStyle2D containing the style information 
 	 * @param shape the shape to be labeled
 	 */
-	void put(TextStyle2D textStyle, LiteShape2 shape);
+	void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) ;
 	/**
 	 * Called to indicate that a layer is done rendering.  The method may draw labels if appropriate
 	 * for the labeling algorithm 

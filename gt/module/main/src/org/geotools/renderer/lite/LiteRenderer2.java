@@ -873,8 +873,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 graphics.setTransform(shape.getAffineTransform());
                 renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]);
                 graphics.setTransform(tempTransform);
-            } else {
-                Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
+            } else{
                 Geometry g = findGeometry(feature, symbolizers[m]);
                 CoordinateReferenceSystem crs = findGeometryCS(feature, symbolizers[m]);
                 MathTransform2D transform = null;
@@ -888,14 +887,19 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     }
                 }
 
-                // if (transform != null && !(transform instanceof AffineTransform) ) {
                 if (transform != null) {
-                	LiteShape2 transformedShape = getTransformedShape(g, transform);
-                    painter.paint(graphics, transformedShape, style, scaleDenominator);
+                	shape = getTransformedShape(g, transform);
                 } else {
                     shape.setGeometry(g);
+                }
+                if( symbolizers[m] instanceof TextSymbolizer ){
+                	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
+                }
+                else{
+                    Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                     painter.paint(graphics, shape, style, scaleDenominator);
                 }
+
             }
         }
     }

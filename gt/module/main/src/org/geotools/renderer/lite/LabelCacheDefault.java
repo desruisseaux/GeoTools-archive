@@ -28,7 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.media.jai.util.Range;
+
+import org.geotools.feature.Feature;
+import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
+import org.geotools.styling.TextSymbolizer;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -52,6 +57,7 @@ public class LabelCacheDefault implements LabelCache {
 
     /** Map<label, LabelCacheItem> the label cache */
 	Map labelCache=new HashMap();
+	private SLDStyleFactory styleFactory=new SLDStyleFactory();
 	
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#start()
@@ -68,7 +74,8 @@ public class LabelCacheDefault implements LabelCache {
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D, org.geotools.renderer.lite.LiteShape)
 	 */
-	public void put(TextStyle2D textStyle, LiteShape2 shape) {
+	public void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) {
+		TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
     	//equals and hashcode of LabelCacheItem is the hashcode of label and the
     	// equals of the 2 labels so label can be used to find the entry.  
     	if( !labelCache.containsKey(textStyle.getLabel())){

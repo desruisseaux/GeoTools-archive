@@ -565,6 +565,18 @@ public class Parser extends MathTransformParser {
         BursaWolfParameters toWGS84 = parseToWGS84(element); // Optional; may be null.
         Map              properties = parseAuthority(element, name);
         element.close();
+        
+        //if our name is on our list of aliases, add the aliases to the property
+        org.geotools.resources.DatumAliases aliases = new org.geotools.resources.DatumAliases();
+        if (aliases.inDatumNameAliasList(name)) {
+            if (properties.size() == 1) {
+                properties = new HashMap(properties);
+            }
+            Identifier[] identifiers = aliases.getDatumNameAliases(name);
+            if (identifiers != null) {
+                properties.put(IdentifiedObject.ALIAS_PROPERTY, identifiers);
+            }
+        }
         if (toWGS84 != null) {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);
