@@ -32,7 +32,7 @@ public class WorldImageReaderTest extends TestCaseSupport {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		wiReader = new WorldImageReader(new File("c:\\etopo.png"));
+		wiReader = new WorldImageReader(new File(getTestResource("etoto.png").toExternalForm()));
 
 	}
 
