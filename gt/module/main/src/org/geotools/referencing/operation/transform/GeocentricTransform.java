@@ -601,8 +601,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         static ParameterDescriptorGroup group(final String ogc, final String epsg) {
             return group(
                      new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, null,  ogc),
-                        new Identifier(Citation.EPSG,    "EPSG", epsg)
+                        new Identifier(Citation.OPEN_GIS, ogc),
+                        new Identifier(Citation.EPSG,     epsg)
                      }, new ParameterDescriptor[] {
                         SEMI_MAJOR, SEMI_MINOR, DIM
                      });

@@ -22,6 +22,7 @@ package org.geotools.parameter;
 // J2SE dependencies
 import java.util.Map;
 import java.util.List;
+import java.util.Iterator;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -62,19 +63,20 @@ import org.geotools.referencing.operation.GeneralMatrix;
  * elt_<var>&lt;num_row-1&gt;</var>_<var>&lt;num_col-1&gt;</var>
  * </pre></blockquote>
  *
- * @version $Id: MatrixParameters.java 7846 2004-09-08 21:34:06Z jgarnett $
+ * @version $Id: MatrixParameterDescriptors.java 7846 2004-09-08 21:34:06Z jgarnett $
  * @author Martin Desruisseaux
  *
  * @see MatrixParameterValues
  */
-public class MatrixParameters extends ParameterDescriptorGroup {
+public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7386537348359343836L;
 
     /**
-     * The default matrix size for the {@linkplain #MatrixParameters(Map) one-argument constructor}.
+     * The default matrix size for the
+     * {@linkplain #MatrixParameterDescriptors(Map) one-argument constructor}.
      */
     public static final int DEFAULT_MATRIX_SIZE = 3;
 
@@ -118,7 +120,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      */
-    public MatrixParameters(final Map properties) {
+    public MatrixParameterDescriptors(final Map properties) {
         /*
          * Note: the upper limit given in the operation parameters is arbitrary. A high
          *       value doesn't make much sense anyway  since matrix size for projective
@@ -144,10 +146,10 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      * @param prefix     The prefix to insert in front of parameter name for each matrix elements.
      * @param separator  The separator between the row and the column index in parameter names.
      */
-    public MatrixParameters(final Map             properties,
-                            ParameterDescriptor[] parameters,
-                            final String          prefix,
-                            final char            separator)
+    public MatrixParameterDescriptors(final Map             properties,
+                                      ParameterDescriptor[] parameters,
+                                      final String          prefix,
+                                      final char            separator)
     {
         super(properties, parameters);
         if (parameters.length < 2) {
@@ -287,8 +289,9 @@ public class MatrixParameters extends ParameterDescriptorGroup {
         }
         /*
          * Parameter not found in the cache. Create a new one and cache it for future reuse.
-         * Note that this cache is shared by all MatrixParameters instance. There is no need
-         * to synchronize since it is not a big deal if the same parameter is constructed twice.
+         * Note that this cache is shared by all MatrixParameterDescriptors instance. There
+         * is no need to synchronize since it is not a big deal if the same parameter is
+         * constructed twice.
          */
         param = new org.geotools.parameter.ParameterDescriptor(prefix + row + separator + column,
                 Double.TYPE, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
@@ -372,10 +375,10 @@ public class MatrixParameters extends ParameterDescriptorGroup {
         final int numRow = numRowParam.intValue();
         final int numCol = numColParam.intValue();
         final GeneralMatrix matrix = new GeneralMatrix(numRow, numCol);
-        final GeneralParameterValue[] params = Parameters.array( parameters );
+        final List/*<GeneralParameterValue>*/ params = parameters.values();
         if (params != null) {
-            for (int i=0; i<params.length; i++) {
-                final GeneralParameterValue param = params[i];
+            for (final Iterator it=params.iterator(); it.hasNext();) {
+                final GeneralParameterValue param = (GeneralParameterValue) it.next();
                 if (param==numRowParam || param==numColParam) {
                     continue;
                 }
@@ -416,7 +419,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
      */
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
-            final MatrixParameters that = (MatrixParameters) object;
+            final MatrixParameterDescriptors that = (MatrixParameterDescriptors) object;
             return this.separator == that.separator &&
                    Utilities.equals(this.prefix, that.prefix);
         }

@@ -52,8 +52,8 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameterValues;
-import org.geotools.parameter.MatrixParameters;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.resources.cts.Resources;
@@ -426,7 +426,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * The provider for {@link ProjectiveTransform}. This transform is registered
      * under the name "Affine", which is a special case of projective transform.
      * The default matrix size is
-     * {@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}&times;{@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}.
+     * {@value org.geotools.parameter.MatrixParameterDescriptors#DEFAULT_MATRIX_SIZE}&times;{@value
+     * org.geotools.parameter.MatrixParameterDescriptors#DEFAULT_MATRIX_SIZE}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -447,18 +448,18 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             final Map properties = new HashMap(4);
             properties.put("name", "Affine");
             properties.put("identifiers", new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, null,  "Affine"),
-                new Identifier(Citation.EPSG,    "EPSG", "9624")
+                new Identifier(Citation.OPEN_GIS, "Affine"),
+                new Identifier(Citation.EPSG,     "9624")
             });
-            PARAMETERS = new MatrixParameters(properties);
+            PARAMETERS = new MatrixParameterDescriptors(properties);
         }
 
         /**
          * Create a provider for affine transform with a default matrix size.
          */
         public Provider() {
-            super(MatrixParameters.DEFAULT_MATRIX_SIZE-1,
-                  MatrixParameters.DEFAULT_MATRIX_SIZE-1,
+            super(MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
+                  MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
                   PARAMETERS);
         }
 
@@ -472,7 +473,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(((MatrixParameters) getParameters()).getMatrix(values));
+            return create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
         }
 
         /**

@@ -44,7 +44,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.parameter.MatrixParameters}.
+ * @deprecated Replaced by {@link org.geotools.parameter.MatrixParameterDescriptors}.
  */
 final class MatrixParameters extends Matrix implements ParameterList, ParameterListDescriptor {
     /**

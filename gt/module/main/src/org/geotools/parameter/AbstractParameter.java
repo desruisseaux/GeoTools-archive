@@ -137,6 +137,15 @@ public abstract class AbstractParameter extends Formattable
     }
 
     /**
+     * Convenience method returning the name of the specified descriptor. This method is used
+     * mostly for output to be read by human, not for processing. Concequently, we may consider
+     * to returns a localized name in a future version.
+     */
+    static String getName(final GeneralParameterDescriptor descriptor) {
+        return descriptor.getName().getCode();
+    }
+
+    /**
      * Returns a copy of this parameter value or group.
      */
     public Object clone() {

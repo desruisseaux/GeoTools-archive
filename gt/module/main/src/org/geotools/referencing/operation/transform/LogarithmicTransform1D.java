@@ -307,7 +307,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS, null, "Logarithmic")
+                        new Identifier(Citation.GEOTOOLS, "Logarithmic")
                      }, new ParameterDescriptor[] {
                         BASE, OFFSET
                      });

@@ -341,7 +341,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS, null, "Exponential")
+                        new Identifier(Citation.GEOTOOLS, "Exponential")
                      }, new ParameterDescriptor[] {
                         BASE, SCALE
                      });

@@ -257,13 +257,6 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Returns the parameter name in the default locale.
-     */
-    static String getName(final GeneralParameterDescriptor descriptor) {
-        return descriptor.getName().toString();
-    }
-
-    /**
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}.
      * If the parameter value has no unit (for example because it is a {@link String} type),
      * then this method returns <code>null</code>. Note that "no unit" doesn't means
@@ -655,7 +648,7 @@ public class Parameter extends AbstractParameter
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {
-        table.write(descriptor.getName().getCode());
+        table.write(getName(descriptor));
         table.nextColumn();
         table.write('=');
         table.nextColumn();

@@ -423,8 +423,8 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, null,  "Abridged_Molodenski"),
-                        new Identifier(Citation.EPSG,    "EPSG", "9605")
+                        new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
+                        new Identifier(Citation.EPSG,     "9605")
                      }, new ParameterDescriptor[] {
                         DIM, DX, DY, DZ,
                         SRC_SEMI_MAJOR, SRC_SEMI_MINOR,

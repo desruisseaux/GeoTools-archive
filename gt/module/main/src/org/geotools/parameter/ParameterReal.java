@@ -341,7 +341,7 @@ public class ParameterReal extends AbstractParameter
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {
-        table.write(descriptor.getName().getCode());
+        table.write(getName(descriptor));
         table.nextColumn();
         table.write('=');
         table.nextColumn();

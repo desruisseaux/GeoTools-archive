@@ -47,16 +47,16 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
 
 
 /**
- * The values for a group of {@linkplain MatrixParameters matrix parameters}. This value group
- * is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code> parameters
- * depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values. Concequently,
- * this {@linkplain ParameterGroup parameter value group} is also its own mutable
+ * The values for a group of {@linkplain MatrixParameterDescriptors matrix parameters}. This value
+ * group is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code>
+ * parameters depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values.
+ * Concequently, this {@linkplain ParameterGroup parameter value group} is also its own mutable
  * {@linkplain ParameterDescriptorGroup operation parameter group}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see MatrixParameters
+ * @see MatrixParameterDescriptors
  */
 public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
                                 implements ParameterDescriptorGroup
@@ -72,22 +72,22 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     private ParameterValue[][] matrixValues;
 
     /**
-     * The value for the {@link MatrixParameters#numRow} parameter.
+     * The value for the {@link MatrixParameterDescriptors#numRow} parameter.
      * Consider this field as final. It is not only for {@link #clone} implementation.
      */
     private ParameterValue numRow;
 
     /**
-     * The value for the {@link MatrixParameters#numCol} parameter.
+     * The value for the {@link MatrixParameterDescriptors#numCol} parameter.
      * Consider this field as final. It is not only for {@link #clone} implementation.
      */
     private ParameterValue numCol;
 
     /**
      * Construct default values for the specified
-     * {@linkplain MatrixParameters matrix parameters}.
+     * {@linkplain MatrixParameterDescriptors matrix parameter descriptors}.
      */
-    public MatrixParameterValues(final MatrixParameters descriptor) {
+    public MatrixParameterValues(final MatrixParameterDescriptors descriptor) {
         super(descriptor);
         numRow = (ParameterValue) parameter(0);
         numCol = (ParameterValue) parameter(1);
@@ -103,7 +103,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public Identifier getName() {
@@ -111,7 +111,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public GenericName[] getAlias() {
@@ -119,7 +119,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public Identifier[] getIdentifiers() {
@@ -127,7 +127,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public InternationalString getRemarks() {
@@ -135,7 +135,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public int getMinimumOccurs() {
@@ -143,7 +143,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public int getMaximumOccurs() {
@@ -153,10 +153,10 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     /**
      * Returns the parameter in this group for the specified name. The name can be a matrix element
      * if it uses the following syntax: <code>"elt_<var>row</var>_<var>col</var>"</code> where
-     * <code>"elt_"</code> is the {@linkplain MatrixParameters#prefix prefix} for all matrix
-     * elements, and <var>row</var> and <var>col</var> are row and column indices respectively.
-     * For example <code>"elt_2_1"</code> is the element name for the value at line 2 and row 1.
-     * The row and column index are 0 based.
+     * <code>"elt_"</code> is the {@linkplain MatrixParameterDescriptors#prefix prefix} for all
+     * matrix elements, and <var>row</var> and <var>col</var> are row and column indices
+     * respectively. For example <code>"elt_2_1"</code> is the element name for the value at line 2
+     * and row 1. The row and column index are 0 based.
      *
      * @param  name The case insensitive name of the parameter to search for.
      * @return The parameter for the given name.
@@ -165,8 +165,8 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     public GeneralParameterDescriptor descriptor(final String name)
             throws ParameterNotFoundException
     {
-        return ((MatrixParameters) descriptor).descriptor(name, numRow.intValue(),
-                                                                numCol.intValue());
+        return ((MatrixParameterDescriptors) descriptor).descriptor(name, numRow.intValue(),
+                                                                          numCol.intValue());
     }
 
     /**
@@ -181,10 +181,10 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     /**
      * Returns the value in this group for the specified name. The name can be a matrix element
      * if it uses the following syntax: <code>"elt_<var>row</var>_<var>col</var>"</code> where
-     * <code>"elt_"</code> is the {@linkplain MatrixParameters#prefix prefix} for all matrix
-     * elements, and <var>row</var> and <var>col</var> are row and column indices respectively.
-     * For example <code>"elt_2_1"</code> is the element name for the value at line 2 and row 1.
-     * The row and column index are 0 based.
+     * <code>"elt_"</code> is the {@linkplain MatrixParameterDescriptors#prefix prefix} for all
+     * matrix elements, and <var>row</var> and <var>col</var> are row and column indices
+     * respectively. For example <code>"elt_2_1"</code> is the element name for the value at line
+     * 2 and row 1. The row and column index are 0 based.
      *
      * @param  name The case insensitive name of the parameter to search for.
      * @return The parameter value for the given name.
@@ -193,7 +193,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        final MatrixParameters descriptor = ((MatrixParameters) this.descriptor);
+        final MatrixParameterDescriptors descriptor = ((MatrixParameterDescriptors)this.descriptor);
         final String prefix = descriptor.prefix;
         RuntimeException cause = null;
         if (name.regionMatches(true, 0, prefix, 0, prefix.length())) {
@@ -253,8 +253,8 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
                                      final int numRow, final int numCol)
             throws IndexOutOfBoundsException
     {
-        MatrixParameters.checkIndice("row",    row,    numRow);
-        MatrixParameters.checkIndice("column", column, numCol);
+        MatrixParameterDescriptors.checkIndice("row",    row,    numRow);
+        MatrixParameterDescriptors.checkIndice("column", column, numCol);
         if (matrixValues == null) {
             matrixValues = new ParameterValue[numRow][];
         }
@@ -271,7 +271,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
         ParameterValue param = rowValues[column];
         if (param == null) {
             rowValues[column] = param = new ParameterReal(
-                    ((MatrixParameters) descriptor).descriptor(row, column, numRow, numCol));
+                ((MatrixParameterDescriptors) descriptor).descriptor(row, column, numRow, numCol));
         }
         return param;
     }
@@ -281,8 +281,8 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      */
     public List/*<GeneralParameterDescriptor>*/ descriptors() {
-        return ((MatrixParameters) descriptor).descriptors(numRow.intValue(),
-                                                           numCol.intValue());
+        return ((MatrixParameterDescriptors) descriptor).descriptors(numRow.intValue(),
+                                                                     numCol.intValue());
     }
 
     /**
@@ -318,7 +318,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     }
     
     /**
-     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
     public GeneralParameterValue createValue() {
@@ -358,7 +358,8 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * @param matrix The matrix to copy in this group of parameters.
      */
     public void setMatrix(final Matrix matrix) {
-        final MatrixParameters matrixDescriptor = ((MatrixParameters) this.descriptor);
+        final MatrixParameterDescriptors matrixDescriptor =
+            ((MatrixParameterDescriptors) this.descriptor);
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         this.numRow.setValue(numRow);
@@ -370,30 +371,26 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
                 final Object defaultValue = descriptor.getDefaultValue();
                 if (defaultValue instanceof Number) {
                     double value = ((Number) defaultValue).doubleValue();
-                    if (element != value) {
-                        if (matrixValues == null) {
-                            matrixValues = new ParameterValue[numRow][];
-                        }
-                        if (matrixValues[row] == null ){
-                            matrixValues[row] = new ParameterValue[numCol]; 
-                        }
-                        matrixValues[row][col] = new ParameterReal(descriptor, element);
-                    } else {
-                        // remove entry to keep things sparse
-                        if (matrixValues != null && matrixValues[row] != null &&
-                            matrixValues[row][col] != null)
-                        {
+                    if (Double.doubleToLongBits(element) == 
+                        Double.doubleToLongBits(value))
+                    {
+                        /*
+                         * Value matches the default value, so there is no need to keep it.
+                         * Remove entry to keep things sparse.
+                         */
+                        if (matrixValues != null  &&  matrixValues[row] != null) {
                             matrixValues[row][col] = null;
                         }
-                    }
-                } else {
-                    // remove entry
-                    if( matrixValues != null && matrixValues[row] != null &&
-                        matrixValues[row][col] != null)
-                    {
-                        matrixValues[row][col] = null;
+                        continue;
                     }
                 }               
+                if (matrixValues == null) {
+                    matrixValues = new ParameterValue[numRow][];
+                }
+                if (matrixValues[row] == null ){
+                    matrixValues[row] = new ParameterValue[numCol]; 
+                }
+                matrixValues[row][col] = new ParameterReal(descriptor, element);
             }
         }
     }
@@ -454,7 +451,7 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {
-        table.write(descriptor.getName().getCode());
+        table.write(getName(descriptor));
         table.nextColumn();
         table.write('=');
         table.nextColumn();

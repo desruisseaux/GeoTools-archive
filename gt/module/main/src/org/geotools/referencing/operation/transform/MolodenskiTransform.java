@@ -383,8 +383,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          */
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, null,  "Molodenski"),
-                        new Identifier(Citation.EPSG,    "EPSG", "9604")
+                        new Identifier(Citation.OPEN_GIS, "Molodenski"),
+                        new Identifier(Citation.EPSG,     "9604")
                      }, new ParameterDescriptor[] {
                         DIM, DX, DY, DZ,
                         SRC_SEMI_MAJOR, SRC_SEMI_MINOR,

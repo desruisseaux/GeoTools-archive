@@ -476,7 +476,11 @@ public class Formatter {
      * This implementation do not requires an exact matches. A matching title is enough.
      */
     private boolean authorityMatches(final Citation citation) {
-        return authority.getTitle().toString(null).equalsIgnoreCase(
+        if (authority == citation) {
+            return true;
+        }
+        return (citation != null) && 
+               authority.getTitle().toString(null).equalsIgnoreCase(
                 citation.getTitle().toString(null));
     }
 

@@ -209,7 +209,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             final GeneralParameterDescriptor descriptor = values[i].getDescriptor();
             final int[] count = (int[]) occurences.get(descriptor);
             if (count == null) {
-                final String name = descriptor.getName().getCode();
+                final String name = getName(descriptor);
                 throw new InvalidParameterTypeException(Resources.format(
                           ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1,
                           name), name);
@@ -226,7 +226,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             final int min   = descriptor.getMinimumOccurs();
             final int max   = descriptor.getMaximumOccurs();
             if (!(count>=min && count<=max)) {
-                final String name = descriptor.getName().getCode();
+                final String name = getName(descriptor);
                 throw new InvalidParameterCardinalityException(Resources.format(
                           ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
                           new Integer(count), new Integer(min), new Integer(max)), name);
@@ -291,34 +291,32 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        while (values != null) {
-            for (final Iterator it=values.iterator(); it.hasNext();) {
-                final GeneralParameterValue value = (GeneralParameterValue) it.next();
-                if (value instanceof ParameterValue) {
-                    if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
-                        return (ParameterValue) value;
-                    }
+        for (final Iterator it=values.iterator(); it.hasNext();) {
+            final GeneralParameterValue value = (GeneralParameterValue) it.next();
+            if (value instanceof ParameterValue) {
+                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                    return (ParameterValue) value;
                 }
             }
-            /*
-             * No existing parameter found. Check if an optional parameter exists.
-             * If such a descriptor is found, create it, add it to the list of values
-             * and returns it.
-             */
-            // TODO: The following lines should be considerably shorter with J2SE 1.5:
-            // for (GeneralParameterDescriptor descriptor : getDescriptor()) {
-            for (final Iterator it=((ParameterDescriptorGroup)
-                 getDescriptor()).descriptors().iterator(); it.hasNext();)
-            {
-                final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
-                if (descriptor instanceof ParameterDescriptor) {
-                    if (IdentifiedObject.nameMatches(descriptor, name)) {
-                        // TODO: remove the first cast with J2SE 1.5.
-                        final ParameterValue value = (ParameterValue)
-                                ((ParameterDescriptor) descriptor).createValue();
-                        values.add(value);
-                        return value;
-                    }
+        }
+        /*
+         * No existing parameter found. Check if an optional parameter exists.
+         * If such a descriptor is found, create it, add it to the list of values
+         * and returns it.
+         */
+        // TODO: The following lines should be considerably shorter with J2SE 1.5:
+        // for (GeneralParameterDescriptor descriptor : getDescriptor().descriptors()) {
+        for (final Iterator it=((ParameterDescriptorGroup)
+             getDescriptor()).descriptors().iterator(); it.hasNext();)
+        {
+            final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
+            if (descriptor instanceof ParameterDescriptor) {
+                if (IdentifiedObject.nameMatches(descriptor, name)) {
+                    // TODO: remove the first cast with J2SE 1.5.
+                    final ParameterValue value = (ParameterValue)
+                            ((ParameterDescriptor) descriptor).createValue();
+                    values.add(value);
+                    return value;
                 }
             }
         }
@@ -512,7 +510,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {
-        table.write(descriptor.getName().getCode());
+        table.write(getName(descriptor));
         table.nextColumn();
         table.write(':');
         table.nextColumn();
