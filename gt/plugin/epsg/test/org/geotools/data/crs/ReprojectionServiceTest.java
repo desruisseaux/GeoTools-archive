@@ -42,11 +42,11 @@ public class ReprojectionServiceTest extends TestCase {
 	}
 
 	public void testEPSG() throws FactoryException {
-	    CoordinateSystem bc = service.createCoordianteSystem("EPSG:42102");
+	    CoordinateSystem bc = service.createCoordinateSystem("EPSG:42102");
 		assertNotNull( "bc", bc );
 	}
 	public void testAUTO() throws FactoryException {	
-		CoordinateSystem utm = service.createCoordianteSystem("AUTO:42001,0.0,0.0");
+		CoordinateSystem utm = service.createCoordinateSystem("AUTO:42001,0.0,0.0");
 		assertNotNull( "auto-utm", utm );		
 	}
 
