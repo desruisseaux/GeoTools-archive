@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
@@ -236,11 +236,6 @@
   </dependencies>
 
   <build>
-    <resources> 
-      <excludes>
-        <exclude>**/META-INF/services/org.geotools.referencing.crs.CRSAuthorityFactory</exclude>
-      </excludes>
-    </resources>
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
