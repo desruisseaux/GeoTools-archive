@@ -1,77 +1,85 @@
-//RS May 17,2004
-//The following were calculated with ArcGIS 8.3 
-//(minor changes needed in projection names and parameters between ArcGIS and gt2)
-//points with an //Error: comment could not be calculated with ArcGIS, 
-//and were instead calculated with libproj4
-//Note, the lambert is undefined at one of the poles (these points were removed below)
+// The following were calculated with ArcGIS 8.3 
+// (minor changes needed in projection names and parameters between ArcGIS and gt2)
+// points with an //Error: comment could not be calculated with ArcGIS, 
+// and were instead calculated with libproj4
+// Note, the lambert is undefined at one of the poles (these points were removed below)
+//
+// Rueben Schulz - May 17, 2004
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole LambertConic.txt
 
 //geogCS's 
-set _WGS84_=GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
-set _sphere_=GEOGCS["sphere", DATUM["sphere", SPHEROID["sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
+set _WGS84_ = GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
+set _sphere_ = GEOGCS["sphere", DATUM["sphere", SPHEROID["sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
 
 
 ////////////////////////////////////////////
 //Elliptical 1SP tests
 //Lambert_Conformal_Conic_1SP
-set _Lambert1_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_1SP"], PARAMETER["central_meridian", -50.0], PARAMETER["latitude_of_origin", 30.0], PARAMETER["scale_factor", 1.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Lambert1_ = PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_1SP"], PARAMETER["central_meridian", -50.0], PARAMETER["latitude_of_origin", 30.0], PARAMETER["scale_factor", 1.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
-cs_source=_WGS84_
-cs_target=_Lambert1_
-test_tolerance=(1e-4, 1e-4)
+source crs = _WGS84_
+target crs = _Lambert1_
+test tolerance = (1e-4, 1e-4)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-5287947.56661412, 3923289.38044914)
+source pt = (-123.1, 49.2166666666)
+target pt = (-5287947.56661412, 3923289.38044914)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(4185423.61877629, 2538710.23201799)
+source pt = (2.33656753, 43.96499314)
+target pt = (4185423.61877629, 2538710.23201799)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(-19525733.294059, 7387672.78619532)
+source pt = (151.283333333, -33.9166666666)
+target pt = (-19525733.294059, 7387672.78619532)
 
-pt_source=(-47.95, -15.75)
-pt_target=(298409.350632235, -5622289.01947474)
+source pt = (-47.95, -15.75)
+target pt = (298409.350632235, -5622289.01947474)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-10387588.640478, 10172070.1600998)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-10387588.640478, 10172070.1600998)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(11174319.1486514, -5370575.41032723)
+source pt = (18.45, -33.9166666666)
+target pt = (11174319.1486514, -5370575.41032723)
 
-pt_source=(0, 0)
-pt_target=(6139309.47189679, -2109278.37104688)
+source pt = (0, 0)
+target pt = (6139309.47189679, -2109278.37104688)
 
-pt_source=(180, 0)
-pt_target=(-13165791.6496326, 4917203.80668888)
+source pt = (180, 0)
+target pt = (-13165791.6496326, 4917203.80668888)
 
-pt_source=(-180, 0)
-pt_target=(-13165791.6496326, 4917203.80668888)
+source pt = (-180, 0)
+target pt = (-13165791.6496326, 4917203.80668888)
 
-pt_source=(90, 0)
-pt_target=(13650767.9145254, 6088040.08282229)
+source pt = (90, 0)
+target pt = (13650767.9145254, 6088040.08282229)
 
-pt_source=(-90, 0)
-pt_target=(-4968473.19576338, -2594254.63593975)
+source pt = (-90, 0)
+target pt = (-4968473.19576338, -2594254.63593975)
 
-pt_source=(-76, -55)
-pt_target=(-5803708.44264532, -14082109.8221118)
+source pt = (-76, -55)
+target pt = (-5803708.44264532, -14082109.8221118)
 
-pt_source=(12, -15)
-pt_target=(8533831.69205367, -3146167.71233186)
+source pt = (12, -15)
+target pt = (8533831.69205367, -3146167.71233186)
 
-pt_source=(80, 6)
-pt_target=(12497341.854468, 5228907.06526625)
+source pt = (80, 6)
+target pt = (12497341.854468, 5228907.06526625)
 
-pt_source=(-45, 71)
-pt_target=(260034.706357411, 5100739.32972038)
+source pt = (-45, 71)
+target pt = (260034.706357411, 5100739.32972038)
 
-pt_source=(175, 66.67)
-pt_target=(-6116945.48176684, 8522791.49974102)
+source pt = (175, 66.67)
+target pt = (-6116945.48176684, 8522791.49974102)
 
-pt_source=(60, -70)
-pt_target=(28249300.5970262, -8723859.94860411)
+source pt = (60, -70)
+target pt = (28249300.5970262, -8723859.94860411)
 
-pt_source=(0, 90)
-pt_target=(0.00000000,      11056513.27858567)
+source pt = (0, 90)
+target pt = (0.00000000,      11056513.27858567)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
@@ -80,66 +88,66 @@ pt_target=(0.00000000,      11056513.27858567)
 //Lambert_Conformal_Conic_2SP
 set _Lambert2_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 0.0], PARAMETER["latitude_of_origin", -50.0], PARAMETER["false_easting", 100000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -40.0], PARAMETER["standard_parallel_2", -40.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
-cs_source=_WGS84_
-cs_target=_Lambert2_
-test_tolerance=(1e-4, 1e-4)
+source crs = _WGS84_
+target crs = _Lambert2_
+test tolerance = (1e-4, 1e-4)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-22820289.5545572, -2091996.34363481)
+source pt = (-123.1, 49.2166666666)
+target pt = (-22820289.5545572, -2091996.34363481)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(661568.111578295, 14923557.2916456)
+source pt = (2.33656753, 43.96499314)
+target pt = (661568.111578295, 14923557.2916456)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(8321915.54062767, -7539430.42482499)
+source pt = (151.283333333, -33.9166666666)
+target pt = (8321915.54062767, -7539430.42482499)
 
-pt_source=(-47.95, -15.75)
-pt_target=(-5216412.40039615, 2416218.24402446)
+source pt = (-47.95, -15.75)
+target pt = (-5216412.40039615, 2416218.24402446)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(19088312.4822445, -6434450.68367952)
+source pt = (139.733333333, 35.6833333333)
+target pt = (19088312.4822445, -6434450.68367952)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(1803288.33236079, 1616657.78463416)
+source pt = (18.45, -33.9166666666)
+target pt = (1803288.33236079, 1616657.78463416)
 
-pt_source=(0, 0)
-pt_target=(100000, 5900689.35012278)
+source pt = (0, 0)
+target pt = (100000, 5900689.35012278)
 
-pt_source=(180, 0)
-pt_target=(11268839.64783209,       -11870108.19875328)
+source pt = (180, 0)
+target pt = (11268839.64783209,       -11870108.19875328)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(-180, 0)
-pt_target=(-11068839.64783209,      -11870108.19875328)
+source pt = (-180, 0)
+target pt = (-11068839.64783209,      -11870108.19875328)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(90, 0)
-pt_target=(10594572.6997586, 101292.200868419)
+source pt = (90, 0)
+target pt = (10594572.6997586, 101292.200868419)
 
-pt_source=(-90, 0)
-pt_target=(-10394572.6997586, 101292.200868419)
+source pt = (-90, 0)
+target pt = (-10394572.6997586, 101292.200868419)
 
-pt_source=(-76, -55)
-pt_target=(-4360379.64235021, -2596841.9772493)
+source pt = (-76, -55)
+target pt = (-4360379.64235021, -2596841.9772493)
 
-pt_source=(12, -15)
-pt_target=(1504807.07815238, 3877354.04243759)
+source pt = (12, -15)
+target pt = (1504807.07815238, 3877354.04243759)
 
-pt_source=(80, 6)
-pt_target=(10461528.5307621, 1770205.34123655)
+source pt = (80, 6)
+target pt = (10461528.5307621, 1770205.34123655)
 
-pt_source=(-45, 71)
-pt_target=(-18740321.30124548,      27598908.42729972)
+source pt = (-45, 71)
+target pt = (-18740321.30124548,      27598908.42729972)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(175, 66.67)
-pt_target=(31549319.6364911, -19513394.1242404)
+source pt = (175, 66.67)
+target pt = (31549319.6364911, -19513394.1242404)
 
-pt_source=(60, -70)
-pt_target=(2642991.48675362, -3305196.94555041)
+source pt = (60, -70)
+target pt = (2642991.48675362, -3305196.94555041)
 
-pt_source=(0, -90)
-pt_target=(100000.00000000, -6494483.78125990)
+source pt = (0, -90)
+target pt = (100000.00000000, -6494483.78125990)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
@@ -149,127 +157,127 @@ pt_target=(100000.00000000, -6494483.78125990)
 set _Lambert3_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 180.0], PARAMETER["latitude_of_origin", -10.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", 30.0], PARAMETER["standard_parallel_2", 60.0], AXIS["x",EAST], AXIS["y",NORTH]]
 set _Lambert4_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 35.0], PARAMETER["latitude_of_origin", 70.0], PARAMETER["false_easting", 100.0], PARAMETER["false_northing", 0.0], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", 70.0], PARAMETER["standard_parallel_2", 80.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
-cs_source=_WGS84_
-cs_target=_Lambert3_
-test_tolerance=(1e-3, 1e-3)
+source crs = _WGS84_
+target crs = _Lambert3_
+test tolerance = (1e-3, 1e-3)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(12079690.7390989, 28400620.6810672)
+source pt = (-123.1, 49.2166666666)
+target pt = (12079690.7390989, 28400620.6810672)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-16233824.7065762, 54733007.9165814)
+source pt = (2.33656753, 43.96499314)
+target pt = (-16233824.7065762, 54733007.9165814)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(-20584520.8915721, -12470944.5767305)
+source pt = (151.283333333, -33.9166666666)
+target pt = (-20584520.8915721, -12470944.5767305)
 
-pt_source=(-47.95, -15.75)
-pt_target=(45517278.1919222, 46019589.2896444)
+source pt = (-47.95, -15.75)
+target pt = (45517278.1919222, 46019589.2896444)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-11229968.4483455, 22021503.7243361)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-11229968.4483455, 22021503.7243361)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-52873049.7229041, 67785243.1859717)
+source pt = (18.45, -33.9166666666)
+target pt = (-52873049.7229041, 67785243.1859717)
 
-pt_source=(0, 0)
-pt_target=(-29184210.01866646,      65915963.88300204)
+source pt = (0, 0)
+target pt = (-29184210.01866646,      65915963.88300204)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(180, 0)
-pt_target=(0, 4975437.32394589)
+source pt = (180, 0)
+target pt = (0, 4975437.32394589)
 
-pt_source=(-180, 0)
-pt_target=(0, 4975437.32394589)
+source pt = (-180, 0)
+target pt = (0, 4975437.32394589)
 
-pt_source=(90, 0)
-pt_target=(-33784115.6895853, 26254712.2415197)
+source pt = (90, 0)
+target pt = (-33784115.6895853, 26254712.2415197)
 
-pt_source=(-90, 0)
-pt_target=(33784115.6895853, 26254712.2415197)
+source pt = (-90, 0)
+target pt = (33784115.6895853, 26254712.2415197)
 
-pt_source=(-76, -55)
-pt_target=(82102142.0037036, 19556495.1013422)
+source pt = (-76, -55)
+target pt = (82102142.0037036, 19556495.1013422)
 
-pt_source=(12, -15)
-pt_target=(-39069131.1375607, 65202488.4393535)
+source pt = (12, -15)
+target pt = (-39069131.1375607, 65202488.4393535)
 
-pt_source=(80, 6)
-pt_target=(-32982612.1434063, 31440922.5136959)
+source pt = (80, 6)
+target pt = (-32982612.1434063, 31440922.5136959)
 
-pt_source=(-45, 71)
-pt_target=(10398635.8005264, 43639841.9810012)
+source pt = (-45, 71)
+target pt = (10398635.8005264, 43639841.9810012)
 
-pt_source=(175, 66.67)
-pt_target=(-759239.857568571, 30292851.2899953)
+source pt = (175, 66.67)
+target pt = (-759239.857568571, 30292851.2899953)
 
-pt_source=(60, -70)
-pt_target=(-128781718.69504182,     33158637.46636094)
+source pt = (60, -70)
+target pt = (-128781718.69504182,     33158637.46636094)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, 90)
-pt_target=(0.00000000,      42433809.85117260)
+source pt = (0, 90)
+target pt = (0.00000000,      42433809.85117260)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
-cs_source=_WGS84_
-cs_target=_Lambert4_
-test_tolerance=(1e-3, 1e-3)
+source crs = _WGS84_
+target crs = _Lambert4_
+test tolerance = (1e-3, 1e-3)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-6943798.83300395, 20999133.5874514)
+source pt = (-123.1, 49.2166666666)
+target pt = (-6943798.83300395, 20999133.5874514)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-9086535.19706922, -7353099.4083668)
+source pt = (2.33656753, 43.96499314)
+target pt = (-9086535.19706922, -7353099.4083668)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(66918490.1419551, 35097262.5614701)
+source pt = (151.283333333, -33.9166666666)
+target pt = (66918490.1419551, 35097262.5614701)
 
-pt_source=(-47.95, -15.75)
-pt_target=(-50892091.6747429, -1342575.49726327)
+source pt = (-47.95, -15.75)
+target pt = (-50892091.6747429, -1342575.49726327)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(20398306.3266684, 11496741.2300582)
+source pt = (139.733333333, 35.6833333333)
+target pt = (20398306.3266684, 11496741.2300582)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-19968913.0957736, -62186105.9988317)
+source pt = (18.45, -33.9166666666)
+target pt = (-19968913.0957736, -62186105.9988317)
 
-pt_source=(0, 0)
-pt_target=(-22014144.1076334, -25398547.6022803)
+source pt = (0, 0)
+target pt = (-22014144.1076334, -25398547.6022803)
 
-pt_source=(180, 0)
-pt_target=(25274043.7372954, 37802994.9017624)
+source pt = (180, 0)
+target pt = (25274043.7372954, 37802994.9017624)
 
-pt_source=(-180, 0)
-pt_target=(25274043.7372954, 37802994.9017624)
+source pt = (-180, 0)
+target pt = (25274043.7372954, 37802994.9017624)
 
-pt_source=(90, 0)
-pt_target=(31642874.122088, -16253823.2470006)
+source pt = (90, 0)
+target pt = (31642874.122088, -16253823.2470006)
 
-pt_source=(-90, 0)
-pt_target=(-33910484.8737013, 27716221.2027921)
+source pt = (-90, 0)
+target pt = (-33910484.8737013, 27716221.2027921)
 
-pt_source=(-76, -55)
-pt_target=(-114576059.75181164,     43236791.44689217)
+source pt = (-76, -55)
+target pt = (-114576059.75181164,     43236791.44689217)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(12, -15)
-pt_target=(-19296597.387849, -39756343.1131665)
+source pt = (12, -15)
+target pt = (-19296597.387849, -39756343.1131665)
 
-pt_source=(80, 6)
-pt_target=(24606044.008841, -18486034.5353427)
+source pt = (80, 6)
+target pt = (24606044.008841, -18486034.5353427)
 
-pt_source=(-45, 71)
-pt_target=(-6885216.89211205, 5879564.02985726)
+source pt = (-45, 71)
+target pt = (-6885216.89211205, 5879564.02985726)
 
-pt_source=(175, 66.67)
-pt_target=(6068497.13407492, 13576979.0840003)
+source pt = (175, 66.67)
+target pt = (6068497.13407492, 13576979.0840003)
 
-pt_source=(60, -70)
-pt_target=(86195373.90844388,       -184551890.08781531)
+source pt = (60, -70)
+target pt = (86195373.90844388,       -184551890.08781531)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, 90)
-pt_target=(100.00000000,    7421697.75033144)
+source pt = (0, 90)
+target pt = (100.00000000,    7421697.75033144)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
@@ -278,65 +286,65 @@ pt_target=(100.00000000,    7421697.75033144)
 //Lambert_Conformal_Conic_1SP
 set _Lambert5_=PROJCS["Lambert", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_1SP"], PARAMETER["central_meridian", 111.0], PARAMETER["latitude_of_origin", -55.0], PARAMETER["scale_factor", 0.98], PARAMETER["false_easting", 500000.0], PARAMETER["false_northing", 1000000.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
-cs_source=_sphere_
-cs_target=_Lambert5_
-test_tolerance=(1e-5, 1e-5)
+source crs = _sphere_
+target crs = _Lambert5_
+test tolerance = (1e-5, 1e-5)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(25150392.3770065, -9122296.8313593)
+source pt = (-123.1, 49.2166666666)
+target pt = (25150392.3770065, -9122296.8313593)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-22186217.770281, -2980512.77833212)
+source pt = (2.33656753, 43.96499314)
+target pt = (-22186217.770281, -2980512.77833212)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(4158303.91793427, 2261887.18690673)
+source pt = (151.283333333, -33.9166666666)
+target pt = (4158303.91793427, 2261887.18690673)
 
-pt_source=(-47.95, -15.75)
-pt_target=(-6342032.32737388, -9154628.66936942)
+source pt = (-47.95, -15.75)
+target pt = (-6342032.32737388, -9154628.66936942)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(8263841.14031911, 14452353.4292672)
+source pt = (139.733333333, 35.6833333333)
+target pt = (8263841.14031911, 14452353.4292672)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-6012378.87476079, -1725428.82164033)
+source pt = (18.45, -33.9166666666)
+target pt = (-6012378.87476079, -1725428.82164033)
 
-pt_source=(0, 0)
-pt_target=(-10751908.7661057, -3553641.90364655)
+source pt = (0, 0)
+target pt = (-10751908.7661057, -3553641.90364655)
 
-pt_source=(180, 0)
-pt_target=(9886361.48361485, 2835835.54019235)
+source pt = (180, 0)
+target pt = (9886361.48361485, 2835835.54019235)
 
-pt_source=(-180, 0)
-pt_target=(9886361.48361485, 2835835.54019235)
+source pt = (-180, 0)
+target pt = (9886361.48361485, 2835835.54019235)
 
-pt_source=(90, 0)
-pt_target=(-2828125.92417021, 7378181.45356739)
+source pt = (90, 0)
+target pt = (-2828125.92417021, 7378181.45356739)
 
-pt_source=(-90, 0)
-pt_target=(9089555.79707993, -10642153.8179198)
+source pt = (-90, 0)
+target pt = (9089555.79707993, -10642153.8179198)
 
-pt_source=(-76, -55)
-pt_target=(3208753.09987476, -6803313.88717037)
+source pt = (-76, -55)
+target pt = (3208753.09987476, -6803313.88717037)
 
-pt_source=(12, -15)
-pt_target=(-8449505.59750819, -1969712.80770742)
+source pt = (12, -15)
+target pt = (-8449505.59750819, -1969712.80770742)
 
-pt_source=(80, 6)
-pt_target=(-4758923.17925177, 7706603.72958979)
+source pt = (80, 6)
+target pt = (-4758923.17925177, 7706603.72958979)
 
-pt_source=(-45, 71)
-pt_target=(-37963756.16259558,      -33194144.39980113)
+source pt = (-45, 71)
+target pt = (-37963756.16259558,      -33194144.39980113)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(175, 66.67)
-pt_target=(32977495.09144947,       21616011.37932907)
+source pt = (175, 66.67)
+target pt = (32977495.09144947,       21616011.37932907)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(60, -70)
-pt_target=(-1309370.6916782, -1346475.61683347)
+source pt = (60, -70)
+target pt = (-1309370.6916782, -1346475.61683347)
 
-pt_source=(0, -90)
-pt_target=(500000.00000000, -3371799.72280522)
+source pt = (0, -90)
+target pt = (500000.00000000, -3371799.72280522)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
@@ -345,64 +353,64 @@ pt_target=(500000.00000000, -3371799.72280522)
 //Lambert_Conformal_Conic_2SP
 set _Lambert6_=PROJCS["Lambert", GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", -120.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", 2.0], PARAMETER["standard_parallel_2", 60.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
-cs_source=_sphere_
-cs_target=_Lambert6_
-test_tolerance=(1e-5, 1e-5)
+source crs = _sphere_
+target crs = _Lambert6_
+test tolerance = (1e-5, 1e-5)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-205662.859087179, 4976567.12932888)
+source pt = (-123.1, 49.2166666666)
+target pt = (-205662.859087179, 4976567.12932888)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(6914767.96215543, 8944877.64211284)
+source pt = (2.33656753, 43.96499314)
+target pt = (6914767.96215543, 8944877.64211284)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(-12528988.3120792, 699778.9719129)
+source pt = (151.283333333, -33.9166666666)
+target pt = (-12528988.3120792, 699778.9719129)
 
-pt_source=(-47.95, -15.75)
-pt_target=(8770667.97677009, 1149590.95763235)
+source pt = (-47.95, -15.75)
+target pt = (8770667.97677009, 1149590.95763235)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-6789805.64711139, 7107623.68588724)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-6789805.64711139, 7107623.68588724)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(16288385.6535451, 7582342.01362188)
+source pt = (18.45, -33.9166666666)
+target pt = (16288385.6535451, 7582342.01362188)
 
-pt_source=(0, 0)
-pt_target=(10870176.5302443, 6901337.87713984)
+source pt = (0, 0)
+target pt = (10870176.5302443, 6901337.87713984)
 
-pt_source=(180, 0)
-pt_target=(-6437957.7952391, 1871066.68995603)
+source pt = (180, 0)
+target pt = (-6437957.7952391, 1871066.68995603)
 
-pt_source=(-180, 0)
-pt_target=(-6437957.7952391, 1871066.68995603)
+source pt = (-180, 0)
+target pt = (-6437957.7952391, 1871066.68995603)
 
-pt_source=(90, 0)
-pt_target=(-11864397.6076844, 10138055.0105434)
+source pt = (90, 0)
+target pt = (-11864397.6076844, 10138055.0105434)
 
-pt_source=(-90, 0)
-pt_target=(3352170.60766389, 477247.912104765)
+source pt = (-90, 0)
+target pt = (3352170.60766389, 477247.912104765)
 
-pt_source=(-76, -55)
-pt_target=(9030604.19880547, -8494721.74396554)
+source pt = (-76, -55)
+target pt = (9030604.19880547, -8494721.74396554)
 
-pt_source=(12, -15)
-pt_target=(13127480.2866495, 7569018.05871254)
+source pt = (12, -15)
+target pt = (13127480.2866495, 7569018.05871254)
 
-pt_source=(80, 6)
-pt_target=(-11327573.7127649, 11304505.683228)
+source pt = (80, 6)
+target pt = (-11327573.7127649, 11304505.683228)
 
-pt_source=(-45, 71)
-pt_target=(2970740.09591458, 8534773.50616157)
+source pt = (-45, 71)
+target pt = (2970740.09591458, 8534773.50616157)
 
-pt_source=(175, 66.67)
-pt_target=(-2946260.53908498, 7821120.79982213)
+source pt = (175, 66.67)
+target pt = (-2946260.53908498, 7821120.79982213)
 
-pt_source=(60, -70)
-pt_target=(30426269.62451866,       15872835.09010968)
+source pt = (60, -70)
+target pt = (30426269.62451866,       15872835.09010968)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, 90)
-pt_target=(0.00000000,      12011381.36145192)
+source pt = (0, 90)
+target pt = (0.00000000,      12011381.36145192)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 

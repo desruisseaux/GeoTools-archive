@@ -1,8 +1,17 @@
-//AbridgedMolodenskyTransformation tests
-//the following test points are outside of the valid regions for these datums
-//Calculations were done with ArcGIS 8.3, calculations for Z were done
-//with a spreadsheet (OO.o)
-//May 29, 2004
+// AbridgedMolodenskyTransformation tests
+// the following test points are outside of the valid regions for these datums
+// Calculations were done with ArcGIS 8.3, calculations for Z were done
+// with a spreadsheet (OO.o)
+//
+// Rueben Schulz - May 29, 2004
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole AbridgedMolodensky.txt
+
 
 //nad 27 to nad 83
 set _MT_AMol1_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 3], PARAMETER["dx", -3.0], PARAMETER["dy", 142.0], PARAMETER["dz", 183.0], PARAMETER["src_semi_major", 6378206.4], PARAMETER["src_semi_minor", 6356583.8], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31414036]]

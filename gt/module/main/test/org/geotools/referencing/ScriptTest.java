@@ -172,21 +172,21 @@ public class ScriptTest extends TestCase {
 //    }
     
     /**
-     * Run the {@link #ALBERS_SCRIPT}.
+     * Run "AlbersEqualArea.txt"
      *
      * @throws Exception If a test failed.
      */
-//    public void testAlbersEqualArea() throws Exception {
-//        runScript(ALBERS_SCRIPT);
-//    }
+    public void testAlbersEqualArea() throws Exception {
+        runScript("scripts/AlbersEqualArea.txt");
+    }
     
     /**
-     * Run the {@link #LAMBERT_SCRIPT}.
+     * Run "LambertConic.txt".
      *
      * @throws Exception If a test failed.
      */
 //    public void testLambertConic() throws Exception {
-//        runScript(LAMBERT_SCRIPT);
+//        runScript("scripts/LambertConic.txt");
 //    }
     
     /**

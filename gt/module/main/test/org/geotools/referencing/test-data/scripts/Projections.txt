@@ -1,6 +1,14 @@
-//Parameterized math transform tests to test some map projections
-//These replace the hard coded tests in org.geotools.ct.ProjectionTest
-//May 27, 2004
+// Parameterized math transform tests to test some map projections
+// These replace the hard coded tests in org.geotools.ct.ProjectionTest
+//
+// Rueben Schulz - May 27, 2004
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole Projections.txt
 
 
 ////////////////////////////////////////////

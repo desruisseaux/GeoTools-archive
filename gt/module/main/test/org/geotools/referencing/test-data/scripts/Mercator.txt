@@ -1,16 +1,18 @@
-//Rueben Schulz May 15,2004
-//The following were calculated with ArcGIS 8.3 
-//(minor changes needed in projection names and parameters between ArcGIS and gt2:
+// The following were calculated with ArcGIS 8.3 
+// (minor changes needed in projection names and parameters between ArcGIS and gt2:
 // ArcGIS does not distinguish between Mercator_1SP and Mercator_2SP)
-//points with an //Error: comment could not be calculated with ArcGIS, 
-//and were instead calculated with libproj4
-//Note that the mercator is undefined at the poles
-
-// Scripts like this one can be executed invidivually use the following command-line:
-// (to be executed in the directory containing script tests. Otherwise, specify the
-// full path instead of "Mercator.txt").
+// points with an //Error: comment could not be calculated with ArcGIS, 
+// and were instead calculated with libproj4
+// Note that the mercator is undefined at the poles
 //
-// java -ea org.geotools.referencing.operation.TestConsole Mercator.txt
+// Rueben Schulz - May 15, 2004
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole Mercator.txt
 
 
 //geogCS's 

@@ -12,12 +12,19 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//Simple test cases for the Stereographic Projection
-//Spherical tests cases used the ArcInfo 'type 1' stereographic
-//Ellipse test used ArcInfo 'type 2' stereographic
+// Simple test cases for the Stereographic Projection
+// Spherical tests cases used the ArcInfo 'type 1' stereographic
+// Ellipse test used ArcInfo 'type 2' stereographic
 //
-//Rueben Schulz
-//June 22, 2003
+// Rueben Schulz
+// June 22, 2003
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole Stereographic.txt
 
 set _sphere_  = GEOGCS["Sphere", DATUM["Sphere", SPHEROID["WGS84", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
 set _sphere2_ = GEOGCS["Sphere", DATUM["Sphere", SPHEROID["WGS84", 6300000.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
@@ -42,347 +49,347 @@ set _Stereo14_ = PROJCS["Oblique Stereographic", GEOGCS["WGS84", DATUM["WGS84", 
 ////////////////////////////////////////////
 //Spherical North
 
-cs_source=_sphere_
-cs_target=_Stereo1_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere_
+target crs = _Stereo1_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-569039.6270,        4702290.0974)
+source pt = (-123.1, 49.2166666666)
+target pt = (-569039.6270,        4702290.0974)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-4001482.1176,       -3645739.640)
+source pt = (2.33656753, 43.96499314)
+target pt = (-4001482.1176,       -3645739.640)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(23459842.7218,        4680642.8947)
+source pt = (151.283333333, -33.916666666)
+target pt = (23459842.7218,        4680642.8947)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-16670888.6766,        2328106.9805)
+source pt = (-47.95,  -15.75)
+target pt = (-16670888.6766,        2328106.9805)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(6536715.3141,         -30423.4742)
+source pt = (139.733333333, 35.6833333333)
+target pt = (6536715.3141,         -30423.4742)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-12517120.9473,      -20386130.6194)
+source pt = (18.45, -33.9166666666)
+target pt = (-12517120.9473,      -20386130.6194)
 
 
 ////////////////////////////////////////////
 //Spherical South
 
-cs_source=_sphere_
-cs_target=_Stereo2_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere_
+target crs = _Stereo2_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-13447315.1416,       32029133.6112)
+source pt = (-123.1, 49.2166666666)
+target pt = (-13447315.1416,       32029133.6112)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(29301227.6488,       -5908074.5888)
+source pt = (2.33656753, 43.96499314)
+target pt = (29301227.6488,       -5908074.5888)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-6427015.6000,       -1677847.5077)
+source pt = (151.283333333, -33.916666666)
+target pt = (-6427015.6000,       -1677847.5077)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(7606887.4054,        6431688.8876)
+source pt = (-47.95,  -15.75)
+target pt = (7606887.4054,        6431688.8876)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-21451003.9982,      -12018802.8096)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-21451003.9982,      -12018802.8096)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(5968293.0902,       -2733236.3811)
+source pt = (18.45, -33.9166666666)
+target pt = (5968293.0902,       -2733236.3811)
 
 
 ////////////////////////////////////////////
 //Spherical Equitorial
 
-cs_source=_sphere_
-cs_target=_Stereo3_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere_
+target crs = _Stereo3_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-10975901.6974,       17425146.9141)
+source pt = (-123.1, 49.2166666666)
+target pt = (-10975901.6974,       17425146.9141)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=( -713822.4244,        5162871.3803)
+source pt = (2.33656753, 43.96499314)
+target pt = ( -713822.4244,        5162871.3803)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(18761641.7965,      -20169201.7279)
+source pt = (151.283333333, -33.916666666)
+target pt = (18761641.7965,      -20169201.7279)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-6880387.3644,       -2289409.5189)
+source pt = (-47.95,  -15.75)
+target pt = (-6880387.3644,       -2289409.5189)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(16554295.1489,       15458696.4976)
+source pt = (139.733333333, 35.6833333333)
+target pt = (16554295.1489,       15458696.4976)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(853342.6017,       -3904711.5139)
+source pt = (18.45, -33.9166666666)
+target pt = (853342.6017,       -3904711.5139)
 
 
-cs_source=_sphere2_
-cs_target=_Stereo4_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere2_
+target crs = _Stereo4_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(18313312.9974,       23071108.5406)
+source pt = (-123.1, 49.2166666666)
+target pt = (18313312.9974,       23071108.5406)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-2679048.8043,      102188221.1560)
+source pt = (2.33656753, 43.96499314)
+target pt = (-2679048.8043,      102188221.1560)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-7899377.2908,      -13350238.6363)
+source pt = (151.283333333, -33.916666666)
+target pt = (-7899377.2908,      -13350238.6363)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(84776405.1579,      -31575568.6281)
+source pt = (-47.95,  -15.75)
+target pt = (84776405.1579,      -31575568.6281)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-11758008.0552,       14886510.7664)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-11758008.0552,       14886510.7664)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-49376756.6233,     -108392290.3667)
+source pt = (18.45, -33.9166666666)
+target pt = (-49376756.6233,     -108392290.3667)
 
 
 ////////////////////////////////////////////
 //Spherical Oblique
 
-cs_source=_sphere_
-cs_target=_Stereo5_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere_
+target crs = _Stereo5_
+test tolerance = (1e-2, 1e-2)
 
-//pt_source=(-123.1, 49.2166666666)
-//pt_target=(5111518.3838,        3519921.2597)
+//source pt = (-123.1, 49.2166666666)
+//target pt = (5111518.3838,        3519921.2597)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-4626083.2478,        7709778.2077)
+source pt = (2.33656753, 43.96499314)
+target pt = (-4626083.2478,        7709778.2077)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(2239865.7214,      -13571053.7552)
+source pt = (151.283333333, -33.916666666)
+target pt = (2239865.7214,      -13571053.7552)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(5882861.1803,       30483752.1708)
+source pt = (-47.95,  -15.75)
+target pt = (5882861.1803,       30483752.1708)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-25202.8272,       -2745174.2686)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-25202.8272,       -2745174.2686)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-30070247.8619,        4126498.8667)
+source pt = (18.45, -33.9166666666)
+target pt = (-30070247.8619,        4126498.8667)
 
 
-cs_source=_sphere_
-cs_target=_Stereo6_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere_
+target crs = _Stereo6_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-536335.5224,       14976051.8319)
+source pt = (-123.1, 49.2166666666)
+target pt = (-536335.5224,       14976051.8319)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(35106533.5793,        8734803.7398)
+source pt = (2.33656753, 43.96499314)
+target pt = (35106533.5793,        8734803.7398)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-7344290.0367,       -3049012.9721)
+source pt = (151.283333333, -33.916666666)
+target pt = (-7344290.0367,       -3049012.9721)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(8341703.4925,         480514.1948)
+source pt = (-47.95,  -15.75)
+target pt = (8341703.4925,         480514.1948)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-22133987.2972,        7312269.0941)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-22133987.2972,        7312269.0941)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(6820762.1489,      -10340013.7044)
+source pt = (18.45, -33.9166666666)
+target pt = (6820762.1489,      -10340013.7044)
 
 
 ////////////////////////////////////////////
 //Ellipse North
 
-cs_source=_WGS84_
-cs_target=_Stereo7_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo7_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(4734112.9430,        -256390.3922)
+source pt = (-123.1, 49.2166666666)
+target pt = (4734112.9430,        -256390.3922)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-2897000.2339,        4576132.3583)
+source pt = (2.33656753, 43.96499314)
+target pt = (-2897000.2339,        4576132.3583)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(531572.7533,      -23728661.1588)
+source pt = (151.283333333, -33.916666666)
+target pt = (531572.7533,      -23728661.1588)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(5156818.7159,       15918309.4169)
+source pt = (-47.95,  -15.75)
+target pt = (5156818.7159,       15918309.4169)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-1164785.0278,       -6430662.1897)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-1164785.0278,       -6430662.1897)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-17762444.1908,       15742538.1165)
+source pt = (18.45, -33.9166666666)
+target pt = (-17762444.1908,       15742538.1165)
 
 
-cs_source=_WGS84_
-cs_target=_Stereo8_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo8_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-3942631.5543,       -2649338.4561)
+source pt = (-123.1, 49.2166666666)
+target pt = (-3942631.5543,       -2649338.4561)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(5077292.5287,       -1914846.7289)
+source pt = (2.33656753, 43.96499314)
+target pt = (5077292.5287,       -1914846.7289)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-14732828.3540,       18666157.2113)
+source pt = (151.283333333, -33.916666666)
+target pt = (-14732828.3540,       18666157.2113)
 
-pt_source=(-47.95,  -15.75)
-pt_target=( 5471869.9971,      -15846527.7746)
+source pt = (-47.95,  -15.75)
+target pt = ( 5471869.9971,      -15846527.7746)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-2945434.4200,        5847866.4702)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-2945434.4200,        5847866.4702)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(23704915.6430,       -1886433.3285)
+source pt = (18.45, -33.9166666666)
+target pt = (23704915.6430,       -1886433.3285)
 
 
 ////////////////////////////////////////
 //Elliptical South
 
-cs_source=_WGS84_
-cs_target=_Stereo9_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo9_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(26745521.5872,      19503169.7905)
+source pt = (-123.1, 49.2166666666)
+target pt = (26745521.5872,      19503169.7905)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(335506.9066,      -28973967.1999)
+source pt = (2.33656753, 43.96499314)
+target pt = (335506.9066,      -28973967.1999)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-3476092.5649,        5624613.2248)
+source pt = (151.283333333, -33.916666666)
+target pt = (-3476092.5649,        5624613.2248)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(7283623.7845,       -5908693.9040)
+source pt = (-47.95,  -15.75)
+target pt = (7283623.7845,       -5908693.9040)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-16458682.7200,       17485900.3222)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-16458682.7200,       17485900.3222)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-1761438.3929,       -6373133.3138)
+source pt = (18.45, -33.9166666666)
+target pt = (-1761438.3929,       -6373133.3138)
 
 
-cs_source=_WGS84_
-cs_target=_Stereo10_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo10_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-19468934.7924,      -27908063.5417)
+source pt = (-123.1, 49.2166666666)
+target pt = (-19468934.7924,      -27908063.5417)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-10023169.8500,       28050023.6648)
+source pt = (2.33656753, 43.96499314)
+target pt = (-10023169.8500,       28050023.6648)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(5261171.9431,       -4303664.2698)
+source pt = (151.283333333, -33.916666666)
+target pt = (5261171.9431,       -4303664.2698)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-9057118.4307,        3305475.2442)
+source pt = (-47.95,  -15.75)
+target pt = (-9057118.4307,        3305475.2442)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(21849835.1170,      -11487640.3953)
+source pt = (139.733333333, 35.6833333333)
+target pt = (21849835.1170,      -11487640.3953)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-420877.4389,        6784122.5330)
+source pt = (18.45, -33.9166666666)
+target pt = (-420877.4389,        6784122.5330)
 
 
 ////////////////////////////////////////
 //Elliptical Equitorial
 
-cs_source=_WGS84_
-cs_target=_Stereo11_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo11_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-381517.7735,      27967467.8233)
+source pt = (-123.1, 49.2166666666)
+target pt = (-381517.7735,      27967467.8233)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-5196633.8476,        6180449.7189)
+source pt = (2.33656753, 43.96499314)
+target pt = (-5196633.8476,        6180449.7189)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(11438665.7948,       -7672420.6307)
+source pt = (151.283333333, -33.916666666)
+target pt = (11438665.7948,       -7672420.6307)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-15525059.5040,       -4481382.3081)
+source pt = (-47.95,  -15.75)
+target pt = (-15525059.5040,       -4481382.3081)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(9480395.8620,        6803267.4579)
+source pt = (139.733333333, 35.6833333333)
+target pt = (9480395.8620,        6803267.4579)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-3896229.3187,       -4269843.2094)
+source pt = (18.45, -33.9166666666)
+target pt = (-3896229.3187,       -4269843.2094)
 
 
-cs_source=_WGS84_
-cs_target=_Stereo12_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo12_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-9764791.6464,       12867824.7061)
+source pt = (-123.1, 49.2166666666)
+target pt = (-9764791.6464,       12867824.7061)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(538591.9946,        4675248.9850)
+source pt = (2.33656753, 43.96499314)
+target pt = (538591.9946,        4675248.9850)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(16501209.0722,      -26357916.0339)
+source pt = (151.283333333, -33.916666666)
+target pt = (16501209.0722,      -26357916.0339)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-4581578.1738,       -1849327.3326)
+source pt = (-47.95,  -15.75)
+target pt = (-4581578.1738,       -1849327.3326)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(16269126.0087,       19618474.4606)
+source pt = (139.733333333, 35.6833333333)
+target pt = (16269126.0087,       19618474.4606)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(2084362.8747,       -3645505.7204)
+source pt = (18.45, -33.9166666666)
+target pt = (2084362.8747,       -3645505.7204)
 
 
 ////////////////////////////////////////
 //Elliptical Oblique
 
-cs_source=_WGS84_
-cs_target=_Stereo13_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo13_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-4407434.5194,        2082811.7883)
+source pt = (-123.1, 49.2166666666)
+target pt = (-4407434.5194,        2082811.7883)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(4298278.4273,         955057.5666)
+source pt = (2.33656753, 43.96499314)
+target pt = (4298278.4273,         955057.5666)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(-47167588.1622,       29071179.3031)
+source pt = (151.283333333, -33.916666666)
+target pt = (-47167588.1622,       29071179.3031)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(1067938.1787,       -8233254.2708)
+source pt = (-47.95,  -15.75)
+target pt = (1067938.1787,       -8233254.2708)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-2739234.3871,       12928389.0428)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-2739234.3871,       12928389.0428)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(13968985.4665,       -9367398.2205)
+source pt = (18.45, -33.9166666666)
+target pt = (13968985.4665,       -9367398.2205)
 
 
-cs_source=_WGS84_
-cs_target=_Stereo14_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _Stereo14_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(21084353.9245,       77613853.8593)
+source pt = (-123.1, 49.2166666666)
+target pt = (21084353.9245,       77613853.8593)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-8743580.0850,       10572818.2134)
+source pt = (2.33656753, 43.96499314)
+target pt = (-8743580.0850,       10572818.2134)
 
-pt_source=(151.283333333, -33.916666666)
-pt_target=(7981081.4514,       -4334411.3396)
+source pt = (151.283333333, -33.916666666)
+target pt = (7981081.4514,       -4334411.3396)
 
-pt_source=(-47.95,  -15.75)
-pt_target=(-13608055.3148,       -6384283.3272)
+source pt = (-47.95,  -15.75)
+target pt = (-13608055.3148,       -6384283.3272)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(11635190.0266,        8836389.2762)
+source pt = (139.733333333, 35.6833333333)
+target pt = (11635190.0266,        8836389.2762)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-4231988.1148,       -1174790.7406)
+source pt = (18.45, -33.9166666666)
+target pt = (-4231988.1148,       -1174790.7406)
 
 
 
@@ -417,140 +424,140 @@ set _DStereo12_= PROJCS["Oblique Stereographic EPSG", GEOGCS["NAD27",DATUM["Nort
 
 ////////////////////////////////////////
 //Elliptical Oblique
-cs_source=_WGS84_
-cs_target=_DStereo1_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _DStereo1_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-4398811.24918829, 4780023.58535872)
+source pt = (-123.1, 49.2166666666)
+target pt = (-4398811.24918829, 4780023.58535872)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(197487.535049174, -2946384.25777934)
+source pt = (2.33656753, 43.96499314)
+target pt = (197487.535049174, -2946384.25777934)
 
-//pt_source=(151.283333333, -33.9166666666)
+//source pt = (151.283333333, -33.9166666666)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(-47.95, -15.75)
-pt_target=(-9417083.95801759, -9170019.17553014)
+source pt = (-47.95, -15.75)
+target pt = (-9417083.95801759, -9170019.17553014)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(5013546.19775259, 7475371.30940516)
+source pt = (139.733333333, 35.6833333333)
+target pt = (5013546.19775259, 7475371.30940516)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(4486418.53520613, -15840660.7109299)
+source pt = (18.45, -33.9166666666)
+target pt = (4486418.53520613, -15840660.7109299)
 
-pt_source=(0, 90)
-pt_target=(0, 2255899.32774423)
+source pt = (0, 90)
+target pt = (0, 2255899.32774423)
 
-//pt_source=(0, -90)
+//source pt = (0, -90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
-cs_source=_WGS84_
-cs_target=_DStereo2_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _DStereo2_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-2187792.49332045, 14311891.5579733)
+source pt = (-123.1, 49.2166666666)
+target pt = (-2187792.49332045, 14311891.5579733)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(27866150.44815110, 9702053.86856459)
+source pt = (2.33656753, 43.96499314)
+target pt = (27866150.44815110, 9702053.86856459)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 //error (replaced with libproj output)
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(-7466458.20136069,       -4150816.18942717)
-//pt_target=(-7460003.39378955, -4124311.05369635)  //arcGIS output
+source pt = (151.283333333, -33.9166666666)
+target pt = (-7466458.20136069,       -4150816.18942717)
+//target pt = (-7460003.39378955, -4124311.05369635)  //arcGIS output
 
-pt_source=(-47.95, -15.75)
-pt_target=(6949231.62438508, 1382215.87566019)
+source pt = (-47.95, -15.75)
+target pt = (6949231.62438508, 1382215.87566019)
 
 //error (replaced with libproj output)
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-25009078.87841832, 5079217.18056460)
-//pt_target=(-24924065.4478382, 5124122.41314095)  //arcGIS output
+source pt = (139.733333333, 35.6833333333)
+target pt = (-25009078.87841832, 5079217.18056460)
+//target pt = (-24924065.4478382, 5124122.41314095)  //arcGIS output
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(7265980.56818263, -8446857.93987766)
+source pt = (18.45, -33.9166666666)
+target pt = (7265980.56818263, -8446857.93987766)
 
-//pt_source=(0, 90)   //libproj also fails here, may be a tolerance error
+//source pt = (0, 90)   //libproj also fails here, may be a tolerance error
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, -90)
-pt_target=(3.9914448559467E-10, -4464514.77931394)
+source pt = (0, -90)
+target pt = (3.9914448559467E-10, -4464514.77931394)
 
 
 ////////////////////////////////////////
 //Elliptical Equitorial
 
-cs_source=_WGS84_
-cs_target=_DStereo3_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _DStereo3_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666) 
-pt_target=(-10422471.5923968, 20303079.0429489)
-
-//error (replaced with libproj output)
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-1653798.70244788, 5226442.19714902)
-//pt_target=(-1767825.34583943, 5241329.09731566)  //arcGIS output
+source pt = (-123.1, 49.2166666666) 
+target pt = (-10422471.5923968, 20303079.0429489)
 
 //error (replaced with libproj output)
-pt_source=(151.283333333, -33.9166666666) 
-pt_target=(17624349.50374345, -15831595.66661218)
-//pt_target=(17436880.6584282, -15376813.6457952)  //arcGIS output
+source pt = (2.33656753, 43.96499314)
+target pt = (-1653798.70244788, 5226442.19714902)
+//target pt = (-1767825.34583943, 5241329.09731566)  //arcGIS output
 
 //error (replaced with libproj output)
-pt_source=(-47.95, -15.75) 
-pt_target=(-8367783.05840569, -2533803.44939967)
-//pt_target=(-8556259.14610263, -2569702.00752923)  //arcGIS output
+source pt = (151.283333333, -33.9166666666) 
+target pt = (17624349.50374345, -15831595.66661218)
+//target pt = (17436880.6584282, -15376813.6457952)  //arcGIS output
 
 //error (replaced with libproj output)
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(15105514.94962235, 12507132.48721923)
-//pt_target=(14910741.4194107, 12198910.9989865)  //arcGIS output
+source pt = (-47.95, -15.75) 
+target pt = (-8367783.05840569, -2533803.44939967)
+//target pt = (-8556259.14610263, -2569702.00752923)  //arcGIS output
 
 //error (replaced with libproj output)
-pt_source=(18.45, -33.9166666666)
-pt_target=(-156585.69254757,  -3868038.49689169)
-//pt_target=(-278548.416542974, -3869437.88697763)  //arcGIS output
+source pt = (139.733333333, 35.6833333333)
+target pt = (15105514.94962235, 12507132.48721923)
+//target pt = (14910741.4194107, 12198910.9989865)  //arcGIS output
 
-pt_source=(0, 90)
-pt_target=(-2.82499596765061E-10, 12713504.6284904)
+//error (replaced with libproj output)
+source pt = (18.45, -33.9166666666)
+target pt = (-156585.69254757,  -3868038.49689169)
+//target pt = (-278548.416542974, -3869437.88697763)  //arcGIS output
 
-pt_source=(0, -90)
-pt_target=(-2.82499596765061E-10, -12713504.6284904)
+source pt = (0, 90)
+target pt = (-2.82499596765061E-10, 12713504.6284904)
+
+source pt = (0, -90)
+target pt = (-2.82499596765061E-10, -12713504.6284904)
 
 
 ////////////////////////////////////////
 //Elliptical Polar
 
-cs_source=_WGS84_
-cs_target=_DStereo4_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _DStereo4_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(3772547.94163496, 456528.463621665)
+source pt = (-123.1, 49.2166666666)
+target pt = (3772547.94163496, 456528.463621665)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(-2923662.83596991, 3208946.80055835)
+source pt = (2.33656753, 43.96499314)
+target pt = (-2923662.83596991, 3208946.80055835)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(3722230.51407769, -18656185.5710066)
+source pt = (151.283333333, -33.9166666666)
+target pt = (3722230.51407769, -18656185.5710066)
 
-pt_source=(-47.95, -15.75)
-pt_target=(1854960.95732183, 13282829.3019208)
+source pt = (-47.95, -15.75)
+target pt = (1854960.95732183, 13282829.3019208)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-24379.6291743415, -5238149.13743781)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-24379.6291743415, -5238149.13743781)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-16211849.3469659, 9954104.7217239)
+source pt = (18.45, -33.9166666666)
+target pt = (-16211849.3469659, 9954104.7217239)
 
-pt_source=(0, 90)
-pt_target=(0, 0)
+source pt = (0, 90)
+target pt = (0, 0)
 
-//pt_source=(0, -90)
+//source pt = (0, -90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
 
@@ -561,66 +568,66 @@ pt_target=(0, 0)
 //Points calculated using double stereographic and stereographic are equal
 //for the north polar case above (as expected).
 
-cs_source=_WGS84_
-cs_target=_DStereo5_
-test_tolerance=(1e-2, 1e-2)
+source crs = _WGS84_
+target crs = _DStereo5_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
+source pt = (-123.1, 49.2166666666)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-pt_target=(-28505826.6173,      -18582714.5881)
+target pt = (-28505826.6173,      -18582714.5881)
 
-pt_source=(2.33656753, 43.96499314)
-//pt_target=(1230808.15179152, 30164338.8749791)
-pt_target=(1214402.5538,       29762274.5749)
+source pt = (2.33656753, 43.96499314)
+//target pt = (1230808.15179152, 30164338.8749791)
+target pt = (1214402.5538,       29762274.5749)
 
-pt_source=(151.283333333, -33.9166666666)
-//pt_target=(3310012.24359201, -6041688.15332015)
-pt_target=(3265892.6704,       -5961157.7254)
+source pt = (151.283333333, -33.9166666666)
+//target pt = (3310012.24359201, -6041688.15332015)
+target pt = (3265892.6704,       -5961157.7254)
 
-pt_source=(-47.95, -15.75)
-//pt_target=(-7256078.34586213, 6544877.05627666)
-pt_target=(-7159361.1570,        6457639.5596)
+source pt = (-47.95, -15.75)
+//target pt = (-7256078.34586213, 6544877.05627666)
+target pt = (-7159361.1570,        6457639.5596)
 
-pt_source=(139.733333333, 35.6833333333)
-//pt_target=(16171014.0080265, -19090709.4904612)
-pt_target=(15955468.5106,      -18836247.0015)
+source pt = (139.733333333, 35.6833333333)
+//target pt = (16171014.0080265, -19090709.4904612)
+target pt = (15955468.5106,      -18836247.0015)
 
-pt_source=(18.45, -33.9166666666)
-//pt_target=(2180206.51455429, 6534896.81239062)
-pt_target=(2151146.2653,        6447792.3436)
+source pt = (18.45, -33.9166666666)
+//target pt = (2180206.51455429, 6534896.81239062)
+target pt = (2151146.2653,        6447792.3436)
 
-//pt_source=(0, 90)
+//source pt = (0, 90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, -90)
-pt_target=(0, 0)
+source pt = (0, -90)
+target pt = (0, 0)
 
 
 ////////////////////////////////////////
 //Other tests
 
 //a test point from the EPSG guide book 7
-cs_source=_Bessel_
-cs_target=_DStereo10_
-test_tolerance=(1e-2, 1e-2)
+source crs = _Bessel_
+target crs = _DStereo10_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(6.0,53.0)
-pt_target=(196105.283, 557057.739)
+source pt = (6.0,53.0)
+target pt = (196105.283, 557057.739)
 
 //examples from UNB reports
-cs_source=_Nad27_
-cs_target=_DStereo11_
-test_tolerance=(1e-2, 1e-2)
+source crs = _Nad27_
+target crs = _DStereo11_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-65.484292500000020, 47.056845555555560)
-pt_target=(377164.887, 862395.774)
+source pt = (-65.484292500000020, 47.056845555555560)
+target pt = (377164.887, 862395.774)
 
-cs_source=_Nad27_
-cs_target=_DStereo12_
-test_tolerance=(1e-2, 1e-2)
+source crs = _Nad27_
+target crs = _DStereo12_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-64.49278166666670, 46.707818611111120)
-pt_target=(585855.446,340817.760)
+source pt = (-64.49278166666670, 46.707818611111120)
+target pt = (585855.446,340817.760)
 
 
 
@@ -633,143 +640,143 @@ set _DStereo9_ = PROJCS["Oblique Stereographic", GEOGCS["Sphere", DATUM["Sphere"
 ////////////////////////////////////////
 //Spherical Polar
 
-cs_source=_sphere3_
-cs_target=_DStereo6_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere3_
+target crs = _DStereo6_
+test tolerance = (1e-2, 1e-2)
 
-//pt_source=(-123.1, 49.2166666666)
+//source pt = (-123.1, 49.2166666666)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(1222790.97629403, 29967855.9396212)
+source pt = (2.33656753, 43.96499314)
+target pt = (1222790.97629403, 29967855.9396212)
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(3260975.84097009, -5952183.1512236)
+source pt = (151.283333333, -33.9166666666)
+target pt = (3260975.84097009, -5952183.1512236)
 
-pt_source=(-47.95, -15.75)
-pt_target=(-7162325.06507552, 6460312.9615793)
+source pt = (-47.95, -15.75)
+target pt = (-7162325.06507552, 6460312.9615793)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(16053723.026356, -18952241.4849415)
+source pt = (139.733333333, 35.6833333333)
+target pt = (16053723.026356, -18952241.4849415)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(2147907.69612739, 6438085.13690347)
+source pt = (18.45, -33.9166666666)
+target pt = (2147907.69612739, 6438085.13690347)
 
-//pt_source=(0, 90)
+//source pt = (0, 90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(0, -90)
-pt_target=(0, 0)
+source pt = (0, -90)
+target pt = (0, 0)
 
 
 ////////////////////////////////////////
 //Spherical Equitorial
 
-cs_source=_sphere3_
-cs_target=_DStereo7_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere3_
+target crs = _DStereo7_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-7177457.04562655, 8502789.26341092)
+source pt = (-123.1, 49.2166666666)
+target pt = (-7177457.04562655, 8502789.26341092)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(4532964.6771832, 5945604.3806171)
+source pt = (2.33656753, 43.96499314)
+target pt = (4532964.6771832, 5945604.3806171)
 
-//pt_source=(151.283333333, -33.9166666666)
+//source pt = (151.283333333, -33.9166666666)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(-47.95, -15.75)
-pt_target=(-321816.428830414, -1763578.32357749)
+source pt = (-47.95, -15.75)
+target pt = (-321816.428830414, -1763578.32357749)
 
-//pt_source=(139.733333333, 35.6833333333)
+//source pt = (139.733333333, 35.6833333333)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(6899624.53423796, -5186179.56202058)
+source pt = (18.45, -33.9166666666)
+target pt = (6899624.53423796, -5186179.56202058)
 
 //the long. of the the next 2 points were changed from arcGIS output (was 0)
 //we have differing views about what the long. of a pole should be.
-pt_source=(-45, 90)
-pt_target=(5.5168238290053E-10, 12742000)
+source pt = (-45, 90)
+target pt = (5.5168238290053E-10, 12742000)
 
-pt_source=(-45, -90)
-pt_target=(5.5168238290053E-10, -12742000)
+source pt = (-45, -90)
+target pt = (5.5168238290053E-10, -12742000)
 
-cs_source=_DStereo7_
-cs_target=_sphere3_
-test_tolerance=(1e-5, 1e-5)
+source crs = _DStereo7_
+target crs = _sphere3_
+test tolerance = (1e-5, 1e-5)
 
-pt_source=(5.5168238290053E-10, 12742000)
-pt_target=(-45, 90)
+source pt = (5.5168238290053E-10, 12742000)
+target pt = (-45, 90)
 
-pt_source=(5.5168238290053E-10, -12742000)
-pt_target=(-45, -90)
+source pt = (5.5168238290053E-10, -12742000)
+target pt = (-45, -90)
 
 
 ////////////////////////////////////////
 //Spherical Oblique
 
-cs_source=_sphere3_
-cs_target=_DStereo8_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere3_
+target crs = _DStereo8_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(-4302563.66689065, 213187.830274701)
+source pt = (-123.1, 49.2166666666)
+target pt = (-4302563.66689065, 213187.830274701)
 
-pt_source=(2.33656753, 43.96499314)
-pt_target=(4324891.73045712, -910713.807515885)
+source pt = (2.33656753, 43.96499314)
+target pt = (4324891.73045712, -910713.807515885)
 
-//pt_source=(151.283333333, -33.9166666666)
+//source pt = (151.283333333, -33.9166666666)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(-47.95, -15.75)
-pt_target=(1404583.27391585, -11776410.5577183)
+source pt = (-47.95, -15.75)
+target pt = (1404583.27391585, -11776410.5577183)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-2057243.67777944, 9338231.09361794)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-2057243.67777944, 9338231.09361794)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(18213225.8877641, -9455459.3973766)
+source pt = (18.45, -33.9166666666)
+target pt = (18213225.8877641, -9455459.3973766)
 
-pt_source=(0, 90)
-pt_target=(3.29485054216154E-10, 2246758.38818726)
+source pt = (0, 90)
+target pt = (3.29485054216154E-10, 2246758.38818726)
 
-//pt_source=(0, -90)
+//source pt = (0, -90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-cs_source=_sphere3_
-cs_target=_DStereo9_
-test_tolerance=(1e-2, 1e-2)
+source crs = _sphere3_
+target crs = _DStereo9_
+test tolerance = (1e-2, 1e-2)
 
-pt_source=(-123.1, 49.2166666666)
-pt_target=(8025167.41865162, 10659462.713673)
+source pt = (-123.1, 49.2166666666)
+target pt = (8025167.41865162, 10659462.713673)
 
-//pt_source=(2.33656753, 43.96499314)
+//source pt = (2.33656753, 43.96499314)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 
-pt_source=(151.283333333, -33.9166666666)
-pt_target=(-1751021.5482452, -1465895.97287927)
+source pt = (151.283333333, -33.9166666666)
+target pt = (-1751021.5482452, -1465895.97287927)
 
-pt_source=(-47.95, -15.75)
-pt_target=(18949003.1287529, -17159231.214752)
+source pt = (-47.95, -15.75)
+target pt = (18949003.1287529, -17159231.214752)
 
-pt_source=(139.733333333, 35.6833333333)
-pt_target=(-3642974.56059216, 7151031.37033279)
+source pt = (139.733333333, 35.6833333333)
+target pt = (-3642974.56059216, 7151031.37033279)
 
-pt_source=(18.45, -33.9166666666)
-pt_target=(-9459391.5721868, -18919110.2925948)
+source pt = (18.45, -33.9166666666)
+target pt = (-9459391.5721868, -18919110.2925948)
 
 //the long. of the the next 2 points were changed from arcGIS output (was 0)
 //we have differing views about what the long. of a pole should be.
-pt_source=(170, 90)
-pt_target=(-2.16631219873976E-10, 18890791.8607893)
+source pt = (170, 90)
+target pt = (-2.16631219873976E-10, 18890791.8607893)
 
-pt_source=(170, -90)
-pt_target=(-9.85589165790218E-11, -8594587.5216062)
+source pt = (170, -90)
+target pt = (-9.85589165790218E-11, -8594587.5216062)
 
-cs_source=_DStereo9_
-cs_target=_sphere3_
-test_tolerance=(1e-5, 1e-5)
+source crs = _DStereo9_
+target crs = _sphere3_
+test tolerance = (1e-5, 1e-5)
 
-pt_source=(-9.85589165790218E-11, -8594587.5216062)
-pt_target=(170, -90)
+source pt = (-9.85589165790218E-11, -8594587.5216062)
+target pt = (170, -90)

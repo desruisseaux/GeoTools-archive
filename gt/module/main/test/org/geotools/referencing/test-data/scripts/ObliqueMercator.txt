@@ -1,8 +1,16 @@
-//Tests for the oblique mercator projection, mostly calculated with ArcGIS 9.0.
-//Some test points comes from the proj4 email list, epsg guidebook 7 and Snyder.
-//The test for an azimuth of -90 was actually calculated for azimuth of -89.999999
-//Run with asserts enabled to test the inverse projection
-//Jan 2, 2005
+// Tests for the oblique mercator projection, mostly calculated with ArcGIS 9.0.
+// Some test points comes from the proj4 email list, epsg guidebook 7 and Snyder.
+// The test for an azimuth of -90 was actually calculated for azimuth of -89.999999
+// Run with asserts enabled to test the inverse projection
+//
+// Rueben Schulz - Jan 2, 2005
+//
+//
+// --------------------------------------------------------------------------
+// How to run this script:
+//
+//    chdir org/geotools/referencing/test-data/scripts
+//    java -ea org.geotools.referencing.operation.TestConsole ObliqueMercator.txt
 
 
 //geogCS's 

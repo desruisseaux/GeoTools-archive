@@ -127,136 +127,136 @@ set _VmslhMinus7_=FITTED_CS["Mean sea level minus 7",_Add7_,_Vmslh_]
 // Test horizontal datum shifts.
 // Test cases copied from DMA TR 8350.2-B, using regression polynomials.
 
-cs_target=_Wgs84Z_
-test_tolerance=(1e-5,1e-5,1)
+target crs = _Wgs84Z_
+test tolerance = (1e-5,1e-5,1)
 
-cs_source=_EPSG:4267Z_
-pt_source=(34.78578694,273.41884028,0)
-pt_target=(34.78588583,273.41886250,-38.06)
+source crs = _EPSG:4267Z_
+source pt = (34.78578694,273.41884028,0)
+target pt = (34.78588583,273.41886250,-38.06)
 
-cs_source=_EPSG:4291Z_
-pt_source=(-31.94276500,294.89481722,0)
-pt_target=(-31.94314167,294.89421778,20.27)
+source crs = _EPSG:4291Z_
+source pt = (-31.94276500,294.89481722,0)
+target pt = (-31.94314167,294.89421778,20.27)
 
-cs_source=_EPSG:4230Z_
-pt_source=(46.69524806,13.91502444,0)
-pt_target=(46.69439222,13.91405611,41.21)
+source crs = _EPSG:4230Z_
+source pt = (46.69524806,13.91502444,0)
+target pt = (46.69439222,13.91405611,41.21)
 
-cs_source=_EPSG:4301Z_
-pt_source=(40.71062778,141.37332750,0)
-pt_target=(40.71330389,141.36982806,20.99)
+source crs = _EPSG:4301Z_
+source pt = (40.71062778,141.37332750,0)
+target pt = (40.71330389,141.36982806,20.99)
 
-cs_source=_EPSG:4202Z_
-pt_source=(-17.00910444,144.19367917,0)
-pt_target=(-17.00758222,144.19476861,57.28)
+source crs = _EPSG:4202Z_
+source pt = (-17.00910444,144.19367917,0)
+target pt = (-17.00758222,144.19476861,57.28)
 
-cs_source=_EPSG:4203Z_
-pt_source=(-20.63352028,144.40813556,0)
-pt_target=(-20.63199111,144.40927694,47.84)
+source crs = _EPSG:4203Z_
+source pt = (-20.63352028,144.40813556,0)
+target pt = (-20.63199111,144.40927694,47.84)
 
-cs_source=_EPSG:4201Z_
-pt_source=(9.08673611,36.58023667,0)
-pt_target=(9.08780833,36.58104194,-0.90)
+source crs = _EPSG:4201Z_
+source pt = (9.08673611,36.58023667,0)
+target pt = (9.08780833,36.58104194,-0.90)
 
-cs_source=_EPSG:4209Z_
-pt_source=(-21.15097222,27.51075667,0)
-pt_target=(-21.15183250,27.51050083,12.03)
+source crs = _EPSG:4209Z_
+source pt = (-21.15097222,27.51075667,0)
+target pt = (-21.15183250,27.51050083,12.03)
 
-cs_source=_EPSG:4210Z_
-pt_source=(-6.05910000,35.92201361,0)
-pt_target=(-6.06138222,35.92277528,5.69)
+source crs = _EPSG:4210Z_
+source pt = (-6.05910000,35.92201361,0)
+target pt = (-6.06138222,35.92277528,5.69)
 
-cs_source=_EPSG:4216Z_
-pt_source=(32.35241861,295.34362583,0)
-pt_target=(32.35381972,295.34390250,-29.44)
+source crs = _EPSG:4216Z_
+source pt = (32.35241861,295.34362583,0)
+target pt = (32.35381972,295.34390250,-29.44)
 
-cs_source=_EPSG:4218Z_
-pt_source=(2.57395028,287.36020361,0)
-pt_target=(2.57109583,287.36366639,33.29)
+source crs = _EPSG:4218Z_
+source pt = (2.57395028,287.36020361,0)
+target pt = (2.57109583,287.36366639,33.29)
 
-cs_source=_EPSG:4221Z_
-pt_source=(-29.79602278,301.87272306,0)
-pt_target=(-29.79548028,301.87217778,18.29)
+source crs = _EPSG:4221Z_
+source pt = (-29.79602278,301.87272306,0)
+target pt = (-29.79548028,301.87217778,18.29)
 
-cs_source=_EPSG:4222Z_
-pt_source=(-22.25379944,29.16319111,0)
-pt_target=(-22.25459778,29.16294694,14.63)
+source crs = _EPSG:4222Z_
+source pt = (-22.25379944,29.16319111,0)
+target pt = (-22.25459778,29.16294694,14.63)
 
-cs_source=_EPSG:4223Z_
-pt_source=(36.82255778,10.76911500,0)
-pt_target=(36.82402444,10.76981333,39.19)
+source crs = _EPSG:4223Z_
+source pt = (36.82255778,10.76911500,0)
+target pt = (36.82402444,10.76981333,39.19)
 
-cs_source=_EPSG:4224Z_
-pt_source=(-25.32313056,305.41314306,0)
-pt_target=(-25.32377556,305.41340889,8.14)
+source crs = _EPSG:4224Z_
+source pt = (-25.32313056,305.41314306,0)
+target pt = (-25.32377556,305.41340889,8.14)
 
-cs_source=_EPSG:4225Z_
-pt_source=(-20.48361639,305.21300806,0)
-pt_target=(-20.48390250,305.21242444,-5.16)
+source crs = _EPSG:4225Z_
+source pt = (-20.48361639,305.21300806,0)
+target pt = (-20.48390250,305.21242444,-5.16)
 
-cs_source=_EPSG:4280Z_
-pt_source=(5.43096528,95.54227167,0)
-pt_target=(5.43001833,95.54504389,-31.04)
+source crs = _EPSG:4280Z_
+source pt = (5.43096528,95.54227167,0)
+target pt = (5.43001833,95.54504389,-31.04)
 
-cs_source=_EPSG:4272Z_
-pt_source=(-41.29223611,173.25427917,0)
-pt_target=(-41.29052056,173.25443333,8.27)
+source crs = _EPSG:4272Z_
+source pt = (-41.29223611,173.25427917,0)
+target pt = (-41.29052056,173.25443333,8.27)
 
-cs_source=_EPSG:4244Z_
-pt_source=(7.61742500,81.68048611,0)
-pt_target=(7.61771361,81.68238417,-87.21)
+source crs = _EPSG:4244Z_
+source pt = (7.61742500,81.68048611,0)
+target pt = (7.61771361,81.68238417,-87.21)
 
-cs_source=_EPSG:4245Z_
-pt_source=(3.46408611,102.62348611,0)
-pt_target=(3.46387528,102.62190722,0.58)
+source crs = _EPSG:4245Z_
+source pt = (3.46408611,102.62348611,0)
+target pt = (3.46387528,102.62190722,0.58)
 
-cs_source=_EPSG:4251Z_
-pt_source=(7.51998778,351.48173472,0)
-pt_target=(7.52009444,351.48197444,23.06)
+source crs = _EPSG:4251Z_
+source pt = (7.51998778,351.48173472,0)
+target pt = (7.52009444,351.48197444,23.06)
 
-cs_source=_EPSG:4253Z_
-pt_source=(6.10806667,125.17895278,0)
-pt_target=(6.10696306,125.18033778,70.55)
+source crs = _EPSG:4253Z_
+source pt = (6.10806667,125.17895278,0)
+target pt = (6.10696306,125.18033778,70.55)
 
-cs_source=_EPSG:4261Z_
-pt_source=(35.14442833,357.57036306,0)
-pt_target=(35.14168861,357.57193944,41.46)
+source crs = _EPSG:4261Z_
+source pt = (35.14442833,357.57036306,0)
+target pt = (35.14168861,357.57193944,41.46)
 
-cs_source=_EPSG:4263Z_
-pt_source=(9.31918083,12.23059028,0)
-pt_target=(9.31943917,12.22993806,13.43)
+source crs = _EPSG:4263Z_
+source pt = (9.31918083,12.23059028,0)
+target pt = (9.31943917,12.22993806,13.43)
 
-cs_source=_EPSG:4270Z_
-pt_source=(24.96879750,55.00214444,0)
-pt_target=(24.97054083,55.00327194,-33.88)
+source crs = _EPSG:4270Z_
+source pt = (24.96879750,55.00214444,0)
+target pt = (24.97054083,55.00327194,-33.88)
 
-cs_source=_EPSG:4229Z_
-pt_source=(29.83398667,30.59947167,0)
-pt_target=(29.83416306,30.60113056,8.93)
+source crs = _EPSG:4229Z_
+source pt = (29.83398667,30.59947167,0)
+target pt = (29.83416306,30.60113056,8.93)
 
-cs_source=_EPSG:4135Z_
-pt_source=(21.57293889,201.73711972,0)
-pt_target=(21.56978222,201.73986500,16.51)
+source crs = _EPSG:4135Z_
+source pt = (21.57293889,201.73711972,0)
+target pt = (21.56978222,201.73986500,16.51)
 
-cs_source=_EPSG:4277Z_
-pt_source=(52.14298472,358.03336639,0)
-pt_target=(52.14340833,358.03193278,47.17)
+source crs = _EPSG:4277Z_
+source pt = (52.14298472,358.03336639,0)
+target pt = (52.14340833,358.03193278,47.17)
 
-cs_source=_EPSG:4248Z_
-pt_source=(-16.52608417,291.83361500,0)
-pt_target=(-16.52970111,291.83186694,99.51)
+source crs = _EPSG:4248Z_
+source pt = (-16.52608417,291.83361500,0)
+target pt = (-16.52970111,291.83186694,99.51)
 
-cs_source=_EPSG:4139Z_
-pt_source=(18.36708972,292.73404111,0)
-pt_target=(18.36507667,292.73441917,-46.24)
+source crs = _EPSG:4139Z_
+source pt = (18.36708972,292.73404111,0)
+target pt = (18.36507667,292.73441917,-46.24)
 
-cs_source=_EPSG:4298Z_
-pt_source=(5.01092583,115.04624444,0)
-pt_target=(5.01007278,115.04923278,51.43)
+source crs = _EPSG:4298Z_
+source pt = (5.01092583,115.04624444,0)
+target pt = (5.01007278,115.04923278,51.43)
 
-cs_source=_EPSG:4311Z_
-pt_source=(5.45262528,304.79652389,0)
-pt_target=(5.44945000,304.79516694,-32.33)
+source crs = _EPSG:4311Z_
+source pt = (5.45262528,304.79652389,0)
+target pt = (5.44945000,304.79516694,-32.33)
 
 
 
@@ -264,293 +264,293 @@ pt_target=(5.44945000,304.79516694,-32.33)
 // Test conversions between ellipsoidal and geoid (sea-level) heights. 
 
 // Use large tolerance in Z, since accurate transformations are classified.
-test_tolerance=(1e-5,1e-5,5)
+test tolerance = (1e-5,1e-5,5)
 
-cs_source=_Ed50Z_
-cs_target=_Ed50EZ_
+source crs = _Ed50Z_
+target crs = _Ed50EZ_
 
-pt_source=(57,-5,0)
-pt_target=(57,-5,10)
+source pt = (57,-5,0)
+target pt = (57,-5,10)
 
-cs_source=_Wgs84Z_
-cs_target=_Wgs84EZ_
+source crs = _Wgs84Z_
+target crs = _Wgs84EZ_
 
-pt_source=(20,200,0)
-pt_target=(20,200,7)
+source pt = (20,200,0)
+target pt = (20,200,7)
 
-pt_source=(15,200,0)
-pt_target=(15,200,9)
+source pt = (15,200,0)
+target pt = (15,200,9)
 
-cs_source=_Ed50Z_
-cs_target=_Wgs84Z_
+source crs = _Ed50Z_
+target crs = _Wgs84Z_
 
-pt_source=(46,13,0)
-pt_target=(45.99911,12.99902,42)
+source pt = (46,13,0)
+target pt = (45.99911,12.99902,42)
 
-cs_source=_Osgb36EZ_
-cs_target=_Wgs84EZ_
+source crs = _Osgb36EZ_
+target crs = _Wgs84EZ_
 
-pt_source=(49,-2,0)
-pt_target=(49.000498299229,-2.0012406564658,48)
+source pt = (49,-2,0)
+target pt = (49.000498299229,-2.0012406564658,48)
 
 
 
 ///////////////////////////////////////////////////////////////
 // Test geocentric coordinate transformations.
 
-cs_source=_GccWgs84OEN_
-cs_target=_GccOsgb36OEN_
-test_tolerance=1e-3
+source crs = _GccWgs84OEN_
+target crs = _GccOsgb36OEN_
+test tolerance = 1e-3
 
-pt_source=(6378137,0,0)
-pt_target=(6377762,111,-431)
+source pt = (6378137,0,0)
+target pt = (6377762,111,-431)
 
-cs_source=_GccWgs84ONWcm_
-cs_target=_Wgs84SW_
-test_tolerance=1e-3
+source crs = _GccWgs84ONWcm_
+target crs = _Wgs84SW_
+test tolerance = 1e-3
 
-pt_source=(637813700,0,0)
-pt_target=(0,0)
+source pt = (637813700,0,0)
+target pt = (0,0)
 
-pt_source=(0,-635675231.424518,0)
-pt_target=(90,0)
+source pt = (0,-635675231.424518,0)
+target pt = (90,0)
 
-pt_source=(0,635675231.424518,0)
-pt_target=(-90,0)
+source pt = (0,635675231.424518,0)
+target pt = (-90,0)
 
-pt_source=(0,0,637813700)
-pt_target=(0,90)
+source pt = (0,0,637813700)
+target pt = (0,90)
 
-cs_source=_Wgs84SW_
-cs_target=_GccWgs84ONWcm_
-test_tolerance=1e-3
+source crs = _Wgs84SW_
+target crs = _GccWgs84ONWcm_
+test tolerance = 1e-3
 
-pt_source=(0,0)
-pt_target=(637813700,0,0)
+source pt = (0,0)
+target pt = (637813700,0,0)
 
-pt_source=(90,0)
-pt_target=(0,-635675231.424518,0)
+source pt = (90,0)
+target pt = (0,-635675231.424518,0)
 
-pt_source=(-90,0)
-pt_target=(0,635675231.424518,0)
+source pt = (-90,0)
+target pt = (0,635675231.424518,0)
 
-pt_source=(0,90)
-pt_target=(0,0,637813700)
+source pt = (0,90)
+target pt = (0,0,637813700)
 
-cs_source=_Wgs84SW_
-cs_target=_GccWgs84OEN_
-test_tolerance=1e-3
+source crs = _Wgs84SW_
+target crs = _GccWgs84OEN_
+test tolerance = 1e-3
 
-pt_source=(0,0)
-pt_target=(6378137,0,0)
+source pt = (0,0)
+target pt = (6378137,0,0)
 
-pt_source=(90,0)
-pt_target=(0,0,-6356752.31424518)
+source pt = (90,0)
+target pt = (0,0,-6356752.31424518)
 
-pt_source=(-90,0)
-pt_target=(0,0,6356752.31424518)
+source pt = (-90,0)
+target pt = (0,0,6356752.31424518)
 
-pt_source=(0,90)
-pt_target=(0,-6378137,0)
+source pt = (0,90)
+target pt = (0,-6378137,0)
 
-cs_source=_Wgs84NE_
-cs_target=_GccWgs84OEN_
-test_tolerance=1e-3
+source crs = _Wgs84NE_
+target crs = _GccWgs84OEN_
+test tolerance = 1e-3
 
-pt_source=(0,0)
-pt_target=(6378137,0,0)
+source pt = (0,0)
+target pt = (6378137,0,0)
 
-pt_source=(90,0)
-pt_target=(0,0,6356752.31424518)
+source pt = (90,0)
+target pt = (0,0,6356752.31424518)
 
-pt_source=(-90,0)
-pt_target=(0,0,-6356752.31424518)
+source pt = (-90,0)
+target pt = (0,0,-6356752.31424518)
 
-pt_source=(0,90)
-pt_target=(0,6378137,0)
+source pt = (0,90)
+target pt = (0,6378137,0)
 
 
 
 ///////////////////////////////////////////////////////////////
 // Test Transverse Mercator projections.
 
-cs_source=_Osgb36Z_
-cs_target=_Wgs84Z_
-test_tolerance=(1e-5,1e-5,1)
+source crs = _Osgb36Z_
+target crs = _Wgs84Z_
+test tolerance = (1e-5,1e-5,1)
 
-pt_source=(49,-2,120)
-pt_target=(49.000498299229,-2.0012406564658,168.19377592067)
+source pt = (49,-2,120)
+target pt = (49.000498299229,-2.0012406564658,168.19377592067)
 
-cs_source=_Osgb36Z_
-cs_target=_BritNatGridNWZkm_
-test_tolerance=1e-3
+source crs = _Osgb36Z_
+target crs = _BritNatGridNWZkm_
+test tolerance = 1e-3
 
-pt_source=(49,-2,120)
-pt_target=(-100000,-400000,-0.12)
+source pt = (49,-2,120)
+target pt = (-100000,-400000,-0.12)
 
-cs_source=_Osgb36_
-cs_target=_BritNatGrid_
-test_tolerance=1e-3
+source crs = _Osgb36_
+target crs = _BritNatGrid_
+test tolerance = 1e-3
 
-pt_source=(49,-2)
-pt_target=(400000,-100000)
+source pt = (49,-2)
+target pt = (400000,-100000)
 
-cs_source=_BritNatGrid_
-cs_target=_BritNatGridcm_
-test_tolerance=1e-3
+source crs = _BritNatGrid_
+target crs = _BritNatGridcm_
+test tolerance = 1e-3
 
-pt_source=(23,34)
-pt_target=(2300,3400)
+source pt = (23,34)
+target pt = (2300,3400)
 
-cs_source=_France1_
-cs_target=_Wgs84NE_
-test_tolerance=(1e-5)
+source crs = _France1_
+target crs = _Wgs84NE_
+test tolerance = (1e-5)
 
-pt_source=(0,0)
-pt_target=(38.5200741443094,-4.43593261406989)
+source pt = (0,0)
+target pt = (38.5200741443094,-4.43593261406989)
 
-cs_source=_NAD27Idaho_
-cs_target=_NAD83Idaho_
-test_tolerance=(1e-5)
+source crs = _NAD27Idaho_
+target crs = _NAD83Idaho_
+test tolerance = (1e-5)
 
-pt_source=(30000,40000)
-pt_target=(356672.14701,12183.56326)
+source pt = (30000,40000)
+target pt = (356672.14701,12183.56326)
 
 ///////////////////////////////////////////////////////////////
 // Test Fitted coordinate systems, and axes flips
 
-//cs_source=_ZOsgb36_
-//cs_target=_ZMinus7FitOsgb36_
-//test_tolerance=1e-3
+//source crs = _ZOsgb36_
+//target crs = _ZMinus7FitOsgb36_
+//test tolerance = 1e-3
 
-//pt_source=(0,2102,2003)
-//pt_target=(-7,100,2000)
+//source pt = (0,2102,2003)
+//target pt = (-7,100,2000)
 
-//cs_source=_Vmslh_
-//cs_target=_VmslhMinus7_
-//test_tolerance=1e-3
+//source crs = _Vmslh_
+//target crs = _VmslhMinus7_
+//test tolerance = 1e-3
 
-//pt_source=(23)
-//pt_target=(16)
+//source pt = (23)
+//target pt = (16)
 
-//cs_source=_ZkmFitOsgb36_
-//cs_target=_ZOsgb36_
-//test_tolerance=1e-3
+//source crs = _ZkmFitOsgb36_
+//target crs = _ZOsgb36_
+//test tolerance = 1e-3
 
-//pt_source=(0,100,2000)
-//pt_target=(0,2102,2003)
+//source pt = (0,100,2000)
+//target pt = (0,2102,2003)
 
-//cs_source=_FitOsgb36_
-//cs_target=_Osgb36_
-//test_tolerance=1e-3
+//source crs = _FitOsgb36_
+//target crs = _Osgb36_
+//test tolerance = 1e-3
 
-//pt_source=(0,0)
-//pt_target=(2,3)
+//source pt = (0,0)
+//target pt = (2,3)
 
-//pt_source=(100,2000)
-//pt_target=(2102,2003)
+//source pt = (100,2000)
+//target pt = (2102,2003)
 
-cs_source=_Osgb36Z_
-cs_target=_Osgb36Zkm_
-test_tolerance=1e-3
+source crs = _Osgb36Z_
+target crs = _Osgb36Zkm_
+test tolerance = 1e-3
 
-pt_source=(1,2,3)
-pt_target=(1,2,-0.003)
+source pt = (1,2,3)
+target pt = (1,2,-0.003)
 
-cs_source=_Osgb36Z_
-cs_target=_ZkmOsgb36_
-test_tolerance=1e-3
+source crs = _Osgb36Z_
+target crs = _ZkmOsgb36_
+test tolerance = 1e-3
 
-pt_source=(1,2,3)
-pt_target=(-0.003,1,2)
+source pt = (1,2,3)
+target pt = (-0.003,1,2)
 
-cs_source=_Osgb36Z_
-cs_target=_ZOsgb36_
-test_tolerance=1e-3
+source crs = _Osgb36Z_
+target crs = _ZOsgb36_
+test tolerance = 1e-3
 
-pt_source=(1,2,3)
-pt_target=(3,1,2)
+source pt = (1,2,3)
+target pt = (3,1,2)
 
-cs_source=_Osgb36Z_
-cs_target=_Osgb36Z_
-test_tolerance=1e-3
+source crs = _Osgb36Z_
+target crs = _Osgb36Z_
+test tolerance = 1e-3
 
-pt_source=(1,2,3)
-pt_target=(1,2,3)
+source pt = (1,2,3)
+target pt = (1,2,3)
 
-cs_source=_Vmslh_
-cs_target=_VmsldKm_
-test_tolerance=1e-3
+source crs = _Vmslh_
+target crs = _VmsldKm_
+test tolerance = 1e-3
 
-pt_source=(100)
-pt_target=(-0.1)
+source pt = (100)
+target pt = (-0.1)
 
-cs_source=_GccWgs84OEN_
-cs_target=_GccWgs84ONWcm_
-test_tolerance=1e-3
+source crs = _GccWgs84OEN_
+target crs = _GccWgs84ONWcm_
+test tolerance = 1e-3
 
-pt_source=(1,2,3)
-pt_target=(100,300,-200)
+source pt = (1,2,3)
+target pt = (100,300,-200)
 
-cs_source=_Wgs84NE_
-cs_target=_GccWgs84OEN_
-test_tolerance=1e-3
+source crs = _Wgs84NE_
+target crs = _GccWgs84OEN_
+test tolerance = 1e-3
 
-pt_source=(0,0)
-pt_target=(6378137,0,0)
+source pt = (0,0)
+target pt = (6378137,0,0)
 
-cs_source=_BritNatGridNW_
-cs_target=_BritNatGrid_
-test_tolerance=1e-3
+source crs = _BritNatGridNW_
+target crs = _BritNatGrid_
+test tolerance = 1e-3
 
-pt_source=(100,200)
-pt_target=(-200,100)
+source pt = (100,200)
+target pt = (-200,100)
 
-cs_source=_Wgs84NE_
-cs_target=_Wgs84ES23W_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _Wgs84ES23W_
+test tolerance = 1e-6
 
-pt_source=(1,2)
-pt_target=(25,-1)
+source pt = (1,2)
+target pt = (25,-1)
 
-cs_source=_Wgs84NE_
-cs_target=_Wgs84NE23W_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _Wgs84NE23W_
+test tolerance = 1e-6
 
-pt_source=(1,2)
-pt_target=(1,25)
+source pt = (1,2)
+target pt = (1,25)
 
-cs_source=_Wgs84NE_
-cs_target=_Wgs84SE_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _Wgs84SE_
+test tolerance = 1e-6
 
-pt_source=(1,2)
-pt_target=(-1,2)
+source pt = (1,2)
+target pt = (-1,2)
 
-cs_source=_Wgs84NE_
-cs_target=_Wgs84EN_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _Wgs84EN_
+test tolerance = 1e-6
 
-pt_source=(1,2)
-pt_target=(2,1)
+source pt = (1,2)
+target pt = (2,1)
 
-cs_source=_Wgs84NE_
-cs_target=_Wgs84SW_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _Wgs84SW_
+test tolerance = 1e-6
 
-pt_source=(1,2)
-pt_target=(-1,-2)
+source pt = (1,2)
+target pt = (-1,-2)
 
-cs_source=_Wgs84NE_
-cs_target=_NtfParis_
-test_tolerance=1e-6
+source crs = _Wgs84NE_
+target crs = _NtfParis_
+test tolerance = 1e-6
 
-pt_source=(45,0)
-pt_target=(50.0000443768998,-2.59607577885018)
+source pt = (45,0)
+target pt = (50.0000443768998,-2.59607577885018)
 
-cs_source=_NtfParis_
-cs_target=_Wgs84NE_
-test_tolerance=1e-6
+source crs = _NtfParis_
+target crs = _Wgs84NE_
+test tolerance = 1e-6
 
-pt_source=(50.0000443768998,-2.59607577885018)
-pt_target=(45,0)
+source pt = (50.0000443768998,-2.59607577885018)
+target pt = (45,0)
