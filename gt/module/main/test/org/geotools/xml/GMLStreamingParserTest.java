@@ -37,7 +37,7 @@ public class GMLStreamingParserTest extends TestCase {
             XSISAXHandler.setLogLevel(Level.FINEST);
             XMLElementHandler.setLogLevel(Level.FINEST);
             XSIElementHandler.setLogLevel(Level.FINEST);
-            fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10,10000);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -65,7 +65,7 @@ public class GMLStreamingParserTest extends TestCase {
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10,10000);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -94,7 +94,7 @@ public class GMLStreamingParserTest extends TestCase {
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            fr = FCBuffer.getFeatureReader(u,10);
+            fr = FCBuffer.getFeatureReader(u,10,10000);
             
             assertNotNull("FeatureReader missing", fr);
             
@@ -128,8 +128,8 @@ public class GMLStreamingParserTest extends TestCase {
             f = TestData.file(this,path);
             URI u2 = f.toURI();
 
-            fr1 = FCBuffer.getFeatureReader(u1,10);
-            fr2 = FCBuffer.getFeatureReader(u2,10);
+            fr1 = FCBuffer.getFeatureReader(u1,10,10000);
+            fr2 = FCBuffer.getFeatureReader(u2,10,10000);
 
             assertNotNull("FeatureReader missing", fr1);
             assertNotNull("FeatureReader missing", fr2);

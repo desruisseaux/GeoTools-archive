@@ -42,6 +42,7 @@ public class WFSDataStoreReadTest extends TestCase {
     private DataStore getDataStore(URL server, boolean isPost) throws IOException{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.GET_CAPABILITIES_URL.key,server);
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000));
         if(isPost){
             m.put(WFSDataStoreFactory.USE_POST.key,Boolean.TRUE);
             m.put(WFSDataStoreFactory.USE_GET.key,Boolean.FALSE);

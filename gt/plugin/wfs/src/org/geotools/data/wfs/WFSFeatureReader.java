@@ -24,17 +24,17 @@ import org.xml.sax.SAXException;
 public class WFSFeatureReader extends FCBuffer {
     
     private InputStream is = null;
-    private WFSFeatureReader(InputStream is, int capacity){
+    private WFSFeatureReader(InputStream is, int capacity, int timeout){
         //document may be null
-        super(null,capacity);
+        super(null,capacity,timeout);
         this.is = is;
     }
     
-    public static FeatureReader getFeatureReader(URI document, int capacity) throws SAXException {
+    public static FeatureReader getFeatureReader(URI document, int capacity, int timeout) throws SAXException {
         HttpURLConnection hc;
         try {
             hc = (HttpURLConnection)document.toURL().openConnection();
-            WFSFeatureReader fc = new WFSFeatureReader(hc.getInputStream(), capacity);
+            WFSFeatureReader fc = new WFSFeatureReader(hc.getInputStream(), capacity, timeout);
         	fc.start(); // calls run
 
             if(fc.exception != null)
@@ -50,8 +50,8 @@ public class WFSFeatureReader extends FCBuffer {
         }
     }
     
-    public static WFSFeatureReader getFeatureReader(InputStream is, int capacity) throws SAXException {
-        WFSFeatureReader fc = new WFSFeatureReader(is, capacity);
+    public static WFSFeatureReader getFeatureReader(InputStream is, int capacity, int timeout) throws SAXException {
+        WFSFeatureReader fc = new WFSFeatureReader(is, capacity, timeout);
         fc.start(); // calls run
         if(fc.exception != null)
             throw fc.exception;

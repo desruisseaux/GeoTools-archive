@@ -57,14 +57,12 @@ public class WFSDataStore extends AbstractDataStore{
  	
  	private Authenticator auth = null;
  	
- 	private int bufferSize = 1000;
- 	public void setBufferSize(int buffer){
- 	    bufferSize = buffer;
- 	}
+ 	private int bufferSize = 10;
+ 	private int timeout = 1000;
  	
  	private WFSDataStore(){}
  	
- 	WFSDataStore(URL host, Boolean get, Boolean post, String username, String password) throws SAXException, IOException{
+ 	WFSDataStore(URL host, Boolean get, Boolean post, String username, String password, int timeout, int buffer) throws SAXException, IOException{
  	    super(false); // TODO update when writeable
  	    logger.setLevel(Level.WARNING);
  	    
@@ -93,6 +91,8 @@ public class WFSDataStore extends AbstractDataStore{
  	    }else{
  	        protos = post.booleanValue()?(POST_FIRST+POST_OK):protos|protos;
  	    }
+ 	    this.timeout = timeout;
+ 	    this.bufferSize = buffer;
  	}
  	
  	private static InputStream getInputStream(HttpURLConnection url, Authenticator auth) throws IOException{
@@ -382,7 +382,7 @@ public class WFSDataStore extends AbstractDataStore{
 
  	    InputStream is = getInputStream(hc,auth);
         
- 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout);
         return ft;
     }
     
@@ -413,7 +413,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    InputStream is = getInputStream(hc,auth);
 // 	    System.out.println("ready?"+is.available());
 
- 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
+ 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout);
  	    
         return ft;
     }

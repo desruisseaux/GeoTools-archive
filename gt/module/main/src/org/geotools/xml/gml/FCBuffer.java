@@ -24,6 +24,8 @@ import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
@@ -55,6 +57,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     private int end;
     private int size;
     private int head;
+    private int timeout = 1000;
     private URI document; // for run
     private FeatureType featureType;
     protected SAXException exception = null;
@@ -76,6 +79,12 @@ public class FCBuffer extends Thread implements FeatureReader {
         this.document = document;
         end = size = head = 0;
     }
+    protected FCBuffer(URI document, int capacity,int timeout) {
+        features = new Feature[capacity];
+        this.timeout = timeout;
+        this.document = document;
+        end = size = head = 0;
+    }
 
     /**
      * DOCUMENT ME!
@@ -93,6 +102,15 @@ public class FCBuffer extends Thread implements FeatureReader {
      */
     public int getCapacity() {
         return features.length;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return The buffer capacity
+     */
+    public int getTimeout() {
+        return timeout;
     }
 
     /**
@@ -146,22 +164,29 @@ public class FCBuffer extends Thread implements FeatureReader {
         
         return fc;
     }
+    public static FeatureReader getFeatureReader(URI document, int capacity, int timeout) throws SAXException {
+        FCBuffer fc = new FCBuffer(document, capacity,timeout);
+        fc.start(); // calls run
+
+        if(fc.exception != null)
+            throw fc.exception;
+        
+        return fc;
+    }
 
     /**
      * @throws SAXException
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        // TODO put a real counter here
-//        int t = 100;
-        while ((featureType == null) && (state != FINISH && state != STOP)){// && t>0){
+        Date d = new Date(Calendar.getInstance().getTimeInMillis()+timeout);
+        while ((featureType == null) && (state != FINISH && state != STOP)){
             yield(); // let the parser run ... this is being called from 
-//            t --;
+            if(d.before(Calendar.getInstance().getTime())){
+          	  exception = new SAXException("Timeout");
+              state = STOP;
+      	    }
         }
-//        if(t<=0){
-//            exception = new SAXException("Timeout");
-//            state = STOP;
-//        }
 
         // the original thread
         if (state == FINISH || state == STOP) {
@@ -206,8 +231,7 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         logger.finest("hasNext " + size);
 
-        // TODO put a real counter here
-//        int t=1000;
+        Date d = new Date(Calendar.getInstance().getTimeInMillis()+timeout);
         while ((size <= 1) && (state != FINISH) && (state != STOP) ){//&& t>0) {
 
             if (exception != null) {
@@ -216,12 +240,11 @@ public class FCBuffer extends Thread implements FeatureReader {
             }
             logger.finest("waiting for parser");
             Thread.yield();
-//            t --;
+            if(d.before(Calendar.getInstance().getTime())){
+                exception = new SAXException("Timeout");
+                state = STOP;
+        	}
         }
-//        if(t<=0){
-//            state = STOP;
-//            throw new IOException("Timeout");
-//        }
 
         if (state == STOP) {
             if(exception!=null)

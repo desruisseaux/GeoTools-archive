@@ -33,6 +33,12 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
     // either both or neither
     public static final Param USERNAME = new Param("WFSDataStoreFactory:USERNAME",String.class,"This allows the user to specify a username. This param should not be used without the PASSWORD param.",false);
     public static final Param PASSWORD = new Param("WFSDataStoreFactory:PASSWORD",String.class,"This allows the user to specify a username. This param should not be used without the USERNAME param.",false);
+
+    // timeout -- optional
+    public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",Integer.class,"This allows the user to specify a timeout in milliseconds. This param has a default value of 1000ms.",false);
+    
+    // buffer size -- optional
+    public static final Param BUFFER_SIZE = new Param("WFSDataStoreFactory:BUFFER_SIZE",Integer.class,"This allows the user to specify a buffer size in features. This param has a default value of 10 features.",false);
     
     private Map cache = new HashMap();
     private Logger logger = Logger.getLogger("org.geotools.data.wfs"); 
@@ -83,6 +89,12 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
 //            throw new IOException("Cannot define both get and post");
         
         String user,pass; user = pass = null;
+        int timeout = 1000;
+        int buffer = 10;
+        if(params.containsKey(TIMEOUT.key))
+            timeout = ((Integer)TIMEOUT.lookUp(params)).intValue();
+        if(params.containsKey(BUFFER_SIZE.key))
+            buffer = ((Integer)BUFFER_SIZE.lookUp(params)).intValue();
         if(params.containsKey(USERNAME.key))
             user = (String)USERNAME.lookUp(params);
         if(params.containsKey(PASSWORD.key))
@@ -92,7 +104,7 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
         
         DataStore ds = null;
         try {
-            ds = new WFSDataStore(host,get,post,user,pass);
+            ds = new WFSDataStore(host,get,post,user,pass,timeout,buffer);
             cache.put(params,ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
@@ -136,10 +148,23 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
         }
         
         // check post / get
-        if(params.containsKey(USE_POST.key)){
-            if(params.containsKey(USE_GET.key))
-                return false;	// cannot have both
-        } // may have neither
+        Boolean get,post;
+        post = get = null;
+        if(params.containsKey(USE_POST.key))
+            try {
+                post = (Boolean)USE_POST.lookUp(params);
+            } catch (IOException e) {
+                return false;
+            }
+        if(params.containsKey(USE_GET.key))
+            try {
+                get = (Boolean)USE_GET.lookUp(params);
+            } catch (IOException e) {
+                return false;
+            }
+        if((post!=null && post.booleanValue() && get!=null && get.booleanValue()) || 
+                (post!=null && !post.booleanValue() && get!=null && !get.booleanValue()))
+            return false;
         
         // check password / username
         if(params.containsKey(USERNAME.key)){
@@ -149,6 +174,22 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
             if(params.containsKey(PASSWORD.key))
                 return false;	// must have both
         }
+        
+        // check for type
+        if(params.containsKey(TIMEOUT.key))
+            try {
+               TIMEOUT.lookUp(params);
+            } catch (IOException e) {
+                return false;
+            }
+            
+        if(params.containsKey(BUFFER_SIZE.key))
+            try {
+                BUFFER_SIZE.lookUp(params);
+            } catch (IOException e) {
+                return false;
+            }
+        
         return true;
     }
 
