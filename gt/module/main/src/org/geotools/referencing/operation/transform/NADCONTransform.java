@@ -320,7 +320,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
             return makeURLfromString(str);
         } else {
             //just a file name , prepend base location
-            final Preferences prefs = Preferences.systemNodeForPackage(NADCONTransform.class);
+            final Preferences prefs = Preferences.userNodeForPackage(NADCONTransform.class);
             final String baseLocation = prefs.get(GRID_LOCATION,
                     DEFAULT_GRID_LOCATION);
             return makeURLfromString(baseLocation + "/" + str);
@@ -833,9 +833,9 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     /**
      * Used to set the preference for the default grid shift file location.
      * This allows grids parameters to be specified by name only, without the
-     * full path. This needs to be done only once, by the superuser (root or
-     * admin). Path values may be simple file system paths or more complex
-     * text  representations of a url. A value of "default" resets this
+     * full path. This needs to be done only once, by the user.
+     * Path values may be simple file system paths or more complex
+     * text representations of a url. A value of "default" resets this
      * preference to its default value. 
      * <br><br>
      *
@@ -852,7 +852,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     public static void main(String[] args) {
         final Arguments arguments = new Arguments(args);
         final PrintWriter out = arguments.out;
-        final Preferences prefs = Preferences.systemNodeForPackage(NADCONTransform.class);
+        final Preferences prefs = Preferences.userNodeForPackage(NADCONTransform.class);
 
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("default")) {
