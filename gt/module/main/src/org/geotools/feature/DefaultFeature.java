@@ -520,7 +520,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     }
 
     static final class ComplexWrapper extends DefaultFeature
-        implements ComplexFeature {
+         {
         /**
          * Private constructor to wrap the attributes in list.  Could consider
          * making this public, but for now it seems better to keep it private
