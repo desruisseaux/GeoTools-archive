@@ -8,17 +8,19 @@ package org.geotools.data.wms.gce.test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.gce.WMSFormat;
+import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;
 import org.geotools.data.wms.gce.WMSParameterValue;
 import org.geotools.data.wms.gce.WMSReader;
+import org.geotools.data.wms.getCapabilities.Layer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
-import org.geotools.parameter.GeneralParameterValue;
 
 /**
  * @author rgould
@@ -35,8 +37,9 @@ public class WMSReaderTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		server = new URL("http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
-		capabilities = WebMapServer.getCapabilities(server);
-		reader = new WMSReader(server);
+		WMSGridCoverageExchange exchange = new WMSGridCoverageExchange(server);
+		capabilities = exchange.getCapabilities();
+		reader = (WMSReader) exchange.getReader(server);
 	}
 
 	public WMSReaderTest(String arg0) {
@@ -59,7 +62,16 @@ public class WMSReaderTest extends TestCase {
 			WMSParameterValue[] params = new WMSParameterValue[10];
 			params[0] = new WMSParameterValue("1.1.1", WMSOperationParameter.createVersionReadParam());
 			params[1] = new WMSParameterValue("GetMap", WMSOperationParameter.createRequestReadParam());
-			params[2] = new WMSParameterValue("DRG", WMSOperationParameter.createLayersReadParam());
+			String layerList = "";
+			Iterator iter = capabilities.getCapability().getLayer().getSubLayers().iterator();
+			while (iter.hasNext()) {
+				Layer layer = (Layer) iter.next();
+				layerList = layerList + layer.getName();	
+				if (iter.hasNext()) {
+					layerList = layerList + ",";
+				}
+			}
+			params[2] = new WMSParameterValue(layerList, WMSOperationParameter.createLayersReadParam());
 			params[3] = new WMSParameterValue("", WMSOperationParameter.createStylesReadParam());
 			params[4] = new WMSParameterValue("EPSG:26904", WMSOperationParameter.createSRSReadParam());
 			params[5] = new WMSParameterValue("366800,2170400,816000,2460400", WMSOperationParameter.createBBoxReadParam());
