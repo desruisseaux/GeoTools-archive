@@ -108,7 +108,7 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Compare two affine transforms.
+     * Compares two affine transforms.
      */
     public static void assertEquals(final AffineTransform expected, final AffineTransform actual) {
         assertEquals("scaleX",     expected.getScaleX(),     actual.getScaleX(),     EPS);
@@ -162,19 +162,8 @@ public final class ResampleTest extends GridCoverageTest {
      *
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
-    private String projectTo(final CoordinateReferenceSystem crs, final GridGeometry2D geometry) {
-        return projectTo(crs, geometry, SHOW);
-    }
-
-    /**
-     * Projects the specified image to the specified CRS.
-     * The result will be displayed in a window if {@code show} is set to {@code true}.
-     *
-     * @return The operation name which was applied on the image, or <code>null</code> if none.
-     */
     private String projectTo(final CoordinateReferenceSystem crs,
-                             final GridGeometry2D       geometry,
-                             final boolean                  show)
+                             final GridGeometry2D       geometry)
     {
         final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
         final String arg1; final Object value1;
@@ -195,16 +184,16 @@ public final class ResampleTest extends GridCoverageTest {
         assertNotNull(projected.getRenderedImage().getData());
         final RenderedImage image = projected.getRenderedImage();
         projected = projected.geophysics(false);
-        if (show) {
-            Viewer.show(projected);
-        } else {
-            // Force computation
-            assertNotNull(projected.getRenderedImage().getData());
-        }
         String operation = null;
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
             GridCoverageProcessor2D.LOGGER.fine("Applied \""+operation+"\" JAI operation.");
+        }
+        if (SHOW) {
+            Viewer.show(projected, operation);
+        } else {
+            // Force computation
+            assertNotNull(projected.getRenderedImage().getData());
         }
         return operation;
     }
@@ -246,7 +235,7 @@ public final class ResampleTest extends GridCoverageTest {
          *       here.  It would be visible however with more elaborated viewer like the
          *       one provided in the <code>org.geotools.renderer</code> package.
          */
-        assertEquals("Lookup", projectTo(crs, null, false));
+        assertEquals("Lookup", projectTo(crs, null));
         assertEquals("Affine", projectTo(null, new GridGeometry2D(null, tr)));
     }
     

@@ -125,7 +125,30 @@ public class Viewer extends JPanel {
      * @return The viewer, for information.
      */
     public static Viewer show(final GridCoverage2D coverage) {
-        return show(new Viewer(coverage), coverage.getName().toString(JComponent.getDefaultLocale()));
+        return show(coverage, null);
+    }
+
+    /**
+     * A convenience method showing a grid coverage. The application
+     * will be terminated when the user close the frame.
+     *
+     * @param  coverage The coverage to display.
+     * @param  title The window title.
+     * @return The viewer, for information.
+     */
+    public static Viewer show(final GridCoverage2D coverage, final String title) {
+        final StringBuffer buffer = new StringBuffer();
+        if (title != null) {
+            buffer.append(title);
+            buffer.append(" - ");
+        }
+        buffer.append(coverage.getName().toString(JComponent.getDefaultLocale()));
+        if (coverage != coverage.geophysics(true)) {
+            buffer.append(" (packed)");
+        } else if (coverage != coverage.geophysics(false)) {
+            buffer.append(" (geophysics)");
+        }
+        return show(new Viewer(coverage), buffer.toString());
     }
 
     /**
