@@ -109,7 +109,24 @@ public class VPFCoverage implements FileConstants, VPFCoverageIfc {
     }
 
     /**
-     * Builds feature types for each feature class
+     * The point of this block of code is 
+     * to scan the CHAR.VDT file for FACC codes.  
+     * There is a one to one relationship 
+     * between FACC codes and feature types, 
+     * but there is a one to many relationship 
+     * between feature classes 
+     * and feature types/FACC codes.  
+     * Since objects are stored 
+     * in the file system by feature class, 
+     * this mechanism allows us 
+     * to separate features 
+     * of different feature types 
+     * in the same feature class. 
+     * 
+     * Some coverages do not have a CHAR.VDT file.
+     * In these cases, there is a 1:1:1 relationship
+     * between the coverage, feature class, 
+     * and feature type.
      */
     private void discoverFeatureTypes() {
         try {
@@ -141,7 +158,8 @@ public class VPFCoverage implements FileConstants, VPFCoverageIfc {
             }
         } catch (IOException exc) {
             // If there is no char.vdt, 
-            // we can assume there is only one feature type and only one feature class
+            // we can assume there is only one feature type 
+            // and only one feature class
             VPFFeatureClass coverageClass = (VPFFeatureClass) featureClasses
                 .get(0);
             VPFFeatureType featureType = new VPFFeatureType(coverageClass);
