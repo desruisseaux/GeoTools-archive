@@ -548,5 +548,12 @@ public class WFSSchema implements Schema {
         public SimpleType getSimpleType() {
             return simpleType;
         }
+
+        /**
+         * @see org.geotools.xml.schema.Attribute#getNamespace()
+         */
+        public String getNamespace() {
+            return WFSSchema.NAMESPACE;
+        }
     }
 }
