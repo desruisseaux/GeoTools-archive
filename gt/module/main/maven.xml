@@ -12,6 +12,7 @@
       <include name="org/geotools/cs/*Export.class"/>
       <include name="org/geotools/ct/*Export.class"/>
       <include name="org/geotools/cv/*Export.class"/>
+   
     </rmic>
   </postGoal> 
 </project>
