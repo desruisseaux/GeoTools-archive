@@ -17,8 +17,10 @@
 package org.geotools.data.geomedia.attributeio;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,8 +79,12 @@ public class GeoMediaAttributeIO implements AttributeIO {
     public void write(ResultSet rs, int position, Object value)
         throws IOException {
         try {
-            byte[]  blob = geometryAdapter.serialize((Geometry) value);
-            rs.updateObject(position, (Object) blob);
+            if(value == null) {
+                rs.updateNull(position);
+            } else {
+                byte[]  blob = geometryAdapter.serialize((Geometry) value);
+                rs.updateObject(position, (Object) blob);
+            }
         } catch (SQLException sqlException) {
             String msg = "SQL Exception writing geometry column";
             LOGGER.log(Level.SEVERE, msg, sqlException);
@@ -88,5 +94,28 @@ public class GeoMediaAttributeIO implements AttributeIO {
             LOGGER.log(Level.SEVERE, msg, e);
             throw new DataSourceException(msg, e);
         }
+    }
+
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#write(java.sql.PreparedStatement, int, java.lang.Object)
+     */
+    public void write(PreparedStatement ps, int position, Object value) throws IOException {
+        try {
+            if(value == null) {
+                ps.setNull(position, Types.OTHER);
+            } else {
+                byte[]  blob = geometryAdapter.serialize((Geometry) value);
+                ps.setObject(position, (Object) blob);
+            }
+        } catch (SQLException sqlException) {
+            String msg = "SQL Exception writing geometry column";
+            LOGGER.log(Level.SEVERE, msg, sqlException);
+            throw new DataSourceException(msg, sqlException);
+        } catch (GeoMediaUnsupportedGeometryTypeException e) {
+            String msg = "Geometry Conversion type error";
+            LOGGER.log(Level.SEVERE, msg, e);
+            throw new DataSourceException(msg, e);
+        }
+        
     }
 }
