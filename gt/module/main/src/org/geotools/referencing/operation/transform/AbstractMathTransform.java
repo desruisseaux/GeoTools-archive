@@ -83,18 +83,14 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Returns the parameters for this math transform, or <code>null</code> if unknow. This method
-     * is similar to {@link org.geotools.referencing.operation.Operation#getParameterValues},
+     * Returns the parameter values for this math transform, or <code>null</code> if unknow. This
+     * method is similar to {@link org.geotools.referencing.operation.Operation#getParameterValues},
      * except that <code>MathTransform</code> returns parameters in standard units (usually
-     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
-     * <br><br>
-     * <strong>Note 1:</strong> This method returns a copy of the parameters. Any change to a
-     *         returned parameter will have no effect on this math transform.
-     * <br><br>
-     * <strong>Note 2:</strong> if non-null, parameter values will be used for the default
-     *         implementation of {@link #formatWKT}.
+     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}). Since this
+     * method returns a copy of the parameter values, any change to a value will have no effect
+     * on this math transform.
      *
-     * @return A copy of the parameters for this math transform, or <code>null</code> if unknow.
+     * @return A copy of the parameter values for this math transform, or <code>null</code>.
      */
     public ParameterValueGroup getParameterValues() {
         return null;
@@ -567,14 +563,13 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation gets the
-     * {@linkplain #getParameterValues parameters for this math transform}, uses the
-     * {@linkplain org.opengis.parameter.OperationParameterGroup parameter group}
-     * name as the name for the math transform and format all parameter values.
+     * Known Text</cite> (WKT)</A> element. The default implementation formats all parameter values
+     * returned by {@link #getParameterValues}. The parameter group name is used as the math
+     * transform name.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is <code>"PARAM_MT"</code> for the default
-     *         implementation.
+     * @return The WKT element name, which is <code>"PARAM_MT"</code>
+     *         in the default implementation.
      */
     protected String formatWKT(final Formatter formatter) {
         final ParameterValueGroup parameters = getParameterValues();
@@ -725,14 +720,25 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         /**
          * Format the inner part of a
          * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-         * Known Text</cite> (WKT)</A> element.
+         * Known Text</cite> (WKT)</A> element. If this inverse math transform
+         * has any parameter values, then this method format the WKT as in the
+         * {@linkplain AbstractMathTransform#formatWKT super-class method}. Otherwise
+         * this method format the math transform as an <code>"INVERSE_MT"</code> entity.
          *
          * @param  formatter The formatter to use.
-         * @return The WKT element name.
+         * @return The WKT element name, which is <code>"PARAM_MT"</code> or
+         *         <code>"INVERSE_MT"</code> in the default implementation.
          */
         protected String formatWKT(final Formatter formatter) {
-            formatter.append((Formattable) AbstractMathTransform.this);
-            return "INVERSE_MT";
+            final ParameterValueGroup parameters = getParameterValues();
+            if (parameters != null) {
+                formatter.append(formatter.getName(parameters.getDescriptor()));
+                formatter.append(parameters);
+                return "PARAM_MT";
+            } else {
+                formatter.append((Formattable) AbstractMathTransform.this);
+                return "INVERSE_MT";
+            }
         }
     }
 }

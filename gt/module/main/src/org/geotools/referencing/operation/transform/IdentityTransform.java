@@ -114,9 +114,9 @@ final class IdentityTransform extends AbstractMathTransform
     }
 
     /**
-     * Returns the matrix element value as a group of parameters.
+     * Returns the matrix elements as a group of parameters values.
      *
-     * @return The parameter values.
+     * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
         return ProjectiveTransform.getParameterValues(getMatrix());

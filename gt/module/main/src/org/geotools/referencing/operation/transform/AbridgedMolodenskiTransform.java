@@ -131,47 +131,6 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
 //    {
         
 //    }
-
-    /**
-     * Returns the parameters for this math transform.
-     *
-     * @return The parameters for this math transform.
-     *
-     * @todo 'dim' is not an OpenGIS parameter; this is an addition from Geotools.
-     *       Maybe we should not includes it in the WKT.
-     */
-    public ParameterValueGroup getParameterValues() {
-        final ParameterValue dim;
-        if (true) {
-            dim = new org.geotools.parameter.ParameterValue(Provider.DIM);
-            dim.setValue(getDimSource());
-        }
-        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS,
-               new ParameterValue[] {
-                   dim,
-                   new ParameterRealValue(Provider.DX,             dx),
-                   new ParameterRealValue(Provider.DY,             dy),
-                   new ParameterRealValue(Provider.DZ,             dz),
-                   new ParameterRealValue(Provider.SRC_SEMI_MAJOR, a),
-                   new ParameterRealValue(Provider.SRC_SEMI_MINOR, b),
-                   new ParameterRealValue(Provider.TGT_SEMI_MAJOR, a+da),
-                   new ParameterRealValue(Provider.TGT_SEMI_MINOR, b+db)
-               });
-    }
-    
-    /**
-     * Gets the dimension of input points.
-     */
-    public int getDimSource() {
-        return source3D ? 3 : 2;
-    }
-    
-    /**
-     * Gets the dimension of output points.
-     */
-    public final int getDimTarget() {
-        return target3D ? 3 : 2;
-    }
     
     /**
      * Construct an AbridgedMolodenskiTransform from the specified parameters.
@@ -200,6 +159,41 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         df = (ta-tb)/ta - f;
         e2  = 1 - (b*b)/(a*a);
         adf = (a*df) + (f*da);
+    }
+
+    /**
+     * Returns the parameter values for this math transform.
+     *
+     * @return A copy of the parameter values for this math transform.
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValue dim = new org.geotools.parameter.ParameterValue(Provider.DIM);
+        dim.setValue(getDimSource());
+        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS,
+               new ParameterValue[] {
+                   dim,
+                   new ParameterRealValue(Provider.DX,             dx),
+                   new ParameterRealValue(Provider.DY,             dy),
+                   new ParameterRealValue(Provider.DZ,             dz),
+                   new ParameterRealValue(Provider.SRC_SEMI_MAJOR, a),
+                   new ParameterRealValue(Provider.SRC_SEMI_MINOR, b),
+                   new ParameterRealValue(Provider.TGT_SEMI_MAJOR, a+da),
+                   new ParameterRealValue(Provider.TGT_SEMI_MINOR, b+db)
+               });
+    }
+    
+    /**
+     * Gets the dimension of input points.
+     */
+    public int getDimSource() {
+        return source3D ? 3 : 2;
+    }
+    
+    /**
+     * Gets the dimension of output points.
+     */
+    public final int getDimTarget() {
+        return target3D ? 3 : 2;
     }
     
     /**

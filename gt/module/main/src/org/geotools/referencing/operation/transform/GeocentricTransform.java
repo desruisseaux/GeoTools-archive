@@ -186,23 +186,33 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
 
     /**
-     * The operation parameters. To be overrides by {@link Inverse} only.
+     * Returns the parameter values for this math transform.
+     *
+     * @return A copy of the parameter values for this math transform.
      */
-    OperationParameterGroup getParameters() {
-        return Provider.PARAMETERS;
+    public ParameterValueGroup getParameterValues() {
+        return getParameterValues(Provider.PARAMETERS);
     }
 
     /**
-     * Returns the parameters for this math transform.
+     * Returns the parameter values for this math transform.
      *
-     * @return The parameters for this math transform.
+     * @param  descriptor The parameters descriptor.
+     * @return A copy of the parameter values for this math transform.
      */
-    public ParameterValueGroup getParameterValues() {
-        return new org.geotools.parameter.ParameterValueGroup(getParameters(),
-               new ParameterValue[] {
-                   new ParameterRealValue(Provider.SEMI_MAJOR, a),
-                   new ParameterRealValue(Provider.SEMI_MINOR, b)
-               });
+    final ParameterValueGroup getParameterValues(final OperationParameterGroup descriptor) {
+        final int dim = getDimSource();
+        final boolean includeDim = (dim != ((Number)Provider.DIM.getDefaultValue()).intValue());
+        final ParameterValue[] parameters = new ParameterValue[includeDim ? 3 : 2];
+        int index = 0;
+        if (includeDim) {
+            final ParameterValue p = new org.geotools.parameter.ParameterValue(Provider.DIM);
+            p.setValue(dim);
+            parameters[index++] = p;
+        }
+        parameters[index++] = new ParameterRealValue(Provider.SEMI_MAJOR, a);
+        parameters[index++] = new ParameterRealValue(Provider.SEMI_MINOR, b);
+        return new org.geotools.parameter.ParameterValueGroup(descriptor, parameters);
     }
     
     /**
@@ -510,10 +520,12 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         }
 
         /**
-         * The operation parameters.
+         * Returns the parameter values for this math transform.
+         *
+         * @return A copy of the parameter values for this math transform.
          */
-        OperationParameterGroup getParameters() {
-            return ProviderInverse.PARAMETERS;
+        public ParameterValueGroup getParameterValues() {
+            return GeocentricTransform.this.getParameterValues(ProviderInverse.PARAMETERS);
         }
 
         /**
@@ -576,8 +588,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
          * The default value is 3.
          */
-        private static final OperationParameter DIM_GEOCS = new org.geotools.parameter.OperationParameter(
-                "dim_geoCS", 3, 2, 3);
+        private static final OperationParameter DIM = new org.geotools.parameter.OperationParameter(
+                "dim", 3, 2, 3);
 
         /**
          * The parameters group.
@@ -593,7 +605,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                         new Identifier(Citation.OPEN_GIS, null,  ogc),
                         new Identifier(Citation.EPSG,    "EPSG", epsg)
                      }, new OperationParameter[] {
-                        SEMI_MAJOR, SEMI_MINOR, DIM_GEOCS
+                        SEMI_MAJOR, SEMI_MINOR, DIM
                      });
         }
 
@@ -623,7 +635,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         {
             final double  semiMajor = values.getValue("semi_major").doubleValue();
             final double  semiMinor = values.getValue("semi_minor").doubleValue();
-            final int dimGeographic = values.getValue("dim_geoCS" ).intValue();
+            final int dimGeographic = values.getValue("dim"       ).intValue();
             return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
         }
 

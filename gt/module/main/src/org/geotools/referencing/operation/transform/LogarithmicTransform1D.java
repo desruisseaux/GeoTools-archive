@@ -128,9 +128,9 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Returns the parameters for this math transform.
+     * Returns the parameter values for this math transform.
      *
-     * @return The parameters for this math transform.
+     * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
         final ParameterValue[] parameters = new ParameterValue[offset!=0 ? 2 : 1];

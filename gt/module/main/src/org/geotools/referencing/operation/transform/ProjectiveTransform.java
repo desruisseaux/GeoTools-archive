@@ -161,12 +161,12 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
 
     /**
-     * Returns the matrix element value as a group of parameters. The amount of parameters
-     * depends the matrix size. The group will contains only elements different from their
-     * default value.
+     * Returns the matrix elements as a group of parameters values. The number of parameters
+     * depends on the matrix size. Only matrix elements different from their default value
+     * will be included in this group.
      *
      * @param  matrix The matrix to returns as a group of parameters.
-     * @return The parameter values.
+     * @return A copy of the parameter values for this math transform.
      */
     static ParameterValueGroup getParameterValues(final Matrix matrix) {
         final MatrixParameterValues values;
@@ -176,11 +176,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
 
     /**
-     * Returns the matrix element value as a group of parameters. The amount of parameters
-     * depends the matrix size. The group will contains only elements different from their
-     * default value.
+     * Returns the matrix elements as a group of parameters values. The number of parameters
+     * depends on the matrix size. Only matrix elements different from their default value
+     * will be included in this group.
      *
-     * @return The parameter values.
+     * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
         return getParameterValues(getMatrix());
