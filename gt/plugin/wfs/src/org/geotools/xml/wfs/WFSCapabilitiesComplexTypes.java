@@ -16,24 +16,31 @@
  */
 package org.geotools.xml.wfs;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.handlers.ElementHandlerFactory;
-import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.ogc.FilterSchema;
+import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
-import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.FacetGT;
@@ -46,15 +53,8 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.naming.OperationNotSupportedException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -198,7 +198,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
@@ -227,8 +227,7 @@ public class WFSCapabilitiesComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return null;
         }
 
@@ -254,7 +253,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
@@ -377,7 +376,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
@@ -502,7 +501,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
@@ -557,7 +556,7 @@ public class WFSCapabilitiesComplexTypes {
                         new Facet[] {
                             new FacetGT(Facet.ENUMERATION, "TC211"),
                             new FacetGT(Facet.ENUMERATION, "FGDC")
-                        }, SimpleType.NONE), WFSAttribute.REQUIRED),
+                        }, SimpleType.NONE), Attribute.REQUIRED),
                 new WFSAttribute("format",
                     new SimpleTypeGT(null, null, WFSSchema.NAMESPACE,
                         SimpleType.RESTRICTION,
@@ -566,7 +565,7 @@ public class WFSCapabilitiesComplexTypes {
                             new FacetGT(Facet.ENUMERATION, "XML"),
                             new FacetGT(Facet.ENUMERATION, "SGML"),
                             new FacetGT(Facet.ENUMERATION, "TXT")
-                        }, SimpleType.NONE), WFSAttribute.REQUIRED)
+                        }, SimpleType.NONE), Attribute.REQUIRED)
             };
 
         public static WFSComplexType getInstance() {
@@ -676,9 +675,18 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
+        }
+        /**
+         * TODO summary sentence for isMixed ...
+         * 
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         * @return
+         */
+        public boolean isMixed() {
+            return true;
         }
     }
 
@@ -698,13 +706,13 @@ public class WFSCapabilitiesComplexTypes {
         // static element list
         private static Attribute[] attributes = {
                 new WFSAttribute("minx", XSISimpleTypes.String.getInstance(),
-                    WFSAttribute.REQUIRED),
+                        Attribute.REQUIRED),
                 new WFSAttribute("miny", XSISimpleTypes.String.getInstance(),
-                    WFSAttribute.REQUIRED),
+                        Attribute.REQUIRED),
                 new WFSAttribute("maxx", XSISimpleTypes.String.getInstance(),
-                    WFSAttribute.REQUIRED),
+                        Attribute.REQUIRED),
                 new WFSAttribute("maxy", XSISimpleTypes.String.getInstance(),
-                    WFSAttribute.REQUIRED)
+                        Attribute.REQUIRED)
             };
 
         public static WFSComplexType getInstance() {
@@ -817,7 +825,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -842,7 +850,7 @@ public class WFSCapabilitiesComplexTypes {
         // static list of attributes
         private static Attribute[] attributes = {
                 new WFSAttribute("onlineResource",
-                    XSISimpleTypes.String.getInstance(), WFSAttribute.REQUIRED)
+                    XSISimpleTypes.String.getInstance(), Attribute.REQUIRED)
             };
 
         public static WFSComplexType getInstance() {
@@ -876,8 +884,7 @@ public class WFSCapabilitiesComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
@@ -921,7 +928,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1050,7 +1057,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1071,7 +1078,7 @@ public class WFSCapabilitiesComplexTypes {
         // static list of attributes
         private static Attribute[] attributes = {
                 new WFSAttribute("onlineResource",
-                    XSISimpleTypes.String.getInstance(), WFSAttribute.REQUIRED)
+                    XSISimpleTypes.String.getInstance(), Attribute.REQUIRED)
             };
 
         public static WFSComplexType getInstance() {
@@ -1105,8 +1112,7 @@ public class WFSCapabilitiesComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
@@ -1150,7 +1156,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1365,7 +1371,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1468,7 +1474,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1579,7 +1585,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -1884,7 +1890,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2042,7 +2048,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2175,7 +2181,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2310,7 +2316,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2352,11 +2358,11 @@ public class WFSCapabilitiesComplexTypes {
             };
         private static final Attribute[] attributes = {
                 new WFSAttribute("version",
-                    XSISimpleTypes.String.getInstance(), WFSAttribute.REQUIRED,
+                    XSISimpleTypes.String.getInstance(), Attribute.REQUIRED,
                     "1.0.0"),
                 new WFSAttribute("updateSequence",
                     XSISimpleTypes.NonNegativeInteger.getInstance(),
-                    WFSAttribute.REQUIRED, "0")
+                    Attribute.REQUIRED, "0")
             };
 
         // static sequence
@@ -2416,7 +2422,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2624,7 +2630,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2754,7 +2760,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2864,7 +2870,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
@@ -2990,7 +2996,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
             throw new OperationNotSupportedException();
         }
