@@ -46,6 +46,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
 public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFLibraryIfc {
+
     /**
      * Part of bounding box.
      */
@@ -82,6 +83,11 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      * The coordinate reference system used through this library
      */
     private CoordinateReferenceSystem crs;
+    /**
+     * Signals if an error has already been logged for a CRS related exception
+     */
+    private boolean loggedCRSException = false;
+
     
     /**
      * Complete constructor
@@ -358,7 +364,10 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
                 }
             } catch(Exception ex){
                 // Don't know what else can be done here, just dump it
-                ex.printStackTrace();
+                if(!loggedCRSException) {
+                    ex.printStackTrace();
+                    loggedCRSException = true;
+                }
             }
         }
         return crs;
