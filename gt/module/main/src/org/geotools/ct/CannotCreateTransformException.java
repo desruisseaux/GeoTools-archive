@@ -120,6 +120,6 @@ public class CannotCreateTransformException extends TransformException {
      * Gets a display name for the specified coordinate system.
      */
     private static String getName(final CoordinateSystem cs) {
-        return Utilities.getShortClassName(cs)+'('+cs.getName()+')';
+        return Utilities.getShortClassName(cs) +'('+ cs.getName().getCode() +')';
     }
 }
