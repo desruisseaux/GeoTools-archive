@@ -1,0 +1,456 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2005, Geotools Project Management Committee (PMC)
+ * (C) 2003, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.geotools.coverage;
+
+// J2SE dependencies
+import java.awt.geom.Point2D;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
+import java.util.Date;
+import javax.media.jai.util.Range;
+
+// OpenGIS dependencies
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.factory.Hints;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.TemporalCRS;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.geometry.XRectangle2D;
+
+
+/**
+ * Convenience view of an other coverage with <var>x</var>, <var>y</var> and time axis.
+ * This class provides {@code evaluate} methods in two versions: the usual one expecting
+ * a complete {@linkplain DirectPosition direct position}, and an other one expecting the
+ * {@linkplain Point2D spatial position} and the {@linkplain Date date} as separated arguments.
+ * <br><br>
+ * <strong>Note:</strong> This simple implementation is not thread safe.
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+public class SpatioTemporalCoverage3D extends AbstractCoverage {
+    /**
+     * The hints for the creation of coordinate operation.
+     * The default coordinate operation factory should be suffisient.
+     */
+    private static final Hints HINTS = null;
+
+    /**
+     * The wrapped coverage.
+     */
+    private final Coverage coverage;
+
+    /**
+     * The temporal coordinate system, as a Geotools implementation in order to gets
+     * the {@link TemporalCRS#toDate} and {@link TemporalCRS#toValue} methods.
+     */
+    private final TemporalCRS temporalCRS;
+
+    /**
+     * The dimension of the temporal coordinate system.
+     * All other dimensions are expected to be the temporal ones.
+     */
+    private final int temporalDimension;
+
+    /**
+     * The dimension for <var>x</var> and <var>y</var> coordinates.
+     */
+    private final int xDimension, yDimension;
+
+    /**
+     * The geographic bounding box. Will be computed only when first needed.
+     */
+    private transient GeographicBoundingBox boundingBox;
+
+    /**
+     * The direct position to uses for {@code evaluate(...)} methods.
+     * This object is cached and reused for performance purpose. However,
+     * this caching sacrifies {@code SpatioTemporalCoverage3D} thread safety.
+     */
+    private final GeneralDirectPosition coordinate;
+
+    /**
+     * Constructs a new coverage. The coordinate reference system will be the same than the
+     * wrapped coverage, which must be three dimensional. This CRS must have a
+     * {@link org.opengis.referencing.crs.TemporalCRS temporal} component.
+     *
+     * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
+     * @param coverage The source coverage.
+     * @throws IllegalArgumentException if the coverage CRS doesn't have a temporal component.
+     */
+    public SpatioTemporalCoverage3D(final CharSequence name, final Coverage coverage)
+            throws IllegalArgumentException
+    {
+        super(name, coverage);
+        final int dimension = crs.getCoordinateSystem().getDimension();
+        if (dimension != 3) {
+            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
+                      org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                      new Integer(3), new Integer(dimension)));
+        }
+        if (coverage instanceof SpatioTemporalCoverage3D) {
+            final SpatioTemporalCoverage3D source = (SpatioTemporalCoverage3D) coverage;
+            this.coverage          = source.coverage;
+            this.temporalCRS       = source.temporalCRS;
+            this.temporalDimension = source.temporalDimension;
+            this.xDimension        = source.xDimension;
+            this.yDimension        = source.yDimension;
+        } else {
+            this.coverage = coverage;
+            temporalCRS = TemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
+            if (temporalCRS == null) {
+                throw new IllegalArgumentException( // TODO: localize
+                        /*Resources.format(ResourceKeys.ERROR_BAD_COORDINATE_SYSTEM)*/);
+            }
+            temporalDimension = CRSUtilities.getDimensionOf(crs, temporalCRS.getClass());
+            xDimension = (temporalDimension!=0) ? 0 : 1;
+            yDimension = (temporalDimension!=2) ? 2 : 1;
+        }
+        assert temporalDimension>=0 && temporalDimension<dimension : temporalDimension;
+        coordinate = new GeneralDirectPosition(dimension);
+    }
+
+    /**
+     * The number of sample dimensions in the coverage.
+     * For grid coverages, a sample dimension is a band.
+     *
+     * @return The number of sample dimensions in the coverage.
+     */
+    public int getNumSampleDimensions() {
+        return coverage.getNumSampleDimensions();
+    }
+
+    /**
+     * Retrieve sample dimension information for the coverage.
+     *
+     * @param  index Index for sample dimension to retrieve. Indices are numbered 0 to
+     *         (<var>{@linkplain #getNumSampleDimensions n}</var>-1).
+     * @return Sample dimension information for the coverage.
+     * @throws IndexOutOfBoundsException if <code>index</code> is out of bounds.
+     */
+    public SampleDimension getSampleDimension(final int index) throws IndexOutOfBoundsException {
+        return coverage.getSampleDimension(index);
+    }
+
+    /**
+     * Returns the {@linkplain #getEnvelope envelope} geographic bounding box.
+     * The bounding box coordinates uses the {@linkplain GeographicCRS#WGS84 WGS84} CRS.
+     *
+     * @return The geographic bounding box.
+     * @throws TransformException if the envelope can't be transformed.
+     */
+    public GeographicBoundingBox getGeographicBoundingBox() throws TransformException {
+        if (boundingBox == null) {
+            final Envelope envelope = getEnvelope();
+            Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
+                    envelope.getMinimum(xDimension),
+                    envelope.getMinimum(yDimension),
+                    envelope.getMaximum(xDimension),
+                    envelope.getMaximum(yDimension));
+            final CoordinateReferenceSystem sourceCS = CRSUtilities.getHorizontalCRS(crs);
+            final CoordinateReferenceSystem targetCS = GeographicCRS.WGS84;
+            if (!CRSUtilities.equalsIgnoreMetadata(targetCS, sourceCS)) {
+                final CoordinateOperation      transform;
+                final CoordinateOperationFactory factory;
+                factory = FactoryFinder.getCoordinateOperationFactory(HINTS);
+                try {
+                    transform = factory.createOperation(sourceCS, targetCS);
+                } catch (FactoryException exception) {
+                    throw new TransformException(exception.getLocalizedMessage(), exception);
+                }
+                geographicArea = CRSUtilities.transform((MathTransform2D)transform.getMathTransform(),
+                                                         geographicArea, geographicArea);
+            }
+            boundingBox = (GeographicBoundingBox)
+              new org.geotools.metadata.extent.GeographicBoundingBox(geographicArea).unmodifiable();
+        }
+        return boundingBox;
+    }
+
+    /**
+     * Returns the {@linkplain #getEnvelope envelope} time range.
+     * The returned range contains {@link Date} objects.
+     */
+    public Range getTimeRange() {
+        final Envelope envelope = getEnvelope();
+        return new Range(Date.class, temporalCRS.toDate(envelope.getMinimum(temporalDimension)),
+                                     temporalCRS.toDate(envelope.getMaximum(temporalDimension)));
+    }
+
+    /**
+     * Returns a coordinate point for the given spatial position and date.
+     * Overrides this method if all {@code evaluate(Point2D, Date, ...)}
+     * methods should transform their coordinates in a different way.
+     *
+     * @param  point The spatial position.
+     * @param  date  The date.
+     * @return The coordinate point.
+     */
+    private DirectPosition toDirectPosition(final Point2D point, final Date date) {
+        coordinate.ordinates[       xDimension] = point.getX();
+        coordinate.ordinates[       yDimension] = point.getY();
+        coordinate.ordinates[temporalDimension] = temporalCRS.toValue(date);
+        return coordinate;
+    }
+
+    /**
+     * Returns a sequence of boolean values for a given point in the coverage.
+     *
+     * @param  point The coordinate point where to evaluate.
+     * @param  time  The date where to evaluate.
+     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
+     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final boolean[] evaluate(final Point2D point, final Date time, boolean[] dest)
+            throws CannotEvaluateException
+    {
+        return evaluate(toDirectPosition(point, time), dest);
+    }
+
+    /**
+     * Returns a sequence of byte values for a given point in the coverage.
+     *
+     * @param  point The coordinate point where to evaluate.
+     * @param  time  The date where to evaluate.
+     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
+     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final byte[] evaluate(final Point2D point, final Date time, byte[] dest)
+            throws CannotEvaluateException
+    {
+        return evaluate(toDirectPosition(point, time), dest);
+    }
+
+    /**
+     * Returns a sequence of integer values for a given point in the coverage.
+     *
+     * @param  point The coordinate point where to evaluate.
+     * @param  time  The date where to evaluate.
+     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
+     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final int[] evaluate(final Point2D point, final Date time, int[] dest)
+            throws CannotEvaluateException
+    {
+        return evaluate(toDirectPosition(point, time), dest);
+    }
+
+    /**
+     * Returns a sequence of float values for a given point in the coverage.
+     *
+     * @param  point The coordinate point where to evaluate.
+     * @param  time  The date where to evaluate.
+     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
+     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final float[] evaluate(final Point2D point, final Date time, float[] dest)
+            throws CannotEvaluateException
+    {
+        return evaluate(toDirectPosition(point, time), dest);
+    }
+
+    /**
+     * Returns a sequence of double values for a given point in the coverage.
+     *
+     * @param  point The coordinate point where to evaluate.
+     * @param  time  The date where to evaluate.
+     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
+     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final double[] evaluate(final Point2D point, final Date time, double[] dest)
+            throws CannotEvaluateException
+    {
+        return evaluate(toDirectPosition(point, time), dest);
+    }
+
+    /**
+     * Returns the value vector for a given point in the coverage.
+     *
+     * @param  coord The coordinate point where to evaluate.
+     * @throws PointOutsideCoverageException if <code>coord</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public final Object evaluate(final DirectPosition coord)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord);
+    }
+    
+    /**
+     * Returns a sequence of boolean values for a given point in the coverage.
+     */
+    public final boolean[] evaluate(final DirectPosition coord, boolean[] dest)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord, dest);
+    }
+    
+    /**
+     * Returns a sequence of byte values for a given point in the coverage.
+     */
+    public final byte[] evaluate(final DirectPosition coord, byte[] dest)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord, dest);
+    }
+    
+    /**
+     * Returns a sequence of integer values for a given point in the coverage.
+     */
+    public final int[] evaluate(final DirectPosition coord, int[] dest)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord, dest);
+    }
+
+    /**
+     * Returns a sequence of float values for a given point in the coverage.
+     */
+    public final float[] evaluate(final DirectPosition coord, float[] dest)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord, dest);
+    }
+
+    /**
+     * Returns a sequence of double values for a given point in the coverage.
+     */
+    public final double[] evaluate(final DirectPosition coord, final double[] dest)
+            throws CannotEvaluateException
+    {
+        return coverage.evaluate(coord, dest);
+    }
+
+    /**
+     * Returns a 2 dimensional grid coverage for the given date. The grid geometry will be computed
+     * in order to produces image with the {@linkplain #getDefaultPixelSize() default pixel size},
+     * if any.
+     *
+     * @param  time The date where to evaluate.
+     * @return The grid coverage at the specified time, or <code>null</code>
+     *         if the requested date fall in a hole in the data.
+     * @throws PointOutsideCoverageException if <code>time</code> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     *
+     * @see #getRenderableImage(Date)
+     * @see RenderableImage#createDefaultRendering()
+     */
+    public GridCoverage2D getGridCoverage2D(final Date time) throws CannotEvaluateException {
+        final InternationalString      name = getName();
+        final CoordinateReferenceSystem crs = CRSUtilities.getHorizontalCRS(this.crs);
+        final RenderedImage           image = getRenderableImage(time).createDefaultRendering();
+        final SampleDimensionGT[]     bands = new SampleDimensionGT[getNumSampleDimensions()];
+        for (int i=0; i<getNumSampleDimensions(); i++){
+            bands[i] = SampleDimensionGT.wrap(getSampleDimension(i));
+        }
+        final MathTransform gridToCRS = ProjectiveTransform.create((AffineTransform)
+                                        image.getProperty("gridToCoordinateSystem"));
+        return new GridCoverage2D(name, image, crs, gridToCRS, bands, null, null);
+    }
+
+    /**
+     * Returns 2D view of this grid coverage at the given date. For images produced by the
+     * {@linkplain RenderableImage#createDefaultRendering() default rendering}, the size
+     * will be computed from the {@linkplain #getDefaultPixelSize() default pixel size},
+     * if any.
+     *
+     * @param  date The date where to evaluate the images.
+     * @return The renderable image.
+     */
+    public RenderableImage getRenderableImage(final Date date) {
+        return new Renderable(date);
+    }
+
+    /**
+     * Constructs rendered images on demand.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    private final class Renderable extends AbstractCoverage.Renderable {
+        /**
+         * Construct a <code>Renderable</code> object for the supplied date.
+         */
+        public Renderable(final Date date) {
+            super(xDimension, yDimension);
+            coordinate.ordinates[temporalDimension] = temporalCRS.toValue(date);
+        }
+        
+        /**
+         * Returns a rendered image with width and height computed from
+         * {@link Coverage3D#getDefaultPixelSize()}.
+         */
+        public RenderedImage createDefaultRendering() {
+            final Dimension2D pixelSize = getDefaultPixelSize();
+            if (pixelSize == null) {
+                return super.createDefaultRendering();
+            }
+            return createScaledRendering((int)Math.round(getWidth()  / pixelSize.getWidth()),
+                                         (int)Math.round(getHeight() / pixelSize.getHeight()), null);
+        }
+    }
+
+    /**
+     * Returns the default pixel size for images to be produced by {@link #getRenderableImage(Date)}.
+     * This method is invoked by {@link RenderableImage#createDefaultRendering()} for computing a
+     * default image size. The default implementation for this method always returns {@code null}.
+     * Subclasses should overrides this method in order to provides a pixel size better suited to
+     * their data.
+     *
+     * @return The default pixel size, or <code>null</code> if no default is provided.
+     */
+    protected Dimension2D getDefaultPixelSize() {
+        return null;
+    }
+}

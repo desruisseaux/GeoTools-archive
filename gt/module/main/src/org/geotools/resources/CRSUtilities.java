@@ -33,6 +33,7 @@ import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.SingleCRS;
@@ -252,8 +253,12 @@ public final class CRSUtilities {
      * Returns the first horizontal coordinate reference system found in the given CRS,
      * or {@code null} if there is none.
      */
-    public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof GeographicCRS || crs instanceof ProjectedCRS) {
+    public static SingleCRS getHorizontalCRS(CoordinateReferenceSystem crs) {
+        while (crs instanceof GeneralDerivedCRS) {
+            crs = ((GeneralDerivedCRS) crs).getBaseCRS();
+        }
+        // No need to test for ProjectedCRS, since the code above unwrap it.
+        if (crs instanceof GeographicCRS) {
             if (crs.getCoordinateSystem().getDimension() == 2) {
                 return (SingleCRS) crs;
             }

@@ -56,7 +56,7 @@ import org.opengis.util.InternationalString;
 /**
  * @deprecated Replaced by {@link GridCoverage2D}.
  */
-public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage
+public class GridCoverageImpl extends AbstractGridCoverage
                             implements RenderedCoverage
 {
 
@@ -77,8 +77,8 @@ public class GridCoverageImpl extends org.geotools.coverage.grid.GridCoverage
 	 * @throws NoSuchElementException 
 	 * @throws OperationNotFoundException 
 	 */
-	public GridCoverageImpl(org.geotools.coverage.grid.GridCoverage coverage) throws OperationNotFoundException, NoSuchElementException, FactoryException {
-		super(coverage);
+	public GridCoverageImpl(AbstractGridCoverage coverage) throws OperationNotFoundException, NoSuchElementException, FactoryException {
+		super(null, coverage);
 
 //		transform = createTransform(crs);
 	}

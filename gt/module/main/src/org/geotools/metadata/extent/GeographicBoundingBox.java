@@ -22,6 +22,9 @@
  */
 package org.geotools.metadata.extent;
 
+// J2SE dependencies
+import java.awt.geom.Rectangle2D;
+
 
 /**
  * Geographic position of the dataset. This is only an approximate
@@ -71,6 +74,13 @@ public class GeographicBoundingBox extends GeographicExtent
      * Constructs an initially empty geographic bounding box.
      */
     public GeographicBoundingBox() {
+    }
+
+    /**
+     * Constructs a geographic bounding box from the specified rectangle.
+     */
+    public GeographicBoundingBox(final Rectangle2D bounds) {
+        this(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
     }
 
     /**

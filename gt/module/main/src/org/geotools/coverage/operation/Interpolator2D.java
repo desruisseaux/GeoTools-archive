@@ -163,7 +163,7 @@ public final class Interpolator2D extends GridCoverage2D {
                            final Interpolation[] interpolations,
                            final int             index)
     {
-        super(coverage);
+        super(null, coverage);
         this.interpolation = interpolations[index];
         if (index+1 < interpolations.length) {
             if (interpolations[index+1] instanceof InterpolationNearest) {

@@ -134,9 +134,14 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
 
     /**
      * Constructs a new coverage with the same parameters than the specified coverage.
+     *
+     * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
+     * @param coverage The source coverage.
      */
-    protected AbstractGridCoverage(final AbstractGridCoverage coverage) {
-        super(coverage);
+    protected AbstractGridCoverage(final CharSequence name,
+                                   final GridCoverage coverage)
+    {
+        super(name, coverage);
         sources = Collections.singletonList(coverage);
     }
 

@@ -225,10 +225,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * identical data, but in which some method has been overriden in order to
      * process data differently (e.g. interpolating them).
      *
+     * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
      * @param coverage The source grid coverage.
      */
-    protected GridCoverage2D(final GridCoverage2D coverage) {
-        super(coverage);
+    protected GridCoverage2D(final CharSequence   name,
+                             final GridCoverage2D coverage)
+    {
+        super(name, coverage);
         crs2D            = coverage.crs2D;
         image            = coverage.image;
         gridGeometry     = coverage.gridGeometry;

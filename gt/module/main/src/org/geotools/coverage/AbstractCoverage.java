@@ -67,6 +67,7 @@ import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridCoverage;                // For javadoc
 import org.opengis.coverage.grid.GridGeometry;                // For javadoc
 import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc
 import org.opengis.referencing.cs.AxisDirection;
@@ -188,17 +189,25 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
     
     /**
-     * Constructs a new coverage with the same
-     * parameters than the specified coverage.
+     * Constructs a new coverage with the same parameters than the specified coverage.
+     * <strong>Note:</strong> This constructor keeps a strong reference to the source
+     * coverage (through {@link PropertySourceImpl}). In many cases, it is not a problem
+     * since {@link GridCoverage} will retains a strong reference to its source anyway.
+     *
+     * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
+     * @param coverage The source coverage.
      */
-    protected AbstractCoverage(final AbstractCoverage coverage) {
-        // NOTE: This constructor keep a strong reference to the
-        //       source coverage (through 'PropertySourceImpl').
-        //       In many cases, it is not a problem since GridCoverage
-        //       will retains a strong reference to its source anyway.
-        super(null, coverage);
-        this.name = coverage.name;
-        this.crs  = coverage.crs;
+    protected AbstractCoverage(final CharSequence name, final Coverage coverage) {
+        super(null, (coverage instanceof PropertySource) ? (PropertySource) coverage : null);
+        final InternationalString n = SimpleInternationalString.wrap(name);
+        if (coverage instanceof AbstractCoverage) {
+            final AbstractCoverage source = (AbstractCoverage) coverage;
+            this.name = (n!=null) ? n : source.name;
+            this.crs  = source.crs;
+        } else {
+            this.name = (n!=null) ? n : new SimpleInternationalString(coverage.toString());
+            this.crs  = coverage.getCoordinateReferenceSystem();
+        }
     }
     
     /**
