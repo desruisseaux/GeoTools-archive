@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Collections;
 
 // OpenGIS dependencies
-//import org.opengis.util.GenericName;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 
@@ -50,7 +50,7 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Serial number for interoperability with different versions.
      */
-//    private static final long serialVersionUID = -4415559967618358778L;
+    private static final long serialVersionUID = -2566307080447896276L;
     
     /**
      * Indication of whether or not the cited feature catalogue complies with ISO 19110.
@@ -108,7 +108,7 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Returns the language(s) used within the catalogue
      */
-    public void setLanguages(final Set newValues) {
+    public synchronized void setLanguages(final Set newValues) {
         checkWritePermission();
         if (language == null) {
             language = new CheckedHashSet(Locale.class);
@@ -149,8 +149,7 @@ public class FeatureCatalogueDescription extends ContentInformation
     public synchronized void setFeatureTypes(final Set newValues) {
         checkWritePermission();
         if (featureTypes == null) {
-            featureTypes = new java.util.HashSet();
-//            featureTypes = new CheckedHashSet(GenericName.class);
+            featureTypes = new CheckedHashSet(GenericName.class);
         } else {
             featureTypes.clear();
         }
@@ -212,7 +211,7 @@ public class FeatureCatalogueDescription extends ContentInformation
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = 0; // (int)serialVersionUID;
+        int code = (int)serialVersionUID;
         if (featureCatalogueCitations != null)  code ^= featureCatalogueCitations.hashCode();
         if (language != null)                   code ^= language                 .hashCode();
         return code;

@@ -83,12 +83,12 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * Note: consider as final. This field is not final only in order
      * to allows {@link #clone} to work.
      */
-    private GeneralParameterValue[] values;
+    private ArrayList/*<GeneralParameterValue>*/ values;
 
     /**
-     * A view of {@link #values} as a list. Will be constructed only when first needed.
-     * Note that while this list may be immutable, <strong>elements</strong> in this list
-     * stay modifiable. The goal is to allows the following idiom:
+     * A view of {@link #values} as an immutable list. Will be constructed only when first
+     * needed. Note that while this list may be immutable, <strong>elements</strong> in this
+     * list stay modifiable. The goal is to allows the following idiom:
      *
      * <blockquote><pre>
      * values().get(i).setValue(myValue);
@@ -106,16 +106,15 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     public ParameterGroup(final ParameterDescriptorGroup descriptor) {
         super(descriptor);
         final List/*<GeneralParameterDescriptor>*/ parameters = descriptor.descriptors();
-        final List/*<GeneralParameterValue>*/ values = new ArrayList(parameters.size());
+        values = new ArrayList/*<GeneralParameterValue>*/(parameters.size());
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
             final GeneralParameterDescriptor element = (GeneralParameterDescriptor) it.next();
-            for (int i=element.getMinimumOccurs(); --i>=0;) {
+            for (int count=element.getMinimumOccurs(); --count>=0;) {
                 final GeneralParameterValue value = element.createValue();
                 ensureNonNull("createValue", value);
                 values.add(value);
             }
         }
-        this.values = (GeneralParameterValue[]) values.toArray(new GeneralParameterValue[values.size()]);
     }
 
     /**
@@ -125,11 +124,14 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * @param values The list of parameter values.
      */
     public ParameterGroup(final ParameterDescriptorGroup descriptor,
-                                     GeneralParameterValue[] values)
+                          final GeneralParameterValue[]  values)
     {
         super(descriptor);
         ensureNonNull("values", values);
-        this.values = values = (GeneralParameterValue[]) values.clone();
+        this.values = new ArrayList(values.length);
+        for (int i=0; i<values.length; i++) {
+            this.values.add(values[i]);
+        }
         final List/*<GeneralParameterDescriptor>*/ parameters = descriptor.descriptors();
         final Map occurences = new LinkedHashMap(Math.round(parameters.size()/0.75f)+1, 0.75f);
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
@@ -151,7 +153,10 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      */
     public ParameterGroup(final Map properties, final GeneralParameterValue[] values) {
         super(createDescriptor(properties, values));
-        this.values = (GeneralParameterValue[]) values.clone();
+        this.values = new ArrayList(values.length);
+        for (int i=0; i<values.length; i++) {
+            this.values.add(values[i]);
+        }
     }
 
     /**
@@ -230,7 +235,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             if (values == null){
                 asList = Collections.EMPTY_LIST;
             } else {
-                asList = new UnmodifiableArrayList(values);
+                asList = Collections.unmodifiableList(values);
             }
         }
         return asList;
@@ -244,17 +249,19 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * @throws IndexOutOfBoundsException if the specified index is out of bounds.
      */
     final GeneralParameterValue parameter(final int index) throws IndexOutOfBoundsException {
-        return values[index];
+        return (GeneralParameterValue) values.get(index); // Remove cast with J2SE 1.5.
     }
 
     /**
-     * Returns the first value in this group for the specified {@linkplain Identifier#getCode
-     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterDescriptor parameter
-     * descriptor} is found for the given code, then this method search recursively in subgroups
-     * (if any). If a parameter descriptor is found but there is no
-     * {@linkplain org.geotools.parameter.ParameterValue value} for it (because it is an optional
-     * parameter), then a {@linkplain org.geotools.parameter.ParameterValue parameter value} is
-     * automatically created and initialized to its default value (if any).
+     * Returns the value in this group for the specified
+     * {@linkplain org.geotools.referencing.Identifier#getCode identifier code}.
+     * If no {@linkplain org.geotools.parameter.ParameterValue parameter value} is found but
+     * a {@linkplain org.geotools.parameter.ParameterDescriptor parameter descriptor} is found
+     * (which may occurs if the parameter is optional, i.e.
+     * <code>{@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumOccurs minimumOccurs}
+     * == 0</code>), then a {@linkplain org.geotools.parameter.ParameterValue parameter value} is
+     * automatically created and initialized to its {@linkplain ParameterDescriptor#getDefaultValue
+     * default value} (if any).
      *
      * <P>This convenience method provides a way to get and set parameter values by name. For
      * example the following idiom fetches a floating point value for the
@@ -265,20 +272,20 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * org.geotools.parameter.ParameterValue#doubleValue() doubleValue()};
      * </code></blockquote>
      *
+     * <P>This method do not search recursively in subgroups. This is because more than one
+     * subgroup may exist for the same {@linkplain org.geotools.parameter.ParameterDescriptorGroup
+     * descriptor}. The user must {@linkplain #groups query all subgroups} and select explicitly
+     * the appropriate one to use.</P>
+     *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
      *              parameter to search for.
      * @return The parameter value for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter value for the given identifier
      *         code.
-     *
-     * @todo Creation of new {@link org.geotools.parameter.ParameterValue} object not yet
-     *       implemented.
      */
     public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        List subgroups = null;
-        List/*<GeneralParameterValue>*/ values = values();
         while (values != null) {
             for (final Iterator it=values.iterator(); it.hasNext();) {
                 final GeneralParameterValue value = (GeneralParameterValue) it.next();
@@ -286,25 +293,117 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
                     if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                         return (ParameterValue) value;
                     }
-                } else if (value instanceof org.opengis.parameter.ParameterValueGroup) {
-                    if (subgroups == null) {
-                        subgroups = new LinkedList();
-                    }
-                    assert !subgroups.contains(value) : value;
-                    subgroups.add(value);
                 }
             }
             /*
-             * Looks in subgroups only after all parameters in the current group have been verified.
-             * Search in a "first in, first out" basis.
+             * No existing parameter found. Check if an optional parameter exists.
+             * If such a descriptor is found, create it, add it to the list of values
+             * and returns it.
              */
-            if (subgroups==null || subgroups.isEmpty()) {
-                break;
+            // TODO: The following lines should be considerably shorter with J2SE 1.5:
+            // for (GeneralParameterDescriptor descriptor : getDescriptor()) {
+            for (final Iterator it=((ParameterDescriptorGroup)
+                 getDescriptor()).descriptors().iterator(); it.hasNext();)
+            {
+                final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
+                if (descriptor instanceof ParameterDescriptor) {
+                    if (IdentifiedObject.nameMatches(descriptor, name)) {
+                        // TODO: remove the first cast with J2SE 1.5.
+                        final ParameterValue value = (ParameterValue)
+                                ((ParameterDescriptor) descriptor).createValue();
+                        values.add(value);
+                        return value;
+                    }
+                }
             }
-            values = ((org.opengis.parameter.ParameterValueGroup) subgroups.remove(0)).values();
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+    }
+    
+    /**
+     * Returns all subgroups with the specified name. This method do not create new groups.
+     * If the requested group is optional (i.e.
+     * <code>{@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumOccurs minimumOccurs}
+     * == 0</code>) and no value were set, then this method returns an empty set.
+     *
+     * @param  name The case insensitive {@linkplain org.geotools.referencing.Identifier#getCode
+     *              identifier code} of the parameter group to search for.
+     * @return The set of all parameter group for the given identifier code.
+     * @throws ParameterNotFoundException if no {@linkplain ParameterDescriptorGroup descriptor}
+     *         was found for the given name.
+     */
+    public List/*<org.opengis.parameter.ParameterValueGroup>*/ groups(String name)
+            throws ParameterNotFoundException
+    {
+        ensureNonNull("name", name);
+        name = name.trim();
+        final List groups = new ArrayList(Math.min(values.size(), 10));
+        for (final Iterator it=values.iterator(); it.hasNext();) {
+            final GeneralParameterValue value = (GeneralParameterValue) it.next();
+            if (value instanceof org.opengis.parameter.ParameterValueGroup) {
+                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                    groups.add(value);
+                }
+            }
+        }
+        /*
+         * No groups were found. Check if the group actually exists (i.e. is declared in the
+         * descriptor). If it doesn't exists, then an exception is thrown. If it exists (i.e.
+         * it is simply an optional group not yet defined), then returns an empty list.
+         */
+        if (groups.isEmpty()) {
+            final GeneralParameterDescriptor check = 
+                    ((ParameterDescriptorGroup) descriptor).getParameter(name);
+            // TODO: invoke 'descriptor' instead.
+            if (!(check instanceof ParameterDescriptorGroup)) {
+                throw new ParameterNotFoundException(Resources.format(
+                          ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+            }
+        }
+        return groups;
+    }
+    
+    /**
+     * Create a new group of the specified name. The specified name must be the
+     * {@linkplain Identifier#getCode identifier code} of a {@linkplain ParameterDescriptorGroup
+     * descriptor group}.
+     *
+     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
+     *              parameter group to create.
+     * @return A newly created parameter group for the given identifier code.
+     * @throws ParameterNotFoundException if no {@linkplain ParameterDescriptorGroup descriptor}
+     *         was found for the given name.
+     * @throws IllegalStateException if this parameter group already contains the
+     *         {@linkplain ParameterDescriptorGroup#getMaximumOccurs maximum number of occurences}
+     *         of subgroups of the given name.
+     */
+    public org.opengis.parameter.ParameterValueGroup addGroup(String name)
+            throws ParameterNotFoundException, IllegalStateException
+    {
+        final GeneralParameterDescriptor check = 
+                ((ParameterDescriptorGroup) descriptor).getParameter(name);
+        // TODO: invoke 'descriptor' instead.
+        if (!(check instanceof ParameterDescriptorGroup)) {
+            throw new ParameterNotFoundException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        }
+        int occurs = 0;
+        for (final Iterator it=values.iterator(); it.hasNext();) {
+            final GeneralParameterValue value = (GeneralParameterValue) it.next();
+            if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                occurs++;
+            }
+        }
+        if (occurs >= check.getMaximumOccurs()) {
+            throw new IllegalStateException(Resources.format(
+                ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(occurs)));
+        }
+        final org.opengis.parameter.ParameterValueGroup value =
+            (org.opengis.parameter.ParameterValueGroup) // Remove this cast for J2SE 1.5.
+            ((ParameterDescriptorGroup) check).createValue();
+        values.add(value);
+        return value;
     }
 
     /**
@@ -380,33 +479,18 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             // optional parameter group - we will simply replace what is there
             int index = Parameters.indexOf( this, type ); 
             if (index == -1) {
-                addImpl(param);                
+                values.add(param);                
             } else {
-                values[ index ] = param;
+                values.set(index, param);
             }
         } else if (Parameters.count(this, type) < MAX) {            
-            addImpl(param);
+            values.add(param);
         } else {
             throw new InvalidParameterTypeException(
             "Cannot exceed maximum allowed in ParameterValueGroup",
             type.getName().toString()
             );
         }
-    }
-
-    /**
-     * Implementation of add methods.
-     *
-     * @deprecated User should never add {@link ParameterValue} himself.
-     */
-    private synchronized void addImpl(GeneralParameterValue param) {
-        final int LENGTH = this.values == null ? 0 : this.values.length;
-        GeneralParameterValue params[] = new GeneralParameterValue[ LENGTH+1 ];
-        if (LENGTH > 0) {
-            System.arraycopy(this.values, 0, params, 0, LENGTH);
-        }
-        params[LENGTH] = param;
-        this.values = params;
     }
     
     /**
@@ -421,7 +505,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         }
         if (super.equals(object)) {
             final ParameterGroup that = (ParameterGroup) object;
-            Arrays.equals(this.values, that.values);
+            return Utilities.equals(this.values, that.values);
         }
         return false;
     }
@@ -433,12 +517,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      *         in past or future versions of this class.
      */
     public int hashCode() {
-        int code = super.hashCode();
-        // TODO: We should use Arrays.hashCode instead in J2SE 1.5.
-        for (int i=0; i<values.length; i++) {
-            code = code*37 + values[i].hashCode();
-        }
-        return code;
+        return super.hashCode() ^ values.hashCode();
     }
 
     /**
@@ -449,10 +528,12 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      */
     public Object clone() {
         final ParameterGroup copy = (ParameterGroup) super.clone();
-        copy.values = (GeneralParameterValue[]) copy.values.clone();
-        for (int i=0; i<copy.values.length; i++) {
-            copy.values[i] = (GeneralParameterValue) copy.values[i].clone();
+        copy.values = (ArrayList/*<GeneralParameterValue>*/) copy.values.clone();
+        for (int i=copy.values.size(); --i>=0;) {
+            // TODO: remove cast with J2SE 1.5
+            copy.values.set(i, ((GeneralParameterValue) copy.values.get(i)).clone());
         }
+        copy.asList = null;
         return copy;
     }
 
@@ -468,8 +549,8 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         table.write(':');
         table.nextColumn();
         TableWriter inner = null;
-        for (int i=0; i<values.length; i++) {
-            final GeneralParameterValue value = values[i];
+        for (final Iterator it=values.iterator(); it.hasNext();) {
+            final GeneralParameterValue value = (GeneralParameterValue) it.next();
             if (value instanceof AbstractParameter) {
                 if (inner == null) {
                     inner = new TableWriter(table, 1);

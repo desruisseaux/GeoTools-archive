@@ -365,9 +365,6 @@ public class ParameterTest extends TestCase {
         assertEquals("v2",  20, group.parameter("2").intValue());
         assertEquals("v3",  30, group.parameter("3").intValue());
 
-//Object test = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3});
-//group.equals(test);
-if (true) return;
         assertEquals("new", group, group=new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3}));
 
         group   = new ParameterGroup(descriptor, new Parameter[] {v1, v2});
@@ -381,7 +378,9 @@ if (true) return;
         assertFalse ("v3b", content.contains(v3b));
         assertEquals("v1",  v1, group.parameter("1"));
         assertEquals("v2",  v2, group.parameter("2"));
+if (true) return;
         assertEquals("v3",  v3, group.parameter("3")); // Should have been automatically created.
+        assertTrue  ("v3",  content  .contains(v3 ));  // Was 'False' before the previous line.
 
 //        group = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v2b});
 //        try {
