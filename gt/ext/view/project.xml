@@ -4,11 +4,11 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-view</name>
   <id>view</id>
-  <currentVersion>2.0-B6-DEV</currentVersion>
+  <currentVersion>2.1.x</currentVersion>
   <versions>
     <version>
       <id>b1</id>
-      <name>2.0-B6-DEV</name>
+      <name>2.1.x</name>
       <tag>GT_2_0_B6_DEV</tag>
     </version>
   </versions>
@@ -34,7 +34,7 @@
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.0-B6-DEV</version>
+      <version>2.1.x</version>
     </dependency>
     <dependency>
       <id>JTS</id>
