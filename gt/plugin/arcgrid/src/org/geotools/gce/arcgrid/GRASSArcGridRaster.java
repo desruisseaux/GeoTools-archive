@@ -16,16 +16,17 @@
  */
 package org.geotools.gce.arcgrid;
 
+import javax.media.jai.RasterFactory;
+
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+
 import java.net.URL;
-
-import javax.media.jai.RasterFactory;
-
 
 /**
  * ArcGridRaster sub-instance that handles the "ArcGrid" format that GRASS
@@ -61,25 +62,27 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public GRASSArcGridRaster(URL srcURL) throws IOException {
+    public GRASSArcGridRaster(URL srcURL)
+        throws IOException {
         super(srcURL);
     }
 
-    public GRASSArcGridRaster(Reader reader, boolean compress) throws IOException {
+    public GRASSArcGridRaster(Reader reader, boolean compress)
+        throws IOException {
         super(reader, compress);
     }
 
-    public GRASSArcGridRaster(PrintWriter writer) throws IOException {
+    public GRASSArcGridRaster(PrintWriter writer)
+        throws IOException {
         super(writer);
     }
 
-
-
-    protected void parseHeader(StreamTokenizer st) throws IOException {
+    protected void parseHeader(StreamTokenizer st)
+        throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();
         st.eolIsSignificant(true);
-        st.whitespaceChars(0,' ');
+        st.whitespaceChars(0, ' ');
         st.whitespaceChars(':', ':');
         st.wordChars('a', 'z');
         st.wordChars('A', 'Z');
@@ -97,8 +100,9 @@ public class GRASSArcGridRaster extends ArcGridRaster {
             if (st.ttype == StreamTokenizer.TT_WORD) {
                 String key = st.sval;
 
-                if (NO_DATA_MARKER.equalsIgnoreCase(key))
-                        break;
+                if (NO_DATA_MARKER.equalsIgnoreCase(key)) {
+                    break;
+                }
 
                 if (st.nextToken() != StreamTokenizer.TT_NUMBER) {
                     throw new IOException("Expected number after " + key);
@@ -108,17 +112,23 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
                 if (COLS.equalsIgnoreCase(key)) {
                     nCols = (int) val;
-                } else if (ROWS.equalsIgnoreCase(key)) {
+                }
+                else if (ROWS.equalsIgnoreCase(key)) {
                     nRows = (int) val;
-                } else if (NORTH.equalsIgnoreCase(key)) {
+                }
+                else if (NORTH.equalsIgnoreCase(key)) {
                     north = readHeaderDouble(st);
-                } else if (SOUTH.equalsIgnoreCase(key)) {
+                }
+                else if (SOUTH.equalsIgnoreCase(key)) {
                     south = readHeaderDouble(st);
-                } else if (EAST.equalsIgnoreCase(key)) {
+                }
+                else if (EAST.equalsIgnoreCase(key)) {
                     east = readHeaderDouble(st);
-                } else if (WEST.equalsIgnoreCase(key)) {
+                }
+                else if (WEST.equalsIgnoreCase(key)) {
                     west = readHeaderDouble(st);
-                } else {
+                }
+                else {
                     // ignore extra fields for now
                     // are there ever any?
                 }
@@ -126,7 +136,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
                 if (st.nextToken() != StreamTokenizer.TT_EOL) {
                     throw new IOException("Expected new line, not " + st.sval);
                 }
-            } else {
+            }
+            else {
                 throw new IOException("Exected word token");
             }
         }
@@ -145,7 +156,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public WritableRaster readRaster() throws IOException {
+    public WritableRaster readRaster()
+        throws IOException {
         // open reader and make tokenizer
         Reader reader = openReader();
         StreamTokenizer st = new StreamTokenizer(reader);
@@ -158,9 +170,9 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         st.parseNumbers();
         st.whitespaceChars(' ', ' ');
         st.whitespaceChars(' ', '\t');
-        st.whitespaceChars('\n','\n');
-        st.whitespaceChars('\r','\r');//linefeed (on windows only?)
-        st.whitespaceChars('\f','\f');//form feed (on printers????)
+        st.whitespaceChars('\n', '\n');
+        st.whitespaceChars('\r', '\r'); //linefeed (on windows only?)
+        st.whitespaceChars('\f', '\f'); //form feed (on printers????)
 
         st.eolIsSignificant(false);
         st.ordinaryChars('E', 'E');
@@ -226,10 +238,12 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
         default:
 
-            if (st.ttype == '*' || st.sval.equalsIgnoreCase(NO_DATA_MARKER)) {
-            	st.nextToken();
+            if ((st.ttype == '*') || st.sval.equalsIgnoreCase(NO_DATA_MARKER)) {
+                st.nextToken();
+
                 return Double.NaN;
-            } else {
+            }
+            else {
                 throw new IOException("Unknown token " + st.ttype);
             }
         }
@@ -256,7 +270,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
             break;
 
-		case '*':
+        case '*':
         case StreamTokenizer.TT_NUMBER:
         case StreamTokenizer.TT_EOF:
             break;
@@ -280,7 +294,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      * @throws IOException DOCUMENT ME!
      */
     public void writeRaster(Raster raster, double xl, double yl,
-        double cellsize, boolean compress) throws IOException {
+        double cellsize, boolean compress)
+        throws IOException {
         // open writer
         PrintWriter out = openWriter(compress);
 
@@ -323,7 +338,8 @@ public class GRASSArcGridRaster extends ArcGridRaster {
                 // no data masking
                 if (Double.isNaN(v)) {
                     buffer.append(NO_DATA_MARKER);
-                } else {
+                }
+                else {
                     buffer.append(v);
                 }
 
