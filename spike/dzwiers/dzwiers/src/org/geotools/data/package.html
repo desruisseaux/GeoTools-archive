@@ -1,0 +1,18 @@
+This package, and the four sub packages reley heavily on the Catalog 
+implementation. In many cases it is posible to represent the information 
+and modification requests in terms of CatalogEntrys. Please pay particular 
+attention to the super interface, in many cases what you are looking for 
+will be hidden there.
+
+This pacakge contains common data access definitions. the feature subclass 
+is particular to feature sources, and .grid for grid sources. Both these 
+packages have a min package ... representing the minimum a developer 
+would have to write to get this going.
+
+Catalog -- We used this as a base to allow for easy abstraction between 
+multiple data types and sources from a user's point of view. Much of the 
+Catalog API can be used directly by client UIs.
+
+We should also note that ALL factories are responsible for caching! This is
+vital, as this allows the seemless modification and re-parameterization 
+between data sources.
