@@ -26,6 +26,7 @@ package org.geotools.parameter;
 import org.opengis.parameter.ParameterDescriptor;
 
 // J2SE dependencies
+import java.lang.reflect.Array;
 import java.net.URL;
 
 import javax.units.Unit;
@@ -330,4 +331,21 @@ public class ParameterReal extends AbstractParameter
         final long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32) + super.hashCode()*37;
     }
+    public String toString() {
+        String name = descriptor.getName().toString( null );
+        Object value = getValue();
+        
+        StringBuffer buf = new StringBuffer();
+        buf.append( "[<" );
+        buf.append( descriptor.getName().toString( null ) );
+        buf.append( "> " );
+        if( value == null ){
+            buf.append( "null" );
+        }
+        else {
+            buf.append( value );            
+        }        
+        buf.append("]");
+        return buf.toString();
+    }    
 }

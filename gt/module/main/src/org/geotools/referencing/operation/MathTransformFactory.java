@@ -192,9 +192,9 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     private MathTransformProvider getProvider(final String identifier)
             throws NoSuchIdentifierException
     {
-        final Iterator providers = getProviders(MathTransformProvider.class);
+        final Iterator providers = getProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
-            final MathTransformProvider provider = (MathTransformProvider) providers.next();
+            final MathTransformProvider provider = (MathTransformProvider) providers.next();            
             if (provider.identifierMatches(identifier)) {
                 return provider;
             }

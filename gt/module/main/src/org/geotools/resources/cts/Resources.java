@@ -23,6 +23,7 @@ package org.geotools.resources.cts;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import org.geotools.resources.ResourceBundle;
+import org.geotools.util.InternationalString;
 
 
 /**
@@ -54,6 +55,22 @@ public class Resources extends ResourceBundle {
         super(filepath);
     }
     
+    /** Sets us up with an international String for the provided key */
+    public static InternationalString international( int key ){
+        InternationalString string = new InternationalString();        
+        Locale locales[] = { null, Locale.ENGLISH, Locale.FRENCH };
+        for( int i=0; i<locales.length; i++){
+            Locale locale = locales[i];
+            try {
+                String str = getResources( locale ).getString( key );
+                string.addLocalizedString( locale, str );
+            }
+            catch( MissingResourceException missing ){
+                // oh well
+            }
+        }
+        return string;
+    }
     /**
      * Returns resources in the given locale.
      *

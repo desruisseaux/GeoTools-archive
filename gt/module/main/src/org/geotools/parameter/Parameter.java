@@ -24,9 +24,11 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Set;
 import java.util.Arrays;
 import javax.units.Unit;
@@ -719,5 +721,42 @@ public class Parameter extends AbstractParameter
         }
     }
                
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        String name = descriptor.getName().toString( null );
+        Object value = getValue();
+        
+        StringBuffer buf = new StringBuffer();
+        buf.append( "[<" );
+        buf.append( descriptor.getName().toString( null ) );
+        buf.append( "> " );
+        if( value == null ){
+            buf.append( "null" );
+        }
+        else if( value.getClass().isArray() ){
+            int length = Array.getLength( value );
+            if( length == 0 ){
+                buf.append( "(,)" );
+            }
+            else {
+                buf.append( "(");
+                for( int i = 0; i< Math.min(5,length);i++){
+                    buf.append( Array.get( value, 0 ) );
+                    buf.append( "," );
+                }
+                if( length > 5 ){
+                    buf.append( "..." );
+                }
+                buf.append(")");
+            }
+        }
+        else {
+            buf.append( value );            
+        }        
+        buf.append("]");
+        return buf.toString();
+    }
 }
 

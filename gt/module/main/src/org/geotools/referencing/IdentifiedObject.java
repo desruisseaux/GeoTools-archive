@@ -228,13 +228,25 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
             }
             Locale locale = getLocale(key, NAME_PROPERTY );
             if (locale != null) {
-                name.addLocalizedString( locale, (String) value);
-                continue CHECK;
+                if( value instanceof String ){
+                    name.addLocalizedString( locale, (String) value);
+                    continue CHECK;
+                }
+                else if ( value instanceof InternationalString ){
+                    name = (InternationalString) value;
+                    continue CHECK;                    
+                }
             }
             locale = getLocale(key, REMARKS_PROPERTY );
-            if (locale != null) {                
-                remarks.addLocalizedString( locale, (String) value);
-                continue CHECK;
+            if (locale != null) {
+                if( value instanceof String ){
+                    remarks.addLocalizedString( locale, (String) value);
+                    continue CHECK;                    
+                }
+                if ( value instanceof InternationalString ){
+                    remarks = (InternationalString) value;
+                    continue CHECK;                    
+                }
             }
             if (localizables != null) {
                 for (int i=0; i<localizables.length; i++) {
@@ -374,7 +386,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     {
         identifier = identifier.trim();
         if (identifiers==null || identifiers.length==0) {
-            return identifier.equalsIgnoreCase(info.getName().toString().trim());
+            return identifier.equalsIgnoreCase(info.getName().toString(null).trim());
         }
         final String code, codespace;
         final int separator = identifier.indexOf(':');

@@ -230,9 +230,29 @@ public abstract class MathTransformProvider extends OperationMethod {
                 }
             }
         }
-        return createMathTransform(
-            new FallbackParameterValueGroup( getParameters(), values)
-        );
+        ParameterDescriptorGroup group = getParameters();
+        System.out.println( group );
+        ParameterValueGroup params = (ParameterValueGroup) group.createValue();
+        System.out.println( params );
+        for( int i=0; i<values.length; i++){            
+            if( values[i] instanceof ParameterValue ){
+                ParameterValue value = (ParameterValue) values[i];                
+                ParameterDescriptor descriptor = (ParameterDescriptor) value.getDescriptor();
+                String name = descriptor.getName().toString( null );                
+                if( descriptor.getMaximumOccurs() == 1 &&
+                    params.parameter( name ) != null ){                    
+                    params.parameter( name ).setValue( value.getValue() );
+                }
+                else {
+                    params.add( value );
+                }
+            }
+            else if (values[i] instanceof ParameterValueGroup ){
+                params.add( (ParameterValueGroup) values[i] );                
+            }
+        }
+        return createMathTransform( params );
+        // return createMathTransform( new FallbackParameterValueGroup( getParameters(), values) );
     }
 
     /**

@@ -23,6 +23,7 @@
 package org.geotools.referencing.cs;
 
 // J2SE dependencies
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -428,7 +430,7 @@ public class CoordinateSystemAxis extends IdentifiedObject
     private final Unit unit;
 
     /**
-     * Construct an axis with the same {@linkplain #getName name} than the abbreviation.
+     * Construct an axis with the same {@linkplain #getName name} as the abbreviation.
      *
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
      *                     coordinate system axes.
@@ -437,12 +439,33 @@ public class CoordinateSystemAxis extends IdentifiedObject
      *                     system axis.
      */
     public CoordinateSystemAxis(final String        abbreviation,
+						        final AxisDirection direction,
+						        final Unit          unit)
+    {
+        this( Collections.singletonMap("name", abbreviation), abbreviation, direction, unit);
+    }
+    /**
+     * Construct an axis with an InternationalString name and a abbreviation.
+     *
+     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
+     *                     coordinate system axes.
+     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
+     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
+     *                     system axis.
+     */    
+    public CoordinateSystemAxis(final InternationalString name,
+                                final String        abbreviation,
                                 final AxisDirection direction,
                                 final Unit          unit)
     {
-        this(Collections.singletonMap("name", abbreviation), abbreviation, direction, unit);
+        this( propertites( name, abbreviation), abbreviation, direction, unit);
     }
-
+    private static Map propertites( final InternationalString name, final String abbreviation ){
+        Map map = new HashMap();
+        map.put( "name", name );
+        map.put( "abbreviation", abbreviation );
+        return map;
+    }
     /**
      * Construct an axis from a set of properties. The properties map is given unchanged
      * to the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
@@ -588,10 +611,10 @@ public class CoordinateSystemAxis extends IdentifiedObject
                          final Unit          unit,
                          final int           key)
         {
-            super(abbreviation, direction, unit);
+            super( Resources.international( key ), abbreviation,
+                   direction, unit);
             this.key = key;
-        }
-        
+        }        
         /**
          * Returns a localized string. If <code>locale</code> is <code>null</code>, then the
          * {@linkplain Locale#ENGLISH English} locale is used in order to allows proper WKT

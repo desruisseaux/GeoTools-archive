@@ -372,7 +372,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
 	    GeneralParameterDescriptor type = param.getDescriptor();        
 	    if( !Parameters.allowed( (ParameterGroupDescriptor) this.getDescriptor(), type ) ){
 	        throw new InvalidParameterTypeException(
-                "Not allowed in ParameterValueGroup",
+                "Not allowed in ParameterValueGroup:"+type.getName(),
                 type.getName().toString());
 	    }
 	    final int MIN = type.getMinimumOccurs();
@@ -432,5 +432,23 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     public org.opengis.parameter.ParameterValueGroup[] group( ParameterGroupDescriptor groupType ){
         List found = Parameters.list( this, groupType );
         return (org.opengis.parameter.ParameterValueGroup[]) found.toArray( new org.opengis.parameter.ParameterValueGroup[ found.size()] );
+    }
+    /**
+     * Returns Parameter Group using notation similar to list (<name> p1, p2, p3)
+     */
+    public String toString(){
+        String name = descriptor.getName().toString( null );
+        StringBuffer buf = new StringBuffer();
+        buf.append( "(<" );
+        buf.append( descriptor.getName().toString( null ) );
+        buf.append( "> " );        
+        for( int i=0; i<values.length;i++){
+            buf.append( values[i] );
+            if( i<values.length){
+                buf.append( ",");
+            }
+        }
+        buf.append(")");
+        return buf.toString();
     }
 }
