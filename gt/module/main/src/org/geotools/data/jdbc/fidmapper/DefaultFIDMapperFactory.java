@@ -273,7 +273,10 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * Returns true if the specified column is auto-increment. This method is
      * left protected so that specific datastore implementations can put their
      * own logic, should the default one be ineffective or have bad
-     * performance
+     * performance.
+     * 
+     *  NOTE: the postgis subclass will call this with the columnname and table name pre-double-quoted!
+     *        Other DB may have to do the same - please check your DB's documentation.
      *
      * @param catalog
      * @param schema
@@ -305,7 +308,9 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             statement = conn.createStatement();
             statement.setFetchSize(1);
             rs = statement.executeQuery("Select " + columnName + " from "
-                    + tableName);
+                    + tableName+" WHERE 0=1");  //DJB: the "where 0=1" will optimize if you have a lot of dead tuples
+            // if the WHERE 0=1 give any data store problems, just remove it 
+            // and put a comment here as to why it caused problems.
 
             java.sql.ResultSetMetaData rsInfo = rs.getMetaData();
             autoIncrement = rsInfo.isAutoIncrement(1);
