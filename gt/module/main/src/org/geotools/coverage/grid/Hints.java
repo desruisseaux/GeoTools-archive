@@ -44,7 +44,7 @@ import org.geotools.resources.Utilities;
  * <blockquote><pre>
  * CoordinateOperationFactory myFactory = <FONT FACE="Arial">...</FONT>
  * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
- * GridCoverageProcessor processor = new GridCoverageProcessorGT(hints);
+ * GridCoverageProcessor processor = new GridCoverageProcessor2D(hints);
  * </pre></blockquote>
  *
  * @version $Id$

@@ -56,7 +56,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class OperationGT implements Operation, Serializable {
+public abstract class Operation2D implements Operation, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -92,7 +92,7 @@ public abstract class OperationGT implements Operation, Serializable {
      *
      * @param descriptor The parameters descriptor.
      */
-    public OperationGT(final ParameterDescriptorGroup descriptor) {
+    public Operation2D(final ParameterDescriptorGroup descriptor) {
         this.descriptor = descriptor;
     }
 
@@ -174,12 +174,12 @@ public abstract class OperationGT implements Operation, Serializable {
     
     /**
      * Apply a process operation to a grid coverage. This method is invoked by
-     * {@link GridCoverageProcessorGT}.
+     * {@link GridCoverageProcessor2D}.
      *
      * @param  parameters List of name value pairs for the parameters
      *         required for the operation.
      * @param  hints A set of rendering hints, or {@code null} if none.
-     *         The {@code GridCoverageProcessorGT} may provides hints
+     *         The {@code GridCoverageProcessor2D} may provides hints
      *         for the following keys: {@link Hints#COORDINATE_OPERATION_FACTORY}
      *         and {@link Hints#JAI_INSTANCE}.
      * @return The result as a grid coverage.
@@ -188,20 +188,20 @@ public abstract class OperationGT implements Operation, Serializable {
                                                   final RenderingHints hints);
 
     /**
-     * Returns the {@link GridCoverageProcessorGT} instance used for an operation.
+     * Returns the {@link GridCoverageProcessor2D} instance used for an operation.
      * The instance is fetch from the rendering hints given to the {@link #doOperation} method.
      *
      * @param  hints The rendering hints, or {@code null} if none.
-     * @return The {@code GridCoverageProcessorGT} instance in use (never {@code null}).
+     * @return The {@code GridCoverageProcessor2D} instance in use (never {@code null}).
      */
-    protected static GridCoverageProcessorGT getGridCoverageProcessor(final RenderingHints hints) {
+    protected static GridCoverageProcessor2D getGridCoverageProcessor(final RenderingHints hints) {
         if (hints != null) {
             final Object value = hints.get(Hints.GRID_COVERAGE_PROCESSOR);
-            if (value instanceof GridCoverageProcessorGT) {
-                return (GridCoverageProcessorGT) value;
+            if (value instanceof GridCoverageProcessor2D) {
+                return (GridCoverageProcessor2D) value;
             }
         }
-        return GridCoverageProcessorGT.getDefault();
+        return GridCoverageProcessor2D.getDefault();
     }
 
     /**
@@ -219,7 +219,7 @@ public abstract class OperationGT implements Operation, Serializable {
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final OperationGT that = (OperationGT) object;
+            final Operation2D that = (Operation2D) object;
             return Utilities.equals(this.descriptor, that.descriptor);
         }
         return false;

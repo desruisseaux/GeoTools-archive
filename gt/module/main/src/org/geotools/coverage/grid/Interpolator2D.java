@@ -634,7 +634,7 @@ public final class Interpolator2D extends GridCoverage2D {
 //
 //        /**
 //         * Apply an interpolation to a grid coverage. This method is invoked
-//         * by {@link GridCoverageProcessorGT} for the "Interpolate" operation.
+//         * by {@link GridCoverageProcessor2D} for the "Interpolate" operation.
 //         */
 //        protected GridCoverage doOperation(final ParameterList  parameters,
 //                                           final RenderingHints hints)
