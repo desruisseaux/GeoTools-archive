@@ -424,7 +424,9 @@ public class WorldImageWriter implements GridCoverageWriter {
             output.close();
         }
         catch (Exception e) {
-            throw new IOException(e.getMessage());
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
         }
     }
 
