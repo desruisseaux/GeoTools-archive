@@ -23,14 +23,9 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
@@ -41,6 +36,10 @@ import org.opengis.metadata.identification.Progress;
 import org.opengis.metadata.identification.Usage;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -76,49 +75,49 @@ public class Identification extends MetadataEntity
     /**
      * Recognition of those who contributed to the resource(s).
      */
-    private List credits;
+    private Collection credits;
 
     /**
      * Status of the resource(s).
      */
-    private Set status;
+    private Collection status;
 
     /**
      * Identification of, and means of communication with, person(s) and organizations(s)
      * associated with the resource(s).
      */
-    private Set pointOfContacts;
+    private Collection pointOfContacts;
 
     /**
      * Provides information about the frequency of resource updates, and the scope of those updates.
      */
-    private Set resourceMaintenance;
+    private Collection resourceMaintenance;
 
     /**
      * Provides a graphic that illustrates the resource(s) (should include a legend for the graphic).
      */
-    private Set graphicOverviews;
+    private Collection graphicOverviews;
 
     /**
      * Provides a description of the format of the resource(s).
      */
-    private Set resourceFormat;
+    private Collection resourceFormat;
 
     /**
      * Provides category keywords, their type, and reference source.
      */
-    private Set descriptiveKeywords;
+    private Collection descriptiveKeywords;
 
     /**
      * Provides basic information about specific application(s) for which the resource(s)
      * has/have been or is being used by different users.
      */
-    private Set resourceSpecificUsages;
+    private Collection resourceSpecificUsages;
 
     /**
      * Provides information about constraints which apply to the resource(s).
      */
-    private Set resourceConstraints;
+    private Collection resourceConstraints;
     
     /**
      * Construct an initially empty identification.
@@ -182,192 +181,131 @@ public class Identification extends MetadataEntity
     /**
      * Recognition of those who contributed to the resource(s).
      */
-    public List getCredits() {
-        final List credits = this.credits; // Avoid synchronization
-        return (credits!=null) ? credits : Collections.EMPTY_LIST;
+    public synchronized Collection getCredits() {
+        return credits = nonNullCollection(credits, String.class);
     }
 
     /**
      * Set a recognition of those who contributed to the resource(s).
      */
-    public synchronized void setCredits(final List newValues) {
-        checkWritePermission();
-        if (credits == null) {
-            credits = new CheckedArrayList(String.class);
-        } else {
-            credits.clear();
-        }
-        credits.addAll(newValues);
+    public synchronized void setCredits(final Collection newValues) {
+        credits = copyCollection(newValues, credits, String.class);
     }
 
     /**
      * Status of the resource(s).
      */
-    public Set getStatus() {
-        final Set status = this.status; // Avoid synchronization
-        return (status!=null) ? status : Collections.EMPTY_SET;
+    public synchronized Collection getStatus() {
+        return status = nonNullCollection(status, Progress.class);
     }
 
     /**
      * Set the status of the resource(s).
      */
-    public synchronized void setStatus(final Set newValues) {
-        checkWritePermission();
-        if (status == null) {
-            status = new CheckedHashSet(Progress.class);
-        } else {
-            status.clear();
-        }
-        status.addAll(newValues);
+    public synchronized void setStatus(final Collection newValues) {
+        status = copyCollection(newValues, status, Progress.class);
     }
 
     /**
      * Identification of, and means of communication with, person(s) and organizations(s)
      * associated with the resource(s).
      */
-    public Set getPointOfContacts() {
-        final Set pointOfContacts = this.pointOfContacts; // Avoid synchronization
-        return (pointOfContacts!=null) ? pointOfContacts : Collections.EMPTY_SET;
+    public synchronized Collection getPointOfContacts() {
+        return pointOfContacts = nonNullCollection(pointOfContacts, ResponsibleParty.class);
     }
 
     /**
      * Set the point of contacts.
      */
-    public synchronized void setPointOfContacts(final Set newValues) {
-        checkWritePermission();
-        if (pointOfContacts == null) {
-            pointOfContacts = new CheckedHashSet(ResponsibleParty.class);
-        } else {
-            pointOfContacts.clear();
-        }
-        pointOfContacts.addAll(newValues);
+    public synchronized void setPointOfContacts(final Collection newValues) {
+        pointOfContacts = copyCollection(newValues, pointOfContacts, ResponsibleParty.class);
     }
 
     /**
      * Provides information about the frequency of resource updates, and the scope of those updates.
      */
-    public Set getResourceMaintenance() {
-        final Set resourceMaintenance = this.resourceMaintenance; // Avoid synchronization
-        return (resourceMaintenance!=null) ? resourceMaintenance : Collections.EMPTY_SET;
+    public synchronized Collection getResourceMaintenance() {
+        return resourceMaintenance = nonNullCollection(resourceMaintenance,
+                                                       MaintenanceInformation.class);
     }
 
     /**
      * Set information about the frequency of resource updates, and the scope of those updates.
      */
-    public synchronized void setResourceMaintenance(final Set newValues) {
-        checkWritePermission();
-        if (resourceMaintenance == null) {
-            resourceMaintenance = new CheckedHashSet(MaintenanceInformation.class);
-        } else {
-            resourceMaintenance.clear();
-        }
-        resourceMaintenance.addAll(newValues);
+    public synchronized void setResourceMaintenance(final Collection newValues) {
+        resourceMaintenance = copyCollection(newValues, resourceMaintenance,
+                                             MaintenanceInformation.class);
     }
 
     /**
      * Provides a graphic that illustrates the resource(s) (should include a legend for the graphic).
      */
-    public Set getGraphicOverviews() {
-        final Set graphicOverviews = this.graphicOverviews; // Avoid synchronization
-        return (graphicOverviews!=null) ? graphicOverviews : Collections.EMPTY_SET;
+    public synchronized Collection getGraphicOverviews() {
+        return graphicOverviews = nonNullCollection(graphicOverviews, BrowseGraphic.class);
     }
 
     /**
      * Set a graphic that illustrates the resource(s).
      */
-    public synchronized void setGraphicOverviews(final Set newValues) {
-        checkWritePermission();
-        if (graphicOverviews == null) {
-            graphicOverviews = new CheckedHashSet(BrowseGraphic.class);
-        } else {
-            graphicOverviews.clear();
-        }
-        graphicOverviews.addAll(newValues);
+    public synchronized void setGraphicOverviews(final Collection newValues) {
+        graphicOverviews = copyCollection(newValues, graphicOverviews, BrowseGraphic.class);
     }
 
     /**
      * Provides a description of the format of the resource(s).
      */
-    public Set getResourceFormat() {
-        final Set resourceFormat = this.resourceFormat; // Avoid synchronization
-        return (resourceFormat!=null) ? resourceFormat : Collections.EMPTY_SET;
+    public synchronized Collection getResourceFormat() {
+        return resourceFormat = nonNullCollection(resourceFormat, Format.class);
     }
 
     /**
      * Set a description of the format of the resource(s).
      */
-    public synchronized void setResourceFormat(final Set newValues) {
-        checkWritePermission();
-        if (resourceFormat == null) {
-            resourceFormat = new CheckedHashSet(Format.class);
-        } else {
-            resourceFormat.clear();
-        }
-        resourceFormat.addAll(newValues);
+    public synchronized void setResourceFormat(final Collection newValues) {
+        resourceFormat = copyCollection(newValues, resourceFormat, Format.class);
     }
 
     /**
      * Provides category keywords, their type, and reference source.
      */
-    public Set getDescriptiveKeywords() {
-        final Set descriptiveKeywords = this.descriptiveKeywords; // Avoid synchronization
-        return (descriptiveKeywords!=null) ? descriptiveKeywords : Collections.EMPTY_SET;
+    public synchronized Collection getDescriptiveKeywords() {
+        return descriptiveKeywords = nonNullCollection(descriptiveKeywords, Keywords.class);
     }
 
     /**
      * Set category keywords, their type, and reference source.
      */
-    public synchronized void setDescriptiveKeywords(final Set newValues) {
-        checkWritePermission();
-        if (descriptiveKeywords == null) {
-            descriptiveKeywords = new CheckedHashSet(Keywords.class);
-        } else {
-            descriptiveKeywords.clear();
-        }
-        descriptiveKeywords.addAll(newValues);
+    public synchronized void setDescriptiveKeywords(final Collection newValues) {
+        descriptiveKeywords = copyCollection(newValues, descriptiveKeywords, Keywords.class);
     }
 
     /**
      * Provides basic information about specific application(s) for which the resource(s)
      * has/have been or is being used by different users.
      */
-    public Set getResourceSpecificUsages() {
-        final Set resourceSpecificUsages = this.resourceSpecificUsages; // Avoid synchronization
-        return (resourceSpecificUsages!=null) ? resourceSpecificUsages : Collections.EMPTY_SET;
+    public synchronized Collection getResourceSpecificUsages() {
+        return resourceSpecificUsages = nonNullCollection(resourceSpecificUsages, Usage.class);
     }
 
     /**
      * Set basic information about specific application(s).
      */
-    public synchronized void setResourceSpecificUsages(final Set newValues) {
-        checkWritePermission();
-        if (resourceSpecificUsages == null) {
-            resourceSpecificUsages = new CheckedHashSet(Usage.class);
-        } else {
-            resourceSpecificUsages.clear();
-        }
-        resourceSpecificUsages.addAll(newValues);
+    public synchronized void setResourceSpecificUsages(final Collection newValues) {
+        resourceSpecificUsages = copyCollection(newValues, resourceSpecificUsages, Usage.class);
     }
 
     /**
      * Provides information about constraints which apply to the resource(s).
      */
-    public Set getResourceConstraints() {
-        final Set resourceConstraints = this.resourceConstraints; // Avoid synchronization
-        return (resourceConstraints!=null) ? resourceConstraints : Collections.EMPTY_SET;
+    public synchronized Collection getResourceConstraints() {
+        return resourceConstraints = nonNullCollection(resourceConstraints, Constraints.class);
     }
 
     /**
      * Set information about constraints which apply to the resource(s).
      */
-    public synchronized void setResourceConstraints(final Set newValues) {
-        checkWritePermission();
-        if (resourceConstraints == null) {
-            resourceConstraints = new CheckedHashSet(Constraints.class);
-        } else {
-            resourceConstraints.clear();
-        }
-        resourceConstraints.addAll(newValues);
+    public synchronized void setResourceConstraints(final Collection newValues) {
+        resourceConstraints = copyCollection(newValues, resourceConstraints, Constraints.class);
     }
 
     /**
@@ -378,14 +316,14 @@ public class Identification extends MetadataEntity
         citation               = (Citation)            unmodifiable(citation);
         abstracts              = (InternationalString) unmodifiable(abstracts);
         purpose                = (InternationalString) unmodifiable(purpose);
-        credits                = (List)                unmodifiable(credits);
-        status                 = (Set)                 unmodifiable(status);
-        pointOfContacts        = (Set)                 unmodifiable(pointOfContacts);
-        resourceMaintenance    = (Set)                 unmodifiable(resourceMaintenance);
-        resourceFormat         = (Set)                 unmodifiable(resourceFormat);
-        descriptiveKeywords    = (Set)                 unmodifiable(descriptiveKeywords);
-        resourceSpecificUsages = (Set)                 unmodifiable(resourceSpecificUsages);
-        resourceConstraints    = (Set)                 unmodifiable(resourceConstraints);
+        credits                = (Collection)          unmodifiable(credits);
+        status                 = (Collection)          unmodifiable(status);
+        pointOfContacts        = (Collection)          unmodifiable(pointOfContacts);
+        resourceMaintenance    = (Collection)          unmodifiable(resourceMaintenance);
+        resourceFormat         = (Collection)          unmodifiable(resourceFormat);
+        descriptiveKeywords    = (Collection)          unmodifiable(descriptiveKeywords);
+        resourceSpecificUsages = (Collection)          unmodifiable(resourceSpecificUsages);
+        resourceConstraints    = (Collection)          unmodifiable(resourceConstraints);
     }
 
     /**

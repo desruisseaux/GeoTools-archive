@@ -16,7 +16,7 @@
  */
 package org.geotools.data.wms.gce;
 
-import java.net.URL;
+import java.net.URI;
 
 import javax.units.Unit;
 
@@ -118,7 +118,7 @@ public class WMSParameterValue extends Parameter {
     /* (non-Javadoc)
      * @see org.opengis.parameter.ParameterValue#valueFile()
      */
-    public URL valueFile() throws InvalidParameterTypeException {
+    public URI valueFile() throws InvalidParameterTypeException {
         // TODO Auto-generated method stub
         return null;
     }

@@ -24,6 +24,7 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -452,7 +453,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
         }
         InternationalString title = authority.getTitle();
         int length = title.length();
-        final List alt = authority.getAlternateTitles();
+        final Collection alt = authority.getAlternateTitles();
         if (alt != null) {
             for (final Iterator it=alt.iterator(); it.hasNext();) {
                 final InternationalString candidate = (InternationalString) it.next();

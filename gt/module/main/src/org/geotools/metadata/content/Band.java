@@ -237,14 +237,12 @@ public class Band extends RangeDimension
      */
     protected void freeze() {
         super.freeze();
-        maxValue       = (Number)  unmodifiable(maxValue);
-        minValue       = (Number)  unmodifiable(minValue);
-        units          = (Unit)    unmodifiable(units);
-        peakResponse   = (Number)  unmodifiable(peakResponse);
-        bitsPerValue   = (Integer) unmodifiable(bitsPerValue);
-        toneGradation  = (Integer) unmodifiable(toneGradation);
-        scaleFactor    = (Number)  unmodifiable(scaleFactor);
-        offset         = (Number)  unmodifiable(offset);
+        maxValue     = (Number) unmodifiable(maxValue);
+        minValue     = (Number) unmodifiable(minValue);
+        units        = (Unit)   unmodifiable(units);
+        peakResponse = (Number) unmodifiable(peakResponse);
+        scaleFactor  = (Number) unmodifiable(scaleFactor);
+        offset       = (Number) unmodifiable(offset);
     }
 
     /**

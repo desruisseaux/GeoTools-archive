@@ -24,7 +24,7 @@ package org.geotools.metadata.citation;
 
 // OpenGIS dependencies
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Address;
@@ -71,26 +71,26 @@ public class ResponsibleParty extends MetadataEntity
      *
      * @param role           The OGC role (point of contact, owner, etc.) for a resource.
      * @param function       The OGC function (information, download, etc.) for a resource.
-     * @param onlineResource The URL on the resource.
+     * @param onlineResource The URI on the resource.
      * @return ResponsibleParty describing OGC involvement
      */ 
     public static ResponsibleParty OGC(final Role role,
                                        final OnLineFunction function,
-                                       final URL onlineResource)
+                                       final URI onlineResource)
     {
         org.geotools.metadata.citation.OnLineResource resource = new org.geotools.metadata.citation.OnLineResource();
         
-        resource.setLinkage( onlineResource );
-        resource.setFunction( function );
+        resource.setLinkage(onlineResource);
+        resource.setFunction(function);
         resource.freeze();
         
         org.geotools.metadata.citation.Contact contact = new org.geotools.metadata.citation.Contact();        
-        contact.setOnLineResource( resource );
+        contact.setOnLineResource(resource);
         contact.freeze();
         
         ResponsibleParty ogc = new ResponsibleParty( role );
-        ogc.setOrganisationName( OGC_NAME );
-        ogc.setContactInfo( contact );        
+        ogc.setOrganisationName(OGC_NAME);
+        ogc.setContactInfo(contact);        
         ogc.freeze();
         
         return ogc;
@@ -315,11 +315,9 @@ public class ResponsibleParty extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        individualName    = (String)              unmodifiable(individualName);
-        organisationName  = (InternationalString) unmodifiable(organisationName);
-        positionName      = (InternationalString) unmodifiable(positionName);
-        contactInfo       = (Contact)             unmodifiable(contactInfo);
-        role              = (Role)                unmodifiable(role);
+        organisationName = (InternationalString) unmodifiable(organisationName);
+        positionName     = (InternationalString) unmodifiable(positionName);
+        contactInfo      = (Contact)             unmodifiable(contactInfo);
     }
 
     /**

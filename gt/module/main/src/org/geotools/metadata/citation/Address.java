@@ -23,14 +23,15 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -71,12 +72,12 @@ public class Address extends MetadataEntity
     /**
      * Address line for the location (as described in ISO 11180, Annex A).
      */
-    private Set deliveryPoints = new CheckedHashSet( String.class );
+    private Collection deliveryPoints;
     
     /**
      * Address of the electronic mailbox of the responsible organization or individual.
      */
-    private Set electronicMailAddresses = new CheckedHashSet( String.class );
+    private Collection electronicMailAddresses;
 
     /**
      * Constructs an initially empty address.
@@ -135,41 +136,28 @@ public class Address extends MetadataEntity
     /**
      * Returns the address line for the location (as described in ISO 11180, Annex A).
      */
-    public Set getDeliveryPoints() {
-        final Set deliveryPoints = this.deliveryPoints; // Avoid synchronization
-        return (deliveryPoints!=null) ? deliveryPoints : Collections.EMPTY_SET;
+    public synchronized Collection getDeliveryPoints() {
+        return deliveryPoints = nonNullCollection(deliveryPoints, String.class);
     }
     
     /**
      * Set the address line for the location (as described in ISO 11180, Annex A).
      */
-    public synchronized void setDeliveryPoints(final Set newValues) {
-        checkWritePermission();
-        if (deliveryPoints == null) {
-            deliveryPoints = new CheckedHashSet(String.class);
-        } else {
-            deliveryPoints.clear();
-        }
-        deliveryPoints.addAll(newValues);
+    public synchronized void setDeliveryPoints(final Collection newValues) {
+        deliveryPoints = copyCollection(newValues, deliveryPoints, String.class);
     }
     /**
      * Returns the address of the electronic mailbox of the responsible organization or individual.
      */
-    public Set getElectronicMailAddresses() {
-        final Set electronicMailAddresses = this.electronicMailAddresses; // Avoid synchronization
-        return (electronicMailAddresses!=null) ? electronicMailAddresses : Collections.EMPTY_SET;
+    public synchronized Collection getElectronicMailAddresses() {
+        return electronicMailAddresses = nonNullCollection(electronicMailAddresses, String.class);
     }
+
     /**
      * Set the address of the electronic mailbox of the responsible organization or individual.
      */
-    public synchronized void setElectronicMailAddresses(final Set newValues) {
-        checkWritePermission();
-        if (electronicMailAddresses == null) {
-            electronicMailAddresses = new CheckedHashSet(String.class);
-        } else {
-            electronicMailAddresses.clear();
-        }
-        electronicMailAddresses.addAll(newValues);
+    public synchronized void setElectronicMailAddresses(final Collection newValues) {
+        electronicMailAddresses = copyCollection(newValues, electronicMailAddresses, String.class);
     }
     
     /**
@@ -196,9 +184,8 @@ public class Address extends MetadataEntity
         administrativeArea      = (InternationalString) unmodifiable(administrativeArea);
         city                    = (InternationalString) unmodifiable(city);
         country                 = (InternationalString) unmodifiable(country);
-        postalCode              = (String)              unmodifiable(postalCode);
-        deliveryPoints          = (Set)                 unmodifiable(deliveryPoints);
-        electronicMailAddresses = (Set)                 unmodifiable(electronicMailAddresses);
+        deliveryPoints          = (Collection)          unmodifiable(deliveryPoints);
+        electronicMailAddresses = (Collection)          unmodifiable(electronicMailAddresses);
     }
 
     /**

@@ -22,13 +22,18 @@
  */
 package org.geotools.metadata.extent;
 
-// OpenGIS direct dependencies
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
+// J2SE dependencies
+import java.util.Collection;
+
+// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.TemporalExtent;
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -58,17 +63,17 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
     /**
      * Provides geographic component of the extent of the referring object
      */
-    private GeographicExtent geographicElement;
+    private Collection/*<GeographicExtent>*/ geographicElements;
 
     /**
      * Provides temporal component of the extent of the referring object
      */
-    private TemporalExtent temporalElement;
+    private Collection/*<TemporalExtent>*/ temporalElements;
 
     /**
      * Provides vertical component of the extent of the referring object
      */
-    private VerticalExtent verticalElement;
+    private Collection/*<VerticalExtent>*/ verticalElements;
 
     /**
      * Construct an initially empty extent.
@@ -94,46 +99,43 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
     /**
      * Provides geographic component of the extent of the referring object
      */
-    public GeographicExtent getGeographicElement() {
-        return geographicElement;
+    public synchronized Collection/*<GeographicExtent>*/ getGeographicElements() {
+        return geographicElements = nonNullCollection(geographicElements, GeographicExtent.class);
     }
 
     /**
      * Set geographic component of the extent of the referring object
      */
-    public synchronized void setGeographicElement(final GeographicExtent newValue) {
-        checkWritePermission();
-        geographicElement = newValue;
+    public synchronized void setGeographicElements(final Collection/*<GeographicExtent>*/ newValues) {
+        geographicElements = copyCollection(newValues, geographicElements, GeographicExtent.class);
     }
 
     /**
      * Provides temporal component of the extent of the referring object
      */
-    public TemporalExtent getTemporalElement() {
-        return temporalElement;
+    public synchronized Collection/*<TemporalExtent>*/ getTemporalElements() {
+        return temporalElements = nonNullCollection(temporalElements, TemporalExtent.class);
     }
 
     /**
      * Set temporal component of the extent of the referring object
      */
-    public synchronized void setTemporalElement(final TemporalExtent newValue) {
-        checkWritePermission();
-        temporalElement = newValue;
+    public synchronized void setTemporalElements(final Collection/*<TemporalExtent>*/ newValues) {
+        temporalElements = copyCollection(newValues, temporalElements, TemporalExtent.class);
     }
 
     /**
      * Provides vertical component of the extent of the referring object
      */
-    public VerticalExtent getVerticalElement() {
-        return verticalElement;
+    public synchronized Collection/*<VerticalExtent>*/ getVerticalElements() {
+        return verticalElements = nonNullCollection(verticalElements, VerticalExtent.class);
     }
 
     /**
      * Set vertical component of the extent of the referring object
      */
-    public synchronized void setVerticalElement(final VerticalExtent newValue) {
-        checkWritePermission();
-        verticalElement = newValue;
+    public synchronized void setVerticalElements(final Collection/*<VerticalExtent>*/ newValues) {
+        verticalElements = copyCollection(newValues, verticalElements, VerticalExtent.class);
     }
 
     /**
@@ -141,10 +143,10 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
      */
     protected void freeze() {
         super.freeze();
-        description       = (InternationalString) unmodifiable(description);
-        geographicElement = (GeographicExtent)    unmodifiable(geographicElement);
-        temporalElement   = (TemporalExtent)      unmodifiable(temporalElement);
-        verticalElement   = (VerticalExtent)      unmodifiable(verticalElement);
+        description        = (InternationalString) unmodifiable(description);
+        geographicElements = (Collection)          unmodifiable(geographicElements);
+        temporalElements   = (Collection)          unmodifiable(temporalElements);
+        verticalElements   = (Collection)          unmodifiable(verticalElements);
     }
 
     /**
@@ -156,10 +158,10 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final Extent that = (Extent) object;
-            return Utilities.equals(this.description,       that.description       ) &&
-                   Utilities.equals(this.geographicElement, that.geographicElement ) &&
-                   Utilities.equals(this.temporalElement,   that.temporalElement   ) &&
-                   Utilities.equals(this.verticalElement,   that.verticalElement   )  ;
+            return Utilities.equals(this.description,        that.description       ) &&
+                   Utilities.equals(this.geographicElements, that.geographicElements) &&
+                   Utilities.equals(this.temporalElements,   that.temporalElements  ) &&
+                   Utilities.equals(this.verticalElements,   that.verticalElements  )  ;
         }
         return false;
     }
@@ -169,10 +171,10 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (description        != null) code ^= description      .hashCode();
-        if (geographicElement  != null) code ^= geographicElement.hashCode();
-        if (temporalElement    != null) code ^= temporalElement  .hashCode();
-        if (verticalElement    != null) code ^= verticalElement  .hashCode();
+        if (description        != null) code ^= description       .hashCode();
+        if (geographicElements != null) code ^= geographicElements.hashCode();
+        if (temporalElements   != null) code ^= temporalElements  .hashCode();
+        if (verticalElements   != null) code ^= verticalElements  .hashCode();
         return code;
     }
 

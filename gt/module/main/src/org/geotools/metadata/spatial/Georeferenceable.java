@@ -23,14 +23,16 @@
 package org.geotools.metadata.spatial;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -73,7 +75,7 @@ public class Georeferenceable extends GridSpatialRepresentation
     /**
      * Reference providing description of the parameters.
      */
-    private Set parameterCitation;
+    private Collection parameterCitation;
 
     /**
      * Construct an initially empty georeferenceable.
@@ -84,12 +86,12 @@ public class Georeferenceable extends GridSpatialRepresentation
     /**
      * Creates a georeferencable initialized to the given parameters.
      */
-    public Georeferenceable(final int numberOfDimensions,
-                            final Set axisDimensionsProperties,
+    public Georeferenceable(final int          numberOfDimensions,
+                            final List         axisDimensionsProperties,
                             final CellGeometry cellGeometry,
-                            final boolean transformationParameterAvailable,
-                            final boolean controlPointAvailable, 
-                            final boolean orientationParameterAvailable)
+                            final boolean      transformationParameterAvailable,
+                            final boolean      controlPointAvailable, 
+                            final boolean      orientationParameterAvailable)
     {
         super(numberOfDimensions, axisDimensionsProperties, cellGeometry, transformationParameterAvailable);
         setControlPointAvailable        (controlPointAvailable        );
@@ -136,7 +138,7 @@ public class Georeferenceable extends GridSpatialRepresentation
     /**
      * Set a description of parameters used to describe sensor orientation.
      */
-     public synchronized void setOrientationParameterDescription(final InternationalString newValue) {
+    public synchronized void setOrientationParameterDescription(final InternationalString newValue) {
         checkWritePermission();
         orientationParameterDescription = newValue;
     }
@@ -159,22 +161,15 @@ public class Georeferenceable extends GridSpatialRepresentation
     /**
      * Reference providing description of the parameters.
      */
-    public Set getParameterCitation() {
-        final Set parameterCitation = this.parameterCitation; // Avoid synchronization
-        return (parameterCitation!=null) ? parameterCitation : Collections.EMPTY_SET;
+    public synchronized Collection getParameterCitation() {
+        return parameterCitation = nonNullCollection(parameterCitation, Citation.class);
     }
 
     /**
      * Set reference providing description of the parameters.
      */
-    public synchronized void setParameterCitation(final Set newValues) {
-        checkWritePermission();
-        if (parameterCitation == null) {
-            parameterCitation = new CheckedHashSet(Citation.class);
-        } else {
-            parameterCitation.clear();
-        }
-        parameterCitation.addAll(newValues);
+    public synchronized void setParameterCitation(final Collection newValues) {
+        parameterCitation = copyCollection(newValues, parameterCitation, Citation.class);
     }
 
     /**
@@ -184,7 +179,7 @@ public class Georeferenceable extends GridSpatialRepresentation
         super.freeze();
         orientationParameterDescription = (InternationalString) unmodifiable(orientationParameterDescription);
         parameters                      = (Object)              unmodifiable(parameters);
-        parameterCitation               = (Set)                 unmodifiable(parameterCitation);
+        parameterCitation               = (Collection)          unmodifiable(parameterCitation);
     }
 
     /**

@@ -319,14 +319,11 @@ public class ImageDescription extends CoverageDescription
      */
     protected void freeze() {
         super.freeze();
-        illuminationElevationAngle    = (Number)           unmodifiable(illuminationElevationAngle);
-        illuminationAzimuthAngle      = (Number)           unmodifiable(illuminationAzimuthAngle);
-        imagingCondition              = (ImagingCondition) unmodifiable(imagingCondition);
-        imageQualityCode              = (Identifier)       unmodifiable(imageQualityCode);
-        cloudCoverPercentage          = (Number)           unmodifiable(cloudCoverPercentage);
-        processingLevelCode           = (Identifier)       unmodifiable(processingLevelCode);
-        compressionGenerationQuantity = (Integer)          unmodifiable(compressionGenerationQuantity);
-        triangulationIndicator        = (Boolean)          unmodifiable(triangulationIndicator);
+        illuminationElevationAngle = (Number)     unmodifiable(illuminationElevationAngle);
+        illuminationAzimuthAngle   = (Number)     unmodifiable(illuminationAzimuthAngle);
+        imageQualityCode           = (Identifier) unmodifiable(imageQualityCode);
+        cloudCoverPercentage       = (Number)     unmodifiable(cloudCoverPercentage);
+        processingLevelCode        = (Identifier) unmodifiable(processingLevelCode);
     }
 
     /**

@@ -20,6 +20,7 @@
 package org.geotools.resources;
 
 // J2SE dependencies
+import java.util.Iterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -385,23 +386,35 @@ public final class CRSUtilities {
      * @return The envelope, or {@code null} if none.
      */
     public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
+        GeneralEnvelope envelope = null;
         if (crs != null) {
             final Extent validArea = crs.getValidArea();
             if (validArea != null) {
-                final GeographicExtent geo = validArea.getGeographicElement();
-                if (geo instanceof GeographicBoundingBox) {
-                    final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                    return new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
-                                                             bounds.getWestBoundLongitude()},
-                                               new double[] {bounds.getSouthBoundLatitude(),
-                                                             bounds.getNorthBoundLatitude()});
-                }
-                if (geo instanceof BoundingPolygon) {
-                    return ((BoundingPolygon) geo).getPolygon().getEnvelope();
+                for (final Iterator it=validArea.getGeographicElements().iterator(); it.hasNext();) {
+                    final GeographicExtent geo = (GeographicExtent) it.next();
+                    final GeneralEnvelope candidate;
+                    if (geo instanceof GeographicBoundingBox) {
+                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
+                        candidate = new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
+                                                                      bounds.getWestBoundLongitude()},
+                                                        new double[] {bounds.getSouthBoundLatitude(),
+                                                                      bounds.getNorthBoundLatitude()});
+                    } else if (geo instanceof BoundingPolygon) {
+                        // TODO: iterates through all polygons and invoke
+                        //       Polygon.getEnvelope();
+                        continue;
+                    } else {
+                        continue;
+                    }
+                    if (envelope == null) {
+                        envelope = candidate;
+                    } else {
+                        envelope.add(candidate);
+                    }
                 }
             }
         }
-        return null;
+        return envelope;
     }
     
     /**

@@ -22,8 +22,6 @@
  */
 package org.geotools.metadata.extent;
 
-// J2SE direct dependencies
-
 
 /**
  * Geographic position of the dataset. This is only an approximate
@@ -172,16 +170,16 @@ public class GeographicBoundingBox extends GeographicExtent
         checkWritePermission();
         northBoundLatitude = newValue;
     }
-    
+
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
     }
 
     /**
-     * Compare this GeographicBoundingBox with the specified object for equality.
+     * Compares this geographic bounding box with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

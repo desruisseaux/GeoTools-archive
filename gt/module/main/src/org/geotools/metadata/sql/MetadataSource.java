@@ -27,8 +27,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -250,7 +251,7 @@ public class MetadataSource {
     /**
      * Converts the specified non-metadata value into an object of the expected type.
      * The expected value is an instance of a class outside the metadata package, for
-     * example {@link String}, {@link InternationalString}, {@link URL}, etc.
+     * example {@link String}, {@link InternationalString}, {@link URI}, etc.
      */
     private static Object convert(final Class valueType, final Object value) {
         if (value!=null && !valueType.isAssignableFrom(value.getClass())) {
@@ -260,6 +261,12 @@ public class MetadataSource {
             if (URL.class.isAssignableFrom(valueType)) try {
                 return new URL(value.toString());
             } catch (MalformedURLException exception) {
+                // TODO: localize and provides more details.
+                throw new MetadataException("Illegal value.", exception);
+            }
+            if (URI.class.isAssignableFrom(valueType)) try {
+                return new URI(value.toString());
+            } catch (URISyntaxException exception) {
                 // TODO: localize and provides more details.
                 throw new MetadataException("Illegal value.", exception);
             }

@@ -23,14 +23,15 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -76,7 +77,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     /**
      * Provides information about the distributor’s format.
      */
-    private Set formatDistributors;
+    private Collection formatDistributors;
     
     /**
      * Construct an initially empty format.
@@ -172,22 +173,15 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     /**
      * Provides information about the distributor’s format.
      */
-    public Set getFormatDistributors() {
-        final Set formatDistributors = this.formatDistributors; // Avoid synchronization
-        return (formatDistributors!=null) ? formatDistributors : Collections.EMPTY_SET;
+    public synchronized Collection getFormatDistributors() {
+        return formatDistributors = nonNullCollection(formatDistributors, Distributor.class);
     }
     
     /**
      * Set information about the distributor’s format.
      */
-    public synchronized void setFormatDistributors(final Set newValues) {
-        checkWritePermission();
-        if (formatDistributors == null) {
-            formatDistributors = new CheckedHashSet(Distributor.class);
-        } else {
-            formatDistributors.clear();
-        }
-        formatDistributors.addAll(newValues);
+    public synchronized void setFormatDistributors(final Collection newValues) {
+        formatDistributors = copyCollection(newValues, formatDistributors, Distributor.class);
     }
 
     /**
@@ -200,7 +194,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
         amendmentNumber            = (InternationalString) unmodifiable(amendmentNumber);
         specification              = (InternationalString) unmodifiable(specification);
         fileDecompressionTechnique = (InternationalString) unmodifiable(fileDecompressionTechnique);
-        formatDistributors         = (Set)                 unmodifiable(formatDistributors);
+        formatDistributors         = (Collection)          unmodifiable(formatDistributors);
     }
 
     /**

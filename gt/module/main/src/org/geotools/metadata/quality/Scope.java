@@ -22,11 +22,13 @@
  */
 package org.geotools.metadata.quality;
 
-// OpenGIS direct dependencies
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.maintenance.ScopeCode;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -99,16 +101,15 @@ public class Scope extends MetadataEntity implements org.opengis.metadata.qualit
     }
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        level   = (ScopeCode) unmodifiable(level);
-        extent  = (Extent)    unmodifiable(extent);
+        extent = (Extent) unmodifiable(extent);
     }
 
     /**
-     * Compare this Scope with the specified object for equality.
+     * Compares this Scope with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

@@ -23,17 +23,17 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies and extensions
-import java.util.Collections;
-import java.util.List;
-
+import java.util.Collection;
 import javax.units.Unit;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
+// OpenGIS dependencies
 import org.opengis.metadata.distribution.MediumFormat;
 import org.opengis.metadata.distribution.MediumName;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -59,7 +59,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      * Returns <code>null</code> if unknown.
      * If non-null, then the number should be greater than zero.
      */
-    private List densities;
+    private Collection densities;
 
     /**
      * Units of measure for the recording density.
@@ -73,9 +73,9 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
     private Integer volumes;
 
     /**
-     * Method used to write to the medium.
+     * Methods used to write to the medium.
      */
-    private MediumFormat mediumFormat;
+    private Collection/*<MediumFormat>*/ mediumFormats;
 
     /**
      * Description of other limitations or requirements for using the medium.
@@ -138,16 +138,15 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
     /**
      * Returns the method used to write to the medium.
      */
-    public MediumFormat getMediumFormat() {
-        return mediumFormat;
+    public synchronized Collection/*<MediumFormat>*/ getMediumFormats() {
+        return mediumFormats = nonNullCollection(mediumFormats, MediumFormat.class);
     }
 
     /**
      * Set the method used to write to the medium.
      */
-    public synchronized void setMediumFormat(final MediumFormat newValue) {
-        checkWritePermission();
-        mediumFormat = newValue;
+    public synchronized void setMediumFormat(final Collection/*<MediumFormat>*/ newValues) {
+        mediumFormats = copyCollection(newValues, mediumFormats, MediumFormat.class);
     }
 
     /**
@@ -169,23 +168,16 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      * Returns the density at which the data is recorded.
      * The numbers should be greater than zero.
      */
-    public List getDensities() {
-        final List densities = this.densities; // Avoid synchronization
-        return (densities!=null) ? densities : Collections.EMPTY_LIST;
+    public synchronized Collection getDensities() {
+        return densities = nonNullCollection(densities, Number.class);
     }
 
     /**
      * Set density at which the data is recorded.
      * The numbers should be greater than zero.
      */
-    public synchronized void setDensities(final List newValues) {
-        checkWritePermission();
-        if (densities == null) {
-            densities = new CheckedArrayList(Number.class);
-        } else {
-            densities.clear();
-        }
-        densities.addAll(newValues);
+    public synchronized void setDensities(final Collection newValues) {
+        densities = copyCollection(newValues, densities, Number.class);
     }
 
     /**
@@ -193,12 +185,10 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     protected void freeze() {
         super.freeze();
-        name         = (MediumName)          unmodifiable(name);
-        densities    = (List)                unmodifiable(densities);
-        densityUnits = (Unit)                unmodifiable(densityUnits);
-        volumes      = (Integer)             unmodifiable(volumes);
-        mediumFormat = (MediumFormat)        unmodifiable(mediumFormat);
-        mediumNote   = (InternationalString) unmodifiable(mediumNote);
+        densities     = (Collection)          unmodifiable(densities);
+        densityUnits  = (Unit)                unmodifiable(densityUnits);
+        mediumFormats = (Collection)          unmodifiable(mediumFormats);
+        mediumNote    = (InternationalString) unmodifiable(mediumNote);
     }
 
     /**
@@ -214,7 +204,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
                    Utilities.equals(this.densities,     that.densities    ) &&
                    Utilities.equals(this.densityUnits,  that.densityUnits ) &&
                    Utilities.equals(this.volumes,       that.volumes      ) &&
-                   Utilities.equals(this.mediumFormat,  that.mediumFormat ) &&
+                   Utilities.equals(this.mediumFormats, that.mediumFormats) &&
                    Utilities.equals(this.mediumNote,    that.mediumNote   );
         }
         return false;
@@ -225,12 +215,12 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (name           != null) code ^= name        .hashCode();
-        if (densities      != null) code ^= densities   .hashCode();
-        if (densityUnits   != null) code ^= densityUnits.hashCode();
-        if (volumes        != null) code ^= volumes     .hashCode();
-        if (mediumFormat   != null) code ^= mediumFormat.hashCode();
-        if (mediumNote     != null) code ^= mediumNote  .hashCode();
+        if (name          != null) code ^= name         .hashCode();
+        if (densities     != null) code ^= densities    .hashCode();
+        if (densityUnits  != null) code ^= densityUnits .hashCode();
+        if (volumes       != null) code ^= volumes      .hashCode();
+        if (mediumFormats != null) code ^= mediumFormats.hashCode();
+        if (mediumNote    != null) code ^= mediumNote   .hashCode();
         return code;
     }
 

@@ -2,6 +2,8 @@ package org.geotools.metadata.iso19115;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.Collection;
+import java.nio.charset.Charset;
 
 import org.geotools.util.CheckedHashSet;
 import org.opengis.metadata.MetadataExtensionInformation;
@@ -26,7 +28,7 @@ public class MetaData extends AbstractMetaData implements
 	private Set hierarchyLevels;
 	
 	private String parentIdentifier;
-	private String characterSet;
+	private Charset characterSet;
 	
 	/** Set of String */
 	private Set hierarchyLevelNames;
@@ -57,7 +59,7 @@ public class MetaData extends AbstractMetaData implements
 	/** Set of ApplicationSchemaInformation */
 	private Set applicationSchemaInfo;	
 
-	public String getCharacterSet() {
+	public Charset getCharacterSet() {
 		return characterSet;
 	}	
 	public String getParentIdentifier() {
@@ -72,7 +74,7 @@ public class MetaData extends AbstractMetaData implements
 	    }
 	    this.hierarchyLevels.addAll( hierarchyLevels );		
 	}	
-	public synchronized Set getHierarchyLevels() {
+	public synchronized Collection getHierarchyLevels() {
 	    if( hierarchyLevels == null ){
 	        hierarchyLevels = new CheckedHashSet( ScopeCode.class );
 	    }
@@ -87,7 +89,7 @@ public class MetaData extends AbstractMetaData implements
 	    }
 	    this.hierarchyLevelNames.addAll( hierarchyLevelNames );
 	}
-	public Set getHierarchyLevelNames() {
+	public Collection getHierarchyLevelNames() {
 		if( hierarchyLevelNames == null ){
 		    hierarchyLevelNames = new CheckedHashSet( String.class );
 	    }
@@ -99,31 +101,31 @@ public class MetaData extends AbstractMetaData implements
 	public Date getDateStamp() {
 		return dateStamp;
 	}
-	public Set getSpatialRepresentationInfo() {
+	public Collection getSpatialRepresentationInfo() {
 		if( spatialRepresentationInfo == null ){
 		    spatialRepresentationInfo = new CheckedHashSet( SpatialRepresentation.class );
 	    }
 	    return spatialRepresentationInfo;	    	
 	}
-	public Set getReferenceSystemInfo() {
+	public Collection getReferenceSystemInfo() {
 		if( referenceSystemInfo == null ){
 		    referenceSystemInfo = new CheckedHashSet( ReferenceSystem.class );
 	    }
 	    return referenceSystemInfo;
 	}
-	public Set getMetadataExtensionInfo() {
+	public Collection getMetadataExtensionInfo() {
 	    if( metadataExtensionInfo == null ){
 	        metadataExtensionInfo = new CheckedHashSet( MetadataExtensionInformation.class );
 	    }
 	    return metadataExtensionInfo;
 	}
-	public Set getIdentificationInfo() {
+	public Collection getIdentificationInfo() {
 	    if( identificationInfo == null ){
 	        identificationInfo = new CheckedHashSet( Identification.class );
 	    }
 	    return identificationInfo;
 	}
-	public Set getContentInfo() {
+	public Collection getContentInfo() {
 		if( contentInfo == null ){
 		    contentInfo = new CheckedHashSet( ContentInformation.class );
 	    }
@@ -132,25 +134,25 @@ public class MetaData extends AbstractMetaData implements
 	public Distribution getDistributionInfo() {
 		return distributionInfo;
 	}
-	public Set getDataQualityInfo() {
+	public Collection getDataQualityInfo() {
 		if( dataQualityInfo == null ){
 		    dataQualityInfo = new CheckedHashSet( DataQuality.class );
 	    }
 	    return dataQualityInfo;
 	}
-	public Set getPortrayalCatalogueInfo() {
+	public Collection getPortrayalCatalogueInfo() {
 		if( portrayalCatalogueInfo == null ){
 		    portrayalCatalogueInfo = new CheckedHashSet( PortrayalCatalogueReference.class );
 	    }
 	    return portrayalCatalogueInfo;
 	}
-	public Set getMetadataConstraints() {
+	public Collection getMetadataConstraints() {
 		if( metadataConstraints == null ){
 		    metadataConstraints = new CheckedHashSet( Constraints.class );
 	    }
 	    return metadataConstraints;
 	}
-	public Set getApplicationSchemaInfo() {
+	public Collection getApplicationSchemaInfo() {
 		if( applicationSchemaInfo == null ){
 		    applicationSchemaInfo = new CheckedHashSet( ApplicationSchemaInformation.class );
 	    }
@@ -169,7 +171,7 @@ public class MetaData extends AbstractMetaData implements
 	    }
 	    this.applicationSchemaInfo.addAll( applicationSchemaInfo );		
 	}
-	public void setCharacterSet(String characterSet) {
+	public void setCharacterSet(Charset characterSet) {
 		this.characterSet = characterSet;
 	}
 	public void setContact(ResponsibleParty contact) {

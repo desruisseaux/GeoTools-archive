@@ -23,15 +23,16 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -69,7 +70,7 @@ public class Usage extends MetadataEntity implements org.opengis.metadata.identi
      * Identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    private Set userContactInfo;
+    private Collection userContactInfo;
     
     /**
      * Construct an initially empty usage.
@@ -81,7 +82,7 @@ public class Usage extends MetadataEntity implements org.opengis.metadata.identi
      * Create an usage initialized to the specified values.
      */
     public Usage(final InternationalString specificUsage,
-                 final Set                 userContactInfo)
+                 final Collection          userContactInfo)
     {
         setUserContactInfo(userContactInfo);
         setSpecificUsage  (specificUsage  );
@@ -138,23 +139,16 @@ public class Usage extends MetadataEntity implements org.opengis.metadata.identi
      * Identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    public Set getUserContactInfo() {
-        final Set userContactInfo = this.userContactInfo; // Avoid synchronization
-        return (userContactInfo!=null) ? userContactInfo : Collections.EMPTY_SET;
+    public synchronized Collection getUserContactInfo() {
+        return userContactInfo = nonNullCollection(userContactInfo, ResponsibleParty.class);
     }
     
     /**
      * Set identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    public synchronized void setUserContactInfo(final Set newValues) {
-        checkWritePermission();
-        if (userContactInfo == null) {
-            userContactInfo = new CheckedHashSet(ResponsibleParty.class);
-        } else {
-            userContactInfo.clear();
-        }
-        userContactInfo.addAll(newValues);
+    public synchronized void setUserContactInfo(final Collection newValues) {
+        userContactInfo = copyCollection(newValues, userContactInfo, ResponsibleParty.class);
     }    
     
     /**
@@ -164,7 +158,7 @@ public class Usage extends MetadataEntity implements org.opengis.metadata.identi
         super.freeze();
         specificUsage             = (InternationalString) unmodifiable(specificUsage);
         userDeterminedLimitations = (InternationalString) unmodifiable(userDeterminedLimitations);
-        userContactInfo           = (Set)                 unmodifiable(userContactInfo);
+        userContactInfo           = (Collection)          unmodifiable(userContactInfo);
     }
 
     /**

@@ -23,12 +23,14 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+
 
 /**
  * Information identifying the portrayal catalogue used.
@@ -48,7 +50,7 @@ public class PortrayalCatalogueReference extends MetadataEntity
     /**
      * Bibliographic reference to the portrayal catalogue cited.
      */
-    private Set portrayalCatalogueCitations;
+    private Collection portrayalCatalogueCitations;
 
     /**
      * Construct an initially empty portrayal catalogue reference.
@@ -59,29 +61,22 @@ public class PortrayalCatalogueReference extends MetadataEntity
     /**
      * Creates a portrayal catalogue reference initialized to the given values.
      */
-    public PortrayalCatalogueReference(final Set portrayalCatalogueCitations) {
+    public PortrayalCatalogueReference(final Collection portrayalCatalogueCitations) {
         setPortrayalCatalogueCitations(portrayalCatalogueCitations);
     }
     
     /**
      * Bibliographic reference to the portrayal catalogue cited.
      */
-    public Set getPortrayalCatalogueCitations() {
-        final Set portrayalCatalogueCitations = this.portrayalCatalogueCitations; // Avoid synchronization
-        return (portrayalCatalogueCitations!=null) ? portrayalCatalogueCitations : Collections.EMPTY_SET;
+    public synchronized Collection getPortrayalCatalogueCitations() {
+        return portrayalCatalogueCitations = nonNullCollection(portrayalCatalogueCitations, Citation.class);
     }
 
     /**
      * Set bibliographic reference to the portrayal catalogue cited.
      */
-    public synchronized void setPortrayalCatalogueCitations(Set newValues) {
-        checkWritePermission();
-        if (portrayalCatalogueCitations == null) {
-            portrayalCatalogueCitations = new CheckedHashSet(Citation.class);
-        } else {
-            portrayalCatalogueCitations.clear();
-        }
-        portrayalCatalogueCitations.addAll(newValues);
+    public synchronized void setPortrayalCatalogueCitations(Collection newValues) {
+        portrayalCatalogueCitations = copyCollection(newValues, portrayalCatalogueCitations, Citation.class);
     }
 
    /**
@@ -89,7 +84,7 @@ public class PortrayalCatalogueReference extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        portrayalCatalogueCitations    = (Set) unmodifiable(portrayalCatalogueCitations);
+        portrayalCatalogueCitations = (Collection) unmodifiable(portrayalCatalogueCitations);
     }
 
     /**

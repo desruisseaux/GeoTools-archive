@@ -23,17 +23,16 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.Obligation;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -110,7 +109,7 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
      * Name of the metadata entity(s) under which this extended metadata element may appear.
      * The name(s) may be standard metadata element(s) or other extended metadata element(s).
      */
-    private Set parentEntity;
+    private Collection parentEntity;
 
     /**
      * Specifies how the extended element relates to other existing elements and entities.
@@ -120,12 +119,12 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
     /**
      * Reason for creating the extended element.
      */
-    private List rationales;
+    private Collection rationales;
 
     /**
      * Name of the person or organization creating the extended element.
      */
-    private Set sources;
+    private Collection sources;
     
     /**
      * Construct an initially empty extended element information.
@@ -140,9 +139,9 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
                                       final InternationalString definition, 
                                       final InternationalString condition, 
                                       final Datatype datatype, 
-                                      final Set parentEntity, 
+                                      final Collection parentEntity, 
                                       final InternationalString rule,
-                                      final Set sources)
+                                      final Collection sources)
     {
         setName        (name);
         setDefinition  (definition);
@@ -307,22 +306,15 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
      * Name of the metadata entity(s) under which this extended metadata element may appear.
      * The name(s) may be standard metadata element(s) or other extended metadata element(s).
      */
-    public Set getParentEntity() {
-        final Set parentEntity = this.parentEntity; // Avoid synchronization
-        return (parentEntity!=null) ? parentEntity : Collections.EMPTY_SET;
+    public synchronized Collection getParentEntity() {
+        return parentEntity = nonNullCollection(parentEntity, String.class);
     }
 
     /**
      * Set the name of the metadata entity(s) under which this extended metadata element may appear.
      */
-    public synchronized void setParentEntity(final Set newValues) {
-        checkWritePermission();
-        if (parentEntity == null) {
-            parentEntity = new CheckedHashSet(String.class);
-        } else {
-            parentEntity.clear();
-        }
-        parentEntity.addAll(newValues);
+    public synchronized void setParentEntity(final Collection newValues) {
+        parentEntity = copyCollection(newValues, parentEntity, String.class);
     }
 
    /**
@@ -343,43 +335,29 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
     /**
      * Reason for creating the extended element.
      */
-    public List getRationales() {
-        final List rationales = this.rationales; // Avoid synchronization
-        return (rationales!=null) ? rationales : Collections.EMPTY_LIST;
+    public synchronized Collection getRationales() {
+        return rationales = nonNullCollection(rationales, InternationalString.class);
     }
 
     /**
      * Set the reason for creating the extended element.
      */
-    public synchronized void setRationales(final List newValues) {
-        checkWritePermission();
-        if (rationales == null) {
-            rationales = new CheckedArrayList(InternationalString.class);
-        } else {
-            rationales.clear();
-        }
-        rationales.addAll(newValues);
+    public synchronized void setRationales(final Collection newValues) {
+        rationales = copyCollection(newValues, rationales, InternationalString.class);
     }
 
     /**
      * Name of the person or organization creating the extended element.
      */
-    public Set getSources() {
-        final Set sources = this.sources; // Avoid synchronization
-        return (sources!=null) ? sources : Collections.EMPTY_SET;
+    public synchronized Collection getSources() {
+        return sources = nonNullCollection(sources, ResponsibleParty.class);
     }
         
     /**
      * Set the name of the person or organization creating the extended element.
      */
-    public synchronized void setSources(final Set newValues) {
-        checkWritePermission();
-        if (sources == null) {
-            sources = new CheckedHashSet(ResponsibleParty.class);
-        } else {
-            sources.clear();
-        }
-        sources.addAll(newValues);
+    public synchronized void setSources(final Collection newValues) {
+        sources = copyCollection(newValues, sources, ResponsibleParty.class);
     }
 
     /**
@@ -387,19 +365,13 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
      */
     protected void freeze() {
         super.freeze();
-        name              = (String)              unmodifiable(name);
-        shortName         = (String)              unmodifiable(shortName);
-        domainCode        = (Integer)             unmodifiable(domainCode);
-        definition        = (InternationalString) unmodifiable(definition);
-        obligation        = (Obligation)          unmodifiable(obligation);
-        condition         = (InternationalString) unmodifiable(condition);
-        dataType          = (Datatype)            unmodifiable(dataType);
-        maximumOccurrence = (Integer)             unmodifiable(maximumOccurrence);
-        domainValue       = (InternationalString) unmodifiable(domainValue);
-        parentEntity      = (Set)                 unmodifiable(parentEntity);
-        rule              = (InternationalString) unmodifiable(rule);
-        rationales        = (List)                unmodifiable(rationales);
-        sources           = (Set)                 unmodifiable(sources);
+        definition   = (InternationalString) unmodifiable(definition);
+        condition    = (InternationalString) unmodifiable(condition);
+        domainValue  = (InternationalString) unmodifiable(domainValue);
+        parentEntity = (Collection)          unmodifiable(parentEntity);
+        rule         = (InternationalString) unmodifiable(rule);
+        rationales   = (Collection)          unmodifiable(rationales);
+        sources      = (Collection)          unmodifiable(sources);
     }
 
     /**

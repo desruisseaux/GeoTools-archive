@@ -23,15 +23,16 @@
 package org.geotools.metadata.lineage;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.metadata.lineage.Source;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -63,12 +64,12 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     /**
      * Information about an event in the creation process for the data specified by the scope.
      */
-    private Set processSteps;
+    private Collection processSteps;
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    private Set sources;
+    private Collection sources;
 
     /**
      * Construct an initially empty lineage.
@@ -101,44 +102,30 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
      * Returns the information about an event in the creation process for the data
      * specified by the scope.
      */
-    public Set getProcessSteps() {
-        final Set processSteps = this.processSteps; // Avoid synchronization
-        return (processSteps!=null) ? processSteps : Collections.EMPTY_SET;
+    public synchronized Collection getProcessSteps() {
+        return processSteps = nonNullCollection(processSteps, ProcessStep.class);
     }
 
     /**
      * Set information about an event in the creation process for the data specified
      * by the scope.
      */
-    public synchronized void setProcessSteps(final Set newValues)  {
-        checkWritePermission();
-        if (processSteps == null) {
-            processSteps = new CheckedHashSet(ProcessStep.class);
-        } else {
-            processSteps.clear();
-        }
-        processSteps.addAll(newValues);
+    public synchronized void setProcessSteps(final Collection newValues)  {
+        processSteps = copyCollection(newValues, processSteps, ProcessStep.class);
     }
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    public Set getSources() {
-        final Set sources = this.sources; // Avoid synchronization
-        return (sources!=null) ? sources : Collections.EMPTY_SET;
+    public synchronized Collection getSources() {
+        return sources = nonNullCollection(sources, Source.class);
     }
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    public synchronized void setSources(final Set newValues) {
-        checkWritePermission();
-        if (sources == null) {
-            sources = new CheckedHashSet(Source.class);
-        } else {
-            sources.clear();
-        }
-        sources.addAll(newValues);
+    public synchronized void setSources(final Collection newValues) {
+        sources = copyCollection(newValues, sources, Source.class);
     }
 
     /**
@@ -147,8 +134,8 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     protected void freeze() {
         super.freeze();
         statement    = (InternationalString) unmodifiable(statement);
-        processSteps = (Set)                 unmodifiable(processSteps);
-        sources      = (Set)                 unmodifiable(sources);
+        processSteps = (Collection)          unmodifiable(processSteps);
+        sources      = (Collection)          unmodifiable(sources);
     }
 
     /**

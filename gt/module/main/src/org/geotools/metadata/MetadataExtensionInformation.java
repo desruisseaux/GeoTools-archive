@@ -23,12 +23,13 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineResource;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -56,7 +57,7 @@ public class MetadataExtensionInformation extends MetadataEntity
      * Provides information about a new metadata element, not found in ISO 19115, which is
      * required to describe geographic data.
      */
-    private Set extendedElementInformation;
+    private Collection extendedElementInformation;
 
     /**
      * Construct an initially empty metadata extension information.
@@ -84,22 +85,17 @@ public class MetadataExtensionInformation extends MetadataEntity
      * Provides information about a new metadata element, not found in ISO 19115, which is
      * required to describe geographic data.
      */
-    public Set getExtendedElementInformation() {
-        final Set extendedElementInformation = this.extendedElementInformation; // Avoid synchronization
-        return (extendedElementInformation!=null) ? extendedElementInformation : Collections.EMPTY_SET;
+    public synchronized Collection getExtendedElementInformation() {
+        return extendedElementInformation = nonNullCollection(extendedElementInformation,
+                                                              ExtendedElementInformation.class);
     }
     
     /**
      * Set information about a new metadata element.
      */
-    public synchronized void setextendedElementInformation(final Set newValues) {
-        checkWritePermission();
-        if (extendedElementInformation == null) {
-            extendedElementInformation = new CheckedHashSet(ExtendedElementInformation.class);
-        } else {
-            extendedElementInformation.clear();
-        }
-        extendedElementInformation.addAll(newValues);
+    public synchronized void setextendedElementInformation(final Collection newValues) {
+        extendedElementInformation = copyCollection(newValues, extendedElementInformation,
+                                                    ExtendedElementInformation.class);
     }
     
    /**
@@ -108,7 +104,7 @@ public class MetadataExtensionInformation extends MetadataEntity
     protected void freeze() {
         super.freeze();
         extensionOnLineResource    = (OnLineResource) unmodifiable(extensionOnLineResource);
-        extendedElementInformation = (Set)            unmodifiable(extendedElementInformation);
+        extendedElementInformation = (Collection)     unmodifiable(extendedElementInformation);
     }
 
     /**

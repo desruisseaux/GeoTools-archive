@@ -98,16 +98,14 @@ public class FeatureTypeList extends MetadataEntity
     }
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        spatialSchemaName  = (String) unmodifiable(spatialSchemaName);
-        spatialObject      = (String) unmodifiable(spatialObject);
     }
 
     /**
-     * Compare this FeatureTypeList with the specified object for equality.
+     * Compares this FeatureTypeList with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
@@ -115,8 +113,8 @@ public class FeatureTypeList extends MetadataEntity
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final FeatureTypeList that = (FeatureTypeList) object;
-            return Utilities.equals(this.spatialSchemaName, that.spatialSchemaName ) &&
-                   Utilities.equals(this.spatialObject,     that.spatialObject     );
+            return Utilities.equals(this.spatialSchemaName, that.spatialSchemaName) &&
+                   Utilities.equals(this.spatialObject,     that.spatialObject    );
         }
         return false;
     }

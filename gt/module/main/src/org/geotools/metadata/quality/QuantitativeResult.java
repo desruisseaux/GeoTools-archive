@@ -22,11 +22,15 @@
  */
 package org.geotools.metadata.quality;
 
-// J2SE direct dependencies and extension
+// J2SE dependencies and extension
+import java.util.Arrays;
 import javax.units.Unit;
 
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -47,7 +51,7 @@ public class QuantitativeResult extends Result
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */    
-    private Object value;
+    private double[] values;
 
     /**
      * Value type for reporting a data quality result, or <code>null</code> if none.
@@ -73,25 +77,27 @@ public class QuantitativeResult extends Result
     /**
      * Construct a quantitative result initialized to the specified value.
      */
-    public QuantitativeResult(final Object value) {
-        setValue(value);
+    public QuantitativeResult(final double[] values) {
+        setValues(values);
     }
     
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */
-    public Object getValue() {
-        return value;
+    public synchronized double[] getValues() {
+        if (isModifiable()) {
+            return values;
+        } else {
+            return (double[]) values.clone();
+        }
     }
 
     /**
      * Set the quantitative value or values, content determined by the evaluation procedure used.
-     *
-     * @todo Verify if the value is of the requested type.
      */
-    public synchronized void setValue(final Object newValue) {
+    public synchronized void setValues(final double[] newValues) {
         checkWritePermission();
-        value = newValue;
+        values = (double[]) newValues.clone();
     }
 
     /**
@@ -142,11 +148,11 @@ public class QuantitativeResult extends Result
     } 
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        value          = (Object)              unmodifiable(value);
+        values         = (double[])            unmodifiable(values);
         valueType      = (Class)               unmodifiable(valueType);
         valueUnit      = (Unit)                unmodifiable(valueUnit);
         errorStatistic = (InternationalString) unmodifiable(errorStatistic);
@@ -161,7 +167,7 @@ public class QuantitativeResult extends Result
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final QuantitativeResult that = (QuantitativeResult) object; 
-            return Utilities.equals(this.value,          that.value          ) &&
+            return    Arrays.equals(this.values,         that.values         ) &&
                    Utilities.equals(this.valueType,      that.valueType      ) &&
                    Utilities.equals(this.valueUnit,      that.valueUnit      ) &&
                    Utilities.equals(this.errorStatistic, that.errorStatistic ) ;
@@ -176,15 +182,18 @@ public class QuantitativeResult extends Result
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (value     != null) code ^= value    .hashCode();
+//TODO: Uses Arrays.hashCode when we will be allowed to uses J2SE 1.5.
+//      if (values    != null) code ^= values   .hashCode();
         if (valueType != null) code ^= valueType.hashCode();
         return code;
     }
 
     /**
      * Returns a string representation of this result.
+     *
+     * @todo Provides a more elaborated implementation.
      */
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf(valueType);
     }        
 }

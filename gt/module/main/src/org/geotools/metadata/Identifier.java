@@ -138,9 +138,7 @@ public class Identifier extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        code       = (String)   unmodifiable(code);
-        version    = (String)   unmodifiable(version);
-        authority  = (Citation) unmodifiable(authority);
+        authority = (Citation) unmodifiable(authority);
     }
 
     /**

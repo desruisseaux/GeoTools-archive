@@ -22,14 +22,16 @@
  */
 package org.geotools.metadata.spatial;
 
-// OpenGIS direct dependencies
+// OpenGIS dependencies
+import org.opengis.metadata.spatial.GeometricObjectType;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.opengis.metadata.spatial.GeometricObjectType;
 
 
 /**
- * number of objects, listed by geometric object type, used in the dataset.
+ * Number of objects, listed by geometric object type, used in the dataset.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -97,15 +99,14 @@ public class GeometricObjects extends MetadataEntity
     }
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        geometricObjectType = (GeometricObjectType) unmodifiable(geometricObjectType);
     }
 
     /**
-     * Compare this geometric objects with the specified object for equality.
+     * Compares this geometric objects with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

@@ -22,10 +22,12 @@
  */
 package org.geotools.metadata.spatial;
 
-// OpenGIS direct dependencies
+// OpenGIS dependencies
+import org.opengis.metadata.spatial.DimensionNameType;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.opengis.metadata.spatial.DimensionNameType;
 
 
 /**
@@ -118,15 +120,14 @@ public class Dimension extends MetadataEntity
     }
     
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        dimensionName = (DimensionNameType) unmodifiable(dimensionName);
     }
 
     /**
-     * Compare this dimension with the specified object for equality.
+     * Compares this dimension with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

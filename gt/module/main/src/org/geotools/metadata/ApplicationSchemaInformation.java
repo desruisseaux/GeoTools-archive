@@ -23,11 +23,14 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.net.URL;
+import java.net.URI;
 
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.metadata.SpatialAttributeSupplement;
 import org.opengis.metadata.citation.Citation;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -63,17 +66,17 @@ public class ApplicationSchemaInformation extends MetadataEntity
     /**
      * Full application schema given as an ASCII file.
      */
-    private URL schemaAscii;
+    private URI schemaAscii;
 
     /**
      * Full application schema given as a graphics file.
      */
-    private URL graphicsFile;
+    private URI graphicsFile;
 
     /**
      * Full application schema given as a software development file.
      */
-    private URL softwareDevelopmentFile;
+    private URI softwareDevelopmentFile;
 
     /**
      * Software dependent format used for the application schema software dependent file.
@@ -151,14 +154,14 @@ public class ApplicationSchemaInformation extends MetadataEntity
     /**
      * Full application schema given as an ASCII file.
      */
-    public URL getSchemaAscii()  {
+    public URI getSchemaAscii()  {
         return schemaAscii;
     }
 
     /**
      * Set the full application schema given as an ASCII file.
      */
-    public synchronized void setSchemaAscii(final URL newValue) {
+    public synchronized void setSchemaAscii(final URI newValue) {
         checkWritePermission();
         schemaAscii = newValue;
     }
@@ -166,14 +169,14 @@ public class ApplicationSchemaInformation extends MetadataEntity
     /**
      * Full application schema given as a graphics file.
      */
-    public URL getGraphicsFile()  {
+    public URI getGraphicsFile()  {
         return graphicsFile;
     }
 
     /**
      * Set the full application schema given as a graphics file.
      */
-    public synchronized void setGraphicsFile(final URL newValue) {
+    public synchronized void setGraphicsFile(final URI newValue) {
         checkWritePermission();
         graphicsFile = newValue;
     }
@@ -181,14 +184,14 @@ public class ApplicationSchemaInformation extends MetadataEntity
     /**
      * Full application schema given as a software development file.
      */
-    public URL getSoftwareDevelopmentFile()  {
+    public URI getSoftwareDevelopmentFile()  {
         return softwareDevelopmentFile;
     }
 
     /**
      * Set the full application schema given as a software development file.
      */
-    public synchronized void setSoftwareDevelopmentFile(final URL newValue) {
+    public synchronized void setSoftwareDevelopmentFile(final URI newValue) {
         checkWritePermission();
         softwareDevelopmentFile = newValue;
     }
@@ -228,14 +231,8 @@ public class ApplicationSchemaInformation extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        name                          = (Citation)                  unmodifiable(name);
-        schemaLanguage                = (String)                    unmodifiable(schemaLanguage);
-        constraintLanguage            = (String)                    unmodifiable(constraintLanguage);
-        schemaAscii                   = (URL)                       unmodifiable(schemaAscii);
-        graphicsFile                  = (URL)                       unmodifiable(graphicsFile);
-        softwareDevelopmentFile       = (URL)                       unmodifiable(softwareDevelopmentFile);
-        softwareDevelopmentFileFormat = (String)                    unmodifiable(softwareDevelopmentFileFormat);
-        featureCatalogueSupplement    = (SpatialAttributeSupplement)unmodifiable(featureCatalogueSupplement);
+        name                       = (Citation)                   unmodifiable(name);
+        featureCatalogueSupplement = (SpatialAttributeSupplement) unmodifiable(featureCatalogueSupplement);
     }
 
     /**

@@ -23,13 +23,13 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
+import java.nio.charset.Charset;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.ApplicationSchemaInformation;
 import org.opengis.metadata.MetadataExtensionInformation;
 import org.opengis.metadata.PortrayalCatalogueReference;
@@ -42,6 +42,9 @@ import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.ReferenceSystem;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -70,7 +73,7 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Full name of the character coding standard used for the metadata set.
      */
-    private String characterSet;
+    private Charset characterSet;
 
     /**
      * File identifier of the metadata to which this metadata is a subset (child).
@@ -80,12 +83,12 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Scope to which the metadata applies.
      */
-    private Set hierarchyLevels;
+    private Collection hierarchyLevels;
 
     /**
      * Name of the hierarchy levels for which the metadata is provided.
      */
-    private Set hierarchyLevelNames;
+    private Collection hierarchyLevelNames;
 
     /**
      * Party responsible for the metadata information.
@@ -111,28 +114,28 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Digital representation of spatial information in the dataset.
      */
-    private Set spatialRepresentationInfo;
+    private Collection spatialRepresentationInfo;
 
     /**
      * Description of the spatial and temporal reference systems used in the dataset.
      */
-    private Set referenceSystemInfo;
+    private Collection referenceSystemInfo;
 
     /**
      * Information describing metadata extensions.
      */
-    private Set metadataExtensionInfo;
+    private Collection metadataExtensionInfo;
 
     /**
      * Basic information about the resource(s) to which the metadata applies.
      */
-    private Set identificationInfo;
+    private Collection identificationInfo;
 
     /**
      * Provides information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
-    private Set contentInfo;
+    private Collection contentInfo;
 
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
@@ -142,22 +145,22 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Provides overall assessment of quality of a resource(s).
      */
-    private Set dataQualityInfo;
+    private Collection dataQualityInfo;
 
     /**
      * Provides information about the catalogue of rules defined for the portrayal of a resource(s).
      */
-    private Set portrayalCatalogueInfo;
+    private Collection portrayalCatalogueInfo;
 
     /**
      * Provides restrictions on the access and use of data.
      */
-    private Set metadataConstraints;
+    private Collection metadataConstraints;
 
     /**
      * Provides information about the conceptual schema of a dataset.
      */
-    private Set applicationSchemaInfo;
+    private Collection applicationSchemaInfo;
      
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
@@ -186,14 +189,14 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
         setDateStamp         (dateStamp);
         setIdentificationInfo(Collections.singleton(identificationInfo));
     }
-     
+
     /**
      * Returns the unique identifier for this metadata file, or <code>null</code> if none.
      */
     public String getFileIdentifier() {
         return fileIdentifier;
     }
-     
+
     /**
      * Set the unique identifier for this metadata file, or <code>null</code> if none.
      */
@@ -220,7 +223,7 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Returns the full name of the character coding standard used for the metadata set.
      */
-    public String getCharacterSet()  {
+    public Charset getCharacterSet()  {
         return characterSet;
     }
 
@@ -250,43 +253,29 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Returns the scope to which the metadata applies.
      */
-    public Set getHierarchyLevels() {
-        final Set hierarchyLevels = this.hierarchyLevels; // Avoid synchronization
-        return (hierarchyLevels!=null) ? hierarchyLevels : Collections.EMPTY_SET;
+    public synchronized Collection getHierarchyLevels() {
+        return hierarchyLevels = nonNullCollection(hierarchyLevels, ScopeCode.class);
     }
 
     /**
      * Set the scope to which the metadata applies.
      */
-    public synchronized void setHierarchyLevels(final Set newValues) {
-        checkWritePermission();
-        if (hierarchyLevels == null) {
-            hierarchyLevels = new CheckedHashSet(ScopeCode.class);
-        } else {
-            hierarchyLevels.clear();
-        }
-        hierarchyLevels.addAll(newValues);
+    public synchronized void setHierarchyLevels(final Collection newValues) {
+        hierarchyLevels = copyCollection(newValues, hierarchyLevels, ScopeCode.class);
     }
     
     /**
      * Returns the name of the hierarchy levels for which the metadata is provided.
      */
-    public Set getHierarchyLevelNames() {
-        final Set hierarchyLevelNames = this.hierarchyLevelNames; // Avoid synchronization
-        return (hierarchyLevelNames!=null) ? hierarchyLevelNames : Collections.EMPTY_SET;
+    public synchronized Collection getHierarchyLevelNames() {
+        return hierarchyLevelNames = nonNullCollection(hierarchyLevelNames, String.class);
     }
 
     /**
      * Set the name of the hierarchy levels for which the metadata is provided.
      */
-    public synchronized void setHierarchyLevelNames(final Set newValues) {
-        checkWritePermission();
-        if (hierarchyLevelNames == null) {
-            hierarchyLevelNames = new CheckedHashSet(String.class);
-        } else {
-            hierarchyLevelNames.clear();
-        }
-        hierarchyLevelNames.addAll(newValues);
+    public synchronized void setHierarchyLevelNames(final Collection newValues) {
+        hierarchyLevelNames = copyCollection(newValues, hierarchyLevelNames, String.class);
     }
 
     /**
@@ -352,108 +341,77 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Returns the digital representation of spatial information in the dataset.
      */
-    public Set getSpatialRepresentationInfo() {
-        final Set spatialRepresentationInfo = this.spatialRepresentationInfo; // Avoid synchronization
-        return (spatialRepresentationInfo!=null) ? spatialRepresentationInfo : Collections.EMPTY_SET;
+    public synchronized Collection getSpatialRepresentationInfo() {
+        return spatialRepresentationInfo = nonNullCollection(spatialRepresentationInfo,
+                                                             SpatialRepresentation.class);
     }
 
     /**
      * Set the digital representation of spatial information in the dataset.
      */
-    public synchronized void setSpatialRepresentationInfo(final Set newValues) {
-        checkWritePermission();
-        if (spatialRepresentationInfo == null) {
-            spatialRepresentationInfo = new CheckedHashSet(SpatialRepresentation.class);
-        } else {
-            spatialRepresentationInfo.clear();
-        }
-        spatialRepresentationInfo.addAll(newValues);
+    public synchronized void setSpatialRepresentationInfo(final Collection newValues) {
+        spatialRepresentationInfo = copyCollection(newValues, spatialRepresentationInfo,
+                                                   SpatialRepresentation.class);
     }
 
     /**
      * Returns the description of the spatial and temporal reference systems used in the dataset.
      */
-     public Set getReferenceSystemInfo() {
-        final Set referenceSystemInfo = this.referenceSystemInfo; // Avoid synchronization
-        return (referenceSystemInfo!=null) ? referenceSystemInfo : Collections.EMPTY_SET;
+     public synchronized Collection getReferenceSystemInfo() {
+        return referenceSystemInfo = nonNullCollection(referenceSystemInfo, ReferenceSystem.class);
     }
     
     /**
      * Set the description of the spatial and temporal reference systems used in the dataset.
      */
-    public synchronized void setReferenceSystemInfo(final Set newValues) {
-        checkWritePermission();
-        if (referenceSystemInfo == null) {
-            referenceSystemInfo = new CheckedHashSet(ReferenceSystem.class);
-        } else {
-            referenceSystemInfo.clear();
-        }
-        referenceSystemInfo.addAll(newValues);
+    public synchronized void setReferenceSystemInfo(final Collection newValues) {
+        referenceSystemInfo = copyCollection(newValues, referenceSystemInfo, ReferenceSystem.class);
     }
 
     /**
      * Returns information describing metadata extensions.
      */
-    public Set getMetadataExtensionInfo() {
-        final Set metadataExtensionInfo = this.metadataExtensionInfo; // Avoid synchronization
-        return (metadataExtensionInfo!=null) ? metadataExtensionInfo : Collections.EMPTY_SET;
+    public synchronized Collection getMetadataExtensionInfo() {
+        return metadataExtensionInfo = nonNullCollection(metadataExtensionInfo,
+                                                         MetadataExtensionInformation.class);
     }
 
     /**
      * Set information describing metadata extensions.
      */
-    public synchronized void setMetadataExtensionInfo(final Set newValues) {
-        checkWritePermission();
-        if (metadataExtensionInfo == null) {
-            metadataExtensionInfo = new CheckedHashSet(MetadataExtensionInformation.class);
-        } else {
-            metadataExtensionInfo.clear();
-        }
-        metadataExtensionInfo.addAll(newValues);
+    public synchronized void setMetadataExtensionInfo(final Collection newValues) {
+        metadataExtensionInfo = copyCollection(newValues, metadataExtensionInfo,
+                                               MetadataExtensionInformation.class);
     }
 
     /**
      * Returns basic information about the resource(s) to which the metadata applies.
      */
-    public Set getIdentificationInfo() {
-        final Set identificationInfo = this.identificationInfo; // Avoid synchronization
-        return (identificationInfo!=null) ? identificationInfo : Collections.EMPTY_SET;
+    public synchronized Collection getIdentificationInfo() {
+        return identificationInfo = nonNullCollection(identificationInfo, Identification.class);
     }
      
     /**
      * Set basic information about the resource(s) to which the metadata applies.
      */
-    public synchronized void setIdentificationInfo(final Set newValues) {
-        checkWritePermission();
-        if (identificationInfo == null) {
-            identificationInfo = new CheckedHashSet(Identification.class);
-        } else {
-            identificationInfo.clear();
-        }
-        identificationInfo.addAll(newValues);
+    public synchronized void setIdentificationInfo(final Collection newValues) {
+        identificationInfo = copyCollection(newValues, identificationInfo, Identification.class);
     }
 
     /**
      * Provides information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
-    public Set getContentInfo() {
-        final Set contentInfo = this.contentInfo; // Avoid synchronization
-        return (contentInfo!=null) ? contentInfo : Collections.EMPTY_SET;
+    public synchronized Collection getContentInfo() {
+        return contentInfo = nonNullCollection(contentInfo, Identification.class);
     }
      
     /**
      * Set information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
-    public synchronized void setContentInfo(final Set newValues) {
-        checkWritePermission();
-        if (contentInfo == null) {
-            contentInfo = new CheckedHashSet(Identification.class);
-        } else {
-            contentInfo.clear();
-        }
-        contentInfo.addAll(newValues);
+    public synchronized void setContentInfo(final Collection newValues) {
+        contentInfo = copyCollection(newValues, contentInfo, Identification.class);
     }
 
     /**
@@ -474,86 +432,62 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
     /**
      * Provides overall assessment of quality of a resource(s).
      */
-    public Set getDataQualityInfo() {
-        final Set dataQualityInfo = this.dataQualityInfo; // Avoid synchronization
-        return (dataQualityInfo!=null) ? dataQualityInfo : Collections.EMPTY_SET;
+    public synchronized Collection getDataQualityInfo() {
+        return dataQualityInfo = nonNullCollection(dataQualityInfo, DataQuality.class);
     }
      
     /**
      * Set overall assessment of quality of a resource(s).
      */
-    public synchronized void setDataQualityInfo(final Set newValues) {
-        checkWritePermission();
-        if (dataQualityInfo == null) {
-            dataQualityInfo = new CheckedHashSet(DataQuality.class);
-        } else {
-            dataQualityInfo.clear();
-        }
-        dataQualityInfo.addAll(newValues);
+    public synchronized void setDataQualityInfo(final Collection newValues) {
+        dataQualityInfo = copyCollection(newValues, dataQualityInfo, DataQuality.class);
     }
 
      /**
       * Provides information about the catalogue of rules defined for the portrayal of a
       * resource(s).
       */
-     public Set getPortrayalCatalogueInfo() {
-        final Set portrayalCatalogueInfo = this.portrayalCatalogueInfo; // Avoid synchronization
-        return (portrayalCatalogueInfo!=null) ? portrayalCatalogueInfo : Collections.EMPTY_SET;
+     public synchronized Collection getPortrayalCatalogueInfo() {
+        return portrayalCatalogueInfo = nonNullCollection(portrayalCatalogueInfo,
+                                                          PortrayalCatalogueReference.class);
     }
      
     /**
      * Set information about the catalogue of rules defined for the portrayal of a resource(s).
      */
-    public synchronized void setPortrayalCatalogueInfo(final Set newValues) {
-        checkWritePermission();
-        if (portrayalCatalogueInfo == null) {
-            portrayalCatalogueInfo = new CheckedHashSet(PortrayalCatalogueReference.class);
-        } else {
-            portrayalCatalogueInfo.clear();
-        }
-        portrayalCatalogueInfo.addAll(newValues);
+    public synchronized void setPortrayalCatalogueInfo(final Collection newValues) {
+        portrayalCatalogueInfo = copyCollection(newValues, portrayalCatalogueInfo,
+                                                PortrayalCatalogueReference.class);
     }
 
     /**
      * Provides restrictions on the access and use of data.
      */
-    public Set getMetadataConstraints() {
-        final Set metadataConstraints = this.metadataConstraints; // Avoid synchronization
-        return (metadataConstraints!=null) ? metadataConstraints : Collections.EMPTY_SET;
+    public synchronized Collection getMetadataConstraints() {
+        return metadataConstraints = nonNullCollection(metadataConstraints, Constraints.class);
     }
      
     /**
      * Set restrictions on the access and use of data.
      */
-    public synchronized void setMetadataConstraints(final Set newValues) {
-        checkWritePermission();
-        if (metadataConstraints == null) {
-            metadataConstraints = new CheckedHashSet(Constraints.class);
-        } else {
-            metadataConstraints.clear();
-        }
-        metadataConstraints.addAll(newValues);
+    public synchronized void setMetadataConstraints(final Collection newValues) {
+        metadataConstraints = copyCollection(newValues, metadataConstraints, Constraints.class);
     }
 
     /**
      * Provides information about the conceptual schema of a dataset.
      */
-    public Set getApplicationSchemaInfo() {
-        final Set applicationSchemaInfo = this.applicationSchemaInfo; // Avoid synchronization
-        return (applicationSchemaInfo!=null) ? applicationSchemaInfo : Collections.EMPTY_SET;
+    public synchronized Collection getApplicationSchemaInfo() {
+        return applicationSchemaInfo = nonNullCollection(applicationSchemaInfo,
+                                                         ApplicationSchemaInformation.class);
     }
 
     /**
      * Provides information about the conceptual schema of a dataset.
      */
-    public synchronized void setApplicationSchemaInfo(final Set newValues) {
-        checkWritePermission();
-        if (applicationSchemaInfo == null) {
-            applicationSchemaInfo = new CheckedHashSet(ApplicationSchemaInformation.class);
-        } else {
-            applicationSchemaInfo.clear();
-        }
-        applicationSchemaInfo.addAll(newValues);
+    public synchronized void setApplicationSchemaInfo(final Collection newValues) {
+        applicationSchemaInfo = copyCollection(newValues, applicationSchemaInfo,
+                                               ApplicationSchemaInformation.class);
     }
      
     /**
@@ -576,26 +510,22 @@ public class MetaData extends MetadataEntity implements org.opengis.metadata.Met
      */
     protected void freeze() {
         super.freeze();
-        fileIdentifier              = (String)                 unmodifiable(fileIdentifier);
-        language                    = (Locale)                 unmodifiable(language);
-        characterSet                = (String)                 unmodifiable(characterSet);
-        parentIdentifier            = (String)                 unmodifiable(parentIdentifier);
-        hierarchyLevels             = (Set)                    unmodifiable(hierarchyLevels);
-        hierarchyLevelNames         = (Set)                    unmodifiable(hierarchyLevelNames);
-        contact                     = (ResponsibleParty)       unmodifiable(contact);
-        metadataStandardName        = (String)                 unmodifiable(metadataStandardName);
-        metadataStandardVersion     = (String)                 unmodifiable(metadataStandardVersion);
-        spatialRepresentationInfo   = (Set)                    unmodifiable(spatialRepresentationInfo);
-        referenceSystemInfo         = (Set)                    unmodifiable(referenceSystemInfo);
-        metadataExtensionInfo       = (Set)                    unmodifiable(metadataExtensionInfo);
-        identificationInfo          = (Set)                    unmodifiable(identificationInfo);
-        contentInfo                 = (Set)                    unmodifiable(contentInfo);
-        distributionInfo            = (Distribution)           unmodifiable(distributionInfo);
-        dataQualityInfo             = (Set)                    unmodifiable(dataQualityInfo);
-        portrayalCatalogueInfo      = (Set)                    unmodifiable(portrayalCatalogueInfo);
-        metadataConstraints         = (Set)                    unmodifiable(metadataConstraints);
-        applicationSchemaInfo       = (Set)                    unmodifiable(applicationSchemaInfo);
-        metadataMaintenance         = (MaintenanceInformation) unmodifiable(metadataMaintenance);     
+        language                  = (Locale)                 unmodifiable(language);
+        characterSet              = (Charset)                unmodifiable(characterSet);
+        hierarchyLevels           = (Collection)             unmodifiable(hierarchyLevels);
+        hierarchyLevelNames       = (Collection)             unmodifiable(hierarchyLevelNames);
+        contact                   = (ResponsibleParty)       unmodifiable(contact);
+        spatialRepresentationInfo = (Collection)             unmodifiable(spatialRepresentationInfo);
+        referenceSystemInfo       = (Collection)             unmodifiable(referenceSystemInfo);
+        metadataExtensionInfo     = (Collection)             unmodifiable(metadataExtensionInfo);
+        identificationInfo        = (Collection)             unmodifiable(identificationInfo);
+        contentInfo               = (Collection)             unmodifiable(contentInfo);
+        distributionInfo          = (Distribution)           unmodifiable(distributionInfo);
+        dataQualityInfo           = (Collection)             unmodifiable(dataQualityInfo);
+        portrayalCatalogueInfo    = (Collection)             unmodifiable(portrayalCatalogueInfo);
+        metadataConstraints       = (Collection)             unmodifiable(metadataConstraints);
+        applicationSchemaInfo     = (Collection)             unmodifiable(applicationSchemaInfo);
+        metadataMaintenance       = (MaintenanceInformation) unmodifiable(metadataMaintenance);     
     }
 
     /**

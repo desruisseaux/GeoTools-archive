@@ -23,16 +23,17 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.distribution.StandardOrderProcess;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -59,17 +60,17 @@ public class Distributor extends MetadataEntity
      * Provides information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    private Set distributionOrderProcesses;
+    private Collection distributionOrderProcesses;
 
     /**
      * Provides information about the format used by the distributor.
      */
-    private Set distributorFormats;
+    private Collection distributorFormats;
 
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    private Set distributorTransferOptions;
+    private Collection distributorTransferOptions;
     
     /**
      * Construct an initially empty distributor.
@@ -103,65 +104,48 @@ public class Distributor extends MetadataEntity
      * Provides information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    public Set getDistributionOrderProcesses() {
-        final Set distributionOrderProcesses = this.distributionOrderProcesses; // Avoid synchronization
-        return (distributionOrderProcesses!=null) ? distributionOrderProcesses : Collections.EMPTY_SET;
+    public synchronized Collection getDistributionOrderProcesses() {
+        return distributionOrderProcesses = nonNullCollection(distributionOrderProcesses,
+                                                              StandardOrderProcess.class);
     }
 
     /**
      * Set information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    public synchronized void setDistributionOrderProcesses(final Set newValues) {
-        checkWritePermission();
-        if (distributionOrderProcesses == null) {
-            distributionOrderProcesses = new CheckedHashSet(StandardOrderProcess.class);
-        } else {
-            distributionOrderProcesses.clear();
-        }
-        distributionOrderProcesses.addAll(newValues);
+    public synchronized void setDistributionOrderProcesses(final Collection newValues) {
+        distributionOrderProcesses = copyCollection(newValues, distributionOrderProcesses,
+                                                    StandardOrderProcess.class);
     }
 
     /**
      * Provides information about the format used by the distributor.
      */
-    public Set getDistributorFormats() {
-        final Set distributorFormats = this.distributorFormats; // Avoid synchronization
-        return (distributorFormats!=null) ? distributorFormats : Collections.EMPTY_SET;
+    public synchronized Collection getDistributorFormats() {
+        return distributorFormats = nonNullCollection(distributorFormats, Format.class);
     }
 
     /**
      * Set information about the format used by the distributor.
      */
-    public synchronized void setDistributorFormats(final Set newValues) {
-        checkWritePermission();
-        if (distributorFormats == null) {
-            distributorFormats = new CheckedHashSet(Format.class);
-        } else {
-            distributorFormats.clear();
-        }
-        distributorFormats.addAll(newValues);
+    public synchronized void setDistributorFormats(final Collection newValues) {
+        distributorFormats = copyCollection(newValues, distributorFormats, Format.class);
     }
 
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    public Set getDistributorTransferOptions() {
-        final Set distributorTransferOptions = this.distributorTransferOptions; // Avoid synchronization
-        return (distributorTransferOptions!=null) ? distributorTransferOptions : Collections.EMPTY_SET;
+    public synchronized Collection getDistributorTransferOptions() {
+        return distributorTransferOptions = nonNullCollection(distributorTransferOptions,
+                                                              DigitalTransferOptions.class);
     }
     
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    public synchronized void setDistributorTransferOptions(final Set newValues) {
-        checkWritePermission();
-        if (distributorTransferOptions == null) {
-            distributorTransferOptions = new CheckedHashSet(DigitalTransferOptions.class);
-        } else {
-            distributorTransferOptions.clear();
-        }
-        distributorTransferOptions.addAll(newValues);
+    public synchronized void setDistributorTransferOptions(final Collection newValues) {
+        distributorTransferOptions = copyCollection(newValues, distributorTransferOptions,
+                                                    DigitalTransferOptions.class);
     }
     
     /**
@@ -170,9 +154,9 @@ public class Distributor extends MetadataEntity
     protected void freeze() {
         super.freeze();
         distributorContact         = (ResponsibleParty) unmodifiable(distributorContact);
-        distributionOrderProcesses = (Set)              unmodifiable(distributionOrderProcesses);
-        distributorFormats         = (Set)              unmodifiable(distributorFormats);
-        distributorTransferOptions = (Set)              unmodifiable(distributorTransferOptions);
+        distributionOrderProcesses = (Collection)       unmodifiable(distributionOrderProcesses);
+        distributorFormats         = (Collection)       unmodifiable(distributorFormats);
+        distributorTransferOptions = (Collection)       unmodifiable(distributorTransferOptions);
     }
 
     /**

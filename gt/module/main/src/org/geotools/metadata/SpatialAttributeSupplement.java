@@ -23,11 +23,11 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+
 
 /**
  * Spatial attributes in the application schema for the feature types.
@@ -47,7 +47,7 @@ public class SpatialAttributeSupplement extends MetadataEntity
     /**
      * Provides information about the list of feature types with the same spatial representation.
      */
-    private Set featureTypeList;
+    private Collection featureTypeList;
 
     /** 
      * Construct an initially empty spatial attribute supplement.
@@ -58,29 +58,22 @@ public class SpatialAttributeSupplement extends MetadataEntity
     /** 
      * Creates a spatial attribute supplement initialized to the given values.
      */
-    public SpatialAttributeSupplement(final Set featureTypeList) {
+    public SpatialAttributeSupplement(final Collection featureTypeList) {
         setFeatureTypeList(featureTypeList);
     }
 
     /**
      * Provides information about the list of feature types with the same spatial representation.
      */
-    public Set getFeatureTypeList() {
-        final Set featureTypeList = this.featureTypeList; // Avoid synchronization
-        return (featureTypeList!=null) ? featureTypeList : Collections.EMPTY_SET;
+    public synchronized Collection getFeatureTypeList() {
+        return featureTypeList = nonNullCollection(featureTypeList, FeatureTypeList.class);
     }
 
     /**
      * Set information about the list of feature types with the same spatial representation.
      */
-    public synchronized void setFeatureTypeList(final Set newValues) {
-        checkWritePermission();
-        if (featureTypeList == null) {
-            featureTypeList = new CheckedHashSet(FeatureTypeList.class);
-        } else {
-            featureTypeList.clear();
-        }
-        featureTypeList.addAll(newValues);
+    public synchronized void setFeatureTypeList(final Collection newValues) {
+        featureTypeList = copyCollection(newValues, featureTypeList, FeatureTypeList.class);
     }
 
    /**
@@ -88,7 +81,7 @@ public class SpatialAttributeSupplement extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        featureTypeList = (Set) unmodifiable(featureTypeList);
+        featureTypeList = (Collection) unmodifiable(featureTypeList);
     }
 
     /**

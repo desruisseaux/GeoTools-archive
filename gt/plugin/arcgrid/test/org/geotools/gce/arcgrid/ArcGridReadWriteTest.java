@@ -148,8 +148,9 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
 
         Envelope e1 = gc1.getEnvelope();
         Envelope e2 = gc2.getEnvelope();
-        if(e1.equals(e2))
+        if (!e1.equals(e2)) {
             throw new Exception("GridCoverage Envelopes are not equal" + e1.toString() + e2.toString());
+        }
         double[] values1 = null;
         double[] values2 = null;
         Raster r1 = ((GridCoverage2D)gc1).getRenderedImage().getData();

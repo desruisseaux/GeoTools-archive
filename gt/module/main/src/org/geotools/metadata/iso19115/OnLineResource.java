@@ -1,6 +1,6 @@
 package org.geotools.metadata.iso19115;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.util.InternationalString;
@@ -14,7 +14,7 @@ public class OnLineResource extends MetaData implements
 	private InternationalString description;
 	private String applicationProfile;
 	private String protocol;
-	private URL linkage;
+	private URI linkage;
     public String getApplicationProfile() {
         return applicationProfile;
     }
@@ -33,10 +33,10 @@ public class OnLineResource extends MetaData implements
     public void setFunction(OnLineFunction function) {
         this.function = function;
     }
-    public URL getLinkage() {
+    public URI getLinkage() {
         return linkage;
     }
-    public void setLinkage(URL linkage) {
+    public void setLinkage(URI linkage) {
         this.linkage = linkage;
     }
     public String getProtocol() {

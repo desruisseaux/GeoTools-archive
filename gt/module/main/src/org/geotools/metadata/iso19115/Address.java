@@ -1,6 +1,7 @@
 package org.geotools.metadata.iso19115;
 
 import java.util.Set;
+import java.util.Collection;
 
 import org.geotools.util.CheckedHashSet;
 import org.opengis.util.InternationalString;
@@ -36,13 +37,13 @@ public class Address extends MetaData implements
     public void setCountry(InternationalString country) {
         this.country = country;
     }
-    public Set getDeliveryPoints() {
+    public Collection getDeliveryPoints() {
         return deliveryPoints;
     }
     public void setDeliveryPoints(Set deliveryPoints) {
         this.deliveryPoints = deliveryPoints;
     }
-    public Set getElectronicMailAddresses() {
+    public Collection getElectronicMailAddresses() {
         return electronicMailAddresses;
     }
     public void setElectronicMailAddresses(Set electronicMailAddresses) {

@@ -193,10 +193,8 @@ public class MaintenanceInformation extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        maintenanceAndUpdateFrequency  = (MaintenanceFrequency) unmodifiable(maintenanceAndUpdateFrequency);
-        updateScope                    = (ScopeCode)            unmodifiable(updateScope);
-        updateScopeDescription         = (ScopeDescription)     unmodifiable(updateScopeDescription);
-        maintenanceNote                = (InternationalString)  unmodifiable(maintenanceNote);
+        updateScopeDescription = (ScopeDescription)    unmodifiable(updateScopeDescription);
+        maintenanceNote        = (InternationalString) unmodifiable(maintenanceNote);
     }
 
     /**

@@ -23,14 +23,15 @@
 package org.geotools.metadata.quality;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.lineage.Lineage;
 import org.opengis.metadata.quality.Scope;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -58,7 +59,7 @@ public class DataQuality extends MetadataEntity
      * Should be provided only if {@linkplain Scope#getLevel scope level} is
      * {@linkplain org.opengis.metadata.maintenance.ScopeCode#DATASET dataset}.
      */
-    private Set reports;
+    private Collection reports;
 
     /**
      * Non-quantitative quality information about the lineage of the data specified by the scope.
@@ -100,9 +101,8 @@ public class DataQuality extends MetadataEntity
      * Should be provided only if {@linkplain Scope#getLevel scope level} is
      * {@linkplain org.opengis.metadata.maintenance.ScopeCode#DATASET dataset}.
      */
-    public Set getReports() {
-        final Set reports = this.reports; // Avoid synchronization
-        return (reports!=null) ? reports : Collections.EMPTY_SET;
+    public synchronized Collection getReports() {
+        return reports = nonNullCollection(reports, Element.class);
     }
 
     /**
@@ -110,14 +110,8 @@ public class DataQuality extends MetadataEntity
      * Should be provided only if {@linkplain Scope#getLevel scope level} is
      * {@linkplain org.opengis.metadata.maintenance.ScopeCode#DATASET dataset}.
      */
-    public synchronized void setReports(final Set newValues) {
-        checkWritePermission();
-        if (reports == null) {
-            reports = new CheckedHashSet(Element.class);
-        } else {
-            reports.clear();
-        }
-        reports.addAll(newValues);
+    public synchronized void setReports(final Collection newValues) {
+        reports = copyCollection(newValues, reports, Element.class);
     }
 
     /**
@@ -140,17 +134,17 @@ public class DataQuality extends MetadataEntity
     }
     
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        scope     = (Scope)   unmodifiable(scope);
-        reports   = (Set)     unmodifiable(reports);
-        lineage   = (Lineage) unmodifiable(lineage);
+        scope   = (Scope)      unmodifiable(scope);
+        reports = (Collection) unmodifiable(reports);
+        lineage = (Lineage)    unmodifiable(lineage);
     }
 
     /**
-     * Compare this data quality with the specified object for equality.
+     * Compares this data quality with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

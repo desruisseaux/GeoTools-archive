@@ -23,17 +23,18 @@
 package org.geotools.metadata.lineage;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -74,12 +75,12 @@ public class Source extends MetadataEntity
     /**
      * Information about the spatial, vertical and temporal extent of the source data.
      */
-    private Set sourceExtents;
+    private Collection sourceExtents;
 
     /**
      * Information about an event in the creation process for the source data.
      */
-    private Set sourceSteps;
+    private Collection sourceSteps;
     
     /**
      * Creates an initially empty source.
@@ -158,43 +159,29 @@ public class Source extends MetadataEntity
      * Returns tiInformation about the spatial, vertical and temporal extent
      * of the source data.
      */
-    public Set getSourceExtents()  {
-        final Set sourceExtents = this.sourceExtents; // Avoid synchronization
-        return (sourceExtents!=null) ? sourceExtents : Collections.EMPTY_SET;
+    public synchronized Collection getSourceExtents()  {
+        return sourceExtents = nonNullCollection(sourceExtents, Extent.class);
     }
 
     /**
      * Information about the spatial, vertical and temporal extent of the source data.
      */
-    public synchronized void setSourceExtents(final Set newValues) {
-        checkWritePermission();
-        if (sourceExtents == null) {
-            sourceExtents = new CheckedHashSet(Extent.class);
-        } else {
-            sourceExtents.clear();
-        }
-        sourceExtents.addAll(newValues);
+    public synchronized void setSourceExtents(final Collection newValues) {
+        sourceExtents = copyCollection(newValues, sourceExtents, Extent.class);
     }
 
     /**
      * Returns information about an event in the creation process for the source data.
      */
-    public Set getSourceSteps() {
-        final Set sourceSteps = this.sourceSteps; // Avoid synchronization
-        return (sourceSteps!=null) ? sourceSteps : Collections.EMPTY_SET;
+    public synchronized Collection getSourceSteps() {
+        return sourceSteps = nonNullCollection(sourceSteps, ProcessStep.class);
     }
 
     /**
      * Set information about an event in the creation process for the source data.
      */
-    public synchronized void setSourceSteps(final Set newValues) {
-        checkWritePermission();
-        if (sourceSteps == null) {
-            sourceSteps = new CheckedHashSet(ProcessStep.class);
-        } else {
-            sourceSteps.clear();
-        }
-        sourceSteps.addAll(newValues);
+    public synchronized void setSourceSteps(final Collection newValues) {
+        sourceSteps = copyCollection(newValues, sourceSteps, ProcessStep.class);
     }
     
     /**
@@ -205,8 +192,8 @@ public class Source extends MetadataEntity
         description           = (InternationalString) unmodifiable(description);
         sourceReferenceSystem = (ReferenceSystem)     unmodifiable(sourceReferenceSystem);
         sourceCitation        = (Citation)            unmodifiable(sourceCitation);
-        sourceExtents         = (Set)                 unmodifiable(sourceExtents);
-        sourceSteps           = (Set)                 unmodifiable(sourceSteps);
+        sourceExtents         = (Collection)          unmodifiable(sourceExtents);
+        sourceSteps           = (Collection)          unmodifiable(sourceSteps);
     }
 
     /**

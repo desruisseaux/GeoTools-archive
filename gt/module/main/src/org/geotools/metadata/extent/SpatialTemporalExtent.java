@@ -23,13 +23,14 @@
 package org.geotools.metadata.extent;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicExtent;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -53,7 +54,7 @@ public class SpatialTemporalExtent extends TemporalExtent
      * The spatial extent component of composite
      * spatial and temporal extent.
      */
-    private Set spatialExtent;
+    private Collection spatialExtent;
     
     /**
      * Construct an initially empty spatial-temporal extent.
@@ -64,9 +65,9 @@ public class SpatialTemporalExtent extends TemporalExtent
     /**
      * Creates a spatial-temporal extent initialized to the specified values.
      */
-    public SpatialTemporalExtent(final Date startTime,
-                                 final Date endTime,
-                                 final Set  spatialExtent)
+    public SpatialTemporalExtent(final Date       startTime,
+                                 final Date       endTime,
+                                 final Collection spatialExtent)
     {
         super(startTime, endTime);
         setSpatialExtent(spatialExtent);
@@ -78,23 +79,16 @@ public class SpatialTemporalExtent extends TemporalExtent
      *
      * @return The list of geographic extents (never <code>null</code>).
      */
-    public Set getSpatialExtent() {
-        final Set spatialExtent = this.spatialExtent; // Avoid synchronization
-        return (spatialExtent!=null) ? spatialExtent : Collections.EMPTY_SET;
+    public synchronized Collection getSpatialExtent() {
+        return spatialExtent = nonNullCollection(spatialExtent, GeographicExtent.class);
     }
 
     /**
      * Set the spatial extent component of composite
      * spatial and temporal extent.
      */
-    public synchronized void setSpatialExtent(final Set newValues) {
-        checkWritePermission();
-        if (spatialExtent == null) {
-            spatialExtent = new CheckedHashSet(GeographicExtent.class);
-        } else {
-            spatialExtent.clear();
-        }
-        spatialExtent.addAll(newValues);
+    public synchronized void setSpatialExtent(final Collection newValues) {
+        spatialExtent = copyCollection(newValues, spatialExtent, GeographicExtent.class);
     }
 
     /**
@@ -102,7 +96,7 @@ public class SpatialTemporalExtent extends TemporalExtent
      */
     protected void freeze() {
         super.freeze();
-        spatialExtent = (Set) unmodifiable(spatialExtent);
+        spatialExtent = (Collection) unmodifiable(spatialExtent);
     }
 
     /**

@@ -45,6 +45,8 @@ import org.opengis.util.Cloneable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashSet;
 import org.geotools.xml.XPathFactory;
 
 
@@ -669,6 +671,58 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
             throw new UnsupportedOperationException("Unmodifiable metadata");
         }
         unmodifiable = null;
+    }
+
+    /**
+     * Copy the content of one collection ({@code source}) into an other ({@code target}).
+     * If the target collection is {@code null}, or if its type ({@link List} vs {@link Set})
+     * doesn't matches the type of the source collection, a new target collection is expected.
+     *
+     * @param  source      The source collection.
+     * @param  target      The target collection, or {@code null} if not yet created.
+     * @param  elementType The base type of elements to put in the collection.
+     * @return {@code target}, or a newly created collection.
+     */
+    protected final Collection copyCollection(final Collection source, Collection target,
+                                              final Class elementType)
+    {
+        checkWritePermission();
+        if (source == null) {
+            if (target != null) {
+                target.clear();
+            }
+        } else {
+            final boolean isList = (source instanceof List);
+            if (target==null || (target instanceof List)!=isList) {
+                // TODO: remove the cast once we are allowed to compile for J2SE 1.5.
+                target = isList ? (Collection) new CheckedArrayList(elementType)
+                                : (Collection) new CheckedHashSet  (elementType);
+            } else {
+                target.clear();
+            }
+            target.addAll(source);
+        }
+        return target;
+    }
+
+    /**
+     * Returns the specified collection, or a new one if {@code c} is null.
+     * This is a convenience method for implementation of {@code getFoo()}
+     * methods.
+     *
+     * @param  c The collection to checks.
+     * @param  elementType The element type (used only if {@code c} is null).
+     * @return {@code c}, or a new collection if {@code c} is null.
+     */
+    protected final Collection nonNullCollection(final Collection c, final Class elementType) {
+        assert Thread.holdsLock(this);
+        if (c != null) {
+            return c;
+        }
+        if (isModifiable()) {
+            return new CheckedHashSet(elementType);
+        }
+        return Collections.EMPTY_SET;
     }
 
     /**

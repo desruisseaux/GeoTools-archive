@@ -23,9 +23,12 @@
 package org.geotools.metadata.content;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
+import org.opengis.util.LocalName;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -36,12 +39,18 @@ import org.opengis.util.InternationalString;
  * @author Touraïvane
  */
 public class RangeDimension extends MetadataEntity
-       implements org.opengis.metadata.content.ContentInformation
+       implements org.opengis.metadata.content.RangeDimension
 {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 4365956866782010460L;
+
+    /**
+     * Number that uniquely identifies instances of bands of wavelengths on which a sensor
+     * operates.
+     */
+    private LocalName sequenceIdentifier;
 
     /**
      * Description of the range of a cell measurement value.
@@ -55,7 +64,24 @@ public class RangeDimension extends MetadataEntity
     }
 
     /**
-     * Return the description of the range of a cell measurement value.
+     * Returns the number that uniquely identifies instances of bands of wavelengths
+     * on which a sensor operates.
+     */
+    public LocalName getSequenceIdentifier() {
+        return sequenceIdentifier;
+    }
+
+    /**
+     * Set the number that uniquely identifies instances of bands of wavelengths
+     * on which a sensor operates.
+     */
+    public synchronized void setSequenceIdentifier(final LocalName newValue) {
+        checkWritePermission();
+        sequenceIdentifier = newValue;
+    }
+
+    /**
+     * Returns the description of the range of a cell measurement value.
      */
     public InternationalString getDescriptor() {
         return descriptor;
@@ -74,7 +100,8 @@ public class RangeDimension extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        descriptor = (InternationalString) unmodifiable(descriptor);
+        sequenceIdentifier = (LocalName)           unmodifiable(sequenceIdentifier);
+        descriptor         = (InternationalString) unmodifiable(descriptor);
     }
 
     /**
@@ -86,7 +113,8 @@ public class RangeDimension extends MetadataEntity
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final RangeDimension that = (RangeDimension) object;
-            return Utilities.equals(this.descriptor, that.descriptor);
+            return Utilities.equals(this.sequenceIdentifier, that.sequenceIdentifier) &&
+                   Utilities.equals(this.descriptor,         that.descriptor);
         }
         return false;
     }
@@ -98,7 +126,8 @@ public class RangeDimension extends MetadataEntity
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (descriptor != null) code ^= descriptor.hashCode();
+        if (sequenceIdentifier != null) code ^= sequenceIdentifier.hashCode();
+        if (descriptor         != null) code ^= descriptor        .hashCode();
         return code;
     }
 

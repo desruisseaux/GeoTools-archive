@@ -23,13 +23,14 @@
 package org.geotools.metadata.constraint;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.constraint.Restriction;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -51,13 +52,13 @@ public class LegalConstraints extends Constraints
      * Access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    private Set accessConstraints;
+    private Collection accessConstraints;
 
     /**
      * Constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    private Set useConstraints;
+    private Collection useConstraints;
 
     /**
      * Other restrictions and legal prerequisites for accessing and using the resource.
@@ -77,46 +78,32 @@ public class LegalConstraints extends Constraints
      * Returns the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    public Set getAccessConstraints() {
-        final Set accessConstraints = this.accessConstraints; // Avoid synchronization
-        return (accessConstraints!=null) ? accessConstraints : Collections.EMPTY_SET;
+    public synchronized Collection getAccessConstraints() {
+        return accessConstraints = nonNullCollection(accessConstraints, Restriction.class);
     }
 
     /**
      * Set the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    public synchronized void setAccessConstraints(final Set newValues) {
-        checkWritePermission();
-        if (accessConstraints == null) {
-            accessConstraints = new CheckedHashSet(Restriction.class);
-        } else {
-            accessConstraints.clear();
-        }
-        accessConstraints.addAll(newValues);
+    public synchronized void setAccessConstraints(final Collection newValues) {
+        accessConstraints = copyCollection(newValues, accessConstraints, Restriction.class);
     }
 
     /**
      * Returns the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    public Set getUseConstraints() {
-        final Set useConstraints = this.useConstraints; // Avoid synchronization
-        return (useConstraints!=null) ? useConstraints : Collections.EMPTY_SET;
+    public synchronized Collection getUseConstraints() {
+        return useConstraints = nonNullCollection(useConstraints, Restriction.class);
     }
 
     /**
      * Set the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    public synchronized void setUseConstraints(final Set newValues) {
-        checkWritePermission();
-        if (useConstraints == null) {
-            useConstraints = new CheckedHashSet(Restriction.class);
-        } else {
-            useConstraints.clear();
-        }
-        useConstraints.addAll(newValues);
+    public synchronized void setUseConstraints(final Collection newValues) {
+        useConstraints = copyCollection(newValues, useConstraints, Restriction.class);
     }
 
     /**
@@ -145,8 +132,8 @@ public class LegalConstraints extends Constraints
      */
     protected void freeze() {
         super.freeze();
-        accessConstraints = (Set)                 unmodifiable(accessConstraints);
-        useConstraints    = (Set)                 unmodifiable(useConstraints);
+        accessConstraints = (Collection)          unmodifiable(accessConstraints);
+        useConstraints    = (Collection)          unmodifiable(useConstraints);
         otherConstraints  = (InternationalString) unmodifiable(otherConstraints);
     } 
 

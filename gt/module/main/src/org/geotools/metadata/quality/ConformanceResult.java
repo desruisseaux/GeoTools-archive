@@ -22,10 +22,12 @@
  */
 package org.geotools.metadata.quality;
 
-// OpenGIS direct dependencies
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**

@@ -114,9 +114,8 @@ public class CoverageDescription extends ContentInformation
      */
     protected void freeze() {
         super.freeze();
-        attributeDescription = (Class)               unmodifiable(attributeDescription);
-        contentType          = (CoverageContentType) unmodifiable(contentType);
-        dimension            = (RangeDimension)      unmodifiable(dimension);        
+        attributeDescription = (Class)          unmodifiable(attributeDescription);
+        dimension            = (RangeDimension) unmodifiable(dimension);        
     }
 
     /**

@@ -22,6 +22,10 @@
  */
 package org.geotools.metadata.maintenance;
 
+// J2SE dependencies
+import java.util.Set;
+import java.util.Collections;
+
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 
@@ -45,6 +49,33 @@ public class ScopeDescription extends MetadataEntity
      * Creates an initially empty scope description.
      */
     public ScopeDescription() {
+    }
+
+    /**
+     * Returns the attributes to which the information applies.
+     *
+     * @todo Not yet implemented.
+     */
+    public Set getAttributes() {
+        return Collections.EMPTY_SET;
+    }
+
+    /**
+     * Returns the features to which the information applies.
+     *
+     * @todo Not yet implemented.
+     */
+    public Set getFeatures() {
+        return Collections.EMPTY_SET;
+    }
+
+    /**
+     * Returns the feature instances to which the information applies.
+     *
+     * @todo Not yet implemented.
+     */
+    public Set getFeatureInstances() {
+        return Collections.EMPTY_SET;
     }
     
     /**

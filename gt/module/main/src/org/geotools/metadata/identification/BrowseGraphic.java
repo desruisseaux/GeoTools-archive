@@ -23,11 +23,14 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.net.URL;
+import java.net.URI;
 
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -48,12 +51,12 @@ public class BrowseGraphic extends MetadataEntity
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
-    private URL applicationSchemaInformation;
+    private URI applicationSchemaInformation;
 
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
-    private URL fileName;
+    private URI fileName;
 
     /**
      * Text description of the illustration.
@@ -73,16 +76,16 @@ public class BrowseGraphic extends MetadataEntity
     }
 
     /**
-     * Creates a browse graphics initialized to the specified URL.
+     * Creates a browse graphics initialized to the specified URI.
      */
-    public BrowseGraphic(URL fileName) {
+    public BrowseGraphic(final URI fileName) {
         setFileName(fileName);
     }
     
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
-    public URL getApplicationSchemaInformation() {
+    public URI getApplicationSchemaInformation() {
         return applicationSchemaInformation;
     }
 
@@ -90,7 +93,7 @@ public class BrowseGraphic extends MetadataEntity
      * Set the name of the file that contains a graphic that provides an illustration of the
      * dataset.
      */
-    public synchronized void setApplicationSchemaInformation(final URL newValue) {
+    public synchronized void setApplicationSchemaInformation(final URI newValue) {
         checkWritePermission();
         applicationSchemaInformation = newValue;
     }
@@ -98,7 +101,7 @@ public class BrowseGraphic extends MetadataEntity
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
-    public URL getFileName() {
+    public URI getFileName() {
         return fileName;
     }
 
@@ -106,7 +109,7 @@ public class BrowseGraphic extends MetadataEntity
      * Set the name of the file that contains a graphic that provides an illustration of the
      * dataset.
      */
-    public synchronized void setFileName(final URL newValue) {
+    public synchronized void setFileName(final URI newValue) {
         checkWritePermission();
         fileName = newValue;
     }
@@ -147,9 +150,7 @@ public class BrowseGraphic extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        fileName        = (URL)                 unmodifiable(fileName);
         fileDescription = (InternationalString) unmodifiable(fileDescription);
-        fileType        = (String)              unmodifiable(fileType);
     }
 
     /**

@@ -140,9 +140,9 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
      */
     protected void freeze() {
         super.freeze();
-        fees                     = (InternationalString)  unmodifiable(fees);
-        orderingInstructions     = (InternationalString)  unmodifiable(orderingInstructions);
-        turnaround               = (InternationalString)  unmodifiable(turnaround);
+        fees                 = (InternationalString) unmodifiable(fees);
+        orderingInstructions = (InternationalString) unmodifiable(orderingInstructions);
+        turnaround           = (InternationalString) unmodifiable(turnaround);
     }
 
     /**

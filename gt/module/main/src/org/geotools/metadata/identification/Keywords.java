@@ -23,14 +23,16 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.util.List;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -51,7 +53,7 @@ public class Keywords extends MetadataEntity
     /**
      * Commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    private List keywords;
+    private Collection keywords;
 
     /**
      * Subject matter used to group similar keywords.
@@ -73,29 +75,22 @@ public class Keywords extends MetadataEntity
     /* 
      * Creates keywords initialized to the given list.
      */    
-    public Keywords(final List keywords) {
+    public Keywords(final Collection keywords) {
         setKeywords(keywords);
     }
 
     /**
      * Commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    public List getKeywords() {
-        final List keywords = this.keywords; // Avoid synchronization
-        return (keywords!=null) ? keywords : java.util.Collections.EMPTY_LIST;
+    public synchronized Collection getKeywords() {
+        return keywords = nonNullCollection(keywords, InternationalString.class);
     }
 
     /**
      * Set commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    public synchronized void setKeywords(final List newValues) {
-        checkWritePermission();
-        if (keywords == null) {
-            keywords = new CheckedArrayList(InternationalString.class);
-        } else {
-            keywords.clear();
-        }
-        keywords.addAll(newValues);
+    public synchronized void setKeywords(final Collection newValues) {
+        keywords = copyCollection(newValues, keywords, InternationalString.class);
     }
 
     /**
@@ -134,9 +129,8 @@ public class Keywords extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        keywords       = (List)        unmodifiable(keywords);
-        type           = (KeywordType) unmodifiable(type);
-        thesaurusName  = (Citation)    unmodifiable(thesaurusName);
+        keywords      = (Collection) unmodifiable(keywords);
+        thesaurusName = (Citation)   unmodifiable(thesaurusName);
     }
 
     /**

@@ -23,15 +23,16 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.distribution.Format;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -52,18 +53,18 @@ public class Distribution extends MetadataEntity
     /**
      * Provides a description of the format of the data to be distributed.
      */
-    private Set distributionFormats;
+    private Collection distributionFormats;
 
     /**
      * Provides information about the distributor.
      */
-    private Set distributors;
+    private Collection distributors;
 
     /**
      * Provides information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    private Set transferOptions;
+    private Collection transferOptions;
     
     /**
      * Construct an initially empty distribution.
@@ -74,66 +75,45 @@ public class Distribution extends MetadataEntity
     /**
      * Provides a description of the format of the data to be distributed.
      */
-    public Set getDistributionFormats() {
-        final Set distributionFormats = this.distributionFormats; // Avoid synchronization
-        return (distributionFormats!=null) ? distributionFormats : Collections.EMPTY_SET;
+    public synchronized Collection getDistributionFormats() {
+        return distributionFormats = nonNullCollection(distributionFormats, Format.class);
     }
 
     /**
      * Set a description of the format of the data to be distributed.
      */
-    public synchronized void setDistributionFormats(final Set newValues) {
-        checkWritePermission();
-        if (distributionFormats == null) {
-            distributionFormats = new CheckedHashSet(Format.class);
-        } else {
-            distributionFormats.clear();
-        }
-        distributionFormats.addAll(newValues);
+    public synchronized void setDistributionFormats(final Collection newValues) {
+        distributionFormats = copyCollection(newValues, distributionFormats, Format.class);
     }
 
     /**
      * Provides information about the distributor.
      */
-    public Set getDistributors() {
-        final Set distributors = this.distributors; // Avoid synchronization
-        return (distributors!=null) ? distributors : Collections.EMPTY_SET;
+    public synchronized Collection getDistributors() {
+        return distributors = nonNullCollection(distributors, Distributor.class);
     }
 
     /**
      * Set information about the distributor.
      */
-    public synchronized void setDistributors(final Set newValues) {
-        checkWritePermission();
-        if (distributors == null) {
-            distributors = new CheckedHashSet(Distributor.class);
-        } else {
-            distributors.clear();
-        }
-        distributors.addAll(newValues);
+    public synchronized void setDistributors(final Collection newValues) {
+        distributors = copyCollection(newValues, distributors, Distributor.class);
     }
 
     /**
      * Provides information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    public Set getTransferOptions() {
-        final Set transferOptions = this.transferOptions; // Avoid synchronization
-        return (transferOptions!=null) ? transferOptions : Collections.EMPTY_SET;
+    public synchronized Collection getTransferOptions() {
+        return transferOptions = nonNullCollection(transferOptions, DigitalTransferOptions.class);
     }
 
     /**
      * Set information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    public synchronized void setTransferOptions(final Set newValues) {
-        checkWritePermission();
-        if (transferOptions == null) {
-            transferOptions = new CheckedHashSet(DigitalTransferOptions.class);
-        } else {
-            transferOptions.clear();
-        }
-        transferOptions.addAll(newValues);
+    public synchronized void setTransferOptions(final Collection newValues) {
+        transferOptions = copyCollection(newValues, transferOptions, DigitalTransferOptions.class);
     }
     
     /**
@@ -141,9 +121,9 @@ public class Distribution extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        distributionFormats = (Set) unmodifiable(distributionFormats);
-        distributors        = (Set) unmodifiable(distributors);
-        transferOptions     = (Set) unmodifiable(transferOptions);
+        distributionFormats = (Collection) unmodifiable(distributionFormats);
+        distributors        = (Collection) unmodifiable(distributors);
+        transferOptions     = (Collection) unmodifiable(transferOptions);
     }
 
     /**

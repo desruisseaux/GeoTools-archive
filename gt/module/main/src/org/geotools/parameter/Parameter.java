@@ -23,26 +23,33 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Set;
 
+// Units dependencies
 import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.io.TableWriter;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.CodeList;
+
+// Geotools dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -497,26 +504,48 @@ public class Parameter extends AbstractParameter
      * file can reference another part of the same or different files, as allowed in XML documents.
      *
      * @return The reference to a file containing parameter values.
-     * @throws InvalidParameterTypeException if the value is not a reference to a file or an URL.
+     * @throws InvalidParameterTypeException if the value is not a reference to a file or an URI.
      *
      * @see #getValue
      * @see #setValue(Object)
      */
-    public URL valueFile() throws InvalidParameterTypeException {
-        if (value instanceof URL) {
-            return (URL) value;
+    public URI valueFile() throws InvalidParameterTypeException {
+        if (value instanceof URI) {
+            return (URI) value;
         }
+        if (value instanceof File) {
+            return ((File) value).toURI();
+        }
+        Exception cause = null;
+        try {
+            if (value instanceof URL) {
+                return ((URL) value).toURI();
+            }
+            if (value instanceof String) {
+                return new URI((String) value);
+            }
+        } catch (URISyntaxException exception) {
+            cause = exception;
+        }
+        /*
+         * Value can't be converted.
+         */
         final String name = getName(descriptor);
         if (value == null) {
             throw new IllegalStateException(Resources.format(
                       ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
         }
-        throw new InvalidParameterTypeException(getClassTypeError(), name);
+        final InvalidParameterTypeException exception =
+                new InvalidParameterTypeException(getClassTypeError(), name);
+        if (cause != null) {
+            exception.initCause(cause);
+        }
+        throw exception;
     }
 
     /**
      * Returns the parameter value as an object. The object type is typically a {@link Double},
-     * {@link Integer}, {@link Boolean}, {@link String}, {@link URL}, <code>double[]</code> or
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, <code>double[]</code> or
      * <code>int[]</code>.
      *
      * @return The parameter value as an object.
@@ -612,7 +641,7 @@ public class Parameter extends AbstractParameter
 
     /**
      * Set the parameter value as an object. The object type is typically a {@link Double},
-     * {@link Integer}, {@link Boolean}, {@link String}, {@link URL}, <code>double[]</code>
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, <code>double[]</code>
      * or <code>int[]</code>.
      *
      * @param  value The parameter value.

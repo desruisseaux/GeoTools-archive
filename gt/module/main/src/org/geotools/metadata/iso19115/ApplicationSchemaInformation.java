@@ -1,6 +1,6 @@
 package org.geotools.metadata.iso19115;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.opengis.metadata.SpatialAttributeSupplement;
 import org.opengis.metadata.citation.Citation;
@@ -13,11 +13,11 @@ public class ApplicationSchemaInformation extends MetaData implements
 		org.opengis.metadata.ApplicationSchemaInformation {
 	
 	private Citation name;
-	private URL graphicsFile;
-	private URL schemaAscii;
+	private URI graphicsFile;
+	private URI schemaAscii;
 	private String constraintLanguage;
 	private String schemaLanguage;
-	private URL softwareDevelopmentFile;
+	private URI softwareDevelopmentFile;
 	private SpatialAttributeSupplement featureCatalogueSupplement;
 	private String softwareDevelopmentFileFormat;
 	
@@ -43,21 +43,21 @@ public class ApplicationSchemaInformation extends MetaData implements
 	/* (non-Javadoc)
 	 * @see org.opengis.metadata.ApplicationSchemaInformation#getSchemaAscii()
 	 */
-	public URL getSchemaAscii() {
+	public URI getSchemaAscii() {
 		return schemaAscii;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.metadata.ApplicationSchemaInformation#getGraphicsFile()
 	 */
-	public URL getGraphicsFile() {
+	public URI getGraphicsFile() {
 		return graphicsFile;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.metadata.ApplicationSchemaInformation#getSoftwareDevelopmentFile()
 	 */
-	public URL getSoftwareDevelopmentFile() {
+	public URI getSoftwareDevelopmentFile() {
 		return softwareDevelopmentFile;
 	}
 

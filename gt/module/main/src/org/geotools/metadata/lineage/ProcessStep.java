@@ -23,16 +23,17 @@
 package org.geotools.metadata.lineage;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.lineage.Source;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -71,12 +72,12 @@ public class ProcessStep extends MetadataEntity
      * Identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    private Set processors;
+    private Collection processors;
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    private Set sources;
+    private Collection sources;
 
     /**
      * Creates an initially empty process step.
@@ -142,45 +143,31 @@ public class ProcessStep extends MetadataEntity
      * Returns the identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    public Set getProcessors() {
-        final Set processors = this.processors; // Avoid synchronization
-        return (processors!=null) ? processors : Collections.EMPTY_SET;
+    public synchronized Collection getProcessors() {
+        return processors = nonNullCollection(processors, ResponsibleParty.class);
     }
 
     /**
      * Identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    public synchronized void setProcessors(final Set newValues) {
-        checkWritePermission();
-        if (processors == null) {
-            processors = new CheckedHashSet(ResponsibleParty.class);
-        } else {
-            processors.clear();
-        }
-        processors.addAll(newValues);
+    public synchronized void setProcessors(final Collection newValues) {
+        processors = copyCollection(newValues, processors, ResponsibleParty.class);
     }
 
     /**
      * Returns the information about the source data used in creating the data specified
      * by the scope.
      */
-    public Set getSources() {
-        final Set sources = this.sources; // Avoid synchronization
-        return (sources!=null) ? sources : Collections.EMPTY_SET;
+    public synchronized Collection getSources() {
+        return sources = nonNullCollection(sources, Source.class);
     }
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    public synchronized void setSources(final Set newValues) {
-        checkWritePermission();
-        if (sources == null) {
-            sources = new CheckedHashSet(Source.class);
-        } else {
-            sources.clear();
-        }
-        sources.addAll(newValues);
+    public synchronized void setSources(final Collection newValues) {
+        sources = copyCollection(newValues, sources, Source.class);
     }
  
     
@@ -191,8 +178,8 @@ public class ProcessStep extends MetadataEntity
         super.freeze();
         description = (InternationalString)  unmodifiable(description);
         rationale    = (InternationalString) unmodifiable(rationale);
-        processors   = (Set)                 unmodifiable(processors);
-        sources      = (Set)                 unmodifiable(sources);
+        processors   = (Collection)          unmodifiable(processors);
+        sources      = (Collection)          unmodifiable(sources);
     }
 
     /**

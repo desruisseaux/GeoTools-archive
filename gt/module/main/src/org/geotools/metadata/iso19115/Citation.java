@@ -2,8 +2,9 @@ package org.geotools.metadata.iso19115;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Collection;
 
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashMap;
@@ -24,7 +25,7 @@ public class Citation extends MetaData implements
 	private Set citedResponsibleParties = new CheckedHashSet( ResponsibleParty.class );
 	
 	private InternationalString title;
-	private Map dates = new CheckedHashMap( DateType.class, Date.class );
+	private Collection dates = new HashSet();
 	private InternationalString edition;
 	private Date editionDate;
 	private Set identifiers = new CheckedHashSet( String.class );
@@ -36,13 +37,13 @@ public class Citation extends MetaData implements
 	private InternationalString collectiveTitle;
 	private String ISBN;
 	private String ISSN;
-    public List getAlternateTitles() {
+    public Collection getAlternateTitles() {
         return alternateTitles;
     }
     public void setAlternateTitles(List alternateTitles) {
         this.alternateTitles = alternateTitles;
     }
-    public Set getCitedResponsibleParties() {
+    public Collection getCitedResponsibleParties() {
         return citedResponsibleParties;
     }
     public void setCitedResponsibleParties(Set citedResponsibleParties) {
@@ -54,10 +55,10 @@ public class Citation extends MetaData implements
     public void setCollectiveTitle(InternationalString collectiveTitle) {
         this.collectiveTitle = collectiveTitle;
     }
-    public Map getDates() {
+    public Collection getDates() {
         return dates;
     }
-    public void setDates(Map dates) {
+    public void setDates(Collection dates) {
         this.dates = dates;
     }
     public InternationalString getEdition() {
@@ -72,14 +73,14 @@ public class Citation extends MetaData implements
     public void setEditionDate(Date editionDate) {
         this.editionDate = editionDate;
     }
-    public Set getIdentifiers() {
+    public Collection getIdentifiers() {
         return identifiers;
     }
     public void setIdentifiers(Set identifiers) {
         this.identifiers.clear();
         this.identifiers.addAll( identifiers );
     }
-    public Set getIdentifierTypes() {
+    public Collection getIdentifierTypes() {
         return identifierTypes;
     }
     public void setIdentifierTypes(Set identifierTypes) {
@@ -104,7 +105,7 @@ public class Citation extends MetaData implements
     public void setOtherCitationDetails(InternationalString otherCitationDetails) {
         this.otherCitationDetails = otherCitationDetails;
     }
-    public Set getPresentationForm() {
+    public Collection getPresentationForm() {
         return presentationForm;
     }
     public void setPresentationForm(Set presentationForm) {

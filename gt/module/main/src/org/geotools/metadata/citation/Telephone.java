@@ -91,16 +91,14 @@ public class Telephone extends MetadataEntity
     }
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        voice     = (String) unmodifiable(voice    );
-        facsimile = (String) unmodifiable(facsimile);
     }
 
     /**
-     * Compare this telephone with the specified object for equality.
+     * Compares this telephone with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {

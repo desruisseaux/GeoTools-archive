@@ -24,7 +24,7 @@ package org.geotools.parameter;
 
 // J2SE dependencies and extensions
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 
 import javax.units.Unit;
 
@@ -201,12 +201,12 @@ public class ParameterReal extends AbstractParameter
     }
 
     /**
-     * Always throws an exception, since this parameter is not an URL.
+     * Always throws an exception, since this parameter is not an URI.
      *
      * @return Never return.
-     * @throws InvalidParameterTypeException The value is not a reference to a file or an URL.
+     * @throws InvalidParameterTypeException The value is not a reference to a file or an URI.
      */
-    public URL valueFile() throws InvalidParameterTypeException {
+    public URI valueFile() throws InvalidParameterTypeException {
         throw new InvalidParameterTypeException(getClassTypeError(),
                   Parameter.getName(descriptor));
     }

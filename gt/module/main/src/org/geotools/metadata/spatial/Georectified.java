@@ -23,16 +23,18 @@
 package org.geotools.metadata.spatial;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
+// OpenGIS dependencies
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.spatialschema.geometry.primitive.Point;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedArrayList;
 
 
 /**
@@ -93,7 +95,7 @@ public class Georectified extends GridSpatialRepresentation
     /**
      * Information about which grid dimensions are the spatial dimensions.
      */
-    private List transformationDimensionMapping;
+    private Collection transformationDimensionMapping;
     
     /**
      * Construct an initially empty georectified object.
@@ -104,12 +106,12 @@ public class Georectified extends GridSpatialRepresentation
     /**
      * Creates a georectified object initialized to the specified values.
      */
-    public Georectified(final int numberOfDimensions,
-                        final Set axisDimensionsProperties,
-                        final CellGeometry cellGeometry,
-                        final boolean transformationParameterAvailable,
-                        final boolean checkPointAvailable, 
-                        final List cornerPoints, 
+    public Georectified(final int              numberOfDimensions,
+                        final List             axisDimensionsProperties,
+                        final CellGeometry     cellGeometry,
+                        final boolean          transformationParameterAvailable,
+                        final boolean          checkPointAvailable, 
+                        final List             cornerPoints, 
                         final PixelOrientation pointInPixel)
     {
         super(numberOfDimensions,
@@ -161,9 +163,11 @@ public class Georectified extends GridSpatialRepresentation
      * diagonals in the grid spatial dimensions. There are four corner points in a
      * georectified grid; at least two corner points along one diagonal are required.
      */
-    public List getCornerPoints() {
-        final List cornerPoints = this.cornerPoints; // Avoid synchronization
-        return (cornerPoints!=null) ? cornerPoints : Collections.EMPTY_LIST;
+    public synchronized List getCornerPoints() {
+        if (cornerPoints == null) {
+            cornerPoints = new CheckedArrayList(Point.class);
+        }
+        return cornerPoints;
     }
 
     /**
@@ -229,22 +233,17 @@ public class Georectified extends GridSpatialRepresentation
     /**
      * Information about which grid dimensions are the spatial dimensions.
      */
-    public List getTransformationDimensionMapping() {
-        final List transformationDimensionMapping = this.transformationDimensionMapping; // Avoid synchronization
-        return (transformationDimensionMapping!=null) ? transformationDimensionMapping : Collections.EMPTY_LIST;
+    public synchronized Collection getTransformationDimensionMapping() {
+        return transformationDimensionMapping = nonNullCollection(transformationDimensionMapping,
+                                                                  InternationalString.class);
     }
 
     /**
      * Set information about which grid dimensions are the spatial dimensions.
      */
-    public synchronized void setTransformationDimensionMapping(final List newValues) {
-        checkWritePermission();
-        if (transformationDimensionMapping == null) {
-            transformationDimensionMapping = new CheckedArrayList(InternationalString.class);
-        } else {
-            transformationDimensionMapping.clear();
-        }
-        transformationDimensionMapping.addAll(newValues);
+    public synchronized void setTransformationDimensionMapping(final Collection newValues) {
+        transformationDimensionMapping = copyCollection(newValues, transformationDimensionMapping,
+                                                        InternationalString.class);
     }
         
     /**
@@ -255,9 +254,8 @@ public class Georectified extends GridSpatialRepresentation
         checkPointDescription              = (InternationalString) unmodifiable(checkPointDescription);
         cornerPoints                       = (List)                unmodifiable(cornerPoints);
         centerPoint                        = (Point)               unmodifiable(centerPoint);
-        pointInPixel                       = (PixelOrientation)    unmodifiable(pointInPixel);
         transformationDimensionDescription = (InternationalString) unmodifiable(transformationDimensionDescription);
-        transformationDimensionMapping     = (List) unmodifiable(transformationDimensionMapping);
+        transformationDimensionMapping     = (Collection)          unmodifiable(transformationDimensionMapping);
     }
 
     /**

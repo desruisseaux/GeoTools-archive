@@ -144,10 +144,9 @@ public class SecurityConstraints extends Constraints
      */
     protected void freeze() {
         super.freeze();
-        classification        = (Classification)      unmodifiable(classification);
-        userNote              = (InternationalString) unmodifiable(userNote);
-        classificationSystem  = (InternationalString) unmodifiable(classificationSystem);
-        handlingDescription   = (InternationalString) unmodifiable(handlingDescription);
+        userNote             = (InternationalString) unmodifiable(userNote);
+        classificationSystem = (InternationalString) unmodifiable(classificationSystem);
+        handlingDescription  = (InternationalString) unmodifiable(handlingDescription);
     }
 
     /**

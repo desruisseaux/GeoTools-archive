@@ -21,10 +21,12 @@
  */
 package org.geotools.metadata.citation;
 
-// OpenGIS dependencies
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
 import org.geotools.util.SimpleInternationalString;
+
+// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 
 
@@ -124,9 +126,7 @@ public class Series extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        name                = (InternationalString) unmodifiable(name);
-        issueIdentification = (String)              unmodifiable(issueIdentification);
-        page                = (String)              unmodifiable(page);
+        name = (InternationalString) unmodifiable(name);
     }
 
     /**

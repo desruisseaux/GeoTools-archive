@@ -22,6 +22,9 @@
  */
 package org.geotools.metadata.extent;
 
+// J2Se dependencies
+import java.util.Collection;
+
 // OpenGIS direct dependencies
 import org.geotools.resources.Utilities;
 import org.opengis.spatialschema.geometry.Geometry;
@@ -47,7 +50,7 @@ public class BoundingPolygon extends GeographicExtent
     /**
      * The sets of points defining the bounding polygon.
      */
-    private Geometry polygon;
+    private Collection/*<Geometry>*/ polygons;
 
     /**
      * Construct an initially empty bounding polygon.
@@ -58,23 +61,22 @@ public class BoundingPolygon extends GeographicExtent
     /**
      * Creates a bounding polygon initialized to the specified value.
      */
-    public BoundingPolygon(final Geometry polygon) {
-        setPolygon(polygon);
+    public BoundingPolygon(final Collection/*<Geometry>*/ polygons) {
+        setPolygons(polygons);
     }
 
     /**
      * Returns the sets of points defining the bounding polygon.
      */
-    public Geometry getPolygon() {
-        return polygon;
+    public synchronized Collection/*<Geometry>*/ getPolygons() {
+        return polygons = nonNullCollection(polygons, Geometry.class);
     }
 
     /**
-     * Returns the sets of points defining the bounding polygon.
+     * Set the sets of points defining the bounding polygon.
      */
-    public synchronized void setPolygon(final Geometry newValue) {
-        checkWritePermission();
-        polygon = newValue;
+    public synchronized void setPolygons(final Collection/*<Geometry>*/ newValues) {
+        polygons = copyCollection(newValues, polygons, Geometry.class);
     }
     
     /**
@@ -82,7 +84,7 @@ public class BoundingPolygon extends GeographicExtent
      */
     protected void freeze() {
         super.freeze();
-        polygon = (Geometry) unmodifiable(polygon);
+        polygons = (Collection) unmodifiable(polygons);
     }
 
     /**
@@ -94,7 +96,7 @@ public class BoundingPolygon extends GeographicExtent
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final BoundingPolygon that = (BoundingPolygon) object;
-            return Utilities.equals(this.polygon, that.polygon)  ;
+            return Utilities.equals(this.polygons, that.polygons);
         }
         return false;
     }
@@ -104,7 +106,7 @@ public class BoundingPolygon extends GeographicExtent
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (polygon != null) code ^= polygon.hashCode();
+        if (polygons != null) code ^= polygons.hashCode();
         return code;
     }
 
@@ -114,6 +116,6 @@ public class BoundingPolygon extends GeographicExtent
      * @todo Provides a more elaborated implementation.
      */
     public String toString() {
-        return String.valueOf(polygon);
+        return String.valueOf(polygons);
     }    
 }

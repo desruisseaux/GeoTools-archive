@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -869,8 +870,8 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                 if (extent == null) {
                                     extent = new org.geotools.metadata.extent.Extent();
                                 }
-                                extent.setGeographicElement(
-                                        new GeographicBoundingBox(xmin, xmax, ymin, ymax));
+                                extent.setGeographicElements(Collections.singleton(
+                                        new GeographicBoundingBox(xmin, xmax, ymin, ymax)));
                             }
                         }
                     }

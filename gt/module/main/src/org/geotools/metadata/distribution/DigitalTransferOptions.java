@@ -23,15 +23,16 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.distribution.Medium;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -64,7 +65,7 @@ public class DigitalTransferOptions extends MetadataEntity
     /**
      * Information about online sources from which the resource can be obtained.
      */
-    private Set onLines;
+    private Collection onLines;
 
     /**
      * Information about offline media on which the resource can be obtained.
@@ -113,22 +114,15 @@ public class DigitalTransferOptions extends MetadataEntity
     /**
      * Returns information about online sources from which the resource can be obtained.
      */
-    public Set getOnLines() {
-        final Set onLines = this.onLines; // Avoid synchronization
-        return (onLines!=null) ? onLines : Collections.EMPTY_SET;
+    public synchronized Collection getOnLines() {
+        return onLines = nonNullCollection(onLines, OnLineResource.class);
     }
 
     /**
      * Set information about online sources from which the resource can be obtained.
      */
-    public synchronized void setOnLines(final Set newValues) {
-        checkWritePermission();
-        if (onLines == null) {
-            onLines = new CheckedHashSet(OnLineResource.class);
-        } else {
-            onLines.clear();
-        }
-        onLines.addAll(newValues);
+    public synchronized void setOnLines(final Collection newValues) {
+        onLines = copyCollection(newValues, onLines, OnLineResource.class);
     }
 
     /**
@@ -153,7 +147,7 @@ public class DigitalTransferOptions extends MetadataEntity
         super.freeze();
         unitsOfDistribution = (InternationalString) unmodifiable(unitsOfDistribution);
         transferSize        = (Number)              unmodifiable(transferSize);
-        onLines             = (Set)                 unmodifiable(onLines);
+        onLines             = (Collection)          unmodifiable(onLines);
         offLines            = (Medium)              unmodifiable(offLines);
     }
 

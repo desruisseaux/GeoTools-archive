@@ -23,12 +23,13 @@
 package org.geotools.metadata.spatial;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.spatial.TopologyLevel;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -54,7 +55,7 @@ public class VectorSpatialRepresentation extends SpatialRepresentation
     /**
      * Information about the geometric objects used in the dataset.
      */
-    private Set geometricObjects;
+    private Collection geometricObjects;
 
     /**
      * Construct an initially empty vector spatial representation.
@@ -80,22 +81,15 @@ public class VectorSpatialRepresentation extends SpatialRepresentation
     /**
      * Information about the geometric objects used in the dataset.
      */
-    public Set getGeometricObjects() {
-        final Set geometricObjects = this.geometricObjects; // Avoid synchronization
-        return (geometricObjects!=null) ? geometricObjects : Collections.EMPTY_SET;
+    public synchronized Collection getGeometricObjects() {
+        return geometricObjects = nonNullCollection(geometricObjects, GeometricObjects.class);
     }
 
     /**
      * Set information about the geometric objects used in the dataset.
      */
-    public synchronized void setGeometricObjects(final Set newValues) {
-        checkWritePermission();
-        if (geometricObjects == null) {
-            geometricObjects = new CheckedHashSet(GeometricObjects.class);
-        } else {
-            geometricObjects.clear();
-        }
-        geometricObjects.addAll(newValues);
+    public synchronized void setGeometricObjects(final Collection newValues) {
+        geometricObjects = copyCollection(newValues, geometricObjects, GeometricObjects.class);
     }
 
     /**
@@ -103,8 +97,7 @@ public class VectorSpatialRepresentation extends SpatialRepresentation
      */
     protected void freeze() {
         super.freeze();
-        topologyLevel    = (TopologyLevel) unmodifiable(topologyLevel);
-        geometricObjects = (Set)           unmodifiable(geometricObjects);
+        geometricObjects = (Collection) unmodifiable(geometricObjects);
     }
 
     /**

@@ -23,18 +23,19 @@
 package org.geotools.metadata.quality;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.quality.Result;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -53,7 +54,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
     /**
      * Name of the test applied to the data.
      */
-    private List namesOfMeasure;
+    private Collection namesOfMeasure;
 
     /**
      * Code identifying a registered standard procedure, or <code>null</code> if none.
@@ -110,22 +111,15 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
     /**
      * Returns the name of the test applied to the data.
      */
-    public List getNamesOfMeasure() {
-        final List namesOfMeasure = this.namesOfMeasure; // Avoid synchronization
-        return (namesOfMeasure!=null) ? namesOfMeasure : Collections.EMPTY_LIST;
+    public synchronized Collection getNamesOfMeasure() {
+        return namesOfMeasure = nonNullCollection(namesOfMeasure, InternationalString.class);
     }
 
     /**
      * Set the name of the test applied to the data.
      */
-    public synchronized void setNamesOfMeasure(final List newValues) {
-        checkWritePermission();
-        if (namesOfMeasure == null) {
-            namesOfMeasure = new CheckedArrayList(InternationalString.class);
-        } else {
-            namesOfMeasure.clear();
-        }
-        namesOfMeasure.addAll(newValues);
+    public synchronized void setNamesOfMeasure(final Collection newValues) {
+        namesOfMeasure = copyCollection(newValues, namesOfMeasure, InternationalString.class);
     }
 
     /**
@@ -256,17 +250,16 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
     }
     
     /**
-     * Declare this metadata and all its attributes as unmodifiable.
+     * Declares this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        namesOfMeasure              = (List)                 unmodifiable(namesOfMeasure);
-        measureIdentification       = (Identifier)           unmodifiable(measureIdentification);
-        measureDescription          = (InternationalString)  unmodifiable(measureDescription);
-        evaluationMethodType        = (EvaluationMethodType) unmodifiable(evaluationMethodType);
-        evaluationMethodDescription = (InternationalString)  unmodifiable(evaluationMethodDescription);
-        evaluationProcedure         = (Citation)             unmodifiable(evaluationProcedure);
-        result                      = (Result)               unmodifiable(result);
+        namesOfMeasure              = (Collection)          unmodifiable(namesOfMeasure);
+        measureIdentification       = (Identifier)          unmodifiable(measureIdentification);
+        measureDescription          = (InternationalString) unmodifiable(measureDescription);
+        evaluationMethodDescription = (InternationalString) unmodifiable(evaluationMethodDescription);
+        evaluationProcedure         = (Citation)            unmodifiable(evaluationProcedure);
+        result                      = (Result)              unmodifiable(result);
     }
 
     /**

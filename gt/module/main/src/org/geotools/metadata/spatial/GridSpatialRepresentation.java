@@ -23,12 +23,14 @@
 package org.geotools.metadata.spatial;
 
 // J2SE direct dependencies
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.spatial.CellGeometry;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedArrayList;
 
 
 /**
@@ -54,7 +56,7 @@ public class GridSpatialRepresentation extends SpatialRepresentation
     /**
      * Information about spatial-temporal axis properties.
      */
-    private Set axisDimensionsProperties;
+    private List axisDimensionsProperties;
 
     /**
      * Identification of grid data as point or cell.
@@ -76,7 +78,7 @@ public class GridSpatialRepresentation extends SpatialRepresentation
      * Creates a grid spatial representation initialized to the given values.
      */
     public GridSpatialRepresentation(final int numberOfDimensions,
-                                     final Set axisDimensionsProperties,
+                                     final List axisDimensionsProperties,
                                      final CellGeometry cellGeometry,
                                      final boolean transformationParameterAvailable)
     {
@@ -104,18 +106,20 @@ public class GridSpatialRepresentation extends SpatialRepresentation
     /**
      * Information about spatial-temporal axis properties.
      */
-    public Set getAxisDimensionsProperties() {
-        final Set axisDimensionsProperties = this.axisDimensionsProperties; // Avoid synchronization
-        return (axisDimensionsProperties!=null) ? axisDimensionsProperties : Collections.EMPTY_SET;
+    public synchronized List getAxisDimensionsProperties() {
+        if (axisDimensionsProperties == null) {
+            axisDimensionsProperties = new CheckedArrayList(Dimension.class);
+        }
+        return axisDimensionsProperties;
     }
 
     /**
      * Set information about spatial-temporal axis properties.
      */
-    public synchronized void setAxisDimensionsProperties(final Set newValues) {
+    public synchronized void setAxisDimensionsProperties(final List newValues) {
         checkWritePermission();
         if (axisDimensionsProperties == null) {
-            axisDimensionsProperties = new CheckedHashSet(Dimension.class);
+            axisDimensionsProperties = new CheckedArrayList(Dimension.class);
         } else {
             axisDimensionsProperties.clear();
         }
@@ -157,8 +161,7 @@ public class GridSpatialRepresentation extends SpatialRepresentation
      */
     protected void freeze() {
         super.freeze();
-        axisDimensionsProperties = (Set) unmodifiable(axisDimensionsProperties);
-        cellGeometry = (CellGeometry) unmodifiable(cellGeometry); 
+        axisDimensionsProperties = (List) unmodifiable(axisDimensionsProperties);
     }
 
     /**

@@ -23,16 +23,16 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 // OpenGIS dependencies
@@ -47,9 +47,6 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashMap;
-import org.geotools.util.CheckedHashSet;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -74,15 +71,15 @@ public class Citation extends MetadataEntity
      *
      * @param role           The OGC role (point of contact, owner, etc.) for a resource.
      * @param function       The OGC function (information, download, etc.) for a resource.
-     * @param onlineResource The URL on the resource.
+     * @param onlineResource The URI on the resource.
      * @return ResponsibleParty describing OGC involvement
      */ 
     private static ResponsibleParty OGC(Role role, OnLineFunction function, String onlineResource) {
         try {
-            return org.geotools.metadata.citation.ResponsibleParty.OGC( role, function,
-                                                                        new URL( onlineResource ) );
+            return org.geotools.metadata.citation.ResponsibleParty.OGC(role, function,
+                                                                       new URI(onlineResource));
         }
-        catch (MalformedURLException badContact) {
+        catch (URISyntaxException badContact) {
             Utilities.unexpectedException("org.geotools.metadata", "Citation", "OGC", badContact);
             return org.geotools.metadata.citation.ResponsibleParty.OGC;
         }
@@ -121,9 +118,9 @@ public class Citation extends MetadataEntity
         Set parties = new HashSet(4);
         parties.add( OGC( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
         parties.add( OGC( Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf" ));
-        AUTO.setCitedResponsibleParties( parties );
+        AUTO.setCitedResponsibleParties(parties);
 
-        AUTO.setIdentifiers( Collections.singleton("AUTO") );        
+        AUTO.setIdentifiers(Collections.singleton("AUTO"));
         AUTO.freeze();
     }
     
@@ -161,7 +158,7 @@ public class Citation extends MetadataEntity
         parties.add( OGC( Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316" ));
         AUTO2.setCitedResponsibleParties( parties );
 
-        AUTO2.setIdentifiers( Collections.singleton("AUTO2") );        
+        AUTO2.setIdentifiers(Collections.singleton("AUTO2"));
         AUTO2.freeze();
     }
     
@@ -268,12 +265,12 @@ public class Citation extends MetadataEntity
      * Short name or other language name by which the cited information is known.
      * Example: "DCW" as an alternative title for "Digital Chart of the World.
      */
-    private List alternateTitles;
+    private Collection alternateTitles;
 
     /**
      * Reference date for the cited resource.
      */
-    private Map dates;
+    private Collection dates;
 
     /**
      * Version of the cited resource.
@@ -290,24 +287,24 @@ public class Citation extends MetadataEntity
      * Unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    private Set identifiers;
+    private Collection identifiers;
 
     /**
      * Reference form of the unique identifier (ID). Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    private Set identifierTypes;
+    private Collection identifierTypes;
 
     /**
      * Name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    private Set citedResponsibleParties;
+    private Collection citedResponsibleParties;
 
     /**
      * Mode in which the resource is represented, or an empty string if none.
      */
-    private Set presentationForm;
+    private Collection presentationForm;
 
     /**
      * Information about the series, or aggregate dataset, of which the dataset is a part.
@@ -400,7 +397,7 @@ public class Citation extends MetadataEntity
                 return true;
             }
             if (iterator == null) {
-                final List titles = citation.getAlternateTitles();
+                final Collection titles = citation.getAlternateTitles();
                 if (titles == null) {
                     break;
                 }
@@ -433,46 +430,29 @@ public class Citation extends MetadataEntity
      * Returns the short name or other language name by which the cited information is known.
      * Example: "DCW" as an alternative title for "Digital Chart of the World".
      */
-    public List getAlternateTitles() {
-        final List alternateTitles = this.alternateTitles; // Avoid synchronization
-        return (alternateTitles!=null) ? alternateTitles : Collections.EMPTY_LIST;
+    public synchronized Collection getAlternateTitles() {
+        return alternateTitles = nonNullCollection(alternateTitles, InternationalString.class);
     }
 
     /**
      * Set the short name or other language name by which the cited information is known.
      */
-    public synchronized void setAlternateTitles(final List newValues) {
-        checkWritePermission();
-        if (alternateTitles == null) {
-            alternateTitles = new CheckedArrayList(InternationalString.class);
-        } else {
-            alternateTitles.clear();
-        }
-        alternateTitles.addAll(newValues);
+    public synchronized void setAlternateTitles(final Collection newValues) {
+        alternateTitles = copyCollection(newValues, alternateTitles, InternationalString.class);
     }
 
     /**
      * Returns the reference date for the cited resource.
      */
-    public Map getDates() {
-        final Map dates = this.dates; // Avoid synchronization
-        return (dates!=null) ? dates : Collections.EMPTY_MAP;
+    public synchronized Collection getDates() {
+        return dates = nonNullCollection(dates, CitationDate.class);
     }
 
     /**
      * Set the reference date for the cited resource.
-     *
-     * @todo Defines a {@link java.util.HashMap} subclass which transform all {@link Date} object
-     *       into unmidifiable dates.
      */
-    public synchronized void setDates(final Map newValues) {
-        checkWritePermission();
-        if (dates == null) {
-            dates = new CheckedHashMap(DateType.class, Date.class);
-        } else {
-            dates.clear();
-        }
-        dates.putAll(newValues);
+    public synchronized void setDates(final Collection newValues) {
+        dates = copyCollection(newValues, dates, CitationDate.class);
     }
 
     /**
@@ -511,90 +491,64 @@ public class Citation extends MetadataEntity
      * Returns the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public Set getIdentifiers() {
-        final Set identifiers = this.identifiers; // Avoid synchronization
-        return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
+    public synchronized Collection getIdentifiers() {
+        return identifiers = nonNullCollection(identifiers, String.class);
     }
 
     /**
      * Set the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public synchronized void setIdentifiers(final Set newValues) {
-        checkWritePermission();
-        if (identifiers == null) {
-            identifiers = new CheckedHashSet(String.class);
-        } else {
-            identifiers.clear();
-        }
-        identifiers.addAll(newValues);
+    public synchronized void setIdentifiers(final Collection newValues) {
+        identifiers = copyCollection(newValues, identifiers, String.class);
     }
 
     /**
      * Returns the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
      */
-    public Set getIdentifierTypes() {
-        final Set identifierTypes = this.identifierTypes; // Avoid synchronization
-        return (identifierTypes!=null) ? identifierTypes : Collections.EMPTY_SET;
+    public synchronized Collection getIdentifierTypes() {
+        return identifierTypes = nonNullCollection(identifierTypes, String.class);
     }
 
     /**
      * Set the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
      */
-    public synchronized void setIdentifierTypes(final Set newValues) {
-        checkWritePermission();
-        if (identifierTypes == null) {
-            identifierTypes = new CheckedHashSet(String.class);
-        } else {
-            identifierTypes.clear();
-        }
-        identifierTypes.addAll(newValues);
+    public synchronized void setIdentifierTypes(final Collection newValues) {
+        identifierTypes = copyCollection(newValues, identifierTypes, String.class);
     }
 
     /**
      * Returns the name and position information for an individual or organization that is
      * responsible for the resource. Returns an empty string if there is none.
      */
-    public Set getCitedResponsibleParties() {
-        final Set citedResponsibleParties = this.citedResponsibleParties; // Avoid synchronization
-        return (citedResponsibleParties!=null) ? citedResponsibleParties : Collections.EMPTY_SET;
+    public synchronized Collection getCitedResponsibleParties() {
+        return citedResponsibleParties = nonNullCollection(citedResponsibleParties,
+                                                           ResponsibleParty.class);
     }
 
     /**
      * Set the name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    public synchronized void setCitedResponsibleParties(final Set newValues) {
-        checkWritePermission();
-        if (citedResponsibleParties == null) {
-            citedResponsibleParties = new CheckedHashSet(ResponsibleParty.class);
-        } else {
-            citedResponsibleParties.clear();
-        }
-        citedResponsibleParties.addAll(newValues);
+    public synchronized void setCitedResponsibleParties(final Collection newValues) {
+        citedResponsibleParties = copyCollection(newValues, citedResponsibleParties,
+                                                 ResponsibleParty.class);
     }
 
     /**
      * Returns the mode in which the resource is represented, or an empty string if none.
      */
-    public Set getPresentationForm() {
-        final Set presentationForm = this.presentationForm; // Avoid synchronization
-        return (presentationForm!=null) ? presentationForm : Collections.EMPTY_SET;
+    public synchronized Collection getPresentationForm() {
+        return presentationForm = nonNullCollection(presentationForm, PresentationForm.class);
     }
 
     /**
      * Set the mode in which the resource is represented, or an empty string if none.
      */
-    public synchronized void setPresentationForm(final Set newValues) {
-        checkWritePermission();
-        if (presentationForm == null) {
-            presentationForm = new CheckedHashSet(PresentationForm.class);
-        } else {
-            presentationForm.clear();
-        }
-        presentationForm.addAll(newValues);
+    public synchronized void setPresentationForm(final Collection newValues) {
+        presentationForm = copyCollection(newValues, presentationForm, PresentationForm.class);
     }
 
     /**
@@ -686,17 +640,15 @@ public class Citation extends MetadataEntity
     protected void freeze() {
         super.freeze();
         title                   = (InternationalString) unmodifiable(title);
-        alternateTitles         = (List)                unmodifiable(alternateTitles);
-        dates                   = (Map)                 unmodifiable(dates);
+        alternateTitles         = (Collection)          unmodifiable(alternateTitles);
+        dates                   = (Collection)          unmodifiable(dates);
         edition                 = (InternationalString) unmodifiable(edition);
-        identifiers             = (Set)                 unmodifiable(identifiers);
-        identifierTypes         = (Set)                 unmodifiable(identifierTypes);
-        citedResponsibleParties = (Set)                 unmodifiable(citedResponsibleParties);
-        presentationForm        = (Set)                 unmodifiable(presentationForm);
+        identifiers             = (Collection)          unmodifiable(identifiers);
+        identifierTypes         = (Collection)          unmodifiable(identifierTypes);
+        citedResponsibleParties = (Collection)          unmodifiable(citedResponsibleParties);
+        presentationForm        = (Collection)          unmodifiable(presentationForm);
         otherCitationDetails    = (InternationalString) unmodifiable(otherCitationDetails);
         collectiveTitle         = (InternationalString) unmodifiable(collectiveTitle);
-        ISBN                    = (String)              unmodifiable(ISBN);
-        ISSN                    = (String)              unmodifiable(ISSN);
     }
 
     /**

@@ -23,15 +23,16 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Locale;
-import java.util.Set;
 
-import org.geotools.metadata.content.ContentInformation;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.util.GenericName;
+
+// Geotools dependencies
+import org.geotools.metadata.content.ContentInformation;
+import org.geotools.resources.Utilities;
  
 
 /**
@@ -57,7 +58,7 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Language(s) used within the catalogue
      */
-    private Set language;
+    private Collection language;
 
     /**
      * Indication of whether or not the feature catalogue is included with the dataset.
@@ -67,12 +68,12 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Subset of feature types from cited feature catalogue occurring in dataset.
      */
-    private Set featureTypes;
+    private Collection featureTypes;
 
     /**
      * Complete bibliographic reference to one or more external feature catalogues.
      */
-    private Set featureCatalogueCitations;
+    private Collection featureCatalogueCitations;
 
     /**
      * Construct an initially empty feature catalogue description.
@@ -97,22 +98,15 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Returns the language(s) used within the catalogue
      */
-    public Set getLanguages() {
-        final Set language = this.language; // Avoid synchronization
-        return (language!=null) ? language : Collections.EMPTY_SET;
+    public synchronized Collection getLanguages() {
+        return language = nonNullCollection(language, Locale.class);
     }
     
     /**
      * Returns the language(s) used within the catalogue
      */
-    public synchronized void setLanguages(final Set newValues) {
-        checkWritePermission();
-        if (language == null) {
-            language = new CheckedHashSet(Locale.class);
-        } else {
-            language.clear();
-        }
-        language.addAll(newValues);
+    public synchronized void setLanguages(final Collection newValues) {
+        language = copyCollection(newValues, language, Locale.class);
     }
     
     /**
@@ -133,45 +127,29 @@ public class FeatureCatalogueDescription extends ContentInformation
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
-    public Set getFeatureTypes() {
-        final Set featureTypes = this.featureTypes; // Avoid synchronization
-        return (featureTypes!=null) ? featureTypes : Collections.EMPTY_SET;
+    public synchronized Collection getFeatureTypes() {
+        return featureTypes = nonNullCollection(featureTypes, GenericName.class);
     }
     
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
-     *
-     * @todo Use CheckedHashSet(GenericName.class)
      */
-    public synchronized void setFeatureTypes(final Set newValues) {
-        checkWritePermission();
-        if (featureTypes == null) {
-            featureTypes = new CheckedHashSet(GenericName.class);
-        } else {
-            featureTypes.clear();
-        }
-        featureTypes.addAll(newValues);
+    public synchronized void setFeatureTypes(final Collection newValues) {
+        featureTypes = copyCollection(newValues, featureTypes, GenericName.class);
     }
 
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
-    public Set getFeatureCatalogueCitations() {
-        final Set featureCatalogueCitations = this.featureCatalogueCitations; // Avoid synchronization
-        return (featureCatalogueCitations!=null) ? featureCatalogueCitations : Collections.EMPTY_SET;
+    public synchronized Collection getFeatureCatalogueCitations() {
+        return featureCatalogueCitations = nonNullCollection(featureCatalogueCitations, Citation.class);
     }
     
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
-    public synchronized void setFeatureCatalogueCitations(final Set newValues) {
-        checkWritePermission();
-        if (featureCatalogueCitations == null) {
-            featureCatalogueCitations = new CheckedHashSet(Citation.class);
-        } else {
-            featureCatalogueCitations.clear();
-        }
-        featureCatalogueCitations.addAll(newValues);
+    public synchronized void setFeatureCatalogueCitations(final Collection newValues) {
+        featureCatalogueCitations = copyCollection(newValues, featureCatalogueCitations, Citation.class);
     }
     
     /**
@@ -179,9 +157,9 @@ public class FeatureCatalogueDescription extends ContentInformation
      */
     protected void freeze() {
         super.freeze();
-        language                  = (Set) unmodifiable(language);
-        featureTypes              = (Set) unmodifiable(featureTypes);
-        featureCatalogueCitations = (Set) unmodifiable(featureCatalogueCitations);
+        language                  = (Collection) unmodifiable(language);
+        featureTypes              = (Collection) unmodifiable(featureTypes);
+        featureCatalogueCitations = (Collection) unmodifiable(featureCatalogueCitations);
     }
 
     /**

@@ -23,13 +23,16 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -88,14 +91,14 @@ public class OnLineResource extends MetadataEntity
     public static final OnLineResource GEOTOOLS = new OnLineResource();
     static {
         try {
-            OGC.     setLinkage(new URL("http://www.opengeospatial.org/"      ));
-            OPEN_GIS.setLinkage(new URL("http://www.opengis.org"              ));
-            EPSG    .setLinkage(new URL("http://www.epsg.org"                 ));
-            GEOTIFF .setLinkage(new URL("http://www.remotesensing.org/geotiff"));
-            ESRI    .setLinkage(new URL("http://www.esri.com"                 ));
-            ORACLE  .setLinkage(new URL("http://www.oracle.com"               ));
-            GEOTOOLS.setLinkage(new URL("http://www.geotools.org"             ));
-        } catch (MalformedURLException exception) {
+            OGC.     setLinkage(new URI("http://www.opengeospatial.org/"      ));
+            OPEN_GIS.setLinkage(new URI("http://www.opengis.org"              ));
+            EPSG    .setLinkage(new URI("http://www.epsg.org"                 ));
+            GEOTIFF .setLinkage(new URI("http://www.remotesensing.org/geotiff"));
+            ESRI    .setLinkage(new URI("http://www.esri.com"                 ));
+            ORACLE  .setLinkage(new URI("http://www.oracle.com"               ));
+            GEOTOOLS.setLinkage(new URI("http://www.geotools.org"             ));
+        } catch (URISyntaxException exception) {
             // Should never happen.
             throw new ExceptionInInitializerError(exception);
         }
@@ -135,7 +138,7 @@ public class OnLineResource extends MetadataEntity
      * Location (address) for on-line access using a Uniform Resource Locator address or
      * similar addressing scheme such as http://www.statkart.no/isotc211.
      */
-    private URL linkage;
+    private URI linkage;
     
     /**
      * Creates an initially empty on line resource.
@@ -144,9 +147,9 @@ public class OnLineResource extends MetadataEntity
      }
     
     /**
-     * Creates an on line resource initialized to the given URL.
+     * Creates an on line resource initialized to the given URI.
      */
-     public OnLineResource(final URL linkage) {
+     public OnLineResource(final URI linkage) {
          setLinkage(linkage);
      }
     
@@ -202,7 +205,7 @@ public class OnLineResource extends MetadataEntity
      * Returns the location (address) for on-line access using a Uniform Resource Locator address or
      * similar addressing scheme such as http://www.statkart.no/isotc211.
      */
-    public URL getLinkage() {
+    public URI getLinkage() {
         return linkage;
     }
     
@@ -210,7 +213,7 @@ public class OnLineResource extends MetadataEntity
      * Set the location (address) for on-line access using a Uniform Resource Locator address or
      * similar addressing scheme such as http://www.statkart.no/isotc211.
      */
-    public synchronized void setLinkage(final URL newValue) {
+    public synchronized void setLinkage(final URI newValue) {
         checkWritePermission();
         linkage = newValue;
     }
@@ -220,8 +223,8 @@ public class OnLineResource extends MetadataEntity
      * Returns <code>null</code> if none.
      */
     public String getProtocol() {
-        final URL linkage = this.linkage;
-        return (linkage!=null) ? linkage.getProtocol() : null;
+        final URI linkage = this.linkage;
+        return (linkage!=null) ? linkage.getScheme() : null;
     }
     
     /**
@@ -229,10 +232,7 @@ public class OnLineResource extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        applicationProfile = (String)              unmodifiable(applicationProfile);
-        description        = (InternationalString) unmodifiable(description);
-        function           = (OnLineFunction)      unmodifiable(function);
-        linkage            = (URL)                 unmodifiable(linkage);
+        description = (InternationalString) unmodifiable(description);
     }
 
     /**

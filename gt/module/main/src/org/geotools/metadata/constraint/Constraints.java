@@ -23,14 +23,15 @@
 package org.geotools.metadata.constraint;
 
 // J2SE direct dependencies
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -52,7 +53,7 @@ public class Constraints extends MetadataEntity
      * Limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    private List useLimitation;
+    private Collection useLimitation;
 
     /**
      * Constructs an initially empty constraints.
@@ -64,23 +65,16 @@ public class Constraints extends MetadataEntity
      * Returns the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    public List getUseLimitation() {
-        final List useLimitation = this.useLimitation; // Avoid synchronization
-        return (useLimitation!=null) ? useLimitation : Collections.EMPTY_LIST;
+    public synchronized Collection getUseLimitation() {
+        return useLimitation = nonNullCollection(useLimitation, InternationalString.class);
     }
 
     /**
      * Set the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    public synchronized void setUseLimitation(final List newValue) {
-        checkWritePermission();
-        if (useLimitation == null) {
-            useLimitation = new CheckedArrayList(InternationalString.class);
-        } else {
-            useLimitation.clear();
-        }
-        useLimitation.addAll(newValue);
+    public synchronized void setUseLimitation(final Collection newValues) {
+        useLimitation = copyCollection(newValues, useLimitation, InternationalString.class);
     }
 
     /**
@@ -88,7 +82,7 @@ public class Constraints extends MetadataEntity
      */
     protected void freeze() {
         super.freeze();
-        useLimitation = (List) unmodifiable(useLimitation);
+        useLimitation = (Collection) unmodifiable(useLimitation);
     }
 
     /**
