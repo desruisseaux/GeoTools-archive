@@ -205,7 +205,7 @@ public class SQLUnpacker {
                 subUnSup = subPair.getUnSupported();
 
                 if (subSup != null) {
-                    retSup = subUnSup.not();
+                    retSup = subSup.not();
                 }
 
                 if (subUnSup != null) {
