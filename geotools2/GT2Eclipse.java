@@ -396,6 +396,13 @@ public static void main( String args[] ) {
     project.println("    <nature>org.eclipse.jdt.core.javanature</nature>");
     project.println("  </natures>");
     project.println("</projectDescription>");
+    
+    System.out.println("Thanks for using GT2Eclipse!");
+    System.out.println("your .project and .classpath files are ready now.");
+    System.out.println("Make sure refresh your project in Eclipse so it notices the change,");
+	System.out.println("And if you have not already done so set a 'Classpath Variable' up");
+	System.out.println("for MAVEN_REPO (so Eclipse knows where all the jars are located).");
+    
 }
 
 }
