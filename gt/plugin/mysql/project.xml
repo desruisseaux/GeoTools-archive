@@ -51,6 +51,11 @@
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
+      <id>geoapi</id>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sf.net</url>
+    </dependency>
+    <dependency>
         <artifactId>mysql-connector-java</artifactId>
         <groupId>mysql</groupId>
         <version>3.0.9</version>
@@ -65,7 +70,7 @@
   <unitTest>
     <!-- This section excludes the tests -->
     <excludes>
-      <exclude>**/*.java</exclude>
+      <exclude>**/mysql/*.java</exclude>
     </excludes>
     <!-- End exclude tests -->
      <resources>
