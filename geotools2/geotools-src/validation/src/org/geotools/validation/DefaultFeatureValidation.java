@@ -49,7 +49,7 @@ public class DefaultFeatureValidation implements FeatureValidation {
             "org.geotools.validation");
 
     /** User's Name of this validation test. */
-    private String name; // name of the validation
+    private String attribute; // name of the validation
 
     /** User's description of this validation test. */
     private String description;

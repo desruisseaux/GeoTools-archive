@@ -71,8 +71,8 @@ import org.geotools.validation.ValidationResults;
 public class RangeValidation extends DefaultFeatureValidation {
     private int max = Integer.MAX_VALUE;
     private int min = Integer.MIN_VALUE;
-    private String name;
-
+    /** XPath expression used to specify attribute */
+	private String attribute;
     /**
      * RangeFeatureValidation constructor.
      * 
@@ -103,25 +103,23 @@ public class RangeValidation extends DefaultFeatureValidation {
      */
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) {
-        Object ft = feature.getAttribute(name);
+        Object obj = feature.getAttribute(attribute);
 
-        if (ft == null) {
-            results.error(feature, name + " is Empty");
-
-            return false;
+        if (obj == null) {
+            return true; // user can separately issue a nullzero test
         }
 
-        if (ft instanceof Number) {
-            Number nb = (Number) ft;
+        if (obj instanceof Number) {
+            Number number = (Number) obj;
 
-            if (nb.intValue() < min) {
-                results.error(feature, name + " is less than " + min);
+            if (number.intValue() < min) {
+                results.error(feature, attribute + " is less than " + min);
 
                 return false;
             }
 
-            if (nb.intValue() > max) {
-                results.error(feature, name + " is greater than " + max);
+            if (number.intValue() > max) {
+                results.error(feature, attribute + " is greater than " + max);
 
                 return false;
             }
@@ -226,4 +224,20 @@ public class RangeValidation extends DefaultFeatureValidation {
     //public void setName(String string) {
     //    name = string;
     //}
+	/**
+	 * XPATH expression used to locate attribute
+	 * @return xpath
+	 */
+	public String getAttribute() {
+		return attribute;
+	}
+
+	/**
+	 * XPATH expression used to locate attribute
+	 * @param xpath
+	 */
+	public void setAttribute(String xpath) {
+		attribute = xpath;
+	}
+
 }
