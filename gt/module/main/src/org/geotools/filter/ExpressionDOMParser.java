@@ -358,6 +358,7 @@ public final class ExpressionDOMParser {
             Element param = (Element) child;
 
             NamedNodeMap map = param.getAttributes();
+            String funcName = null;
 
             for (int k = 0; k < map.getLength(); k++) {
                 String res = map.item(k).getNodeValue();
@@ -368,13 +369,18 @@ public final class ExpressionDOMParser {
                 LOGGER.fine("attribute " + name + " with value of " + res);
 
                 if (name.equalsIgnoreCase("name")) {
+                    funcName = res;
                     func = FILTER_FACT.createFunctionExpression(res);
                 }
             }
 
             if (func == null) {
-                LOGGER.severe("failed to find function in " + child);
-
+                if (funcName != null){
+                    LOGGER.severe("failed to create instance of function " + funcName);
+                }
+                else{
+                    LOGGER.severe("failed to find a function name in " + child);
+                }
                 return null;
             }
 
