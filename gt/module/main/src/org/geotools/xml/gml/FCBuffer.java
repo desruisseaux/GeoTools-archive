@@ -224,6 +224,8 @@ public class FCBuffer extends Thread implements FeatureReader {
 //        }
 
         if (state == STOP) {
+            if(exception!=null)
+                throw new IOException(exception.toString());
             return false;
         }
 

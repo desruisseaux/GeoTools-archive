@@ -3,7 +3,6 @@ package org.geotools.data.wfs;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,18 +80,19 @@ public class WFSDataStoreReadTest extends TestCase {
     public void testGaldos() throws NoSuchElementException, IOException, IllegalAttributeException{
         URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
         System.out.println("\nGaldos");
-        doFeatureType(url);
-        doFeatureReader(url);
-        doFeatureReaderWithFilter(url);
+        doFeatureType(url,true,true);
+        doFeatureReader(url,true,true);
+        doFeatureReaderWithFilter(url,true,true);
         System.out.println("");
     }
     
     public void testGeoServer() throws NoSuchElementException, IOException, IllegalAttributeException{
         URL url = new URL("http://192.168.50.35:8080/geoserver/wfs?Request=GetCapabilities&service=WFS");
+        
         System.out.println("\nGeoServer");
-        doFeatureType(url);
-        doFeatureReader(url);
-        doFeatureReaderWithFilter(url);
+//        doFeatureType(url,true,true);
+//        doFeatureReader(url,true,true);
+//        doFeatureReaderWithFilter(url,true,true);
         System.out.println("");
     }
     
@@ -101,25 +101,25 @@ public class WFSDataStoreReadTest extends TestCase {
     public void testGeomatics() throws NoSuchElementException, IOException, IllegalAttributeException{
         URL url = new URL("http://gws2.pcigeomatics.com/wfs1.0.0/wfs?service=WFS&request=getcapabilities");
         System.out.println("\nGeomatics");
-        doFeatureType(url);
+        doFeatureType(url,true,false);
         // TODO uncomment when server bug is fixed
-//        doFeatureReader(url);
-//        doFeatureReaderWithFilter(url);
+        doFeatureReader(url,false,false);
+        doFeatureReaderWithFilter(url,false,false);
         System.out.println("");
     }
     
     public void testMapServer() throws NoSuchElementException, IOException, IllegalAttributeException{
         URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
         System.out.println("\nMapServer");
-        doFeatureType(url);
-        doFeatureReader(url);
-        doFeatureReaderWithFilter(url);
+        doFeatureType(url,true,false);
+        doFeatureReader(url,true,false);
+        doFeatureReaderWithFilter(url,true,false);
         System.out.println("");
     }
     
-    public void doFeatureType(URL url) throws IOException{
+    public void doFeatureType(URL url,boolean get, boolean post) throws IOException{
         DataStore wfs = null;
-        
+        if(get){
         // get
         System.out.println("Get FeatureTypeTest");
         wfs = getDataStore(url,false);
@@ -129,21 +129,21 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
-        
+        }if(post){
         // post
         System.out.println("Post FeatureTypeTest");
         wfs = getDataStore(url,true);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[1]);
         System.out.println("FT name = "+wfs.getTypeNames()[1]);
-        ft = wfs.getSchema(wfs.getTypeNames()[1]);
+        FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
-    }
+    }}
     
-    public void doFeatureReader(URL url) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void doFeatureReader(URL url, boolean get, boolean post) throws NoSuchElementException, IOException, IllegalAttributeException{
         DataStore wfs = null;
-        
+        if(post){
         // 	post
         System.out.println("Post FeatureReaderTest");
         wfs = getDataStore(url,true);
@@ -154,22 +154,22 @@ public class WFSDataStoreReadTest extends TestCase {
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",ft.hasNext() && ft.getFeatureType()!=null && ft.next()!=null);
         ft.close();
-    
+        }if(get){
         // 	get
         System.out.println("Get FeatureReaderTest");
         wfs = getDataStore(url,false);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[1]);
-        query = new DefaultQuery(wfs.getTypeNames()[1]);
-        ft = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
+        Query query = new DefaultQuery(wfs.getTypeNames()[1]);
+        FeatureReader ft = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",ft.hasNext() && ft.getFeatureType()!=null && ft.next()!=null);
-        ft.close();
+        ft.close();}
     }
     
-    public void doFeatureReaderWithFilter(URL url) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void doFeatureReaderWithFilter(URL url, boolean get, boolean post) throws NoSuchElementException, IOException, IllegalAttributeException{
         DataStore wfs = null;
-    
+    if(get){
         // 	get
         System.out.println("Get FeatureReaderWithFilterTest");
         wfs = getDataStore(url,false);
@@ -182,18 +182,18 @@ public class WFSDataStoreReadTest extends TestCase {
         FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
-
+    }if(post){
         // 	post
         System.out.println("Post FeatureReaderWithFilterTest");
         wfs = getDataStore(url,true);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[1]);
-        ft = wfs.getSchema(wfs.getTypeNames()[1]);
-        props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
-        query = new DefaultQuery(ft.getTypeName());
+        FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
+        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
+        DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
-        fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
+        FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
-    }
+    }}
 }
