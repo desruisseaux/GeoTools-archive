@@ -79,7 +79,7 @@ public class ForceCoordinateSystemFeatureResults implements FeatureResults {
                 + " already used (check before using wrapper)");
         }
 
-        this.schema = DataUtilities.changeFeatureTypeCS(forcedCS, type);
+        this.schema = CRSService.transform(type, forcedCS);
         this.results = results;
 
         // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,

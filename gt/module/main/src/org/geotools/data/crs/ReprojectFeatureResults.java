@@ -97,7 +97,7 @@ public class ReprojectFeatureResults implements FeatureResults {
                 + destinationCS + " already used (check before using wrapper)");
         }
 
-        this.schema = DataUtilities.changeFeatureTypeCS(destinationCS, type);
+        this.schema = CRSService.transform(type, destinationCS);
         this.results = results;
 
         this.transform = CRSService.reproject(originalCs, destinationCS, true);
