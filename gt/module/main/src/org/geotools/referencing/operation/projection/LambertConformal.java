@@ -57,6 +57,7 @@ import org.geotools.resources.cts.Resources;
  *   <li><code>Lambert_Conformal_Conic_1SP</code> (EPSG code 9801)</li>
  *   <li><code>Lambert_Conformal_Conic_2SP</code> (EPSG code 9802)</li>
  *   <li><code>Lambert_Conic_Conformal_2SP_Belgium</code> (EPSG code 9803)</li>
+ *   <li><code>Lambert_Conformal_Conic</code></li>
  * </ul>
  *
  * For the 1SP case the latitude of origin is used as the standard parallel (SP). 
@@ -64,6 +65,10 @@ import org.geotools.resources.cts.Resources;
  * and set both the SP1 and SP2 to the single SP. Alternatively, the "standard_parallel_2" 
  * parameter is optional and will be given the same value as "standard_parallel_1" 
  * if not set (creating a 1 standard parallel projection). 
+ * <br><br>
+ *
+ * The <code>Lambert_Conformal_Conic</code> is a 2SP case that includes a 
+ * scale_factor code that ESRI specifies.
  * <br><br>
  *
  * <strong>References:</strong><ul>
@@ -115,6 +120,10 @@ public class LambertConformal extends MapProjection{
      */
     private final boolean belgium;
     
+    /**
+     * <code>true</code> for ESRI 2SP parameters.
+     */
+    private final boolean esri;
     
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
@@ -162,7 +171,7 @@ public class LambertConformal extends MapProjection{
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            return new LambertConformal(parameters, descriptors, false, false);
+            return new LambertConformal(parameters, descriptors, false, false, false);
         }
     }
 
@@ -204,7 +213,6 @@ public class LambertConformal extends MapProjection{
         
         /**
          * The parameters group.
-         * @task REVISIT: ESRI also includes a scale factor parameter
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
                 new Identifier(Citation.OPEN_GIS, "Lambert_Conformal_Conic_2SP"),
@@ -212,7 +220,6 @@ public class LambertConformal extends MapProjection{
                 new Identifier(Citation.EPSG,     "9802"),
                 new Identifier(Citation.GEOTIFF,  "CT_LambertConfConic_2SP"),
                 new Identifier(Citation.GEOTIFF,  "CT_LambertConfConic"),
-                new Identifier(Citation.ESRI,     "Lambert_Conformal_Conic"),
                 new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
                                                   ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
@@ -247,7 +254,7 @@ public class LambertConformal extends MapProjection{
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            return new LambertConformal(parameters, descriptors, true, false);
+            return new LambertConformal(parameters, descriptors, true, false, false);
         }
      }
 
@@ -296,7 +303,55 @@ public class LambertConformal extends MapProjection{
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            return new LambertConformal(parameters, descriptors, true, true);
+            return new LambertConformal(parameters, descriptors, true, true, false);
+        }
+    }
+    
+    /**
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link LambertConformal} 2SP projection, using ESRI parameters.
+     * ESRI includes a scale_factor parameter. 
+     *
+     * @see org.geotools.referencing.operation.MathTransformFactory
+     *
+     * @version $Id:$
+     * @author Rueben Schulz
+     */
+     public static final class Provider2SP_ESRI extends Provider2SP {
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+                new Identifier(Citation.ESRI,     "Lambert_Conformal_Conic"),
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,          SEMI_MINOR,
+                CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
+                STANDARD_PARALLEL_1, STANDARD_PARALLEL_2,
+                SCALE_FACTOR,
+                FALSE_EASTING,       FALSE_NORTHING
+            });
+         
+        /**
+         * Construct a new provider. 
+         */
+        public Provider2SP_ESRI() {
+            super(PARAMETERS);
+        }
+           
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+                throws ParameterNotFoundException
+        {
+            final Collection descriptors = PARAMETERS.descriptors();
+            return new LambertConformal(parameters, descriptors, true, false, true);
         }
     }
      
@@ -311,13 +366,14 @@ public class LambertConformal extends MapProjection{
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     LambertConformal(final ParameterValueGroup parameters, final Collection expected,
-                     final boolean sp2, final boolean belgium) 
+                     final boolean sp2, final boolean belgium, final boolean esri) 
             throws ParameterNotFoundException
     {
         //Fetch parameters 
         super(parameters, expected);
         this.sp2         = sp2;
         this.belgium     = belgium;
+        this.esri        = esri;
         if (sp2) {
             phi1 = doubleValue(expected, Provider2SP.STANDARD_PARALLEL_1, parameters);
             ensureLatitudeInRange(Provider2SP.STANDARD_PARALLEL_1, phi1, true);
@@ -381,9 +437,11 @@ public class LambertConformal extends MapProjection{
      * {@inheritDoc}
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
-        return (belgium) ? 
-                    Provider2SP_Belgium.PARAMETERS :
-                    ((sp2) ? Provider2SP.PARAMETERS : Provider1SP.PARAMETERS);
+        return (esri) ? 
+                    Provider2SP_ESRI.PARAMETERS :
+                    ((belgium) ? 
+                        Provider2SP_Belgium.PARAMETERS :
+                        ((sp2) ? Provider2SP.PARAMETERS : Provider1SP.PARAMETERS));
     }
     
     /**
