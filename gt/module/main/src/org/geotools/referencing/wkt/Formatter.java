@@ -34,8 +34,9 @@ import javax.units.UnitFormat;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.metadata.Identifier;
@@ -43,6 +44,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.parameter.Parameters;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -223,7 +225,7 @@ public class Formatter {
                                     ? (IdentifiedObject) formattable : null;
         if (info != null) {
             buffer.append(QUOTE);
-            buffer.append(info.getName(locale));
+            buffer.append(info.getName().toString(locale));
             buffer.append(QUOTE);
         }
         String keyword = formattable.formatWKT(this);
@@ -308,7 +310,7 @@ public class Formatter {
      */
     public void append(final GeneralParameterValue parameter) {
         if (parameter instanceof ParameterValueGroup) {
-            final GeneralParameterValue[] parameters = ((ParameterValueGroup)parameter).getValues();
+            final GeneralParameterValue[] parameters = Parameters.array( (ParameterValueGroup)parameter);
             for (int i=0; i<parameters.length; i++) {
                 append(parameters[i]);
             }
@@ -316,7 +318,7 @@ public class Formatter {
         if (parameter instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameter;
             // Covariance: Remove cast if covariance is allowed.
-            final OperationParameter descriptor = (OperationParameter) param.getDescriptor();
+            final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
             Unit unit = descriptor.getUnit();
             if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
                 unit = contextualUnit;
@@ -446,7 +448,7 @@ public class Formatter {
      */
     public String getName(final IdentifiedObject info) {
         final Identifier identifier = getIdentifier(info);
-        return (identifier!=null) ? identifier.getCode() : info.getName(locale);
+        return (identifier!=null) ? identifier.getCode() : info.getName().toString(locale);
     }
 
     /**

@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.FactoryException;
@@ -141,16 +141,16 @@ public final class MathTransformParser extends AbstractParser {
          * set the corresponding parameter in the ParameterList.
          */
         Element param;
-        ParameterValueGroup params = new org.geotools.parameter.ParameterValueGroup(
+        ParameterValueGroup params = new org.geotools.parameter.ParameterGroup(
             Collections.singletonMap("name", "params"), parameters);
         while ((param=element.pullOptionalElement("PARAMETER")) != null) {
             final String name = param.pullString("name");
 //I am assuming this will not be a ParameterValueGroup (bad assumption?)
-            ParameterValue parameter = (ParameterValue) params.getValue(name);
+            ParameterValue parameter = params.parameter(name);
 //should be able to use parameter.getValue().getClass() here, but it returns null            
-            if (Integer.class.equals(((OperationParameter)parameter.getDescriptor()).getValueClass())) {
+            if (Integer.class.equals(((ParameterDescriptor)parameter.getDescriptor()).getValueClass())) {
                 parameter.setValue(param.pullInteger("value"));
-            } else if (Double.class.equals(((OperationParameter)parameter.getDescriptor()).getValueClass())) {
+            } else if (Double.class.equals(((ParameterDescriptor)parameter.getDescriptor()).getValueClass())) {
                 parameter.setValue(param.pullDouble("value"));
             } else {
                 parameter.setValue(param.pullString("value"));
