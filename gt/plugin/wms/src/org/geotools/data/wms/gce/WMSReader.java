@@ -132,14 +132,7 @@ public class WMSReader implements GridCoverageReader {
      */
     public GridCoverage read(ParameterValueGroup parameters)
         throws IllegalArgumentException, IOException {
-        GetMapRequest request;
-        try {
-            request = wms.createGetMapRequest();
-        } catch (SAXException e1) {
-            throw new IOException();
-        } catch (URISyntaxException e1) {
-            throw new IOException();
-        }
+        GetMapRequest request = wms.createGetMapRequest();
         String minx = "";
         String miny = "";
         String maxx = "";
