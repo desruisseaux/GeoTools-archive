@@ -114,39 +114,6 @@ public abstract class NewQuery {
      * @return the gml namespace of the feature type to be returned with this query
      */
     public abstract URI getNamespace();
-    
-    /**
-     * The handle attribute is included to allow a client to associate  a
-     * mnemonic name to the Query request. The purpose of the handle attribute
-     * is to provide an error handling mechanism for locating  a statement
-     * that might fail.
-     *
-     * @return the mnemonic name of the query request.
-     */
-    public abstract String getHandle();
-
-    /**
-     * From WFS Spec:  The version attribute is included in order to
-     * accommodate systems that  support feature versioning. A value of ALL
-     * indicates that all versions of a feature should be fetched. Otherwise
-     * an integer, n, can be specified  to return the n th version of a
-     * feature. The version numbers start at '1'  which is the oldest version.
-     * If a version value larger than the largest version is specified then
-     * the latest version is return. The default action shall be for the query
-     * to return the latest version. Systems that do not support versioning
-     * can ignore the parameter and return the only version  that they have.
-     * 
-     * <p>
-     * This will not be used for awhile, but at some future point geotools
-     * should support feature versioning.  Obviously none do now, nor are any
-     * close to supporting it, so perhaps we should just wait and see.  And of
-     * course we'd need the corresponding supportsFeatureVersioning in the
-     * datasource metadata object.
-     * </p>
-     *
-     * @return the version of the feature to return.
-     */
-    public abstract String getVersion();
 
     /**
      * aaime -- this is you hint spot :)
