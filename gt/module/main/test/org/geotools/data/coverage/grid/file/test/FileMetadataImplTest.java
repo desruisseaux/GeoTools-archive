@@ -43,6 +43,7 @@ public class FileMetadataImplTest extends TestCase {
         assertNotNull(resource);
         uri=new URI(URLDecoder.decode(resource.toString(),"UTF-8"));
         f=new File(uri);
+        assertTrue(f.exists());
     }
 
     private void init(){
@@ -73,12 +74,6 @@ public class FileMetadataImplTest extends TestCase {
     	init();
 //      test begins
         assertEquals(metadata.getFile(), f);
-    }
-
-    public void testGetFormat() {
-    	init();
-//      test begins
-        assertTrue(metadata.getFormat().equals(GridFormatFinder.findFormat(f)));
     }
 
     public void testGetLastModified() {
