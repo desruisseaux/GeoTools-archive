@@ -55,6 +55,24 @@ import java.util.NoSuchElementException;
  * @since 0.6.0
  */
 public class JTS {
+    
+    public static class ReferencedEnvelope extends Envelope{
+        private CoordinateReferenceSystem crs = null;
+        public ReferencedEnvelope(Envelope env, CoordinateReferenceSystem crs){
+            super(env);
+            if(crs == null)
+                throw new NullPointerException("CoordinateRefrenceSystem may not be null");
+            this.crs = crs;
+        }
+        
+        public CoordinateReferenceSystem getCRS(){
+            return crs;
+        }
+    }
+    
+    public static ReferencedEnvelope create(Envelope env, CoordinateReferenceSystem crs){
+        return new ReferencedEnvelope(env,crs);
+    }
 
     /**
      * Transforms the Envelope using the MathTransform.
@@ -68,6 +86,15 @@ public class JTS {
         double[] newcoords=new double[4];
         transform.transform(coords, 0, newcoords, 0, 2);
         return new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]);
+    }
+
+    public static ReferencedEnvelope transform(ReferencedEnvelope envelope, CoordinateReferenceSystem crs) throws TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
+        double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
+        double[] newcoords=new double[4];
+        MathTransform transform = FactoryFinder.getCoordinateOperationFactory()
+        .createOperation(envelope.getCRS(),crs).getMathTransform();
+        transform.transform(coords, 0, newcoords, 0, 2);
+        return new ReferencedEnvelope(new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]),crs);
     }
     
     /**
