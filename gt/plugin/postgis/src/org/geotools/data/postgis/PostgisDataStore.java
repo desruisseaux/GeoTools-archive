@@ -42,6 +42,7 @@ import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCFeatureLocking;
+import org.geotools.data.jdbc.JDBCFeatureSource;
 import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.JDBCUtils;
@@ -663,8 +664,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
@@ -965,9 +965,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return names;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
+     * 
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
      *      org.geotools.feature.FeatureType)
      */
@@ -987,27 +986,32 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     public FeatureSource getFeatureSource(String typeName)
         throws IOException {
-        LOGGER.fine("get Feature source called on " + typeName);
+        if (typeHandler.getFIDMapper(typeName).isVolatile() || allowWriteOnVolatileFIDs) {
+            LOGGER.fine("get Feature source called on " + typeName);
 
-        if (OPTIMIZE_MODE == OPTIMIZE_SQL) {
-            LOGGER.fine("returning pg feature locking");
+            if (OPTIMIZE_MODE == OPTIMIZE_SQL) {
+                LOGGER.fine("returning pg feature locking");
 
-            return new PostgisFeatureLocking(this, getSchema(typeName));
-        }
+                return new PostgisFeatureLocking(this, getSchema(typeName));
+            }
 
-        // default
-        if (getLockingManager() != null) {
-            // Use default JDBCFeatureLocking that delegates all locking
-            // the getLockingManager
-            LOGGER.fine("returning jdbc feature locking");
+            // default
+            if (getLockingManager() != null) {
+                // Use default JDBCFeatureLocking that delegates all locking
+                // the getLockingManager
+                LOGGER.fine("returning jdbc feature locking");
 
-            return new JDBCFeatureLocking(this, getSchema(typeName));
+                return new JDBCFeatureLocking(this, getSchema(typeName));
+            } else {
+                LOGGER
+                        .fine("returning jdbc feature store (lock manager is null)");
+
+                // subclass should provide a FeatureLocking implementation
+                // but for now we will simply forgo all locking
+                return new JDBCFeatureStore(this, getSchema(typeName));
+            }
         } else {
-            LOGGER.fine("returning jdbc feature store (lock manager is null)");
-
-            // subclass should provide a FeatureLocking implementation
-            // but for now we will simply forgo all locking
-            return new JDBCFeatureStore(this, getSchema(typeName));
+            return new JDBCFeatureSource(this, getSchema(typeName));
         }
     }
 
