@@ -18,6 +18,9 @@
  */
 package org.geotools.data.crs;
 
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +38,8 @@ import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.ct.MathTransform;
+import org.geotools.ct.MathTransform2D;
+import org.geotools.ct.MathTransformFactory;
 import org.geotools.data.FeatureReader;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.feature.AttributeType;
@@ -69,7 +74,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * Utility method isolating data source providers from CRS production.
  * <p>
- * This should be reworked as a Martins new CoordianteReferenceSystem work
+ * This should be reworked as a Martins new CoordinateReferenceSystem work
  * comes along, it is factory based an should take care of most of the functionality
  * of this module.
  * </p>
@@ -163,7 +168,7 @@ public class CRSService {
 	 * @return coordinate system for the provided code
 	 * @throws FactoryException
 	 */
-	CoordinateSystem createCoordianteSystem( String code ) throws FactoryException{
+	CoordinateSystem createCoordinateSystem( String code ) throws FactoryException{
 		int split = code.indexOf(":");
 		String authority = "EPSG";
 		if( split != -1 ){
@@ -210,13 +215,13 @@ public class CRSService {
 	 * @throws FactoryException
 	 */	
 	public CoordinateReferenceSystem createCRS( String code ) throws FactoryException {
-	    return createCoordianteSystem( code );
+	    return createCoordinateSystem( code );
 	}
 	/** 
 	 * A "safe" cast to the old CoordinateSystem class.
 	 * 
 	 * @param crs CoordinateReferenceSystem
-	 * @return CoordianteSystem for provided CRS, or null if this is not posssible.
+	 * @return CoordinateSystem for provided CRS, or null if this is not posssible.
 	 */
 	public static CoordinateSystem cs( CoordinateReferenceSystem crs ){
 	    if( crs instanceof CoordinateSystem  ){
@@ -232,19 +237,58 @@ public class CRSService {
         }
 	}
 		
-	public static MathTransform reproject( CoordinateReferenceSystem from, CoordinateReferenceSystem to ) throws CannotCreateTransformException{
-	    return reproject( cs( from ), cs( to ) );
+	public static MathTransform reproject( CoordinateReferenceSystem from, CoordinateReferenceSystem to, boolean bidimensionalTransform) throws CannotCreateTransformException{
+	    return reproject( cs( from ), cs( to ), bidimensionalTransform );
 	}
 	
-	public static MathTransform reproject( CoordinateSystem from, CoordinateSystem to ) throws CannotCreateTransformException{
+	/**
+     * Returns a math transform for the specified transformations. If no
+     * transformation is available, or if it is the identity transform, then
+     * this method returns <code>null</code>. This method accepts null
+     * argument.
+     */
+    public static MathTransform2D getMathTransform2D(
+        final CoordinateTransformation transformation) {
+        if (transformation != null) {
+            final MathTransform transform = transformation.getMathTransform();
+
+            if (!transform.isIdentity()) {
+                return (MathTransform2D) transform;
+            }
+        }
+
+        return null;
+    }
+	
+	
+	public static MathTransform reproject( CoordinateSystem from, CoordinateSystem to, boolean bidimensionalTransform) throws CannotCreateTransformException{
     	CoordinateTransformationFactory factory =
     	    CoordinateTransformationFactory.getDefault();
     	
         CoordinateTransformation transformation;
 
         transformation = factory.createFromCoordinateSystems( from, to );
-        return transformation.getMathTransform();        
+        if(!bidimensionalTransform)
+        	return transformation.getMathTransform();
+        else
+        	return getMathTransform2D(transformation);
     }
+	
+	public static MathTransform concatenate(MathTransform firstTransform, MathTransform secondTransform) {
+		return MathTransformFactory.getDefault()
+		                                     .createConcatenatedTransform(firstTransform, secondTransform);
+	}
+	
+	/**
+     * @param transform
+     * @param at
+     * @return
+     */
+    public static MathTransform2D concatenate(MathTransform2D transform, AffineTransform at) {
+        MathTransformFactory factory = MathTransformFactory.getDefault();
+        return (MathTransform2D) factory.createConcatenatedTransform(transform, factory.createAffineTransform(at));
+    }
+
 	
 	static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
@@ -333,21 +377,28 @@ public class CRSService {
 	}
 	
 	public static Envelope transform( Envelope envelope, MathTransform transform ) throws MismatchedDimensionException, TransformException {
-	    CoordinatePoint pt;
-	    Envelope bbox = new Envelope();
-	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMinY() ), null );
-	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-	    
-	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMinY() ), null );
-	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-	    
-	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMaxY() ), null );
-	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-	    
-	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMaxY() ), null );
-	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
-	    
-	    return bbox;	    	    
+		// This code does not provide an exact transform, since the transformed envelope may not
+		// be a rectangle
+//	    CoordinatePoint pt;
+//	    Envelope bbox = new Envelope();
+//	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMinY() ), null );
+//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+//	    
+//	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMinY() ), null );
+//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+//	    
+//	    pt = transform.transform( new CoordinatePoint( envelope.getMaxX(), envelope.getMaxY() ), null );
+//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+//	    
+//	    pt = transform.transform( new CoordinatePoint( envelope.getMinX(), envelope.getMaxY() ), null );
+//	    bbox.expandToInclude( pt.getOrdinate( 0 ), pt.getOrdinate( 1 ));
+//	    
+//	    return bbox;	 
+		
+		Rectangle2D rect = new Rectangle2D.Double(envelope.getMinX(), envelope.getMinY(), envelope.getWidth(), envelope.getHeight());
+        Shape s = ((MathTransform2D) transform).createTransformedShape(rect);
+        Rectangle2D tb = s.getBounds2D();
+        return new Envelope(tb.getMinX(), tb.getMaxX(), tb.getMinY(), tb.getMaxY());
 	}
 	public static Point transform( Point point, MathTransform transform ) throws MismatchedDimensionException, TransformException {
 	    GeometryFactory factory = point.getFactory();
@@ -440,10 +491,10 @@ public class CRSService {
 	 * FeatureReader reader = CRSSerivce.readerForce( origionalReader, forceCS );
 	 * 
 	 * CoordinateReferenceSystem orgionalCS =
-	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
 	 * 
 	 * CoordinateReferenceSystem newCS =
-	 *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 *     reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
 	 * 
 	 * assertEquals( forceCS, newCS );
 	 * </code></pre>
@@ -465,10 +516,10 @@ public class CRSService {
 	 * FeatureReader reader = CRSService.readerReproject( origionalReader, newCS );
 	 * 
 	 * CoordinateReferenceSystem orgionalCS =
-	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 *     origionalReader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
 	 * 
 	 * CoordinateReferenceSystem newCS =
-	 *     reader.getFeatureType().getDefaultGeometry().getCoordianteSystem();
+	 *     reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
 	 * 
 	 * assertEquals( forceCS, newCS );
 	 * </code></pre>
