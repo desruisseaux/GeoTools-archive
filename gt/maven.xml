@@ -633,6 +633,72 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
              </ant:copy>
             <!-- </j:if> -->
     </goal>
+ <goal name="xjavadoc">
 
+    <maven:reactor basedir="${basedir}"
+      includes="**/project.xml"
+      excludes="**/target/**,**/test/project.xml,project.xml,site/**"
+      banner="Site Prep:"
+      ignoreFailures="false"
+      postProcessing="true" />
+
+    <ant:path id="template.classpath">
+      <j:forEach var="child" items="${reactorProjects}">
+        <j:set var="deps" value="${child.dependencies}"/>
+        <j:forEach var="dep" items="${deps}">
+          <ant:pathelement 
+            path="${maven.repo.local}/${dep.getArtifactDirectory()}/jars/${dep.getArtifact()}"/>
+        </j:forEach>
+      </j:forEach>
+    </ant:path>
+
+    <ant:mkdir dir="${maven.build.dir}/docs/api" />
+    <ant:property name="copyright"
+      value="Copyright &amp;copy; ${year} ${pom.organization.name}. All Rights Reserved." />
+    <ant:property name="title" value="${pom.name} ${pom.currentVersion} API"/>
+
+    <ant:javadoc destdir="${maven.build.dir}/docs/api" 
+	doctitle="&lt;h1&gt;${title}&lt;/h1&gt;" 
+      noindex="false" author="true" use="true"
+	windowtitle="${title}" 
+      bottom="${copyright}"
+      source="1.4"
+      additionalparam="-breakiterator -J-Xmx128m "
+      packagenames="*,org.*">
+
+        <classpath>
+          <path refid="template.classpath"/>
+	  </classpath>
+
+        <j:forEach var="child" items="${reactorProjects}">
+          <sourcepath path="${child.file.parentFile}/src"/>
+        </j:forEach>
+
+       
+
+        <j:forEach var="packageGroup" items="${pom.packageGroups}">
+          <group title="${packageGroup.title}" packages="${packageGroup.packages}"/>
+        </j:forEach>
+
+	  <link href="${sun.j2se.link}" />
+	
+
+        <u:tokenize 
+          var="listOfTags" 
+          delim=" ">${maven.javadoc.customtags}</u:tokenize>
+        <j:forEach var="someTag" items="${listOfTags}">
+          <j:set var="nameVar" value="${someTag}.name"/>
+          <j:set var="name" value="${context.findVariable(nameVar)}"/>
+          <j:set var="descriptionVar" value="${someTag}.description"/>
+          <j:set var="description" value="${context.findVariable(descriptionVar)}"/>
+          <j:set var="enabledVar" value="${someTag}.enabled"/>
+          <j:set var="enabled" value="${context.findVariable(enabledVar)}"/>
+          <j:set var="scopeVar" value="${someTag}.scope"/>
+          <j:set var="scope" value="${context.findVariable(scopeVar)}"/>
+          <ant:tag name="${name}" description="${description}"
+               enabled="${enabled}" scope="${scope}"/>
+        </j:forEach>
+
+    </ant:javadoc>
 
 </project>
