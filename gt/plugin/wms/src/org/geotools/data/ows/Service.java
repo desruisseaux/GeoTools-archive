@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.capabilities;
+package org.geotools.data.ows;
 
 import java.net.URL;
 import java.util.List;

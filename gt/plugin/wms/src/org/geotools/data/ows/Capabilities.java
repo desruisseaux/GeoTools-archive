@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.capabilities;
+package org.geotools.data.ows;
 
 /**
  * Represents a base object for a WMS getCapabilities response.
