@@ -71,9 +71,20 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
 
+    static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
+            "set to true if Well Known Binary should be used to read PostGIS "
+            + "data (experimental)", false, new Boolean(true));
+
+    static final Param LOOSEBBOX = new Param("loose bbox", Boolean.class,
+            "set to true if the Bounding Box should be 'loose', faster but "
+            + "not as deadly accurate", false, new Boolean(true));
+
+
+
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX,
+        NAMESPACE
     };
 
     /**
@@ -152,6 +163,8 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
+        Boolean wkb_enabled = (Boolean) WKBENABLED.lookUp(params);
+        Boolean is_loose_bbox = (Boolean) LOOSEBBOX.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
         
         // Try processing params first so we can get real IO
@@ -173,11 +186,23 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             throw new DataSourceException("Could not create connection", e);
         }
 
+        PostgisDataStore dataStore;
+
         if (namespace != null) {
-            return new PostgisDataStore(pool, namespace);
+            dataStore = new PostgisDataStore(pool, namespace);
         } else {
-            return new PostgisDataStore(pool);
+            dataStore = new PostgisDataStore(pool);
         }
+
+        if (wkb_enabled != null) {
+            dataStore.setWKBEnabled(wkb_enabled.booleanValue());
+        }
+
+        if (is_loose_bbox != null) {
+            dataStore.setLooseBbox(is_loose_bbox.booleanValue());
+        }
+
+        return dataStore;
     }
 
     /**
@@ -208,6 +233,9 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         return "PostGIS spatial database";
     }
 
+      /**
+       * TODO: Probabaly need some metadata for loose bbox and wkbenabled?
+       */
 	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
 	    String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
@@ -239,7 +267,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX, NAMESPACE
         };
     }
 }

@@ -184,6 +184,7 @@ public class SQLEncoderPostgisTest extends TestCase {
         gf.addLeftGeometry(left);
 
         SQLEncoderPostgis encoder = new SQLEncoderPostgis();
+        encoder.setLooseBbox(true);
         encoder.setSRID(2356);
 
         String out = encoder.encode((AbstractFilterImpl) gf);

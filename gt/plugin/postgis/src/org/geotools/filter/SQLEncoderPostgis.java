@@ -57,7 +57,10 @@ public class SQLEncoderPostgis extends SQLEncoder
 
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
-    private boolean useGeos;
+    
+    /** Whether the BBOX filter should be strict (using the exact geom), or 
+     *  loose (using the envelopes) */
+    protected boolean looseBbox = false;
     
    
     /**
@@ -74,12 +77,10 @@ public class SQLEncoderPostgis extends SQLEncoder
 
     public SQLEncoderPostgis(boolean looseBbox) {
         this();
-        if (!looseBbox) {
-            this.useGeos = true;
-        }
+	this.looseBbox = looseBbox;
     }
     
-    
+
     /**
      * 
      * @see org.geotools.filter.SQLEncoder#createFilterCapabilities()
@@ -117,6 +118,32 @@ public class SQLEncoderPostgis extends SQLEncoder
         this(true);
         this.srid = srid;
     }
+
+    /**
+     * Sets whether the Filter.BBOX query should be 'loose', meaning that it
+     * should just doing a bounding box against the envelope.  If set to
+     * <tt>false</tt> then the BBOX query will perform a full intersects 
+     * against the geometry, ensuring that it is exactly correct.  If 
+     * <tt>true</tt> then the query will likely perform faster, but may not
+     * be exactly correct.
+     *
+     * @param isLooseBbox whether the bbox should be loose or strict.
+     */
+    public void setLooseBbox(boolean isLooseBbox) {
+	this.looseBbox = isLooseBbox;
+    }
+   
+    /**
+     * Gets whether the Filter.BBOX query will be strict and use an intersects
+     * or 'loose' and just operate against the geometry envelopes.
+     *
+     * @return <tt>true</tt> if this encoder is going to do loose filtering.
+     */
+    public boolean isLooseBbox() {
+	return looseBbox;
+    }
+    
+
 
     /**
      * Sets a spatial reference system ESPG number, so that the geometry can be
@@ -162,7 +189,7 @@ public class SQLEncoderPostgis extends SQLEncoder
                 .getRightGeometry();
 
             try {
-                if (useGeos) {
+                if (!looseBbox) {
                     out.write("NOT disjoint(");
                 }
 
@@ -172,7 +199,7 @@ public class SQLEncoderPostgis extends SQLEncoder
                     left.accept(this);
                 }
 
-                if (useGeos) {
+                if (!looseBbox) {
                     out.write(", ");
                 } else {
                     out.write(" && ");
@@ -184,7 +211,7 @@ public class SQLEncoderPostgis extends SQLEncoder
                     right.accept(this);
                 }
 
-                if (useGeos) {
+                if (!looseBbox) {
                     out.write(")");
                 }
             } catch (java.io.IOException ioe) {

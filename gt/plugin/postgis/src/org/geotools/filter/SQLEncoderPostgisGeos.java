@@ -163,6 +163,8 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
         }
 
         boolean constrainBBOX = (literalGeometryCount == 1);
+        boolean onlyBbox = filterType == AbstractFilter.GEOMETRY_BBOX
+	    && looseBbox;
 
         try {
 
@@ -181,13 +183,15 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
                 } else {
                     right.accept(this);
                 }
-                out.write(" AND ");
-            }                   
-
+		if (!onlyBbox) {
+		    out.write(" AND ");
+                }                   
+            }
 	    
 
             String closingParenthesis = ")";
 
+            if (!onlyBbox) {
             if (filterType == AbstractFilter.GEOMETRY_EQUALS) {
                 out.write("equals");
             } else if (filterType == AbstractFilter.GEOMETRY_DISJOINT) {
@@ -229,6 +233,7 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
             }
 
             out.write(closingParenthesis);
+	    }
         } catch (java.io.IOException ioe) {
             log.warning("Unable to export filter" + ioe);
             throw new RuntimeException("io error while writing", ioe);

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Collections;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;
@@ -38,10 +39,21 @@ public class OIDFidMapper extends AbstractFIDMapper {
     /**
      * Will always return an emtpy array since OIDs are not updatable, 
      * so we don't try to parse the Feature ID at all.
+     * Um - this causes failures in SQLEncoder - that may be the place
+     * to fix it, but I'm putting it in here for now.  I believe that
+     * the oid will not try to get updated since auto increment
+     * is set to false.
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getPKAttributes(java.lang.String)
      */
     public Object[] getPKAttributes(String FID) throws IOException {
-        return new Object[0];
+	try {
+	    return new Object[] { new Long(Long.parseLong(FID)) };
+	} catch (NumberFormatException nfe) {
+	    //if we get a really bad featureid we want to return something
+	    //that will not mess up the database and throw an exception,
+	    //we just want to not match against it, so we return -1
+	    return new Object[] { new Integer(-1) };
+	}
     }
 
     /**

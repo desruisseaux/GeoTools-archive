@@ -85,7 +85,7 @@ import java.util.logging.Logger;
  * 
  * <p>
  * This datastore by default will read/write geometries in WKT format.<br>
- * Optionally use of WKB can be turned on, in this case you may want to turn
+ * Optionally use of WKB can be turned on, in which case you may want to turn
  * on also the use of the bytea function, that fasten the data trasfer, but
  * that it's available only from version 0.7.2 onwards.
  * </p>
@@ -172,6 +172,12 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected boolean byteaEnabled = false;
 
+    /** 
+     * If true then the bounding box filters will use the && postgis operator,
+     * which uses the spatial index and performs against the envelope of the
+     * geom, leading to greater speed and slightly less accuracy.
+     */ 
+    protected boolean looseBbox;
 
     protected PostgisDataStore(ConnectionPool connPool)
         throws IOException {
@@ -217,6 +223,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return new InProcessLockingManager();
     }
 
+
+    /**
+     * Attempts to figure out some optimization options, based on some
+     * postgis metadata.  If the version is later than 0.7.2 then bytea
+     * will be used to read geometries if WKB is enabled.  And it will
+     * read if GEOS is enabled from the version string as well.
+     */
     protected void guessDataStoreOptions() throws IOException {
         Connection dbConnection = null;
 
@@ -247,7 +260,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     if ((versionNumbers[0] > 0) || (versionNumbers[1] > 7)
                             || ((versionNumbers.length > 2)
                             && (versionNumbers[2] >= 2))) {
-                        byteaEnabled = true;
+                         byteaEnabled = true;
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.WARNING,
@@ -451,7 +464,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos()
                                             : new SQLEncoderPostgis();
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
-
         if (info.getSchema().getDefaultGeometry() != null) {
             String geom = info.getSchema().getDefaultGeometry().getName();
             srid = info.getSRID(geom);
@@ -459,7 +471,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
 
         encoder.setSRID(srid);
-
+        encoder.setLooseBbox(looseBbox);
         PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder);
         builder.setWKBEnabled(WKBEnabled);
         builder.setByteaEnabled(byteaEnabled);
@@ -1163,6 +1175,30 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     /**
+     * Sets this postgis instance to use a less strict but faster bounding
+     * box query.  Setting this to <tt>true</tt> will have PostGIS issue
+     * bounding box queries against the envelope of the geometry, so some
+     * may be <i>slighty</i> wrong, but will perform much faster.  The 
+     * intersects function can still be used to obtain the exact query.
+     * 
+     * @param isLooseBbox <tt>true</tt> if this should have a loose Bbox.
+     */
+    public void setLooseBbox(boolean isLooseBbox) {
+	this.looseBbox = isLooseBbox;
+    }
+
+    /**
+     * Whether the bounding boxes issued against this postgis datastore are
+     * on the envelope of the geometry or the actual geometry.
+     *
+     * @return <tt>true</tt> if the bounding box is 'loose', against the 
+     *         envelope instead of the actual geometry.
+     */
+    public boolean isLooseBbox() {
+	return looseBbox;
+    }
+
+    /**
      * Returns true if the data store is using the bytea function to fasten WKB
      * data transfer, false otherwise
      * 
@@ -1176,7 +1212,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     /**
      * Enables the use of bytea function for WKB data transfer (will improve
-     * performance)
+     * performance).  Note this function need not be set by the programmer,
+     * as the datastore will use it to optimize performance whenever it can
+     * (when postGIS is 0.7.2 or later)
      * 
      * @param byteaEnabled
      * 
