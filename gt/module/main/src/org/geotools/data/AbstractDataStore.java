@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.catalog.DefaultQueryResult;
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.data.view.DefaultView;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
@@ -284,41 +285,8 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
     // in order to support CS reprojection and override
     public FeatureSource getView(final Query query)
         throws IOException, SchemaException {
-        return null;
-    }
-        /*String typeName = query.getTypeName();
-        FeatureType origionalType = getSchema( typeName );
-        CoordinateSystem forceCs = (CoordinateSystem) query.getCoordianteSystem();
-        CoordinateSystem targetCs = (CoordinateSystem) query.getCoordianteSystemReproject();
-        CoordinateSystem cs = targetCs != null ? targetCs : forceCs;
-        
-        FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs );
-        
-        //final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames() );        
-
-        return new AbstractFeatureSource() {
-            public DataStore getDataStore() {
-                return AbstractDataStore.this;
-            }
-
-            public void addFeatureListener(FeatureListener listener) {
-                listenerManager.addFeatureListener(this, listener);
-            }
-
-            public void removeFeatureListener(FeatureListener listener) {
-                listenerManager.removeFeatureListener(this, listener);
-            }
-
-            public FeatureType getSchema() {
-                return featureType;
-            }
-            public FeatureResults getFeatures(Query query) {
-                // TODO Auto-generated method stub
-                return super.getFeatures(query);
-            }
-        };
-    }*/
-
+        return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
+    }        
     /**
      * Default implementation based on getFeatureReader and getFeatureWriter.
      *
