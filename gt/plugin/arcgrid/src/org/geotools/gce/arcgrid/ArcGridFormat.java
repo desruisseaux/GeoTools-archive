@@ -20,20 +20,26 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.ParameterGroup;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * A simple implementation of the Arc Grid Format Metadata
  * 
  * @author jeichar
  */
-public class ArcGridFormat extends AbstractGridFormat {
-    /**
+public class ArcGridFormat implements Format {
+    private ParameterValueGroup readParameters;
+	private ParameterValueGroup writeParameters;
+	private HashMap mInfo;
+
+	/**
      * creates an instance and sets the metadata
      */
     public ArcGridFormat() {
@@ -54,8 +60,8 @@ public class ArcGridFormat extends AbstractGridFormat {
         mInfo = info;
         
         
-        readParameters = new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS } );        
-        writeParameters = new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS} );        
+        readParameters = new ParameterGroup(new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS } ));        
+        writeParameters = new ParameterGroup(new ParameterDescriptorGroup( mInfo, new GeneralParameterDescriptor[]{ GRASS, COMPRESS} ));        
     }
     
     /** Indicates whether the arcgrid data is compressed with GZIP */
@@ -108,5 +114,54 @@ public class ArcGridFormat extends AbstractGridFormat {
             return false;
         }
     }
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getName()
+	 */
+	public String getName() {
+		return (String) this.mInfo.get("name");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDescription()
+	 */
+	public String getDescription() {
+		return (String) this.mInfo.get("description");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVendor()
+	 */
+	public String getVendor() {
+		return (String) this.mInfo.get("vendor");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDocURL()
+	 */
+	public String getDocURL() {
+		return (String) this.mInfo.get("docURL");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVersion()
+	 */
+	public String getVersion() {
+		return (String) this.mInfo.get("version");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getReadParameters()
+	 */
+	public ParameterValueGroup getReadParameters() {
+		return readParameters;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
+	 */
+	public ParameterValueGroup getWriteParameters() {
+		return writeParameters;
+	}
 
 }

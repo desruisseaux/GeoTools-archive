@@ -22,13 +22,14 @@ import java.io.Reader;
 
 import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -60,7 +61,7 @@ public class ArcGridReader implements GridCoverageReader {
             Color.RED };
 
     /** The coordinate system associated to the returned GridCoverage */
-    private CoordinateReferenceSystem coordinateSystem = GeographicCRS.WGS84;
+    private CoordinateReferenceSystem coordinateSystem = org.geotools.referencing.crs.GeographicCRS.WGS84;
 
     /** The grid coverage read from the data file */
     private java.lang.ref.SoftReference gridCoverage = null;
@@ -134,7 +135,7 @@ public class ArcGridReader implements GridCoverageReader {
      * 
      * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
      */
-    public GridCoverage read(ParameterValueGroup params) throws IllegalArgumentException, IOException {
+    public GridCoverage read(GeneralParameterValue[] params) throws IllegalArgumentException, IOException {
         setEnvironment("ArcGrid", params );
 
         return getGridCoverage();
@@ -174,7 +175,7 @@ public class ArcGridReader implements GridCoverageReader {
      * @throws IOException
      *             Thrown for any other unexpected exception
      */
-    private void setEnvironment(String name, ParameterValueGroup params)
+    private void setEnvironment(String name, GeneralParameterValue[] params)
             throws InvalidParameterNameException,
             InvalidParameterValueException, IOException {
         this.name = name;

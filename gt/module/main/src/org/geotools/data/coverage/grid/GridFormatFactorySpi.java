@@ -19,6 +19,8 @@ package org.geotools.data.coverage.grid;
 
 import java.io.IOException;
 
+import org.opengis.coverage.grid.Format;
+
 
 /**
  * Constructs a live GridCoverageFormat.

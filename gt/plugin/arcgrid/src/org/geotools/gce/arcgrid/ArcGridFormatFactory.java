@@ -16,8 +16,8 @@
  */
 package org.geotools.gce.arcgrid;
 
-import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.opengis.coverage.grid.Format;
 
 
 /**

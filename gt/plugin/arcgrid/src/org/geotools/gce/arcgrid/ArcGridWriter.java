@@ -16,20 +16,22 @@
  */
 package org.geotools.gce.arcgrid;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.stream.IOExchange;
+import org.geotools.feature.FeatureCollection;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.GridRange;
-import org.geotools.data.coverage.grid.Format;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 
 
 /**
@@ -129,7 +131,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 		return target.booleanValue();        
 	}
 
-    private void setEnvironment(ParameterValueGroup parameters)
+    private void setEnvironment(GeneralParameterValue[] parameters)
         throws InvalidParameterNameException, InvalidParameterValueException, 
             IOException {
         
@@ -204,7 +206,7 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
      *      org.opengis.parameter.GeneralParameterValue[])
      */
-    public void write(GridCoverage coverage, ParameterValueGroup parameters) throws IllegalArgumentException, IOException {
+    public void write(GridCoverage coverage, GeneralParameterValue[] parameters) throws IllegalArgumentException, IOException {
         setEnvironment( parameters );
         writeGridCoverage(coverage);
         mWriter.close();
