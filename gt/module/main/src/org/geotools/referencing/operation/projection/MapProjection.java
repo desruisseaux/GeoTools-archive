@@ -1040,6 +1040,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                     new Identifier(Citation.OPEN_GIS, "central_meridian"),
                     new Identifier(Citation.EPSG,     "Longitude of natural origin"),
                     new Identifier(Citation.EPSG,     "Longitude of false origin"),
+                    new Identifier(Citation.ESRI,     "Longitude_Of_Center"),
+                    new Identifier(Citation.ESRI,     "Longitude_Of_Origin"),
                     new Identifier(Citation.GEOTIFF,  "NatOriginLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
@@ -1053,6 +1055,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                     new Identifier(Citation.OPEN_GIS, "latitude_of_origin"),
                     new Identifier(Citation.EPSG,     "Latitude of false origin"),
                     new Identifier(Citation.EPSG,     "Latitude of natural origin"),
+                    new Identifier(Citation.ESRI,     "Latitude_Of_Center"),
                     new Identifier(Citation.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
