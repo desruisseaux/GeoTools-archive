@@ -134,6 +134,13 @@
         <role>Java developper</role>
       </roles>
     </contributor>
+    <contributor>
+      <name>Touraïvane</name>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
   </contributors>
 
   <dependencies>
@@ -238,7 +245,6 @@
         <include>**/*Test.java</include>
       </includes>
       <excludes>
-        <exclude>**/*CodeList*</exclude>
         <exclude>**/org/geotools/ct/SerializationTest.java</exclude>
       </excludes>     
       <resources>
