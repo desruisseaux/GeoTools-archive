@@ -148,4 +148,10 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
             return false;
         }
     }
+    
+    /**
+     */
+    public Map getImplementationHints(){
+        return java.util.Collections.EMPTY_MAP;
+    }
 }
