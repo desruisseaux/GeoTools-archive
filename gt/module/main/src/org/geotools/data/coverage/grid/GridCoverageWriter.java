@@ -21,6 +21,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterNotFoundException;     // For javadoc
 import org.opengis.parameter.InvalidParameterNameException;  // For javadoc
 import org.opengis.parameter.InvalidParameterValueException; // For javadoc
+import org.opengis.parameter.ParameterValueGroup;
 
 
 
@@ -104,7 +105,7 @@ public interface GridCoverageWriter {
      *         {@link javax.imageio.IIOException} if an error was thrown by the underlying
      *         image library.
      */
-    void write(GridCoverage coverage, GeneralParameterValue[] parameters)
+    void write(GridCoverage coverage, ParameterValueGroup parameters)
             throws IllegalArgumentException, IOException;
 
     /**

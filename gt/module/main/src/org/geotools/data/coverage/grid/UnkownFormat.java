@@ -16,6 +16,7 @@
  */
 package org.geotools.data.coverage.grid;
 
+import org.geotools.parameter.ParameterGroupDescriptor;
 import org.opengis.parameter.GeneralOperationParameter;
 
 
@@ -72,15 +73,14 @@ public class UnkownFormat implements Format {
     /**
      * @see org.geotools.data.coverage.grid.Format#getReadParameters()
      */
-    public GeneralOperationParameter[] getReadParameters() {
-        // TODO Auto-generated method stub
+    public ParameterGroupDescriptor getReadParameters() {
         return null;
     }
 
     /**
      * @see org.geotools.data.coverage.grid.Format#getWriteParameters()
      */
-    public GeneralOperationParameter[] getWriteParameters() {
+    public ParameterGroupDescriptor getWriteParameters() {
         return null;
     }
 

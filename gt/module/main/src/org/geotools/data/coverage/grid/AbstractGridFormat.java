@@ -20,7 +20,7 @@
 package org.geotools.data.coverage.grid;
 
 import org.geotools.data.coverage.grid.Format;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.geotools.parameter.ParameterGroupDescriptor;
 import java.util.Map;
 
 
@@ -32,10 +32,10 @@ import java.util.Map;
  * HashMap(); info.put("name", "ArcGrid"); info.put("description", "Arc Grid
  * Coverage Format"); info.put("vendor", "Geotools"); info.put("docURL",
  * "http://gdal.velocet.ca/projects/aigrid/index.html"); info.put("version",
- * "1.0");  mInfo=info;  readParameters=new GeneralOperationParameter[2];
+ * "1.0");  mInfo=info;  readParameters=new GeneralParameterDescriptor[2];
  * readParameters[0]=ArcGridOperationParameter.getGRASSReadParam();
  * readParameters[0]=ArcGridOperationParameter.getCompressReadParam();
- * writeParameters=new GeneralOperationParameter[2];
+ * writeParameters=new GeneralParameterDescriptor[2];
  * writeParameters[0]=ArcGridOperationParameter.getGRASSWriteParam();
  * writeParameters[0]=ArcGridOperationParameter.getCompressWriteParam();
  * }</code>
@@ -62,8 +62,8 @@ public abstract class AbstractGridFormat implements Format {
      * Naturally, any methods that are overridden need not have an entry in the Map
      */
     protected Map mInfo;
-    protected GeneralOperationParameter[] readParameters;
-    protected GeneralOperationParameter[] writeParameters;
+    protected ParameterGroupDescriptor readParameters;
+    protected ParameterGroupDescriptor writeParameters;
 
     /**
      * @see org.opengis.coverage.grid.Format#getName()
@@ -103,14 +103,14 @@ public abstract class AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getReadParameters()
      */
-    public GeneralOperationParameter[] getReadParameters() {
+    public ParameterGroupDescriptor getReadParameters() {
         return readParameters;
     }
 
     /**
      * @see org.opengis.coverage.grid.Format#getWriteParameters()
      */
-    public GeneralOperationParameter[] getWriteParameters() {
+    public ParameterGroupDescriptor getWriteParameters() {
         return writeParameters;
     }
     
