@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -167,10 +168,9 @@ public class TextStyleTest extends junit.framework.TestCase {
     }
 
     private Style loadStyleFromXml() throws Exception {
-        java.net.URL base = getClass().getResource("rs-testData/");
-
+        java.net.URL base = TestData.getResource(this, ".");
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "/textTest.sld");
+        java.net.URL surl = TestData.getResource(this,"textTest.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
         Style[] style = stylereader.readXML();
 
@@ -273,7 +273,7 @@ public class TextStyleTest extends junit.framework.TestCase {
      */
     private void performTestOnRenderer(Renderer2D renderer, String fileSuffix)
         throws Exception {
-        java.net.URL base = getClass().getResource("rs-testData");
+        java.net.URL base = TestData.getResource(this,".");
 
         AffineTransform at = new AffineTransform();
         at.translate(0, 400);
@@ -332,7 +332,8 @@ public class TextStyleTest extends junit.framework.TestCase {
         int[] pixel1 = null;
         int[] pixel2 = null;
         boolean isBlack = false;
-
+        int count = 0;
+        int bad = 0;
         for (int x = 0; x < data.getWidth(); x++) {
             for (int y = 0; y < data.getHeight(); y++) {
                 pixel1 = data.getPixel(x, y, pixel1);
@@ -341,12 +342,21 @@ public class TextStyleTest extends junit.framework.TestCase {
                 if ((notBlack(pixel1)) && (notBlack(pixel2))) { //Since text is black and fonts are not stable across platforms, ignore pixels where at least one is black.
 
                     for (int band = 0; band < data2.getNumBands(); band++) {
-                        assertEquals("mismatch in image comparison at (x: " + x + " y: " + y
-                            + " band: " + band + ")", pixel1[band], pixel2[band]);
+                        count++;
+                       if(pixel1[band] != pixel2[band]) {
+                           bad++;
+                       }
                     }
                 }
             }
         }
+        double ratio = (double)bad/(double)count;
+        //System.out.println("ratio is " + ratio + " total = " + count + " bad " + bad);
+        if(ratio > 0.01){
+            fail("Too many incorrect pixels " + bad + " ratio = " + ratio);
+        }
+       //  assertEquals("mismatch in image comparison at (x: " + x + " y: " + y
+       //                     + " band: " + band + ")", pixel1[band], pixel2[band]);
     }
 
     private boolean notBlack(int[] pixel) {

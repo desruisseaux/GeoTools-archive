@@ -39,6 +39,7 @@ import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
 
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -142,10 +143,10 @@ public class DefaultMarkTest extends junit.framework.TestCase {
     }
 
     private Style loadStyleFromXml() throws Exception {
-        java.net.URL base = getClass().getResource("rs-testData");
+      
 
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "/markTest.sld");
+        java.net.URL surl = TestData.getResource(this, "markTest.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
         Style[] style = stylereader.readXML();
 
@@ -234,7 +235,7 @@ public class DefaultMarkTest extends junit.framework.TestCase {
      */
     private void performTestOnRenderer(Renderer2D renderer, String fileSuffix)
         throws Exception {
-        java.net.URL base = getClass().getResource("rs-testData");
+         java.net.URL base = TestData.getResource(this,".");
         
         AffineTransform at = new AffineTransform();
         at.translate(0, 400);

@@ -74,6 +74,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.resources.TestData;
 
 
 /**
@@ -344,8 +345,8 @@ public class RenderingGridCoverageTest extends TestCase {
         final double scalex = width / dataWidth;
         final double scaley = height / dataHeigth;
             
-        java.net.URL base = getClass().getResource("rs-testData/");
-
+        java.net.URL base = TestData.getResource(this, ".");
+ 
         AffineTransform at = new AffineTransform();
         at.translate(0, height);
         at.scale(scalex, -scaley);
