@@ -85,6 +85,9 @@ public class MySQLDataStoreFactory
      * When we convert to BeanInfo custom PropertyEditors will be required for
      * this Param.
      * </p>
+     * @task TODO: Remove this param, as it does not do anything, I am 
+     *       pretty positive there is not charset param that does anything 
+     *       in mysql
      */
     static final Param CHARSET = new Param("charset", Charset.class,
             "character set", false, Charset.forName("ISO-8859-1")) {
