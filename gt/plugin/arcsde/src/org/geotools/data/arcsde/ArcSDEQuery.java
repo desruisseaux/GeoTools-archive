@@ -38,8 +38,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Wrapper class extends SeQuery to hold a SeConnection until close() is
- * called.
+ * Wrapper class for SeQuery to hold a SeConnection until close() is
+ * called and provide utility methods.
  *
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ArcSDEQuery.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $

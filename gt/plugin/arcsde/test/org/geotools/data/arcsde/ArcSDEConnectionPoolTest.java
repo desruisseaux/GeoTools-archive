@@ -223,6 +223,10 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         assertEquals(expected, conn);
     }
 
+    /**
+     * a null database name should not be an impediment to create the pool
+     * @throws DataSourceException
+     */
     public void testCreateWithNullDBName()throws DataSourceException{
     	Map params = new HashMap(this.connectionParameters);
         params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,
@@ -233,6 +237,10 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         createPool(params);
     }
 
+    /**
+     * an empty database name should not be an impediment to create the pool
+     * @throws DataSourceException
+     */
     public void testCreateWithEmptyDBName()throws DataSourceException{
     	Map params = new HashMap(this.connectionParameters);
         params.put(ConnectionConfig.MIN_CONNECTIONS_PARAM,

@@ -37,34 +37,48 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 class ArcSDEAttributeReader implements AttributeReader {
-    /** DOCUMENT ME! */
+    /** Shared package's logger */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
-    /** DOCUMENT ME! */
+    /** query passed to the constructor */
     private ArcSDEQuery query;
 
-    /** DOCUMENT ME! */
+    /** schema of the features this attribute reader iterates over */
     private FeatureType schema;
 
-    /** DOCUMENT ME! */
+    /** current sde java api row being read */
     private SeRow currentRow;
 
-    /** DOCUMENT ME! */
+    /** the sde java api shape of the current row */
     private SeShape currentShape;
 
-    /** DOCUMENT ME! */
+    /**
+     * the builder for the geometry type of the schema's default geometry, or
+     * null if the geometry attribute is not included in the schema
+     */
     private GeometryBuilder geometryBuilder;
 
-    /** DOCUMENT ME! */
+    /** index of the geometry attribute in the schema's attributes array */
     private int geometryTypeIndex = -1;
 
-    /** DOCUMENT ME! */
-    StringBuffer fidPrefix;
+    /**
+     * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used
+     * to efficiently create String FIDs from the SeShape feature id, which is
+     * a long number.
+     */
+    private StringBuffer fidPrefix;
 
-    /** DOCUMENT ME! */
-    int fidPrefixLen;
+    /**
+     * lenght of the prefix string for creating string based feature ids, used
+     * to truncate the <code>fidPrefix</code> and append it the SeShape's
+     * feature id number
+     */
+    private int fidPrefixLen;
 
-    /** DOCUMENT ME! */
+    /**
+     * flag to avoid the processing done in <code>hasNext()</code> if next()
+     * was not called between calls to hasNext()
+     */
     private boolean hasNextAlreadyCalled = false;
 
     /**
@@ -85,7 +99,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 
         //@task REVISIT: put the if statement again when knowing how to
         //obtain the feature ID if the geometry att was not requested. (needed in readFID())
-        ////if (geomType != null) {
+        if (geomType != null) {
             Class geometryClass = geomType.getType();
             this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
 
@@ -99,7 +113,7 @@ class ArcSDEAttributeReader implements AttributeReader {
                     break;
                 }
             }
-        ////}
+        }
     }
 
     /**

@@ -263,10 +263,12 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         final String nonQualifiedTypeName = featureType.getTypeName();
 
-        if (nonQualifiedTypeName.indexOf('.') != -1) {
-            throw new IllegalArgumentException(
-                "Please do not use type names that contains '.' (dots)");
-        }
+        /*
+           if (nonQualifiedTypeName.indexOf('.') != -1) {
+               throw new IllegalArgumentException(
+                   "Please do not use type names that contains '.' (dots)");
+           }
+         */
 
         // Create a new SeTable/SeLayer with the specified attributes....
         SeConnection connection = null;
@@ -284,9 +286,17 @@ class ArcSDEDataStore extends AbstractDataStore {
             connection = connectionPool.getConnection();
 
             //create a table with provided username
-            String qualifiedName = connection.getUser() + "."
-                + featureType.getTypeName();
-            LOGGER.info("new full qualified type name: " + qualifiedName);
+            String qualifiedName = null;
+
+            if (nonQualifiedTypeName.indexOf('.') == -1) {
+                qualifiedName = connection.getUser() + "."
+                    + featureType.getTypeName();
+                LOGGER.info("new full qualified type name: " + qualifiedName);
+            } else {
+                qualifiedName = nonQualifiedTypeName;
+                LOGGER.info("full qualified type name provided by user: "
+                    + qualifiedName);
+            }
 
             layer = new SeLayer(connection);
             layer.setTableName(qualifiedName);
@@ -310,18 +320,22 @@ class ArcSDEDataStore extends AbstractDataStore {
 
                     SeColumnDefinition newCol = ArcSDEAdapter
                         .createSeColumnDefinition(currAtt);
+
                     ///////////////////////////////////////////////////////////////
                     //HACK!!!!: this hack is just to avoid the error that occurs //
                     //when adding a column wich is not nillable. Need to fix this//
                     //but by now it conflicts with the requirement of creating   //
                     //the schema with the correct attribute order.               //
                     ///////////////////////////////////////////////////////////////
-                    newCol = new SeColumnDefinition(newCol.getName(), newCol.getType(),
-                    		newCol.getSize(), newCol.getScale(), true);
+                    newCol = new SeColumnDefinition(newCol.getName(),
+                            newCol.getType(), newCol.getSize(),
+                            newCol.getScale(), true);
+
                     ///////////////////////////////////////////////////////////////
                     //END of horrible HACK                                       //
                     ///////////////////////////////////////////////////////////////
-                    LOGGER.info("Adding column " + newCol.getName() + " to the actual table.");
+                    LOGGER.info("Adding column " + newCol.getName()
+                        + " to the actual table.");
                     table.addColumn(newCol);
                 }
             }
@@ -644,18 +658,20 @@ class ArcSDEDataStore extends AbstractDataStore {
         // Jake Fear 6/25/2004
         ArcTransactionState state = null;
 
-        synchronized (this) {
-            Transaction.State s = transaction.getState(this);
+        if (Transaction.AUTO_COMMIT != transaction) {
+            synchronized (this) {
+                Transaction.State s = transaction.getState(this);
 
-            if (!(s instanceof ArcTransactionState)) {
-                if (s != null) {
-                    transaction.removeState(this);
+                if (!(s instanceof ArcTransactionState)) {
+                    if (s != null) {
+                        transaction.removeState(this);
+                    }
+
+                    state = new ArcTransactionState(this);
+                    transaction.putState(this, state);
+                } else {
+                    state = (ArcTransactionState) s;
                 }
-
-                state = new ArcTransactionState(this);
-                transaction.putState(this, state);
-            } else {
-                state = (ArcTransactionState) s;
             }
         }
 

@@ -35,6 +35,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFilter;
@@ -400,7 +401,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * attributes are requested does not fails due to the datastore trying to
      * parse the geometry attribute.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
      */
     public void testAttributeOnlyQuery() throws Exception {
         DataStore ds = testData.getDataStore();
@@ -427,7 +428,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals(propNames.get(i),
                 resultSchema.getAttributeType(i).getName());
         }
-        
+
         //the problem described in GEOT-408 arises in attribute reader, so
         //we must to try fetching features
         results.reader().next();
@@ -436,10 +437,43 @@ public class ArcSDEDataStoreTest extends TestCase {
     /**
      * Test that FID filters are correctly handled
      *
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
      */
-    public void testFidFilters() {
-        throw new UnsupportedOperationException("Don't forget to implement");
+    public void testFidFilters() throws Exception {
+        final DataStore ds = testData.getDataStore();
+        final String typeName = testData.getPoint_table();
+
+        //grab some fids
+        FeatureReader reader = ds.getFeatureReader(new DefaultQuery(typeName),
+                Transaction.AUTO_COMMIT);
+        List fids = new ArrayList();
+
+        while (reader.hasNext()) {
+            fids.add(reader.next().getID());
+
+            //skip one
+            if (reader.hasNext()) {
+                reader.next();
+            }
+        }
+
+        reader.close();
+
+        FidFilter filter = FilterFactory.createFilterFactory().createFidFilter();
+        filter.addAllFids(fids);
+
+        FeatureSource source = ds.getFeatureSource(typeName);
+        Query query = new DefaultQuery(typeName, filter);
+        FeatureResults results = source.getFeatures(query);
+
+        assertEquals(fids.size(), results.getCount());
+        reader = results.reader();
+
+        while (reader.hasNext()) {
+            String fid = reader.next().getID();
+            assertTrue("a fid not included in query was returned: " + fid,
+                fids.contains(fid));
+        }
     }
 
     /**

@@ -16,20 +16,22 @@
  */
 package org.geotools.data.arcsde;
 
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeDBMSInfo;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeInstance;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeRelease;
+import com.esri.sde.sdk.client.SeTable;
+import org.geotools.data.DataSourceException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
-
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeTable;
 
 
 /**
@@ -87,6 +89,9 @@ public class ArcSDEConnectionPool {
     private static final Logger LOGGER = Logger.getLogger(ArcSDEConnectionPool.class.getPackage()
                                                                                     .getName());
 
+    /** DOCUMENT ME! */
+    private static final Level INFO_LOG_LEVEL = Level.WARNING;
+
     /** default number of connections a pool creates at first population */
     public static final int DEFAULT_CONNECTIONS = 2;
 
@@ -134,7 +139,7 @@ public class ArcSDEConnectionPool {
 
     //    START ADDED BY BROCK
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private HashMap cachedLayers;
 
     //    END ADDED BY BROCK
@@ -179,7 +184,12 @@ public class ArcSDEConnectionPool {
     private void populate() throws DataSourceException {
         synchronized (mutex) {
             int minConnections = config.getMinConnections().intValue();
-            int actualCount = getPoolSize();
+            final int actualCount = getPoolSize();
+
+            if (actualCount == 0) {
+                SeConfigReport.reportConfiguration(this.config);
+            }
+
             int increment = (actualCount == 0) ? minConnections
                                                : config.getIncrement().intValue();
             int actual = 0;
@@ -619,5 +629,88 @@ public class ArcSDEConnectionPool {
      */
     public ConnectionConfig getConfig() {
         return config;
+    }
+
+    /**
+     * Inner utility class to report the configuration of the ArcSDE service
+     * and the underlying RDBMS pointed by a <code>ConnectionConfig</code>
+     * object.
+     *
+     * @author Gabriel Roldan, Axios Engineering
+     * @version $Id$
+     */
+    private static class SeConfigReport {
+        /**
+         * Reports the configuration of the ArcSDE version and DBMS information
+         * to the logging system, at connection pool's startup, with INFO
+         * logging level.
+         *
+         * @param config DOCUMENT ME!
+         *
+         * @throws DataSourceException if a SeException is thrown by the ArcSDE
+         *         Java API while trying to fetch the server information.
+         */
+        private static void reportConfiguration(ConnectionConfig config)
+            throws DataSourceException {
+            try {
+                SeInstance instanceInfo = new SeInstance(config.getServerName(),
+                        config.getPortNumber().intValue());
+
+                if (!LOGGER.isLoggable(INFO_LOG_LEVEL)) {
+                    return;
+                }
+
+                StringBuffer sb = new StringBuffer(
+                        "***\nArcSDE configuration info:\n");
+
+                sb.append("*** ArcSDE Server info: ****");
+                sb.append("Server name: " + instanceInfo.getServerName());
+
+                SeInstance.SeInstanceStatus status = instanceInfo.getStatus();
+                SeRelease sdeRelease = status.getSeRelease();
+
+                sb.append("\n ArcSDE version: ");
+                sb.append(sdeRelease.getMajor());
+                sb.append('.');
+                sb.append(sdeRelease.getMinor());
+                sb.append('.');
+                sb.append(sdeRelease.getBugFix());
+                sb.append(" - ");
+                sb.append(sdeRelease.getDesc());
+
+                sb.append("\nAccepting connections: ");
+                sb.append(status.isAccepting());
+                sb.append("\nBlocking connections: ");
+                sb.append(status.isBlocking());
+
+                SeInstance.SeInstanceConfiguration iconf = instanceInfo
+                    .getConfiguration();
+                sb.append("\n---- Instance configuration: ----");
+                sb.append("\nInstance is read-only: ");
+                sb.append(iconf.getReadOnlyInstance());
+                sb.append("\nHome path: ");
+                sb.append(iconf.getHomePath());
+                sb.append("\nLog path: ");
+                sb.append(iconf.getLogPath());
+                sb.append("\nMax. connections: ");
+                sb.append(iconf.getMaxConnections());
+                sb.append("\nMax. layers: ");
+                sb.append(iconf.getMaxLayers());
+                sb.append("\nMax. streams: ");
+                sb.append(iconf.getMaxStreams()
+                    + " (maximum number of streams allowed by the ArcSde instance)");
+                sb.append("\nStream pool size: ");
+                sb.append(iconf.getStreamPoolSize()
+                    + " (maximum number of streams allowed in a native pool.)");
+
+                SeDBMSInfo dbms = iconf.getDbmsInfo();
+                sb.append("\n**************************");
+                LOGGER.log(INFO_LOG_LEVEL, sb.toString());
+            } catch (SeException e) {
+                throw new DataSourceException(
+                    "Error fetching information from " + " the server "
+                    + config.getServerName() + ":" + config.getPortNumber());
+            }
+        }
     }
 }
