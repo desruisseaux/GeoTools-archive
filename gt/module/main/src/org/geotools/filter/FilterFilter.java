@@ -121,10 +121,14 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             //DJB: Found "UpperBoundary" and "LowerBoundary" - these are completely ignored by this parser!!!
             //     Thats a pain, but...
             //DJB: <Distance> also looks like its hacked in this function (see bottom)
+            //DJB: Also found <gml:pointMember>-like things from the CITE tests.
             
-			//didnt recognize filter tag
+			//in all these cases, the correct (well, defined) thing to do is to ignore the tag - its never used anywhere!
 			if ( (filterType == -1) && !( (localName.equals("UpperBoundary")) || (localName.equals("LowerBoundary")) || (localName.equals("Distance")) )   )
-				throw new SAXException("Attempted to construct illegal filter - I dont understand the tag: "+qName+".  HINT: tags are case-sensitive!");
+			{
+				if (!(localName.endsWith("Member"))) //from CITE tests
+					throw new SAXException("Attempted to construct illegal filter - I dont understand the tag: "+qName+".  HINT: tags are case-sensitive!");
+			}
 
             try {
                 if (isFidFilter) {
