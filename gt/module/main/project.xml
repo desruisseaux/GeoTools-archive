@@ -190,13 +190,13 @@
       </includes>
       <excludes>
         <exlcude>**/*CodeList*</exlcude>
-      </excludes>
-     
+      </excludes>     
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
           <includes>
             <include>META-INF/</include>
+            <include>**/test-data/</include>
             <include>**/*.xml</include>
             <include>**/*.wkt</include>
             <include>**/*.txt</include>
