@@ -37,7 +37,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.InvalidParameterNameException;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -57,7 +56,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.OperationParameterGroup
+ * @see org.geotools.parameter.ParameterGroupDescriptor
  * @see org.geotools.parameter.ParameterValue
  */
 public class ParameterValueGroup extends org.geotools.parameter.GeneralParameterValue
@@ -116,7 +115,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * Construct a parameter group from the specified list of parameters.
      *
      * @param properties The properties for the
-     *        {@linkplain org.geotools.parameter.OperationParameterGroup operation parameter group}
+     *        {@linkplain org.geotools.parameter.ParameterGroupDescriptor operation parameter group}
      *        to construct from the list of parameters.
      * @param values The list of parameter values.
      */
@@ -129,7 +128,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static OperationParameterGroup createDescriptor(final Map properties,
+    private static ParameterGroupDescriptor createDescriptor(final Map properties,
                                                             final GeneralParameterValue[] values)
     {
         ensureNonNull("values", values);
@@ -140,7 +139,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
         }
         ensureValidOccurs(values, occurences);
         final Set descriptors = occurences.keySet();
-        return new org.geotools.parameter.OperationParameterGroup(properties,
+        return new org.geotools.parameter.ParameterGroupDescriptor(properties,
                                           (GeneralOperationParameter[]) descriptors.toArray(
                                           new GeneralOperationParameter[descriptors.size()]));
     }
@@ -150,7 +149,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *
      * @param values The list of parameter values.
      * @param occurences A map of the number of occurences of a value for each descriptor.
-     *        The key must be {@link GeneralOperationParameter} instances and the values
+     *        The key must be {@link GeneralParameterDescriptor} instances and the values
      *        must be <code>int[]</code> array of length 1 initialized with the 0 value.
      */
     private static void ensureValidOccurs(final GeneralParameterValue[] values,

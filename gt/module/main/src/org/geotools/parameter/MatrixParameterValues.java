@@ -44,7 +44,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  * is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code> parameters
  * depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values. Concequently,
  * this {@linkplain ParameterValueGroup parameter value group} is also its own mutable
- * {@linkplain OperationParameterGroup operation parameter group}.
+ * {@linkplain ParameterGroupDescriptor operation parameter group}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -52,6 +52,9 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  * @see MatrixParameters
  */
 public class MatrixParameterValues extends ParameterValueGroup implements OperationParameterGroup {
+    
+    private static final long serialVersionUID = 1L;
+
     /**
      * The parameter values. Will be constructed only when first requested.
      */

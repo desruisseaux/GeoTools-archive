@@ -5,8 +5,27 @@
     <TITLE>package org.geotools.parameter</TITLE>
   </HEAD>
   <BODY>
-  {@linkplain org.geotools.parameter.ParameterValue Parameter} implementation. An explanation
-  for this package is provided in the {@linkplain org.opengis.parameter OpenGIS&reg; javadoc}.
+  {@linkplain org.geotools.parameter.ParameterValue Parameter} implementation.
+  <p>An explanation for this package is provided in the
+  {@linkplain org.opengis.parameter OpenGIS&reg; javadoc}.
   The remaining discussion on this page is specific to the Geotools implementation.
+  </p>
+  <p>
+  For our implementation of OperationalParameter (as returned by ParameterValue.getDescriptor())
+  we make use the classname ParameterDescriptor (rather than following the confusing
+  OperationalParameter naming provided by geoapi).
+  </p>
+  <p>
+  We are targeting this class as a replacement for DataStore.PARAM.
+  To provide pairity we need to account for the following features:
+  <ul>
+  <li>parse( text ) - parsing a text string into the parameter value
+  <li>text() - parsable representation of value
+  </ul>
+  </p>
+  <p>
+  These additional capabilities of our ParameterValue are designed to
+  ease the creation of parsing and user interface routines. These do not
+  represent a persistence systems as such.
   </BODY>
 </HTML>

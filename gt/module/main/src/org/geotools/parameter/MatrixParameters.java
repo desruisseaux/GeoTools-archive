@@ -65,7 +65,9 @@ import org.geotools.referencing.operation.GeneralMatrix;
  *
  * @see MatrixParameterValues
  */
-public class MatrixParameters extends OperationParameterGroup {
+public class MatrixParameters extends ParameterGroupDescriptor {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The default matrix size for the {@linkplain #MatrixParameters(Map) one-argument constructor}.
      */
@@ -120,8 +122,8 @@ public class MatrixParameters extends OperationParameterGroup {
          *       elements.
          */
         this(properties, new OperationParameter[] {
-            new org.geotools.parameter.OperationParameter("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
-            new org.geotools.parameter.OperationParameter("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
+            new org.geotools.parameter.ParameterDescriptor("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
+            new org.geotools.parameter.ParameterDescriptor("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
         }, "elt_", '_');
     }
 
@@ -237,7 +239,7 @@ public class MatrixParameters extends OperationParameterGroup {
     /**
      * Returns the parameter in this group for a matrix element at the specified
      * index. row and column indices are 0 based. Indices must be lower that the
-     * {@link org.geotools.parameter.OperationParameter#getMaximumValue maximum values}
+     * {@link org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum values}
      * given to the {@link #numRow} and {@link #numCol} parameters.
      *
      * @param  row    The row indice.
@@ -283,7 +285,7 @@ public class MatrixParameters extends OperationParameterGroup {
          * Note that this cache is shared by all MatrixParameters instance. There is no need
          * to synchronize since it is not a big deal if the same parameter is constructed twice.
          */
-        param = new org.geotools.parameter.OperationParameter(prefix + row + separator + column,
+        param = new org.geotools.parameter.ParameterDescriptor(prefix + row + separator + column,
                 Double.TYPE, org.geotools.parameter.ParameterValue.wrap(row==column ? 1.0 : 0.0),
                 null, null, Unit.ONE);
         if (index >= 0) {
@@ -294,7 +296,7 @@ public class MatrixParameters extends OperationParameterGroup {
 
     /**
      * Returns the parameters in this group. The number or elements is inferred from the
-     * {@link org.geotools.parameter.OperationParameter#getDefaultValue default values}
+     * {@link org.geotools.parameter.ParameterDescriptor#getDefaultValue default values}
      * given to the {@link #numRow} and {@link #numCol} parameters.
      *
      * @return The matrix parameters, including all elements.

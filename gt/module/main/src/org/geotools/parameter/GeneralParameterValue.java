@@ -23,7 +23,6 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
-import java.util.Map;
 import java.io.Serializable;
 
 // OpenGIS dependencies
@@ -41,7 +40,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.GeneralOperationParameter
+ * @see org.geotools.parameter.GeneralParameterDescriptor
  */
 public class GeneralParameterValue implements org.opengis.parameter.GeneralParameterValue, Serializable {
     /**

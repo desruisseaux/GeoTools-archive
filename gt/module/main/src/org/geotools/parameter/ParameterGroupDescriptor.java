@@ -30,7 +30,6 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterNotFoundException;

@@ -24,25 +24,15 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.net.URL;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.Locale;
-import javax.units.Unit;
-import javax.units.SI;
-import javax.units.NonSI;
-import javax.units.Converter;
 
-// OpenGIS dependencies
-import org.opengis.util.CodeList;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.GeneralOperationParameter;
+import javax.units.Unit;
+
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.opengis.parameter.OperationParameter;
 
 
 /**
@@ -50,7 +40,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * {@link ParameterValue}, except that:
  * <ul>
  *   <li>Values are always floating point numbers of type <code>double</code>.</li>
- *   <li>Units are the same than the {@linkplain OperationParameter#getUnit default units}.</li>
+ *   <li>Units are the same than the {@linkplain ParameterDescriptor#getUnit default units}.</li>
  * </ul>
  * When those conditions are meet, <code>ParameterRealValue</code> is slightly more efficient
  * than <code>ParameterValue</code> since it avoid the creation of {@link Double} objects.
@@ -58,7 +48,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.OperationParameter
+ * @see org.geotools.parameter.ParameterDescriptor
  * @see org.geotools.parameter.ParameterValueGroup
  */
 public class ParameterRealValue extends GeneralParameterValue
@@ -76,7 +66,7 @@ public class ParameterRealValue extends GeneralParameterValue
 
     /**
      * Construct a parameter from the specified descriptor. The descriptor
-     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass() value class}
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass() value class}
      * must be <code>{@linkplain Double}.class</code>.
      *
      * @param  descriptor The abstract definition of this parameter.
@@ -110,7 +100,7 @@ public class ParameterRealValue extends GeneralParameterValue
 
     /**
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}. The default
-     * implementation always delegates to {@link org.geotools.parameter.OperationParameter#getUnit}.
+     * implementation always delegates to {@link org.geotools.parameter.ParameterDescriptor#getUnit}.
      *
      * @return The unit of measure, or <code>null</code> if none.
      */
