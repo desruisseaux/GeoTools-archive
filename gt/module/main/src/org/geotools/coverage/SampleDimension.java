@@ -1304,7 +1304,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @return The sample dimension. Never <code>null</code>, but may be <code>this</code>.
      *
      * @see Category#geophysics
-     * @see org.geotools.gc.GridCoverage#geophysics
+     * @see org.geotools.coverage.grid.GridCoverage#geophysics
      */
     public SampleDimension geophysics(final boolean geo) {
         if (geo == isGeophysics) {
@@ -1620,26 +1620,26 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * Register the "SampleTranscode" image operation.
      * Registration is done when the class is first loaded.
      *
-     * @task REVISIT: This static initializer will imply immediate class loading of a lot of
-     *                JAI dependencies.  This is a pretty high overhead if JAI is not wanted
-     *                right now. The correct approach is to declare the image operation into
-     *                the <code>META-INF/registryFile.jai</code> file, which is automatically
-     *                parsed during JAI initialization. Unfortunatly, it can't access private
-     *                classes and we don't want to make our registration classes public. We
-     *                can't move our registration classes into a hidden "resources" package
-     *                neither because we need package-private access to <code>CategoryList</code>.
-     *                For now, we assume that people using the GCS package probably want to work
-     *                with {@link org.geotools.gc.GridCoverage}, which make extensive use of JAI.
-     *                Peoples just working with {@link org.geotools.cv.Coverage} are stuck with
-     *                the overhead. Note that we register the image operation here because the
-     *                only operation's argument is of type <code>SampleDimension[]</code>.
-     *                Consequently, the image operation may be invoked at any time after class
-     *                loading of {@link SampleDimension}.
-     *                <br><br>
-     *                Additional note: moving the initialization into the
-     *                <code>META-INF/registryFile.jai</code> file may not be the best idea neithter,
-     *                since peoples using JAI without the GCS module may be stuck with the overhead
-     *                of loading GCS classes.
+     * @todo This static initializer will imply immediate class loading of a lot of
+     *       JAI dependencies.  This is a pretty high overhead if JAI is not wanted
+     *       right now. The correct approach is to declare the image operation into
+     *       the {@code META-INF/registryFile.jai} file, which is automatically
+     *       parsed during JAI initialization. Unfortunatly, it can't access private
+     *       classes and we don't want to make our registration classes public. We
+     *       can't move our registration classes into a hidden "resources" package
+     *       neither because we need package-private access to {@code CategoryList}.
+     *       For now, we assume that people using the GC package probably want to work
+     *       with {@link org.geotools.coverage.grid.GridCoverage2D}, which make extensive
+     *       use of JAI. Peoples just working with {@link org.geotools.coverage.Coverage} are
+     *       stuck with the overhead. Note that we register the image operation here because
+     *       the only operation's argument is of type {@code SampleDimension[]}.
+     *       Consequently, the image operation may be invoked at any time after class
+     *       loading of {@link SampleDimension}.
+     *       <br><br>
+     *       Additional note: moving the initialization into the
+     *       {@code META-INF/registryFile.jai} file may not be the best idea neithter,
+     *       since peoples using JAI without the GCS module may be stuck with the overhead
+     *       of loading GC classes.
      */
     static {
         SampleTranscoder.register(JAI.getDefaultInstance());

@@ -65,7 +65,8 @@ import org.geotools.resources.image.DualRectIter;
  */
 final class SampleTranscoder extends PointOpImage {
     /**
-     * The operation name. <strong>NOTE:</strong> Class {@link org.geotools.gc.GridCoverage}
+     * The operation name.
+     * <strong>NOTE:</strong> Class {@link org.geotools.coverage.grid.GridCoverage2D}
      * uses this name, but can't refer to this constant since it is in an other package.
      */
     public static final String OPERATION_NAME = "org.geotools.SampleTranscode";
@@ -270,7 +271,7 @@ final class SampleTranscoder extends PointOpImage {
             record.setSourceClassName("SampleDimension");
             record.setSourceMethodName("<classinit>");
             record.setThrown(exception);
-            Logger.getLogger("org.geotools.gc").log(record);
+            Logger.getLogger("org.geotools.coverage").log(record);
         }
     }
 }

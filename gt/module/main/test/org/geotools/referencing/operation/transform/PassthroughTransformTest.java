@@ -116,27 +116,26 @@ public class PassthroughTransformTest extends TestTransform {
         assertEquals("Wrong number of source dimensions", sub.getSourceDimensions() + subLower + 1, passthrough.getSourceDimensions());
         assertEquals("Wrong number of target dimensions", sub.getTargetDimensions() + subLower + 1, passthrough.getTargetDimensions());
         compare(passthrough, sub, 2);
-/*
- *      TODO: The following was ported from the legacy test package, but the 'subTransform'
- *            is not yet implemented in the new package. We would like to revisit it (just
- *            use a projective transform instead of the complicated legacy implementation).
- */
-//        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
-//                   JAIUtilities.createSequence(0, subLower-1), null).isIdentity());
-//
-//        assertTrue("Expected an identity transform", mtFactory.createSubTransform(passthrough,
-//                   JAIUtilities.createSequence(subUpper, passthrough.getSourceDimensions()-1), null).isIdentity());
-//
-//        final IntegerSequence outputDimensions = new IntegerSequence();
-//        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(subLower, subUpper-1);
-//        assertEquals("'createSubTransform' failed", sub, mtFactory.createSubTransform(passthrough,
-//                     inputDimensions, outputDimensions));
-//        final int[] expectedDimensions = new int[sub.getTargetDimensions()];
-//        for (int i=0; i<expectedDimensions.length; i++) {
-//            expectedDimensions[i] = subLower + i;
-//        }
-//        assertTrue("Unexpected output dimensions",
-//                   Arrays.equals(JAIUtilities.toArray(outputDimensions), expectedDimensions));
+        /*
+         * Try to split the pass through transform and get back the original one.
+         */
+        final DimensionFilter filter = new DimensionFilter(mtFactory);
+        filter.addSourceDimensionRange(0, subLower);
+        assertTrue("Expected an identity transform", filter.separate(passthrough).isIdentity());
+
+        filter.clear();
+        filter.addSourceDimensionRange(subUpper, passthrough.getSourceDimensions());
+        assertTrue("Expected an identity transform", filter.separate(passthrough).isIdentity());
+
+        filter.clear();
+        filter.addSourceDimensionRange(subLower, subUpper);
+        assertEquals("Expected the sub-transform", sub, filter.separate(passthrough));
+        final int[] expectedDimensions = new int[sub.getTargetDimensions()];
+        for (int i=0; i<expectedDimensions.length; i++) {
+            expectedDimensions[i] = subLower + i;
+        }
+        assertTrue("Unexpected output dimensions", Arrays.equals(expectedDimensions,
+                                                                 filter.getTargetDimensions()));
     }
 
     /**

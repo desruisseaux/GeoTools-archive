@@ -24,27 +24,19 @@
 package org.geotools.coverage.grid;
 
 // J2SE dependencies
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
 
 // OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -65,21 +57,21 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8740895616121262893L;
-    
+    private static final long serialVersionUID = -3133087291728297383L;
+
     /**
-     * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest
-     * valid grid coordinate is zero for {@link BufferedImage}, but may be non-zero for arbitrary
-     * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and maximum
-     * of 512, with 511 as the highest valid index.
+     * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest valid
+     * grid coordinate is zero for {@link BufferedImage}, but may be non-zero for arbitrary
+     * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and
+     * maximum of 512, with 511 as the highest valid index.
      *
      * @see RenderedImage#getMinX
      * @see RenderedImage#getMinY
      * @see RenderedImage#getWidth
      * @see RenderedImage#getHeight
      */
-    private final GridRange gridRange;
-    
+    protected final GridRange gridRange;
+
     /**
      * The math transform (usually an affine transform), or {@code null} if none.
      * This math transform maps pixel center to "real world" coordinate using the
@@ -87,40 +79,18 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      *
      * <pre>gridToCoordinateSystem.transform(pixels, point);</pre>
      */
-    private final MathTransform gridToCoordinateSystem;
-    
-    /**
-     * A math transform mapping only the two first dimensions of
-     * <code>gridToCoordinateSystem</code>, or {@code null}
-     * if such a "sub-transform" is not available.
-     */
-    private final MathTransform2D gridToCoordinateSystem2D;
-    
-    /**
-     * The inverse of {@code gridToCoordinateSystem2D}.
-     */
-    private final MathTransform2D gridFromCoordinateSystem2D;
-    
+    protected final MathTransform gridToCoordinateSystem;
+
     /**
      * Constructs a new grid geometry from a math transform.
      *
-     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if
-     *        none. The lowest valid grid coordinate is zero for {@link BufferedImage}, but may
-     *        be non-zero for arbitrary {@link RenderedImage}. A grid with 512 cells can have a
-     *        minimum coordinate of 0 and maximum of 512, with 511 as the highest valid index.
+     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
      * @param gridToCoordinateSystem The math transform which allows for the transformations
      *        from grid coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *
-     * @see RenderedImage#getMinX
-     * @see RenderedImage#getMinY
-     * @see RenderedImage#getWidth
-     * @see RenderedImage#getHeight
      */
     public GridGeometry(final GridRange gridRange, final MathTransform gridToCoordinateSystem) {
-        this.gridRange                  = gridRange;
-        this.gridToCoordinateSystem     = gridToCoordinateSystem;
-        this.gridToCoordinateSystem2D   = getMathTransform2D(gridToCoordinateSystem);
-        this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
+        this.gridRange              = gridRange;
+        this.gridToCoordinateSystem = gridToCoordinateSystem;
         if (gridRange!=null && gridToCoordinateSystem!=null) {
             final int dimRange  = gridRange.getDimension();
             final int dimSource = gridToCoordinateSystem.getSourceDimensions();
@@ -133,7 +103,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
             }
         }
     }
-    
+
     /**
      * Constructs a new grid geometry. An affine transform will be computed automatically
      * from the specified envelope.  The {@code reverse} argument tells whatever or
@@ -166,20 +136,11 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
             throw new MismatchedDimensionException(format(dimension, reverse.length));
         }
         /*
-         * Prepare elements for the 2D sub-transform. Those
-         * elements will be set during the matrix setup below.
-         */
-        double scaleX = 1;
-        double scaleY = 1;
-        double transX = 0;
-        double transY = 0;
-        /*
          * Setup the multi-dimensional affine transform for use with OpenGIS.
          * According OpenGIS specification, transforms must map pixel center.
          * This is done by adding 0.5 to grid coordinates.
          */
         final GeneralMatrix matrix = new GeneralMatrix(dimension+1);
-        matrix.setElement(dimension, dimension, 1);
         for (int i=0; i<dimension; i++) {
             double scale = userRange.getLength(i) / gridRange.getLength(i);
             double trans;
@@ -192,73 +153,8 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
             trans -= scale * (gridRange.getLower(i)-0.5);
             matrix.setElement(i, i,         scale);
             matrix.setElement(i, dimension, trans);
-            /*
-             * Keep two-dimensional components for the AffineTransform.
-             */
-            switch (i) {
-                case 0: scaleX=scale; transX=trans; break;
-                case 1: scaleY=scale; transY=trans; break;
-            }
         }
         gridToCoordinateSystem = ProjectiveTransform.create(matrix);
-        if (gridToCoordinateSystem instanceof MathTransform2D) {
-            gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
-        } else {
-            gridToCoordinateSystem2D = (MathTransform2D) ProjectiveTransform.create(
-                    new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
-        }
-        this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
-    }
-    
-    /**
-     * Constructs a new two-dimensional grid geometry. A math transform will
-     * be computed automatically with an inverted <var>y</var> axis (i.e.
-     * <code>gridRange</code> and <code>userRange</code> are assumed to
-     * have <var>y</var> axis in opposite direction).
-     *
-     * @param gridRange The valid coordinate range of a grid coverage.
-     *                  Increasing <var>x</var> values goes right and
-     *                  increasing <var>y</var> values goes <strong>down</strong>.
-     * @param userRange The corresponding coordinate range in user coordinate.
-     *                  Increasing <var>x</var> values goes right and
-     *                  increasing <var>y</var> values goes <strong>up</strong>.
-     *                  This rectangle must contains entirely all pixels, i.e.
-     *                  the rectangle's upper left corner must coincide with
-     *                  the upper left corner of the first pixel and the rectangle's
-     *                  lower right corner must coincide with the lower right corner
-     *                  of the last pixel.
-     */
-    public GridGeometry(final Rectangle gridRange, final Rectangle2D userRange) {
-        final double scaleX = userRange.getWidth()  / gridRange.getWidth();
-        final double scaleY = userRange.getHeight() / gridRange.getHeight();
-        final double transX = userRange.getMinX()   - gridRange.x*scaleX;
-        final double transY = userRange.getMaxY()   + gridRange.y*scaleY;
-        final AffineTransform tr = new AffineTransform(scaleX, 0, 0, -scaleY, transX, transY);
-        tr.translate(0.5, 0.5); // Map to pixel center
-        this.gridRange                  = new org.geotools.coverage.grid.GridRange(gridRange);
-        this.gridToCoordinateSystem2D   = (MathTransform2D) ProjectiveTransform.create(tr);
-        this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
-        this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
-    }
-    
-    /**
-     * Inverse the specified math transform.
-     */
-    private static MathTransform2D inverse(final MathTransform2D gridToCoordinateSystem2D)
-            throws IllegalArgumentException
-    {
-        if (gridToCoordinateSystem2D != null) {
-            try {
-                return (MathTransform2D) gridToCoordinateSystem2D.inverse();
-            } catch (NoninvertibleTransformException exception) {
-                IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                            ResourceKeys.ERROR_BAD_TRANSFORM_$1,
-                                            Utilities.getShortClassName(gridToCoordinateSystem2D)));
-                e.initCause(exception);
-                throw e;
-            }
-        }
-        return null;
     }
 
     /**
@@ -269,7 +165,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
                org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                new Integer(dim1), new Integer(dim2));
     }
-    
+
     /**
      * Returns the number of dimensions.
      */
@@ -309,7 +205,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
                     Utilities.getShortClassName(gridToCoordinateSystem)), exception);
         }
     }
-    
+
     /**
      * Returns the valid coordinate range of a grid coverage. The lowest valid grid coordinate is
      * zero for {@link BufferedImage}, but may be non-zero for arbitrary {@link RenderedImage}. A
@@ -328,16 +224,15 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         if (gridRange != null) {
             return gridRange;
         }
-            throw new InvalidGridGeometryException(Resources.format(
-                      ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(Resources.format(
+                  ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
     }
-    
+
     /**
      * Returns the math transform which allows for the transformations from grid coordinates to
      * real world earth coordinates. The transform is often an affine transformation. The coordinate
      * reference system of the real world coordinates is given by
      * {@link org.opengis.coverage.Coverage#getCoordinateReferenceSystem}.
-     * If no math transform is available, this method returns {@code null}.
      * <br><br>
      * <strong>Note:</strong> OpenGIS requires that the transform maps <em>pixel centers</em>
      * to real world coordinates. This is different from some other systems that map pixel's
@@ -350,118 +245,15 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         if (gridToCoordinateSystem != null) {
             return gridToCoordinateSystem;
         }
-            throw new InvalidGridGeometryException();
-    }
-    
-    /**
-     * Returns a math transform for the first two dimensions, if such a transform exists.
-     * This is a convenient method for working on horizontal data while ignoring vertical
-     * or temporal dimensions. This method will succed only if the first two dimensions
-     * are separable from extra dimensions (i.e. the transformation from
-     * (<var>x<sub>0</sub></var>,&nbsp;<var>x<sub>1</sub></var>,&nbsp;<var>x<sub>2</sub></var>...) to
-     * (<var>y<sub>0</sub></var>,&nbsp;<var>y<sub>1</sub></var>,&nbsp;<var>y<sub>2</sub></var>...)
-     * must be such that <var>y<sub>0</sub></var> and <var>y<sub>1</sub></var> depend only on
-     * <var>x<sub>0</sub></var> and <var>x<sub>1</sub></var>).
-     *
-     * @return The transform which allows for the transformations from grid coordinates
-     *         to real world earth coordinates, operating only on the first two dimensions.
-     *         The returned transform is often an instance of {@link AffineTransform}, which
-     *         make it convenient for interoperability with Java2D.
-     * @throws InvalidGridGeometryException if a two-dimensional transform is not available
-     *         for this grid geometry.
-     */
-    public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
-        if (gridToCoordinateSystem2D != null) {
-            return gridToCoordinateSystem2D;
-        }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(); // TODO: provide a localized message.
     }
 
-    /**
-     * Returns the math transform for the two first dimensions of the specified transform.
-     * This method is usefull for extracting the transformation caused by the head CRS in
-     * a {@link org.geotools.cs.CompoundCoordinateSystem}, assuming that this head CRS is
-     * a {@link org.geotools.cs.HorizontalCoordinateSystem}.
-     *
-     * @param  transform The transform.
-     * @param  mtFactory The factory to use for extracting the sub-transform.
-     * @return The {@link MathTransform2D} part of <code>transform</code>, or {@code null}
-     *         if none.
-     */
-    private static MathTransform2D getMathTransform2D(MathTransform transform) {
-        if (transform==null || transform instanceof MathTransform2D) {
-            return (MathTransform2D) transform;
-        }
-//        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
-//        final IntegerSequence  inputDimensions = JAIUtilities.createSequence(0, 1);
-//        final IntegerSequence outputDimensions = new IntegerSequence();
-//// TODO
-//        try {
-//            transform = factory.(transform, inputDimensions, outputDimensions);
-//        } catch (FactoryException exception) {
-//            // A MathTransform2D is not mandatory. Just tell that we have none.
-//            return null;
-//        }
-//        if (JAIUtilities.containsAll(outputDimensions, 0, 2)) {
-//            transform = factory.createFilterTransform(transform, inputDimensions);
-//            return (MathTransform2D) transform;
-//        }
-        return null;
-    }
-    
-    /**
-     * Transform a point using the inverse of {@link #getGridToCoordinateSystem2D()}.
-     *
-     * @param  point The point in logical coordinate system.
-     * @return A new point in the grid coordinate system.
-     * @throws InvalidGridGeometryException if a two-dimensional inverse
-     *         transform is not available for this grid geometry.
-     * @throws CannotEvaluateException if the transformation failed.
-     */
-    final Point2D inverseTransform(final Point2D point) throws InvalidGridGeometryException {
-        if (gridFromCoordinateSystem2D != null) {
-            try {
-                return gridFromCoordinateSystem2D.transform(point, null);
-            } catch (TransformException exception) {
-                throw new CannotEvaluateException(
-                          Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
-                          GridCoverage.toString(new DirectPosition2D(point)), exception));
-            }
-        }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
-    }
-    
-    /**
-     * Returns the pixel coordinate of a rectangle containing the
-     * specified geographic area. If the rectangle can't be computed,
-     * then this method returns {@code null}.
-     */
-    final Rectangle inverseTransform(Rectangle2D bounds) {
-        if (bounds!=null && gridFromCoordinateSystem2D!=null) {
-            try {
-                bounds = CRSUtilities.transform(gridFromCoordinateSystem2D, bounds, null);
-                final int xmin = (int)Math.floor(bounds.getMinX() - 0.5);
-                final int ymin = (int)Math.floor(bounds.getMinY() - 0.5);
-                final int xmax = (int)Math.ceil(bounds.getMaxX() - 0.5);
-                final int ymax = (int)Math.ceil(bounds.getMaxY() - 0.5);
-                return new Rectangle(xmin, ymin, xmax-xmin, ymax-ymin);
-            } catch (TransformException exception) {
-                // Ignore, since this method is invoked from 'GridCoverage.prefetch' only.
-                // It doesn't matter if the transformation failed; 'prefetch' is just a hint.
-            }
-        }
-        return null;
-    }
-    
     /**
      * Try to guess which axis are inverted in this grid geometry. If
      * this method can't make the guess, it returns {@code null}.
      *
-     * @return An array with length equals  to the number of dimensions in
-     *         the "real world" coordinate system, or {@code null} if
-     *         if this array can't be deduced.
+     * @return An array with length equals  to the number of dimensions in the "real world"
+     *         coordinate reference system, or {@code null} if this array can't be deduced.
      */
     final boolean[] areAxisInverted() {
         final Matrix matrix;
@@ -476,7 +268,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         } catch (Exception exception) {
             // Some other error occured. We didn't expected it,
             // but it will not prevent 'GridCoverage' to work.
-            Utilities.unexpectedException("org.geotools.gcs", "MathTransform",
+            Utilities.unexpectedException("org.geotools.referencing", "MathTransform",
                                           "derivative", exception);
             return null;
         }
@@ -485,7 +277,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         for (int j=0; j<inverse.length; j++) {
             for (int i=0; i<numCol; i++) {
                 final double value = matrix.getElement(j,i);
-                if (i==j) {
+                if (i == j) {
                     inverse[j] = (value < 0);
                 } else if (value!=0) {
                     // Matrix is not diagonal. Can't guess axis direction.
@@ -495,11 +287,10 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         }
         return inverse;
     }
-    
+
     /**
-     * Returns a hash value for this grid geometry.
-     * This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this grid geometry. This value need not remain
+     * consistent between different implementations of the same class.
      */
     public int hashCode() {
         int code = (int)serialVersionUID;
@@ -511,24 +302,22 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
         }
         return code;
     }
-    
+
     /**
-     * Compares the specified object with
-     * this grid geometry for equality.
+     * Compares the specified object with this grid geometry for equality.
      */
     public boolean equals(final Object object) {
-        if (object instanceof GridGeometry) {
+        if (object!=null && object.getClass().equals(getClass())) {
             final GridGeometry that = (GridGeometry) object;
-            return Utilities.equals(this.gridRange,              that.gridRange             ) &&
+            return Utilities.equals(this.gridRange,              that.gridRange) &&
                    Utilities.equals(this.gridToCoordinateSystem, that.gridToCoordinateSystem);
         }
         return false;
     }
-    
+
     /**
-     * Returns a string représentation of this grid range.
-     * The returned string is implementation dependent. It
-     * is usually provided for debugging purposes.
+     * Returns a string représentation of this grid geometry. The returned string
+     * is implementation dependent. It is usually provided for debugging purposes.
      */
     public String toString() {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));

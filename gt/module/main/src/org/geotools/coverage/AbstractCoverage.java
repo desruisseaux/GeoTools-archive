@@ -808,9 +808,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * @param  hints The rendering hints, or {@code null} if none.
          * @return A render context initialized with an affine transform from the coverage
          *         to the grid coordinate system. This transform is the inverse of
-         *         {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem2D}.
+         *         {@link org.geotools.coverage.grid.GridGeometry2D#getGridToCoordinateSystem2D}.
          *
-         * @see org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem
+         * @see org.geotools.coverage.grid.GridGeometry2D#getGridToCoordinateSystem2D
          */
         protected RenderContext createRenderContext(final Rectangle2D gridBounds,
                                                     final RenderingHints hints)
@@ -834,7 +834,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                     }
                 }
                 normalized[1] = normalized[1].opposite(); // Image's Y axis is downward.
-                
                 matrix = new GeneralMatrix(srcEnvelope, axis, dstEnvelope, normalized);
             } else {
                 matrix = new GeneralMatrix(srcEnvelope, dstEnvelope);

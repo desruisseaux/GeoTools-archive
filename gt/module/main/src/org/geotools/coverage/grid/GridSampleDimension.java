@@ -23,7 +23,7 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
@@ -32,11 +32,18 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.util.Arrays;
-
-import javax.media.jai.iterator.RectIter;
-import javax.media.jai.iterator.RectIterFactory;
 import javax.units.Unit;
 
+// JAI dependencies
+import javax.media.jai.iterator.RectIter;
+import javax.media.jai.iterator.RectIterFactory;
+
+// OpenGIS dependencies
+import org.opengis.coverage.ColorInterpretation;
+import org.opengis.coverage.SampleDimensionType;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimension;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
@@ -45,16 +52,12 @@ import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
-import org.opengis.coverage.ColorInterpretation;
-import org.opengis.coverage.SampleDimensionType;
-import org.opengis.util.InternationalString;
 
 
 /**
  * Describes the band values for a grid coverage.
  *
  * @version $Id$
- * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
 final class GridSampleDimension extends SampleDimension {
@@ -110,7 +113,7 @@ final class GridSampleDimension extends SampleDimension {
     private final SampleDimensionType type;
     
     /**
-     * Construct a sample dimension with a set of categories from an other sample dimension.
+     * Constructs a sample dimension with a set of categories from an other sample dimension.
      *
      * @param band  The originating sample dimension.
      * @param image The image to be wrapped by {@link GridCoverage}.
@@ -128,12 +131,12 @@ final class GridSampleDimension extends SampleDimension {
     }
 
     /**
-     * Create a set of sample dimensions for the given image. The array length of both
+     * Creates a set of sample dimensions for the given image. The array length of both
      * arguments must matches the number of bands in the supplied <code>image</code>.
      *
      * @param  name  The name for data (e.g. "Elevation").
      * @param  image The image for which to create a set of sample dimensions.
-     * @param  src   User-provided sample dimensions, or <code>null</code> if none.
+     * @param  src   User-provided sample dimensions, or {@code null} if none.
      * @param  dst   The array where to put sample dimensions.
      * @return <code>true</code> if all sample dimensions are geophysics, or <code>false</code>
      *         if all sample dimensions are <strong>not</strong> geophysics.
@@ -184,20 +187,20 @@ final class GridSampleDimension extends SampleDimension {
     }
 
     /**
-     * Create a set of sample dimensions for the given raster.
+     * Creates a set of sample dimensions for the given raster.
      *
      * @param  name The name for data (e.g. "Elevation").
      * @param  raster The raster.
-     * @param  min The minimal value for each bands, or <code>null</code> for computing it
+     * @param  min The minimal value for each bands, or {@code null} for computing it
      *         automatically.
-     * @param  max The maximal value for each bands, or <code>null</code> for computing it
+     * @param  max The maximal value for each bands, or {@code null} for computing it
      *         automatically.
-     * @param  units The units of sample values, or <code>null</code> if unknow.
-     * @param  colors The colors to use for values from <code>min</code> to <code>max</code>
-     *         for each bands, or <code>null</code> for a default color palette. If non-null,
+     * @param  units The units of sample values, or {@code null} if unknow.
+     * @param  colors The colors to use for values from {@code min} to {@code max}
+     *         for each bands, or {@code null} for a default color palette. If non-null,
      *         each arrays <code>colors[b]</code> may have any length; colors will be interpolated
      *         as needed.
-     * @param  hints An optional set of rendering hints, or <code>null</code> if none.
+     * @param  hints An optional set of rendering hints, or {@code null} if none.
      *         Those hints will not affect the sample dimensions to be created. However,
      *         they may affect the sample dimensions to be returned by
      *         <code>{@link #geophysics geophysics}(false)</code>, i.e.
@@ -223,22 +226,21 @@ final class GridSampleDimension extends SampleDimension {
     }
 
     /**
-     * Create a set of sample dimensions for the data backing the given iterator.
+     * Creates a set of sample dimensions for the data backing the given iterator.
      *
      * @param  name The name for data (e.g. "Elevation").
-     * @param  iterator The iterator through the raster data, or <code>null</code>.
+     * @param  iterator The iterator through the raster data, or {@code null}.
      * @param  rasterType The data type of the image sample values.
      *         Must be one of {@link DataBuffer} constants.
-     * @param  min The minimal value, or <code>null</code> for computing it automatically.
-     * @param  max The maximal value, or <code>null</code> for computing it automatically.
-     * @param  units The units of sample values, or <code>null</code> if unknow.
-     * @param  colors The colors to use for values from <code>min</code> to <code>max</code>
-     *         for each bands, or <code>null</code> for a default color palette. If non-null,
-     *         each arrays <code>colors[b]</code> may have any length; colors will be interpolated
-     *         as needed.
+     * @param  min The minimal value, or {@code null} for computing it automatically.
+     * @param  max The maximal value, or {@code null} for computing it automatically.
+     * @param  units The units of sample values, or {@code null} if unknow.
+     * @param  colors The colors to use for values from {@code min} to {@code max} for each bands,
+     *         or {@code null} for a default color palette. If non-null, each arrays
+     *         {@code colors[b]} may have any length; colors will be interpolated as needed.
      * @param  dst The array where to store sample dimensions. The array length must matches
      *         the number of bands.
-     * @param  hints An optional set of rendering hints, or <code>null</code> if none.
+     * @param  hints An optional set of rendering hints, or {@code null} if none.
      *         Those hints will not affect the sample dimensions to be created. However,
      *         they may affect the sample dimensions to be returned by
      *         <code>{@link #geophysics geophysics}(false)</code>, i.e.
@@ -285,7 +287,7 @@ final class GridSampleDimension extends SampleDimension {
                     new Integer(numBands), new Integer(colors.length), "colors[i]"));
         }
         /*
-         * Arguments are now know to be valids. We now need to compute two ranges:
+         * Arguments are know to be valids. We now need to compute two ranges:
          *
          * STEP 1: Range of sample values. This is computed in the following block.
          * STEP 2: Range of geophysics values. It will be computed one block later.
@@ -296,10 +298,10 @@ final class GridSampleDimension extends SampleDimension {
          * the raster data use integer numbers, then we will rescale the numbers only
          * if they would not fit in the rendering type.
          */
-//        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
-//        if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
+        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
+        if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
 //            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
-//        }
+        }
         final boolean byteRenderingType = false; //TODO renderingType.getSize()<=8;
         final NumberRange sampleValueRange;
         final Category[]  categories;
@@ -326,7 +328,7 @@ final class GridSampleDimension extends SampleDimension {
             }
         }
         /*
-         * Compute the minimal and maximal values, if not explicitely provided.
+         * Computes the minimal and maximal values, if not explicitely provided.
          * This information is required for determining the range of geophysics
          * values.
          */
@@ -353,7 +355,7 @@ final class GridSampleDimension extends SampleDimension {
             } while (!iterator.nextBandDone());
         }
         /*
-         * Determine the class of geophysics values. This class can generally be infered from
+         * Determines the class of geophysics values. This class can generally be infered from
          * the raster data type. In the exceptional case where the data type is unknow, we will
          * determine a default class based on the range of values computed just above.
          */
@@ -378,7 +380,7 @@ final class GridSampleDimension extends SampleDimension {
             }
         }
         /*
-         * Now, construct the sample dimensions. We will inconditionnaly provides a "nodata"
+         * Now, constructs the sample dimensions. We will inconditionnaly provides a "nodata"
          * category for floating point images, since we don't know if the user plan to have
          * NaN values. Even if the current image doesn't have NaN values, it could have NaN
          * later if the image uses a writable raster.

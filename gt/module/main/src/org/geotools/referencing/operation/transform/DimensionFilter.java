@@ -29,6 +29,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.resources.XArray;
@@ -46,7 +47,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * the following code:
  *
  * <blockquote><pre>
- * {@linkplain #setSourceDimensionRange setSourceDimensionRange}(0, 2);
+ * {@linkplain #addSourceDimensionRange addSourceDimensionRange}(0, 2);
  * MathTransform mt = {@linkplain #separate separate}(transform);
  * </pre></blockquote>
  *
@@ -56,6 +57,15 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo This class is specific to Geotools implementation; it is better to avoid it if
+ *       you can. It could be generalized a bit if we perform the same operations on
+ *       {@link org.opengis.referencing.Operation.CoordinateOperation} interfaces instead
+ *       of math transforms. We should revisit this issue after grid coverage API has been
+ *       revisited (since grid coverage is a user of this class).
+ *
+ * @todo This class contains a set of static methods that could be factored out in
+ *       some kind of {@code org.geotools.util.SortedIntegerSet} implementation.
  */
 public class DimensionFilter {
     /**
@@ -80,7 +90,15 @@ public class DimensionFilter {
     private final MathTransformFactory factory;
 
     /**
-     * Constructs a dimension filter.
+     * Constructs a dimension filter with the {@linkplain FactoryFinder#getMathTransformFactory
+     * default math transform factory}.
+     */
+    public DimensionFilter() {
+        this(FactoryFinder.getMathTransformFactory());
+    }
+
+    /**
+     * Constructs a dimension filter with the specified factory.
      *
      * @param factory The factory for the creation of new math transforms.
      */
@@ -89,33 +107,47 @@ public class DimensionFilter {
     }
 
     /**
-     * Add an input dimension to keep. The {@code dimension} value apply to the
+     * Clear any {@linkplain #getSourceDimensions source} and
+     * {@linkplain #getTargetDimensions target dimension} setting.
+     */
+    public void clear() {
+        sourceDimensions = null;
+        targetDimensions = null;
+    }
+
+    /**
+     * Add an input dimension to keep. The {@code dimension} applies to the
      * source dimensions of the transform to be given to
      * <code>{@linkplain #separate separate}(transform)</code>.
      * The number must be in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>
      * exclusive.
+     *
+     * @param  dimension The dimension to add.
+     * @throws IllegalArgumentException if {@code dimension} is negative.
      */
-    public void addSourceDimension(final int dimension) {
+    public void addSourceDimension(final int dimension) throws IllegalArgumentException {
         sourceDimensions = add(sourceDimensions, dimension);
     }
 
     /**
-     * Set the input dimensions to keep. The {@code index} values apply to the
+     * Add input dimensions to keep. The {@code dimensions} apply to the
      * source dimensions of the transform to be given to
      * <code>{@linkplain #separate separate}(transform)</code>.
      * All numbers must be in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>
-     * exclusive. The {@code index} values must be in strictly increasing order.
+     * exclusive. The {@code dimensions} values must be in strictly increasing order.
+     *
+     * @param  dimensions The new sequence of dimensions.
+     * @throws IllegalArgumentException if {@code dimensions} contains negative values or
+     *         is not a strictly increasing sequence.
      */
-    public void setSourceDimensions(int[] index) {
-        index = (int[]) index.clone();
-        ensureValidSeries(index, "sourceDimensions");
-        sourceDimensions = index;
+    public void addSourceDimensions(final int[] dimensions) throws IllegalArgumentException {
+        sourceDimensions = add(sourceDimensions, dimensions);
     }
 
     /**
-     * Set the range of input dimensions to keep. The {@code lower} and {@code upper} values
+     * Add a range of input dimensions to keep. The {@code lower} and {@code upper} values
      * apply to the source dimensions of the transform to be given to
      * <code>{@linkplain #separate separate}(transform)</code>.
      *
@@ -123,13 +155,85 @@ public class DimensionFilter {
      * @param upper The upper dimension, exclusive. Must not be greater than
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>.
      */
-    public void setSourceDimensionRange(final int lower, final int upper) {
-        sourceDimensions = series(lower, upper);
+    public void addSourceDimensionRange(final int lower, final int upper)
+            throws IllegalArgumentException
+    {
+        sourceDimensions = add(sourceDimensions, lower, upper);
     }
 
     /**
-     * Returns the output dimensions.
+     * Returns the input dimensions. This information is available only if at least one
+     * setter method has been explicitly invoked for source dimensions.
+     * 
+     * @return The input dimension as a sequence of strictly increasing values.
+     * @throws IllegalStateException if input dimensions have not been set.
+     */
+    public int[] getSourceDimensions() throws IllegalStateException {
+        if (sourceDimensions != null) {
+            return (int[]) sourceDimensions.clone();
+        }
+        throw new IllegalStateException();
+    }
+
+    /**
+     * Add an output dimension to keep. The {@code dimension} applies to the
+     * target dimensions of the transform to be given to
+     * <code>{@linkplain #separate separate}(transform)</code>.
+     * The number must be in the range 0 inclusive to
+     * <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>
+     * exclusive.
      *
+     * @param  dimension The dimension to add.
+     * @throws IllegalArgumentException if {@code dimension} is negative.
+     */
+    public void addTargetDimension(final int dimension) throws IllegalArgumentException {
+        targetDimensions = add(targetDimensions, dimension);
+    }
+
+    /**
+     * Add output dimensions to keep. The {@code dimensions} apply to the
+     * target dimensions of the transform to be given to
+     * <code>{@linkplain #separate separate}(transform)</code>.
+     * All numbers must be in the range 0 inclusive to
+     * <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>
+     * exclusive. The {@code dimensions} values must be in strictly increasing order.
+     *
+     * @param  dimensions The new sequence of dimensions.
+     * @throws IllegalArgumentException if {@code dimensions} contains negative values or
+     *         is not a strictly increasing sequence.
+     */
+    public void addTargetDimensions(int[] dimensions) throws IllegalArgumentException {
+        targetDimensions = add(targetDimensions, dimensions);
+    }
+
+    /**
+     * Add a range of output dimensions to keep. The {@code lower} and {@code upper} values
+     * apply to the target dimensions of the transform to be given to
+     * <code>{@linkplain #separate separate}(transform)</code>.
+     *
+     * @param lower The lower dimension, inclusive. Must not be smaller than 0.
+     * @param upper The upper dimension, exclusive. Must not be greater than
+     * <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>.
+     */
+    public void addTargetDimensionRange(final int lower, final int upper)
+            throws IllegalArgumentException
+    {
+        targetDimensions = add(targetDimensions, lower, upper);
+    }
+
+    /**
+     * Returns the output dimensions. This information is available only if one of the following
+     * conditions is meet:
+     *
+     * <ul>
+     *   <li>Target dimensions has been explicitly set using setter methods.</li>
+     *   <li>No target dimensions were set but <code>{@linkplain #separate separate}(transform)</code>
+     *       has been invoked at least once, in which case the target dimensions are inferred
+     *       automatically from the {@linkplain #getSourceDimensions source dimensions} and the
+     *       {@code transform}.</li>
+     * </ul>
+     *
+     * @return The output dimension as a sequence of strictly increasing values.
      * @throws IllegalStateException if this information is not available.
      */
     public int[] getTargetDimensions() throws IllegalStateException {
@@ -137,6 +241,65 @@ public class DimensionFilter {
             return (int[]) targetDimensions.clone();
         }
         throw new IllegalStateException();
+    }
+
+    /**
+     * Separates the specified math transform. This method returns a math transform that uses
+     * only the specified {@linkplain #getSourceDimensions source dimensions} and returns only
+     * the specified {@linkplain #getTargetDimensions target dimensions}. Special case:
+     *
+     * <ul>
+     *   <li><p>If {@linkplain #getSourceDimensions source dimensions} are unspecified, then the
+     *       returned transform will expects all source dimensions as input but will produces only
+     *       the specified {@linkplain #getTargetDimensions target dimensions} as output.</p></li>
+     *
+     *   <li><p>If {@linkplain #getTargetDimensions target dimensions} are unspecified, then the
+     *       returned transform will expects only the specified {@linkplain #getSourceDimensions
+     *       source dimensions} as input, and the target dimensions will be inferred
+     *       automatically.</p></li>
+     * </ul>
+     *
+     * @param  transform The transform to separate.
+     * @return The separated math transform.
+     * @throws FactoryException if the transform can't be separated.
+     */
+    public MathTransform separate(MathTransform transform) throws FactoryException {
+        if (sourceDimensions == null) {
+            sourceDimensions = series(0, transform.getSourceDimensions());
+            if (targetDimensions == null) {
+                targetDimensions = series(0, transform.getTargetDimensions());
+                return transform;
+            }
+            return separateOutput(transform);
+        }
+        final int[] target = targetDimensions;
+        transform = separateInput(transform);
+        assert XArray.isSorted(targetDimensions);
+        if (target != null) {
+            final int[] step = targetDimensions;
+            targetDimensions = new int[target.length];
+            for (int i=0; i<target.length; i++) {
+                final int j = Arrays.binarySearch(step, target[i]);
+                if (j < 0) {
+                    /*
+                     * The user is asking for some target dimensions that we can't keep, probably
+                     * because at least one of the requested target dimension as a dependency to
+                     * an source dimension that do not appears in the list of source dimensions to
+                     * kept.
+                     *
+                     * TODO: provide a more accurate error message.
+                     */
+                    throw new FactoryException(Resources.format(
+                                               ResourceKeys.ERROR_INSEPARABLE_TRANSFORM));
+                }
+                targetDimensions[i] = j;
+            }
+            transform = separateOutput(transform);
+            targetDimensions = target;
+        }
+        assert sourceDimensions.length == transform.getSourceDimensions() : transform;
+        assert targetDimensions.length == transform.getTargetDimensions() : transform;
+        return transform;
     }
 
     /**
@@ -149,12 +312,12 @@ public class DimensionFilter {
      * @throws FactoryException if the transform is not separable.
      */
     private MathTransform separateInput(final MathTransform transform) throws FactoryException {
-        targetDimensions    = null;
         final int dimSource = transform.getSourceDimensions();
         final int dimTarget = transform.getTargetDimensions();
         final int dimInput  = sourceDimensions.length;
         final int lower     = sourceDimensions[0];
         final int upper     = sourceDimensions[dimInput-1] + 1;
+        assert XArray.isSorted(sourceDimensions);
         if (upper > dimSource) {
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
@@ -211,7 +374,7 @@ public class DimensionFilter {
                  * No source dimensions belong to the sub-transform. The only remaining
                  * sources are heading and trailing dimensions. A passthrough transform
                  * without its sub-transform is an identity transform...
-                 */ 
+                 */
                 return factory.createAffineTransform(new GeneralMatrix(dimInput+1));
             }
             /*
@@ -222,10 +385,10 @@ public class DimensionFilter {
              * numbering.
              */
             final MathTransform subTransform = subFilter.separateInput(passThrough.subTransform);
-            targetDimensions = subFilter.targetDimensions;
-            for (int i=0; i<targetDimensions.length; i++) {
-                targetDimensions[i] += subLower;
+            for (int i=0; i<subFilter.targetDimensions.length; i++) {
+                subFilter.targetDimensions[i] += subLower;
             }
+            targetDimensions = add(targetDimensions, subFilter.targetDimensions);
             /*
              * If all source dimensions not in the sub-transform are consecutive numbers, we can
              * use our pass though transform implementation. The "consecutive numbers" requirement
@@ -236,12 +399,13 @@ public class DimensionFilter {
             if (containsAll(sourceDimensions, lower, subLower) &&
                 containsAll(sourceDimensions, subUpper, upper))
             {
-                final int  firstAffectedOrdinate = Math.max(0, subLower-lower);
-                final int   numTrailingOrdinates = Math.max(0, upper-subUpper);
+                final int firstAffectedOrdinate = Math.max(0, subLower-lower);
+                final int  numTrailingOrdinates = Math.max(0, upper-subUpper);
                 return factory.createPassThroughTransform(
                         firstAffectedOrdinate, subTransform, numTrailingOrdinates);
             }
             // TODO: handle more general case here...
+            targetDimensions = null; // Clear before to fallback on the LinearTransform case.
         }
         /*
          * If the transform is affine (or at least projective), express the transform as a matrix.
@@ -278,14 +442,14 @@ reduce:     for (int j=0; j<rows.length; j++) {
                         continue reduce;
                     }
                 }
-                row[nCols++] = row[dimSource]; // Copy the translation term.
+                row[nCols++] = matrix.getElement(j, dimSource); // Copy the translation term.
                 assert nCols == row.length : nCols;
                 if (j == dimTarget) {
                     hasLastRow = true;
                 } else {
                     targetDimensions = add(targetDimensions, j);
                 }
-                rows[j] = row;
+                rows[nRows++] = row;
             }
             rows = (double[][]) XArray.resize(rows, nRows);
             if (hasLastRow) {
@@ -300,152 +464,230 @@ reduce:     for (int j=0; j<rows.length; j++) {
 
     /**
      * Creates a transform which retains only a subset of an other transform's outputs. The number
-     * and nature of inputs stay unchanged. For example if the supplied <code>transform</code> has
+     * and nature of inputs stay unchanged. For example if the supplied {@code transform} has
      * (<var>longitude</var>, <var>latitude</var>, <var>height</var>) outputs, then a sub-transform
      * may be used to keep only the (<var>longitude</var>, <var>latitude</var>) part. In most cases,
      * the created sub-transform is non-invertible since it loose informations.
      * <br><br>
      * This transform may be see as a non-square matrix transform with less rows
-     * than columns, concatenated with <code>transform</code>. However, invoking
-     * <code>createFilterTransfom(...)</code> allows the optimization of some common cases.
+     * than columns, concatenated with {@code transform}. However, invoking
+     * {@code createFilterTransfom(...)} allows the optimization of some common cases.
      *
      * @param  transform The transform to reduces.
-     * @param  targetDimensions The output dimension to keep.
-     *         This sequence can contains any integers in the range 0 inclusive to
-     *         <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>
-     *         exclusive.
-     * @return The <code>transform</code> keeping only the specified output dimensions.
+     * @return The {@code transform} keeping only the output dimensions.
+     * @throws FactoryException if the transform can't be created.
      */
-//    public MathTransform createFilterTransform(MathTransform transform,
-//                                               final IntegerSequence targetDimensions)
-//    {
-//        final int dimSource = transform.getSourceDimensions();
-//        final int dimTarget = transform.getTargetDimensions();
-//        final int dimOutput = targetDimensions.getNumElements();
-//        final int lower     = JAIUtilities.getMinimum(targetDimensions);
-//        final int upper     = JAIUtilities.getMaximum(targetDimensions)+1;
-//        if (lower<0 || lower>=upper) {
-//            throw new IllegalArgumentException(Resources.format(
-//                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-//                    "minimum(targetDimensions)", new Integer(lower)));
-//        }
-//        if (upper > dimTarget) {
-//            throw new IllegalArgumentException(Resources.format(
-//                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-//                    "maximum(targetDimensions)", new Integer(upper)));
-//        }
-//        if (dimOutput == dimTarget) {
-//            assert lower==0 && upper==dimTarget;
-//            return transform;
-//        }
-//        /*
-//         * If the transform is an instance of "pass through" transform but no dimension from its
-//         * subtransform is requested, then ignore the subtransform (i.e. treat the whole transform
-//         * as identity, except for the number of output dimension which may be different from the
-//         * number of input dimension).
-//         */
-//        int dimPass = 0;
-//        int dimDiff = 0;
-//        int dimStep = dimTarget;
-//        if (transform instanceof PassThroughTransform) {
-//            final PassThroughTransform passThrough = (PassThroughTransform) transform;
-//            final int subLower = passThrough.firstAffectedOrdinate;
-//            final int subUpper = subLower + passThrough.transform.getTargetDimensions();
-//            if (!JAIUtilities.containsAny(targetDimensions, subLower, subUpper)) {
-//                transform = null;
-//                dimStep = dimSource;
-//                dimPass = subLower;
-//                dimDiff = (subLower + passThrough.transform.getSourceDimensions()) - subUpper;
-//            }
-//        }
-//        /*
-//         * Create the matrix to be used as a filter,        [x']     [1  0  0  0] [x]
-//         * and concatenate it to the transform. The         [z']  =  [0  0  1  0] [y]
-//         * matrix will contains only a 1 for the output     [1 ]     [0  0  0  1] [z]
-//         * dimension to keep, as in the following example:                        [1]
-//         */
-//        final Matrix matrix = new Matrix(dimOutput+1, dimStep+1);
-//        matrix.setZero();
-//        int j=0;
-//        for (targetDimensions.startEnumeration(); targetDimensions.hasMoreElements(); j++) {
-//            int i = targetDimensions.nextElement();
-//            if (i >= dimPass) {
-//                i += dimDiff;
-//            }
-//            matrix.setElement(j, i, 1);
-//        }
-//        // Affine transform has one more row/column than dimension.
-//        matrix.setElement(dimOutput, dimStep, 1);
-//        MathTransform filtered = createAffineTransform(matrix);
-//        if (transform != null) {
-//            filtered = createConcatenatedTransform(transform, filtered);
-//        }
-//        return filtered;
-//    }
-
-    /**
-     * Returns {@code true} if {@code array} contains all index in the range {@code lower}
-     * inclusive to {@code upper} exclusive.
-     */
-    private static boolean containsAll(final int[] array, final int lower, final int upper) {
-        if (array != null) {
-            assert XArray.isSorted(array);
-            int index = Arrays.binarySearch(array, lower);
-            if (index >= 0) {
-                index += upper-lower;
-                if (index < array.length) {
-                    return array[index] == upper;
-                }
+    private MathTransform separateOutput(MathTransform transform) throws FactoryException {
+        final int dimSource = transform.getSourceDimensions();
+        final int dimTarget = transform.getTargetDimensions();
+        final int dimOutput = targetDimensions.length;
+        final int lower     = targetDimensions[0];
+        final int upper     = targetDimensions[dimOutput-1];
+        assert XArray.isSorted(targetDimensions);
+        if (upper > dimTarget) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+                      "targetDimensions", new Integer(upper)));
+        }
+        if (dimOutput == dimTarget) {
+            assert lower==0 && upper==dimTarget;
+            return transform;
+        }
+        /*
+         * If the transform is an instance of "pass through" transform but no dimension from its
+         * subtransform is requested, then ignore the subtransform (i.e. treat the whole transform
+         * as identity, except for the number of output dimension which may be different from the
+         * number of input dimension).
+         */
+        int dimPass = 0;
+        int dimDiff = 0;
+        int dimStep = dimTarget;
+        if (transform instanceof PassThroughTransform) {
+            final PassThroughTransform passThrough = (PassThroughTransform) transform;
+            final int subLower = passThrough.firstAffectedOrdinate;
+            final int subUpper = subLower + passThrough.subTransform.getTargetDimensions();
+            if (!containsAny(targetDimensions, subLower, subUpper)) {
+                transform = null;
+                dimStep = dimSource;
+                dimPass = subLower;
+                dimDiff = (subLower + passThrough.subTransform.getSourceDimensions()) - subUpper;
             }
         }
-        return lower == upper;
+        /*
+         * Creates the matrix to be used as a filter,       [x']     [1  0  0  0] [x]
+         * and concatenates it to the transform. The        [z']  =  [0  0  1  0] [y]
+         * matrix will contains only a 1 for the output     [1 ]     [0  0  0  1] [z]
+         * dimension to keep, as in the following example:                        [1]
+         */
+        final GeneralMatrix matrix = new GeneralMatrix(dimOutput+1, dimStep+1);
+        matrix.setZero();
+        for (int j=0; j<dimOutput; j++) {
+            int i = targetDimensions[j];
+            if (i >= dimPass) {
+                i += dimDiff;
+            }
+            matrix.setElement(j, i, 1);
+        }
+        // Affine transform has one more row/column than dimension.
+        matrix.setElement(dimOutput, dimStep, 1);
+        MathTransform filtered = factory.createAffineTransform(matrix);
+        if (transform != null) {
+            filtered = factory.createConcatenatedTransform(transform, filtered);
+        }
+        return filtered;
     }
 
     /**
-     * Add the specified {@code value} to the specified {@code array}. Values are added
-     * in increasing order. Duplicated value are not added.
+     * Returns {@code true} if the given sequence contains all index in the range {@code lower}
+     * inclusive to {@code upper} exclusive.
+     *
+     * @param  sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to test.
+     * @param  lower The lower value, inclusive.
+     * @param  upper The upper value, exclusive.
+     * @return {@code true} if the full range was found in the sequence.
      */
-    private static int[] add(int[] array, int value) {
-        if (array == null) {
-            return new int[] {value};
+    private static boolean containsAll(final int[] sequence, final int lower, int upper) {
+        if (lower == upper) {
+            return true;
         }
-        assert XArray.isSorted(array);
-        int i = Arrays.binarySearch(array, value);
+        if (sequence != null) {
+            assert XArray.isSorted(sequence);
+            int index = Arrays.binarySearch(sequence, lower);
+            if (index >= 0) {
+                index += --upper - lower;
+                if (index>=0 && index<sequence.length) {
+                    return sequence[index] == upper;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if the given sequence contains any value in the given range.
+     *
+     * @param  sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to test.
+     * @param  lower The lower value, inclusive.
+     * @param  upper The upper value, exclusive.
+     * @return {@code true} if the sequence contains at least one value in the given range.
+     */
+    private static boolean containsAny(final int[] sequence, final int lower, final int upper) {
+        if (upper == lower) {
+            return true;
+        }
+        if (sequence != null) {
+            assert XArray.isSorted(sequence);
+            int index = Arrays.binarySearch(sequence, lower);
+            if (index >= 0) {
+                return true;
+            }
+            index = ~index; // Tild, not minus sign.
+            return index < sequence.length  &&  sequence[index] < upper;
+        }
+        return false;
+    }
+
+    /**
+     * Add the specified {@code dimension} to the specified sequence. Values are added
+     * in increasing order. Duplicated values are not added.
+     *
+     * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.
+     */
+    private static int[] add(int[] sequence, int dimension) throws IllegalArgumentException {
+        if (dimension < 0) {
+            throw new IllegalArgumentException(Resources.format(
+                  ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dimension", new Integer(dimension)));
+        }
+        if (sequence == null) {
+            return new int[] {dimension};
+        }
+        assert XArray.isSorted(sequence);
+        int i = Arrays.binarySearch(sequence, dimension);
         if (i < 0) {
             i = ~i;   // Tild, not the minus sign.
-            array = XArray.insert(array, i, 1);
-            array[i] = value;
+            sequence = XArray.insert(sequence, i, 1);
+            sequence[i] = dimension;
         }
-        return array;
+        assert Arrays.binarySearch(sequence, dimension) == i;
+        return sequence;
+    }
+
+    /**
+     * Add the specified {@code dimensions} to the specified sequence. Values are added
+     * in increasing order. Duplicated values are not added.
+     *
+     * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.
+     */
+    private static int[] add(int[] sequence, final int[] dimensions)
+            throws IllegalArgumentException
+    {
+        if (dimensions.length != 0) {
+            ensureValidSeries(dimensions);
+            if (sequence == null) {
+                sequence = (int[]) dimensions.clone();
+            } else {
+                // Note: the following loop is unefficient, but should suffise since this
+                //       case should not occurs often and arrays should be small anyway.
+                for (int i=0; i<dimensions.length; i++) {
+                    sequence = add(sequence, dimensions[i]);
+                }
+            }
+        }
+        return sequence;
+    }
+
+    /**
+     * Add the specified range to the specified sequence. Values are added
+     * in increasing order. Duplicated values are not added.
+     *
+     * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.
+     * @throws IllegalArgumentException if {@code lower} is not smaller than {@code upper}.
+     */
+    private static int[] add(int[] sequence, int lower, final int upper)
+            throws IllegalArgumentException
+    {
+        if (lower<0 || lower>=upper) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+        }
+        if (sequence == null) {
+            sequence = series(lower, upper);
+        } else {
+            // Note: the following loop is unefficient, but should suffise since this
+            //       case should not occurs often and arrays should be small anyway.
+            while (lower < upper) {
+                sequence = add(sequence, lower++);
+            }
+        }
+        assert containsAll(sequence, lower, upper);
+        return sequence;
     }
 
     /**
      * Returns a series of increasing values starting at {@code lower}.
      */
-    private static int[] series(final int lower, final int upper) {
-        final int[] array = new int[upper-lower];
-        for (int i=0; i<array.length; i++) {
-            array[i] = i+lower;
+    private static int[] series(final int lower, final int upper) throws IllegalArgumentException {
+        final int[] sequence = new int[upper-lower];
+        for (int i=0; i<sequence.length; i++) {
+            sequence[i] = i+lower;
         }
-        return array;
+        return sequence;
     }
 
     /**
-     * Ensure that the specified array contains strictly increasing non-negative values.
+     * Ensures that the specified array contains strictly increasing non-negative values.
      *
-     * @param  array The array to check.
-     * @param  name  The argument name. Used for formatting exception message if needed.
-     * @throws IllegalArgumentException if the specified array is not a valid series.
+     * @param  dimensions The sequence to check.
+     * @throws IllegalArgumentException if the specified sequence is not a valid series.
      */
-    private static void ensureValidSeries(int[] array, final String name)
-            throws IllegalArgumentException
-    {
+    private static void ensureValidSeries(final int[] dimensions) throws IllegalArgumentException {
         int last = -1;
-        for (int i=0; i<array.length; i++) {
-            final int value = array[i];
+        for (int i=0; i<dimensions.length; i++) {
+            final int value = dimensions[i];
             if (value <= last) {
                 throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name+'['+i+']', new Integer(value)));
+                          ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dimensions["+i+']',
+                          new Integer(value)));
             }
             last = value;
         }

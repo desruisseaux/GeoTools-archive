@@ -54,6 +54,12 @@ import org.geotools.util.UnsupportedImplementationException;
  * @author Martin Desruisseaux
  *
  * @see OperationMethod
+ *
+ * @todo OpenGIS is considering to remove this class from UML diagrams. In this case, all
+ *       methods in this interface will move to the {@link SingleOperation} interface. The
+ *       removal of {@code Operation} interface would simplify the API and brings more
+ *       flexibility: {@link ConcatenatedOperation} would be a legal component in both
+ *       other {@link ConcatenatedOperation} and in {@link PassThroughOperation}.
  */
 public class Operation extends SingleOperation
                     implements org.opengis.referencing.operation.Operation
