@@ -4,7 +4,9 @@
  */
 package org.geotools.data.wms.request;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -18,15 +20,6 @@ import org.geotools.data.ows.Layer;
  * functionality.
  */
 public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest implements GetFeatureInfoRequest {
-    /** A list of type String, each representing a format for the request */
-    private List infoFormats;
-
-    /**
-     * A list of type Layer, each of which has queryable set to true. This is instantiated usually from a
-     * GetCapabilities document
-     */
-    private Set queryableLayers;
-
     /** A set of type Layer, each of which is to be queried in the request */
     private Set queryLayers;
 
@@ -36,15 +29,10 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
      * 
      * @param onlineResource the URL pointing to the place to execute a GetFeatureInfo request
      * @param request a previously configured GetMapRequest that the query will be executed on
-     * @param queryableLayers a Set of all the Layers that can be queried
-     * @param infoFormats all the known formats that can be returned by the request
      */
-    public AbstractGetFeatureInfoRequest( URL onlineResource, GetMapRequest request,
-            Set queryableLayers, String[] infoFormats ) {
+    public AbstractGetFeatureInfoRequest( URL onlineResource, GetMapRequest request) {
         super(onlineResource, request.getProperties());
 
-        this.queryableLayers = queryableLayers;
-        this.infoFormats = Arrays.asList(infoFormats);
         queryLayers = new TreeSet();
         
         initRequest();
@@ -61,7 +49,11 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
 
         while( iter.hasNext() ) {
             Layer layer = (Layer) iter.next();
-            queryLayerString = queryLayerString + layer.getName();
+            try {
+                queryLayerString = queryLayerString + URLEncoder.encode(layer.getName(), "UTF-8"); //$NON-NLS-1$
+            } catch (UnsupportedEncodingException e) {
+                queryLayerString = queryLayerString + layer.getName();
+            }
 
             if (iter.hasNext()) {
                 queryLayerString = queryLayerString + ","; //$NON-NLS-1$
@@ -135,20 +127,6 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
      */
     protected String getQueryY() {
         return QUERY_Y;
-    }
-    
-    /**
-     * @see org.geotools.data.wms.request.GetFeatureInfoRequest#getInfoFormats()
-     */
-    public List getInfoFormats() {
-        return infoFormats;
-    }
-
-    /**
-     * @see org.geotools.data.wms.request.GetFeatureInfoRequest#getQueryableLayers()
-     */
-    public Set getQueryableLayers() {
-        return queryableLayers;
     }
 
     protected void initRequest() {

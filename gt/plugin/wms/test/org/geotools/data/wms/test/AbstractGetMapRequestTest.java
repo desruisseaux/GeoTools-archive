@@ -19,8 +19,7 @@ public class AbstractGetMapRequestTest extends TestCase {
 	public void testGetFinalURL() throws Exception {
 		URL badURL = new URL("http://test.com/map.php?LAYERS=Provincial Boundary");
 		
-		GetMapRequest request = new RequestTest(badURL, null, new SimpleLayer[] { }, 
-				null, new String[] { } , null);
+		GetMapRequest request = new RequestTest(badURL, null);
 		
 		SimpleLayer layer = new SimpleLayer("Provincial Boundary", "Two words");
 		request.setLayers(Collections.singletonList(layer));
@@ -41,9 +40,8 @@ public class AbstractGetMapRequestTest extends TestCase {
 		 * @param availableFormats
 		 * @param availableExceptions
 		 */
-		public RequestTest(URL onlineResource, Properties properties, SimpleLayer[] availableLayers, Set availableSRSs, String[] availableFormats, List availableExceptions) {
-			super(onlineResource, properties, availableLayers, availableSRSs,
-					availableFormats, availableExceptions);
+		public RequestTest(URL onlineResource, Properties properties) {
+			super(onlineResource, properties);
 			// TODO Auto-generated constructor stub
 		}
 

@@ -287,11 +287,11 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         
         assertNotNull(request);
         
-        SimpleLayer[] layers = request.getLayers();
+        Layer[] layers = wms.getNamedLayers();
         SimpleLayer layer = null;
         for (int i = 0; i < layers.length; i++) {
             if (layers[i].getName().equals("BARRIERL_1M:Foundation")) {
-                layer = layers[i];
+                layer = new SimpleLayer(layers[i].getName(), "");
                 break;
             }
         }

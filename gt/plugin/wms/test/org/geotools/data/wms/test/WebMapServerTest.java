@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -99,41 +100,42 @@ public class WebMapServerTest extends TestCase {
         //request.setVersion("1.1.1");
 
         List simpleLayers = new ArrayList();
-        Iterator iter = request.getAvailableLayers().iterator();
+        Layer[] layers = wms.getNamedLayers();
+        Iterator iter = Arrays.asList(layers).iterator();
         int count = -1;
         while (iter.hasNext()) {
 
-            SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-            
+            Layer layer = (Layer) iter.next();
+            SimpleLayer sLayer = new SimpleLayer(layer.getName(), "");
             count++;
             if (count >= 5) { 
                 break;
             }
             
-            simpleLayers.add(simpleLayer);
+            simpleLayers.add(sLayer);
             
-            Object[] styles = simpleLayer.getValidStyles().toArray();
+            List styles = layer.getStyles();
 
-            if (styles.length == 0) {
-                simpleLayer.setStyle("");
+            if (styles.size() == 0) {
+                sLayer.setStyle("");
 
                 continue;
             }
 
             Random random = new Random();
-            int randomInt = random.nextInt(styles.length);
-            simpleLayer.setStyle((String) styles[randomInt]);
+            int randomInt = random.nextInt(styles.size());
+            sLayer.setStyle((String) styles.get(randomInt));
 
         }
 
         request.setLayers(simpleLayers);
 
-        Set srss = request.getAvailableSRSs();
+        Set srss = wms.getSRSs();
         request.setSRS((String) srss.iterator().next());
         request.setDimensions("400", "400");
 
         String format = "image/gif";
-        List formats = request.getAvailableFormats();
+        List formats = Arrays.asList(wms.getCapabilities().getRequest().getGetMap().getFormatStrings());
         if (!formats.contains("image/gif")) {
             format = (String) formats.get(0);
         } 
@@ -160,18 +162,21 @@ public class WebMapServerTest extends TestCase {
         
         GetMapRequest getMapRequest = wms.createGetMapRequest();
 
-        List simpleLayers = getMapRequest.getAvailableLayers();
-        Iterator iter = simpleLayers.iterator();
+        List layers = Arrays.asList(wms.getNamedLayers());
+        List simpleLayers = new ArrayList();
+        Iterator iter = layers.iterator();
         while (iter.hasNext()) {
-                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-                Object[] styles = simpleLayer.getValidStyles().toArray();
-                if (styles.length == 0) {
-                        simpleLayer.setStyle("");
+                Layer layer = (Layer) iter.next();
+                SimpleLayer sLayer = new SimpleLayer(layer.getName(), "");
+                simpleLayers.add(sLayer);
+                List styles = layer.getStyles();
+                if (styles.size() == 0) {
+                        sLayer.setStyle("");
                         continue;
                 }
                 Random random = new Random();
-                int randomInt = random.nextInt(styles.length);
-                simpleLayer.setStyle((String) styles[randomInt]);
+                int randomInt = random.nextInt(styles.size());
+                sLayer.setStyle((String) styles.get(randomInt));
         }
         getMapRequest.setLayers(simpleLayers);
 
@@ -183,7 +188,7 @@ public class WebMapServerTest extends TestCase {
         URL url2 = getMapRequest.getFinalURL();
 
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-        request.setQueryLayers(request.getQueryableLayers());
+        request.setQueryLayers(wms.getQueryableLayers());
         request.setQueryPoint(200, 200);
         request.setInfoFormat("text/html");
         

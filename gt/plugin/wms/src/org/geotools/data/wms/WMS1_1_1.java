@@ -82,9 +82,8 @@ public class WMS1_1_1 extends WMS1_1_0 {
 
     static public class GetMapRequest extends WMS1_1_0.GetMapRequest {
 
-        public GetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs,
-                String[] availableFormats, List availableExceptions ) {
-            super(onlineResource, availableLayers, availableSRSs, availableFormats, availableExceptions);
+        public GetMapRequest( URL onlineResource ) {
+            super(onlineResource);
         }
 
         protected void initVersion() {
@@ -94,9 +93,8 @@ public class WMS1_1_1 extends WMS1_1_0 {
 
     static public class GetFeatureInfoRequest extends WMS1_1_0.GetFeatureInfoRequest {
 
-        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request,
-                Set queryableLayers, String[] infoFormats ) {
-            super(onlineResource, request, queryableLayers, infoFormats);
+        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request) {
+            super(onlineResource, request);
         }
 
         protected void initVersion() {
@@ -104,13 +102,11 @@ public class WMS1_1_1 extends WMS1_1_0 {
         }
     }
 
-    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers,
-            Set availableSRSs, String[] formatStrings, List exceptions ) {
-        return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
+    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get ) {
+        return new GetMapRequest(get);
     }
 
-    public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest,
-            Set queryableLayers, String[] infoFormats ) {
-        return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
+    public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest getMapRequest) {
+        return new GetFeatureInfoRequest(onlineResource, getMapRequest);
     }
 }

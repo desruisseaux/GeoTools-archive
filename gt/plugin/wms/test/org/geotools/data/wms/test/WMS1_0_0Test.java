@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -164,18 +166,21 @@ public class WMS1_0_0Test extends TestCase {
         
         GetMapRequest getMapRequest = wms.createGetMapRequest();
 
-        List simpleLayers = getMapRequest.getAvailableLayers();
-        Iterator iter = simpleLayers.iterator();
+        List layers = Arrays.asList(wms.getNamedLayers());
+        List simpleLayers = new ArrayList();
+        Iterator iter = layers.iterator();
         while (iter.hasNext()) {
-                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-                Object[] styles = simpleLayer.getValidStyles().toArray();
-                if (styles.length == 0) {
-                        simpleLayer.setStyle("");
+                Layer layer = (Layer) iter.next();
+                SimpleLayer sLayer = new SimpleLayer(layer.getName(), "");
+                simpleLayers.add(sLayer);
+                List styles = layer.getStyles();
+                if (styles.size() == 0) {
+                        sLayer.setStyle("");
                         continue;
                 }
                 Random random = new Random();
-                int randomInt = random.nextInt(styles.length);
-                simpleLayer.setStyle((String) styles[randomInt]);
+                int randomInt = random.nextInt(styles.size());
+                sLayer.setStyle((String) styles.get(randomInt));
         }
         getMapRequest.setLayers(simpleLayers);
 
@@ -187,7 +192,7 @@ public class WMS1_0_0Test extends TestCase {
         URL url2 = getMapRequest.getFinalURL();
 
         GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-        request.setQueryLayers(request.getQueryableLayers());
+        request.setQueryLayers(wms.getQueryableLayers());
         request.setQueryPoint(200, 200);
         request.setInfoFormat(caps.getRequest().getGetFeatureInfo().getFormatStrings()[0]);
         

@@ -12,14 +12,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
 import org.geotools.catalog.CatalogEntry;
@@ -46,11 +44,8 @@ import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
-import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
-import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.handlers.DocumentHandler;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
@@ -85,6 +80,7 @@ public class WebMapServer implements Discovery {
     private final URL serverURL;
     private WMSCapabilities capabilities;
 
+    /** Contains the specifications that are to be used with this WMS */
     protected Specification[] specs;
     private Specification specification;
 
@@ -343,7 +339,7 @@ public class WebMapServer implements Discovery {
 
         InputStream inputStream = connection.getInputStream();
         
-        if (connection.getContentEncoding() != null && connection.getContentEncoding().indexOf("gzip") != -1) {
+        if (connection.getContentEncoding() != null && connection.getContentEncoding().indexOf("gzip") != -1) { //$NON-NLS-1$
             inputStream = new GZIPInputStream(inputStream);
         }
 
@@ -398,49 +394,30 @@ public class WebMapServer implements Discovery {
 
     /**
      * Creates a GetMapRequest that can be configured and then passed to 
-     * issueRequest(). It is created with the data retrieved from the
-     * capabilities document.
+     * issueRequest(). 
      * 
      * @return a configureable GetMapRequest object
-     * @throws IOException if there is an error while attempting to read the capabilities document
      */
-    public GetMapRequest createGetMapRequest() throws IOException {
-        if (capabilities == null) {
-            getCapabilities();
-
-            if (capabilities == null) {
-                throw new RuntimeException(
-                        "Unable to create a GetMapRequest when the GetCapabilities document is null.");
-            }
-        }
-        
+    public GetMapRequest createGetMapRequest() {
         URL onlineResource = onlineResource = getCapabilities().getRequest().getGetMap().getGet();
         if (onlineResource == null) { 
             onlineResource = serverURL;
         }
 
-        GetMapRequest request = specification.createGetMapRequest(onlineResource,
-                Utils.findDrawableLayers(getCapabilities().getLayers()), getSRSs(), getCapabilities().getRequest()
-                        .getGetMap().getFormatStrings(), getExceptions());
+        GetMapRequest request = specification.createGetMapRequest(onlineResource);
 
         return request;
     }
 
     /**
      * Creates a GetFeatureInfoRequest that can be configured and then passed to
-     * issueRequest(). It is created using the data from a previously configured
-     * GetMapRequest.
+     * issueRequest(). 
      * 
      * @param getMapRequest a previous configured GetMapRequest
      * @return a GetFeatureInfoRequest
-     * @throws IOException if there is an reading the capabilities file
      * @throws UnsupportedOperationException if the server does not support GetFeatureInfo
      */
-    public GetFeatureInfoRequest createGetFeatureInfoRequest( GetMapRequest getMapRequest ) throws IOException {
-        if (capabilities == null) {
-            throw new RuntimeException("Unable to create a GetFeatureInfoRequest without a GetCapabilities document");
-        }
-
+    public GetFeatureInfoRequest createGetFeatureInfoRequest( GetMapRequest getMapRequest ) {
         if (getCapabilities().getRequest().getGetFeatureInfo() == null) {
             throw new UnsupportedOperationException("This Web Map Server does not support GetFeatureInfo requests");
         }
@@ -451,13 +428,12 @@ public class WebMapServer implements Discovery {
         }
         
         GetFeatureInfoRequest request = specification.createGetFeatureInfoRequest(onlineResource,
-                getMapRequest, getQueryableLayers(), getCapabilities().getRequest()
-                .getGetFeatureInfo().getFormatStrings());
+                getMapRequest);
 
         return request;
     }
     
-    public DescribeLayerRequest createDescribeLayerRequest() throws UnsupportedOperationException, IOException {
+    public DescribeLayerRequest createDescribeLayerRequest() throws UnsupportedOperationException {
         if (getCapabilities().getRequest().getDescribeLayer() == null ) {
             throw new UnsupportedOperationException("Server does not specify a DescribeLayer operation. Cannot be performed");
         }
@@ -472,7 +448,7 @@ public class WebMapServer implements Discovery {
         return request;
     }
     
-    public GetLegendGraphicRequest createGetLegendGraphicRequest() throws UnsupportedOperationException, IOException {
+    public GetLegendGraphicRequest createGetLegendGraphicRequest() throws UnsupportedOperationException {
         if (getCapabilities().getRequest().getGetLegendGraphic() == null) {
             throw new UnsupportedOperationException("Server does not specify a GetLegendGraphic operation. Cannot be performed");
         }
@@ -482,15 +458,12 @@ public class WebMapServer implements Discovery {
             onlineResource = serverURL;
         }
         
-        GetLegendGraphicRequest request = specification.createGetLegendGraphicRequest(onlineResource, 
-                Utils.findDrawableLayers(getCapabilities().getLayers()),
-                getCapabilities().getRequest().getGetLegendGraphic().getFormatStrings(), 
-                null);
+        GetLegendGraphicRequest request = specification.createGetLegendGraphicRequest(onlineResource);
         
         return request;        
     }
     
-    public GetStylesRequest createGetStylesRequest() throws IOException, UnsupportedOperationException{
+    public GetStylesRequest createGetStylesRequest() throws UnsupportedOperationException{
         if (getCapabilities().getRequest().getGetStyles() == null) {
             throw new UnsupportedOperationException("Server does not specify a GetStyles operation. Cannot be performed");
         }
@@ -500,13 +473,12 @@ public class WebMapServer implements Discovery {
             onlineResource = serverURL;
         }
         
-        GetStylesRequest request = specification.createGetStylesRequest(onlineResource,
-                getNamedLayers());
+        GetStylesRequest request = specification.createGetStylesRequest(onlineResource);
        
         return request;
     }
     
-    public PutStylesRequest createPutStylesRequest() throws IOException, UnsupportedOperationException {
+    public PutStylesRequest createPutStylesRequest() throws UnsupportedOperationException {
         if (getCapabilities().getRequest().getPutStyles() == null) {
             throw new UnsupportedOperationException("Server does not specify a PutStyles operation. Cannot be performed");
         }
@@ -554,7 +526,7 @@ public class WebMapServer implements Discovery {
         return namedLayers;
     }
 
-    private Set getQueryableLayers() {
+    public Set getQueryableLayers() {
         Set layers = new TreeSet();
 
         Layer[] namedLayers = getNamedLayers();
@@ -570,14 +542,7 @@ public class WebMapServer implements Discovery {
         return layers;
     }
 
-    private List getExceptions() {
-        //TODO hack - fix this later.
-        return null;
-
-        //return getCapabilities().getCapability().getException().getFormats();
-    }
-
-    private Set getSRSs() throws IOException {
+    public Set getSRSs() throws IOException {
         Set srss = new TreeSet();
 
         Layer[] layers = getCapabilities().getLayers();

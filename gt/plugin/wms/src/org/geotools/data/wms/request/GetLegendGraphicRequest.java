@@ -60,10 +60,4 @@ public interface GetLegendGraphicRequest extends Request {
     public void setHeight(String height);
     
     public void setExceptions(String exceptions);
-    
-    public SimpleLayer[] getLayers();
-    
-    public String[] getFormats();
-    
-    public String[] getExceptions();
 }

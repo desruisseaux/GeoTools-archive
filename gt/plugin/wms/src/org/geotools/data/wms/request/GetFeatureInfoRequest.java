@@ -89,14 +89,4 @@ public interface GetFeatureInfoRequest extends Request{
      * @param y the y point, in pixels
      */
     public void setQueryPoint(int x, int y);
-    
-    /**
-     * @return A List of type String, of all available request formats
-     */
-    public List getInfoFormats();
-    
-    /**
-     * @return A list of type Layer, all of which are queryable
-     */
-    public Set getQueryableLayers();
 }

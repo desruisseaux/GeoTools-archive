@@ -1341,9 +1341,9 @@ public class WMSComplexTypes {
 					capabilities.setRequest((WMSRequest) value[i].getValue());
 				}
 
-				// if (sameName(elems[1], value[i])) {
-				// //TODO exception ignored for now
-				// }
+				 if (sameName(elems[1], value[i])) {
+				     capabilities.setExceptions((String[]) value[i].getValue());
+				 }
 
 				// if (sameName(elems[2], value[i])) {
 				// TODO ExtendedCapabilities ignored

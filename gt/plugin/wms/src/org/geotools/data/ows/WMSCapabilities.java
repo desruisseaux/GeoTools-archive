@@ -26,6 +26,7 @@ public class WMSCapabilities {
     private WMSRequest request;
     private Layer[] layers;
     private String version;
+    private String[] exceptions;
 
     /**
      * The layers contained in this Capabilities document, organized according
@@ -92,5 +93,11 @@ public class WMSCapabilities {
      */
     public void setVersion(String version) {
         this.version = version;
+    }
+    public String[] getExceptions() {
+        return exceptions;
+    }
+    public void setExceptions( String[] exceptions ) {
+        this.exceptions = exceptions;
     }
 }

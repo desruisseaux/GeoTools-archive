@@ -95,13 +95,9 @@ public abstract class Specification {
      * values.
      * 
      * @param onlineResource the URL for the GetMapRequest
-     * @param availableLayers valid layers for this request
-     * @param availableSRSs a Set of type String representing valid SRS values for this request
-     * @param formats available formats for the GetMapResponse
-     * @param availableExceptions available formats for any thrown Exceptions
      * @return a GetMapRequest that can be configured and used
      */
-    public abstract GetMapRequest createGetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs, String[] formats, List availableExceptions );
+    public abstract GetMapRequest createGetMapRequest( URL onlineResource );
 
     /**
      * Creates a GetFeatureInfoRequest for this specification, populating it 
@@ -109,11 +105,9 @@ public abstract class Specification {
      * 
      * @param onlineResource the URL to be executed against
      * @param getMapRequest a previously configured GetMapRequest
-     * @param queryableLayers a Set of type Layer, each of which must be queryable
-     * @param formats a list of known formats that are valid for GetFeatureInfoResponses 
      * @return a GetFeatureInfoRequest that can be configured and used
      */
-    public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, GetMapRequest getMapRequest, Set queryableLayers, String[] formats );
+    public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, GetMapRequest getMapRequest);
     
     /**
      * Creates a DescribeLayer request which can be used to retrieve
@@ -130,13 +124,10 @@ public abstract class Specification {
      * graphics from the WebMapServer
      * 
      * @param onlineResource the location where the request can be made
-     * @param layers all the layers that can be queried
-     * @param formats the formats that the graphic can be return in
-     * @param exceptions the formats that any thrown exceptions can be returned in
      * @return a GetLegendGraphicRequest to be configured and passed to the WMS
      * @throws UnsupportedOperationException if the version of the specification doesn't support this request
      */
-    public abstract GetLegendGraphicRequest createGetLegendGraphicRequest(URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) throws UnsupportedOperationException;
+    public abstract GetLegendGraphicRequest createGetLegendGraphicRequest(URL onlineResource) throws UnsupportedOperationException;
     
     
     /**
@@ -144,11 +135,10 @@ public abstract class Specification {
      * the WMS.
      * 
      * @param onlineResource The location where the request can be made
-     * @param layers all the named layers in the WMS
      * @return a configurable request object to be passed to a WMS
      * @throws UnsupportedOperationException if the version of the specification doesn't support this request
      */
-    public abstract GetStylesRequest createGetStylesRequest(URL onlineResource, Layer[] layers) throws UnsupportedOperationException;
+    public abstract GetStylesRequest createGetStylesRequest(URL onlineResource) throws UnsupportedOperationException;
     
     /**
      * Creates a PutStyles request which can be configured and the passed to 

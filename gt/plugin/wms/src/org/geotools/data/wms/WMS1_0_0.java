@@ -181,15 +181,9 @@ public class WMS1_0_0 extends Specification {
          * Constructs a GetMapRequest for use with a 1.0.0 server
          * 
          * @param onlineResource the URL for server's GetMap request
-         * @param availableLayers provides information about the server's layers and styles
-         * @param availableSRSs provides a Set of all known SRS on the server
-         * @param availableFormats provides all known formats for the GetMap request
-         * @param availableExceptions provides all known exceptions for the server
          */
-        public GetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs,
-                String[] availableFormats, List availableExceptions ) {
-            super(onlineResource, null, availableLayers, availableSRSs, //$NON-NLS-1$
-                    availableFormats, availableExceptions);
+        public GetMapRequest( URL onlineResource) {
+            super(onlineResource, null);
         }
 
         protected void initRequest() {
@@ -228,8 +222,8 @@ public class WMS1_0_0 extends Specification {
          * @param queryableLayers
          * @param infoFormats
          */
-        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request, Set queryableLayers, String[] infoFormats ) {
-            super(onlineResource, request, queryableLayers, infoFormats);
+        public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request) {
+            super(onlineResource, request);
         }
 
         protected void initVersion() {
@@ -238,21 +232,19 @@ public class WMS1_0_0 extends Specification {
     }
 
     /** 
-     * @see org.geotools.data.wms.Specification#createGetMapRequest(java.net.URL, java.lang.String,
-     *      org.geotools.data.wms.SimpleLayer[], java.util.Set, java.lang.String[], java.util.List)
+     * @see org.geotools.data.wms.Specification#createGetMapRequest(java.net.URL)
      */
-    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers,
-            Set availableSRSs, String[] formatStrings, List exceptions ) {
-        return new GetMapRequest(get, layers, availableSRSs, formatStrings, exceptions);
+    public org.geotools.data.wms.request.GetMapRequest createGetMapRequest( URL get ) {
+        return new GetMapRequest(get);
     }
 
     /**
      * @see org.geotools.data.wms.Specification#createGetFeatureInfoRequest(java.net.URL,
-     *      org.geotools.data.wms.request.GetMapRequest, java.util.Set, java.lang.String[])
+     *      org.geotools.data.wms.request.GetMapRequest)
      */
     public org.geotools.data.wms.request.GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource,
-            org.geotools.data.wms.request.GetMapRequest getMapRequest, Set queryableLayers, String[] infoFormats ) {
-        return new GetFeatureInfoRequest(onlineResource, getMapRequest, queryableLayers, infoFormats);
+            org.geotools.data.wms.request.GetMapRequest getMapRequest) {
+        return new GetFeatureInfoRequest(onlineResource, getMapRequest);
     }
 
     /**
@@ -265,17 +257,17 @@ public class WMS1_0_0 extends Specification {
 
     /**
      * Note that WMS 1.0.0 does not support this method.
-     * @see org.geotools.data.wms.Specification#createGetLegendGraphicRequest(java.net.URL, org.geotools.data.wms.SimpleLayer[], java.lang.String[], java.lang.String[])
+     * @see org.geotools.data.wms.Specification#createGetLegendGraphicRequest(java.net.URL)
      */
-    public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) throws UnsupportedOperationException {
+    public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("WMS 1.0.0 does not support GetLegendGraphic");
     }
 
     /**
      * Note that WMS 1.0.0 does not support this method
-     * @see org.geotools.data.wms.Specification#createGetStylesRequest(java.net.URL, org.geotools.data.wms.SimpleLayer[])
+     * @see org.geotools.data.wms.Specification#createGetStylesRequest(java.net.URL)
      */
-    public GetStylesRequest createGetStylesRequest( URL onlineResource, Layer[] layers ) throws UnsupportedOperationException {
+    public GetStylesRequest createGetStylesRequest( URL onlineResource) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("WMS 1.0.0 does not support GetStyles");
     }
 

@@ -110,15 +110,15 @@ public interface GetMapRequest extends Request{
 
     /** =============== BEGIN SLD SPECIFICATION PARAMETERS =============== **/
     /** Represents the SLD parameter */
-    public static final String SLD = "SLD";
+    public static final String SLD = "SLD"; //$NON-NLS-1$
     /** Represents the SLD_BODY parameter */
-    public static final String SLD_BODY = "SLD_BODY";
+    public static final String SLD_BODY = "SLD_BODY"; //$NON-NLS-1$
     /** Represents the WFS parameter mentioned briefly in 1.1.1 */
-    public static final String WFS = "WFS";
+    public static final String WFS = "WFS"; //$NON-NLS-1$
     /** Represents REMOTE_OWS_TYPE parameter */
-    public static final String REMOTE_OWS_TYPE = "REMOTE_OWS_TYPE";
+    public static final String REMOTE_OWS_TYPE = "REMOTE_OWS_TYPE"; //$NON-NLS-1$
     /** Represents REMOTE_OWS_URL parameter */
-    public static final String REMOVE_OWS_URL = "REMOTE_OWS_URL";
+    public static final String REMOVE_OWS_URL = "REMOTE_OWS_URL"; //$NON-NLS-1$
     
     
     /** <code>REMOTE_OWS_WFS</code> indicates WFS as a REMOTE_OWS_TYPE */
@@ -305,25 +305,4 @@ public interface GetMapRequest extends Request{
      * @param value a value to accompany the name
      */
     public void setVendorSpecificParameter(String name, String value);
-
-    /**
-     * @return a List of type String, representing valid Exceptions
-     */
-    public List getAvailableExceptions();
-
-    /**
-     * @return a List of type String, representing valid GetMap formats
-     */
-    public List getAvailableFormats();
-
-    /**
-     * @return a List of SimpleLayers, representing available Layers and their Styles
-     */
-    public List getAvailableLayers();
-
-    /**
-     * @return a Set of Strings, representing available SRSs
-     * TODO - might be a good idea to move these to SimpleLayers.
-     */
-    public Set getAvailableSRSs();
 }

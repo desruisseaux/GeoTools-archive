@@ -25,34 +25,15 @@ import org.geotools.data.wms.SimpleLayer;
 public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
 
 
-    private List availableLayers;
-    private Set availableSRSs;
-    private List availableFormats;
-    private List availableExceptions;
-
     /**
      * Constructs a GetMapRequest. The data passed in represents valid values 
      * that can be used.
      * 
      * @param onlineResource the location that the request should be applied to
      * @param properties pre-set properties to be used. Can be null.
-     * @param availableLayers All layers that can be validly requested
-     * @param availableSRSs All SRSs that can be validly requested
-     * @param availableFormats All the formats that can be validly requested
-     * @param availableExceptions All the exceptions that can be validly requested
      */
-    public AbstractGetMapRequest(URL onlineResource, Properties properties,
-        SimpleLayer[] availableLayers, Set availableSRSs,
-        String[] availableFormats, List availableExceptions) {
+    public AbstractGetMapRequest(URL onlineResource, Properties properties) {
         super(onlineResource, properties);
-
-        this.availableLayers = Arrays.asList(availableLayers);
-
-        this.availableSRSs = availableSRSs;
-        this.availableFormats = Arrays.asList(availableFormats);
-        this.availableExceptions = availableExceptions;
-        
-
 
         initRequest();
         initVersion();
@@ -281,33 +262,5 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
      */
     public void setVendorSpecificParameter(String name, String value) {
         properties.setProperty(name, value);
-    }
-
-    /**
-     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableExceptions()
-     */
-    public List getAvailableExceptions() {
-        return availableExceptions;
-    }
-
-    /**
-     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableFormats()
-     */
-    public List getAvailableFormats() {
-        return availableFormats;
-    }
-
-    /**
-     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableLayers()
-     */
-    public List getAvailableLayers() {
-        return availableLayers;
-    }
-
-    /**
-     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableSRSs()
-     */
-    public Set getAvailableSRSs() {
-        return availableSRSs;
     }
 }

@@ -27,19 +27,11 @@ import org.geotools.data.wms.SimpleLayer;
  */
 public abstract class AbstractGetLegendGraphicRequest extends AbstractRequest implements GetLegendGraphicRequest {
 
-    private SimpleLayer[] layers;
-    private String[] formats;
-    private String[] exceptions;
-
     /**
      * @param onlineResource
      */
-    public AbstractGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) {
+    public AbstractGetLegendGraphicRequest( URL onlineResource ) {
         super(onlineResource, null);
-
-        this.layers = layers;
-        this.formats = formats;
-        this.exceptions = exceptions;
         
         initVersion();
         initRequest();
@@ -137,26 +129,4 @@ public abstract class AbstractGetLegendGraphicRequest extends AbstractRequest im
     public void setExceptions( String exceptions ) {
         setProperty(EXCEPTIONS, exceptions);
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.wms.request.GetLegendGraphic#getLayers()
-     */
-    public SimpleLayer[] getLayers() {
-        return layers;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.wms.request.GetLegendGraphic#getFormats()
-     */
-    public String[] getFormats() {
-        return formats;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.wms.request.GetLegendGraphic#getExceptions()
-     */
-    public String[] getExceptions() {
-        return exceptions;
-    }
-
 }

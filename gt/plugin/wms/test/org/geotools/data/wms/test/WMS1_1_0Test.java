@@ -101,18 +101,16 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         
         assertNotNull(request);
         
-        SimpleLayer[] layers = request.getLayers();
+        Layer[] layers = wms.getNamedLayers();
         SimpleLayer park = null;
         for (int i = 0; i < layers.length; i++) {
             if (layers[i].getName().equals("park")) {
-                park = layers[i];
+                park = new SimpleLayer(layers[i].getName(), "");
                 break;
             }
         }
         
         assertNotNull(park);
-        
-        park.setStyle("");
         request.setLayer(park);
         
         request.setFormat("image/gif");
