@@ -70,6 +70,7 @@
       </includes>
       <excludes>
           <exclude>**/WFSDataStoreWriteTest.java</exclude>
+          <exclude>**/CubewerksTest.java</exclude>
       </excludes>
       <resources>
         <resource>

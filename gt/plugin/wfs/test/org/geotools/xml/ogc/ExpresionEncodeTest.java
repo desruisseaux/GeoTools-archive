@@ -23,6 +23,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
@@ -79,6 +80,21 @@ public class ExpresionEncodeTest extends FilterTestSupport {
 
         StringWriter output = new StringWriter();
         DocumentWriter.writeFragment(lf,
+            FilterSchema.getInstance(), output, null);
+        
+        System.out.println(output);
+    }
+    
+    public void testFidFilter() throws OperationNotSupportedException, IOException{
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        FidFilter fif = ff.createFidFilter();
+        fif.addFid("f1");
+        fif.addFid("f2");
+        fif.addFid("f3");
+        fif.addFid("f4");
+
+        StringWriter output = new StringWriter();
+        DocumentWriter.writeFragment(fif,
             FilterSchema.getInstance(), output, null);
         
         System.out.println(output);

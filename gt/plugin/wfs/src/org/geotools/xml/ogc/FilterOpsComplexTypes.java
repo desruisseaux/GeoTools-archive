@@ -736,13 +736,18 @@ public class FilterOpsComplexTypes {
             if (element != null) {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
+//            }else{
+//                output.startElement(getNamespace(), FilterSchema.getInstance().getElements()[2].getName(),
+//                    null);
             }
             
             encodeFilter(filter,output,hints);
 
             if (element != null) {
                 output.endElement(element.getNamespace(), element.getName());
-            }
+//            }else{
+//                output.endElement(getNamespace(), FilterSchema.getInstance().getElements()[2].getName());
+                }
         }
     }
 
@@ -858,7 +863,7 @@ public class FilterOpsComplexTypes {
 
             for (int i = 0; i < fids.length; i++) {
                 att.setAttribute(0, element.getNamespace().toString(),
-                    attrs[0].getName(), null, "anyUri", fids[0]);
+                    attrs[0].getName(), null, "anyUri", fids[i]);
                 output.element(element.getNamespace(), element.getName(), att);
             }
         }
