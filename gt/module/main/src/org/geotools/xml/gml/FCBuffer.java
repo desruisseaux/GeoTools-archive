@@ -193,9 +193,18 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         logger.finest("hasNext " + size);
 
-        while ((size <= 1) && (state != FINISH)) {
+        while ((size <= 1) && (state != FINISH) && (state != STOP)) {
+
+            if (exception != null) {
+                state = STOP;
+                throw new IOException(exception.toString());
+            }
             logger.finest("waiting for parser");
             Thread.yield();
+        }
+
+        if (state == STOP) {
+            return false;
         }
 
         if (state == FINISH) {

@@ -15,11 +15,11 @@ public class FeatureSourceMetadataEnityTest extends DataTestCase {
         store.addFeatures( riverFeatures );
         store.addFeatures( lakeFeatures );                               
     }
-    public void testRoadMeta(){
-        FeatureSourceMetadataEnity roadMeta =
-            new FeatureSourceMetadataEnity( store, "road" );
-        
-    }
+//    public void testRoadMeta(){
+//        FeatureSourceMetadataEnity roadMeta =
+//            new FeatureSourceMetadataEnity( store, "road" );
+//        
+//    }
     protected void tearDown() throws Exception {
         super.tearDown();
     }

@@ -105,7 +105,8 @@ public class AnyHandler extends ElementGroupingHandler {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
         try {
-            this.namespace = new URI(namespace);
+            if(namespace!=null)
+                this.namespace = new URI(namespace);
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);

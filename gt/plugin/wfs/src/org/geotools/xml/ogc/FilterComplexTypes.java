@@ -8,7 +8,10 @@ import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.MathExpression;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultChoice;
@@ -22,6 +25,7 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
+import org.geotools.xml.ogc.FilterSchema.FilterAttribute;
 import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
 import org.geotools.xml.ogc.FilterSchema.FilterElement;
 
@@ -640,7 +644,7 @@ public class FilterComplexTypes {
             throw new OperationNotSupportedException();
         }
     }
-    public static class ExpressionType extends FilterComplexType{
+    public static class ExpressionType extends FilterComplexType implements org.geotools.filter.ExpressionType{
 //    	<xsd:complexType name="ExpressionType" abstract="true"/>
         private static final ComplexType instance = new ExpressionType();
         public static ComplexType getInstance(){return instance;}
@@ -690,29 +694,82 @@ public class FilterComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
             Expression e = (Expression)value;
-            
-            
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            switch(e.getType()){
+            case ATTRIBUTE:
+            case ATTRIBUTE_DOUBLE:
+            case ATTRIBUTE_GEOMETRY:
+            case ATTRIBUTE_INTEGER:
+            case ATTRIBUTE_STRING:
+            case ATTRIBUTE_UNDECLARED:
+                PropertyNameType.getInstance().encode(element!=null?element:new FilterElement("PropertyName",PropertyNameType.getInstance()),e,output,hints);
+                return;
+            case FUNCTION:
+                FunctionType.getInstance().encode(element!=null?element:new FilterElement("Function",FunctionType.getInstance()),e,output,hints);
+                return;
+            case LITERAL_DOUBLE:
+            case LITERAL_GEOMETRY:
+            case LITERAL_INTEGER:
+            case LITERAL_STRING:
+                LiteralType.getInstance().encode(element!=null?element:new FilterElement("Literal",LiteralType.getInstance()),e,output,hints);
+                return;
+            case MATH_ADD:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Add",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_DIVIDE:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Div",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_MULTIPLY:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Mul",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            case MATH_SUBTRACT:
+                BinaryOperatorType.getInstance().encode(element!=null?element:new FilterElement("Sub",BinaryOperatorType.getInstance()),e,output,hints);
+                return;
+            }
+            throw new OperationNotSupportedException("Expression "+e+" type not found");
         }
     }
     public static class BinaryOperatorType extends FilterComplexType{
         private static final ComplexType instance = new BinaryOperatorType();
         public static ComplexType getInstance(){return instance;}
         
+//        <xsd:complexType name="BinaryOperatorType">
+//        <xsd:complexContent>
+//          <xsd:extension base="ogc:ExpressionType">
+//            <xsd:sequence>
+//              <xsd:element ref="ogc:expression" minOccurs="2" maxOccurs="2"/>
+//            </xsd:sequence>
+//          </xsd:extension>
+//        </xsd:complexContent>
+//      </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("expression",ExpressionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 2;
+                    }
+                    public int getMaxOccurs(){
+                        return 2;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -731,41 +788,78 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return MathExpression.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof MathExpression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+                return;
+            MathExpression me = (MathExpression)value;
+            output.startElement(element.getNamespace(),element.getName(),null);
+            elems[0].getType().encode(null,me.getLeftValue(),output,hints);
+            elems[0].getType().encode(null,me.getRightValue(),output,hints);
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class FunctionType extends FilterComplexType{
         private static final ComplexType instance = new FunctionType();
         public static ComplexType getInstance(){return instance;}
         
+//        <xsd:complexType name="FunctionType">
+//          <xsd:complexContent>
+//            <xsd:extension base="ogc:ExpressionType">
+//              <xsd:sequence>
+//                <xsd:element ref="ogc:expression"
+//                             minOccurs="0" maxOccurs="unbounded"/>
+//              </xsd:sequence>
+//              <xsd:attribute name="name" type="xsd:string" use="required"/>
+//            </xsd:extension>
+//          </xsd:complexContent>
+//        </xsd:complexType>
+        
+        private static Element[] elems = new Element[]{
+                new FilterElement("expression",ExpressionType.getInstance()){
+                    public int getMinOccurs(){
+                        return 0;
+                    }
+                    public int getMaxOccurs(){
+                        return Integer.MAX_VALUE;
+                    }
+                },
+        };
+        
+        private static Sequence seq = new DefaultSequence(elems);
+        
+        private static Attribute[] attrs = new Attribute[]{
+                new FilterAttribute("name",XSISimpleTypes.String.getInstance(),Attribute.REQUIRED),
+        };
+        
+        public Attribute[] getAttributes(){
+            return attrs;
+        }
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
+            return elems;
         }
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
@@ -784,22 +878,27 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return FunctionExpression.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof FunctionExpression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+                return;
+            FunctionExpression me = (FunctionExpression)value;
+            AttributesImpl ai = new AttributesImpl();
+            
+            output.startElement(element.getNamespace(),element.getName(),ai);
+            for(int i=0;i<me.getArgCount();i++)
+                elems[0].getType().encode(null,me.getArgs()[i],output,hints);
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class LiteralType extends FilterComplexType{

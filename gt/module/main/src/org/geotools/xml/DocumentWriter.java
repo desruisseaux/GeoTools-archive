@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1242,7 +1243,7 @@ public class DocumentWriter {
                 for (int i = 0; i < imports.length; i++) {
                     if(imports[i]==schema){
                         writer.write(" xmlns=\"" + schema.getTargetNamespace() + "\"");
-                        if(schema.getURI()!=null)
+                        if(schema.getURI()!=null && !schema.getTargetNamespace().equals(schema.getURI()))
                             s = schema.getTargetNamespace()+" "+schema.getURI();
                     }else{
                     writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
@@ -1463,16 +1464,20 @@ public class DocumentWriter {
         private Schema[] getSchemaOrdering() throws IOException{
             if(searchOrder!=null)
                 return searchOrder;
-            if(schema.getImports() == null || schema.getImports().length == 0){
-                searchOrder = new Schema[] {schema,};
+            
+            if((hints == null || hints.get(SCHEMA_ORDER) == null) && (schema.getImports() == null || schema.getImports().length == 0)){
+                
+                    searchOrder = new Schema[] {schema,};
             }else{
                 List so = new LinkedList();
             if(hints!=null && hints.containsKey(SCHEMA_ORDER)){
                 Object order = hints.get(SCHEMA_ORDER);
                 List targNS = new LinkedList();
                 targNS.add(schema.getTargetNamespace());
+                if(schema.getImports() != null)
                 for(int i=0;i<schema.getImports().length;i++)
-                    targNS.add(schema.getImports()[i].getTargetNamespace());
+                    if(!targNS.contains(schema.getImports()[i].getTargetNamespace()))
+                        targNS.add(schema.getImports()[i].getTargetNamespace());
 
                 if(order instanceof Schema[]){
                     Schema[] sOrder = (Schema[])order;
@@ -1489,10 +1494,12 @@ public class DocumentWriter {
                         int nsIndex = targNS.indexOf(stringOrder[i]);
                         try{
                         if(nsIndex>=0){ // found
-                            so.add(SchemaFactory.getInstance(new URI(stringOrder[i]))); 
+                            URI uri = new URI(stringOrder[i]);
+                                so.add(SchemaFactory.getInstance(uri)); 
                             targNS.remove(nsIndex);
                         }else{
-                            so.add(SchemaFactory.getInstance(new URI(stringOrder[i]))); 
+                            URI uri = new URI(stringOrder[i]);
+                                so.add(SchemaFactory.getInstance(uri));  
                         }
                         }catch(URISyntaxException e){
                             logger.warning(e.toString());
@@ -1500,7 +1507,7 @@ public class DocumentWriter {
                         }
                     }
                 }
-                if(targNS.contains(schema.getTargetNamespace())){
+                if(!targNS.contains(schema.getTargetNamespace())){
                     so.add(schema);
                 }
                 for(int i=0;i<schema.getImports().length;i++){

@@ -384,7 +384,7 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return element.getType()!=null && getName().equals(element.getType().getName());
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value == null;
         }
 
         /**
