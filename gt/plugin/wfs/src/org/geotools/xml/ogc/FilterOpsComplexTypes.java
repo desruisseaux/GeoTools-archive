@@ -31,6 +31,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -69,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author dzwiers
  */
-public class FilterOpsComplexTypes {
+public class FilterOpsComplexTypes {    
     
     protected static void encodeFilter(Filter filter, PrintHandler output, Map hints) throws OperationNotSupportedException, IOException{
 
@@ -168,10 +169,38 @@ public class FilterOpsComplexTypes {
         }
     }
 
-    public static class ComparisonOpsType extends FilterComplexType
-        implements org.geotools.filter.FilterType {
+    public static class ComparisonOpsType extends FilterComplexType implements org.geotools.filter.FilterType {
         private static final ComplexType instance = new ComparisonOpsType();
 
+        public static short findFilterType( String s ){
+        	if("PropertyIsEqualTo".equalsIgnoreCase( s ) ) return COMPARE_EQUALS;
+        	if("PropertyIsGreaterThan".equalsIgnoreCase( s ) ) return COMPARE_GREATER_THAN;
+        	if("PropertyIsGreaterThanOrEqualTo".equalsIgnoreCase( s ) ) return COMPARE_GREATER_THAN_EQUAL;
+        	if("PropertyIsLessThan".equalsIgnoreCase( s ) ) return COMPARE_LESS_THAN;
+        	if("PropertyIsLessThanOrEqualTo".equalsIgnoreCase( s ) ) return COMPARE_LESS_THAN_EQUAL;
+        	if("PropertyIsNotEqualTo".equalsIgnoreCase( s ) ) return COMPARE_NOT_EQUALS;
+        	if("PropertyIsLike".equalsIgnoreCase( s ) ) return LIKE;
+        	if("PropertyIsNull".equalsIgnoreCase( s ) ) return NULL;
+        	if("PropertyIsBetween".equalsIgnoreCase( s ) ) return BETWEEN;
+        	return 0;
+            
+        }
+        public static String writeFilterType(short filterType) {
+        	switch (filterType) {
+	        case COMPARE_EQUALS: return "PropertyIsEqualTo";
+	        case COMPARE_GREATER_THAN: return "PropertyIsGreaterThan";
+	        case COMPARE_GREATER_THAN_EQUAL: return "PropertyIsGreaterThanOrEqualTo";
+	        case COMPARE_LESS_THAN: return "PropertyIsLessThan";
+	        case COMPARE_LESS_THAN_EQUAL: return "PropertyIsLessThanOrEqualTo";
+	        case COMPARE_NOT_EQUALS: return "PropertyIsNotEqualTo";
+	        case LIKE: return "PropertyIsLike";
+	        case NULL: return "PropertyIsNull";
+	        case BETWEEN: return "PropertyIsBetween";
+	        default:
+	        	return "";
+	        }
+        }
+        	
         public static ComplexType getInstance() {
             return instance;
         }
@@ -194,15 +223,29 @@ public class FilterOpsComplexTypes {
         public Element[] getChildElements() {
             return null;
         }
-
+        
         /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	
+        	try {
+        		short type = findFilterType( element.getName() );
+				CompareFilter filter = factory.createCompareFilter( type );
+				filter.addLeftValue( (Expression) value[0] );
+				filter.addRightValue( (Expression) value[1] );				
+				return filter;
+			}
+        	catch( ClassCastException filterRequired ){
+        		throw new SAXException("Illegal filter for "+element, filterRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**
@@ -256,7 +299,7 @@ public class FilterOpsComplexTypes {
             switch (lf.getFilterType()) {
             case COMPARE_EQUALS:
                 BinaryComparisonOpType.getInstance().encode(new FilterElement(
-                        "PropertyIsEqualTo",
+                		"PropertyIsEqualTo",
                         BinaryComparisonOpType.getInstance(), element), value,
                     output, hints);
 
@@ -264,7 +307,7 @@ public class FilterOpsComplexTypes {
 
             case COMPARE_GREATER_THAN:
                 BinaryComparisonOpType.getInstance().encode(new FilterElement(
-                        "PropertyIsGreaterThan",
+                		"PropertyIsGreaterThan",
                         BinaryComparisonOpType.getInstance(), element), value,
                     output, hints);
 
@@ -272,7 +315,7 @@ public class FilterOpsComplexTypes {
 
             case COMPARE_GREATER_THAN_EQUAL:
                 BinaryComparisonOpType.getInstance().encode(new FilterElement(
-                        "PropertyIsGreaterThanOrEqualTo",
+                		"PropertyIsGreaterThanOrEqualTo",
                         BinaryComparisonOpType.getInstance(), element), value,
                     output, hints);
 
@@ -330,11 +373,43 @@ public class FilterOpsComplexTypes {
                 + lf.getClass().getName());
         }
     }
-
     public static class SpatialOpsType extends FilterComplexType
         implements org.geotools.filter.FilterType {
         private static final ComplexType instance = new SpatialOpsType();
 
+        public static short findFilterType( String s ){
+        	if("BBOX".equalsIgnoreCase( s ) ) return GEOMETRY_BBOX;
+        	if("Equals".equalsIgnoreCase( s ) ) return GEOMETRY_EQUALS;
+        	if("Disjoint".equalsIgnoreCase( s ) ) return GEOMETRY_DISJOINT;
+        	if("Intersects".equalsIgnoreCase( s ) ) return GEOMETRY_INTERSECTS;
+        	if("Touches".equalsIgnoreCase( s ) ) return GEOMETRY_TOUCHES;
+        	if("Crosses".equalsIgnoreCase( s ) ) return GEOMETRY_CROSSES;
+        	if("Within".equalsIgnoreCase( s ) ) return GEOMETRY_WITHIN;
+        	if("Contains".equalsIgnoreCase( s ) ) return GEOMETRY_CONTAINS;
+        	if("Overlaps".equalsIgnoreCase( s ) ) return GEOMETRY_OVERLAPS;
+        	if("Beyond".equalsIgnoreCase( s ) ) return GEOMETRY_BEYOND;
+        	if("DWithin".equalsIgnoreCase( s ) ) return GEOMETRY_DWITHIN;
+        	return 0;
+            
+        }
+        public static String writeFilterType(short filterType) {
+        	switch (filterType) {
+	        case GEOMETRY_BBOX: return "BBOX";
+	        case GEOMETRY_EQUALS: return "Equals";
+	        case GEOMETRY_DISJOINT: return "Disjoint";
+	        case GEOMETRY_INTERSECTS: return "Intersects";
+	        case GEOMETRY_TOUCHES: return "Touches";
+	        case GEOMETRY_CROSSES: return "Crosses";
+	        case GEOMETRY_WITHIN: return "Within";
+	        case GEOMETRY_CONTAINS: return "Contains";
+	        case GEOMETRY_OVERLAPS: return "Overlaps";
+	        case GEOMETRY_BEYOND: return "Beyond";
+	        case GEOMETRY_DWITHIN: return "DWithin";
+	        default:
+	        	return "";
+	        }
+        }
+        
         public static ComplexType getInstance() {
             return instance;
         }
@@ -359,13 +434,29 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	return null; // child (BBox, BinarySpatialOpType, etc ... ) will handle this
+//        	FilterFactory factory = FilterSchema.filterFactory( hints );
+//        	
+//        	try {
+//        		short type = (short) findFilterType( element.getName() );
+//        		GeometryFilter filter = factory.createGeometryFilter( type );
+//				filter.addLeftGeometry( (Expression) value[0] );
+//				filter.addRightGeometry( (Expression) value[1] );				
+//				return filter;
+//			}
+//        	catch( ClassCastException filterRequired ){
+//        		throw new SAXException("Illegal filter for "+element, filterRequired );
+//			}
+//        	catch (IllegalFilterException e) {
+//				throw new SAXException("Illegal filter for "+element );
+//			} 
         }
 
         /**
@@ -529,7 +620,7 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+            return null; // subclass will do the right thing (tm)
         }
 
         /**
@@ -1049,13 +1140,39 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+            //    			<xsd:extension base="ogc:ComparisonOpsType">
+            //    				<xsd:sequence>
+            //    					<xsd:element ref="ogc:PropertyName"/>
+            //    					<xsd:element ref="ogc:Literal"/>
+            //    				</xsd:sequence>
+            //    				<xsd:attribute name="wildCard" type="xsd:string" use="required"/>
+            //    				<xsd:attribute name="singleChar" type="xsd:string" use="required"/>
+            //    				<xsd:attribute name="escape" type="xsd:string" use="required"/>
+            //    			</xsd:extension>        	
+        	try {
+        		LikeFilter filter = factory.createLikeFilter();
+        		
+        		filter.setValue( (Expression) value[0].getValue() );
+        		String wildCard = attrs.getValue( "wildCard" );
+        		String singleChar = attrs.getValue( "singleChar" );
+        		String escape = attrs.getValue( "escape" );
+        		filter.setPattern( (Expression) value[1].getValue(), wildCard, singleChar, escape );        						
+				return filter;
+			}
+        	catch( ClassCastException expressionRequired ){
+        		throw new SAXException("Illegal filter for "+element, expressionRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**
@@ -1164,9 +1281,21 @@ public class FilterOpsComplexTypes {
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
-        public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+        public Object getValue(Element element, ElementValue[] value,            
+            Attributes attrs, Map hints) throws SAXException{
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+            try {
+        		NullFilter filter = factory.createNullFilter();
+        		
+        		filter.nullCheckValue( (Expression) value[0].getValue() );        						
+				return filter;
+			}
+        	catch( ClassCastException expressionRequired ){
+        		throw new SAXException("Illegal filter for "+element, expressionRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**
@@ -1274,8 +1403,21 @@ public class FilterOpsComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+            try {
+            	BetweenFilter filter = factory.createBetweenFilter();        		
+        		filter.addLeftValue( (Expression) value[1].getValue() );
+        		filter.addMiddleValue( (Expression) value[0].getValue() );
+        		filter.addRightValue( (Expression) value[2].getValue() );
+				return filter;
+			}
+        	catch( ClassCastException expressionRequired ){
+        		throw new SAXException("Illegal filter for "+element, expressionRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**
@@ -1371,7 +1513,7 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+        	return (Expression) value[0].getValue();
         }
 
         /**
@@ -1460,7 +1602,7 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+        	return (Expression) value[0].getValue();
         }
 
         /**
@@ -1560,13 +1702,28 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	
+        	try {
+        		short type = (short) SpatialOpsType.findFilterType( element.getName() );
+        		GeometryFilter filter = factory.createGeometryFilter( type );
+				filter.addLeftGeometry( (Expression) value[0] );
+				filter.addRightGeometry( (Expression) value[1] );				
+				return filter;
+			}
+        	catch( ClassCastException filterRequired ){
+        		throw new SAXException("Illegal filter for "+element, filterRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			}
         }
 
         /**
@@ -1659,6 +1816,19 @@ public class FilterOpsComplexTypes {
         }
     }
 
+    /**
+     * The <BBOX> element is defined as a convenient and more compact way
+     * of encoding the very common bounding box constraint based on the
+     * gml:Box geometry. It is equivalent to the spatial operation
+     * <Not><Disjoint> … </Disjoint></Not> meaning that the <BBOX> operator
+     * should identify all geometries that spatially interact with the box
+     * in some manner.
+     * 
+     * @author jgarnett
+     *
+     * TODO To change the template for this generated type comment go to
+     * Window - Preferences - Java - Code Style - Code Templates
+     */
     public static class BBOXType extends FilterComplexType {
         private static final ComplexType instance = new BBOXType();
 
@@ -1672,10 +1842,11 @@ public class FilterOpsComplexTypes {
         //			</xsd:extension>
         //		</xsd:complexContent>
         //		</xsd:complexType>
-        private static Element[] elems = new Element[] {
-                new FilterElement("PropertyName", PropertyNameType.getInstance()),
-                GMLSchema.getInstance().getElements()[41]
-            };
+        private static final Element OGC_PROPERTY_NAME = new FilterElement("PropertyName", PropertyNameType.getInstance());
+        private static final Element GML_BOX = GMLSchema.getInstance().getElements()[GMLSchema.BOX];
+        
+        private static Element[] elems = new Element[] {OGC_PROPERTY_NAME,GML_BOX};
+        
         private Sequence seq = new SequenceGT(elems);
 
         public static ComplexType getInstance() {
@@ -1701,13 +1872,30 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException  
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	
+        	if( value == null || value.length != 2){
+        		throw new SAXException( "ogc:propertyName or gml:box required for bbox filter" );
+        	}        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	try {
+        		GeometryFilter disjoint = factory.createGeometryFilter( FilterType.GEOMETRY_DISJOINT );
+        		disjoint.addLeftGeometry( (Expression) value[0].getValue() );
+        		disjoint.addRightGeometry( (Expression) value[1].getValue() );
+        		
+        		return disjoint.not();        		
+        	}
+        	catch( ClassCastException wrong){
+        		throw new SAXException( "ogc:propertyName or gml:box required for bbox filter", wrong );
+        	} catch (IllegalFilterException illegalFilterException) {
+        		throw new SAXException( "Could not create bbox filter", illegalFilterException );
+			}        	            
         }
 
         /**
@@ -1721,7 +1909,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return GeometryFilter.class;
+            return Filter.class; // was GeometryFilter.class but use of Disjoint.not() limits this to Filte
         }
 
         public boolean canEncode(Element element, Object value, Map hints) {
@@ -1823,13 +2011,27 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	try {
+        		GeometryDistanceFilter distance = factory.createGeometryDistanceFilter( FilterType.GEOMETRY_BEYOND );
+        		distance.addLeftGeometry( (Expression) value[0].getValue() );
+        		distance.addRightGeometry( (Expression) value[1].getValue() );
+        		distance.setDistance( ((Number)value[2].getValue()).doubleValue() );        		
+        		return distance;        		
+        	}
+        	catch( ClassCastException wrong){
+        		throw new SAXException( wrong );
+        	} catch (IllegalFilterException illegalFilterException) {
+        		throw new SAXException( illegalFilterException );
+			} 
         }
 
         /**
@@ -1945,8 +2147,21 @@ public class FilterOpsComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs1, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	try {
+        		GeometryDistanceFilter distance = factory.createGeometryDistanceFilter( FilterType.GEOMETRY_DWITHIN );
+        		distance.addLeftGeometry( (Expression) value[0].getValue() );        		
+        		distance.addRightGeometry( (Expression) value[1].getValue() );
+        		distance.setDistance( ((Number)value[2].getValue()).doubleValue() );        		
+        		return distance;        		
+        	}
+        	catch( ClassCastException wrong){
+        		throw new SAXException( wrong );
+        	} catch (IllegalFilterException illegalFilterException) {
+        		throw new SAXException( illegalFilterException );
+			}
         }
 
         /**
@@ -2066,8 +2281,33 @@ public class FilterOpsComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	String name = element.getName();
+        	short type;
+        	if( "and".equalsIgnoreCase( name )){
+        		type = FilterType.LOGIC_AND;
+        	}
+        	else if( "or".equalsIgnoreCase( name )){
+        		type = FilterType.LOGIC_OR;
+        	}
+        	else {
+        		throw new SAXException("Expected AND or OR logic filter" );
+        	}
+        	try {
+				LogicFilter filter = factory.createLogicFilter( type );
+				for( int i=0; i<value.length; i++){
+					filter.addFilter( (Filter) value[i].getValue() );
+				}
+				return filter;
+			}
+        	catch( ClassCastException filterRequired ){
+        		throw new SAXException("Illegal filter for "+element, filterRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			}            
         }
 
         /**
@@ -2177,13 +2417,42 @@ public class FilterOpsComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException {
+        	FilterFactory factory = FilterSchema.filterFactory( hints );
+        	String name = element.getName();
+        	short type;        
+        	if( "and".equalsIgnoreCase( name )){
+        		type = FilterType.LOGIC_AND;
+        	}
+        	else if( "or".equalsIgnoreCase( name )){
+        		type = FilterType.LOGIC_OR;
+        	}
+        	else if( "not".equalsIgnoreCase( name )){
+        		type = FilterType.LOGIC_NOT;
+        	}
+        	else {
+        		throw new SAXException("Expected AND or OR logic filter" );
+        	}
+        	if( value == null || value.length != 1 ){
+        		throw new SAXException("Require a single filter for "+element );
+        	}
+        	try {
+				LogicFilter filter = factory.createLogicFilter( type );
+				filter.addFilter( (Filter) value[0].getValue() );				
+				return filter;
+			}
+        	catch( ClassCastException filterRequired ){
+        		throw new SAXException("Require a single filter for "+element, filterRequired );
+			}
+        	catch (IllegalFilterException e) {
+				throw new SAXException("Illegal filter for "+element );
+			} 
         }
 
         /**

@@ -26,6 +26,7 @@ import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.ServiceException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
@@ -61,10 +62,10 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
+ * Represent complex types Bbox, Comparison etc ...
  * <p>
- * DOCUMENT ME!
+ * Subclass must override encode and getValue as usual.
  * </p>
- *
  * @author dzwiers
  */
 public class FilterComplexTypes {
@@ -159,7 +160,7 @@ public class FilterComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
             // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            throw new OperationNotSupportedException(element.toString()+" encode value "+value );
         }
     }
 

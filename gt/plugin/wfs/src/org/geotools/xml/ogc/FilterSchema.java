@@ -16,10 +16,15 @@
  */
 package org.geotools.xml.ogc;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.geotools.filter.FilterFactory;
+import org.geotools.xml.PrintHandler;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.BinaryOperatorType;
 import org.geotools.xml.ogc.FilterComplexTypes.Comparison_OperatorsType;
@@ -77,6 +82,18 @@ public class FilterSchema implements Schema {
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/ogc");
     private static final FilterSchema instance = new FilterSchema();
     private static Element[] elements = loadElements();
+    
+    /**
+     * Grab provided FilterFactory from hints, or
+     * use default provided by FilterFactory.createFilterFactory();
+     * 
+     * @param hints
+     * @return FilterFactory
+     */
+    static FilterFactory filterFactory(Map hints){
+    	return FilterFactory.createFilterFactory();
+    }
+    
     private static final ComplexType[] complexTypes = new ComplexType[] {
             
             // filterCapabilities
@@ -371,7 +388,7 @@ public class FilterSchema implements Schema {
     public boolean isElementFormDefault() {
         return true;
     }
-
+        
     static class FilterAttribute extends AttributeGT {
         /**
          * DOCUMENT ME!
@@ -407,7 +424,7 @@ public class FilterSchema implements Schema {
         public FilterAttribute(String name, SimpleType type, int use,
             String defaulT, String fixed, boolean form) {
             super(null, name, NAMESPACE, type, use, defaulT, fixed, form);
-        }
+        }        
     }
 
     public static class FilterElement implements Element {
@@ -536,7 +553,7 @@ public class FilterSchema implements Schema {
          */
         public Element findChildElement(String name1) {
             return (((getName() != null) && getName().equals(name1)) ? this : null);
-        }
+        }        
     }
 
     static abstract class FilterComplexType implements ComplexType {
@@ -624,5 +641,27 @@ public class FilterSchema implements Schema {
         public Element findChildElement(String name) {
             return (getChild() == null) ? null : getChild().findChildElement(name);
         }
+        /**
+         * Subclass must override this method to allow encoding.
+         * @return <code>false</code>, subclass override to allow encoding
+         */
+        public boolean canEncode(Element element, Object value, Map hints) {
+            return false;
+        }
+        /**
+         * Subclass should implement this, this implementation provides a good OperationsNotSupportedException.
+         * 
+		 * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+		 */
+        public void encode(Element element, Object value, PrintHandler output,
+                Map hints) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException(element.toString()+" encode value "+value );
+        }
+        /* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString() {
+			return getName();
+		}
     }
 }
