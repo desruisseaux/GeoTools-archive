@@ -152,7 +152,7 @@ public class WMSParameterMaker {
         param.remarks = "Value contains a list containing multiple SimpleLayer instances, " 
         	           +"representing a layer to be drawn and its style. The Style value "
 					   +"can be empty.";
-        param.availableLayers = Utils.retrieveLayers(capabilities.getCapability().getLayer());
+        param.availableLayers = Utils.findDrawableLayers(capabilities.getCapability().getLayer());
 
         Identifier id = null;
 

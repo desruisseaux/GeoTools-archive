@@ -30,9 +30,6 @@ import org.geotools.data.wms.GetMapRequest;
 import org.geotools.data.wms.GetMapResponse;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.getCapabilities.DCPType;
-import org.geotools.data.wms.getCapabilities.Get;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -49,19 +46,19 @@ public class WMSReader implements GridCoverageReader {
 	private Object source;
 	private boolean hasNext = true;
 	private WMSFormat format;
-	private WMT_MS_Capabilities capabilities;
+	private WebMapServer wms;
 	
 	/**
-	 * Source must be a WMT_MS_Capabilities object
+	 * Source must be a WebMapServer object
 	 * 
 	 * @param source 
 	 */
 	public WMSReader(Object source) {
 		this.source = source;
-		if (source instanceof WMT_MS_Capabilities) {
-			capabilities = (WMT_MS_Capabilities) source;
+		if (source instanceof WebMapServer) {
+			wms = (WebMapServer) source;
 		} else {
-			throw new RuntimeException("source is not of type WMT_MS_Capabilities");
+			throw new RuntimeException("source is not of type WebMapServer");
 		}
 	}
 
@@ -124,11 +121,8 @@ public class WMSReader implements GridCoverageReader {
 	 */
 	public GridCoverage read(GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
-		
-			DCPType dcp = (DCPType) capabilities.getCapability().getRequest().getGetMap().getDcpTypes().get(0);
-			Get get = (Get) dcp.getHttp().getGets().get(0);
 			
-			GetMapRequest request = new GetMapRequest(get.getOnlineResource());
+			GetMapRequest request = wms.createGetMapRequest();
 		    
 			String minx = "",miny = "",maxx = "",maxy = "";
 			
@@ -188,7 +182,7 @@ public class WMSReader implements GridCoverageReader {
 		    String bbox = minx+","+miny+","+maxx+","+maxy;
 		    request.setProperty("BBOX", bbox);
 		    
-		    GetMapResponse response = WebMapServer.issueGetMapRequest(request);
+		    GetMapResponse response = wms.issueGetMapRequest(request, false);
 
 		    BufferedImage image = ImageIO.read(response.getResponse());
 		    Envelope envelope = new Envelope(new double[] {366800, 2170400}, new double[] {816000, 2460400});

@@ -31,13 +31,13 @@ public class Utils {
 	 * @param rootLayer The layer to start processing from
 	 * @return a list of type SimpleLayer
 	 */
-	public static List retrieveLayers(Layer rootLayer) {
+	public static List findDrawableLayers(Layer rootLayer) {
 		ArrayList layers = new ArrayList();
-		retrieveLayers(rootLayer, layers, null);
+		findDrawableLayers(rootLayer, layers, null);
 		return layers;
 	}
 	
-	private static void retrieveLayers(Layer layer, List finalLayers, Set parentStyles) {
+	private static void findDrawableLayers(Layer layer, List finalLayers, Set parentStyles) {
 		Set layerStyles = new TreeSet();
 		Iterator iterator = layer.getStyles().iterator();
 		while (iterator.hasNext()) {
@@ -56,7 +56,7 @@ public class Utils {
 		if (layer.getSubLayers() != null) {
 			Iterator iter = layer.getSubLayers().iterator();
 			while (iter.hasNext()) {
-				retrieveLayers((Layer) iter.next(), finalLayers, layerStyles);
+				findDrawableLayers((Layer) iter.next(), finalLayers, layerStyles);
 			}
 		}
 	}

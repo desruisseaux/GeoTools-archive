@@ -18,18 +18,20 @@ package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.wms.GetMapRequest;
 import org.geotools.data.wms.GetMapResponse;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.getCapabilities.DCPType;
-import org.geotools.data.wms.getCapabilities.Get;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
-
-import junit.framework.TestCase;
 
 /**
  * @author Richard Gould
@@ -97,24 +99,34 @@ public class WebMapServerTest extends TestCase {
 	    
 	    WMT_MS_Capabilities capabilities = wms.getCapabilities();
 	    
-	    List namedLayers = wms.getNamedLayers();
+	    GetMapRequest request = wms.createGetMapRequest();
 	    
-	    GetMapRequest request2 = wms.createGetMapRequest(namedLayers);
+	    List simpleLayers = request.getAvailableLayers();
+	    Iterator iter = simpleLayers.iterator();
+	    while (iter.hasNext()) {
+	    	SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+	    	Object[] styles = simpleLayer.getValidStyles().toArray();
+	    	Random random = new Random();
+	    	int randomInt = random.nextInt(styles.length);
+	    	simpleLayer.setStyle((String) styles[randomInt]);
+	    }
+	    request.setLayers(simpleLayers);
 	    
-	    DCPType dcpType = (DCPType) capabilities.getCapability().getRequest().getGetMap().getDcpTypes().get(0);
-	    Get get = (Get) dcpType.getHttp().getGets().get(0);
-	    
-	    GetMapRequest request = new GetMapRequest(get.getOnlineResource());
-	    request.setVersion("1.1.1");
-	    request.setLayers("DRG");
-	    request.setStyles("");
-	    request.setSRS("EPSG:26904");
+	    Set srss = request.getAvailableSRSs();
+	    request.setSRS((String) srss.iterator().next());
 	    request.setDimensions("400", "400");
-	    request.setFormat("image/jpeg");
+	    
+	    List formats = request.getAvailableFormats();
+	    request.setFormat((String) formats.get(0));
+	    
 	    request.setBBox("366800,2170400,816000,2460400");
 	    
-	    GetMapResponse response = WebMapServer.issueGetMapRequest(request);
-	    assertEquals(response.getFormat(), "image/jpeg");
+	    List exceptions = request.getAvailableExceptions();
+	    request.setExceptions((String) exceptions.get(0));
+	        
+	    GetMapResponse response = wms.issueGetMapRequest(request, false);
+	    
+	    assertEquals(response.getFormat(), (String) formats.get(0));
 	    BufferedImage image = ImageIO.read(response.getResponse());
 	    assertEquals(image.getHeight(), 400);
 	}

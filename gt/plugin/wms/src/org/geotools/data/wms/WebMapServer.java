@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import org.geotools.data.wms.getCapabilities.DCPType;
 import org.geotools.data.wms.getCapabilities.Get;
@@ -56,11 +58,14 @@ public class WebMapServer {
 	private WMT_MS_Capabilities capabilities;
 	private Exception problem;
 	
-	private Thread retrieveCapabilities;
+	private Thread capabilitiesRetriever;
 	public static final int IN_PROGRESS = 1;
 	public static final int NOTCONNECTED = 0;
 	public static final int ERROR = -1;
 	public static final int CONNECTED = 2;
+	private Thread getMapRetriever;
+	private GetMapResponse getMapResponse;
+	private GetMapRequest getMapRequest;
 	
 	/**
 	 * Create a WebMapServer and immediately retrieve the GetCapabilities
@@ -94,12 +99,12 @@ public class WebMapServer {
 	public WebMapServer (final URL serverURL, boolean wait) {
 		this.serverURL = serverURL;
 		if (!wait) {
-			retrieveCapabilities = new Thread(new Runnable() {
+			capabilitiesRetriever = new Thread(new Runnable() {
 				public void run() {
 					retrieveCapabilities();
 				}
 			});			
-			retrieveCapabilities.start();
+			capabilitiesRetriever.start();
 		}
 	}
 	
@@ -114,7 +119,7 @@ public class WebMapServer {
 	 * @return the current status of the GetCapabilities document
 	 */
 	public int getStatus() {
-		if (retrieveCapabilities != null && retrieveCapabilities.isAlive()) {
+		if (capabilitiesRetriever != null && capabilitiesRetriever.isAlive()) {
 			return IN_PROGRESS;
 		}
 
@@ -206,9 +211,9 @@ public class WebMapServer {
 	 */
 	public WMT_MS_Capabilities getCapabilities() {
 		if (capabilities == null) {
-			if (retrieveCapabilities != null && retrieveCapabilities.isAlive()) {
+			if (capabilitiesRetriever != null && capabilitiesRetriever.isAlive()) {
 				try {
-					retrieveCapabilities.join();
+					capabilitiesRetriever.join();
 					return capabilities;
 				} catch (InterruptedException e) {
 					problem = e;
@@ -227,22 +232,56 @@ public class WebMapServer {
 	 * @return the response from the server as a result of the request
 	 * @throws IOException if there is a network error
 	 */	
-	public static GetMapResponse issueGetMapRequest(GetMapRequest request) throws IOException {
-	    GetMapResponse response;
+	public GetMapResponse issueGetMapRequest(GetMapRequest request, boolean threaded) {
+
+		this.getMapRequest = request;
 		
-	    URL finalURL = request.getFinalURL();
-
-	    URLConnection connection = finalURL.openConnection();
-	    InputStream inputStream = connection.getInputStream();
-
-	    String contentType = connection.getContentType();
-	    
-	    response = new GetMapResponse(contentType, inputStream);
-	    
-	    return response;
+		if (threaded) {
+			getMapRetriever = new Thread(new Runnable() {
+				public void run() {
+					retrieveGetMap();
+				}
+			});			 
+			getMapRetriever.start();
+			return null;
+		}
+		retrieveGetMap();
+			    
+	    return getMapResponse;
 	}
 	
-    /**
+	protected void retrieveGetMap() {
+		try {
+			URL finalURL = getMapRequest.getFinalURL();
+
+			URLConnection connection = finalURL.openConnection();
+			InputStream inputStream = connection.getInputStream();
+
+			String contentType = connection.getContentType();
+	    
+			getMapResponse = new GetMapResponse(contentType, inputStream);
+		} catch (IOException e) {
+			problem = e;
+		}
+	}
+	
+	public GetMapResponse getGetMapResponse() {
+		if (getMapResponse == null) {
+			if (getMapRetriever != null && getMapRetriever.isAlive()) {
+				try {
+					getMapRetriever.join();
+					return getMapResponse;
+				} catch (InterruptedException e) {
+					problem = e;
+					return null;
+				}
+			}
+			retrieveGetMap();
+		}
+		return getMapResponse;
+	}
+
+	/**
      * Utility method to return each layer that has a name.
 	 * This method maintains no hierarchy at all.
 	 * @return A list of type Layer, each value has a it's name property set
@@ -282,22 +321,49 @@ public class WebMapServer {
 		return problem;
 	}
 
-	/**
-	 * @param namedLayers
-	 * @return
-	 */
-	public GetMapRequest createGetMapRequest(List namedLayers) {
+	public GetMapRequest createGetMapRequest() {
+		
+		if (getStatus() != CONNECTED) {
+			throw new RuntimeException("Unable to create a GetMapRequest when the GetCapabilities document has not been retrieved");
+		}
 		
 		DCPType dcpType = (DCPType) getCapabilities().getCapability().getRequest().getGetMap().getDcpTypes().get(0);
 	    Get get = (Get) dcpType.getHttp().getGets().get(0);
 		
-	//	GetMapRequest request = 
-	//		new GetMapRequest(get.getOnlineResource(),
-	//						  capabilities.getVersion(),
-	//						  );
-	
+		GetMapRequest request = 
+			new GetMapRequest(get.getOnlineResource(),
+							  getCapabilities().getVersion(),
+							  Utils.findDrawableLayers(getCapabilities().getCapability().getLayer()),
+							  getSRSs(),
+							  getFormats(),
+							  getExceptions()
+							  );
 		
+		return request;
+	}
+	private List getExceptions() {
+		return getCapabilities().getCapability().getException().getFormats();
+	}
+
+	private List getFormats() {
+		return getCapabilities().getCapability().getRequest().getGetMap().getFormats();
+	}
+
+	private Set getSRSs() {
+		Set srss = new TreeSet();
 		
-		return null;
+		getSRSs(getCapabilities().getCapability().getLayer(), srss);
+		
+		return srss;
+	}
+
+	private void getSRSs(Layer rootLayer, Set srss) {
+		srss.addAll(rootLayer.getSrs());
+		
+		Iterator iter = rootLayer.getSubLayers().iterator();
+		while (iter.hasNext()) {
+			Layer layer = (Layer) iter.next();
+			getSRSs(layer, srss);
+		}
 	}
 }

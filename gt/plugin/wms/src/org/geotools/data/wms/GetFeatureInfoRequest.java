@@ -15,8 +15,11 @@ import java.util.List;
  */
 public class GetFeatureInfoRequest extends GetMapRequest {
 
-	public GetFeatureInfoRequest(URL onlineResource) {
-		super(onlineResource);
+	public GetFeatureInfoRequest(URL onlineResource, GetMapRequest request) {
+		super(onlineResource, "1.1.1", 
+				request.getAvailableLayers(),
+				request.getAvailableSRSs(), request.getAvailableFormats(),
+				request.getAvailableExceptions());
 		setProperty("REQUEST", "GetFeatureInfo");
 	}
 	
@@ -25,7 +28,7 @@ public class GetFeatureInfoRequest extends GetMapRequest {
 	}
 	
 	public void setQueryLayers(List layerList) {
-		setQueryLayers(toCommaDelimitedString(layerList));
+		setQueryLayers(layerList);
 	}
 	
 	public void setInfoFormat(String infoFormat) {

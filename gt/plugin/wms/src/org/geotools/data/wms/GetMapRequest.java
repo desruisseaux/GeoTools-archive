@@ -18,6 +18,7 @@ package org.geotools.data.wms;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.data.wms.getCapabilities.Layer;
 
@@ -31,12 +32,30 @@ public class GetMapRequest extends AbstractRequest {
 	
 	public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
 	public static final String EXCEPTION_BLANK   = "application/vnd.ogc.se_blank";
+	private List availableLayers;
+	private Set availableSRSs;
+	private List availableFormats;
+	private List availableExceptions;
 	
     /**
      * Initialize properties and set the request propertie to "GetMap"
+     * @param list3
+     * @param list2
+     * @param set
+     * @param list
+     * @param version
      */
-    public GetMapRequest(URL onlineResource) {
+    public GetMapRequest(URL onlineResource, String version,
+    					 List availableLayers, 
+						 Set availableSRSs, 
+						 List availableFormats, 
+						 List availableExceptions) {
     	super(onlineResource);
+    	
+    	this.availableLayers = availableLayers;
+    	this.availableSRSs = availableSRSs;
+    	this.availableFormats = availableFormats;
+    	this.availableExceptions = availableExceptions;
 
     	setProperty("REQUEST", "GetMap");
         
@@ -51,73 +70,25 @@ public class GetMapRequest extends AbstractRequest {
         properties.setProperty("VERSION", version);
     }
     
-    /**
-     * Adds the specified Layers into the request. Does not add sub-layers. 
-     * Each layer MUST have a it's <code>name</code> field set. 
-     * 
-     * The layers are drawn bottom-up, with the layer at element 0 drawn 
-     * on the bottom and the layer at layers.size() on top.
-     * 
-     * @param layers A list of Layers, each containing a name.
-     */
     public void setLayers(List layers) {
-        setLayers(toCommaDelimitedString(layers));
+  	
+    	String layerString = "";
+    	String styleString = "";
+    	
+    	for (int i = 0; i < layers.size(); i++) {
+    		SimpleLayer simpleLayer = (SimpleLayer) layers.get(i);
+    		layerString = layerString + simpleLayer.getName();
+    		styleString = styleString + simpleLayer.getStyle();
+    		
+    		if (i != layers.size()-1) {
+    			layerString = layerString + ",";
+    			styleString = styleString + ",";
+    		}
+    	}
+    	setProperty("LAYERS", layerString);
+    	setProperty("STYLES", styleString);
     }
-    
-    /**
-	 * @param layers
-	 * @return
-	 */
-	protected String toCommaDelimitedString(List layers) {
-        String layerList = "";
-        
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = (Layer) layers.get(i);
-            layerList.concat(layer.getName());
-            
-            if (i != layers.size()-1) {
-                layerList.concat(",");
-            }
-        }
-        return layerList;
-	}
 
-	/**
-     * From the Web Map Service Implementation Specification:
-     * "The required LAYERS parameter lists the map layer(s) to be returned by this GetMap
-     * request. The value of the LAYERS parameter is a comma-separated list of one or more
-     * valid layer names. Allowed layer names are the character data content of any
-     * &lt;Layer>&lt;Name> element in the Capabilities XML.
-     * 
-     * Layers are rendered by drawing the leftmost in the list bottommost, the next one 
-     * over that, and so on."
-     * 
-     * @param layerList A comma-delimited String containing the names of Layers to be rendered.
-     */
-    public void setLayers(String layerList) {
-       properties.setProperty("LAYERS", layerList); 
-    }
-    
-    /**
-     * From the Web Map Service Implementation Specification:
-     * "The required STYLES parameter lists the style in which each layer is to be 
-     * rendered. The value of the styleList is a comma-separated list of one or 
-     * more valid style names. There is a one-to-one correspondance between the values
-     * in the LAYERS parameter and the values in the STYLES parameter. Each map in the
-     * list of LAYERS is drawn using the corresponding style in the same position in the
-     * list of STYLES. The Client may not request a Layer in a Style that was only
-     * defined for a different Layer.
-     * 
-     * A client may request the default Style by using an empty String (""). If several
-     * layers are requested with a mixture of named and default styles, the STYLES parameter
-     * includes null values between commas (eg. "STYLES=style1,,style2,,")."
-     * 
-     * @param styleList A comma-separated list of style names.
-     */
-    public void setStyles(String styleList) {
-        properties.setProperty("STYLES", styleList);
-    }
-    
     /**
      * From the Web Map Service Implementation Specification:
      * "The required SRS parameter states which Spatial Reference System applies to the values
@@ -149,6 +120,7 @@ public class GetMapRequest extends AbstractRequest {
      * @param bbox A string representing a bounding box in the format "minx,miny,maxx,maxy"
      */
     public void setBBox(String bbox) {
+    	//TODO enforce non-subsettable layers
         properties.setProperty("BBOX", bbox);
     }
     
@@ -269,4 +241,17 @@ public class GetMapRequest extends AbstractRequest {
     public void setVendorSpecificParameter(String name, String value) {
     	properties.setProperty(name, value);
     }
+    
+	public List getAvailableExceptions() {
+		return availableExceptions;
+	}
+	public List getAvailableFormats() {
+		return availableFormats;
+	}
+	public List getAvailableLayers() {
+		return availableLayers;
+	}
+	public Set getAvailableSRSs() {
+		return availableSRSs;
+	}
 }

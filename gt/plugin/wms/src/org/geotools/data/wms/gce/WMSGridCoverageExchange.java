@@ -39,6 +39,7 @@ import org.jdom.JDOMException;
 public class WMSGridCoverageExchange implements GridCoverageExchange {
     private Format[] formats;
     private WMT_MS_Capabilities capabilities;
+    private WebMapServer wms;
     
     public WMSGridCoverageExchange (Object source) throws MalformedURLException, IOException, ParseCapabilitiesException {
     	if (source instanceof String || source instanceof URL) {
@@ -49,7 +50,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     			url = (URL) source;
     		}
 
-   			WebMapServer wms = new WebMapServer(url, true);
+   			wms = new WebMapServer(url, true);
    			capabilities = wms.getCapabilities();
    			if (capabilities == null) {
    				Exception e = wms.getProblem();
@@ -91,7 +92,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 			for (int i = 0; i < formats.length; i++) {
 				Format format = formats[i];
 				if (format.accepts(source)) {
-					return format.getReader(capabilities);
+					return format.getReader(wms);
 				}
 			}
 		}
