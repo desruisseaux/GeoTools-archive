@@ -22,6 +22,7 @@ package org.geotools.referencing;
 // J2SE dependencies
 import java.io.*;
 import java.util.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.lang.reflect.*;
 import java.net.URLDecoder;
@@ -146,19 +147,47 @@ public class CodeListTest extends TestCase implements FileFilter {
      */
     private File defaultRootDirectory() {
         final Class c = getClass();
-        final URL url = c.getClassLoader().getResource(c.getName().replace('.','/')+".class");
+        URL url = c.getClassLoader().getResource( "." );
+        
+        System.out.println( "here:"+url );
+        if (url ==null || !url.getProtocol().trim().equalsIgnoreCase("file")){
+        	return null; // bad developer no test not on filesystem
+        }
+        String path = url.getPath();
+        if( path.charAt(0) == '/' && path.charAt(2) == ':' ){
+        	path = path.substring(1);
+        }
+        System.out.println( "path:"+path );        
+        try {
+        	url = new URL( "file", null, 0, path );
+        }
+        catch (MalformedURLException ignore ){
+        	return null;
+        }
+        System.out.println( "url:"+url );        
+        File file = new File( path );
+        System.out.println( "file:"+file );
+        if( file.exists() && file.isDirectory() ){
+        	return file;
+        }
+        url = c.getClassLoader().getResource(c.getName().replace('.','/')+".class");
+        System.out.println( "class:"+url );
         if (url!=null && url.getProtocol().trim().equalsIgnoreCase("file")) {
             try{
-                File file = new File(URLDecoder.decode(url.toExternalForm(),"UTF-8"));
+                file = new File(URLDecoder.decode(url.toExternalForm(),"UTF-8"));
+                System.out.println( "file:"+file );
                 final String[] packages = c.getPackage().getName().split("\\.");
                 for (int i=packages.length; --i>=0;) {
+                	System.out.println( i+ " package:"+packages[i] );                	
                     file = file.getParentFile();
                     if (file==null || !file.getName().equals(packages[i])) {
                         fail("Wrong directory name: "+file);
                         return null;
                     }
                 }
-                return file.getParentFile();
+                file = file.getParentFile();
+                System.out.println( "file:"+file );                
+                return file;
             }
             catch(UnsupportedEncodingException uee){
                 return null;
@@ -171,8 +200,9 @@ public class CodeListTest extends TestCase implements FileFilter {
      * Scan the directory and all subdirectory for classes implementing {@link CodeList}.
      */
     private void scan(final File directory, final File base) {
-        if (directory == null) {
-            Logger.getLogger("org.geotools").warning("No directory to scan");
+        if (directory == null || !directory.exists()
+        		|| !directory.isDirectory()) {
+            Logger.getLogger("org.geotools").warning("No directory to scan:"+directory);
             return; // Just a warning; do not fails.
         }
         final StringBuffer buffer = new StringBuffer();
