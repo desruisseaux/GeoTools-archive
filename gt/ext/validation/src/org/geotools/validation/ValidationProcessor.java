@@ -430,8 +430,8 @@ public class ValidationProcessor {
 				}
 			} catch(Throwable e){
 				LOGGER.finer( "Validation test died:"+ validator.getName() );
-				LOGGER.log( Level.WARNING, validator.getName()+" failed", e );
-				results.error(null,e.getMessage());
+				LOGGER.log( Level.WARNING, validator.getName()+" failed with "+e, e );
+				results.error(null, e.getClass().getName() + " - " + e.getMessage());
 			}
         }        
     }

@@ -24,12 +24,16 @@
  */
 package org.geotools.validation.relate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.validation.Validation;
 import org.geotools.validation.ValidationResults;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -111,7 +115,27 @@ public class SpatialTestCase extends TestCase
 		gf = new GeometryFactory();
 		mds = new MemoryDataStore();
 		namespace = getName();
-		vr = null; // new RoadValidationResults();
+		vr = new ValidationResults(){
+			Validation trial;
+			List error = new ArrayList();
+			List warning = new ArrayList();
+			public void setValidation(Validation validation) {
+				trial = validation;									
+			}
+
+			public void error(Feature feature, String message) {
+				String where = feature != null ? feature.getID() : "all"; 
+				error.add( where + ":"+ message );
+				System.err.println( where + ":"+ message );
+			}
+
+			public void warning(Feature feature, String message) {
+				String where = feature != null ? feature.getID() : "all";
+				warning.add( where + ":"+ message );
+				System.out.println( where + ":"+ message );
+			}
+		
+		};
 
 		lineFeatures = new Feature[4];
 		ls0 = gf.createLineString(new Coordinate[]{	new Coordinate(0,0),

@@ -114,6 +114,7 @@ public class OverlapsIntegrityTest extends SpatialTestCase
 		
 		try
 		{
+			vr.setValidation( overlap );
 			assertFalse(overlap.validate(map, lineBounds, vr));
 		} catch (Exception e)
 		{
