@@ -31,17 +31,29 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
     /** Well Known Text writer (from JTS). */
     protected static WKTWriter geometryWriter = new WKTWriter();
     private boolean WKBEnabled;
-    
+    private boolean byteaWKB;
 
-    public PostgisFeatureWriter(FeatureReader fReader, QueryData queryData, boolean WKBEnabled) throws IOException {
+    /**
+     * 
+     * @param fReader
+     * @param queryData
+     * @param WKBEnabled
+     * @param byteaWKB   -- true if you're using postgis 1.0+.  they changed how to do wkb writing.
+     * @throws IOException
+     */
+    public PostgisFeatureWriter(FeatureReader fReader, QueryData queryData, boolean WKBEnabled,boolean byteaWKB) throws IOException {
         super(fReader, queryData);
         this.WKBEnabled = WKBEnabled;
+        this.byteaWKB = byteaWKB;
     }
 
     protected String getGeometryInsertText(Geometry geom, int srid) throws IOException {
         if(WKBEnabled) {
             String wkb = WKBEncoder.encodeGeometryHex(geom);
-            return "GeomFromWKB('" + wkb + "', " + srid + ")";
+            if (byteaWKB)
+            	return "setSRID('"+wkb+"'::geometry,"+srid+")";
+	        else
+            	return "GeomFromWKB('" + wkb + "', " + srid + ")";
         }
             String geoText = geometryWriter.write(geom);
             return "GeometryFromText('" + geoText + "', " + srid + ")";

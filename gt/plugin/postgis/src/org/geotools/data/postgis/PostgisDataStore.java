@@ -183,7 +183,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * loading when using WKB format
      */
     protected boolean byteaEnabled = false;
-
+    
+    /**
+     *  postgis 1.0 changed the way WKB is handled, this needs to be
+     *  set if version >1.
+     *  (it affects the way you send WKB to the database)
+     */
+    protected boolean byteaWKB = false;
+    
     /**
      * If true then the bounding box filters will use the && postgis operator,
      * which uses the spatial index and performs against the envelope of the
@@ -212,7 +219,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         String namespace, int optimizeMode) throws IOException {
         this(connPool,
             new JDBCDataStoreConfig(namespace, schema, new HashMap(),
-                new HashMap()), OPTIMIZE_SQL);
+                new HashMap()), OPTIMIZE_SQL); // DB: should this be optimizeMode instead of optimize_sql?
     }
 
     public PostgisDataStore(ConnectionPool connectionPool,
@@ -276,6 +283,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                             && (versionNumbers[2] >= 2))) {
                         byteaEnabled = true;
                     }
+                    if (versionNumbers[0]>=1)
+                    	byteaWKB = true; // force new wkb writing format
                 } catch (Exception e) {
                     LOGGER.log(Level.WARNING,
                         "Exception occurred while parsing the version number.",
@@ -308,8 +317,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         try {
             conn = getConnection(Transaction.AUTO_COMMIT);
 
-            DatabaseMetaData meta = conn.getMetaData();
-            String[] tableType = { "TABLE" };
+            DatabaseMetaData meta = conn.getMetaData();  // DB: shouldnt this be done by looking at geometry_columns?  or are you trying to allow non-spatial tables in as well?
+            String[] tableType = { "TABLE" , "VIEW"};
             ResultSet tables = meta.getTables(null,
                     config.getDatabaseSchemaName(), "%", tableType);
 
@@ -1209,7 +1218,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
         QueryData queryData) throws IOException {
-        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled);
+        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled,byteaWKB);
     }
 
     /**
@@ -1375,6 +1384,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return byteaEnabled;
     }
 
+    public void setByteaWKB(boolean byteaWKB) {
+        this.byteaWKB = byteaWKB;
+    }
+    public boolean isByteaWKB()
+    {
+    	return byteaWKB;
+    }
     /**
      * Enables the use of bytea function for WKB data transfer (will improve
      * performance).  Note this function need not be set by the programmer, as
