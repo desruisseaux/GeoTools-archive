@@ -1,6 +1,8 @@
 
 package org.geotools.data.wfs;
 
+import java.util.List;
+
 import org.geotools.data.wms.getCapabilities.MetadataURL;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -14,18 +16,18 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  */
 public class FeatureSetDescription {
-    public static final int NO_OPERATION = -1;
-    public static final int QUERY_OPERATION = 0;
-    public static final int INSERT_OPERATION = 1;
-    public static final int UPDATE_OPERATION = 2;
-    public static final int DELETE_OPERATION = 4;
-    public static final int LOCK_OPERATION = 8;
+    public static final int NO_OPERATION = 0;
+    public static final int QUERY_OPERATION = 1;
+    public static final int INSERT_OPERATION = 2;
+    public static final int UPDATE_OPERATION = 4;
+    public static final int DELETE_OPERATION = 8;
+    public static final int LOCK_OPERATION = 16;
     
     private String name;
     private String title;
     private String _abstract;
     private String SRS;
-    private String keywords;
+    private List keywords;
     private Envelope[] latLongBoundingBox;
     private int operations;
     private MetadataURL[] metadataURL;
@@ -44,13 +46,13 @@ public class FeatureSetDescription {
     /**
      * @return Returns the keywords.
      */
-    public String getKeywords() {
+    public List getKeywords() {
         return keywords;
     }
     /**
      * @param keywords The keywords to set.
      */
-    public void setKeywords(String keywords) {
+    public void setKeywords(List keywords) {
         this.keywords = keywords;
     }
     /**

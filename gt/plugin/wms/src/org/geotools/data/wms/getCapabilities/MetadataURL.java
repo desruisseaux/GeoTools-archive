@@ -29,13 +29,36 @@ import java.net.URL;
  */
 public class MetadataURL {
     
-    public final static int TC211 = 0;
-    public final static int FGDC  = 1;
+    public final static int TC211 = 1;
+    public final static int FGDC  = 2;
 
     private String format;
     private URL onlineResource;
     
     private int type;
+    
+    public MetadataURL(){
+        format = "";type = 0;onlineResource = null;
+    }
+    
+    public static int parseType(String s){
+        if("TC211".equals(s))
+            return TC211;
+        if("FGDC".equals(s))
+            return FGDC;
+        return 0;
+    }
+    
+    public static String writeType(int type){
+        switch(type){
+        case TC211:
+            return "TC211";
+        case FGDC:
+            return "FGDC";
+        default:
+            return null;
+        }
+    }
     
     /**
      * @param format
