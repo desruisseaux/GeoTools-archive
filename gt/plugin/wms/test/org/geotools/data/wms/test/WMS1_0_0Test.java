@@ -149,7 +149,7 @@ public class WMS1_0_0Test extends TestCase {
         URL getCapsURL = getCaps.toURL();
         Map hints = new HashMap();
         hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-    	Object object = DocumentFactory.getInstance(getCapsURL.toURI(), hints, Level.FINEST);
+    	Object object = DocumentFactory.getInstance(getCapsURL.openStream(), hints, Level.FINEST);
     
         Schema schema = WMSSchema.getInstance();
     	SchemaFactory.getInstance(WMSSchema.NAMESPACE);

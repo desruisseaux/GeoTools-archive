@@ -38,6 +38,7 @@ import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.filter.CapabilitiesTest;
 import org.xml.sax.SAXException;
 
 
@@ -141,51 +142,59 @@ public class WebMapServerTest extends TestCase {
         assertEquals(image.getHeight(), 400);
     }
 
-    //TODO This test is offline pending writing of a 1.1.0 parser.
+    public void testIssueGetFeatureInfoRequest() throws Exception {
+        
+        WebMapServer wms = new WebMapServer(featureURL);
+        WMSCapabilities capabilities = wms.getCapabilities();
+        
+        assertNotNull(capabilities);
+        
+        
+        
+        
+        
+//            WebMapServer wms = new WebMapServer(featureURL, true);
+//            wms.getCapabilities();
+//            GetMapRequest getMapRequest = wms.createGetMapRequest();
+//
+//            List simpleLayers = getMapRequest.getAvailableLayers();
+//        Iterator iter = simpleLayers.iterator();
+//        while (iter.hasNext()) {
+//                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
+//                Object[] styles = simpleLayer.getValidStyles().toArray();
+//                if (styles.length == 0) {
+//                        simpleLayer.setStyle("");
+//                        continue;
+//                }
+//                Random random = new Random();
+//                int randomInt = random.nextInt(styles.length);
+//                simpleLayer.setStyle((String) styles[randomInt]);
+//        }
+//        getMapRequest.setLayers(simpleLayers);
+//
+//        getMapRequest.setSRS("EPSG:42304");
+//        getMapRequest.setDimensions("400", "400");
+//        getMapRequest.setFormat("image/jpeg");
+//
+//        getMapRequest.setBBox("-2.2e+06,-712631,3.0728e+06,3.84e+06");
+//        URL url2 = getMapRequest.getFinalURL();
+//
+//            GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
+//            request.setQueryLayers(request.getQueryableLayers());
+//            request.setQueryPoint(200, 200);
+//            request.setInfoFormat("application/vnd.ogc.gml");
+//            URL url = request.getFinalURL();
+//
+//            GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request, false);
+//            assertEquals("application/vnd.ogc.gml", response.getContentType());
+//            BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+//    String line;
+//
+//            while ((line = in.readLine()) != null) {
+//        System.out.println(line);
+//    }
 
-    /*public void testIssueGetFeatureInfoRequest() throws Exception {
-            WebMapServer wms = new WebMapServer(featureURL, true);
-            wms.getCapabilities();
-            GetMapRequest getMapRequest = wms.createGetMapRequest();
-
-            List simpleLayers = getMapRequest.getAvailableLayers();
-        Iterator iter = simpleLayers.iterator();
-        while (iter.hasNext()) {
-                SimpleLayer simpleLayer = (SimpleLayer) iter.next();
-                Object[] styles = simpleLayer.getValidStyles().toArray();
-                if (styles.length == 0) {
-                        simpleLayer.setStyle("");
-                        continue;
-                }
-                Random random = new Random();
-                int randomInt = random.nextInt(styles.length);
-                simpleLayer.setStyle((String) styles[randomInt]);
-        }
-        getMapRequest.setLayers(simpleLayers);
-
-        getMapRequest.setSRS("EPSG:42304");
-        getMapRequest.setDimensions("400", "400");
-        getMapRequest.setFormat("image/jpeg");
-
-        getMapRequest.setBBox("-2.2e+06,-712631,3.0728e+06,3.84e+06");
-        URL url2 = getMapRequest.getFinalURL();
-
-            GetFeatureInfoRequest request = wms.createGetFeatureInfoRequest(getMapRequest);
-            request.setQueryLayers(request.getQueryableLayers());
-            request.setQueryPoint(200, 200);
-            request.setInfoFormat("application/vnd.ogc.gml");
-            URL url = request.getFinalURL();
-
-            GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request, false);
-            assertEquals("application/vnd.ogc.gml", response.getContentType());
-            BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
-    String line;
-
-            while ((line = in.readLine()) != null) {
-        System.out.println(line);
     }
-
-    }*/
     
     public void testIterator() throws SAXException, URISyntaxException, IOException {
         WebMapServer wms = new WebMapServer(serverURL);
