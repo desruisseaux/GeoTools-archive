@@ -7,7 +7,7 @@
 <!-- sorted dependencies.                                                 -->
 <!--                                                                      -->
 <!-- This particular reactor will take a set of projects and:             -->
-<!--                                                                 	    -->
+<!--                                                                 	  -->
 <!-- a) sort the order of processing based on dependencies                -->
 <!-- b) clean                                                             -->
 <!-- c) compile                                                           -->
