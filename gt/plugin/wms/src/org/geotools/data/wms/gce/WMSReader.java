@@ -13,7 +13,6 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.coverage.grid.Format;
@@ -42,6 +41,7 @@ public class WMSReader implements GridCoverageReader {
 	private Object source;
 	private URL url;
 	private boolean hasNext = true;
+	private WMSFormat format;
 	
 	/**
 	 * Source can be one of:
@@ -82,7 +82,7 @@ public class WMSReader implements GridCoverageReader {
 	 * @see org.geotools.data.coverage.grid.GridCoverageReader#getFormat()
 	 */
 	public Format getFormat() {
-		return new WMSFormat();
+		return format;
 	}
 
 	/* (non-Javadoc)
@@ -188,6 +188,13 @@ public class WMSReader implements GridCoverageReader {
 	public void dispose() throws IOException {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * @param format
+	 */
+	public void setFormat(WMSFormat format) {
+		this.format = format;
 	}
 
 }

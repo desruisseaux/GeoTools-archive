@@ -14,6 +14,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.opengis.parameter.GeneralOperationParameter;
 
 /**
  * @author rgould
@@ -22,12 +23,27 @@ import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WMSFormat extends AbstractGridFormat {
+	
+	private WMT_MS_Capabilities capabilities;
 
+	public WMSFormat() {
+		
+	}
+	
+	/**
+	 * @param capabilities
+	 */
+	public WMSFormat(WMT_MS_Capabilities capabilities) {
+		this.capabilities = capabilities;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
 	 */
 	public GridCoverageReader getReader(Object source) {
-		return new WMSReader(source);
+		WMSReader reader = new WMSReader (source);
+		reader.setFormat(this);
+		return reader;
 	}
 
 	/* (non-Javadoc)
@@ -70,4 +86,12 @@ public class WMSFormat extends AbstractGridFormat {
 		return false;
 	}
 
+	public GeneralOperationParameter[] getReadParameters() {
+		readParameters = new GeneralOperationParameter[14];
+		
+		WMSParameterMaker maker = new WMSParameterMaker(capabilities);
+		readParameters[0] = maker.createFormatReadParam();
+		
+		return readParameters;
+	}
 }

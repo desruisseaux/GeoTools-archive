@@ -50,7 +50,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     		capabilities = (WMT_MS_Capabilities) source;
     	}
     	formats = new Format[1];
-    	formats[0] = new WMSFormat();
+    	formats[0] = new WMSFormat(capabilities);
     }
 	
 	public void dispose() throws IOException {
