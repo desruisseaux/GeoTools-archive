@@ -237,22 +237,22 @@ public class BasicTest extends TestCase {
         MathTransform transform = ProjectiveTransform.create(matrix);
         assertFalse(transform instanceof AffineTransform);
         formatter.append(transform);
-        assertEquals(formatter.toString(), "PARAM_MT[\"Affine\", "          +
-                                           "PARAMETER[\"num_row\", 4], "    +
-                                           "PARAMETER[\"num_col\", 4], "    +
-                                           "PARAMETER[\"elt_0_2\", 4.0], "  +
-                                           "PARAMETER[\"elt_1_0\", -2.0], " +
-                                           "PARAMETER[\"elt_2_3\", 7.0]]");
+        assertEquals("PARAM_MT[\"Affine\", "          +
+                     "PARAMETER[\"num_row\", 4], "    +
+                     "PARAMETER[\"num_col\", 4], "    +
+                     "PARAMETER[\"elt_0_2\", 4.0], "  +
+                     "PARAMETER[\"elt_1_0\", -2.0], " +
+                     "PARAMETER[\"elt_2_3\", 7.0]]", formatter.toString());
         matrix.setSize(3,3);
         transform = ProjectiveTransform.create(matrix);
         assertTrue(transform instanceof AffineTransform);
         formatter.clear();
         formatter.append(transform);
-        assertEquals(formatter.toString(), "PARAM_MT[\"Affine\", "          +
-                                           "PARAMETER[\"num_row\", 3], "    +
-                                           "PARAMETER[\"num_col\", 3], "    +
-                                           "PARAMETER[\"elt_0_2\", 4.0], "  +
-                                           "PARAMETER[\"elt_1_0\", -2.0]]");
+        assertEquals("PARAM_MT[\"Affine\", "          +
+                     "PARAMETER[\"num_row\", 3], "    +
+                     "PARAMETER[\"num_col\", 3], "    +
+                     "PARAMETER[\"elt_0_2\", 4.0], "  +
+                     "PARAMETER[\"elt_1_0\", -2.0]]", formatter.toString());
     }
 
     /**

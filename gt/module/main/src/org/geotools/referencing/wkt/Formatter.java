@@ -311,7 +311,6 @@ public class Formatter {
         }
         if (parameter instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameter;
-            appendSeparator(false);
             // Covariance: Remove cast if covariance is allowed.
             final OperationParameter descriptor = (OperationParameter) param.getDescriptor();
             Unit unit = descriptor.getUnit();
@@ -340,6 +339,7 @@ public class Formatter {
      * @see #appendParameter(String, double, Unit)
      */
     private void appendParameter(final String name, final String value) {
+        appendSeparator(false);
         buffer.append("PARAMETER");
         buffer.append(OPEN);
         buffer.append(QUOTE);
