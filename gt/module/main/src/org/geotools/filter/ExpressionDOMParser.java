@@ -446,9 +446,15 @@ public final class ExpressionDOMParser {
         List coordList;
         int type = 0;
         Node child = root;
-        String childName = (child.getLocalName()!=null)?child.getLocalName():child.getNodeName(); 
-        if (childName.equalsIgnoreCase("gml:box")) {
-            LOGGER.finer("box");
+	//Jesus I hate DOM.  I have no idea why this was checking for localname
+	//and then nodename - lead to non-deterministic behavior, that for
+	//some reason only failed if the filter parser was used within the
+	//SLDparser.  I really would like that class redone, so we don't have
+	//to use this crappy DOM GML parser.
+        String childName = child.getNodeName(); 
+	childName = childName.toLowerCase();
+	if (childName.equalsIgnoreCase("gml:box")) {
+     
             type = GML_BOX;
             coordList = parseCoords(child);
 
@@ -600,7 +606,7 @@ public final class ExpressionDOMParser {
             //}
             
             
-            String childName = (child.getLocalName()!=null)?child.getLocalName():child.getNodeName(); 
+            String childName = child.getNodeName(); 
             if (childName.equalsIgnoreCase("gml:coordinates")) {
                 LOGGER.finer("coordinates "
                     + child.getFirstChild().getNodeValue());
