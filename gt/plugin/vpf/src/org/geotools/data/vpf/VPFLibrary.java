@@ -242,6 +242,14 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
             Feature row = (Feature)rowsIter.next();
             Short rowId = new Short(Short.parseShort(row.getAttribute("id").toString()));
             String value = row.getAttribute(FIELD_TILE_NAME).toString();
+
+            // Mangle tile directory from DOS style directory splits to a system
+            // specific form
+            String[] tmp = value.split("\\\\");
+            value = tmp[0];
+            for(int i = 1, ii = tmp.length; i < ii; i++) {
+                value = value.concat(File.separator).concat(tmp[i]);
+            }
             tileMap.put(rowId, value);
         }
     }
