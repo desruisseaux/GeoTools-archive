@@ -131,7 +131,6 @@ public class WFSDataStore extends AbstractDataStore {
         String password, int timeout, int buffer)
         throws SAXException, IOException {
         super(true);
-        WFSDataStoreFactory.logger.setLevel(Level.WARNING);
 
         // TODO find a better way of adding functionality to the factory ... perhaps putting in your own RootHandler?
         new WFSSchemaFactory();

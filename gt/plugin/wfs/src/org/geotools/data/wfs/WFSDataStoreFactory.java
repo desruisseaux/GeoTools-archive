@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreFactory;
@@ -89,7 +90,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             false);
     
     protected Map cache = new HashMap();
-    protected static Logger logger = Logger.getLogger("org.geotools.data.wfs");
+    protected static Logger logger = {
+    	logger = Logger.getLogger("org.geotools.data.wfs");
+    	logger.setLevel(Level.OFF);
+    };
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)

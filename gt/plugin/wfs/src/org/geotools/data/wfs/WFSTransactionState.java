@@ -117,18 +117,18 @@ public class WFSTransactionState implements State {
             }
         }
 
-        if (((ds.protocol & WFSDataStore.GET_PROTOCOL) == WFSDataStore.GET_PROTOCOL)
-                && (tr == null)) {
-            try {
-                tr = commitPost();
-            } catch (OperationNotSupportedException e) {
-                WFSDataStoreFactory.logger.warning(e.toString());
-                tr = null;
-            } catch (SAXException e) {
-                WFSDataStoreFactory.logger.warning(e.toString());
-                tr = null;
-            }
-        }
+//        if (((ds.protocol & WFSDataStore.GET_PROTOCOL) == WFSDataStore.GET_PROTOCOL)
+//                && (tr == null)) {
+//            try {
+//                tr = commitPost();
+//            } catch (OperationNotSupportedException e) {
+//                WFSDataStoreFactory.logger.warning(e.toString());
+//                tr = null;
+//            } catch (SAXException e) {
+//                WFSDataStoreFactory.logger.warning(e.toString());
+//                tr = null;
+//            }
+//        }
 
         if (tr == null) {
             throw new IOException("An error occured");
@@ -169,6 +169,13 @@ public class WFSTransactionState implements State {
         }
         hints.put(DocumentWriter.SCHEMA_ORDER,
     			ns.toArray(new String[ns.size()])); // Transaction
+        
+        // DEBUG
+        OutputStream debugos = System.out;
+        Writer debugw = new OutputStreamWriter(debugos);
+
+        DocumentWriter.writeDocument(this, WFSSchema.getInstance(), debugw, hints);
+        debugos.flush();
         
         OutputStream os = hc.getOutputStream();
 

@@ -200,5 +200,11 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         if(transaction == null)
             throw new NullPointerException("Should this not be Transaction.AutoCommit?");
         trans = transaction;
+        if(trans != Transaction.AUTO_COMMIT){
+        	WFSTransactionState ts = (WFSTransactionState) trans.getState(ds);
+        	if(ts == null){
+        		trans.putState(ds,new WFSTransactionState(ds));
+        	}
+        }
     }
 }
