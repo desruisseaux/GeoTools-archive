@@ -274,17 +274,24 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     private ReadableByteChannel getReadChannel(URL url)
     throws IOException {
         ReadableByteChannel channel = null;
-        
-        if (url.getProtocol().equals("file") && useMemoryMappedBuffer) {
-            File file = new File(url.getFile());
-            
-            if (!file.exists() || !file.canRead()) {
-                throw new IOException(
-                "File either doesn't exist or is unreadable : " + file);
+
+        if (url.getProtocol().equals("file")){// && useMemoryMappedBuffer) {
+            File file = null;
+            if(url.getHost()!=null && !url.getHost().equals("")) {
+                //win
+                file = new File(url.getHost()+":"+url.getFile());
+            }else {
+                //linux
+                file = new File(url.getFile());
             }
-            
-            FileInputStream in = new FileInputStream(file);
-            channel = in.getChannel();
+
+			if (!file.exists() || !file.canRead()) {
+			    throw new IOException(
+			            "File either doesn't exist or is unreadable : " + file);
+			}                        
+			FileInputStream in = new FileInputStream(file);            
+			channel = in.getChannel();
+			
         } else {
             InputStream in = url.openConnection().getInputStream();
             channel = Channels.newChannel(in);
@@ -308,15 +315,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     private WritableByteChannel getWriteChannel(URL url)
     throws IOException {
         WritableByteChannel channel;
-        
-        if (url.getProtocol().equals("file") && useMemoryMappedBuffer) {
-            File f = new File(url.getFile());
-            
-            if (!f.exists() && !f.createNewFile()) {
-                throw new IOException("Cannot create file " + f);
+
+        if (url.getProtocol().equals("file")){// && useMemoryMappedBuffer) {
+            File file = null;
+            if(url.getHost()!=null && !url.getHost().equals("")) {
+                //win
+                file = new File(url.getHost()+":"+url.getFile());
+            }else {
+                //linux
+                file = new File(url.getFile());
             }
             
-            RandomAccessFile raf = new RandomAccessFile(f, "rw");
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
             channel = raf.getChannel();
         } else {
             OutputStream out = url.openConnection().getOutputStream();

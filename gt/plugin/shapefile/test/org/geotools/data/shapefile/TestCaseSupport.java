@@ -149,7 +149,4 @@ public abstract class TestCaseSupport extends TestCase {
         tmpFile.deleteOnExit();
         return tmpFile;
     }
-    
-    
-    
 }
