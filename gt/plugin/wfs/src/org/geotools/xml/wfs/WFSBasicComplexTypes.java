@@ -167,7 +167,7 @@ public class WFSBasicComplexTypes {
                 attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
                 attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[2].getName(),null,"string",attrs[2].getFixed());
                 Query query = (Query)value;
-                if(query.getMaxFeatures()!=Query.DEFAULT_MAX)
+                if(query!=null && query.getMaxFeatures()!=Query.DEFAULT_MAX)
                     attributes.addAttribute(WFSSchema.NAMESPACE.toString(),elems[3].getName(),null,"integer",""+query.getMaxFeatures());
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);
