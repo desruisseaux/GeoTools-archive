@@ -838,7 +838,8 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
                         normalized[i] = normalized[i].absolute();
                     }
                 }
-                normalized[1] = normalized[1].inverse(); // Image's Y axis is downward.
+                normalized[1] = normalized[1].opposite(); // Image's Y axis is downward.
+                
                 matrix = new GeneralMatrix(srcEnvelope, axis, dstEnvelope, normalized);
             } else {
                 matrix = new GeneralMatrix(srcEnvelope, dstEnvelope);
