@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p>
  * Q: Should this class turn itself into a data.Query? Or should I turn data.Query into a subclass.
  * </p>
+ * @UML CG_CATALOG
  * @author Jody Garnett, Refractions Research
  * @version 2.1
  */

@@ -28,13 +28,14 @@ import java.util.List;
  * or the dereference value of the element is returned( when getValue is called)
  *
  * The following XPath options are permitted:
- * Hard reference - eg.  FileData/Name
- *                                         the <code>Element</code> <italic>Name</italic> in the <code>Entity</code> <italic>FileData</italic> is returned.
- * Regular expressions - eg.          FileData/\w+
- *                                                                 returns all the <code>Elements</code> in the <code>Entity</code> <italic>FileData</italic>
- *
+ * <ul>
+ * <li>Hard reference: FileData/Name <br>
+ * the <code>Element</code> Name in the <code>Entity</code>
+ * FileData is returned
+ * <li>Regular expressions: FileData/\w+ <br>
+ * all the <code>Elements</code> in the <code>Entity</code> FileData
+ * </ul>
  * @author jeichar
- *
  */
 public class XPath {
     String[] terms;

@@ -56,6 +56,30 @@ import java.util.List;
  * <li>Finally you can ignore the problem
  * </ul> 
  * </p>
+ * <p>
+ * This interface is based on the discussion in the Abstract Catalog specification:
+ * <pre><code>
+ * 4.6 Metadata dataset
+ *     Metadta describing a specific dataset [ISO 19101]
+ * 
+ * 4.7 Metadata entity
+ *     Group of metadata elements and other metadata entities describing the same
+ *     aspect of data.
+ * 
+ * NOTE 1  A metadata entity may contain one or more metadata entities
+ * NOTE 2  A metadata is equivalent to a class in UML terminology [ISO 19101]
+ * 
+ * 4.8 Metadata schema
+ *     Conceptual schema describing metadata
+ * 
+ * NOTE ISO 19115 describes a standard for a metadata schema [ISO 19101]
+ * </code></pre>
+ * </p>
+ * <p>
+ * 
+ * @UML abstract CG_Catalog (Figure 6)
+ * @see ISO 19101
+ * @see ISO 19115 
  * @author jeichar
  */
 public interface Metadata {
