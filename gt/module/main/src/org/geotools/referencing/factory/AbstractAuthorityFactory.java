@@ -68,12 +68,15 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.util.NameFactory;
 
 
 /**
@@ -561,9 +564,9 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system} from a code. If the
-     * coordinate reference system type is know at compile time, it is recommended to invoke the most precise method
-     * instead of this one (for example
+     * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}
+     * from a code. If the coordinate reference system type is know at compile time, it is
+     * recommended to invoke the most precise method instead of this one (for example
      * <code>&nbsp;{@linkplain #createGeographicCRS createGeographicCRS}(code)&nbsp;</code>
      * instead of <code>&nbsp;createCoordinateReferenceSystem(code)&nbsp;</code> if the caller
      * know he is asking for a {@linkplain GeographicCRS geographic coordinate reference system}).
@@ -830,6 +833,33 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         final NoSuchAuthorityCodeException exception = noSuchAuthorityCode(type, code);
         exception.initCause(cause);
         return exception;
+    }
+
+    /**
+     * Trim the authority scope, if present. For example if this factory is an EPSG authority
+     * factory and the specified code start with the "EPSG:" prefix, then the prefix is removed.
+     * Otherwise, if a prefix is present but unrecognized, then an exception is thrown.
+     *
+     * @param  code The code to trim.
+     * @return The code without the authority scope.
+     * @throws NoSuchAuthorityCodeException if the specified code as a scope and the scope
+     *         is not the one expected by this factory.
+     *
+     * @todo Localize the error message.
+     */
+    protected String trimAuthority(String code) throws NoSuchAuthorityCodeException {
+        code = code.trim();
+        final GenericName name  = NameFactory.create(code);
+        final GenericName scope = name.getScope();
+        if (scope == null) {
+            return code;
+        }
+        if (org.geotools.metadata.citation.Citation.titleMatches(getAuthority(), scope.toString())) {
+            return name.asLocalName().toString();
+        }
+        final InternationalString authority = getAuthority().getTitle();
+        throw new NoSuchAuthorityCodeException("\"" + scope.toInternationalString() + 
+                "\" is outside the scope of " + authority + "factory.", authority.toString(), code);
     }
 
     /**

@@ -43,7 +43,7 @@ public class FactoryForOracle extends FactoryForSQL {
     /**
      * The pattern to use for removing <code>" as "</code> elements from the SQL statements.
      */
-    private final Pattern pattern = Pattern.compile("\\sas\\s");
+    private final Pattern pattern = Pattern.compile("\\sAS\\s");
 
     /**
      * Constructs an authority factory using the specified connection.

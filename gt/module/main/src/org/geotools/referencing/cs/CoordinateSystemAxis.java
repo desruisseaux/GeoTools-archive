@@ -488,13 +488,12 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @throws NoSuchElementException if the given name is not a know axis direction.
      */
     public static AxisDirection getDirection(final String direction) throws NoSuchElementException {
-        final String search = direction.trim().toUpperCase();
+        final String search = direction.trim();
         final AxisDirection[] values = AxisDirection.values();
         for (int i=0; i<values.length; i++) {
             final AxisDirection candidate = values[i];
             final String name = candidate.name();
-            assert name.equals(name.toUpperCase()) : name;
-            if (search.equals(name)) {
+            if (search.equalsIgnoreCase(name)) {
                 return candidate;
             }
         }

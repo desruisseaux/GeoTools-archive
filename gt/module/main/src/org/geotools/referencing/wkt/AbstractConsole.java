@@ -176,7 +176,7 @@ public abstract class AbstractConsole implements Runnable {
      * in the form <code>name = wkt</code> (without the <code>SET</code> keyword). The
      * result is the same than invoking the <code>SET</code> instruction for each line
      * in the specified stream. This method is used for loading predefined objects like
-     * the database used by {@link org.geotools.referencing.PropertyAuthorityFactory}.
+     * the database used by {@link org.geotools.referencing.factory.PropertyAuthorityFactory}.
      *
      * @param  in The input stream.
      * @throws IOException if an input operation failed.

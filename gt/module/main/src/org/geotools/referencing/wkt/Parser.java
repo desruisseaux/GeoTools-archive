@@ -92,6 +92,12 @@ import org.geotools.resources.cts.Resources;
  */
 public class Parser extends MathTransformParser {
     /**
+     * The mapping between WKT element name and the object class to be created.
+     * Will be created by {@link #getClassOf} only when first needed.
+     */
+    private static Map types;
+    
+    /**
      * The factory to use for creating {@linkplain Datum datum}.
      */
     protected final DatumFactory datumFactory;
@@ -119,14 +125,14 @@ public class Parser extends MathTransformParser {
     private final Map directions;
     
     /**
-     * Construct a parser using the default set of symbols and factories.
+     * Constructs a parser using the default set of symbols and factories.
      */
     public Parser() {
         this(Symbols.DEFAULT);
     }
     
     /**
-     * Construct a parser for the specified set of symbols using default factories.
+     * Constructs a parser for the specified set of symbols using default factories.
      *
      * @param symbols The symbols for parsing and formatting numbers.
      */
@@ -139,7 +145,22 @@ public class Parser extends MathTransformParser {
     }
     
     /**
-     * Construct a parser for the specified set of symbols using the specified factories.
+     * Constructs a parser for the specified set of symbols using the specified set of factories.
+     *
+     * @param symbols   The symbols for parsing and formatting numbers.
+     * @param factories The factories to use.
+     */
+    public Parser(final Symbols symbols, final FactoryGroup factories) {
+        this(symbols,
+             factories.getDatumFactory(),
+             factories.getCSFactory(),
+             factories.getCRSFactory(),
+             factories.getMathTransformFactory());
+        this.factories = factories;
+    }
+    
+    /**
+     * Constructs a parser for the specified set of symbols using the specified factories.
      *
      * @param symbols      The symbols for parsing and formatting numbers.
      * @param datumFactory The factory to use for creating {@linkplain Datum datum}.
@@ -881,6 +902,41 @@ public class Parser extends MathTransformParser {
         } catch (NoninvertibleTransformException exception) {
             throw element.parseFailed(exception, null);
         }
+    }
+
+    /**
+     * Returns the class of the specified WKT element. For example for this method returns
+     * <code>{@linkplain ProjectedCRS}.class</code> for element "{@code PROJCS}".
+     *
+     * @param  element The WKT element name.
+     * @return The GeoAPI class of the specified element, or <code>null</code> if unknow.
+     */
+    public static Class getClassOf(String element) {
+        // No need to synchronize.
+        element = element.trim().toUpperCase();
+        if (types == null) {
+            final Map map = new HashMap(25);
+            map.put(        "GEOGCS",        GeographicCRS.class);
+            map.put(        "PROJCS",         ProjectedCRS.class);
+            map.put(        "GEOCCS",        GeocentricCRS.class);
+            map.put(       "VERT_CS",          VerticalCRS.class);
+            map.put(      "LOCAL_CS",       EngineeringCRS.class);
+            map.put(      "COMPD_CS",          CompoundCRS.class);
+            map.put(     "FITTED_CS",           DerivedCRS.class);
+            map.put(          "AXIS", CoordinateSystemAxis.class);
+            map.put(        "PRIMEM",        PrimeMeridian.class);
+            map.put(       "TOWGS84",  BursaWolfParameters.class);
+            map.put(      "SPHEROID",            Ellipsoid.class);
+            map.put(    "VERT_DATUM",        VerticalDatum.class);
+            map.put(   "LOCAL_DATUM",     EngineeringDatum.class);
+            map.put(         "DATUM",        GeodeticDatum.class);
+            map.put(      "PARAM_MT",        MathTransform.class);
+            map.put(     "CONCAT_MT",        MathTransform.class);
+            map.put(    "INVERSE_MT",        MathTransform.class);
+            map.put("PASSTHROUGH_MT",        MathTransform.class);
+            types = map; // Set the field only once completed, in order to avoid synchronisation.
+        }
+        return (Class) types.get(element);
     }
 
     /**

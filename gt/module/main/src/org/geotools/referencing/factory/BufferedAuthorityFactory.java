@@ -82,35 +82,26 @@ import org.geotools.referencing.factory.FactoryGroup;
  * one. This means that this buffered factory will continue to returns them as long as
  * they are in use somewhere else in the Java virtual machine, but will be discarted
  * (and recreated on the fly if needed) otherwise.
- * <br><br>
- * An other purpose of {@code BufferedAuthorityFactory} is to creates the backing factory
- * only the first time a {@code createFoo(...)} method is invoked. This approach allow to
- * instantiate a connection to a database (for example) only when first needed.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Add a protected {@code setTimeout(long)} method which set a {@link java.util.Timer} for
- *       dispoding the backing store after the specified amount of milliseconds of
- *       inactivity. The {@link #createBackingStore} method is responsible for creating
- *       a new backing store when needed.
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The default value for {@link #maxStrongReferences}.
      */
-    private static final int DEFAULT_MAX = 20;
+    static final int DEFAULT_MAX = 20;
 
     /**
      * The underlying authority factory. This field may be <code>null</code> if this object was
-     * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected
+     * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) package protected
      * constructor}. In this case, the subclass is responsible for creating the backing store
-     * when {@link #createBackingStore} is invoked.
+     * when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
      *
      * @see #getBackingStore
-     * @see #createBackingStore
+     * @see DeferredAuthorityFactory#createBackingStore
      */
-    private AbstractAuthorityFactory backingStore;
+    AbstractAuthorityFactory backingStore;
 
     /**
      * The pool of cached objects.
@@ -157,73 +148,42 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * Constructs an instance without initial backing store. This constructor is for subclass
      * constructors only. Subclasses are responsible for creating an appropriate backing store
-     * when the {@link #createBackingStore} method is invoked.
-     *
-     * @param factories The factories to use.
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
-     *
-     * @see #createBackingStore
-     */
-    protected BufferedAuthorityFactory(final FactoryGroup factories,
-                                       final int          priority)
-    {
-        this(factories, priority, DEFAULT_MAX);
-    }
-
-    /**
-     * Constructs an instance without initial backing store. This constructor is for subclass
-     * constructors only. Subclasses are responsible for creating an appropriate backing store
-     * when the {@link #createBackingStore} method is invoked.
+     * when the {@link DeferredAuthorityFactory#createBackingStore} method is invoked.
      *
      * @param factories The factories to use.
      * @param priority The priority for this factory, as a number between
      *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      *
-     * @see #createBackingStore
+     * @see DeferredAuthorityFactory#createBackingStore
      */
-    protected BufferedAuthorityFactory(final FactoryGroup factories,
-                                       final int          priority,
-                                       final int maxStrongReferences)
+    BufferedAuthorityFactory(final FactoryGroup factories,
+                             final int          priority,
+                             final int maxStrongReferences)
     {
         super(factories, priority);
         this.maxStrongReferences = maxStrongReferences;
     }
 
     /**
-     * Returns the backing store authority factory.<
+     * Returns the backing store authority factory.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the creation of backing store failed.
      */
-    private final AbstractAuthorityFactory getBackingStore() throws FactoryException {
+    AbstractAuthorityFactory getBackingStore() throws FactoryException {
         if (backingStore == null) {
-            backingStore = createBackingStore();
+            throw new FactoryException("The factory has been disposed."); // TODO: localize.
         }
         return backingStore;
     }
 
     /**
-     * Creates the backing store authority factory. Subclasses are required to override this
-     * method if they were constructed through one of the protected constructors. In this
-     * case, this method is invoked the first time a {@code createXXX(...)} method is invoked.
-     * Note that subclasses may need to override {@link #getVendor} and {@link #getAuthority}
-     * as well.
-     *
-     * @return The backing store to uses in {@code createXXX(...)} methods.
-     * @throws FactoryException if the creation of backing store failed.
-     */
-    protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
-        throw new FactoryException("Subclasses must override 'createBackingStore()'");
-    }
-
-    /**
      * Returns {@code true} if this factory is ready. The default implementation returns
-     * {@code false} if no backing store were setup and {@link #createBackingStore} throws
-     * an exception.
+     * {@code false} if no backing store were setup and
+     * {@link DeferredAuthorityFactory#createBackingStore} throws an exception.
      */
-    public boolean isReady() {
+    public synchronized boolean isReady() {
         try {
             return getBackingStore().isReady();
         } catch (FactoryException exception) {
@@ -237,20 +197,16 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
 
     /**
      * Returns the vendor responsible for creating the underlying factory implementation.
-     * This method may need to be overriden if this {@code BufferedAuthorityFactory} was created
-     * using the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected constructor}.
      */
-    public Citation getVendor() {
+    public synchronized Citation getVendor() {
         return (backingStore!=null) ? backingStore.getVendor() : super.getVendor();
     }
 
     /**
      * Returns the organization or party responsible for definition and maintenance of the
-     * underlying database. This method should be overriden if this
-     * {@code BufferedAuthorityFactory} was created using the
-     * {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) protected constructor}.
+     * underlying database.
      */
-    public Citation getAuthority() {
+    public synchronized Citation getAuthority() {
         return backingStore.getAuthority();
     }
 
@@ -264,7 +220,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public Set getAuthorityCodes(final Class type) throws FactoryException {
+    public synchronized Set getAuthorityCodes(final Class type)
+            throws FactoryException
+    {
         return getBackingStore().getAuthorityCodes(type);
     }
 
@@ -277,7 +235,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
      * @throws FactoryException if the query failed for some other reason.
      */
-    public InternationalString getDescriptionText(final String code) throws FactoryException {
+    public synchronized InternationalString getDescriptionText(final String code)
+            throws FactoryException
+    {
         return getBackingStore().getDescriptionText(code);
     }
 

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -99,7 +100,60 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             iterator = getServiceProviders(category, true);
         }
-        return iterator;
+        return new Filtered(iterator);
+    }
+
+    /**
+     * An iterator over the factory that are ready.
+     */
+    private static final class Filtered implements Iterator {
+        /** The iterator over all factories. */
+        private final Iterator it;
+
+        /** The next factory, or {@code null} if none. */
+        private Object next;
+
+        /** Filter the specified iterator. */
+        Filtered(final Iterator it) {
+            this.it = it;
+            move();
+        }
+
+        /** Move the iterator to the next factory ready. */
+        private void move() {
+            while (it.hasNext()) {
+                next = it.next();
+                if (next != null) {
+                    if (next instanceof OptionalFactory) {
+                        if (!((OptionalFactory) next).isReady()) {
+                            continue;
+                        }
+                    }
+                    return;
+                }
+            }
+            next = null;
+        }
+
+        /** Returns {@code true} if the iteration has more elements. */
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        /** Returns the next element in the iteration. */
+        public Object next() {
+            final Object factory = next;
+            if (factory == null) {
+                throw new NoSuchElementException();
+            }
+            move();
+            return factory;
+        }
+
+        /** Removes from the underlying collection the last element returned by the iterator. */
+        public void remove() {
+            it.remove();
+        }
     }
 
     /**

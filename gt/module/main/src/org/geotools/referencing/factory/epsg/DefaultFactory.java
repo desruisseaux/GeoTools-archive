@@ -35,12 +35,13 @@ import javax.sql.DataSource;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
-import org.geotools.referencing.factory.BufferedAuthorityFactory;
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;
@@ -71,7 +72,7 @@ import org.geotools.util.MonolineFormatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultFactory extends BufferedAuthorityFactory {
+public class DefaultFactory extends DeferredAuthorityFactory {
     /**
      * Preference node for the {@linkplain DataSource data source} class name.
      */
@@ -92,7 +93,8 @@ public class DefaultFactory extends BufferedAuthorityFactory {
      * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
      */
     public DefaultFactory() {
-        super(new FactoryGroup(), MAX_PRIORITY);
+        super(new FactoryGroup(), MAX_PRIORITY-1);
+        setTimeout(30*60*1000L); // Closes the connection after at least 30 minutes of inactivity.
     }
 
     /**
@@ -139,7 +141,7 @@ public class DefaultFactory extends BufferedAuthorityFactory {
             record.setThrown(exception);
             record.setSourceClassName(DefaultFactory.class.getName());
             record.setSourceMethodName("createDataSource");
-            EPSGFactory.LOGGER.log(record);
+            LOGGER.log(record);
         }
         final DataSource source;
         try {
@@ -173,6 +175,12 @@ public class DefaultFactory extends BufferedAuthorityFactory {
      *
      * @todo Do may need some standard way (in Geotools) for fetching an {@link InitialContext}
      *       for the whole Geotools library?
+     *
+     * @todo Needs a better was to know which {@link EPSGFactory} implementation to use.
+     *       Instead of relying on the product name (which is hardly generic), we should
+     *       try a SQL statement like "SELECT id FROM epsg_sometable WHERE ID=0" (we don't
+     *       mind if the result set contains no record) and use {@link FactoryForSQL} if
+     *       the above didn't threw a SQLException.
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         DataSource source;
@@ -183,13 +191,13 @@ public class DefaultFactory extends BufferedAuthorityFactory {
             } catch (NameNotFoundException exception) {
                 source = createDataSource();
                 context.bind(DATASOURCE_NAME, source);
-                EPSGFactory.LOGGER.info("Created a \"" + DATASOURCE_NAME +
-                                        "\" entry in the naming system."); // TODO: localize
+                LOGGER.info("Created a \"" + DATASOURCE_NAME +
+                            "\" entry in the naming system."); // TODO: localize
             }
         } catch (NoInitialContextException exception) {
             source = createDataSource();
             // TODO: localize
-            EPSGFactory.LOGGER.config("Using default EPSG data source without naming system.");
+            LOGGER.config("Using default EPSG data source without naming system.");
         } catch (NamingException exception) {
             // TODO: localize
             throw new FactoryException("Failed to get the data source for name \"" +
@@ -209,11 +217,11 @@ public class DefaultFactory extends BufferedAuthorityFactory {
             throw new FactoryException("Failed to connect to the EPSG database", exception);
         }
         // TODO: Provide a localized message including the database version.
-        EPSGFactory.LOGGER.config("Connected to EPSG database \"" + url + "\".");
+        LOGGER.config("Connected to EPSG database \"" + url + "\".");
         final EPSGFactory epsg;
         /*
-         * TODO: Hard-coded product names for now.
-         *       We will need to implement a better way later.
+         * TODO: Hard-coded product names for now. We will need to implement a
+         *       better way later (see the @todo comment in the method javadoc).
          */
         if (product.equalsIgnoreCase("PostgreSQL") ||
             product.equalsIgnoreCase("MySQL"))
@@ -316,17 +324,17 @@ public class DefaultFactory extends BufferedAuthorityFactory {
             }
         }
         try {
-            DefaultFactory factory = null;
+            AuthorityFactory factory = null;
             try {
                 for (int i=0; i<args.length; i++) {
                     if (factory == null) {
-                        factory = new DefaultFactory();
+                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG");
                     }
                     arguments.out.println(factory.createObject(args[i]));
                 }
             } finally {
-                if (factory != null) {
-                    factory.dispose();
+                if (factory instanceof AbstractAuthorityFactory) {
+                    ((AbstractAuthorityFactory) factory).dispose();
                 }
             }
         } catch (Exception exception) {

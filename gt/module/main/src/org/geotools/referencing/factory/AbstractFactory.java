@@ -22,11 +22,17 @@
  */
 package org.geotools.referencing.factory;
 
+// J2SE dependencies
+import java.util.logging.Logger;
+
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.ObjectFactory;
+
+// Geotools dependencies
+import org.geotools.factory.OptionalFactory;
 
 
 /**
@@ -44,7 +50,12 @@ import org.opengis.referencing.ObjectFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractFactory implements Factory {
+public class AbstractFactory implements Factory, OptionalFactory {
+    /**
+     * The logger for event related to Geotools's factories.
+     */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+
     /**
      * Construct a default factory.
      */

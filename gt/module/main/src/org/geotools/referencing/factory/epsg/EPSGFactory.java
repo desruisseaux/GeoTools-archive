@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
@@ -97,6 +96,10 @@ import org.geotools.util.ScopedName;
  * Default implementation for a coordinate system factory backed by the EPSG database. The EPSG
  * database is freely available at <A HREF="http://www.epsg.org">http://www.epsg.org</a>. Current
  * version of this class requires EPSG database version 6.6.
+ * <br><br>
+ * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new
+ * query to the EPSG database. For caching, this factory should be wrapped in some buffered factory
+ * like {@link DefaultFactory}.
  *
  * @version $Id$
  * @author Yann Cézard
@@ -104,11 +107,6 @@ import org.geotools.util.ScopedName;
  * @author Rueben Schulz
  */
 public class EPSGFactory extends AbstractAuthorityFactory {
-    /**
-     * The logger for EPSG factories.
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.epsg");
-
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                            ////////
     ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
@@ -287,7 +285,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      * @param connection The connection to the underlying EPSG database.
      */
     public EPSGFactory(final FactoryGroup factories, final Connection connection) {
-        super(factories, MAX_PRIORITY);
+        super(factories, MAX_PRIORITY-2);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }
@@ -509,8 +507,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
          */
         List alias = null;
         final PreparedStatement stmt;
-        stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME,"
-                                       +       " ALIAS"
+        stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME, ALIAS"
                                        + " FROM [Alias] INNER JOIN [Naming System]"
                                        +   " ON [Alias].NAMING_SYSTEM_CODE ="
                                        +      " [Naming System].NAMING_SYSTEM_CODE"
@@ -583,6 +580,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      *         store. This exception usually have {@link SQLException} as its cause.
      */
     public synchronized IdentifiedObject createObject(final String code) throws FactoryException {
+        ensureNonNull("code", code);
         final String       KEY = "IdentifiedObject";
         PreparedStatement stmt = (PreparedStatement) statements.get(KEY); // Null allowed.
         StringBuffer     query = null; // Will be created only if the last statement doesn't suit.
@@ -594,6 +592,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
          * costly operation. Only the last successful prepared statement is cached, in order to keep
          * the amount of statements low. Unsuccessful statements are immediately disposed.
          */
+        final String epsg = trimAuthority(code);
         for (int i=-2; i<OBJECT_TABLES.length; i+=2) {
             if (i == lastObjectType) {
                 // Avoid to test the same table twice.  Note that this test also avoid a
@@ -618,7 +617,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                     assert !statements.containsKey(KEY);
                     stmt = prepareStatement(KEY, query.toString());
                 }
-                stmt.setString(1, code);
+                stmt.setString(1, epsg);
                 final ResultSet result = stmt.executeQuery();
                 final boolean  present = result.next();
                 result.close();
@@ -657,6 +656,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized Unit createUnit(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         Unit returnValue = null;
         try {
             final PreparedStatement stmt;
@@ -666,7 +666,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                           +       " TARGET_UOM_CODE"
                                           + " FROM [Unit of Measure]"
                                           + " WHERE UOM_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final int source = getInt(result,   1, code);
@@ -711,10 +711,12 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized Ellipsoid createEllipsoid(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         Ellipsoid returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("Ellipsoid", "SELECT ELLIPSOID_NAME,"
+            stmt = prepareStatement("Ellipsoid", "SELECT ELLIPSOID_CODE,"
+                                               +       " ELLIPSOID_NAME,"
                                                +       " SEMI_MAJOR_AXIS,"
                                                +       " INV_FLATTENING,"
                                                +       " SEMI_MINOR_AXIS,"
@@ -722,7 +724,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                                +       " REMARKS"
                                                + " FROM [Ellipsoid]"
                                                + " WHERE ELLIPSOID_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 /*
@@ -730,14 +732,15 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  * the database. Consequently, we don't use 'getString(ResultSet, int)'
                  * because we don't want to thrown an exception if a NULL value is found.
                  */
-                final String name              = getString(result, 1, code);
-                final double semiMajorAxis     = getDouble(result, 2, code);
-                final double inverseFlattening = result.getDouble( 3);
-                final double semiMinorAxis     = result.getDouble( 4);
-                final String unitCode          = getString(result, 5, code);
-                final String remarks           = result.getString( 6);
+                final String epsg              = getString(result, 1, code);
+                final String name              = getString(result, 2, code);
+                final double semiMajorAxis     = getDouble(result, 3, code);
+                final double inverseFlattening = result.getDouble( 4);
+                final double semiMinorAxis     = result.getDouble( 5);
+                final String unitCode          = getString(result, 6, code);
+                final String remarks           = result.getString( 7);
                 final Unit   unit              = buffered.createUnit(unitCode);
-                final Map    properties        = createProperties(name, code, remarks);
+                final Map    properties        = createProperties(name, epsg, remarks);
                 final Ellipsoid ellipsoid;
                 if (inverseFlattening == 0) {
                     if (semiMinorAxis == 0) {
@@ -788,24 +791,27 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized PrimeMeridian createPrimeMeridian(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         PrimeMeridian returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("PrimeMeridian", "SELECT PRIME_MERIDIAN_NAME,"
+            stmt = prepareStatement("PrimeMeridian", "SELECT PRIME_MERIDIAN_CODE,"
+                                                   +       " PRIME_MERIDIAN_NAME,"
                                                    +       " GREENWICH_LONGITUDE,"
                                                    +       " UOM_CODE,"
                                                    +       " REMARKS"
                                                    + " FROM [Prime Meridian]"
                                                    + " WHERE PRIME_MERIDIAN_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                final String name      = getString(result, 1, code);
-                final double longitude = getDouble(result, 2, code);
-                final String unit_code = getString(result, 3, code);
-                final String remarks   = result.getString( 4);
+                final String epsg      = getString(result, 1, code);
+                final String name      = getString(result, 2, code);
+                final double longitude = getDouble(result, 3, code);
+                final String unit_code = getString(result, 4, code);
+                final String remarks   = result.getString( 5);
                 final Unit unit        = buffered.createUnit(unit_code);
-                final Map properties   = createProperties(name, code, remarks);
+                final Map properties   = createProperties(name, epsg, remarks);
                 PrimeMeridian primeMeridian = factories.getDatumFactory().createPrimeMeridian(
                                               properties, longitude, unit);
                 returnValue = (PrimeMeridian) ensureSingleton(primeMeridian, returnValue, code);
@@ -832,6 +838,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized Extent createExtent(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         Extent returnValue = null;
         try {
             final PreparedStatement stmt;
@@ -842,7 +849,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                           +       " AREA_EAST_BOUND_LON"
                                           + " FROM [Area]"
                                           + " WHERE AREA_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 org.geotools.metadata.extent.Extent extent = null;
@@ -1010,10 +1017,12 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      *       to maps the exact vertical datum type from the EPSG database.
      */
     public synchronized Datum createDatum(final String code) throws FactoryException {
+        ensureNonNull("code", code);
         Datum returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("Datum", "SELECT DATUM_NAME,"
+            stmt = prepareStatement("Datum", "SELECT DATUM_CODE,"
+                                           +       " DATUM_NAME,"
                                            +       " DATUM_TYPE,"
                                            +       " ORIGIN_DESCRIPTION,"
                                            +       " REALIZATION_EPOCH,"
@@ -1024,17 +1033,18 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                            +       " PRIME_MERIDIAN_CODE" // Only for geodetic type
                                            + " FROM [Datum]"
                                            + " WHERE DATUM_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                final String name    = getString(result, 1, code);
-                final String type    = getString(result, 2, code);
-                final String anchor  = result.getString( 3);
-                final int    epoch   = result.getInt   ( 4);
-                final String area    = result.getString( 5);
-                final String scope   = result.getString( 6);
-                final String remarks = result.getString( 7);
-                Map properties = createProperties(name, code, area, scope, remarks);
+                final String epsg    = getString(result, 1, code);
+                final String name    = getString(result, 2, code);
+                final String type    = getString(result, 3, code);
+                final String anchor  = result.getString( 4);
+                final int    epoch   = result.getInt   ( 5);
+                final String area    = result.getString( 6);
+                final String scope   = result.getString( 7);
+                final String remarks = result.getString( 8);
+                Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (anchor != null) {
                     properties.put(org.geotools.referencing.datum.Datum.
                                    ANCHOR_POINT_PROPERTY, anchor);
@@ -1061,8 +1071,8 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  */
                 if (type.equalsIgnoreCase("geodetic")) {
                     properties = new HashMap(properties); // Protect from changes
-                    final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result, 8, code));
-                    final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 9, code));
+                    final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result,  9, code));
+                    final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 10, code));
                     final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
                     if (param != null) {
                         result = null; // Already closed by createBursaWolfParameters
@@ -1109,6 +1119,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         throw new FactoryException("Not yet implemented.");
     }
 
@@ -1203,24 +1214,27 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized CoordinateSystem createCoordinateSystem(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         CoordinateSystem returnValue = null;
         final PreparedStatement stmt;
         try {
-            stmt = prepareStatement("CoordinateSystem", "SELECT COORD_SYS_NAME,"
+            stmt = prepareStatement("CoordinateSystem", "SELECT COORD_SYS_CODE,"
+                                                      +       " COORD_SYS_NAME,"
                                                       +       " COORD_SYS_TYPE,"
                                                       +       " DIMENSION,"
                                                       +       " REMARKS"
                                                       + " FROM [Coordinate System]"
                                                       + " WHERE COORD_SYS_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                final String    name = getString(result, 1, code);
-                final String    type = getString(result, 2, code);
-                final int  dimension = getInt   (result, 3, code);
-                final String remarks = result.getString( 4);
+                final String    epsg = getString(result, 1, code);
+                final String    name = getString(result, 2, code);
+                final String    type = getString(result, 3, code);
+                final int  dimension = getInt   (result, 4, code);
+                final String remarks = result.getString( 5);
                 final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(code, dimension);
-                final Map properties = createProperties(name, code, remarks); // Must be after axis
+                final Map properties = createProperties(name, epsg, remarks); // Must be after axis
                 final CSFactory factory = factories.getCSFactory();
                 CoordinateSystem cs = null;
                 if (type.equalsIgnoreCase("ellipsoidal")) {
@@ -1292,11 +1306,13 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
+        ensureNonNull("code", code);
         CoordinateReferenceSystem returnValue = null;
         try {
             PreparedStatement stmt;
             stmt = prepareStatement("CoordinateReferenceSystem",
-                                            "SELECT COORD_REF_SYS_NAME,"
+                                            "SELECT COORD_REF_SYS_CODE,"
+                                          +       " COORD_REF_SYS_NAME,"
                                           +       " AREA_OF_USE_CODE,"
                                           +       " CRS_SCOPE,"
                                           +       " REMARKS,"
@@ -1309,14 +1325,15 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                                           +       " CMPD_VERTCRS_CODE"     // For CompoundCRS only
                                           + " FROM [Coordinate Reference System]"
                                           + " WHERE COORD_REF_SYS_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, trimAuthority(code));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                final String name    = getString(result, 1, code);
-                final String area    = result.getString( 2);
-                final String scope   = result.getString( 3);
-                final String remarks = result.getString( 4);
-                final String type    = getString(result, 5, code);
+                final String epsg    = getString(result, 1, code);
+                final String name    = getString(result, 2, code);
+                final String area    = result.getString( 3);
+                final String scope   = result.getString( 4);
+                final String remarks = result.getString( 5);
+                final String type    = getString(result, 6, code);
                 final CRSFactory factory = factories.getCRSFactory();
                 final CoordinateReferenceSystem crs;
                 /* ----------------------------------------------------------------------
@@ -1328,12 +1345,12 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                 if (type.equalsIgnoreCase("geographic 2D") ||
                     type.equalsIgnoreCase("geographic 3D"))
                 {
-                    final String csCode       = getString(result, 6, code);
-                    final String dmCode       = getString(result, 7, code);
+                    final String csCode       = getString(result, 7, code);
+                    final String dmCode       = getString(result, 8, code);
                     final EllipsoidalCS cs    = buffered.createEllipsoidalCS(csCode);
                     final GeodeticDatum datum = buffered.createGeodeticDatum(dmCode);
                     crs = factory.createGeographicCRS(
-                          createProperties(name, code, area, scope, remarks), datum, cs);
+                          createProperties(name, epsg, area, scope, remarks), datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   PROJECTED CRS
@@ -1342,9 +1359,9 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  *         Concequently, we can't use 'result' anymore. We must close it here.
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("projected")) {
-                    final String csCode     = getString(result, 6, code);
-                    final String geoCode    = getString(result, 8, code);
-                    final String conversion = getString(result, 9, code);
+                    final String csCode     = getString(result,  7, code);
+                    final String geoCode    = getString(result,  9, code);
+                    final String conversion = getString(result, 10, code);
                     result.close(); // Must be close before createGeographicCRS
                     final CartesianCS   cs     = buffered.createCartesianCS(csCode);
                     final GeographicCRS geoCRS = buffered.createGeographicCRS(geoCode);
@@ -1367,7 +1384,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                         final String opRemarks = result.getString( 5);
                         method = (OperationMethod) ensureSingleton(createOperationMethod(
                                                    opCode, conversion, 2, 2, true), method, code);
-                        properties = createProperties(name, code, area, scope, remarks);
+                        properties = createProperties(name, epsg, area, scope, remarks);
                         assert prefix.length() == 0 : prefix;
                         try {
                             prefix.append("conversion.");
@@ -1393,12 +1410,12 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  *   VERTICAL CRS
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("vertical")) {
-                    final String        csCode = getString(result, 6, code);
-                    final String        dmCode = getString(result, 7, code);
+                    final String        csCode = getString(result, 7, code);
+                    final String        dmCode = getString(result, 8, code);
                     final VerticalCS    cs     = buffered.createVerticalCS   (csCode);
                     final VerticalDatum datum  = buffered.createVerticalDatum(dmCode);
                     crs = factory.createVerticalCRS(
-                          createProperties(name, code, area, scope, remarks), datum, cs);
+                          createProperties(name, epsg, area, scope, remarks), datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   COMPOUND CRS
@@ -1407,26 +1424,26 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  *         Concequently, we can't use 'result' anymore.
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("compound")) {
-                    final String code1 = getString(result, 10, code);
-                    final String code2 = getString(result, 11, code);
+                    final String code1 = getString(result, 11, code);
+                    final String code2 = getString(result, 12, code);
                     result.close();
                     result = null;
                     final CoordinateReferenceSystem crs1, crs2;
                     crs1 = buffered.createCoordinateReferenceSystem(code1);
                     crs2 = buffered.createCoordinateReferenceSystem(code2);
                     crs  = factory.createCompoundCRS(
-                           createProperties(name, code, area, scope, remarks),
+                           createProperties(name, epsg, area, scope, remarks),
                            new CoordinateReferenceSystem[] {crs1, crs2});
                 }
                 /* ----------------------------------------------------------------------
                  *   GEOCENTRIC CRS
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("geocentric")) {
-                    final String           csCode = getString(result, 6, code);
-                    final String           dmCode = getString(result, 7, code);
+                    final String           csCode = getString(result, 7, code);
+                    final String           dmCode = getString(result, 8, code);
                     final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
                     final GeodeticDatum    datum  = buffered.createGeodeticDatum   (dmCode);
-                    final Map properties = createProperties(name, code, area, scope, remarks);
+                    final Map properties = createProperties(name, epsg, area, scope, remarks);
                     if (cs instanceof CartesianCS) {
                         crs = factory.createGeocentricCRS(properties, datum, (CartesianCS) cs);
                     } else if (cs instanceof SphericalCS) {
@@ -1441,12 +1458,12 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                  *   ENGINEERING CRS
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("engineering")) {
-                    final String           csCode = getString(result, 6, code);
-                    final String           dmCode = getString(result, 7, code);
+                    final String           csCode = getString(result, 7, code);
+                    final String           dmCode = getString(result, 8, code);
                     final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
                     final EngineeringDatum datum  = buffered.createEngineeringDatum(dmCode);
                     crs = factory.createEngineeringCRS(
-                          createProperties(name, code, area, scope, remarks), datum, cs);
+                          createProperties(name, epsg, area, scope, remarks), datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   UNKNOW CRS
