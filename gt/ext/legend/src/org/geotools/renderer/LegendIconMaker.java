@@ -53,6 +53,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.gui.swing.sldeditor.util.StyleCloner;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.LineSymbolizer;
@@ -314,8 +315,7 @@ public class LegendIconMaker {
         try {
             HashMap params1 = new HashMap();
             params1.put("url",
-                new File("u:/work/MMPPAS/step1/testdata/geog/eds_region.shp").toURL()
-                                                                             .toString());
+                TestData.getResource(LegendIconMaker.class, "lakes.shp") );
 
             DataStore data = DataStoreFinder.getDataStore(params1);
             int width = UIManager.getIcon("Tree.openIcon").getIconWidth();
@@ -336,11 +336,11 @@ public class LegendIconMaker {
             JLabel iconJLabel = new JLabel("Legend Icon Example");
             
             String typeName = data.getTypeNames()[0];
-            FeatureSource eds_region = data.getFeatureSource( typeName );
+            FeatureSource shape = data.getFeatureSource( typeName );
             
             iconJLabel.setIcon(LegendIconMaker.makeLegendIcon(width,
                     new Color(0, 0, 0, 0), new Symbolizer[] { polySymbolizer },
-                    (Feature) eds_region.getFeatures().collection().toArray()[0]));
+                    (Feature) shape.getFeatures().collection().toArray()[2]));
 
             JFrame f = new JFrame();
             f.getContentPane().setBackground(new Color(204, 204, 255));
