@@ -26,9 +26,7 @@ package org.geotools.metadata.citation;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.SimpleInternationalString;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Address;
 import org.opengis.metadata.citation.Contact;
 import org.opengis.metadata.citation.OnLineFunction;
@@ -36,6 +34,11 @@ import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Telephone;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
+import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -55,16 +58,26 @@ public class ResponsibleParty extends MetadataEntity
     private static final long serialVersionUID = -2477962229031486552L;
 
     /**
-     * Create a a ResonsibleParty metadata entry for OGC involvemnt.
-     * <p>
-     * TODO: limited to package visability waiting for Martin okay
-     * </p>
-     * @param role 
-     * @param function
-     * @param onlineResource
+     * The name of Open Geospatial Consortium as an international string.
+     *
+     * @todo Localize.
+     */
+    private static final InternationalString OGC_NAME =
+            new SimpleInternationalString("Open Geospatial Consortium");
+
+    /**
+     * Create a a responsible party metadata entry for OGC involvement.
+     * The organisation name is automatically set to "Open Geospatial Consortium".
+     *
+     * @param role           The OGC role (point of contact, owner, etc.) for a resource.
+     * @param function       The OGC function (information, download, etc.) for a resource.
+     * @param onlineResource The URL on the resource.
      * @return ResponsibleParty describing OGC involvement
      */ 
-    static ResponsibleParty ogc( Role role, OnLineFunction function, URL onlineResource ){        
+    public static ResponsibleParty OGC(final Role role,
+                                       final OnLineFunction function,
+                                       final URL onlineResource)
+    {
         org.geotools.metadata.citation.OnLineResource resource = new org.geotools.metadata.citation.OnLineResource();
         
         resource.setLinkage( onlineResource );
@@ -76,7 +89,7 @@ public class ResponsibleParty extends MetadataEntity
         contact.freeze();
         
         ResponsibleParty ogc = new ResponsibleParty( role );
-        ogc.setOrganisationName(new SimpleInternationalString("Open Geospatial Consortium"));        
+        ogc.setOrganisationName( OGC_NAME );
         ogc.setContactInfo( contact );        
         ogc.freeze();
         
@@ -84,15 +97,13 @@ public class ResponsibleParty extends MetadataEntity
     }
     
     /**
-     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> responsible party.
+     * The <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A> responsible party.
      *
-     * @see org.geotools.metadata.citation.Contact#OPEN_GIS
-     *
-     * @todo Localize.
+     * @see org.geotools.metadata.citation.Contact#OGC
      */
     public static ResponsibleParty OGC = new ResponsibleParty(Role.RESOURCE_PROVIDER);
     static {
-        OGC.setOrganisationName(new SimpleInternationalString("Open Geospatial Consortium"));
+        OGC.setOrganisationName(OGC_NAME);
         OGC.setContactInfo(org.geotools.metadata.citation.Contact.OGC);        
         OGC.freeze();
     }

@@ -49,13 +49,14 @@ public class OnLineResource extends MetadataEntity
     private static final long serialVersionUID = 5412370008274334799L;
     
     /**
-     * The online resources for the <A HREF="http://www.opengis.org">Open Geospatial Consortium</A>.
-     * @see OPEN_GIS
+     * The online resources for the <A HREF="http://www.opengeospatial.org">Open Geospatial Consortium</A>.
+     * @see #OPEN_GIS
      */
     public static final OnLineResource OGC = new OnLineResource();
     
     /**
      * The online resources for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
+     * @see #OGC
      */
     public static final OnLineResource OPEN_GIS = new OnLineResource();
     

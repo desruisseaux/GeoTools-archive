@@ -35,12 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashMap;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.util.SimpleInternationalString;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.PresentationForm;
@@ -48,6 +43,14 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashMap;
+import org.geotools.util.CheckedHashSet;
+import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -78,15 +81,27 @@ public class Citation extends MetadataEntity
                  org.geotools.metadata.citation.ResponsibleParty.OGC));
         OPEN_GIS.freeze();
     }
-   
-    private static ResponsibleParty ogc( Role role, OnLineFunction function, String url ){
+
+    /**
+     * Create a a responsible party metadata entry for OGC involvement.
+     * The organisation name is automatically set to "Open Geospatial Consortium".
+     *
+     * @param role           The OGC role (point of contact, owner, etc.) for a resource.
+     * @param function       The OGC function (information, download, etc.) for a resource.
+     * @param onlineResource The URL on the resource.
+     * @return ResponsibleParty describing OGC involvement
+     */ 
+    private static ResponsibleParty OGC(Role role, OnLineFunction function, String onlineResource) {
         try {
-            return org.geotools.metadata.citation.ResponsibleParty.ogc( role, function, new URL( url ) );
+            return org.geotools.metadata.citation.ResponsibleParty.OGC( role, function,
+                                                                        new URL( onlineResource ) );
         }
-        catch( MalformedURLException badContact ){
+        catch (MalformedURLException badContact) {
+            Utilities.unexpectedException("org.geotools.metadata", "Citation", "OGC", badContact);
             return org.geotools.metadata.citation.ResponsibleParty.OGC;
         }
     }
+
     /**
      * The <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A>
      * (01-068r3) "Automatic Projections" Authority.
@@ -107,26 +122,21 @@ public class Citation extends MetadataEntity
      */
     public static final Citation AUTO = new Citation("Automatic Projections");
     static { // Sanity check ensure that all @see tags are actually available in the metadata
-        try {
-            AUTO.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
-            
-            List titles = new ArrayList();
-            titles.add( new SimpleInternationalString("AUTO"));        
-            titles.add( new SimpleInternationalString("WMS 1.1.1"));
-            titles.add( new SimpleInternationalString("OGC 01-068r2"));                
-            AUTO.setAlternateTitles( titles );
-            
-            Set parties = new HashSet();
-            parties.add( ogc( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
-            parties.add( ogc( Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf" ));
-            AUTO.setCitedResponsibleParties( parties );
-            
-            AUTO.setIdentifiers( Collections.singleton("AUTO") );        
-            AUTO.freeze();
-        }
-        catch( Throwable t ){
-            t.printStackTrace();
-        }
+        AUTO.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+
+        List titles = new ArrayList(3);
+        titles.add( new SimpleInternationalString("AUTO"));        
+        titles.add( new SimpleInternationalString("WMS 1.1.1"));
+        titles.add( new SimpleInternationalString("OGC 01-068r2"));                
+        AUTO.setAlternateTitles( titles );
+
+        Set parties = new HashSet(4);
+        parties.add( OGC( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
+        parties.add( OGC( Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf" ));
+        AUTO.setCitedResponsibleParties( parties );
+
+        AUTO.setIdentifiers( Collections.singleton("AUTO") );        
+        AUTO.freeze();
     }
     
     /**
@@ -148,26 +158,21 @@ public class Citation extends MetadataEntity
      */
     public static final Citation AUTO2 = new Citation("Automatic Projections");
     static {
-        try {
-            AUTO2.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
-            
-            List titles = new ArrayList();
-            titles.add( new SimpleInternationalString("AUTO2"));        
-            titles.add( new SimpleInternationalString("WMS 1.3.0"));
-            titles.add( new SimpleInternationalString("OGC 04-024"));                
-            AUTO2.setAlternateTitles( titles );
-            
-            Set parties = new HashSet();
-            parties.add( ogc( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
-            parties.add( ogc( Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316" ));
-            AUTO2.setCitedResponsibleParties( parties );
-            
-            AUTO2.setIdentifiers( Collections.singleton("AUTO2") );        
-            AUTO2.freeze();
-        }
-        catch( Throwable t ){
-            t.printStackTrace();
-        }
+        AUTO2.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+
+        List titles = new ArrayList(3);
+        titles.add( new SimpleInternationalString("AUTO2"));        
+        titles.add( new SimpleInternationalString("WMS 1.3.0"));
+        titles.add( new SimpleInternationalString("OGC 04-024"));                
+        AUTO2.setAlternateTitles( titles );
+
+        Set parties = new HashSet(4);
+        parties.add( OGC( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
+        parties.add( OGC( Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316" ));
+        AUTO2.setCitedResponsibleParties( parties );
+
+        AUTO2.setIdentifiers( Collections.singleton("AUTO2") );        
+        AUTO2.freeze();
     }
     
     /**

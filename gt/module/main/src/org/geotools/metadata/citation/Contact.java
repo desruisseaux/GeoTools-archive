@@ -47,13 +47,13 @@ public class Contact extends MetadataEntity
     private static final long serialVersionUID = 3283637180253117382L;
     
     /**
-     * Contact informations for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
+     * Contact informations for the <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A>.
      *
-     * @see org.geotools.metadata.citation.OnLineResource#OPEN_GIS
+     * @see org.geotools.metadata.citation.OnLineResource#OGC
      */
     public static final Contact OGC = new Contact();
     static {
-        OGC.setOnLineResource(org.geotools.metadata.citation.OnLineResource.OGC );
+        OGC.setOnLineResource(org.geotools.metadata.citation.OnLineResource.OGC);
         OGC.freeze();
     }    
     /**
