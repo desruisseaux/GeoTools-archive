@@ -19,7 +19,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.parameter.ParameterValueGroup;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.renderer.j2d.RenderedMapScale;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.Graphic;
@@ -60,7 +60,7 @@ public class SpearfishSample {
         
         //get the parameters and set them
         OperationParameterGroup paramDescriptor = f.getReadParameters();
-        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+        ParameterGroup params = (ParameterGroup) paramDescriptor.createValue();
         params.getValue( "Compressed" ).setValue( true );
         params.getValue( "GRASS" ).setValue( true );
         
