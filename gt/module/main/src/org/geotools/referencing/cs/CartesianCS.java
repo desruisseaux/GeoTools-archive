@@ -49,9 +49,9 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see ObliqueCartesianCS
+ * @see AffineCS
  */
-public class CartesianCS extends ObliqueCartesianCS implements org.opengis.referencing.cs.CartesianCS {
+public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.CartesianCS {
     /**
      * Serial number for interoperability with different versions.
      */

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Collections;
 
 // OpenGIS dependencies
-import org.opengis.referencing.cs.ObliqueCartesianCS;
+import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.datum.ImageDatum;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
  
@@ -40,21 +40,20 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.CartesianCS        Cartesian},
- *   {@link org.geotools.referencing.cs.ObliqueCartesianCS ObliqueCartesian}
+ *   {@link org.geotools.referencing.cs.CartesianCS Cartesian},
+ *   {@link org.geotools.referencing.cs.AffineCS    Affine}
  * </TD></TR></TABLE>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ImageCRS extends CoordinateReferenceSystem
+public class ImageCRS extends org.geotools.referencing.crs.SingleCRS
                    implements org.opengis.referencing.crs.ImageCRS
 {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 7312452786096397847L;
-
 
     /**
      * Constructs an image CRS from a name.
@@ -63,9 +62,9 @@ public class ImageCRS extends CoordinateReferenceSystem
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public ImageCRS(final String           name,
-                    final ImageDatum      datum,
-                    final ObliqueCartesianCS cs)
+    public ImageCRS(final String     name,
+                    final ImageDatum datum,
+                    final AffineCS   cs)
     {
         this(Collections.singletonMap("name", name), datum, cs);
     }
@@ -78,9 +77,9 @@ public class ImageCRS extends CoordinateReferenceSystem
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public ImageCRS(final Map        properties,
-                    final ImageDatum      datum,
-                    final ObliqueCartesianCS cs)
+    public ImageCRS(final Map   properties,
+                    final ImageDatum datum,
+                    final AffineCS      cs)
     {
         super(properties, datum, cs);
     }

@@ -727,7 +727,7 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
                                    ImageDatum    datum,
                                    CoordinateSystem cs) throws FactoryException
     {
-        return createImageCRS(properties, datum, (ObliqueCartesianCS) cs);
+        return createImageCRS(properties, datum, (AffineCS) cs);
     }
     
     /**
@@ -738,9 +738,9 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public ImageCRS createImageCRS(Map        properties,
-                                   ImageDatum      datum,
-                                   ObliqueCartesianCS cs) throws FactoryException
+    public ImageCRS createImageCRS(Map    properties,
+                                   ImageDatum  datum,
+                                   AffineCS       cs) throws FactoryException
     {
         ImageCRS crs;
         try {

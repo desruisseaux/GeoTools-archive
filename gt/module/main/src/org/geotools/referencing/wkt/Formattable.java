@@ -22,7 +22,11 @@
  */
 package org.geotools.referencing.wkt;
 
+// J2SE dependencies
+import java.util.prefs.Preferences;
+
 // Geotools dependencies
+import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
 
@@ -38,6 +42,12 @@ import org.geotools.resources.Utilities;
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
 public class Formattable {
+    /**
+     * The "Indentation" preference name.
+     * Note: this string is also hard-coded in AffineTransform2D.
+     */
+    private static final String INDENTATION = "Indentation";
+
     /**
      * Default constructor.
      */
@@ -65,13 +75,42 @@ public class Formattable {
     /**
      * Returns a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> using a default indentation. The default indentation is read from
+     * {@linkplain Preferences user preferences}. It can be set from the command line using the
+     * following syntax:
+     *
+     * <blockquote>
+     * <code>java org.geotools.referencing.wkt.Formattable -identation=</code><var>&lt;preferred
+     * indentation&gt;</var>
+     * </blockquote>
+     *
+     * @return The Well Know Text for this object.
+     * @throws UnformattableObjectException If this object can't be formatted as WKT.
+     *         A formatting may fails because an object is too complex for the WKT format
+     *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+     *         engineering CRS} with different unit for each axis), or because only some specific
+     *         implementations can be formatted as WKT.
+     */
+    public String toWKT() throws UnformattableObjectException {
+        int indentation = 2;
+        try {
+            indentation = Preferences.userNodeForPackage(Formattable.class)
+                                     .getInt(INDENTATION, indentation);
+        } catch (SecurityException ignore) {
+            // Ignore. Will fallback on the default indentation.
+        }
+        return toWKT(indentation);
+    }
+
+    /**
+     * Returns a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> for this object using a default {@linkplain Formatter formatter}.
      *
      * @param  indentation The amount of spaces to use in indentation for WKT formatting,
      *         or 0 for formatting the whole WKT on a single line.
      * @return The Well Know Text for this object.
-     *
-     * @throws UnformattableObjectException If an object can't be formatted as WKT.
+     * @throws UnformattableObjectException If this object can't be formatted as WKT.
      *         A formatting may fails because an object is too complex for the WKT format
      *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
      *         engineering CRS} with different unit for each axis), or because only some specific
@@ -113,5 +152,22 @@ public class Formattable {
      */
     protected String formatWKT(final Formatter formatter) {
         return Utilities.getShortClassName(this);
+    }
+
+    /**
+     * Set the preferred indentation from the command line. This indentation is used by
+     * {@link #toWKT()}. This method can be invoked from the command line using the following
+     * syntax:
+     *
+     * <blockquote>
+     * <code>java org.geotools.referencing.wkt.Formattable -identation=</code><var>&lt;preferred
+     * indentation&gt;</var>
+     * </blockquote>
+     */
+    public static void main(final String[] args) {
+        final Arguments arguments = new Arguments(args);
+        final int indentation = arguments.getRequiredInteger(INDENTATION);
+        arguments.getRemainingArguments(0);
+        Preferences.userNodeForPackage(Formattable.class).putInt(INDENTATION, indentation);
     }
 }

@@ -235,7 +235,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @param  x The longitude in radians.
      * @return The longitude in the range &plusmn;&pi;.
      */
-    protected static double ensureLongitudeInRange(final double x) {
+    static double ensureLongitudeInRange(final double x) {
         return x + (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
     }
     

@@ -26,7 +26,8 @@ package org.geotools.referencing.crs;
 import java.util.Map;
 import javax.units.Unit;
 
-// OpenGIS dependencies
+// OpenGIS direct dependencies
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
@@ -37,7 +38,22 @@ import org.geotools.referencing.ReferenceSystem;
 
 
 /**
- * Abstract coordinate reference system, usually defined by a coordinate system and a datum.
+ * Abstract coordinate reference system, consisting of a single
+ * {@linkplain org.geotools.referencing.cs.CoordinateSystem Coordinate System} and a single
+ * {@linkplain org.geotools.referencing.datum.Datum Datum} (as opposed to
+ * {@linkplain org.geotools.referencing.crs.CompoundCRS Compound CRS}).
+ *
+ * A coordinate reference system consists of an ordered sequence of coordinate system
+ * axes that are related to the earth through a datum. A coordinate reference system
+ * is defined by one datum and by one coordinate system. Most coordinate reference system
+ * do not move relative to the earth, except for engineering coordinate reference systems
+ * defined on moving platforms such as cars, ships, aircraft, and spacecraft.
+ *
+ * Coordinate reference systems are commonly divided into sub-types. The common classification
+ * criterion for sub-typing of coordinate reference systems is the way in which they deal with
+ * earth curvature. This has a direct effect on the portion of the earth's surface that can be
+ * covered by that type of CRS with an acceptable degree of error. The exception to the rule is
+ * the subtype "Temporal" which has been added by analogy.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -45,61 +61,68 @@ import org.geotools.referencing.ReferenceSystem;
  * @see org.geotools.referencing.cs.CoordinateSystem
  * @see org.geotools.referencing.datum.Datum
  */
-public abstract class CoordinateReferenceSystem extends ReferenceSystem
-                      implements org.opengis.referencing.crs.CoordinateReferenceSystem
+public class SingleCRS extends CoordinateReferenceSystem
+                    implements org.opengis.referencing.crs.SingleCRS
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -7433284548909530047L;
+    private static final long serialVersionUID = 1815712797774273L;
 
     /**
-     * The coordinate system.
+     * The datum.
      */
-    protected final CoordinateSystem coordinateSystem;
+    protected final Datum datum;
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
      * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public CoordinateReferenceSystem(final Map properties, final CoordinateSystem cs) {
-        super(properties);
-        ensureNonNull("cs", cs);
-        this.coordinateSystem = cs;
+    public SingleCRS(final Map      properties,
+                     final Datum         datum,
+                     final CoordinateSystem cs)
+    {
+        super(properties, cs);
+        this.datum = datum;
+        ensureNonNull("datum", datum);
     }
 
     /**
-     * Returns the coordinate system.
+     * Returns the datum.
      *
-     * @return The coordinate system.
+     * @return The datum.
      */
-    public CoordinateSystem getCoordinateSystem() {
-        return coordinateSystem;
+    public Datum getDatum() {
+        return datum;
     }
 
     /**
-     * Returns the unit used for all axis. If not all axis uses the same unit,
-     * then this method returns <code>null</code>. This method is often used
-     * for Well Know Text (WKT) formatting.
+     * Returns the dimension of the underlying {@linkplain CoordinateSystem coordinate system}.
+     * This is equivalent to <code>{@linkplain #coordinateSystem}.{@linkplain
+     * org.geotools.referencing.cs.CoordinateSystem#getDimension getDimension}()</code>.
      *
-     * @return unit The unit used for all axis, or <code>null</code>.
+     * @return The dimension of this coordinate reference system.
      */
-    final Unit getUnit() {
-        Unit unit = null;
-        for (int i=coordinateSystem.getDimension(); --i>=0;) {
-            final Unit candidate = coordinateSystem.getAxis(i).getUnit();
-            if (candidate != null) {
-                if (unit == null) {
-                    unit = candidate;
-                } else if (!unit.equals(candidate)) {
-                    return null;
-                }
-            }
-        }
-        return unit;
+    public int getDimension() {
+        return coordinateSystem.getDimension();
+    }
+
+    /**
+     * Returns the axis for the underlying {@linkplain CoordinateSystem coordinate system} at
+     * the specified dimension. This is equivalent to
+     * <code>{@linkplain #coordinateSystem}.{@linkplain
+     * org.geotools.referencing.cs.CoordinateSystem#getAxis getAxis}(dimension)</code>.
+     *
+     * @param  dimension The zero based index of axis.
+     * @return The axis at the specified dimension.
+     * @throws IndexOutOfBoundsException if <code>dimension</code> is out of bounds.
+     */
+    public CoordinateSystemAxis getAxis(int dimension) throws IndexOutOfBoundsException {
+        return coordinateSystem.getAxis(dimension);
     }
 
     /**
@@ -114,8 +137,8 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      */
     public boolean equals(final Info object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
-            final CoordinateReferenceSystem that = (CoordinateReferenceSystem) object;
-            return equals(this.coordinateSystem, that.coordinateSystem);
+            final SingleCRS that = (SingleCRS) object;
+            return equals(this.datum, that.datum);
         }
         return false;
     }
@@ -131,7 +154,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      *         in past or future versions of this class.
      */
     public int hashCode() {
-        return (int)serialVersionUID ^ coordinateSystem.hashCode();
+        return super.hashCode() ^ datum.hashCode();
     }
     
     /**
@@ -139,6 +162,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element. The default implementation write the following elements:
      * <ul>
+     *   <li>The {@linkplain #datum datum}.</li>
      *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
      *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
      *   <li>All {@linkplain #coordinateSystem coordinate system}'s axis.</li>
@@ -148,15 +172,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        final Unit unit = getUnit();
-        formatter.append(unit);
-        final int dimension = coordinateSystem.getDimension();
-        for (int i=0; i<dimension; i++) {
-            formatter.append(coordinateSystem.getAxis(i));
-        }
-        if (unit == null) {
-            formatter.setInvalidWKT();
-        }
+        formatter.append(datum);
         return super.formatWKT(formatter);
     }
 }

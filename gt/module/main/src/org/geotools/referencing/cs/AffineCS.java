@@ -33,8 +33,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 /**
  * A two- or three-dimensional coordinate system with straight axes that are not necessarily
- * orthogonal. An <code>ObliqueCartesianCS</code> shall have two or three
- * {@linkplain #getAxis axis}.
+ * orthogonal. An <code>AffineCS</code> shall have two or three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -48,8 +47,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @see CartesianCS
  */
-public class ObliqueCartesianCS extends org.geotools.referencing.cs.CoordinateSystem
-                             implements org.opengis.referencing.cs.ObliqueCartesianCS
+public class AffineCS extends org.geotools.referencing.cs.CoordinateSystem
+                   implements org.opengis.referencing.cs.AffineCS
 {
     /**
      * Serial number for interoperability with different versions.
@@ -63,9 +62,9 @@ public class ObliqueCartesianCS extends org.geotools.referencing.cs.CoordinateSy
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public ObliqueCartesianCS(final String               name,
-                              final CoordinateSystemAxis axis0,
-                              final CoordinateSystemAxis axis1)
+    public AffineCS(final String               name,
+                    final CoordinateSystemAxis axis0,
+                    final CoordinateSystemAxis axis1)
     {
         super(name, new CoordinateSystemAxis[] {axis0, axis1});
     }
@@ -78,10 +77,10 @@ public class ObliqueCartesianCS extends org.geotools.referencing.cs.CoordinateSy
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public ObliqueCartesianCS(final String               name,
-                              final CoordinateSystemAxis axis0,
-                              final CoordinateSystemAxis axis1,
-                              final CoordinateSystemAxis axis2)
+    public AffineCS(final String               name,
+                    final CoordinateSystemAxis axis0,
+                    final CoordinateSystemAxis axis1,
+                    final CoordinateSystemAxis axis2)
     {
         super(name, new CoordinateSystemAxis[] {axis0, axis1, axis2});
     }
@@ -95,9 +94,9 @@ public class ObliqueCartesianCS extends org.geotools.referencing.cs.CoordinateSy
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public ObliqueCartesianCS(final Map             properties,
-                              final CoordinateSystemAxis axis0,
-                              final CoordinateSystemAxis axis1)
+    public AffineCS(final Map             properties,
+                    final CoordinateSystemAxis axis0,
+                    final CoordinateSystemAxis axis1)
     {
         super(properties, new CoordinateSystemAxis[] {axis0, axis1});
     }
@@ -111,10 +110,10 @@ public class ObliqueCartesianCS extends org.geotools.referencing.cs.CoordinateSy
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public ObliqueCartesianCS(final Map             properties,
-                              final CoordinateSystemAxis axis0,
-                              final CoordinateSystemAxis axis1,
-                              final CoordinateSystemAxis axis2)
+    public AffineCS(final Map             properties,
+                    final CoordinateSystemAxis axis0,
+                    final CoordinateSystemAxis axis1,
+                    final CoordinateSystemAxis axis2)
     {
         super(properties, new CoordinateSystemAxis[] {axis0, axis1, axis2});
     }

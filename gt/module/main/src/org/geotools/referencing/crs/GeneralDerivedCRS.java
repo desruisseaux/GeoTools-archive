@@ -30,6 +30,7 @@ import java.util.Collections;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
@@ -55,7 +56,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateReferenceSystem
+public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                             implements org.opengis.referencing.crs.GeneralDerivedCRS
 {
     /**
@@ -223,10 +224,12 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
+     *
+     * @todo What to do if <code>base</code> is not an instance of {@link SingleCRS}?
      */
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
-        return base.getDatum();
+        return (base instanceof SingleCRS) ? ((SingleCRS) base).getDatum() : null;
     }
 
     /**

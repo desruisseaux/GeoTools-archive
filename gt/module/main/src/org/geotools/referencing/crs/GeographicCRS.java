@@ -54,7 +54,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeographicCRS extends CoordinateReferenceSystem
+public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
                         implements org.opengis.referencing.crs.GeographicCRS
 {
     /**

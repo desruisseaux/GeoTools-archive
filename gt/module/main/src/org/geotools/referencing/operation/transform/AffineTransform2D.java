@@ -22,6 +22,7 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.util.prefs.Preferences;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
@@ -163,5 +164,21 @@ final class AffineTransform2D extends XAffineTransform
      */
     public String formatWKT(final Formatter formatter) {
         return ProjectiveTransform.formatWKT(formatter, getMatrix());
+    }
+
+    /**
+     * Returns the WKT for this transform.
+     */
+    public String toWKT() {
+        int indentation = 2;
+        try {
+            indentation = Preferences.userNodeForPackage(Formattable.class)
+                                     .getInt("Indentation", indentation);
+        } catch (SecurityException ignore) {
+            // Ignore. Will fallback on the default indentation.
+        }
+        final Formatter formatter = new Formatter(null, indentation);
+        formatter.append(this);
+        return formatter.toString();
     }
 }

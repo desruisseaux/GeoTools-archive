@@ -243,7 +243,12 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
         }
         throw new UnsupportedOperationException();
     }
-    
+
+    /** For compatibility with GeoAPI interfaces. */
+    public String toWKT() {
+        return toString();
+    }
+
     /**
      * Localized {@link AxisInfo}.
      */

@@ -223,7 +223,7 @@ public class CoordinateFormat extends Format {
                 ////  Date  ////
                 ////////////////
                 if (SI.SECOND.isCompatible(unit)) {
-                    final Datum datum = CRSUtilities.getSubCRS(crs, i, i+1).getDatum();
+                    final Datum datum = CRSUtilities.getDatum(CRSUtilities.getSubCRS(crs, i, i+1));
                     if (datum instanceof TemporalDatum) {
                         if (toMillis == null) {
                             toMillis = new Converter[formats.length];

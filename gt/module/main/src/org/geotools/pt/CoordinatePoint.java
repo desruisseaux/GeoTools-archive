@@ -109,6 +109,13 @@ public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, 
     public CoordinatePoint(final CoordinatePoint point) {
         ord = (double[]) point.ord.clone();
     }
+    
+    /**
+     * Returns always <code>this</code>.
+     */
+    public DirectPosition getPosition() {
+        return this;
+    }
 
     /**
      * Returns always <code>null</code>.

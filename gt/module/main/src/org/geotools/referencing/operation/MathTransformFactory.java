@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.text.ParseException;
-import java.awt.geom.AffineTransform;
 import javax.imageio.spi.ServiceRegistry;
 
 // OpenGIS dependencies
@@ -267,21 +266,6 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         tr = (MathTransform) pool.canonicalize(tr);
         return tr;
     }    
-    
-    /**
-     * Wrap a Java2D affine transform into a math transform object.
-     * This method is provided for interoperability with
-     * <A HREF="http://java.sun.com/products/java-media/2D/index.jsp">Java2D</A>.
-     *
-     * @param matrix The matrix used to define the affine transform.
-     * @return The affine transform.
-     * @throws FactoryException if the object creation failed.
-     */
-    public MathTransform2D createAffineTransform(final AffineTransform matrix)
-            throws FactoryException
-    {
-        return (MathTransform2D) pool.canonicalize(ProjectiveTransform.create(matrix));
-    }
     
     /**
      * Creates an affine transform from a matrix.

@@ -562,12 +562,15 @@ public class Info implements org.opengis.referencing.Info, Serializable {
         return opengis;
     }
 
-    /**
-     * For compatibility with GeoAPI interfaces.
-     */
+    /** For compatibility with GeoAPI interfaces. */
     public Identifier[] getIdentifiers() {
         return EMPTY_IDENTIFIERS;
     }    
+
+    /** For compatibility with GeoAPI interfaces. */
+    public String toWKT() {
+        return toString();
+    }
     
     
     

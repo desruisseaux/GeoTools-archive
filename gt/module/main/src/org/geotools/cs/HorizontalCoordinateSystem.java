@@ -116,7 +116,7 @@ public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_HorizontalCoordinateSystem#getHorizontalDatum()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.CoordinateReferenceSystem#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.SingleCRS#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;

@@ -34,8 +34,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.referencing.Info;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CompoundCS;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -43,8 +43,8 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * A coordinate reference system describing the position of points through two or more
  * independent coordinate reference systems. Thus it is associated with two or more
- * {@linkplain org.geotools.referencing.cs.CoordinateSystem Coordinate Systems} and
- * {@linkplain org.geotools.referencing.datum.Datum Datums} by defining the compound CRS
+ * {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate systems} and
+ * {@linkplain org.geotools.referencing.datum.Datum datums} by defining the compound CRS
  * as an ordered set of two or more instances of
  * {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
  *
@@ -112,7 +112,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
      * @param crs The array of coordinate reference system making this compound CRS.
      */
     public CompoundCRS(final Map properties, CoordinateReferenceSystem[] crs) {
-        super(properties, null, createCoordinateSystem(crs));
+        super(properties, createCoordinateSystem(crs));
         ensureNonNull("crs", crs);
         this.crs = crs = (CoordinateReferenceSystem[]) crs.clone();
         for (int i=0; i<crs.length; i++) {
@@ -125,16 +125,9 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
     }
 
     /**
-     * Signal to the super-class constructor that null {@linkplain Datum datum} and/or
-     * {@linkplain CoordinateSystem coordinate system} are exceptionnally allowed for
-     * this class.
-     */
-    boolean acceptNulls() {
-        return true;
-    }
-
-    /**
      * Returns a compound coordinate system for the specified array of CRS objects.
+     * This method is a work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static CoordinateSystem createCoordinateSystem(final CoordinateReferenceSystem[] crs) {
         if (crs == null) {

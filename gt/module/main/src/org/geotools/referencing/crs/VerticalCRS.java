@@ -52,7 +52,7 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class VerticalCRS extends CoordinateReferenceSystem
+public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
                       implements org.opengis.referencing.crs.VerticalCRS
 {
     /**

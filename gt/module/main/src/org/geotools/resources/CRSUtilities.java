@@ -313,11 +313,18 @@ public final class CRSUtilities {
     }
 
     /**
+     * Returns the datum of the specified CRS, or <code>null</code> if none.
+     */
+    public static Datum getDatum(final CoordinateReferenceSystem crs) {
+        return (crs instanceof SingleCRS) ? ((SingleCRS) crs).getDatum() : null;
+    }
+
+    /**
      * Returns the first ellipsoid found in a coordinate reference system,
      * or <code>null</code> if there is none.
      */
     public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
-        final Datum datum = crs.getDatum();
+        final Datum datum = getDatum(crs);
         if (datum instanceof GeodeticDatum) {
             return ((GeodeticDatum) datum).getEllipsoid();
         }
@@ -349,7 +356,8 @@ public final class CRSUtilities {
             }
             return null;
         }
-        return ((GeodeticDatum) crs.getDatum()).getEllipsoid();
+        // Remove first cast when covariance will be allowed.
+        return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
     }
 
     /**
@@ -361,7 +369,7 @@ public final class CRSUtilities {
      */
     public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
         if (crs != null) {
-            final Datum datum = crs.getDatum();
+            final Datum datum = getDatum(crs);
             if (datum != null) {
                 Extent validArea = datum.getValidArea();
                 if (validArea != null) {

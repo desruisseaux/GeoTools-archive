@@ -71,7 +71,6 @@ import org.geotools.resources.cts.ResourceKeys;
  * </ul>
  *
  * @version $Id$
- * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -135,7 +134,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     /**
      * Construct an AbridgedMolodenskiTransform from the specified parameters.
      * 
-     * @param  parameters The parameter values in standard units.
+     * @param values The parameter values in standard units.
      */
     protected AbridgedMolodenskiTransform(final ParameterValueGroup values) {
         final int dim = values.getValue("dim").intValue();

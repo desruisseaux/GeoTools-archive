@@ -56,7 +56,8 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricCRS extends CoordinateReferenceSystem implements org.opengis.referencing.crs.GeocentricCRS
+public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
+                        implements org.opengis.referencing.crs.GeocentricCRS
 {
     /**
      * Serial number for interoperability with different versions.

@@ -36,6 +36,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.UnformattableObjectException;
 
 
 /**
@@ -367,5 +368,19 @@ public class MatrixParameterValues extends ParameterValueGroup implements Operat
             }
         }
         return copy;
+    }
+
+    /**
+     * Returns a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> using a default indentation.
+     *
+     * @return The Well Know Text for this object.
+     * @throws UnformattableObjectException If this object can't be formatted as WKT.
+     *
+     * @todo Not yet implemented.
+     */
+    public String toWKT() throws UnformattableObjectException {
+        throw new UnformattableObjectException("Not yet implemented.");
     }
 }

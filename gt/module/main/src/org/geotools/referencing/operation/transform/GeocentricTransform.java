@@ -94,12 +94,12 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     private final double b;
     
     /**
-     * Square of semi-major axis (@link #a}²).
+     * Square of semi-major axis (<var>a</var>²).
      */
     private final double a2;
     
     /**
-     * Square of semi-minor axis ({@link #b}²).
+     * Square of semi-minor axis (<var>b</var>²).
      */
     private final double b2;
     
@@ -478,9 +478,18 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
+        return formatWKT(formatter, "Ellipsoid_To_Geocentric");
+    }
+
+    /**
+     * Implementation of the WKT formatting. The classification is
+     * "Ellipsoid_To_Geocentric" or "Geocentric_To_Ellipsoid".
+     */
+    final String formatWKT(final Formatter formatter, final String classification) {
+        formatter.append(classification);
         formatter.appendParameter("semi_major", a, SI.METER);
         formatter.appendParameter("semi_minor", b, SI.METER);
-        return "Ellipsoid_To_Geocentric";
+        return super.formatWKT(formatter);
     }
     
     /**
@@ -526,8 +535,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * Known Text</cite> (WKT)</A> element.
          */
         protected String formatWKT(final Formatter formatter) {
-            GeocentricTransform.this.formatWKT(formatter);
-            return "Geocentric_To_Ellipsoid";
+            return GeocentricTransform.this.formatWKT(formatter, "Geocentric_To_Ellipsoid");
         }
 
         /**

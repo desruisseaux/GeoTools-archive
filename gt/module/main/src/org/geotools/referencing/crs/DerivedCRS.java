@@ -28,8 +28,8 @@ import java.util.Collections;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -42,7 +42,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DerivedCRS extends GeneralDerivedCRS
+public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
                      implements org.opengis.referencing.crs.DerivedCRS
 {
     /**

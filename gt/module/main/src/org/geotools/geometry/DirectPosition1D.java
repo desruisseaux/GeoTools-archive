@@ -79,6 +79,14 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     }
 
     /**
+     * Returns always <code>this</code>, the direct position for this
+     * {@linkplain org.opengis.spatialschema.geometry.geometry.Position position}.
+     */
+    public DirectPosition getPosition() {
+        return this;
+    }
+
+    /**
      * Returns the coordinate reference system in which the coordinate is given.
      * May be <code>null</code> if this particular <code>DirectPosition</code> is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem

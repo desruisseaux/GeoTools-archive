@@ -50,7 +50,7 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TemporalCRS extends CoordinateReferenceSystem
+public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
                       implements org.opengis.referencing.crs.TemporalCRS
 {
     /**

@@ -345,11 +345,11 @@ public class GridGeometry implements Serializable {
     }
     
     /**
-     * Returns the math transform which allows  for the transformations from grid
-     * coordinates to real world earth coordinates.     The transform is often an
-     * affine transformation. The coordinate system of the real world coordinates
-     * is given by {@link org.geotools.cv.Coverage#getCoordinateSystem}. If no math
-     * transform is available, this method returns <code>null</code>.
+     * Returns the math transform which allows  for the transformations from grid coordinates to
+     * real world earth coordinates. The transform is often an affine transformation. The coordinate
+     * reference system of the real world coordinates is given by
+     * {@link org.geotools.cv.Coverage#getCoordinateReferenceSystem}. If no math transform is
+     * available, this method returns <code>null</code>.
      * <br><br>
      * <strong>Note:</strong> OpenGIS requires that the transform maps <em>pixel centers</em>
      * to real world coordinates. This is different from some other systems that map pixel's

@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 
@@ -56,7 +57,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ProjectedCRS extends GeneralDerivedCRS
+public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
                        implements org.opengis.referencing.crs.ProjectedCRS
 {
     /**
