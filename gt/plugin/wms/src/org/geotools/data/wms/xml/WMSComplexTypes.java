@@ -7,13 +7,30 @@
 package org.geotools.data.wms.xml;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.data.ows.BoundingBox;
+import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.OperationType;
+import org.geotools.data.ows.Service;
+import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.ows.WMSRequest;
+import org.geotools.data.wms.WMSOperationType;
 import org.geotools.data.wms.xml.WMSSchema.WMSAttribute;
 import org.geotools.data.wms.xml.WMSSchema.WMSComplexType;
+import org.geotools.data.wms.xml.WMSSchema.WMSSimpleType;
 import org.geotools.data.wms.xml.WMSSchema.WMSElement;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
@@ -22,10 +39,12 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
+import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Sequence;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SequenceGT;
+import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -72,6 +91,46 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+
+            WMSOperationType operationType = null;
+            
+            List formatStrings = new ArrayList();
+            
+            for (int i = 0; i < elems.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    formatStrings.add(value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    operationType = (WMSOperationType) value[i].getValue();
+                }
+            }
+            
+            operationType.setFormatStrings((String[]) formatStrings.toArray());
+            
+            return operationType;
+        }
+
+        public String getName() {
+            return "OperationType";
+        }
+
+        public Class getInstanceType() {
+            return WMSOperationType.class;
+        }
+
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _WMS_CapabilitiesType extends WMSComplexType {
@@ -113,6 +172,61 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+
+            WMSCapabilities capabilities = null;
+            Service service = null;
+            
+            for (int i = 0; i < elems.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    service = ((Service) value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    capabilities = (WMSCapabilities) value[i].getValue();
+                }
+            }
+            
+            capabilities.setVersion(attrs.getValue("", "version"));
+
+            //Update sequence ignored
+            
+            capabilities.setService(service);
+            
+            return capabilities;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "WMS_Capabilities";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSCapabilities.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _ServiceType extends WMSComplexType {
@@ -157,6 +271,87 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+
+            Service service = new Service();
+            
+            for (int i = 0; i < value.length; i++) {
+                
+                if (sameName(elems[0], value[i])) {
+                    service.setTitle((String) value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    service.set_abstract((String) value[i].getValue());
+                }
+                
+                if (sameName(elems[2], value[i])) {
+                    service.setKeywordList((String[]) value[i].getValue());
+                }
+                
+                if (sameName(elems[3], value[i])) {
+                    service.setOnlineResource((URL) value[i].getValue());
+                }
+                
+//                if (sameName(elems[4], value[i])) {
+//                    //TODO contact info not implemented, ignoring
+//                }
+                
+//                if (sameName(elems[5], value[i])) {
+//                    //TODO fees not implemented, ignoring
+//                }
+                
+//                if (sameName(elems[6], value[i])) {
+//                    //TODO access constraints not implemented, ignoring
+//                }
+                
+                if (sameName(elems[7], value[i])) {
+                    service.setLayerLimit(((Integer) value[i].getValue()).intValue());
+                }
+                
+                if (sameName(elems[8], value[i])) {
+                    service.setMaxWidth(((Integer) value[i].getValue()).intValue());
+                }
+                
+                if (sameName(elems[9], value[i])) {
+                    service.setMaxHeight(((Integer) value[i].getValue()).intValue());
+                }
+            }
+            
+            return service;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Service";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return Service.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _KeywordListType extends WMSComplexType {
@@ -187,7 +382,43 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            String[] keywords = new String[value.length];
+            
+            for (int i = 0; i < value.length; i++) {
+                keywords[i] = (String) value[i].getValue();
+            }
+            
+            return keywords;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "KeywordList";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return String[].class;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _KeywordType extends WMSComplexType {
@@ -216,7 +447,40 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return null;
-		}                
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return value[0].getValue();
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Keyword";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return String.class;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }                
+        public boolean isMixed() {
+            return true;
+        }
     }
     
     protected static class _ContactInformationType extends WMSComplexType {
@@ -252,7 +516,37 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ContactInformation";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _ContactPersonPrimaryType extends WMSComplexType {
@@ -283,7 +577,34 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ContactPersonPrimary";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _ContactAddressType extends WMSComplexType {
@@ -318,7 +639,37 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "ContactAddress";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _CapabilityType extends WMSComplexType {
@@ -352,7 +703,57 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            WMSCapabilities capabilities = new WMSCapabilities();
+            
+            for (int i = 0; i < value.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    capabilities.setRequest((WMSRequest) value[i].getValue());
+                }
+                
+//                if (sameName(elems[1], value[i])) {
+//                    //TODO exception ignored for now
+//                }
+                
+//                if (sameName(elems[2], value[i])) {
+//                 TODO ExtendedCapabilities ignored   
+//                }
+                
+                if (sameName(elems[3], value[i])) {
+                    capabilities.setLayers((Layer[]) value[i].getValue());
+                }
+            }
+            
+            return capabilities;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Capability";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSCapabilities.class;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class __ExtendedCapabilitiesType extends WMSComplexType {
@@ -385,6 +786,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return null;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "_ExtendedCapabilities";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _RequestType extends WMSComplexType {
@@ -417,7 +853,44 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            
+            WMSRequest request = new WMSRequest();
+            
+            request.setGetCapabilities((WMSOperationType) value[0].getValue());
+            request.setGetMap((WMSOperationType) value[1].getValue());
+            request.setGetFeatureInfo((WMSOperationType) value[2].getValue());
+            
+            return request;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Request";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSRequest.class;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _DCPTypeType extends WMSComplexType {
@@ -453,6 +926,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return value[0].getValue();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "HTTP";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSOperationType.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _HTTPType extends WMSComplexType {
@@ -488,6 +996,53 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            WMSOperationType operationType = new WMSOperationType();
+            
+            for (int i = 0; i < value.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    operationType.setGet((URL) value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    operationType.setPost((URL) value[i].getValue());
+                }
+            }
+            
+            return operationType;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "HTTP";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return WMSOperationType.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _GetType extends WMSComplexType {
@@ -523,6 +1078,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return value[0].getValue();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Get";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return URL.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _PostType extends WMSComplexType {
@@ -558,6 +1148,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            return value[0].getValue();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Post";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return URL.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _ExceptionType extends WMSComplexType {
@@ -588,7 +1213,44 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+
+            String[] formatStrings = new String[value.length];
+            
+            for (int i = 0; i < value.length; i++) {
+                formatStrings[i] = (String) value[i].getValue();
+            }
+            
+            return formatStrings;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Exception";
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return String[].class;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
 
     protected static class _LayerType extends WMSComplexType {
@@ -640,7 +1302,130 @@ public class WMSComplexTypes {
 
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            
+            List layers = new LinkedList();
+            
+            Layer layer = new Layer();
+            
+            layers.add(0, layer);
+            
+            Set crs = new TreeSet();
+            Map boundingBoxes = new HashMap();
+            List styles = new ArrayList();
+            
+            for (int i = 0; i < value.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    layer.setName((String) value[i].getValue());
+                }
+                
+                if (sameName(elems[1], value[i])) {
+                    layer.setTitle((String) value[i].getValue());
+                }
+                
+//                if (sameName(elems[2], value[i])) {
+//                    //TODO abstract ignored
+//                }
+//                if (sameName(elems[3], value[i])) {
+//                    //TODO keywords ignored
+//                }
+                
+                if (sameName(elems[4], value[i])) {
+                    crs.add(value[i].getValue());
+                }
+                
+                if (sameName(elems[5], value[i])) {
+                    layer.setLatLonBoundingBox((LatLonBoundingBox) value[i].getValue());
+                }
+                
+                if (sameName(elems[6], value[i])) {
+                    BoundingBox bbox = (BoundingBox) value[i].getValue();
+                    
+                    boundingBoxes.put(bbox.getCrs(), bbox);
+                }
+                
+//                if (sameName(elems[7], value[i])) {
+//                    //TODO Dimension ignored
+//                }
+//                if (sameName(elems[8], value[i])) {
+//                    //TODO attribution ignored
+//                }
+//                if (sameName(elems[9], value[i])) {
+//                    //TODO authorityURL ignored
+//                }
+//                if (sameName(elems[10], value[i])) {
+//                    //TODO identifier ignored
+//                }
+//                if (sameName(elems[11], value[i])) {
+//                    //TODO metadataURL ignore
+//                }
+//                if (sameName(elems[12], value[i])) {
+//                    //TODO dataURL ignored
+//                }
+//                if (sameName(elems[13], value[i])) {
+//                    //TODO featureLIstURL ignored
+//                }
+                
+                if (sameName(elems[14], value[i])) {
+                    styles.add(value[i].getValue());
+                }
+                if (sameName(elems[15], value[i])) {
+                    //TODO minScaleDenominator ignored
+                }
+                if (sameName(elems[16], value[i])) {
+                    //TODO maxScaleDenominator ignored
+                }
+                if (sameName(elems[17], value[i])) {
+                    List childLayers = (List) value[i].getValue();
+                    Layer childLayer = (Layer) childLayers.get(0);
+                    childLayer.setParent(layer);
+                    layers.addAll(childLayers);
+                }
+                
+            }
+            
+            layer.setSrs(crs);
+            
+            //Attributes -- only do queryable for now
+            
+            String queryable = attrs.getValue("queryable");
+            layer.setQueryable(new Boolean(queryable).booleanValue());
+            
+            return layers;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Layer";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return List.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _EX_GeographicBoundingBoxType extends WMSComplexType {
@@ -678,7 +1463,59 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            LatLonBoundingBox bbox = new LatLonBoundingBox();
+            
+            for (int i = 0; i < value.length; i++) {
+                if (sameName(elems[0], value[i])) {
+                    bbox.setMinX(((Double) value[i].getValue()).doubleValue());
+                }
+                if (sameName(elems[1], value[i])) {
+                    bbox.setMaxX(((Double) value[i].getValue()).doubleValue());
+                }
+                if (sameName(elems[2], value[i])) {
+                    bbox.setMinY(((Double) value[i].getValue()).doubleValue());
+                }
+                if (sameName(elems[3], value[i])) {
+                    bbox.setMaxY(((Double) value[i].getValue()).doubleValue());
+                }
+            }
+            
+            return bbox;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "EX_GeographicBoundingBox";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return LatLonBoundingBox.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _BoundingBoxType extends WMSComplexType {
@@ -718,6 +1555,49 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return null;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            BoundingBox bbox = new BoundingBox();
+            
+            bbox.setCrs(attrs.getValue("CRS"));
+            bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
+            bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
+            bbox.setMinY(Double.parseDouble(attrs.getValue("miny")));
+            bbox.setMaxY(Double.parseDouble(attrs.getValue("maxy")));
+            
+            return bbox;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "BoundingBox";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return BoundingBox.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _DimensionType extends WMSComplexType {
@@ -757,6 +1637,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return null;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Dimension";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _AttributionType extends WMSComplexType {
@@ -794,6 +1709,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Attribution";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _LogoURLType extends WMSComplexType {
@@ -834,7 +1784,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "LogoURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();        
+        }  
     }
     
     protected static class _MetadataURLType extends WMSComplexType {
@@ -874,7 +1859,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "MetadataURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _AuthorityURLType extends WMSComplexType {
@@ -913,7 +1933,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "AuthorityURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _IdentifierType extends WMSComplexType {
@@ -946,7 +2001,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return null;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Identifier";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _DataURLType extends WMSComplexType {
@@ -982,7 +2072,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "DataURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();            
+        }  
     }
     
     protected static class _FeatureListURLType extends WMSComplexType {
@@ -1018,7 +2143,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "FeatureListURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _StyleType extends WMSComplexType {
@@ -1058,7 +2218,43 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}  
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            //TODO only care about the style's name, in value[0]
+            return value[0].getValue();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "Style";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return String.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }  
     }
     
     protected static class _LegendURLType extends WMSComplexType {
@@ -1099,7 +2295,42 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return elems;
-		}        
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "LegendURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }        
     }
     
     protected static class _StyleSheetURLType extends WMSComplexType {
@@ -1136,6 +2367,41 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "StyleSheetURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _StyleURLType extends WMSComplexType {
@@ -1172,15 +2438,46 @@ public class WMSComplexTypes {
 		public Element[] getChildElements() {
 			return elems;
 		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "StyleURL";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
     }
     
     protected static class _OnlineResourceType extends WMSComplexType {
     	private static final WMSComplexType instance = new _OnlineResourceType();
-    	
-    	private static Attribute[] attrs = new Attribute[] {
-    			//TODO FINISH THIS
-    	};
-    	
+    	    	
         public static WMSComplexType getInstance() {
         	return instance;
         }
@@ -1189,7 +2486,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
 		 */
 		public Attribute[] getAttributes() {
-			return attrs;
+			return XLinkSchema.SimpleLink.getInstance().getAttributes();
 		}
 
 		/* (non-Javadoc)
@@ -1204,10 +2501,51 @@ public class WMSComplexTypes {
 		 */
 		public Element[] getChildElements() {
 			return null;
-		}    	
+		}
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
+            String href = attrs.getValue("", "href");
+            href = href!=null?href:attrs.getValue(XLinkSchema.NAMESPACE.toString(),"href");
+            try {
+                return new URL(href);
+            } catch (MalformedURLException e) {
+            	return null;
+        	}
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "OnlineResource";
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return URL.class;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
+            throw new OperationNotSupportedException();            
+        }    	
     }
     
-    static class LongitudeType implements SimpleType {
+    static class LongitudeType extends WMSSimpleType {
         private static SimpleType instance = new LongitudeType();
         
         private static Facet[] facets = new Facet[] {
@@ -1219,120 +2557,41 @@ public class WMSComplexTypes {
             return instance;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getFinal()
-         */
-        public int getFinal() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getId()
-         */
-        public String getId() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public AttributeValue toAttribute( Attribute attribute, Object value, Map hints ) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public boolean canCreateAttributes( Attribute attribute, Object value, Map hints ) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getChildType()
-         */
         public int getChildType() {
-            // TODO Auto-generated method stub
-            return 0;
+            return Schema.RESTRICTION;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getParents()
-         */
         public SimpleType[] getParents() {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getFacets()
-         */
         public Facet[] getFacets() {
-            // TODO Auto-generated method stub
-            return null;
+            return facets;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
-         */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            return value[0].getValue();
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getName()
-         */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
+            return "longitudeType";
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getNamespace()
-         */
-        public URI getNamespace() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getInstanceType()
-         */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Double.class;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
         public boolean canEncode( Element element, Object value, Map hints ) {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
-         */
         public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            
+            throw new OperationNotSupportedException();
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
-         */
-        public Element findChildElement( String name ) {
-            // TODO Auto-generated method stub
-            return null;
-        }
     }
     
-    static class LatitudeType implements SimpleType {
+    static class LatitudeType extends WMSSimpleType {
         private static SimpleType instance = new LatitudeType();
         
         private static Facet[] facets = new Facet[] {
@@ -1345,50 +2604,16 @@ public class WMSComplexTypes {
         }
 
         /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getFinal()
-         */
-        public int getFinal() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#getId()
-         */
-        public String getId() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public AttributeValue toAttribute( Attribute attribute, Object value, Map hints ) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
-         */
-        public boolean canCreateAttributes( Attribute attribute, Object value, Map hints ) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        /* (non-Javadoc)
          * @see org.geotools.xml.schema.SimpleType#getChildType()
          */
         public int getChildType() {
-            // TODO Auto-generated method stub
-            return 0;
+            return Schema.RESTRICTION;
         }
 
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.SimpleType#getParents()
          */
         public SimpleType[] getParents() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -1396,47 +2621,34 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.SimpleType#getFacets()
          */
         public Facet[] getFacets() {
-            // TODO Auto-generated method stub
-            return null;
+            return facets;
         }
 
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            return value[0].getValue();
         }
 
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getNamespace()
-         */
-        public URI getNamespace() {
-            // TODO Auto-generated method stub
-            return null;
+            return "latitudeType";
         }
 
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return Double.class;
         }
 
         /* (non-Javadoc)
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1444,16 +2656,8 @@ public class WMSComplexTypes {
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            
+            throw new OperationNotSupportedException();
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
-         */
-        public Element findChildElement( String name ) {
-            // TODO Auto-generated method stub
-            return null;
-        }
     }    
 }

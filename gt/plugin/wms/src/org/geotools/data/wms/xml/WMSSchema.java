@@ -48,6 +48,7 @@ import org.geotools.data.wms.xml.WMSComplexTypes.__ExtendedCapabilitiesType;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
@@ -57,6 +58,7 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AttributeGT;
+import org.geotools.xml.schema.impl.AttributeValueGT;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SimpleTypeGT;
 import org.geotools.xml.xLink.XLinkSchema;
@@ -167,67 +169,35 @@ public class WMSSchema implements Schema {
 
     };
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getAttributeGroups()
-     */
     public AttributeGroup[] getAttributeGroups() {
-        // TODO Auto-generated method stub
-        return null;
+        return new AttributeGroup[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getAttributes()
-     */
     public Attribute[] getAttributes() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Attribute[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getBlockDefault()
-     */
     public int getBlockDefault() {
-        // TODO Auto-generated method stub
-        return 0;
+        return NONE;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getComplexTypes()
-     */
     public ComplexType[] getComplexTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        return complexTypes;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getElements()
-     */
     public Element[] getElements() {
-        // TODO Auto-generated method stub
-        return null;
+        return elements;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getFinalDefault()
-     */
     public int getFinalDefault() {
-        // TODO Auto-generated method stub
-        return 0;
+        return NONE;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getGroups()
-     */
     public Group[] getGroups() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Group[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getId()
-     */
     public String getId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -238,68 +208,47 @@ public class WMSSchema implements Schema {
         return imports;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getPrefix()
-     */
     public String getPrefix() {
-        // TODO Auto-generated method stub
-        return null;
+        return "wms";
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getSimpleTypes()
-     */
     public SimpleType[] getSimpleTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        return simpleTypes;
     }
 
     /* (non-Javadoc)
      * @see org.geotools.xml.schema.Schema#getTargetNamespace()
      */
     public URI getTargetNamespace() {
-        // TODO Auto-generated method stub
-        return null;
+        return NAMESPACE;
     }
 
     /* (non-Javadoc)
      * @see org.geotools.xml.schema.Schema#getURI()
      */
     public URI getURI() {
-        // TODO Auto-generated method stub
-        return null;
+        return NAMESPACE;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getVersion()
-     */
     public String getVersion() {
-        // TODO Auto-generated method stub
-        return null;
+        return "1.3.0";
     }
 
     /* (non-Javadoc)
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI( URI uri ) {
-        // TODO Auto-generated method stub
-        return false;
+        //We don't need to read the definition at all
+        //--this is a specification, it shouldn't change.
+        return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#isAttributeFormDefault()
-     */
     public boolean isAttributeFormDefault() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#isElementFormDefault()
-     */
     public boolean isElementFormDefault() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
     
     public static Schema getInstance() {
@@ -351,115 +300,68 @@ public class WMSSchema implements Schema {
             
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#isAbstract()
-         */
         public boolean isAbstract() {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getBlock()
-         */
         public int getBlock() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getDefault()
-         */
-        public String getDefault() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getFinal()
-         */
-        public int getFinal() {
-            // TODO Auto-generated method stub
             return NONE;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getFixed()
-         */
-        public String getFixed() {
-            // TODO Auto-generated method stub
+        public String getDefault() {
+            //TODO terminate
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#isForm()
-         */
+        public int getFinal() {
+            return NONE;
+        }
+
+        public String getFixed() {
+            // TODO Terminate
+            return null;
+        }
+
         public boolean isForm() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getId()
-         */
         public String getId() {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getMaxOccurs()
-         */
         public int getMaxOccurs() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return max;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getMinOccurs()
-         */
         public int getMinOccurs() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return min;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getName()
-         */
         public String getName() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return name;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getNamespace()
-         */
         public URI getNamespace() {
-            // TODO Auto-generated method stub
             return NAMESPACE;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#isNillable()
-         */
         public boolean isNillable() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getSubstitutionGroup()
-         */
         public Element getSubstitutionGroup() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Element#getType()
-         */
         public Type getType() {
-            // TODO Auto-generated method stub
+            // TODO Terminate
             return type;
         }
 
@@ -482,134 +384,81 @@ public class WMSSchema implements Schema {
     
     static abstract class WMSComplexType implements ComplexType {
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getParent()
-         */
         public Type getParent() {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#isAbstract()
-         */
         public boolean isAbstract() {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getAnyAttributeNameSpace()
-         */
         public String getAnyAttributeNameSpace() {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getBlock()
-         */
         public int getBlock() {
-            // TODO Auto-generated method stub
-            return 0;
+            return NONE;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getFinal()
-         */
         public int getFinal() {
-            // TODO Auto-generated method stub
-            return 0;
+            return NONE;
         }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getId()
-         */
+        
         public String getId() {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#isMixed()
-         */
         public boolean isMixed() {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#isDerived()
-         */
         public boolean isDerived() {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
-         */
         public boolean cache( Element element, Map hints ) {
-            // TODO Auto-generated method stub
-            return false;
+            return true;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
-         */
-        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getName()
-         */
-        public String getName() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getNamespace()
-         */
         public URI getNamespace() {
-            // TODO Auto-generated method stub
+            return NAMESPACE;
+        }
+
+        public Element findChildElement( String name ) {
+            return (getChild() == null) ? null : getChild().findChildElement(name);
+        }
+
+        protected boolean sameName( Element element, ElementValue value ) {
+            return element.getName().equals(value.getElement().getName());
+        }
+    }
+    
+    static abstract class WMSSimpleType implements SimpleType {
+
+        public int getFinal() {
+            return NONE;
+        }
+
+        public String getId() {
             return null;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#getInstanceType()
-         */
-        public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
-         */
-        public boolean canEncode( Element element, Object value, Map hints ) {
-            // TODO Auto-generated method stub
+        public boolean canCreateAttributes( Attribute attribute, Object value, Map hints ) {
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
-         */
-        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            
+        public URI getNamespace() {
+            return NAMESPACE;
         }
 
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
-         */
         public Element findChildElement( String name ) {
-            // TODO Auto-generated method stub
             return null;
         }
-
+        
+        public AttributeValue toAttribute(Attribute attribute, Object value,
+                Map hints) throws OperationNotSupportedException {
+            return new AttributeValueGT(attribute, value.toString());
+        }
     }
     
     static class WMSAttribute extends AttributeGT {

@@ -51,10 +51,14 @@ public class Layer implements Comparable {
      */
     private LatLonBoundingBox latLonBoundingBox;
 
-    /** A list of type Style */
+    /** A list of type String */
     private List styles;
     private boolean queryable = false;
     private Layer parent;
+    
+    public Layer() {
+        
+    }
 
     /**
      * DOCUMENT ME!
