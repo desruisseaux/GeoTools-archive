@@ -25,19 +25,17 @@ package org.geotools.gce.arcgrid;
 import java.awt.image.Raster;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.DatumType;
-import org.geotools.cs.LocalDatum;
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
+
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.filter.Filter;
-import org.geotools.gc.GridCoverage;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -48,12 +46,14 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
-import org.geotools.units.Unit;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.DirectPosition;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
@@ -82,12 +82,12 @@ public class ArcGridRenderTest extends TestCaseSupport {
         setup = true;   
 
         // Build the coordinate system
-        DatumType.Local type = (DatumType.Local) DatumType.getEnum(DatumType.Local.MINIMUM);
-        LocalDatum ld = CoordinateSystemFactory.getDefault().createLocalDatum("", type);
-        AxisInfo[] ai = { AxisInfo.X, AxisInfo.Y };
-
-        CoordinateSystem cs = CoordinateSystemFactory.getDefault().createLocalCoordinateSystem("RD",
-                ld, Unit.METRE, ai);
+//        DatumType.Local type = (DatumType.Local) DatumType.getEnum(DatumType.Local.MINIMUM);
+//        LocalDatum ld = CoordinateSystemFactory.getDefault().createLocalDatum("", type);
+//        AxisInfo[] ai = { AxisInfo.X, AxisInfo.Y };
+//
+//        CoordinateSystem cs = CoordinateSystemFactory.getDefault().createLocalCoordinateSystem("RD",
+//                ld, Unit.METRE, ai);
 
         
         
@@ -95,7 +95,7 @@ public class ArcGridRenderTest extends TestCaseSupport {
         URL url = TestData.getResource( this, "ArcGrid.asc");
         ArcGridFormat format = new ArcGridFormat();            
         assertTrue( "Unabled to accept:"+url, format.accepts( url ) );        
-        reader = format.getReader( url );
+        reader = new ArcGridReader( url );
         
         System.out.println("get a reader " + reader);
     }
@@ -112,16 +112,22 @@ public class ArcGridRenderTest extends TestCaseSupport {
         StyleFactory sFac = StyleFactory.createStyleFactory();
         
         Format format = reader.getFormat();
-        ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
-        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+
+        ParameterValueGroup params = format.getReadParameters();
         
-        GridCoverage gc = reader.read( params );
-        Raster raster = gc.getRenderedImage().getData();
+        GeneralParameterValue[] gpvs = new GeneralParameterValue[params.values().size()];
         
-        org.geotools.pt.Envelope ex1 = gc.getEnvelope();
+        for (int i = 0; i < params.values().size(); i++) {
+        	gpvs[i] = (GeneralParameterValue) params.values().get(i);
+        }
+        
+        GridCoverage gc = reader.read( gpvs );
+//        Raster raster = ((GridCoverageImpl)gc).getRenderedImage().getData();
+        
+        Envelope ex1 = gc.getEnvelope();
         DirectPosition p1 = ex1.getLowerCorner();
         DirectPosition p2 = ex1.getUpperCorner(); 
-        Envelope ex = new Envelope( p1.getOrdinate( 0 ), p1.getOrdinate( 1 ), p2.getOrdinate( 0 ), p2.getOrdinate( 1 ) );
+//        Envelope ex = new GeneralEnvelope( p1.getOrdinate( 0 ), p1.getOrdinate( 1 ), p2.getOrdinate( 0 ), p2.getOrdinate( 1 ) );
         
         
 
@@ -144,8 +150,8 @@ public class ArcGridRenderTest extends TestCaseSupport {
         
         //int w = arcGridRaster.getNCols();
         //int h = arcGridRaster.getNRows();
-        int w = raster.getWidth();
-        int h = raster.getWidth();
+//        int w = raster.getWidth();
+//        int h = raster.getWidth();
         /*
         LiteRenderer renderer = new LiteRenderer(mapContext);
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);

@@ -141,8 +141,8 @@ public class ArcGridWriter implements GridCoverageWriter {
     	    GRASS = false;
     	}
     	else {
-    	    compressed = parameters.parameter( "Compressed" ).booleanValue();
-    	    GRASS = parameters.parameter( "GRASS" ).booleanValue();
+//    	    compressed = parameters.parameter( "Compressed" ).booleanValue();
+//    	    GRASS = parameters.parameter( "GRASS" ).booleanValue();
     	}              
     	if( compressed )
             mWriter=ioexchange.getGZIPPrintWriter(destination);
@@ -161,24 +161,24 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @see ArcGridDataSource#setFeatures(FeatureCollection)
      */
     private void writeGridCoverage(GridCoverage gc) throws DataSourceException {
-        java.awt.image.Raster data = gc.getRenderedImage().getData();
-        GridRange bounds = gc.getGridGeometry().getGridRange();
-        double xl = bounds.getLower(0);
-        double yl = bounds.getLower(1);
-        double cellsize = Math.max((bounds.getUpper(0) - xl) / data.getWidth(),
-                (bounds.getUpper(1) - yl) / data.getHeight());
-
-        try {
-            if (GRASS) {
-                arcGridRaster = new GRASSArcGridRaster(mWriter);
-            } else {
-                arcGridRaster = new ArcGridRaster(mWriter);
-            }
-
-            arcGridRaster.writeRaster(data, xl, yl, cellsize, compressed);
-        } catch (java.io.IOException ioe) {
-            throw new DataSourceException("IOError writing", ioe);
-        }
+//        java.awt.image.Raster data = gc.getRenderedImage().getData();
+//        GridRange bounds = gc.getGridGeometry().getGridRange();
+//        double xl = bounds.getLower(0);
+//        double yl = bounds.getLower(1);
+//        double cellsize = Math.max((bounds.getUpper(0) - xl) / data.getWidth(),
+//                (bounds.getUpper(1) - yl) / data.getHeight());
+//
+//        try {
+//            if (GRASS) {
+//                arcGridRaster = new GRASSArcGridRaster(mWriter);
+//            } else {
+//                arcGridRaster = new ArcGridRaster(mWriter);
+//            }
+//
+//            arcGridRaster.writeRaster(data, xl, yl, cellsize, compressed);
+//        } catch (java.io.IOException ioe) {
+//            throw new DataSourceException("IOError writing", ioe);
+//        }
     }
 
     /**

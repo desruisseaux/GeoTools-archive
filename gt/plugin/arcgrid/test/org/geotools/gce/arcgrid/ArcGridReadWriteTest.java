@@ -9,14 +9,15 @@ package org.geotools.gce.arcgrid;
 import java.awt.image.Raster;
 import java.io.File;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.gc.GridCoverage;
-import org.geotools.pt.Envelope;
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.resources.TestData;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.spatialschema.geometry.Envelope;
 
 /**
  * Test reading and writing arcgrid grid coverages.
@@ -63,7 +64,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         File tmpFile = TestData.temp(this,"temp.asc");
         
         //read in the grid coverage
-        GridCoverageReader reader = f.getReader(TestData.getResource( this, testParam.fileName ));        
+        GridCoverageReader reader = new ArcGridReader(TestData.getResource( this, testParam.fileName ));        
         ParameterDescriptorGroup paramDescriptor = f.getReadParameters();
         ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();        
         
@@ -72,7 +73,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         GridCoverage gc1 = reader.read( params );
 
         //write grid coverage out to temp file
-        GridCoverageWriter writer = f.getWriter(tmpFile);
+        GridCoverageWriter writer = new ArcGridWriter(tmpFile);
         paramDescriptor = f.getWriteParameters();
         params = (ParameterValueGroup) paramDescriptor.createValue();
         params.parameter( "Compressed" ).setValue( testParam.compressed );
@@ -80,7 +81,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         writer.write(gc1, params);
         
         //read the grid coverage back in from temp file
-        reader = f.getReader(tmpFile);
+        reader = new ArcGridReader(tmpFile);
         paramDescriptor = f.getReadParameters();
         params = (ParameterValueGroup) paramDescriptor.createValue();
         params.parameter( "Compressed" ).setValue( testParam.compressed );
@@ -105,8 +106,8 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         
         double[] values1 = null;
         double[] values2 = null;
-        Raster r1 = gc1.getRenderedImage().getData();
-        Raster r2 = gc2.getRenderedImage().getData();
+        Raster r1 = ((GridCoverageImpl)gc1).getRenderedImage().getData();
+        Raster r2 = ((GridCoverageImpl)gc2).getRenderedImage().getData();
         for(int i=r1.getMinX(); i < r1.getWidth(); i++) {
             for(int j=r1.getMinY(); j<r1.getHeight(); j++) {
                 values1 = r1.getPixel(i,j, values1);

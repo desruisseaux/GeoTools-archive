@@ -19,11 +19,14 @@ package org.geotools.gce.arcgrid;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.NoSuchElementException;
 
 import org.geotools.coverage.grid.GridCoverageImpl;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
@@ -32,8 +35,9 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -184,8 +188,17 @@ public class ArcGridReader implements GridCoverageReader {
             GRASS = false;
         }
         else {
-            compress = params.parameter( "Compressed" ).booleanValue();
-            GRASS = params.parameter( "GRASS" ).booleanValue();
+        	for (int i = 0; i < params.length; i ++) {
+        		Parameter param = (Parameter) params[i];
+
+        		if (param.getDescriptor().getName().getCode().equals("Compressed")) {
+	        		compress = param.booleanValue();
+        		}
+        		
+        		if (param.getDescriptor().getName().getCode().equals("GRASS")) {
+        			GRASS = param.booleanValue();
+        		}
+        	}
         }              
         if ( compress )
             mReader= mExchange.getGZIPReader(mSource);
@@ -248,9 +261,20 @@ public class ArcGridReader implements GridCoverageReader {
             coordinateSystem = GeographicCRS.WGS84;
         }
 
-        return new GridCoverageImpl(name, raster, coordinateSystem,
-                convertEnvelope(getBounds()), min, max, null,
-                new Color[][] { getColors() }, null);
+        try {
+			//TODO this is not finished
+			return new GridCoverageImpl(name, coordinateSystem, null, null, null);
+		} catch (OperationNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchElementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
     }
 
     /**
