@@ -566,13 +566,14 @@ public class Parser extends MathTransformParser {
         Map              properties = parseAuthority(element, name);
         element.close();
         
-        //if our name is on our list of aliases, add the aliases to the property
+        //if our name is in our list of datum aliases, add the aliases to the property
+        //the following can be removed when this is done in the DatumFactory
         org.geotools.resources.DatumAliases aliases = new org.geotools.resources.DatumAliases();
-        if (aliases.inDatumNameAliasList(name)) {
+        if (aliases.containsAlias(name)) {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);
             }
-            Identifier[] identifiers = aliases.getDatumNameAliases(name);
+            Identifier[] identifiers = aliases.getAliases(name);
             if (identifiers != null) {
                 properties.put(IdentifiedObject.ALIAS_PROPERTY, identifiers);
             }
