@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -80,7 +81,7 @@ public class ForceCoordinateSystemFeatureResults implements FeatureResults {
                 + " already used (check before using wrapper)");
         }
 
-        this.schema = CRSService.transform(type, forcedCS);
+        this.schema = FactoryFinder.transform(type, forcedCS);
         this.results = results;
 
         // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,
@@ -95,7 +96,7 @@ public class ForceCoordinateSystemFeatureResults implements FeatureResults {
     /**
      * @see org.geotools.data.FeatureResults#getSchema()
      */
-    public FeatureType getSchema() throws IOException {
+    public FeatureType getSchema(){
         return schema;
     }
 

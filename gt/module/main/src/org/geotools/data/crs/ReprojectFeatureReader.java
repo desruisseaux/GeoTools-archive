@@ -38,9 +38,6 @@ package org.geotools.data.crs;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.crs.geometry.GeometryCoordinateSequenceTransformer;
@@ -48,6 +45,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -89,20 +87,18 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ReprojectFeatureReader implements FeatureReader {
     FeatureReader reader;
     FeatureType schema;
-    MathTransform transform;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
     ReprojectFeatureReader(FeatureReader reader, FeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
-        this.transform = transform;
         transformer.setMathTransform((MathTransform2D) transform);
     }
 
     public ReprojectFeatureReader(FeatureReader reader,
         CoordinateReferenceSystem cs)
-        throws SchemaException, CannotCreateTransformException {
+        throws SchemaException{
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -117,7 +113,7 @@ public class ReprojectFeatureReader implements FeatureReader {
         }
 
         this.transform = CRSService.reproject(original, cs, true);
-        this.schema = CRSService.transform(type, cs);
+        this.schema = FactoryFinder.transform(type, cs);
         this.reader = reader;
         transformer.setMathTransform((MathTransform2D) transform);
     }

@@ -626,9 +626,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * </p>
      * @param query
      * @return the bounds, or null if too expensive
+     * @throws SchemaNotFoundException 
      * @throws IOException
      */
-    protected Envelope getBounds(Query query){
+    protected Envelope getBounds(Query query) throws IOException{
         return null; // too expensive
     }
 
@@ -644,10 +645,11 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @param query Contains the Filter and MaxFeatures to find the bounds for.
      * @return The number of Features provided by the Query or <code>-1</code>
      *         if count is too expensive to calculate or any errors or occur.
+     * @throws IOException 
      *
      * @throws IOException if there are errors getting the count
      */
-    protected int getCount(Query query){
+    protected int getCount(Query query) throws IOException{
         return -1; // too expensive
     }
 }

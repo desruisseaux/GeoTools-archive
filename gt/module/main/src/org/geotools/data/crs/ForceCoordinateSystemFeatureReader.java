@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -97,7 +98,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
                 + " already used (check before using wrapper)");
         }
 
-        schema = CRSService.transform(type, cs);
+        schema = FactoryFinder.transform(type, cs);
         this.reader = reader;
     }
 

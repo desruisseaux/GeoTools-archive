@@ -120,11 +120,11 @@ public class CollectionDataStore extends AbstractDataStore {
                     }
                 }
 
-                public boolean hasNext() throws IOException {
+                public boolean hasNext(){
                     return (iterator != null) && iterator.hasNext();
                 }
 
-                public void close() throws IOException {
+                public void close(){
                     if (iterator != null) {
                         iterator = null;
                     }
@@ -146,11 +146,11 @@ public class CollectionDataStore extends AbstractDataStore {
     }
 
     /**
+     * @throws SchemaNotFoundException 
      * @see org.geotools.data.AbstractDataStore#getBounds(java.lang.String,
      *      org.geotools.data.Query)
      */
-    protected Envelope getBounds(Query query)
-        throws IOException {
+    protected Envelope getBounds(Query query) throws SchemaNotFoundException{
         String featureTypeName = query.getTypeName();
         if (!featureType.getTypeName().equals(featureTypeName)) {
             throw new SchemaNotFoundException(featureTypeName);
@@ -162,7 +162,7 @@ public class CollectionDataStore extends AbstractDataStore {
     /**
      * @param query
      */
-    private Envelope getBoundsInternal(Query query) {
+    protected Envelope getBoundsInternal(Query query) {
         FeatureIterator iterator = collection.features();
         Envelope envelope = null;
 
@@ -193,10 +193,9 @@ public class CollectionDataStore extends AbstractDataStore {
         String featureTypeName = query.getTypeName();
         if (!featureType.getTypeName().equals(featureTypeName)) {
             throw new SchemaNotFoundException(featureTypeName);
-        } else {
+        }
             int count = 0;
             FeatureIterator iterator = collection.features();
-            Envelope envelope = null;
 
             Filter filter = query.getFilter();
 
@@ -207,7 +206,6 @@ public class CollectionDataStore extends AbstractDataStore {
             }
 
             return count;
-        }
     }
 
     /**

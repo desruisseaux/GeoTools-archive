@@ -19,8 +19,6 @@ package org.geotools.data.crs;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.MathTransform;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
