@@ -92,9 +92,9 @@ public class DefaultCSBuilder implements CSBuilder {
 	public void setOrdinate(CoordinateSequence sequence, double value, int ordinateIndex, int coordinateIndex) {
 		Coordinate c = sequence.getCoordinate(coordinateIndex);
 		switch(ordinateIndex) {
-			case 0: c.x = value;
-			case 1: c.y = value;
-			case 2: c.z = Double.NaN;
+			case 0: c.x = value; break;
+			case 1: c.y = value; break;
+			case 2: c.z = value; break;
 		}
 		
 	}
