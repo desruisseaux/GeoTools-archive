@@ -1,0 +1,2 @@
+org.geotools.referencing.crs.CRSAUTOFactory
+org.geotools.referencing.crs.CRSEPSGPropertyFileFactory
