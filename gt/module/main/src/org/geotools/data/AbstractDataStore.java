@@ -271,11 +271,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @param typeName
      *
      * @return FeatureWriter over contents of typeName
+     * @throws IOException 
      *
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    protected FeatureWriter getFeatureWriter(String typeName){
+    protected FeatureWriter getFeatureWriter(String typeName) throws IOException{
         throw new UnsupportedOperationException("Writing not supported");
     }
 
@@ -283,11 +284,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * Subclass should implement to provide writing support.
      *
      * @param featureType Requested FeatureType
+     * @throws IOException 
      *
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    public void createSchema(FeatureType featureType){
+    public void createSchema(FeatureType featureType) throws IOException{
         throw new UnsupportedOperationException("Schema creation not supported");
     }
     /* (non-Javadoc)

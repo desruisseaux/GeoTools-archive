@@ -74,7 +74,7 @@ public class MemoryDataStore extends AbstractDataStore {
         addFeatures(collection);
     }
 
-    public MemoryDataStore(Feature[] array) throws IOException {
+    public MemoryDataStore(Feature[] array){
         addFeatures(array);
     }
 
@@ -266,9 +266,8 @@ public class MemoryDataStore extends AbstractDataStore {
         synchronized (memory) {
             if (schema.containsKey(typeName)) {
                 return (FeatureType) schema.get(typeName);
-            } else {
-                throw new SchemaNotFoundException(typeName);
             }
+                throw new SchemaNotFoundException(typeName);
         }
     }
 
@@ -292,11 +291,10 @@ public class MemoryDataStore extends AbstractDataStore {
         if (memory.containsKey(typeName)) {
             // we have a conflict
             throw new IOException(typeName + " already exists");
-        } else {
+        }
             Map featuresMap = new HashMap();
             schema.put(typeName, featureType);
             memory.put(typeName, featuresMap);
-        }
     }
 
     /**
@@ -338,11 +336,11 @@ public class MemoryDataStore extends AbstractDataStore {
                     }
                 }
 
-                public boolean hasNext() throws IOException {
+                public boolean hasNext(){
                     return (iterator != null) && iterator.hasNext();
                 }
 
-                public void close() throws IOException {
+                public void close(){
                     if (iterator != null) {
                         iterator = null;
                     }
@@ -377,7 +375,6 @@ public class MemoryDataStore extends AbstractDataStore {
                 Map contents = features(typeName);
                 Iterator iterator = contents.values().iterator();
                 Feature live = null;
-                ; // current 
 
                 Feature current = null; // current Feature returned to user        
 
@@ -484,7 +481,7 @@ public class MemoryDataStore extends AbstractDataStore {
                     return (iterator != null) && iterator.hasNext();
                 }
 
-                public void close() throws IOException {
+                public void close(){
                     if (iterator != null) {
                         iterator = null;
                     }
@@ -507,7 +504,6 @@ public class MemoryDataStore extends AbstractDataStore {
     protected Envelope getBounds(Query query)
         throws IOException {
         String typeName = query.getTypeName();
-        FeatureType featureType = getSchema(typeName);
         Map contents = features(typeName);
         Iterator iterator = contents.values().iterator();
 
@@ -538,12 +534,10 @@ public class MemoryDataStore extends AbstractDataStore {
     protected int getCount(Query query)
         throws IOException {
         String typeName = query.getTypeName();
-        FeatureType featureType = getSchema(typeName);
         Map contents = features(typeName);
         Iterator iterator = contents.values().iterator();
 
         int count = 0;
-        Envelope envelope = null;
 
         Filter filter = query.getFilter();
 

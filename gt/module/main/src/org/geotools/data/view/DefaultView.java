@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -37,9 +36,9 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.LogicFilter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -109,14 +108,13 @@ public class DefaultView implements FeatureSource {
         this.source = source;
         this.constraintQuery = query;
 
-        String typeName = query.getTypeName();
         FeatureType origionalType = source.getSchema();
 
-        CoordinateSystem cs = null;
+        CoordinateReferenceSystem cs = null;
         if (query.getCoordinateSystemReproject() != null) {
-            cs = (CoordinateSystem) query.getCoordinateSystemReproject();
+            cs = query.getCoordinateSystemReproject();
         } else if (query.getCoordinateSystem() != null) {
-            cs = (CoordinateSystem) query.getCoordinateSystem();
+            cs = query.getCoordinateSystem();
         }
         schema = DataUtilities.createSubType(origionalType, query.getPropertyNames(), cs, query
                 .getTypeName(), null);
@@ -281,7 +279,7 @@ public class DefaultView implements FeatureSource {
         try {
             if (constraintFilter != Filter.NONE) {
                 FilterFactory ff = FilterFactory.createFilterFactory();
-                newFilter = ff.createLogicFilter(AbstractFilter.LOGIC_AND);
+                newFilter = ff.createLogicFilter(FilterType.LOGIC_AND);
                 ((LogicFilter) newFilter).addFilter(constraintFilter);
                 ((LogicFilter) newFilter).addFilter(filter);
             }
@@ -478,15 +476,15 @@ public class DefaultView implements FeatureSource {
             if (constraintQuery.getFilter() == null || constraintQuery.getFilter() == Filter.NONE
                     || Filter.NONE.equals(constraintQuery.getFilter())) {
                 return source.getBounds();
-            } else {
-                return source.getBounds(constraintQuery);
             }
-        } else {
+                return source.getBounds(constraintQuery);
+            
+        }
             // this will create a feature results that can reproject the
             // features, and will
             // properly compute the bouds
             return getFeatures().getBounds();
-        }
+        
     }
 
     /**
@@ -521,12 +519,11 @@ public class DefaultView implements FeatureSource {
             }
 
             return source.getBounds(query);
-        } else {
+        }
             // this will create a feature results that can reproject the
             // features, and will
             // properly compute the bouds
             return getFeatures(query).getBounds();
-        }
     }
 
     /**
