@@ -31,6 +31,8 @@ public class WFSDataStoreReadTest extends TestCase {
     public WFSDataStoreReadTest(){
         Logger.global.setLevel(Level.SEVERE);
     }
+    
+    public void testEmpty(){/**/}
 
     public static WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();

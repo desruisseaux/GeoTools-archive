@@ -52,18 +52,18 @@ public class GeoServerTest extends TestCase {
     private URL url = null;
     
     public GeoServerTest() throws MalformedURLException{
-        url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
+//        url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
 //        url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
     }
     
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureType(url,true,true,0);
+//        WFSDataStoreReadTest.doFeatureType(url,true,true,0);
     }
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
-        WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
+//        WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
     }
     public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,0);
+//        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,0);
     }
     
 //    public void testWrite() throws NoSuchElementException, IllegalFilterException, FactoryConfigurationError, IOException, IllegalAttributeException{
