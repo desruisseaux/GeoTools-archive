@@ -16,16 +16,40 @@
  */
 package org.geotools.xml.wfs;
 
+import org.geotools.xml.gml.GMLSchema;
+import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
+import org.geotools.xml.wfs.WFSBasicComplexTypes.DescribeFeatureTypeType;
+import org.geotools.xml.wfs.WFSBasicComplexTypes.FeatureCollectionType;
+import org.geotools.xml.wfs.WFSBasicComplexTypes.GetCapabilitiesType;
+import org.geotools.xml.wfs.WFSBasicComplexTypes.GetFeatureType;
+import org.geotools.xml.wfs.WFSBasicComplexTypes.QueryType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.EmptyType;
+import org.geotools.xml.wfs.WFSCapabilitiesComplexTypes.WFS_CapabilitiesType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.DeleteElementType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.GetFeatureWithLockType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.InsertElementType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.LockFeatureType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.NativeType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.PropertyType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.TransactionType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.UpdateElementType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_LockFeatureResponseType;
+import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_TransactionResponseType;
+import org.geotools.xml.xsi.XSISimpleTypes;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -39,6 +63,8 @@ import java.net.URI;
  * @author Norman Barker www.comsine.com
  */
 public class WFSSchema implements Schema {
+    
+    static Logger logger = Logger.getLogger("net.refractions.xml.wfs");
 
     private static Schema instance = new WFSSchema();
     /**
@@ -48,143 +74,239 @@ public class WFSSchema implements Schema {
         return instance;
     }
     
-    /** DOCUMENT ME!  */
+    /** WFS target namespace */
     public static String NAMESPACE = "http://www.opengis.net/wfs";
 
-    /* (non-Javadoc)
+    static final Element[] elements = new Element[] {
+            new WFSElement("GetCapabilities",GetCapabilitiesType.getInstance()),
+            new WFSElement("DescribeFeatureType",DescribeFeatureTypeType.getInstance()),
+            new WFSElement("GetFeature",GetFeatureType.getInstance()),
+            new WFSElement("FeatureCollection",FeatureCollectionType.getInstance(),1,1,false,findElement(GMLSchema.getInstance(), "_FeatureCollection")),
+            new WFSElement("Query",QueryType.getInstance()),
+            new WFSElement("Abstract",XSISimpleTypes.String.getInstance()),
+            new WFSElement("AccessConstraints",XSISimpleTypes.String.getInstance()),
+            new WFSElement("Fees",XSISimpleTypes.String.getInstance()),
+            new WFSElement("Keywords",XSISimpleTypes.String.getInstance()),
+            new WFSElement("OnlineResource",XSISimpleTypes.String.getInstance()),
+            new WFSElement("SRS",XSISimpleTypes.String.getInstance()),
+            new WFSElement("Title",XSISimpleTypes.String.getInstance()),
+            // TODO check if these should be here - from capabilities ... used in operation type
+            new WFSElement("Query",EmptyType.getInstance()),
+            new WFSElement("Insert",EmptyType.getInstance()),
+            new WFSElement("Update",EmptyType.getInstance()),
+            new WFSElement("Delete",EmptyType.getInstance()),
+            new WFSElement("Lock",EmptyType.getInstance()),
+            new WFSElement("VendorSpecificCapabilities",XSISimpleTypes.String.getInstance()),
+            new WFSElement("WFS_Capabilities",WFS_CapabilitiesType.getInstance()),
+            new WFSElement("GML2",EmptyType.getInstance()),
+            new WFSElement("GML2-GZIP",EmptyType.getInstance()),
+            new WFSElement("XMLSCHEMA",EmptyType.getInstance()),
+            new WFSElement("GetFeatureWithLock",GetFeatureWithLockType.getInstance()),
+            new WFSElement("LockFeature",LockFeatureType.getInstance()),
+            new WFSElement("Transaction",TransactionType.getInstance()),
+            new WFSElement("WFS_TransactionResponse",WFS_TransactionResponseType.getInstance()),
+            new WFSElement("WFS_LockFeatureResponse",WFS_LockFeatureResponseType.getInstance()),
+            new WFSElement("LockId",XSISimpleTypes.String.getInstance()),
+            new WFSElement("Insert",InsertElementType.getInstance()),
+            new WFSElement("Update",UpdateElementType.getInstance()),
+            new WFSElement("Delete",DeleteElementType.getInstance()),
+            new WFSElement("Native",NativeType.getInstance()),
+            new WFSElement("Property",PropertyType.getInstance()),
+            new WFSElement("SUCCESS",EmptyType.getInstance()),
+            new WFSElement("FAILED",EmptyType.getInstance()),
+            new WFSElement("PARTIAL",EmptyType.getInstance())
+    };
+    
+    static final ComplexType[] complexTypes = new ComplexType[] {
+            GetCapabilitiesType.getInstance(),
+            DescribeFeatureTypeType.getInstance(),
+            GetFeatureType.getInstance(),
+            QueryType.getInstance(),
+            FeatureCollectionType.getInstance(),
+            WFS_CapabilitiesType.getInstance(),
+            ServiceType.getInstance(),
+            CapabilityType.getInstance(),
+            FeatureTypeListType.getInstance(),
+            RequestType.getInstance(),
+            TransactionType.getInstance(),
+            LockFeatureTypeType.getInstance(),
+            DCPTypeType.getInstance(),
+            FeatureTypeType.getInstance(),
+            GetType.getInstance(),
+            HTTPType.getInstance(),
+            LatLongBoundingBoxType.getInstance(),
+            MetadataURLType.getInstance(),
+            OperationsType.getInstance(),
+            PostType.getInstance(),
+            ResultFormatType.getInstance(),
+            SchemaDescriptionLanguageType.getInstance(),
+            EmptyType.getInstance(),
+            GetFeatureWithLockType.getInstance(),
+            LockFeatureType.getInstance(),
+            LockType.getInstance(),
+            InsertElementType.getInstance(),
+            UpdateElementType.getInstance(),
+            DeleteElementType.getInstance(),
+            NativeType.getInstance(),
+            PropertyType.getInstance(),
+            WFS_LockFeatureResponseType.getInstance(),
+            FeaturesLockedType.getInstance(),
+            FeaturesNotLockedType.getInstance(),
+            WFS_TransactionResponseType.getInstance(),
+            TransactionResultType.getInstance(),
+            InsertResultType.getInstance(),
+            StatusType.getInstance()
+    };
+    
+    static final SimpleType[] simpleTypes = new SimpleType[] {
+            AllSomeType.getInstance(),
+    };
+    
+    
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getAttributeGroups()
      */
     public AttributeGroup[] getAttributeGroups() {
-        // TODO Auto-generated method stub
-        return null;
+        return new AttributeGroup[0];
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getAttributes()
      */
     public Attribute[] getAttributes() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Attribute[0];
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getBlockDefault()
      */
     public int getBlockDefault() {
-        // TODO Auto-generated method stub
-        return 0;
+        return NONE;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getComplexTypes()
      */
     public ComplexType[] getComplexTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        return complexTypes;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getElements()
      */
     public Element[] getElements() {
-        // TODO Auto-generated method stub
-        return null;
+        return elements;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getFinalDefault()
      */
     public int getFinalDefault() {
-        // TODO Auto-generated method stub
-        return 0;
+        return NONE;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getGroups()
      */
     public Group[] getGroups() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Group[0];
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getId()
      */
     public String getId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getImports()
      */
     public Schema[] getImports() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Schema[] {GMLSchema.getInstance(), FilterSchema.getInstance()};
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getSimpleTypes()
      */
     public SimpleType[] getSimpleTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        return simpleTypes;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getTargetNamespace()
      */
     public String getTargetNamespace() {
-        // TODO Auto-generated method stub
-        return null;
+        return NAMESPACE;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.xml.schema.Schema#getURIs()
+    /**
+     * 
+     * @see org.geotools.xml.schema.Schema#getURI()
      */
     public URI getURI() {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return new URI("http://www.opengis.net/wfs");
+        } catch (URISyntaxException e) {
+            logger.warning(e.toString());
+            return null;
+        }
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#getVersion()
      */
     public String getVersion() {
-        // TODO Auto-generated method stub
-        return null;
+        return "1.0.0";
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-        // TODO Auto-generated method stub
+        if (uri.toString().toLowerCase().endsWith("WFS-basic.xsd")
+            || uri.toString().toLowerCase().endsWith("WFS-capabilities.xsd")
+            || uri.toString().toLowerCase().endsWith("WFS-transaction.xsd")) {
+            return true;
+        }
+
         return false;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#isAttributeFormDefault()
      */
     public boolean isAttributeFormDefault() {
-        // TODO Auto-generated method stub
         return false;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.xml.schema.Schema#isElementFormDefault()
      */
     public boolean isElementFormDefault() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     /**
      * @see org.geotools.xml.schema.Schema#getPrefix()
      */
     public String getPrefix() {
-        // TODO Auto-generated method stub
-        return null;
+        return "wfs";
     }
 
     /**
@@ -252,6 +374,31 @@ public class WFSSchema implements Schema {
         public Type getParent() {
             return null;
         }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
+         */
+        public boolean cache(Element element, Map hints) {
+            return true;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAnyAttributeNameSpace()
+         */
+        public String getAnyAttributeNameSpace() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return getChild()==null?null:getChild().findChildElement(name);
+        }
+
+        /**
+         * @see org.geotools.xml.schema.ComplexType#isAbstract()
+         */
+        public boolean isAbstract() {
+            return false;
+        }
     }
 
     /**
@@ -260,6 +407,7 @@ public class WFSSchema implements Schema {
      * used by the WFSSchema. The remaining data will be configured upon
      * creation.
      * </p>
+     * @author David Zwiers
      *
      * @see Element
      */
@@ -277,6 +425,27 @@ public class WFSSchema implements Schema {
          * Should never be called
          */
         private WFSElement() {
+        }
+
+        /**
+         * Configures the Element for this particular WFS instance.  The
+         * following params match schema definition attributes found in an
+         * element declaration. Those missing have been hard coded for the gml
+         * Schema.
+         *
+         * @param name
+         * @param type
+         * @param min
+         * @param max
+         * @param abstracT
+         * @param substitutionGroup
+         */
+        public WFSElement(String name, Type type) {
+            this.max = 1;
+            this.min = 1;
+            this.name = name;
+            this.type = type;
+            this.substitutionGroup = null;
         }
 
         /**
@@ -446,20 +615,17 @@ public class WFSSchema implements Schema {
      * </p>
      *
      * @author Norman Barker
+     * @author David Zwiers
      *
      * @see Attribute
      */
-    static class WFSAttribute implements Attribute {
-        // package visible class variable, used to avoid set* methods
-        String name;
-        String def = null;
-        SimpleType simpleType;
-        int use = Attribute.OPTIONAL;
-
+    static class WFSAttribute extends DefaultAttribute {
         /*
          * Should never be called
          */
         private WFSAttribute() {
+            super(null, null, WFSSchema.NAMESPACE,
+                    null, OPTIONAL, null, null, false);
         }
 
         /**
@@ -469,8 +635,8 @@ public class WFSSchema implements Schema {
          * @param simpleType
          */
         public WFSAttribute(String name, SimpleType simpleType) {
-            this.name = name;
-            this.simpleType = simpleType;
+            super(null, name, WFSSchema.NAMESPACE,
+                    simpleType, OPTIONAL, null, null, false);
         }
 
         /**
@@ -481,9 +647,8 @@ public class WFSSchema implements Schema {
          * @param use
          */
         public WFSAttribute(String name, SimpleType simpleType, int use) {
-            this.name = name;
-            this.simpleType = simpleType;
-            this.use = use;
+            super(null, name, WFSSchema.NAMESPACE,
+                    simpleType, use, null, null, false);
         }
 
         /**
@@ -497,73 +662,11 @@ public class WFSSchema implements Schema {
          */
         public WFSAttribute(String name, SimpleType simpleType, int use,
             String def) {
-            this.name = name;
-            this.simpleType = simpleType;
-            this.use = use;
-            this.def = def;
+            super(null, name, WFSSchema.NAMESPACE,
+                    simpleType, use, def, null, false);
         }
-
-        /**
-         * @see schema.Attribute#getNameSpace()
-         */
-        public String getNameSpace() {
-            return WFSSchema.NAMESPACE;
-        }
-
-        /**
-         * @see schema.Attribute#getDefault()
-         */
-        public String getDefault() {
-            return def;
-        }
-
-        /**
-         * @see schema.Attribute#getFixed()
-         */
-        public String getFixed() {
-            return null;
-        }
-
-        /**
-         * @see schema.Attribute#isForm()
-         */
-        public boolean isForm() {
-            return false;
-        }
-
-        /**
-         * @see schema.Attribute#getId()
-         */
-        public String getId() {
-            return null;
-        }
-
-        /**
-         * @see schema.Attribute#getName()
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * @see schema.Attribute#getUse()
-         */
-        public int getUse() {
-            return use;
-        }
-
-        /**
-         * @see schema.Attribute#getSimpleType()
-         */
-        public SimpleType getSimpleType() {
-            return simpleType;
-        }
-
-        /**
-         * @see org.geotools.xml.schema.Attribute#getNamespace()
-         */
-        public String getNamespace() {
-            return WFSSchema.NAMESPACE;
-        }
+    }
+    static class AllSomeType implements SimpleType{
+        
     }
 }

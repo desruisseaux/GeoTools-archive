@@ -46,6 +46,12 @@ public class DefaultChoice implements Choice {
         this.max = max;
         this.children = children;
     }
+    
+    public DefaultChoice(ElementGrouping[] children) {
+        this.min = 1;
+        this.max = 1;
+        this.children = children;
+    }
 
     /**
      * @see org.geotools.xml.schema.Choice#getId()
