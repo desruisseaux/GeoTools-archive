@@ -311,13 +311,10 @@ public class WFSDataStore extends AbstractDataStore {
         CoordinateReferenceSystem crs;
         try {
             if(crsName!=null){
-                crs = FactoryFinder.getCRSFactory().createFromWKT(crsName);
-                crs = WFSDataStoreFactory.getCRSService().createCRS(crsName);
-            	t = CRSService.transform(t,crs);
+                crs = FactoryFinder.decode(crsName);
+            	t = FactoryFinder.transform(t,crs);
             }
         } catch (FactoryException e) {
-            WFSDataStoreFactory.logger.warning(e.getMessage());
-        } catch (SchemaException e) {
             WFSDataStoreFactory.logger.warning(e.getMessage());
         }
         

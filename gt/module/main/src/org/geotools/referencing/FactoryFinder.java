@@ -36,6 +36,7 @@ import javax.imageio.spi.ServiceRegistry;
 
 import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.Arguments;
@@ -236,7 +237,7 @@ public final class FactoryFinder {
         return transform(env, transform);
     }
     
-    public static FeatureType transform(FeatureType ft, CoordinateReferenceSystem crs){
+    public static FeatureType transform(FeatureType ft, CoordinateReferenceSystem crs) throws SchemaException{
         // TODO fill me in
         return null;
     }
