@@ -306,10 +306,10 @@ public class SourceFeatureTypeCard extends WizzardCard {
                         try{
                             org.geotools.filter.CompareFilter cf = (org.geotools.filter.CompareFilter)f;
                             if(cf.getLeftValue() instanceof org.geotools.filter.LengthFunction){
-                                val = Integer.parseInt(((org.geotools.filter.LiteralExpression)cf.getRightValue()).getLiteral().toString());
+                                val = new Integer(((org.geotools.filter.LiteralExpression)cf.getRightValue()).getLiteral().toString());
                             }else{
                                 if(cf.getRightValue() instanceof org.geotools.filter.LengthFunction){
-                                    val = Integer.parseInt(((org.geotools.filter.LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+                                    val = new Integer(((org.geotools.filter.LiteralExpression)cf.getLeftValue()).getLiteral().toString());
                                 }
                             }
                         }catch(NumberFormatException e){
