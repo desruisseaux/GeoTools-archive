@@ -19,6 +19,7 @@ package org.geotools.renderer.lite;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 import org.geotools.geometry.JTS;
 import org.geotools.geometry.coordinatesequence.InPlaceCoordinateSequenceTransformer;
@@ -31,6 +32,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 
 
 /**
@@ -41,6 +43,9 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
  * @author Andrea Aime
  */
 public abstract class AbstractLiteIterator implements PathIterator {
+
+    /** The logger for the rendering module. */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     protected double[] dcoords = new double[2];
     protected static final AffineTransform NO_TRANSFORM = new AffineTransform();
     protected MathTransform mathTransform=null;
@@ -70,7 +75,6 @@ public abstract class AbstractLiteIterator implements PathIterator {
      */
     protected void transform( CoordinateSequence coordinates, MathTransform transform ) {
         try {
-            
             MathTransform tmp=mathTransform;
             if( tmp!=null)
                 tmp=FactoryFinder.getMathTransformFactory().createConcatenatedTransform(mathTransform.inverse(), transform);
@@ -79,16 +83,12 @@ public abstract class AbstractLiteIterator implements PathIterator {
             if( tmp==null )
                 return;
             CoordinateSequenceTransformer transformer=new InPlaceCoordinateSequenceTransformer();
-            transformer.transform(coordinates, tmp);
+
+            coordinates=transformer.transform(coordinates, tmp);
+            
             mathTransform=transform;
-        } catch (NoSuchElementException e) {
-            // TODO Catch e
-        } catch (NoninvertibleTransformException e) {
-            // TODO Catch e
-        } catch (FactoryException e) {
-            // TODO Catch e
-        } catch (TransformException e) {
-            // TODO Catch e
+        } catch (Exception e) {
+            LOGGER.warning("The coordinates were not transformed by the math transform");
         }
     }
 

@@ -29,10 +29,12 @@ import org.opengis.referencing.operation.MathTransform2D;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 
 /**
@@ -60,12 +62,16 @@ public class LiteShape implements Shape {
 	private float yScale;
     
     private MathTransform mathTransform;
+    private boolean transformed=false;
+
+    private GeometryFactory geomFac;
     
     /**
      * @param mathTransform The mathTransform to set.
      */
     public void setMathTransform( MathTransform mathTransform ) {
         this.mathTransform = mathTransform;
+        transformed=false;
     }
 
     /**
@@ -100,7 +106,8 @@ public class LiteShape implements Shape {
      * @param maxDistance - distance used in the generalization process
      */
     public LiteShape(Geometry geom, AffineTransform at, boolean generalize) {
-        this.geometry = geom;
+        if( geom!=null)
+            this.geometry =getGeometryFactory().createGeometry(geom);
         this.affineTransform = at;
         this.generalize = generalize;
         if (at==null){
@@ -115,6 +122,14 @@ public class LiteShape implements Shape {
                 + (at.getShearY() * at.getShearY()));
     }
 
+    private GeometryFactory getGeometryFactory() {
+        if (geomFac == null) {
+            geomFac = new GeometryFactory(new PackedCoordinateSequenceFactory());
+        }
+
+        return geomFac;
+    }
+
     /**
      * Sets the geometry contained in this lite shape. Convenient to reuse this
      * object instead of creating it again and again during rendering
@@ -122,7 +137,7 @@ public class LiteShape implements Shape {
      * @param g
      */
     public void setGeometry(Geometry g) {
-        this.geometry = g;
+        this.geometry = (Geometry) g.clone();
     }
 
     /**
@@ -446,8 +461,9 @@ public class LiteShape implements Shape {
                     combined, generalize, maxDistance);
             pi = collIterator;
         }
-
-        pi.setMathTransform(mathTransform);
+        if( !transformed )
+            pi.setMathTransform(mathTransform);
+        transformed=true;
         return pi;
     }
 

@@ -8,8 +8,6 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.HeadlessException;
-import java.awt.Image;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -52,7 +50,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -89,8 +86,14 @@ public class Rendering2DTest extends TestCase {
      * The logger for the rendering module.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final boolean INTERACTIVE=false;
     private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
     private Object transform;
+    private static final String LINE = "linefeature";
+    private static final String POLYGON = "polygonfeature";
+    private static final String POINT = "pointfeature";
+    private static final String RING = "ringfeature";
+    private static final String COLLECTION = "collfeature";
 
     public Rendering2DTest( java.lang.String testName ) {
         super(testName);
@@ -159,14 +162,16 @@ public class Rendering2DTest extends TestCase {
         return style;
     }
 
-    FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs ) throws Exception {
+    FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs, String typeName  ) throws Exception {
+        GeometryFactory geomFac = new GeometryFactory();
+        return createTestFeatureCollection(crs, geomFac, typeName);
+    }
+    
+    FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs, GeometryFactory geomFac, String typeName ) throws Exception {
         // Request extent
-//        Envelope ex = new Envelope(5, 15, 5, 15);
+        // Envelope ex = new Envelope(5, 15, 5, 15);
 
         AttributeType[] types = new AttributeType[2];
-
-        GeometryFactory geomFac = new GeometryFactory(PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-        
 
         LineString line = makeSampleLineString(geomFac);
         if (crs != null)
@@ -175,18 +180,18 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType lineType = FeatureTypeFactory.newFeatureType(types, "linefeature");
+        FeatureType lineType = FeatureTypeFactory.newFeatureType(types, LINE);
         Feature lineFeature = lineType.create(new Object[]{line, "centerline"});
 
         Polygon polygon = makeSamplePolygon(geomFac);
 
         if (crs != null)
-            types[0] = new DefaultAttributeType.Geometric("collection", polygon.getClass(), false, 0,
-                    null, crs);
+            types[0] = new DefaultAttributeType.Geometric("collection", polygon.getClass(), false,
+                    0, null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("edge", polygon.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType polygonType = FeatureTypeFactory.newFeatureType(types, "polygonfeature");
+        FeatureType polygonType = FeatureTypeFactory.newFeatureType(types, POLYGON);
 
         Feature polygonFeature = polygonType.create(new Object[]{polygon, "edge"});
 
@@ -197,7 +202,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType pointType = FeatureTypeFactory.newFeatureType(types, "pointfeature");
+        FeatureType pointType = FeatureTypeFactory.newFeatureType(types, POINT);
 
         Feature pointFeature = pointType.create(new Object[]{point, "centre"});
 
@@ -208,7 +213,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType lrType = FeatureTypeFactory.newFeatureType(types, "ringfeature");
+        FeatureType lrType = FeatureTypeFactory.newFeatureType(types, RING);
         Feature ringFeature = lrType.create(new Object[]{ring, "centerline"});
 
         GeometryCollection coll = makeSampleGeometryCollection(geomFac);
@@ -218,7 +223,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType collType = FeatureTypeFactory.newFeatureType(types, "collfeature");
+        FeatureType collType = FeatureTypeFactory.newFeatureType(types, COLLECTION);
         Feature collFeature = collType.create(new Object[]{coll, "collection"});
 
         MemoryDataStore data = new MemoryDataStore();
@@ -228,74 +233,256 @@ public class Rendering2DTest extends TestCase {
         data.addFeature(ringFeature);
         data.addFeature(collFeature);
 
-        String typeName = data.getTypeNames()[0];
-
         return data.getFeatureSource(typeName).getFeatures().collection();
     }
 
     public void testSimpleRender() throws Exception {
 
-            // same as the datasource test, load in some features into a table
-            System.err.println("starting rendering2DTest");
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
 
-            FeatureCollection ft = createTestFeatureCollection(null);
-            Style style = createTestStyle();
+        FeatureCollection ft = createTestFeatureCollection(null, POLYGON);
+        Style style = createTestStyle();
 
-            MapContext map = new DefaultMapContext();
-            map.addLayer(ft, style);
-            LiteRenderer renderer = new LiteRenderer(map);
-            Envelope env= map.getLayerBounds();
-            env=new Envelope( env.getMinX()-20, env.getMaxX()+20, env.getMinY()-20, env.getMaxY()+20 );
-            showRender("testSimpleRender", renderer, 1000, env);
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        showRender("testSimpleRender", renderer, 1000, env);
 
     }
 
-        public void testReprojection() throws Exception {
+    public void testSimpleLineRender() throws Exception {
 
-                // same as the datasource test, load in some features into a table
-                System.err.println("starting testLiteRender2");
-    
-    
-                FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84);
-                Style style = createTestStyle();
-    
-                StringBuffer stringBuffer=new StringBuffer();
-                for ( FeatureIterator reader=ft.features(); reader.hasNext(); ){
-                    Coordinate[] coords=reader.next().getDefaultGeometry().getCoordinates();
-                    for( int i = 0; i < coords.length; i++ ) {
-                        stringBuffer.append(coords[i]);
-                    }
-                }
-                
-                System.out.println(stringBuffer);
-                
-                MapContext map = new DefaultMapContext();
-                map.addLayer(ft, style);
-                final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-                LiteRenderer2 renderer = new LiteRenderer2(map);
-                CoordinateReferenceSystem crs=FactoryFinder
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+
+        FeatureCollection ft = createTestFeatureCollection(null, LINE);
+        Style style = createTestStyle();
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        showRender("testSimpleLineRender", renderer, 1000, env);
+
+    }
+
+    public void testSimplePointRender() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+
+        FeatureCollection ft = createTestFeatureCollection(null, POINT);
+        Style style = createTestStyle();
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        LiteRenderer renderer = new LiteRenderer(map);
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        showRender("testSimplePointRender", renderer, 1000, env);
+
+    }
+
+    public void testReprojectionWithPackedCoordinateSequence() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting testLiteRender2");
+        GeometryFactory geomFac = new GeometryFactory(
+                PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
+        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, POLYGON);
+        Style style = createTestStyle();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for( FeatureIterator reader = ft.features(); reader.hasNext(); ) {
+            Coordinate[] coords = reader.next().getDefaultGeometry().getCoordinates();
+            for( int i = 0; i < coords.length; i++ ) {
+                stringBuffer.append(coords[i]);
+            }
+        }
+
+        System.out.println(stringBuffer);
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        CoordinateReferenceSystem crs = FactoryFinder
                 .getCRSFactory()
                 .createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
-                
-                MathTransform t=FactoryFinder.getCoordinateOperationFactory()
-                .createOperation( GeographicCRS.WGS84, crs).getMathTransform();
-                
-                Envelope env=map.getLayerBounds();
 
-                Envelope bounds = JTS.transform(env,t);
-                map.setAreaOfInterest(bounds, crs);
-                
-                Rectangle rect = new Rectangle(400, 400);
-                renderer.setOptimizedDataLoadingEnabled(true);
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+                GeographicCRS.WGS84, crs).getMathTransform();
 
-                env=new Envelope( bounds.getMinX()-2000000, bounds.getMaxX()+2000000, bounds.getMinY()-2000000, bounds.getMaxY()+2000000);
-                showRender("testReprojection", renderer, 1000, env);
-                
-//                System.in.read();
+        Envelope env = map.getLayerBounds();
 
+        Envelope bounds = JTS.transform(env, t);
+        map.setAreaOfInterest(bounds, crs);
+
+        Rectangle rect = new Rectangle(400, 400);
+        renderer.setOptimizedDataLoadingEnabled(true);
+
+        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
+                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
+        showRender("testReprojection", renderer, 1000, env);
+
+        // System.in.read();
+
+    }
+
+    public void testReprojectionWithNonPackedCoordinateSequence() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting testLiteRender2");
+        
+        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, POLYGON);
+        Style style = createTestStyle();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for( FeatureIterator reader = ft.features(); reader.hasNext(); ) {
+            Coordinate[] coords = reader.next().getDefaultGeometry().getCoordinates();
+            for( int i = 0; i < coords.length; i++ ) {
+                stringBuffer.append(coords[i]);
+            }
         }
 
+        System.out.println(stringBuffer);
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        CoordinateReferenceSystem crs = FactoryFinder
+                .getCRSFactory()
+                .createFromWKT(
+                        "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+                GeographicCRS.WGS84, crs).getMathTransform();
+
+        Envelope env = map.getLayerBounds();
+
+        Envelope bounds = JTS.transform(env, t);
+        map.setAreaOfInterest(bounds, crs);
+
+        Rectangle rect = new Rectangle(400, 400);
+        renderer.setOptimizedDataLoadingEnabled(true);
+
+        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
+                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
+        showRender("testReprojection", renderer, 1000, env);
+
+        // System.in.read();
+
+    }
+    
+    public void testLineReprojection() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting testLiteRender2");
+        GeometryFactory geomFac = new GeometryFactory(
+                PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
+        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, LINE);
+        Style style = createTestStyle();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for( FeatureIterator reader = ft.features(); reader.hasNext(); ) {
+            Coordinate[] coords = reader.next().getDefaultGeometry().getCoordinates();
+            for( int i = 0; i < coords.length; i++ ) {
+                stringBuffer.append(coords[i]);
+            }
+        }
+
+        System.out.println(stringBuffer);
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        showRender("testSimpleLineRender", renderer, 1000, env);
+        
+        CoordinateReferenceSystem crs = FactoryFinder
+                .getCRSFactory()
+                .createFromWKT(
+                        "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+                GeographicCRS.WGS84, crs).getMathTransform();
+
+        env = map.getLayerBounds();
+
+        Envelope bounds = JTS.transform(env, t);
+        map.setAreaOfInterest(bounds, crs);
+
+        Rectangle rect = new Rectangle(400, 400);
+        renderer.setOptimizedDataLoadingEnabled(true);
+
+        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
+                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
+        showRender("testLineReprojection", renderer, 1000, env);
+
+        // System.in.read();
+
+    }
+    public void testPointReprojection() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting testLiteRender2");
+        GeometryFactory geomFac = new GeometryFactory(
+                PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
+        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, POINT);
+        Style style = createTestStyle();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for( FeatureIterator reader = ft.features(); reader.hasNext(); ) {
+            Coordinate[] coords = reader.next().getDefaultGeometry().getCoordinates();
+            for( int i = 0; i < coords.length; i++ ) {
+                stringBuffer.append(coords[i]);
+            }
+        }
+
+        System.out.println(stringBuffer);
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(ft, style);
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
+        LiteRenderer2 renderer = new LiteRenderer2(map);
+        CoordinateReferenceSystem crs = FactoryFinder
+                .getCRSFactory()
+                .createFromWKT(
+                        "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+                GeographicCRS.WGS84, crs).getMathTransform();
+
+        Envelope env = map.getLayerBounds();
+
+        Envelope bounds = JTS.transform(env, t);
+        map.setAreaOfInterest(bounds, crs);
+
+        Rectangle rect = new Rectangle(400, 400);
+        renderer.setOptimizedDataLoadingEnabled(true);
+
+        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
+                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
+        showRender("testPointReprojection", renderer, 1000, env);
+
+        // System.in.read();
+
+    }
+
+    
     /**
      * Tests the layer definition query behavior as implemented by LiteRenderer.
      * <p>
@@ -306,123 +493,125 @@ public class Rendering2DTest extends TestCase {
      */
     public void testDefinitionQuery() throws Exception {
 
-            System.err.println("starting definition query test");
-            final FeatureCollection ft = createTestDefQueryFeatureCollection();
-            final Style style = createDefQueryTestStyle();
-            FeatureResults results;
-            Envelope envelope = ft.getBounds();
+        System.err.println("starting definition query test");
+        final FeatureCollection ft = createTestDefQueryFeatureCollection();
+        final Style style = createDefQueryTestStyle();
+        FeatureResults results;
+        Envelope envelope = ft.getBounds();
 
-            // we'll use this as the definition query for the layer
-            Query layerQuery;
+        // we'll use this as the definition query for the layer
+        Query layerQuery;
 
-            MapLayer layer = new DefaultMapLayer(ft, style);
-            MapContext map = new DefaultMapContext(new MapLayer[]{layer});
-            map.setAreaOfInterest(envelope);
-            LiteRenderer renderer = new LiteRenderer(map);
-            renderer.setOptimizedDataLoadingEnabled(true);
+        MapLayer layer = new DefaultMapLayer(ft, style);
+        MapContext map = new DefaultMapContext(new MapLayer[]{layer});
+        map.setAreaOfInterest(envelope);
+        LiteRenderer renderer = new LiteRenderer(map);
+        renderer.setOptimizedDataLoadingEnabled(true);
 
-            // this is the reader that LiteRenderer obtains after applying
-            // the mixed filter to a given layer.
-            FeatureReader reader;
-            Filter filter = Filter.NONE;
-            FilterFactory ffac = FilterFactory.createFilterFactory();
+        // this is the reader that LiteRenderer obtains after applying
+        // the mixed filter to a given layer.
+        FeatureReader reader;
+        Filter filter = Filter.NONE;
+        FilterFactory ffac = FilterFactory.createFilterFactory();
 
-            // test maxFeatures, render just the first 2 features
-            layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
-            layer.setQuery(layerQuery);
+        // test maxFeatures, render just the first 2 features
+        layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
+        layer.setQuery(layerQuery);
 
-            results = renderer.queryLayer(layer, envelope);
-            assertEquals(2, results.getCount());
-            // just the 3 geometric atts should get be loaded
-            assertEquals(3, results.getSchema().getAttributeCount());
+        results = renderer.queryLayer(layer, envelope);
+        assertEquals(2, results.getCount());
+        // just the 3 geometric atts should get be loaded
+        assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender("testDefinitionQuery1", renderer, 1000, null);
+        showRender("testDefinitionQuery1", renderer, 1000, null);
 
-            // test attribute based filter
-            FeatureType schema = ft.features().next().getFeatureType();
-            filter = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-            ((CompareFilter) filter).addLeftValue(ffac.createAttributeExpression(schema, "id"));
-            ((CompareFilter) filter).addRightValue(ffac.createLiteralExpression("ft1"));
+        // test attribute based filter
+        FeatureType schema = ft.features().next().getFeatureType();
+        filter = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        ((CompareFilter) filter).addLeftValue(ffac.createAttributeExpression(schema, "id"));
+        ((CompareFilter) filter).addRightValue(ffac.createLiteralExpression("ft1"));
 
-            // note we include the "id" field in the layer query. Bad practice, since it goes
-            // against
-            // the performance gain of renderer.setOptimizedDataLoadingEnabled(true),
-            // but we should test it anyway
-            layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE,
-                    new String[]{"id"}, "handle");
-            layer.setQuery(layerQuery);
+        // note we include the "id" field in the layer query. Bad practice, since it goes
+        // against
+        // the performance gain of renderer.setOptimizedDataLoadingEnabled(true),
+        // but we should test it anyway
+        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, new String[]{"id"},
+                "handle");
+        layer.setQuery(layerQuery);
 
-            results = renderer.queryLayer(layer, envelope);
-            assertEquals(1, results.getCount());
-            // the 4 atts should be loaded since the definition query includes "id"
-            assertEquals(4, results.getSchema().getAttributeCount());
-            // we can check this since we explicitly requested the "id" attribute. If we not,
-            // it would be not loaded
-            String val = (String) results.reader().next().getAttribute("id");
-            assertEquals("ft1", val);
+        results = renderer.queryLayer(layer, envelope);
+        assertEquals(1, results.getCount());
+        // the 4 atts should be loaded since the definition query includes "id"
+        assertEquals(4, results.getSchema().getAttributeCount());
+        // we can check this since we explicitly requested the "id" attribute. If we not,
+        // it would be not loaded
+        String val = (String) results.reader().next().getAttribute("id");
+        assertEquals("ft1", val);
 
-            showRender("testDefinitionQuery2", renderer, 1000, null);
+        showRender("testDefinitionQuery2", renderer, 1000, null);
 
-            // try a bbox filter as definition query for the layer
-            filter = null;
-            GeometryFilter gfilter;
-            // contains the first 2 features
-            Envelope env = new Envelope(20, 130, 20, 130);
-            gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-            gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "point"));
-            gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-            filter = gfilter;
+        // try a bbox filter as definition query for the layer
+        filter = null;
+        GeometryFilter gfilter;
+        // contains the first 2 features
+        Envelope env = new Envelope(20, 130, 20, 130);
+        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "point"));
+        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+        filter = gfilter;
 
-            gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-            gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "line"));
-            gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-            filter = filter.or(gfilter);
+        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "line"));
+        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+        filter = filter.or(gfilter);
 
-            gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-            gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "polygon"));
-            gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-            filter = filter.or(gfilter);
+        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "polygon"));
+        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+        filter = filter.or(gfilter);
 
-            System.err.println("trying with filter: " + filter);
+        System.err.println("trying with filter: " + filter);
 
-            layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
-            layer.setQuery(layerQuery);
+        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
+        layer.setQuery(layerQuery);
 
-            results = renderer.queryLayer(layer, envelope);
-            assertEquals(2, results.getCount());
-            // the 4 atts should be loaded since the definition query includes "id"
-            assertEquals(3, results.getSchema().getAttributeCount());
+        results = renderer.queryLayer(layer, envelope);
+        assertEquals(2, results.getCount());
+        // the 4 atts should be loaded since the definition query includes "id"
+        assertEquals(3, results.getSchema().getAttributeCount());
 
-            showRender("testDefinitionQuery3", renderer, 1000, null);
+        showRender("testDefinitionQuery3", renderer, 1000, null);
 
     }
 
     /**
      * bounds may be null
      */
-    private void showRender( String testName, Object renderer, long timeOut, Envelope bounds ) throws Exception {
-        
+    private void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
+            throws Exception {
+
         int w = 300, h = 300;
         final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
         g.setColor(Color.white);
         g.fillRect(0, 0, w, h);
         render(renderer, g, new Rectangle(w, h), bounds);
-        if( System.getProperty("java.awt.headless")==null || 
-                !System.getProperty("java.awt.headless").equals("true") ){
+        if ( (System.getProperty("java.awt.headless") == null
+                || !System.getProperty("java.awt.headless").equals("true"))
+                && INTERACTIVE) {
             Frame frame = new Frame();
             frame.addWindowListener(new WindowAdapter(){
                 public void windowClosing( WindowEvent e ) {
                     e.getWindow().dispose();
                 }
             });
-            
+
             Panel p = new Panel(){
                 /** <code>serialVersionUID</code> field */
                 private static final long serialVersionUID = 1L;
 
-                public void paint(Graphics g){
-                    g.drawImage(image, 0,0,this);
+                public void paint( Graphics g ) {
+                    g.drawImage(image, 0, 0, this);
                 }
             };
             frame.add(p);
@@ -433,9 +622,9 @@ public class Rendering2DTest extends TestCase {
             frame.dispose();
         }
 
-        //java.net.URL base = TestData.getResource(this, ".");
+        // java.net.URL base = TestData.getResource(this, ".");
         java.io.File base = TestData.file(this, ".");
-        java.io.File file = new java.io.File(base, testName+"_"
+        java.io.File file = new java.io.File(base, testName + "_"
                 + renderer.getClass().getName().replace('.', '_') + ".png");
         java.io.FileOutputStream out = new java.io.FileOutputStream(file);
         boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
@@ -444,21 +633,21 @@ public class Rendering2DTest extends TestCase {
             System.out.println("Failed to write image to " + file.toString());
         }
 
-        java.io.File fileExemplar = new java.io.File(base.getPath()+"/exemplars", testName+"_"
+        java.io.File fileExemplar = new java.io.File(base.getPath() + "/exemplars", testName + "_"
                 + renderer.getClass().getName().replace('.', '_') + ".png");
-        
-        FileInputStream inExemplar=new FileInputStream(fileExemplar);
-        FileInputStream inTest=new FileInputStream(file);
-        
-        BufferedImage imageTest=ImageIO.read(inTest);
-        BufferedImage imageExemplar=ImageIO.read(inExemplar);
-        
-        for( int y=0; y< imageExemplar.getHeight(); y++){
-            for( int x=0; x< imageExemplar.getWidth(); x++){
-                assertEquals(imageExemplar.getRGB(x,y), imageTest.getRGB(x,y));
+
+        FileInputStream inExemplar = new FileInputStream(fileExemplar);
+        FileInputStream inTest = new FileInputStream(file);
+
+        BufferedImage imageTest = ImageIO.read(inTest);
+        BufferedImage imageExemplar = ImageIO.read(inExemplar);
+
+        for( int y = 0; y < imageExemplar.getHeight(); y++ ) {
+            for( int x = 0; x < imageExemplar.getWidth(); x++ ) {
+                assertEquals(imageExemplar.getRGB(x, y), imageTest.getRGB(x, y));
             }
         }
-        
+
     }
 
     /**
@@ -468,20 +657,20 @@ public class Rendering2DTest extends TestCase {
      * @param bounds
      */
     private void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
-        if( obj instanceof LiteRenderer2 ){
-            LiteRenderer2 renderer=(LiteRenderer2) obj;
-        if( bounds==null )
-            renderer.paint((Graphics2D) g, rect, new AffineTransform());
-        else
-            renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
-        }        
-        if( obj instanceof LiteRenderer ){
-            LiteRenderer renderer=(LiteRenderer) obj;
-            if( bounds==null )
+        if (obj instanceof LiteRenderer2) {
+            LiteRenderer2 renderer = (LiteRenderer2) obj;
+            if (bounds == null)
                 renderer.paint((Graphics2D) g, rect, new AffineTransform());
             else
                 renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
-            }
+        }
+        if (obj instanceof LiteRenderer) {
+            LiteRenderer renderer = (LiteRenderer) obj;
+            if (bounds == null)
+                renderer.paint((Graphics2D) g, rect, new AffineTransform());
+            else
+                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
+        }
     }
 
     private FeatureCollection createTestDefQueryFeatureCollection() throws Exception {
@@ -575,28 +764,28 @@ public class Rendering2DTest extends TestCase {
         return gf.createLineString(coords);
     }
 
-    private int xCenter=-133, yCenter=60;
-    
+    private int xCenter = -133, yCenter = 60;
+
     public Point point( final GeometryFactory gf, int x, int y ) {
         Coordinate coord = new Coordinate(x, y);
         return gf.createPoint(coord);
     }
 
     private Point makeSamplePoint( final GeometryFactory geomFac ) {
-        Coordinate c = new Coordinate(xCenter-14.0d, yCenter-14.0d);
+        Coordinate c = new Coordinate(xCenter - 14.0d, yCenter - 14.0d);
         Point point = geomFac.createPoint(c);
         return point;
     }
 
     private LineString makeSampleLineString( final GeometryFactory geomFac ) {
         Coordinate[] linestringCoordinates = new Coordinate[7];
-        linestringCoordinates[0] = new Coordinate(xCenter-5.0d, yCenter-5.0d);
-        linestringCoordinates[1] = new Coordinate(xCenter-6.0d, yCenter-5.0d);
-        linestringCoordinates[2] = new Coordinate(xCenter-6.0d, yCenter-6.0d);
-        linestringCoordinates[3] = new Coordinate(xCenter-7.0d, yCenter-6.0d);
-        linestringCoordinates[4] = new Coordinate(xCenter-7.0d, yCenter-7.0d);
-        linestringCoordinates[5] = new Coordinate(xCenter-8.0d, yCenter-7.0d);
-        linestringCoordinates[6] = new Coordinate(xCenter-8.0d, yCenter-8.0d);
+        linestringCoordinates[0] = new Coordinate(xCenter - 5.0d, yCenter - 5.0d);
+        linestringCoordinates[1] = new Coordinate(xCenter - 6.0d, yCenter - 5.0d);
+        linestringCoordinates[2] = new Coordinate(xCenter - 6.0d, yCenter - 6.0d);
+        linestringCoordinates[3] = new Coordinate(xCenter - 7.0d, yCenter - 6.0d);
+        linestringCoordinates[4] = new Coordinate(xCenter - 7.0d, yCenter - 7.0d);
+        linestringCoordinates[5] = new Coordinate(xCenter - 8.0d, yCenter - 7.0d);
+        linestringCoordinates[6] = new Coordinate(xCenter - 8.0d, yCenter - 8.0d);
         LineString line = geomFac.createLineString(linestringCoordinates);
 
         return line;
@@ -604,16 +793,16 @@ public class Rendering2DTest extends TestCase {
 
     private Polygon makeSamplePolygon( final GeometryFactory geomFac ) {
         Coordinate[] polygonCoordinates = new Coordinate[10];
-        polygonCoordinates[0] = new Coordinate(xCenter-7, yCenter-7);
-        polygonCoordinates[1] = new Coordinate(xCenter-6, yCenter-9);
-        polygonCoordinates[2] = new Coordinate(xCenter-6, yCenter-11);
-        polygonCoordinates[3] = new Coordinate(xCenter-7, yCenter-12);
-        polygonCoordinates[4] = new Coordinate(xCenter-9, yCenter-11);
-        polygonCoordinates[5] = new Coordinate(xCenter-11, yCenter-12);
-        polygonCoordinates[6] = new Coordinate(xCenter-13, yCenter-11);
-        polygonCoordinates[7] = new Coordinate(xCenter-13, yCenter-9);
-        polygonCoordinates[8] = new Coordinate(xCenter-11, yCenter-7);
-        polygonCoordinates[9] = new Coordinate(xCenter-7, yCenter-7);
+        polygonCoordinates[0] = new Coordinate(xCenter - 7, yCenter - 7);
+        polygonCoordinates[1] = new Coordinate(xCenter - 6, yCenter - 9);
+        polygonCoordinates[2] = new Coordinate(xCenter - 6, yCenter - 11);
+        polygonCoordinates[3] = new Coordinate(xCenter - 7, yCenter - 12);
+        polygonCoordinates[4] = new Coordinate(xCenter - 9, yCenter - 11);
+        polygonCoordinates[5] = new Coordinate(xCenter - 11, yCenter - 12);
+        polygonCoordinates[6] = new Coordinate(xCenter - 13, yCenter - 11);
+        polygonCoordinates[7] = new Coordinate(xCenter - 13, yCenter - 9);
+        polygonCoordinates[8] = new Coordinate(xCenter - 11, yCenter - 7);
+        polygonCoordinates[9] = new Coordinate(xCenter - 7, yCenter - 7);
         try {
             LinearRing ring = geomFac.createLinearRing(polygonCoordinates);
             Polygon polyg = geomFac.createPolygon(ring, null);

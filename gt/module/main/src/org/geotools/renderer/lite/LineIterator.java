@@ -198,43 +198,43 @@ class LineIterator extends AbstractLiteIterator {
         return maxDistance;
     }
 
-    /**
-     * Returns the coordinates and type of the current path segment in the
-     * iteration. The return value is the path-segment type: SEG_MOVETO,
-     * SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or SEG_CLOSE. A double array of
-     * length 6 must be passed in and can be used to store the coordinates of
-     * the point(s). Each point is stored as a pair of double x,y coordinates.
-     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns
-     * two points, SEG_CUBICTO returns 3 points and SEG_CLOSE does not return
-     * any points.
-     *
-     * @param coords an array that holds the data returned from this method
-     *
-     * @return the path-segment type of the current path segment.
-     *
-     * @see #SEG_MOVETO
-     * @see #SEG_LINETO
-     * @see #SEG_QUADTO
-     * @see #SEG_CUBICTO
-     * @see #SEG_CLOSE
-     */
-    public int currentSegment(float[] coords) {
-        if (currentCoord == 0) {
-            coords[0] = (float) coordinates.getX(0);
-            coords[1] = (float) coordinates.getY(0);
-            at.transform(coords, 0, coords, 0, 1);
-
-            return SEG_MOVETO;
-        } else if ((currentCoord == coordinateCount) && isClosed) {
-            return SEG_CLOSE;
-        } else {
-            coords[0] = oldX; // (float) coordinates.getX(currentCoord);
-            coords[1] = oldY; // (float) coordinates.getY(currentCoord);
-            at.transform(coords, 0, coords, 0, 1);
-
-            return SEG_LINETO;
-        }
-    }
+//    /**
+//     * Returns the coordinates and type of the current path segment in the
+//     * iteration. The return value is the path-segment type: SEG_MOVETO,
+//     * SEG_LINETO, SEG_QUADTO, SEG_CUBICTO, or SEG_CLOSE. A double array of
+//     * length 6 must be passed in and can be used to store the coordinates of
+//     * the point(s). Each point is stored as a pair of double x,y coordinates.
+//     * SEG_MOVETO and SEG_LINETO types returns one point, SEG_QUADTO returns
+//     * two points, SEG_CUBICTO returns 3 points and SEG_CLOSE does not return
+//     * any points.
+//     *
+//     * @param coords an array that holds the data returned from this method
+//     *
+//     * @return the path-segment type of the current path segment.
+//     *
+//     * @see #SEG_MOVETO
+//     * @see #SEG_LINETO
+//     * @see #SEG_QUADTO
+//     * @see #SEG_CUBICTO
+//     * @see #SEG_CLOSE
+//     */
+//    public int currentSegment(float[] coords) {
+//        if (currentCoord == 0) {
+//            coords[0] = (float) coordinates.getX(0);
+//            coords[1] = (float) coordinates.getY(0);
+//            at.transform(coords, 0, coords, 0, 1);
+//
+//            return SEG_MOVETO;
+//        } else if ((currentCoord == coordinateCount) && isClosed) {
+//            return SEG_CLOSE;
+//        } else {
+//            coords[0] = oldX; // (float) coordinates.getX(currentCoord);
+//            coords[1] = oldY; // (float) coordinates.getY(currentCoord);
+//            at.transform(coords, 0, coords, 0, 1);
+//
+//            return SEG_LINETO;
+//        }
+//    }
 
 //    /**
 //     * Returns the coordinates and type of the current path segment in the
@@ -349,8 +349,8 @@ class LineIterator extends AbstractLiteIterator {
         } else if ((currentCoord == coordinateCount) && isClosed) {
             return SEG_CLOSE;
         } else {
-            coords[0] = oldX; // (float) coordinates.getX(currentCoord);
-            coords[1] = oldY; // (float) coordinates.getY(currentCoord);
+            coords[0] = coordinates.getX(currentCoord);
+            coords[1] = coordinates.getY(currentCoord);
             at.transform(coords, 0, coords, 0, 1);
 
             return SEG_LINETO;

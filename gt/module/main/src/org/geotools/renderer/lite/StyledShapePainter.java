@@ -17,11 +17,13 @@
 package org.geotools.renderer.lite;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -233,13 +235,20 @@ public class StyledShapePainter {
                         }
 
                         graphics.setPaint(paint);
-                        graphics.setStroke(ls2d.getStroke());
+                        graphics.setStroke(processStroke(ls2d.getStroke()));
                         graphics.setComposite(ls2d.getContourComposite());
                         graphics.draw(shape);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Scales the stroke
+     */
+    private Stroke processStroke( Stroke stroke ) {
+        return stroke;
     }
 
     // draws the image along the path

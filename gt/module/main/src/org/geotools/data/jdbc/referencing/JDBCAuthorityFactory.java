@@ -16,8 +16,15 @@
  */
 package org.geotools.data.jdbc.referencing;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Set;
 
+import org.geotools.data.DataSourceException;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
@@ -41,14 +48,16 @@ import org.opengis.util.InternationalString;
  */
 public class JDBCAuthorityFactory implements CRSAuthorityFactory {
 
-    CRSFactory factory;
+    protected CRSFactory factory;
+    protected ConnectionPool connectionPool;
     
     /**
      * Construct <code>PostgisAuthorityFactory</code>.
      *
      */
-    public JDBCAuthorityFactory() {
+    public JDBCAuthorityFactory(ConnectionPool pool) {
         factory=FactoryFinder.getCRSFactory();
+        this.connectionPool=pool;
     }
     
     /**
@@ -162,7 +171,5 @@ public class JDBCAuthorityFactory implements CRSAuthorityFactory {
     public Citation getVendor() {
         return null;
     }
-
-	
 
 }

@@ -19,7 +19,9 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -48,6 +50,12 @@ import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
+import org.geotools.renderer.lite.LiteShape;
+
+import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 
 /**
@@ -90,6 +98,8 @@ public class MathTransformTest extends TestCase {
      */
     private MathTransformFactory factory;
 
+    private static final double ACCURACY = 0.03;
+
     /**
      * Set up common objects used for all tests.
      */
@@ -131,7 +141,7 @@ public class MathTransformTest extends TestCase {
     /**
      * Tests the {@link ProjectiveTransform} implementation.
      */
-    public void testAffineTransform() throws TransformException {
+    public void testAffineTransform() throws Exception {
         for (int pass=0; pass<10; pass++) {
             final AffineTransform transform = new AffineTransform();
             transform.rotate(Math.PI*random.nextDouble(), 100*random.nextDouble(), 100*random.nextDouble());
@@ -143,8 +153,24 @@ public class MathTransformTest extends TestCase {
                 new AffineTransform2D(transform)
             });
         }
+        
+        AffineTransform at =new AffineTransform(23.157082917424454, 0.0, 3220.1613428464952,
+                0.0, -23.157082917424457, 1394.4593259871676);
+        MathTransform mt=FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
+        
+        double[] points=new double[]{
+                -129.992589135802, 55.9226692948365, -129.987254340541,
+                55.9249676996729, -129.982715772093, 55.9308988434656, 
+                -129.989772198265, 55.9289277997662, -129.992589135802, 55.9226692948365 };
+        
+        double[] transformedPoints=new double[points.length];
+        mt.transform(points, 0, transformedPoints, 0, points.length/2);
+        at.transform(points, 0, points, 0, points.length/2);
+        for( int i = 0; i < transformedPoints.length; i++ ) {
+            assertEquals(points[i], transformedPoints[i], ACCURACY);
+        }
     }
-    
+     
     /**
      * Test various linear transformations. We test for many differents dimensions.
      * The factory class should have created specialized classes for 1D and 2D cases.
@@ -584,4 +610,5 @@ public class MathTransformTest extends TestCase {
             }
         }
     }
+
 }
