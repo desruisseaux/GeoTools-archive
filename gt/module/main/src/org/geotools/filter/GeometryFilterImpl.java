@@ -16,12 +16,12 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.logging.Logger;
+
+import org.geotools.feature.Feature;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.feature.Feature;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -180,22 +180,49 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         // there we default to not returning anything
         if(left == null)
             return false;
+        
+        // optimization: since JTS is far from being optimized and computes all 
+        // the times the geometry graphs to perform operations, we perform simple
+        // comparisons on the bounding boxes before using JTS
+        Envelope envRight = right.getEnvelopeInternal();
+        Envelope envLeft = left.getEnvelopeInternal();
 
         // Handles all normal geometry cases
         if (filterType == GEOMETRY_EQUALS) {
-            return left.equals(right);
+            if(envRight.equals(envLeft))
+                return left.equals(right);
+            else    
+                return false;
         } else if (filterType == GEOMETRY_DISJOINT) {
-            return left.disjoint(right);
+            if(envRight.intersects(envLeft))
+                return left.disjoint(right);
+            else
+                return true;
         } else if (filterType == GEOMETRY_INTERSECTS) {
-            return left.intersects(right);
+            if(envRight.intersects(envLeft))
+                return left.intersects(right);
+            else
+                return false;
         } else if (filterType == GEOMETRY_CROSSES) {
-            return left.crosses(right);
+            if(envRight.intersects(envLeft))
+                return left.crosses(right);
+            else
+                return false;
         } else if (filterType == GEOMETRY_WITHIN) {
-            return left.within(right);
+            if(envRight.contains(envLeft))
+                return left.within(right);
+            else
+                return false;
         } else if (filterType == GEOMETRY_CONTAINS) {
-            return left.contains(right);
+            if(envLeft.contains(envRight))
+                return left.contains(right);
+            else
+                return false;
         } else if (filterType == GEOMETRY_OVERLAPS) {
-            return left.overlaps(right);
+            if(envLeft.intersects(envRight))
+                return left.overlaps(right);
+            else
+                return false;
 
             //this is now handled in CartesianDistanceFilter.
             //} else if (filterType == GEOMETRY_BEYOND) {
@@ -203,33 +230,7 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         } else if (filterType == GEOMETRY_TOUCHES) {
             return left.touches(right);
         } else if (filterType == GEOMETRY_BBOX) {
-            Envelope envRight = right.getEnvelopeInternal();
-            Envelope envLeft = left.getEnvelopeInternal();
-            // Coordinate[] cr = right.getEnvelope().getCoordinates();
-            // Coordinate[] cl = left.getEnvelope().getCoordinates();
-            //if (left.getDimension() >= 1) {  Found bug here, see GEOT-186
-//            if (cl.length > 1 && cr.length > 1) {
-//                if ((cl[0].x >= cr[0].x) && (cl[2].x <= cr[2].x)
-//                        && (cl[0].y >= cr[0].y) && (cl[2].y <= cr[2].y)) {
-//                    // feature contained in the bbox
-//                    return true;
-//                } else if ((cl[0].x > cr[2].x) || (cl[2].x < cr[0].x)
-//                        || (cl[0].y > cr[2].y) || (cl[2].y < cr[0].y)) {
-//                    // feature outside the bbox
-//                    return false;
-//                } else {
-//                    if (LOGGER.isLoggable(Level.FINER)) {
-//                        LOGGER.finer("Right: " + "[" + cr[0].x + "," + cr[0].y
-//                            + "]" + "-" + "[" + cr[3].x + "," + cr[3].y + "]");
-//                        LOGGER.finer("Left: " + "[" + cl[0].x + "," + cl[0].y
-//                            + "]" + "-" + "[" + cl[3].x + "," + cl[3].y + "]");
-//                    }
-//
-//                    return left.intersects(right);
-//                }
-//            } else {
-//                return left.intersects(right);
-//            }
+            
             if(envRight.contains(envLeft) || envLeft.contains(envRight)) {
                 return true;
             } else if(envRight.intersects(envLeft)) {
