@@ -2588,9 +2588,9 @@ public class LiteRenderer implements Renderer, Renderer2D {
      */
     private Shape createPath(final Geometry geom) {
         if (generalizationDistance > 0) {
-            return new LiteShape(geom, true, generalizationDistance);
+            return new LiteShape(geom, null, true, generalizationDistance);
         } else {
-            return new LiteShape(geom, false);
+            return new LiteShape(geom, null, false);
         }
     }
 

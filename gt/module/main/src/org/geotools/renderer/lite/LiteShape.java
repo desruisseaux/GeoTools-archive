@@ -16,13 +16,6 @@
  */
 package org.geotools.renderer.lite;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -30,6 +23,12 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -43,49 +42,47 @@ class LiteShape implements Shape {
     /** The wrapped JTS geometry */
     private Geometry geometry;
 
-    /** True if the geometry will be generalized during rendering */
+    /** The transform needed to go from the object space to the device space */
+    private AffineTransform transform = null;
     private boolean generalize = true;
+    private double maxDistance = 1;
 
-    /** Maximum distance used for simple distance generalization */
-    private double maxDistance = 1.0;
+    
 
     /**
-     * Creates a new instance of GeometryShape
+     * Creates a new LiteShape object.
      *
-     * @param g the wrapped geometry
+     * @param geom - the wrapped geometry
+     * @param at - the transformation applied to the geometry in order to get to the shape points
+     * @param generalize - set to true if the geometry need to be generalized
+     *        during rendering
+     * @param maxDistance - distance used in the generalization process
      */
-    public LiteShape(Geometry g) {
-        geometry = g;
+    public LiteShape(Geometry geom, AffineTransform at, boolean generalize,
+        double maxDistance) {
+        this(geom, at, generalize);
+        this.maxDistance = maxDistance;
     }
 
     /**
      * Creates a new LiteShape object.
      *
-     * @param g the wrapped geometry
-     * @param generalize set to true if the geometry need to be generalized
+     * @param geom - the wrapped geometry
+     * @param at - the transformation applied to the geometry in order to get to the shape points
+     * @param generalize - set to true if the geometry need to be generalized
      *        during rendering
+     * @param maxDistance - distance used in the generalization process
      */
-    public LiteShape(Geometry g, boolean generalize) {
-        this(g);
+    public LiteShape(Geometry geom, AffineTransform at, boolean generalize) {
+        this.geometry = geom;
+        this.transform = at;
         this.generalize = generalize;
     }
 
     /**
-     * Creates a new LiteShape object.
+     * Sets the geometry contained in this lite shape. Convenient to reuse this
+     * object instead of creating it again and again during rendering
      *
-     * @param g the wrapped geometry
-     * @param generalize set to true if the geometry need to be generalized
-     *        during rendering
-     * @param maxDistance distance used in the generalization process
-     */
-    public LiteShape(Geometry g, boolean generalize, double maxDistance) {
-        this(g, generalize);
-        this.maxDistance = maxDistance;
-    }
-    
-    /**
-     * Sets the geometry contained in this lite shape. Convenient to reuse
-     * this object instead of creating it again and again during rendering
      * @param g
      */
     public void setGeometry(Geometry g) {
@@ -277,8 +274,8 @@ class LiteShape implements Shape {
         y1 = Math.ceil(y1);
         y2 = Math.floor(y2);
 
-        return new Rectangle(
-            (int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        return new Rectangle((int) x1, (int) y1, (int) (x2 - x1),
+            (int) (y2 - y1));
     }
 
     /**
@@ -311,11 +308,9 @@ class LiteShape implements Shape {
         x1 = x2 = coords[0].x;
         y1 = y2 = coords[0].y;
 
-        
         for (int i = 1; i < 3; i++) {
             double x = coords[i].x;
             double y = coords[i].y;
-            
 
             if (x < x1) {
                 x1 = x;
@@ -374,21 +369,34 @@ class LiteShape implements Shape {
     public PathIterator getPathIterator(AffineTransform at) {
         PathIterator pi = null;
 
+        AffineTransform combined = null;
+
+        if (transform == null) {
+            combined = at;
+        } else if ((at == null) || at.isIdentity()) {
+            combined = transform;
+        } else {
+            combined = new AffineTransform(transform);
+            combined.concatenate(at);
+        }
+
         // return iterator according to the kind of geometry we include
         if (this.geometry instanceof Point) {
-            pi = new PointIterator((Point) geometry, at);
-        } if (this.geometry instanceof Polygon) {
-            pi = new PolygonIterator(
-                    (Polygon) geometry, at, generalize, maxDistance);
+            pi = new PointIterator((Point) geometry, combined);
+        }
+
+        if (this.geometry instanceof Polygon) {
+            pi = new PolygonIterator((Polygon) geometry, combined, generalize,
+                    maxDistance);
         } else if (this.geometry instanceof LinearRing) {
-            pi = new LineIterator(
-                    (LinearRing) geometry, at, generalize, maxDistance);
+            pi = new LineIterator((LinearRing) geometry, combined, generalize,
+                    maxDistance);
         } else if (this.geometry instanceof LineString) {
-            pi = new LineIterator(
-                    (LineString) geometry, at, generalize, maxDistance);
+            pi = new LineIterator((LineString) geometry, combined, generalize,
+                    maxDistance);
         } else if (this.geometry instanceof GeometryCollection) {
-            pi = new GeomCollectionIterator(
-                    (GeometryCollection) geometry, at, generalize, maxDistance);
+            pi = new GeomCollectionIterator((GeometryCollection) geometry,
+                    combined, generalize, maxDistance);
         }
 
         return pi;
@@ -541,7 +549,8 @@ class LiteShape implements Shape {
      * @return a geometry with the same vertices as the rectangle
      */
     private Geometry rectangleToGeometry(Rectangle2D r) {
-        return createRectangle(r.getMinX(), r.getMinY(), r.getWidth(), r.getHeight());
+        return createRectangle(r.getMinX(), r.getMinY(), r.getWidth(),
+            r.getHeight());
     }
 
     /**
@@ -557,10 +566,10 @@ class LiteShape implements Shape {
      */
     private Geometry createRectangle(double x, double y, double w, double h) {
         Coordinate[] coords = {
-            new Coordinate(x, y), new Coordinate(x, y + h),
-            new Coordinate(x + w, y + h), new Coordinate(x + w, y),
-            new Coordinate(x, y)
-        };
+                new Coordinate(x, y), new Coordinate(x, y + h),
+                new Coordinate(x + w, y + h), new Coordinate(x + w, y),
+                new Coordinate(x, y)
+            };
         LinearRing lr = geometry.getFactory().createLinearRing(coords);
 
         return geometry.getFactory().createPolygon(lr, null);
