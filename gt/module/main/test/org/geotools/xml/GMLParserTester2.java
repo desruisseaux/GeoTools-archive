@@ -23,7 +23,7 @@ import javax.xml.parsers.SAXParserFactory;
  *
  * @author dzwiers www.refractions.net
  */
-//public class GMLParserTester2 extends TestCase {
+public class GMLParserTester2 extends TestCase {
 //    public void testFMEPostalFeatures() throws SAXException, IOException {
 //        try {
 //            SAXParserFactory spf = SAXParserFactory.newInstance();
