@@ -33,6 +33,7 @@
             <include>**/*.shp</include>
             <include>**/*.shx</include>
             <include>**/*.dbf</include>
+            <include>**/spearfish_dem.asc.gz</include>
           </includes>
         </resource>
     </resources>
