@@ -79,7 +79,7 @@ final class FallbackParameterValueGroup extends ParameterGroup {
         } catch (ParameterNotFoundException exception) {
             try {
                 // Remove cast if covariance is allowed.
-                return (ParameterValue) fallback.getParameter(name).createValue();
+                return (ParameterValue) fallback.descriptor(name).createValue();
             } catch (ParameterNotFoundException ignore) {
                 throw exception;
             }

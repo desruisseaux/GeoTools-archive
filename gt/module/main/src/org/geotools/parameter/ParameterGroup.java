@@ -138,7 +138,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             final GeneralParameterDescriptor param = (GeneralParameterDescriptor) it.next();
             ensureNonNull("parameters", param);
             occurences.put(param, new int[1]);
-            // The value 'int[1}' will be used by 'ensureValidOccurs'
+            // The value 'int[1]' will be used by 'ensureValidOccurs'
         }
         ensureValidOccurs(values, occurences);
     }
@@ -171,7 +171,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         for (int i=0; i<values.length; i++) {
             ensureNonNull("values", values, i);
             occurences.put(values[i].getDescriptor(), new int[1]);
-            // The value 'int[1}' will be used by 'ensureValidOccurs'
+            // The value 'int[1]' will be used by 'ensureValidOccurs'
         }
         ensureValidOccurs(values, occurences);
         final Set descriptors = occurences.keySet();
@@ -354,8 +354,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
          */
         if (groups.isEmpty()) {
             final GeneralParameterDescriptor check = 
-                    ((ParameterDescriptorGroup) descriptor).getParameter(name);
-            // TODO: invoke 'descriptor' instead.
+                    ((ParameterDescriptorGroup) descriptor).descriptor(name);
             if (!(check instanceof ParameterDescriptorGroup)) {
                 throw new ParameterNotFoundException(Resources.format(
                           ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
@@ -363,7 +362,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         }
         return groups;
     }
-    
+
     /**
      * Create a new group of the specified name. The specified name must be the
      * {@linkplain Identifier#getCode identifier code} of a {@linkplain ParameterDescriptorGroup
@@ -382,8 +381,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             throws ParameterNotFoundException, IllegalStateException
     {
         final GeneralParameterDescriptor check = 
-                ((ParameterDescriptorGroup) descriptor).getParameter(name);
-        // TODO: invoke 'descriptor' instead.
+                ((ParameterDescriptorGroup) descriptor).descriptor(name);
         if (!(check instanceof ParameterDescriptorGroup)) {
             throw new ParameterNotFoundException(Resources.format(
                       ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);

@@ -276,26 +276,6 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
         return param;
     }
 
-    /** @deprecated This is internal mechanic. */
-    public final void delValue(final int row, final int column) {
-        delValue(row, column, numRow.intValue(), numCol.intValue());
-    }
-
-    /** @deprecated This is internal mechanic. */
-    public void delValue( int row, int column, int numRow, int numCol ){
-        if( matrixValues == null ){
-            return; // nothing to remove
-        }
-        final ParameterValue[] rowValues = matrixValues[column];
-        if (rowValues == null ){
-            // nothing there
-            return;
-        }
-        if (row < rowValues.length) {
-            rowValues[row] = null;
-        }
-    }
-
     /**
      * Returns the parameters descriptors in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
@@ -303,16 +283,6 @@ public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
     public List/*<GeneralParameterDescriptor>*/ descriptors() {
         return ((MatrixParameters) descriptor).descriptors(numRow.intValue(),
                                                            numCol.intValue());
-    }
-
-    /**
-     * Returns the parameters in this group.
-     *
-     * @deprecated Use {@link #descriptors} instead.
-     */
-    public final GeneralParameterDescriptor[] getParameters() {
-        final List p = descriptors();
-        return (GeneralParameterDescriptor[]) p.toArray(new GeneralParameterDescriptor[p.size()]);
     }
 
     /**

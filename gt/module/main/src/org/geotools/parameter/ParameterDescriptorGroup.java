@@ -60,10 +60,16 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3395510970737025480L;
+    private static final long serialVersionUID = -4613190550542423839L;
+    
+    /**
+     * The maximum number of times that values for this parameter group or
+     * parameter are required.
+     */
+    private final int maximumOccurs;
 
     /**
-     * The {@linkplain #getParameters operation parameters} for this group.
+     * The {@linkplain #descriptors() parameter descriptors} for this group.
      */
     private final GeneralParameterDescriptor[] parameters;
 
@@ -78,7 +84,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      * This parameter group will be required exactly once.
      *
      * @param name The parameter group name.
-     * @param parameters The {@linkplain #getParameters operation parameters} for this group.
+     * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
      */
     public ParameterDescriptorGroup(final String name,
                                     final GeneralParameterDescriptor[] parameters)
@@ -93,7 +99,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param parameters The {@linkplain #getParameters operation parameters} for this group.
+     * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
      */
     public ParameterDescriptorGroup(final Map properties,
                                     final GeneralParameterDescriptor[] parameters)
@@ -111,7 +117,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      *        that values for this parameter group are required.
      * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}
      *        that values for this parameter group are required.
-     * @param parameters The {@linkplain #getParameters operation parameters} for this group.
+     * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
      */
     public ParameterDescriptorGroup(final Map properties,
                                     final int minimumOccurs,
@@ -119,12 +125,23 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
                                     final GeneralParameterDescriptor[] parameters)
     {
         super(properties, minimumOccurs, maximumOccurs);
+        this.maximumOccurs = maximumOccurs;
         ensureNonNull("parameters", parameters);
         this.parameters = new GeneralParameterDescriptor[parameters.length];
         for (int i=0; i<parameters.length; i++) {
             this.parameters[i] = parameters[i];
             ensureNonNull("parameters", parameters, i);
         }
+    }
+
+    /**
+     * The maximum number of times that values for this parameter group or
+     * parameter are required.
+     *
+     * @see #getMaximumOccurs
+     */
+    public int getMaximumOccurs() {
+        return maximumOccurs;
     }
 
     /**
@@ -151,15 +168,6 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
             }
         }
         return asList;
-    }
-
-    /**
-     * Returns the parameters in this group.
-     *
-     * @deprecated Use {@link #descriptors} instead.
-     */
-    public GeneralParameterDescriptor[] getParameters() {
-        return (GeneralParameterDescriptor[]) parameters.clone();
     }
 
     /**

@@ -334,16 +334,6 @@ public class MatrixParameters extends ParameterDescriptorGroup {
     }
 
     /**
-     * Returns the parameters in this group.
-     *
-     * @deprecated Use {@link #descriptors} instead.
-     */
-    public final GeneralParameterDescriptor[] getParameters() {
-        final List p = descriptors();
-        return (GeneralParameterDescriptor[]) p.toArray(new GeneralParameterDescriptor[p.size()]);
-    }
-
-    /**
      * Returns the descriptor for the specified name.
      *
      * @deprecated Use {@link #descriptor(String)} instead.

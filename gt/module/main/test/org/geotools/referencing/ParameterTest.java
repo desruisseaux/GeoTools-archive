@@ -315,9 +315,9 @@ public class ParameterTest extends TestCase {
     public void testGroup() {
         final Integer ONE = new Integer(1);
         final ParameterDescriptor p1, p2, p3;
-        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"), 1, 1, Integer.class, null, ONE, null, null, null);
-        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"), 1, 2, Integer.class, null, ONE, null, null, null);
-        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), 0, 1, Integer.class, null, ONE, null, null, null);
+        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"), true,  Integer.class, null, ONE, null, null, null);
+        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"), true,  Integer.class, null, ONE, null, null, null);
+        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), false, Integer.class, null, ONE, null, null, null);
 
         final Parameter v1, v2, v3, v1b, v2b, v3b, v1t, v2t, v3t;
         v1  = new Parameter(p1); v1 .setValue( 10);
@@ -331,6 +331,7 @@ public class ParameterTest extends TestCase {
         ParameterGroup           group;
         Collection               content;
         Map                      properties;
+        Parameter                automatic;
         /* --------------------------------------------- *
          * Case (v1, v2, v3) where:
          *    - v1   is mandatory
@@ -346,9 +347,9 @@ public class ParameterTest extends TestCase {
         assertTrue  ("p1",  content.contains(p1));
         assertTrue  ("p2",  content.contains(p2));
         assertTrue  ("p3",  content.contains(p3));
-        assertEquals("p1",  p1, descriptor.descriptor("1"));
-        assertEquals("p2",  p2, descriptor.descriptor("2"));
-        assertEquals("p3",  p3, descriptor.descriptor("3"));
+        assertSame  ("p1",  p1, descriptor.descriptor("1"));
+        assertSame  ("p2",  p2, descriptor.descriptor("2"));
+        assertSame  ("p3",  p3, descriptor.descriptor("3"));
 
         content = group.values();
         assertEquals("values", 3, content.size());
@@ -358,49 +359,70 @@ public class ParameterTest extends TestCase {
         assertFalse ("v1b", content.contains(v1b));
         assertFalse ("v2b", content.contains(v2b));
         assertFalse ("v3b", content.contains(v3b));
-        assertEquals("v1",  v1, group.parameter("1"));
-        assertEquals("v2",  v2, group.parameter("2"));
-        assertEquals("v3",  v3, group.parameter("3"));
+        assertSame  ("v1",  v1, group.parameter("1"));
+        assertSame  ("v2",  v2, group.parameter("2"));
+        assertSame  ("v3",  v3, group.parameter("3"));
         assertEquals("v1",  10, group.parameter("1").intValue());
         assertEquals("v2",  20, group.parameter("2").intValue());
         assertEquals("v3",  30, group.parameter("3").intValue());
 
         assertEquals("new", group, group=new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3}));
 
-        group   = new ParameterGroup(descriptor, new Parameter[] {v1, v2});
-        content = group.values();
-        assertEquals("values", 2, content.size());
-        assertTrue  ("v1",  content.contains(v1 ));
-        assertTrue  ("v2",  content.contains(v2 ));
-        assertFalse ("v3",  content.contains(v3 ));
-        assertFalse ("v1b", content.contains(v1b));
-        assertFalse ("v2b", content.contains(v2b));
-        assertFalse ("v3b", content.contains(v3b));
-        assertEquals("v1",  v1, group.parameter("1"));
-        assertEquals("v2",  v2, group.parameter("2"));
+        group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2});
+        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        content    = group.values();
+        automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        assertEquals   ("values", 2,  content.size());
+        assertTrue     ("v1",         content.contains(v1 ));
+        assertTrue     ("v2",         content.contains(v2 ));
+        assertFalse    ("v3",         content.contains(v3 ));
+        assertFalse    ("v1b",        content.contains(v1b));
+        assertFalse    ("v2b",        content.contains(v2b));
+        assertFalse    ("v3b",        content.contains(v3b));
+        assertSame     ("v1",   v1,   group.parameter ("1"));
+        assertSame     ("v2",   v2,   group.parameter ("2"));
+        assertFalse    ("automatic",  content.contains(automatic));
+        assertNotEquals("v3",   v3,   group.parameter ("3")); // Should have automatically created.
+        assertTrue     ("automatic",  content.contains(automatic));
 if (true) return;
-        assertEquals("v3",  v3, group.parameter("3")); // Should have been automatically created.
-        assertTrue  ("v3",  content  .contains(v3 ));  // Was 'False' before the previous line.
 
-//        group = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v2b});
-//        try {
-//            new ParameterGroup(group, new Parameter[] {v1, v3});
-//            fail("Parameter 2 was mandatory.");
-//        } catch (IllegalArgumentException exception) {
-//            // This is the expected exception.
-//        }
-//        try {
-//            new ParameterGroup(group, new Parameter[] {v1, v2, v3, v3b});
-//            fail("Parameter 3 was not allowed to be inserted twice.");
-//        } catch (IllegalArgumentException exception) {
-//            // This is the expected exception.
-//        }
-//        try {
-//            new ParameterGroup(group, new Parameter[] {v1, v3, v1b});
-//            fail("Parameter 1 was not allowed to be inserted twice.");
-//        } catch (IllegalArgumentException exception) {
-//            // This is the expected exception.
-//        }
+        group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v2b});
+        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        content    = group.values();
+        automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        assertEquals   ("values", 4,  content.size());
+        assertTrue     ("v1",         content.contains(v1 ));
+        assertTrue     ("v2",         content.contains(v2 ));
+        assertTrue     ("v3",         content.contains(v3 ));
+        assertFalse    ("v1b",        content.contains(v1b));
+        assertTrue     ("v2b",        content.contains(v2b));
+        assertFalse    ("v3b",        content.contains(v3b));
+        assertSame     ("v1",   v1,   group.parameter ("1"));
+        assertSame     ("v2",   v2,   group.parameter ("2"));
+        assertSame     ("v3",   v3,   group.parameter ("3"));
+        assertSame     ("v2b",  v2b,   group.parameter("2"));
+        assertFalse    ("automatic",  content.contains(automatic));
+        assertNotEquals("v3",   v3,   group.parameter ("3")); // Should have automatically created.
+        assertTrue     ("automatic",  content.contains(automatic));
+
+        try {
+            new ParameterGroup(descriptor, new Parameter[] {v1, v3});
+            fail("Parameter 2 was mandatory.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        try {
+            new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v3b});
+            fail("Parameter 3 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
+        try {
+            new ParameterGroup(descriptor, new Parameter[] {v1, v3, v1b});
+            fail("Parameter 1 was not allowed to be inserted twice.");
+        } catch (IllegalArgumentException exception) {
+            // This is the expected exception.
+        }
 
         //
         // Case (v1, v2)
@@ -413,10 +435,10 @@ if (true) return;
         assertTrue  ("p1",  content.contains(p1));
         assertTrue  ("p2",  content.contains(p2));
         assertFalse ("p3",  content.contains(p3));
-        assertEquals("p1",  p1, descriptor.descriptor("1"));
-        assertEquals("p2",  p2, descriptor.descriptor("2"));
+        assertSame  ("p1",  p1, descriptor.descriptor("1"));
+        assertSame  ("p2",  p2, descriptor.descriptor("2"));
         try {
-            assertEquals("p3", p3, descriptor.descriptor("3"));
+            assertSame("p3", p3, descriptor.descriptor("3"));
             fail("p3 should not exists");
         } catch (ParameterNotFoundException e) {
             // This is the expected exception
@@ -430,10 +452,10 @@ if (true) return;
         assertFalse ("v1b", content.contains(v1b));
         assertFalse ("v2b", content.contains(v2b));
         assertFalse ("v3b", content.contains(v3b));
-        assertEquals("v1",  v1, group.parameter("1"));
-        assertEquals("v2",  v2, group.parameter("2"));
+        assertSame  ("v1",  v1, group.parameter("1"));
+        assertSame  ("v2",  v2, group.parameter("2"));
         try {
-            assertEquals("v3", v3, group.parameter("3"));
+            assertSame("v3", v3, group.parameter("3"));
             fail("v3 should not exists");
         } catch (ParameterNotFoundException e) {
             // This is the expected exception
@@ -450,10 +472,10 @@ if (true) return;
         assertTrue  ("p1",  content.contains(p1));
         assertFalse ("p2",  content.contains(p2));
         assertTrue  ("p3",  content.contains(p3));
-        assertEquals("p1",  p1, descriptor.descriptor("1"));
-        assertEquals("p3",  p3, descriptor.descriptor("3"));
+        assertSame  ("p1",  p1, descriptor.descriptor("1"));
+        assertSame  ("p3",  p3, descriptor.descriptor("3"));
         try {
-            assertEquals("p2", p2, descriptor.descriptor("2"));
+            assertSame("p2", p2, descriptor.descriptor("2"));
             fail("p2 should not exists");
         } catch (ParameterNotFoundException e) {
             // This is the expected exception
@@ -467,10 +489,10 @@ if (true) return;
         assertFalse ("v1b", content.contains(v1b));
         assertFalse ("v2b", content.contains(v2b));
         assertFalse ("v3b", content.contains(v3b));
-        assertEquals("v1",  v1, group.parameter("1"));
-        assertEquals("v3",  v3, group.parameter("3"));
+        assertSame  ("v1",  v1, group.parameter("1"));
+        assertSame  ("v3",  v3, group.parameter("3"));
         try {
-            assertEquals("v2", v2, group.parameter("2"));
+            assertSame("v2", v2, group.parameter("2"));
             fail("v2 should not exists");
         } catch (ParameterNotFoundException e) {
             // This is the expected exception
@@ -561,7 +583,18 @@ if (true) return;
         final Object test = in.readObject();
         in.close();
 
-        assertEquals("Serialization", object, test);
-        assertEquals("Serialization", object.hashCode(), test.hashCode());
+        assertNotSame("Serialization", object, test);
+        assertEquals ("Serialization", object, test);
+        assertEquals ("Serialization", object.hashCode(), test.hashCode());
+    }
+
+    /**
+     * Ensure that the specified objects are not equals.
+     */
+    private static void assertNotEquals(final String message, final Object o1, final Object o2) {
+        assertNotNull(message, o1);
+        assertNotNull(message, o2);
+        assertNotSame(message, o1, o2);
+        assertFalse  (message, o1.equals(o2));
     }
 }

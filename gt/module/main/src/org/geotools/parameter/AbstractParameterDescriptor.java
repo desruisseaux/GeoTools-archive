@@ -50,19 +50,13 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 6058480546466947696L;
-    
+    private static final long serialVersionUID = -2630644278783845276L;
+
     /**
      * The minimum number of times that values for this parameter group or
      * parameter are required.
      */
     private final int minimumOccurs;
-
-    /**
-     * The maximum number of times that values for this parameter group or
-     * parameter can be included.
-     */
-    private final int maximumOccurs;
 
     /**
      * Construct a parameter from a set of properties. The properties map is given unchanged
@@ -72,7 +66,9 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
      *        that values for this parameter group or parameter are required.
      * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}
-     *        that values for this parameter group or parameter are required.
+     *        that values for this parameter group or parameter are required. This value
+     *        is used in order to check the range. For {@link ParameterValue}, it should
+     *        always be 1.
      */
     protected AbstractParameterDescriptor(final Map properties,
                                           final int minimumOccurs,
@@ -80,7 +76,6 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
     {
         super(properties);
         this.minimumOccurs = minimumOccurs;
-        this.maximumOccurs = maximumOccurs;
         if (minimumOccurs < 0  ||  maximumOccurs < minimumOccurs) {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RANGE_$2,
                         new Integer(minimumOccurs), new Integer(maximumOccurs)));
@@ -91,8 +86,8 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      * Creates a new instance of
      * {@linkplain org.geotools.parameter.AbstractParameter parameter value or group}
      * initialized with the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default value(s)}. The
-     * {@linkplain org.geotools.parameter.AbstractParameter#getDescriptor parameter value
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default value(s)}.
+     * The {@linkplain org.geotools.parameter.AbstractParameter#getDescriptor parameter value
      * descriptor} for the created parameter value(s) will be <code>this</code> object.
      * <p>
      * Example implementation:
@@ -108,8 +103,6 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      * parameter are required. The default value is one. A value of 0 means
      * an optional parameter.
      *
-     * @return The minimum occurrences.
-     *
      * @see #getMaximumOccurs
      */
     public int getMinimumOccurs() {
@@ -120,15 +113,11 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      * The maximum number of times that values for this parameter group or
      * parameter can be included. For a {@linkplain ParameterDescriptor single parameter},
      * the value is always 1. For a {@linkplain ParameterDescriptorGroup parameter group},
-     * it may vary. The default value is one.
-     *
-     * @return The maximum occurrences.
+     * it may vary.
      *
      * @see #getMinimumOccurs
      */
-    public int getMaximumOccurs() {
-        return maximumOccurs;
-    }
+    public abstract int getMaximumOccurs();
     
     /**
      * Compares the specified object with this parameter for equality.
@@ -141,8 +130,7 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractParameterDescriptor that = (AbstractParameterDescriptor) object;
-            return this.minimumOccurs == that.minimumOccurs &&
-                   this.maximumOccurs == that.maximumOccurs;
+            return this.minimumOccurs == that.minimumOccurs;
         }
         return false;
     }
@@ -154,7 +142,7 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      *         in past or future versions of this class.
      */
     public int hashCode() {
-        return (int)serialVersionUID ^ (int)minimumOccurs + 37*(int)maximumOccurs;
+        return (int)serialVersionUID ^ (int)minimumOccurs;
     }
     
     /**

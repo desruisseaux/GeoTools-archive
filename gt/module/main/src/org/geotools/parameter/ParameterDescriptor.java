@@ -168,8 +168,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final Comparable maximum,
                                final Unit       unit)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name),
-          (defaultValue!=null) ? 0 : 1, 1, valueClass, null, defaultValue, minimum, maximum, unit);
+        this(Collections.singletonMap(NAME_PROPERTY, name), true,
+             valueClass, null, defaultValue, minimum, maximum, unit);
     }
 
     /**
@@ -247,11 +247,10 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     public ParameterDescriptor(final String              name,
                                final InternationalString description,
                                final Object              defaultValue,
-                               final boolean             required )
+                               final boolean             required)
     {
         this(toMap(name, description),
-             required ? 1 : 0,
-             1,
+             required,
              defaultValue.getClass(),
              (defaultValue instanceof CodeList) ? getCodeLists(defaultValue.getClass()) : null,
              defaultValue,
@@ -289,8 +288,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final Object[] validValues,
                                final Object   defaultValue)
     {
-        this(Collections.singletonMap("name", name),
-             (defaultValue!=null) ? 0 : 1, 1, valueClass, validValues, defaultValue, null, null, null);
+        this(Collections.singletonMap("name", name), true,
+             valueClass, validValues, defaultValue, null, null, null);
     }
 
     /**
@@ -299,10 +298,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
-     *        that values for this parameter group or parameter are required.
-     * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}
-     *        that values for this parameter group or parameter are required.
+     * @param required <code>true</code> if this parameter is required, or <code>false</code>
+     *        if it is optional.
      * @param valueClass The class that describe the type of the parameter.
      * @param validValues A finite set of valid values (usually from a
      *        {linkplain org.opengis.util.CodeList code list}) or <code>null</code>
@@ -313,8 +310,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * @param unit    The unit for default, minimum and maximum values.
      */
     public ParameterDescriptor(final Map        properties,
-                               final int        minimumOccurs,
-                               final int        maximumOccurs,
+                               final boolean    required,
                                      Class      valueClass,
                                final Object[]   validValues,
                                final Object     defaultValue,
@@ -322,7 +318,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
                                final Comparable maximum,
                                final Unit       unit)
     {
-        super(properties, minimumOccurs, maximumOccurs);
+        super(properties, required ? 1 : 0, 1);
         this.primitiveClass = valueClass;
         this.defaultValue   = defaultValue;
         this.minimum        = minimum;
@@ -356,6 +352,17 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
         if (defaultValue != null) {
             Parameter.ensureValidValue(this, defaultValue);
         }
+    }
+
+    /**
+     * The maximum number of times that values for this parameter group or
+     * parameter can be included. For a {@linkplain ParameterDescriptor single parameter},
+     * the value is always 1.
+     *
+     * @see #getMinimumOccurs
+     */
+    public int getMaximumOccurs() {
+        return 1;
     }
 
     /**
