@@ -1,14 +1,16 @@
-
 package org.geotools.metadata;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * TODO type description
  * 
  * @author jeichar
- *
+ * @since 2.1
  */
 public abstract class AbstractMetadata implements Metadata {
 
@@ -39,19 +41,21 @@ public abstract class AbstractMetadata implements Metadata {
         if( elementlist!=null )
             return;
         
-        Class[] interfaces=getClass().getInterfaces();
+        elementlist=new ArrayList();
+        
+        ArrayList ifaces=new ArrayList(); 
+        getInterfaces(getClass(),ifaces);
+        
         
         /*
          * Inspects each interface.  If the interface is not the MetadataEntity
          * interface then its getXXX() methods are used to identify the MetadataElements
          * of the Metadata
          */
-        for (int i = 0; i < interfaces.length; i++) {
-            Class intrface = interfaces[i];
-            if( intrface.getName().equals("MetadataEntity") ) 
-                continue;
-            
-            Method[] methods= intrface.getMethods();
+        for (Iterator iter = ifaces.iterator(); iter.hasNext();) {
+            Class iface = (Class) iter.next();
+
+            Method[] methods= iface.getDeclaredMethods();
             
             /*
              * locate and add field that the getXXX() indicates
@@ -60,18 +64,48 @@ public abstract class AbstractMetadata implements Metadata {
                 Method method = methods[j];
                 String name = method.getName();
                 if(name.startsWith("get")){
-                    //TODO
-                }
-
-            }
-        }
+                    try{
+                        elementlist.add(method.invoke(this,null));
+                    }catch(IllegalAccessException iae){
+                        throw new RuntimeException(iae);
+                    }catch(InvocationTargetException ite){
+                        throw new RuntimeException(ite);
+                    }//try
+                }//if
+            }//for
+        }//for
     }
 
+    private void getInterfaces(Class class1, List list){
+
+         Class[] ifaces=class1.getInterfaces();
+        
+        for (int i = 0; i < ifaces.length; i++) {
+            Class iface = ifaces[i];
+            getInterfaces(iface, list);
+        }//for
+        
+        if( !class1.isInterface() )
+            return;
+        
+        if (class1==Metadata.class )
+            return;
+        
+        if(!Metadata.class.isAssignableFrom(class1))
+            return;
+        if(list.contains(class1)){
+            return;
+        }   
+        list.add(class1);
+    }
+    
     /** 
      * @see org.geotools.metadata.Metadata#getElement(int)
      */
     public final Object getElement(int index) {
-        // TODO Auto-generated method stub
+        if( elementlist==null )
+            initElementList();
+        
         return elementlist.get(index);
     }
 
@@ -87,8 +121,9 @@ public abstract class AbstractMetadata implements Metadata {
      * @see org.geotools.metadata.Metadata#getNumElements()
      */
     public final int getNumElements() {
-        // TODO Auto-generated method stub
-        return 0;
+        if( elementlist==null )
+            initElementList();
+        return elementlist.size();
     }
 
     /** 
