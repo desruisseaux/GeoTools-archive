@@ -71,13 +71,17 @@ public class XMLSAXHandler extends DefaultHandler {
     // the stack of handlers
     private Stack handlers = new Stack();
 
-    public InputSource resolveEntity( String pubId, String sysId ) throws IOException, SAXException {
+    public InputSource resolveEntity( String pubId, String sysId ) throws SAXException {
 //System.out.println("***"+pubId+"*"+sysId+"*");
         // avoid dtd files
 		if(sysId != null && sysId.endsWith("dtd")){
 		    return new InputSource(new StringBufferInputStream(""));
 		}
-		return super.resolveEntity(pubId,sysId);
+		try {
+            return super.resolveEntity(pubId,sysId);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
     }
     // hints
     private Map hints;

@@ -1912,7 +1912,7 @@ public class FilterComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return false;
+            return element!=null && element.getType().equals(this) && value!=null && value instanceof PropertyName[];
         }
 
         /**
@@ -1922,14 +1922,32 @@ public class FilterComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+                throw new IOException("Cannot encode");
+            
+            PropertyName[] pns = (PropertyName[])value;
+            
+            AttributesImpl ai = null;
+            if(hints!=null && hints.containsKey(SortOrderType.SORT_ORDER_KEY)){
+                if(hints.get(SortOrderType.SORT_ORDER_KEY) == SortOrderType.SORT_ORDER_ASC){
+                    ai = new AttributesImpl();
+                    ai.addAttribute(FilterSchema.NAMESPACE.toString(),"sortOrder",null,"string","ASC");
+                }
+            }
+            output.startElement(element.getNamespace(),element.getName(),ai);
+            for(int i=0;i<pns.length;i++){
+                elems[0].getType().encode(elems[0],pns[i],output,hints);
+            }
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     /** also from the 1.0.20 version, and excluded from the Schema object
      * 
      */
     public static class SortOrderType implements SimpleType{
-
+        public static final String SORT_ORDER_KEY = "org.geotools.xml.ogc.SortOrderType_KEY";
+        public static final String SORT_ORDER_DESC = "org.geotools.xml.ogc.SortOrderType_DESC";
+        public static final String SORT_ORDER_ASC = "org.geotools.xml.ogc.SortOrderType_ASC";
         private static SortOrderType instance = new SortOrderType();
         private SortOrderType(){}
         public static SortOrderType getInstance() {
