@@ -28,17 +28,17 @@ public class WMSCapabilities {
     private String version;
 
     /**
-     * DOCUMENT ME!
+     * The layers contained in this Capabilities document, organized according
+     * to the order they are encountered. Each Layer maintains knowledge of its
+     * parent. The hierarchy can be reconstructed using that.
      *
-     * @return Returns the layers.
+     * @return Returns an array of the layers.
      */
     public Layer[] getLayers() {
         return layers;
     }
 
     /**
-     * DOCUMENT ME!
-     *
      * @param layers The layers to set.
      */
     public void setLayers(Layer[] layers) {
@@ -46,7 +46,8 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
+     * The request contains information about possible Requests that can be 
+     * made against this server, including URLs and formats.
      *
      * @return Returns the request.
      */
@@ -55,8 +56,6 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
      * @param request The request to set.
      */
     public void setRequest(WMSRequest request) {
@@ -64,8 +63,8 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
+     * The Service contains metadata about the WMS.
+     * 
      * @return Returns the service.
      */
     public Service getService() {
@@ -73,8 +72,6 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
      * @param service The service to set.
      */
     public void setService(Service service) {
@@ -82,8 +79,8 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
+     * The version that this Capabilities is in.
+     * 
      * @return Returns the version.
      */
     public String getVersion() {
@@ -91,8 +88,6 @@ public class WMSCapabilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
      * @param version The version to set.
      */
     public void setVersion(String version) {

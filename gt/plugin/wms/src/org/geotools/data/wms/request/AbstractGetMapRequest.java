@@ -22,20 +22,51 @@ import org.geotools.data.wms.SimpleLayer;
  */
 public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
 
+    /** Represents the ELEVATION parameter */
+    public static final String ELEVATION = "ELEVATION"; //$NON-NLS-1$
+    /** Represents the TIME parameter */
+    public static final String TIME = "TIME"; //$NON-NLS-1$
+    /** Represents the EXCEPTIONS parameter */
+    public static final String EXCEPTIONS = "EXCEPTIONS"; //$NON-NLS-1$
+    /** Represents the BGCOLOR parameter */
+    public static final String BGCOLOR = "BGCOLOR"; //$NON-NLS-1$
+    /** Represents the TRANSPARENT parameter */
+    public static final String TRANSPARENT = "TRANSPARENT"; //$NON-NLS-1$
+    /** Represents the WIDTH parameter */
+    public static final String WIDTH = "WIDTH"; //$NON-NLS-1$
+    /** Represents the HEIGHT parameter */
+    public static final String HEIGHT = "HEIGHT"; //$NON-NLS-1$
+    /** Represents the FORMAT parameter */
+    public static final String FORMAT = "FORMAT"; //$NON-NLS-1$
+    /** Represents the BBOX parameter */
+    public static final String BBOX = "BBOX"; //$NON-NLS-1$
+    /** Represents the SRS parameter */
+    public static final String SRS = "SRS"; //$NON-NLS-1$
+    /** Represents the LAYERS parameter */
+    public static final String LAYERS = "LAYERS"; //$NON-NLS-1$
+    /** Represents the STYLES parameter */
+    public static final String STYLES = "STYLES"; //$NON-NLS-1$
+    
+    /** Represents the EXCEPTION_INIMAGE value */
+    public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage"; //$NON-NLS-1$
+    /** Represents the EXCEPTION_BLANK value */
+    public static final String EXCEPTION_BLANK = "application/vnd.ogc.se_blank"; //$NON-NLS-1$
+    
     private List availableLayers;
     private Set availableSRSs;
     private List availableFormats;
     private List availableExceptions;
 
     /**
-     * Initialize properties and set the request propertie to "GetMap"
-     *
-     * @param onlineResource
-     * @param version
-     * @param availableLayers
-     * @param availableSRSs
-     * @param availableFormats
-     * @param availableExceptions DOCUMENT ME!
+     * Constructs a GetMapRequest. The data passed in represents valid values 
+     * that can be used.
+     * 
+     * @param onlineResource the location that the request should be applied to
+     * @param properties pre-set properties to be used. Can be null.
+     * @param availableLayers All layers that can be validly requested
+     * @param availableSRSs All SRSs that can be validly requested
+     * @param availableFormats All the formats that can be validly requested
+     * @param availableExceptions All the exceptions that can be validly requested
      */
     public AbstractGetMapRequest(URL onlineResource, Properties properties,
         SimpleLayer[] availableLayers, Set availableSRSs,
@@ -57,7 +88,7 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
     protected abstract void initVersion();
     
     protected void initRequest() {
-        setProperty(REQUEST, "GetMap");
+        setProperty(REQUEST, "GetMap"); //$NON-NLS-1$
     }
 
     /**
@@ -67,13 +98,15 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
      *        "1.1.1", or "1.3.0")
      */
     public void setVersion(String version) {
-        //TODO Version stuff here
-        properties.setProperty("VERSION", version);
+        properties.setProperty(VERSION, version);
     }
 
+    /**
+     * @see org.geotools.data.wms.request.GetMapRequest#setLayers(java.util.List)
+     */
     public void setLayers(List layers) {
-        String layerString = "";
-        String styleString = "";
+        String layerString = ""; //$NON-NLS-1$
+        String styleString = ""; //$NON-NLS-1$
 
         for (int i = 0; i < layers.size(); i++) {
             SimpleLayer simpleLayer = (SimpleLayer) layers.get(i);
@@ -81,13 +114,13 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
             styleString = styleString + simpleLayer.getStyle();
 
             if (i != (layers.size() - 1)) {
-                layerString = layerString + ",";
-                styleString = styleString + ",";
+                layerString = layerString + ","; //$NON-NLS-1$
+                styleString = styleString + ","; //$NON-NLS-1$
             }
         }
 
-        setProperty("LAYERS", layerString);
-        setProperty("STYLES", styleString);
+        setProperty(LAYERS, layerString);
+        setProperty(STYLES, styleString);
     }
 
     /**
@@ -172,10 +205,10 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
      * @param transparent true for transparency, false otherwise
      */
     public void setTransparent(boolean transparent) {
-        String value = "FALSE";
+        String value = "FALSE"; //$NON-NLS-1$
 
         if (transparent) {
-            value = "TRUE";
+            value = "TRUE"; //$NON-NLS-1$
         }
 
         properties.setProperty(TRANSPARENT, value);
@@ -269,18 +302,30 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         properties.setProperty(name, value);
     }
 
+    /**
+     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableExceptions()
+     */
     public List getAvailableExceptions() {
         return availableExceptions;
     }
 
+    /**
+     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableFormats()
+     */
     public List getAvailableFormats() {
         return availableFormats;
     }
 
+    /**
+     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableLayers()
+     */
     public List getAvailableLayers() {
         return availableLayers;
     }
 
+    /**
+     * @see org.geotools.data.wms.request.GetMapRequest#getAvailableSRSs()
+     */
     public Set getAvailableSRSs() {
         return availableSRSs;
     }

@@ -16,11 +16,7 @@
  */
 package org.geotools.data.wms.request;
 
-import org.geotools.data.wms.SimpleLayer;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 
@@ -59,6 +55,12 @@ import java.util.Set;
  * REQUEST
  * </li>
  * <li>
+ * LAYERS
+ * </li>
+ * <li>
+ * STYLES
+ * </li>
+ * <li>
  * <i>vendor specific parameters</i>
  * </li>
  * </ul>
@@ -74,30 +76,22 @@ import java.util.Set;
  * @author Richard Gould, Refractions Research
  */
 public interface GetMapRequest extends Request{
-    public static final String VERSION = "VERSION";
-    public static final String ELEVATION = "ELEVATION";
-    public static final String TIME = "TIME";
-    public static final String EXCEPTIONS = "EXCEPTIONS";
-    public static final String BGCOLOR = "BGCOLOR";
-    public static final String TRANSPARENT = "TRANSPARENT";
-    public static final String WIDTH = "WIDTH";
-    public static final String HEIGHT = "HEIGHT";
-    public static final String FORMAT = "FORMAT";
-    public static final String BBOX = "BBOX";
-    public static final String SRS = "SRS";
-    public static final String REQUEST = "REQUEST";
-    public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
-    public static final String EXCEPTION_BLANK = "application/vnd.ogc.se_blank";
-
 
     /**
      * Sets the version number of the request.
      *
      * @param version A String indicting a WMS Version ("1.0.0", "1.1.0",
-     *        "1.1.1", or "1.3.0")
+     *        "1.1.1", "1.3.0", etc.)
      */
     public void setVersion(String version);
 
+    /**
+     * A list of type <code>SimpleLayer</code> used to set the layers and
+     * styles for this request. The first element in the List is the first
+     * Layer in the request.
+     * 
+     * @param layers a List of type SimpleLayer
+     */
     public void setLayers(List layers);
 
     /**
@@ -160,7 +154,7 @@ public interface GetMapRequest extends Request{
      */
     public void setDimensions(String width, String height);
 
-    // End required parameters, being optional ones.
+    // End required parameters, begin optional ones.
     //TODO Implement optional parameters.
 
     /**
@@ -249,11 +243,24 @@ public interface GetMapRequest extends Request{
      */
     public void setVendorSpecificParameter(String name, String value);
 
+    /**
+     * @return a List of type String, representing valid Exceptions
+     */
     public List getAvailableExceptions();
 
+    /**
+     * @return a List of type String, representing valid GetMap formats
+     */
     public List getAvailableFormats();
 
+    /**
+     * @return a List of SimpleLayers, representing available Layers and their Styles
+     */
     public List getAvailableLayers();
 
+    /**
+     * @return a Set of Strings, representing available SRSs
+     * TODO - might be a good idea to move these to SimpleLayers.
+     */
     public Set getAvailableSRSs();
 }

@@ -16,9 +16,7 @@
  */
 package org.geotools.data.wms.request;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.StringTokenizer;
 
 
 /**
@@ -27,12 +25,15 @@ import java.util.StringTokenizer;
  * @author Richard Gould
  */
 public abstract class GetCapabilitiesRequest extends AbstractRequest {
+    /** Represents the SERVICE parameter */
+    public static final String SERVICE = "SERVICE"; //$NON-NLS-1$
+
+    
     /**
-     * DOCUMENT ME!
-     *
+     * Creates a GetCapabilitiesRequest and sets the REQUEST, VERSION and
+     * SERVICE parameters.
+     * 
      * @param serverURL
-     *
-     * @throws RuntimeException DOCUMENT ME!
      */
     public GetCapabilitiesRequest(URL serverURL) {
         super(serverURL, null);
@@ -43,21 +44,20 @@ public abstract class GetCapabilitiesRequest extends AbstractRequest {
     }
 
     /**
-     * Default implementation REQUEST = GetCapabilities
-     * 
+     * Sets the REQUEST parameter
      * <p>
      * Subclass can override if needed.
      * </p>
      */
     protected void initRequest() {
-        setProperty("REQUEST", "GetCapabilities");
+        setProperty(REQUEST, "GetCapabilities"); //$NON-NLS-1$
     }
 
     /**
-     * Default implementation SERVICE = WMS
+     * Sets the SERVICE parameter
      */
     protected void initService() {
-        setProperty("SERVICE", "WMS");
+        setProperty(SERVICE, "WMS"); //$NON-NLS-1$
     }
 
     /**

@@ -25,21 +25,39 @@ import java.util.StringTokenizer;
 
 
 /**
- * Functionality for performing basic requests
+ * A class that provides functionality for performing basic requests
  *
  * @author Richard Gould
  */
-public class AbstractRequest {
+public class AbstractRequest implements Request{
     /** Represents OGC Exception MIME types */
-    public static final String EXCEPTION_XML = "application/vnd.ogc.se_xml";
+    public static final String EXCEPTION_XML = "application/vnd.ogc.se_xml"; //$NON-NLS-1$
+    
     protected URL onlineResource;
     protected Properties properties;
 
     /**
-     * DOCUMENT ME!
+     * Creates an AbstractRequest.
+     * 
+     * If properties isn't <code>null</code>, it will use them instead of
+     * creating a new Properties object.
+     * 
+     * This constructor will strip all the query parameters off of
+     * onlineResource and put them in the properties map. This allows clients
+     * to provide their own parameters and have them saved and used along with
+     * the WMS specific ones.
+     * 
+     * However, certain parameters will be over-written by individual requests
+     * themselves. Examples of such parameters include, but are not limited to:
+     * <ul>
+     * <li>WMTVER
+     * <li>REQUEST
+     * <li>VERSION
+     * <li>SERVICE
+     * </ul>
      *
-     * @param onlineResource
-     * @param properties2
+     * @param onlineResource the URL to construct the Request for
+     * @param properties a map of pre-set parameters to be used. Can be null.
      */
     public AbstractRequest(URL onlineResource, Properties properties) {
     	
@@ -52,7 +70,7 @@ public class AbstractRequest {
         // Need to strip off the query, as getFinalURL will add it back
         // on, with all the other properties. If we don't, elements will
         // be duplicated.
-        int index = onlineResource.toExternalForm().lastIndexOf("?");
+        int index = onlineResource.toExternalForm().lastIndexOf("?"); //$NON-NLS-1$
         String urlWithoutQuery = null;
 
         if (index <= 0) {
@@ -64,18 +82,18 @@ public class AbstractRequest {
         try {
             this.onlineResource = new URL(urlWithoutQuery);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Error parsing URL");
+            throw new RuntimeException("Error parsing URL. This is likely a bug in the code.");
         }
 
         // Doing this preserves all of the query parameters while
         // enforcing the mandatory ones
         if (onlineResource.getQuery() != null) {
             StringTokenizer tokenizer = new StringTokenizer(onlineResource.getQuery(),
-                    "&");
+                    "&"); //$NON-NLS-1$
 
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
-                String[] param = token.split("=");
+                String[] param = token.split("="); //$NON-NLS-1$
                 setProperty(param[0].toUpperCase(), param[1]);
             }
         }
@@ -83,21 +101,24 @@ public class AbstractRequest {
         
     }
 
+    /**
+     * @see org.geotools.data.wms.request.Request#getFinalURL()
+     */
     public URL getFinalURL() {
         String url = onlineResource.toExternalForm();
 
-        if (!url.endsWith("?")) {
-            url = url.concat("?");
+        if (!url.endsWith("?")) { //$NON-NLS-1$
+            url = url.concat("?"); //$NON-NLS-1$
         }
 
         Iterator iter = properties.entrySet().iterator();
 
         while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
-            String param = entry.getKey() + "=" + entry.getValue();
+            String param = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 
             if (iter.hasNext()) {
-                param = param.concat("&");
+                param = param.concat("&"); //$NON-NLS-1$
             }
 
             url = url.concat(param);
@@ -112,10 +133,16 @@ public class AbstractRequest {
         return null;
     }
 
+    /**
+     * @see org.geotools.data.wms.request.Request#setProperty(java.lang.String, java.lang.String)
+     */
     public void setProperty(String name, String value) {
         properties.setProperty(name, value);
     }
     
+    /**
+     * @see org.geotools.data.wms.request.Request#getProperties()
+     */
     public Properties getProperties() {
         return (Properties) properties.clone();
     }

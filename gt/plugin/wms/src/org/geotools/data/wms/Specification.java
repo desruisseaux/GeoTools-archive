@@ -16,15 +16,13 @@
  */
 package org.geotools.data.wms;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
-import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.util.InternationalString;
-import org.jdom.Document;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
+
+import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 
 
 /**
@@ -85,29 +83,40 @@ public abstract class Specification {
 
     /**
      * Expected version attribute for root element.
-     *
-     * @return DOCUMENT ME!
+     * @return the version as a String
      */
     public abstract String getVersion();
 
     /**
      * Factory method to create WMSGetCapabilities Request
-     *
-     * @param server DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param server the URL that points to the server's getCapabilities document
+     * @return a configured GetCapabilitiesRequest that can be used to access the Document 
      */
     public abstract GetCapabilitiesRequest createGetCapabilitiesRequest(
         URL server);
 
-    public abstract GetMapRequest createGetMapRequest( URL get, SimpleLayer[] layers, Set availableSRSs, String[] formatStrings, List exceptions );
+    /**
+     * Creates a GetMapRequest for this specification, populating it with valid
+     * values.
+     * 
+     * @param onlineResource the URL for the GetMapRequest
+     * @param availableLayers valid layers for this request
+     * @param availableSRSs a Set of type String representing valid SRS values for this request
+     * @param formats available formats for the GetMapResponse
+     * @param availableExceptions available formats for any thrown Exceptions
+     * @return a GetMapRequest that can be configured and used
+     */
+    public abstract GetMapRequest createGetMapRequest( URL onlineResource, SimpleLayer[] availableLayers, Set availableSRSs, String[] formats, List availableExceptions );
 
     /**
-     * @param get
-     * @param getMapRequest
-     * @param queryableLayers
-     * @param formatStrings
-     * @return
+     * Creates a GetFeatureInfoRequest for this specification, populating it 
+     * with valid values.
+     * 
+     * @param onlineResource the URL to be executed against
+     * @param getMapRequest a previously configured GetMapRequest
+     * @param queryableLayers a Set of type Layer, each of which must be queryable
+     * @param formats a list of known formats that are valid for GetFeatureInfoResponses 
+     * @return a GetFeatureInfoRequest that can be configured and used
      */
-    public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL get, GetMapRequest getMapRequest, Set queryableLayers, String[] formatStrings );
+    public abstract GetFeatureInfoRequest createGetFeatureInfoRequest( URL onlineResource, GetMapRequest getMapRequest, Set queryableLayers, String[] formats );
 }
