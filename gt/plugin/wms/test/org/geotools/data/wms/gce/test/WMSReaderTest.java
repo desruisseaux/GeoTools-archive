@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on Jul 21, 2004
  *
  * TODO To change the template for this generated file go to
@@ -6,14 +22,7 @@
  */
 package org.geotools.data.wms.gce.test;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
@@ -27,12 +36,18 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
- * @author rgould
+ * DOCUMENT ME!
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author rgould TODO To change the template for this generated type comment
+ *         go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class WMSReaderTest extends TestCase {
     WMSCapabilities capabilities;
@@ -63,46 +78,51 @@ public class WMSReaderTest extends TestCase {
     }
 
     public void testRead() throws Exception {
-         ParameterDescriptorGroup descriptorGroup = reader.getFormat().getReadParameters();
-         
-         GeneralParameterDescriptor[] paramDescriptors = descriptorGroup.getParameters();
-         GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.length];
-         
-         for (int i = 0; i < paramDescriptors.length; i++) {
-         	GeneralParameterValue generalParameterValue = paramDescriptors[i].createValue();
+        ParameterDescriptorGroup descriptorGroup = reader.getFormat()
+                                                         .getReadParameters();
+
+        GeneralParameterDescriptor[] paramDescriptors = descriptorGroup
+            .getParameters();
+        GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.length];
+
+        for (int i = 0; i < paramDescriptors.length; i++) {
+            GeneralParameterValue generalParameterValue = paramDescriptors[i]
+                .createValue();
             generalParameterValues[i] = generalParameterValue;
 
-            
-         	String parameterName = paramDescriptors[i].getName().toString();
-         	
+            String parameterName = paramDescriptors[i].getName().toString();
+
             if (parameterName.equals("LAYERS")) {
-            
-            	ParameterGroup groupValue = (ParameterGroup) generalParameterValue;
-            	ParameterGroupDescriptor groupDesc = (ParameterGroupDescriptor) generalParameterValue.getDescriptor();
-            	
-            	ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptors[i];
-            	
-            	GeneralParameterDescriptor[] layerDescriptors = layerGroup.getParameters();
-            	GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.length];
-            	
+                ParameterGroup groupValue = (ParameterGroup) generalParameterValue;
+                ParameterGroupDescriptor groupDesc = (ParameterGroupDescriptor) generalParameterValue
+                    .getDescriptor();
+
+                ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptors[i];
+
+                GeneralParameterDescriptor[] layerDescriptors = layerGroup
+                    .getParameters();
+                GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.length];
+
                 for (int j = 0; j < layerDescriptors.length; j++) {
-                	Parameter layerValue = (Parameter) layerDescriptors[j].createValue();
+                    Parameter layerValue = (Parameter) layerDescriptors[j]
+                        .createValue();
                     layerParameterValues[j] = layerValue;
-                    
-                    ParameterDescriptor layerDesc = (ParameterDescriptor) layerValue.getDescriptor();
+
+                    ParameterDescriptor layerDesc = (ParameterDescriptor) layerValue
+                        .getDescriptor();
                     Set styles = layerDesc.getValidValues();
                     layerValue.setValue(styles.iterator().next());
-                
+
                     groupValue.add(layerValue);
-                    
                 }
-                
+
                 continue;
             }
-            
+
             Parameter value = (Parameter) generalParameterValue;
-            ParameterDescriptor desc = (ParameterDescriptor) generalParameterValue.getDescriptor();
-            
+            ParameterDescriptor desc = (ParameterDescriptor) generalParameterValue
+                .getDescriptor();
+
             if (parameterName.equals("FORMAT")) {
                 Iterator iter = desc.getValidValues().iterator();
 
@@ -110,7 +130,7 @@ public class WMSReaderTest extends TestCase {
                     String format = (String) iter.next();
                     value.setValue(format);
                 }
-                
+
                 continue;
             }
 
@@ -149,17 +169,19 @@ public class WMSReaderTest extends TestCase {
 
                 continue;
             }
-            
+
             if (parameterName.equals("VERSION")) {
                 value.setValue("1.1.1");
+
                 continue;
             }
-        }            
-        
+        }
+
         Map properties = new HashMap();
         properties.put(IdentifiedObject.NAME_PROPERTY, "WMS");
-         
-        ParameterValueGroup parameters = new ParameterGroup(properties, generalParameterValues);
-        org.geotools.gc.GridCoverage coverage = reader.read( parameters );
+
+        ParameterValueGroup parameters = new ParameterGroup(properties,
+                generalParameterValues);
+        org.geotools.gc.GridCoverage coverage = reader.read(parameters);
     }
 }

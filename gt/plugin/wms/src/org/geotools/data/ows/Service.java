@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,15 +20,15 @@ import java.net.URL;
 
 
 /**
- * @author rgould
- *
- * This is a data model for the OGC WMS Service metadata. Feel free to extend it
- * to other OGC services.
- *
- * Name, Title and OnlineResource are Required. Everything else is optional.
+ * This is a data model for the OGC WMS Service metadata. Feel
+ *         free to extend it to other OGC services. Name, Title and
+ *         OnlineResource are Required. Everything else is optional.
  */
 public class Service {
-    /** The name of the Service (machine readible, typically one word) - Required */
+    /**
+     * The name of the Service (machine readible, typically one word) -
+     * Required
+     */
     private String name;
 
     /** The title for the service (human readible) - Required */
@@ -40,9 +40,11 @@ public class Service {
     /** Keywords that apply to the Service. Can be used for searching, etc */
     private String[] keywordList;
 
-    /** Abstract allows a description providing more information about the Service */
+    /**
+     * Abstract allows a description providing more information about the
+     * Service
+     */
     private String _abstract;
-    
     private int layerLimit;
     private int maxWidth;
     private int maxHeight;
@@ -86,22 +88,28 @@ public class Service {
     public void setTitle(String title) {
         this.title = title;
     }
-	public int getLayerLimit() {
-		return layerLimit;
-	}
-	public void setLayerLimit(int layerLimit) {
-		this.layerLimit = layerLimit;
-	}
-	public int getMaxHeight() {
-		return maxHeight;
-	}
-	public void setMaxHeight(int maxHeight) {
-		this.maxHeight = maxHeight;
-	}
-	public int getMaxWidth() {
-		return maxWidth;
-	}
-	public void setMaxWidth(int maxWidth) {
-		this.maxWidth = maxWidth;
-	}
+
+    public int getLayerLimit() {
+        return layerLimit;
+    }
+
+    public void setLayerLimit(int layerLimit) {
+        this.layerLimit = layerLimit;
+    }
+
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
+    }
+
+    public int getMaxWidth() {
+        return maxWidth;
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+    }
 }

@@ -142,7 +142,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		}
 
 		/**
-		 * Parse List<String> from opperation element.
+		 * Parse List(String) from opperation element.
 		 * <p>
 		 * Values are taken to be mine types? We could restrict this list
 		 * to types we know how to deal with (incase image/svg comes up).
@@ -152,20 +152,20 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		 * <p>
 		 * Normal Mime Types:
 		 * <ul>
-		 * <li>image/gif
-		 * <li>image/jpeg
-		 * <li>image/png
-		 * <li>image/svg
-		 * <li>text/xml - generic XML mime type
-		 * <li>application/xml - generic XML mime type
+		 * <li>image/gif</li>
+		 * <li>image/jpeg</li>
+		 * <li>image/png</li>
+		 * <li>image/svg</li>
+		 * <li>text/xml - generic XML mime type</li>
+		 * <li>application/xml - generic XML mime type</li>
 		 * </ul>
 		 * </p>
 		 * <p>
 		 * OGC-specific Mime Types:
 		 * <ul>
-		 * <li>application/vnd.ogc.wms_xml - WMS Capabilities XML
-		 * <li>application/vnd.ogc.gml - Geography Markup Language XML
-		 * <li>application/vnd.ogc.se_xml - Service Exception XML
+		 * <li>application/vnd.ogc.wms_xml - WMS Capabilities XML</li>
+		 * <li>application/vnd.ogc.gml - Geography Markup Language XML</li>
+		 * <li>application/vnd.ogc.se_xml - Service Exception XML</li>
 		 * </p>
 		 * <p>
 		 * Speaking of reality WMS 1.0.0 is unreal - it does not use

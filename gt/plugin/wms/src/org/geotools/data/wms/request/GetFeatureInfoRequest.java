@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,7 @@ package org.geotools.data.wms.request;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.SimpleLayer;
-
 import java.net.URL;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -30,29 +28,26 @@ import java.util.TreeSet;
 
 /**
  * Information required for a GetFeatureInfo request.
+ * 
  * <p>
- * Q: queryableLayers is a Set - is this true? Or is order important
- * Q: infoFormats - what does this do? Do these match up with
- * querableLayers? Or is it a list of formats our client is willing
- * to understand?
+ * Q: queryableLayers is a Set - is this true? Or is order important Q:
+ * infoFormats - what does this do? Do these match up with querableLayers? Or
+ * is it a list of formats our client is willing to understand?
+ * </p>
  *
  * @author Richard Gould, Refractions Research
  */
 public class GetFeatureInfoRequest extends GetMapRequest {
-    /**
-     * A list of type String, each representing a format for the request
-     */
+    /** A list of type String, each representing a format for the request */
     private List infoFormats;
 
     /**
-     * A list of type Layer, each of which has queryable set to true.
-     * This is instantiated usually from a GetCapabilities document
+     * A list of type Layer, each of which has queryable set to true. This is
+     * instantiated usually from a GetCapabilities document
      */
     private Set queryableLayers;
 
-    /**
-     * A set of type Layer, each of which is to be queried in the request
-     */
+    /** A set of type Layer, each of which is to be queried in the request */
     private Set queryLayers;
 
     public GetFeatureInfoRequest(URL onlineResource, GetMapRequest request,
@@ -92,10 +87,10 @@ public class GetFeatureInfoRequest extends GetMapRequest {
     }
 
     /**
-     * An unordered set of type Layer.
-     * Each layer will be queried in the request
+     * An unordered set of type Layer. Each layer will be queried in the
+     * request
      *
-     * @param layerList A Set of type Layer, each to be queried
+     * @param layers A Set of type Layer, each to be queried
      */
     public void setQueryLayers(Set layers) {
         queryLayers = layers;

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,20 +16,18 @@
  */
 package org.geotools.data.ows;
 
-
 /**
- * A pair of coordinates and a reference system that represents a section of the Earth
+ * A pair of coordinates and a reference system that represents a section of
+ * the Earth
  *
  * @author Richard Gould
  */
 public class BoundingBox extends LatLonBoundingBox {
-    /**
-     * Represents the Coordinate Reference System this bounding box is in
-     */
+    /** Represents the Coordinate Reference System this bounding box is in */
     private String crs;
+
     /**
      * Construct an empty BoundingBox
-     *
      */
     public BoundingBox() {
         super();
@@ -37,6 +35,7 @@ public class BoundingBox extends LatLonBoundingBox {
 
     /**
      * Create a bounding box with the specified properties
+     *
      * @param crs The Coordinate Reference System this bounding box is in
      * @param minX
      * @param minY
@@ -45,12 +44,13 @@ public class BoundingBox extends LatLonBoundingBox {
      */
     public BoundingBox(String crs, double minX, double minY, double maxX,
         double maxY) {
-    	super(minX, minY, maxX, maxY);
+        super(minX, minY, maxX, maxY);
         this.crs = crs;
     }
 
     /**
      * The CRS is bounding box's Coordinate Reference System
+     *
      * @return the CRS/SRS value
      */
     public String getCrs() {
@@ -59,6 +59,7 @@ public class BoundingBox extends LatLonBoundingBox {
 
     /**
      * The CRS is bounding box's Coordinate Reference System
+     *
      * @param crs the new value for the CRS/SRS
      */
     public void setCrs(String crs) {

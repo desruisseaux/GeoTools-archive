@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,31 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
-
 import org.jdom.Document;
 import org.jdom.JDOMException;
-
 import org.jdom.input.SAXBuilder;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 
 /**
  * Represents the response of a getCapabilities request.
+ * 
  * <p>
- * Feedback - this object actually starts the parsing? As part of the constructor (!).
- * How does this differ at all from just doing the work? Unless you wanted to go nuts
- * and support response encoding). Basically provide the contentType and inputStream to
- * the superclass and have it take care of providing you a Document. Wrapping the inputStream
- * with zip uncoding before passing it to SAXBuilder.build( inputStream).
+ * Feedback - this object actually starts the parsing? As part of the
+ * constructor (!). How does this differ at all from just doing the work?
+ * Unless you wanted to go nuts and support response encoding). Basically
+ * provide the contentType and inputStream to the superclass and have it take
+ * care of providing you a Document. Wrapping the inputStream with zip
+ * uncoding before passing it to SAXBuilder.build( inputStream).
  * </p>
+ * 
  * <p>
- * Another suggestion - store the error. So this object either provides you with an exception or
- * a working Capabilities object when all is said and done.
+ * Another suggestion - store the error. So this object either provides you
+ * with an exception or a working Capabilities object when all is said and
+ * done.
  * </p>
+ *
  * @author Richard Gould, Refractions Research
  */
 public class GetCapabilitiesResponse extends AbstractResponse {
@@ -65,7 +67,11 @@ public class GetCapabilitiesResponse extends AbstractResponse {
         return builder.build(inputStream);
     }
 
-    /** Retrived parsed Capabilities */
+    /**
+     * Retrived parsed Capabilities
+     *
+     * @return DOCUMENT ME!
+     */
     public WMSCapabilities getCapabilities() {
         return capabilities;
     }

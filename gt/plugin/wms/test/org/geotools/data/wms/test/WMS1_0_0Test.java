@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on Aug 25, 2004
  *
  * TODO To change the template for this generated file go to
@@ -7,7 +23,6 @@
 package org.geotools.data.wms.test;
 
 import junit.framework.TestCase;
-
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
@@ -17,34 +32,22 @@ import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
-
 import org.geotools.resources.TestData;
-
 import org.jdom.Document;
-
 import org.jdom.input.SAXBuilder;
-
 import java.io.File;
 import java.io.IOException;
-
 import java.net.URL;
-
 import java.util.Properties;
 import java.util.StringTokenizer;
 
 
-/**
- * @author Richard Gould
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class WMS1_0_0Test extends TestCase {
     protected URL server;
     protected Specification spec;
 
     public WMS1_0_0Test() throws Exception {
-    	this.spec = new WMS1_0_0();
+        this.spec = new WMS1_0_0();
         this.server = new URL(
                 "http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");
     }
@@ -66,7 +69,7 @@ public class WMS1_0_0Test extends TestCase {
             String[] param = token.split("=");
             properties.setProperty(param[0].toUpperCase(), param[1]);
         }
-        
+
         checkProperties(properties);
 
         WebMapServer wms = new WebMapServer(server, true);
@@ -77,13 +80,14 @@ public class WMS1_0_0Test extends TestCase {
         }
     }
 
-	protected void checkProperties(Properties properties) {
+    protected void checkProperties(Properties properties) {
         assertEquals(properties.getProperty("REQUEST"), "capabilities");
         assertEquals(properties.getProperty("WMTVER"), "1.0.0");
     }
 
-	public void testCreateParser() throws Exception {
-		WMSCapabilities capabilities = createCapabilities("1.0.0Capabilities.xml");
+    public void testCreateParser() throws Exception {
+        WMSCapabilities capabilities = createCapabilities(
+                "1.0.0Capabilities.xml");
 
         assertEquals(capabilities.getVersion(), "1.0.0");
         assertEquals(capabilities.getService().getName(), "GetMap");
@@ -122,7 +126,8 @@ public class WMS1_0_0Test extends TestCase {
         assertNotNull(bbox);
     }
 
-	protected WMSCapabilities createCapabilities(String capFile) throws Exception {
+    protected WMSCapabilities createCapabilities(String capFile)
+        throws Exception {
         File getCaps = TestData.file(this, capFile);
         URL getCapsURL = getCaps.toURL();
 
@@ -130,13 +135,13 @@ public class WMS1_0_0Test extends TestCase {
         Document document = builder.build(getCapsURL);
 
         WMSParser parser = spec.createParser(document);
-        
+
         parserCheck(parser);
 
         return parser.constructCapabilities(document, new WMSBuilder());
-	}
+    }
 
-	protected void parserCheck(WMSParser parser) {
-		assertEquals(parser.getClass(), WMS1_0_0.Parser.class);
-	}
+    protected void parserCheck(WMSParser parser) {
+        assertEquals(parser.getClass(), WMS1_0_0.Parser.class);
+    }
 }

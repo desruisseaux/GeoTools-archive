@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,14 @@ import java.io.InputStream;
 
 /**
  * Process GetMapResponse.
+ * 
  * <p>
  * Assume this is a placeholder allowing other code access to the InputStream?
- * It would be nice if this class actually provided a real object either returned
- * Image, SVG XML Document or a resolved GridCoverage in a manner similar to
- * GetCapabilities.
+ * It would be nice if this class actually provided a real object either
+ * returned Image, SVG XML Document or a resolved GridCoverage in a manner
+ * similar to GetCapabilities.
  * </p>
+ *
  * @author Richard Gould, Refractions Research
  */
 public class GetMapResponse extends AbstractResponse {

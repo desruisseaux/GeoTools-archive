@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@ import org.geotools.data.ows.OperationType;
 
 
 /**
- * A subclass of OperationType that allows format getters and setters
- * without having to cast them.
+ * A subclass of OperationType that allows format getters and setters without
+ * having to cast them.
  *
  * @author Richard Gould
  */

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,21 @@ package org.geotools.data.wms.request;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.StringTokenizer;
 
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Richard Gould
  */
 public abstract class GetCapabilitiesRequest extends AbstractRequest {
     /**
-     * @param onlineResource
+     * DOCUMENT ME!
+     *
+     * @param serverURL
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public GetCapabilitiesRequest(URL serverURL) {
         super(serverURL);
@@ -70,6 +75,7 @@ public abstract class GetCapabilitiesRequest extends AbstractRequest {
 
     /**
      * Default implementation REQUEST = GetCapabilities
+     * 
      * <p>
      * Subclass can override if needed.
      * </p>
@@ -86,8 +92,8 @@ public abstract class GetCapabilitiesRequest extends AbstractRequest {
     }
 
     /**
-     * Sets up the version number for this request.
-     * Typically something like setProperty("VERSION", "1.1.1");
+     * Sets up the version number for this request. Typically something like
+     * setProperty("VERSION", "1.1.1");
      */
     protected abstract void initVersion();
 }

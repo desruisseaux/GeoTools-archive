@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,9 @@ import java.util.Set;
 
 
 /**
- * Nested list of zero or more map Layers offered by this server.
- *
- * It contains only fields for information that we currently find
- * interesting. Feel free to add your own.
+ * Nested list of zero or more map Layers offered by this server. It contains
+ * only fields for information that we currently find interesting. Feel free
+ * to add your own.
  *
  * @author rgould
  */
@@ -40,25 +39,26 @@ public class Layer implements Comparable {
     private Set srs;
 
     /**
-     * A HashMap representings the bounding boxes on each layer.
-     * The Key is the CRS (or SRS) of the bounding box.
-     * The Value is the BoundingBox object itself.
+     * A HashMap representings the bounding boxes on each layer. The Key is the
+     * CRS (or SRS) of the bounding box. The Value is the BoundingBox object
+     * itself.
      */
     private HashMap boundingBoxes;
-    
+
     /**
-     * A boundingbox containing the minimum rectangle of the map data in EPSG:4326
+     * A boundingbox containing the minimum rectangle of the map data in
+     * EPSG:4326
      */
     private LatLonBoundingBox latLonBoundingBox;
 
-    /**
-     * A list of type Style
-     */
+    /** A list of type Style */
     private List styles;
     private boolean queryable = false;
     private Layer parent;
 
     /**
+     * DOCUMENT ME!
+     *
      * @param title
      */
     public Layer(String title) {
@@ -66,9 +66,10 @@ public class Layer implements Comparable {
     }
 
     /**
-     * Returns every BoundingBox contained within this layer. The <code>HashMap</code>
-     * returned has each bounding box's CRS/SRS value as the key, and the value
-     * is the <code>BoundingBox</code> object itself.
+     * Returns every BoundingBox contained within this layer. The
+     * <code>HashMap</code> returned has each bounding box's CRS/SRS value as
+     * the key, and the value is the <code>BoundingBox</code> object itself.
+     *
      * @return a HashMap of all of this layer's bounding boxes.
      */
     public HashMap getBoundingBoxes() {
@@ -76,9 +77,10 @@ public class Layer implements Comparable {
     }
 
     /**
-     * Sets this layer's bounding boxes. The HashMap must have each BoundingBox's 
-     * CRS/SRS value as its key, and the <code>BoundingBox</code> object as its value.
-     * 
+     * Sets this layer's bounding boxes. The HashMap must have each
+     * BoundingBox's  CRS/SRS value as its key, and the
+     * <code>BoundingBox</code> object as its value.
+     *
      * @param boundingBoxes a HashMap containing bounding boxes
      */
     public void setBoundingBoxes(HashMap boundingBoxes) {
@@ -89,7 +91,7 @@ public class Layer implements Comparable {
      * Gets the name of the <code>Layer</code>. It is designed to be machine
      * readable, and if it is present, this layer is determined to be drawable
      * and is a valid candidate for use in a GetMap or GetFeatureInfo request.
-     * 
+     *
      * @return the machine-readable name of the layer
      */
     public String getName() {
@@ -97,9 +99,9 @@ public class Layer implements Comparable {
     }
 
     /**
-     * Sets the name of this layer. Giving the layer name indicates that it 
+     * Sets the name of this layer. Giving the layer name indicates that it
      * can be drawn during a GetMap or GetFeatureInfo request.
-     * 
+     *
      * @param name the layer's new name
      */
     public void setName(String name) {
@@ -152,6 +154,8 @@ public class Layer implements Comparable {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the parent.
      */
     public Layer getParent() {
@@ -159,16 +163,19 @@ public class Layer implements Comparable {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param parent The parent to set.
      */
     public void setParent(Layer parent) {
         this.parent = parent;
     }
-    
-	public LatLonBoundingBox getLatLonBoundingBox() {
-		return latLonBoundingBox;
-	}
-	public void setLatLonBoundingBox(LatLonBoundingBox latLonBoundingBox) {
-		this.latLonBoundingBox = latLonBoundingBox;
-	}
+
+    public LatLonBoundingBox getLatLonBoundingBox() {
+        return latLonBoundingBox;
+    }
+
+    public void setLatLonBoundingBox(LatLonBoundingBox latLonBoundingBox) {
+        this.latLonBoundingBox = latLonBoundingBox;
+    }
 }

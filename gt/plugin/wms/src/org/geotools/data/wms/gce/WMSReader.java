@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
@@ -41,10 +40,10 @@ import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
- * @author rgould
+ * DOCUMENT ME!
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author rgould TODO To change the template for this generated type comment
+ *         go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class WMSReader implements GridCoverageReader {
     private Object source;
@@ -56,6 +55,8 @@ public class WMSReader implements GridCoverageReader {
      * Source must be a WebMapServer object
      *
      * @param source
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public WMSReader(Object source) {
         this.source = source;
@@ -134,9 +135,11 @@ public class WMSReader implements GridCoverageReader {
         String maxy = "";
 
         List values = parameters.values();
+
         for (int i = 0; i < values.size(); i++) {
-            GeneralParameterValue generalValue = (GeneralParameterValue) values.get(i);
-        	
+            GeneralParameterValue generalValue = (GeneralParameterValue) values
+                .get(i);
+
             String paramName = generalValue.getDescriptor().getName().toString();
 
             if ((generalValue == null)) {
@@ -144,7 +147,7 @@ public class WMSReader implements GridCoverageReader {
             }
 
             if (paramName.equals("LAYERS")) {
-            	ParameterGroup groupValue = (ParameterGroup) generalValue;
+                ParameterGroup groupValue = (ParameterGroup) generalValue;
                 String layers = "";
                 String styles = "";
 
@@ -152,8 +155,9 @@ public class WMSReader implements GridCoverageReader {
 
                 for (int j = 0; j < layerList.size(); j++) {
                     Parameter parameter = (Parameter) layerList.get(j);
-                    
-                    layers = layers + parameter.getDescriptor().getName().toString();
+
+                    layers = layers
+                        + parameter.getDescriptor().getName().toString();
                     styles = styles + (String) parameter.getValue();
 
                     if (j < (layerList.size() - 1)) {
@@ -169,7 +173,7 @@ public class WMSReader implements GridCoverageReader {
             }
 
             ParameterValue value = (ParameterValue) generalValue;
-            
+
             if (paramName.equals("BBOX_MINX")) {
                 minx = ((Double) value.getValue()).toString();
 
@@ -193,15 +197,19 @@ public class WMSReader implements GridCoverageReader {
 
                 continue;
             }
-            
+
             if (paramName.equals("HEIGHT")) {
-            	request.setProperty("HEIGHT", ((Integer) value.getValue()).toString());
-            	continue;
+                request.setProperty("HEIGHT",
+                    ((Integer) value.getValue()).toString());
+
+                continue;
             }
-            
+
             if (paramName.equals("WIDTH")) {
-            	request.setProperty("WIDTH", ((Integer) value.getValue()).toString());
-            	continue;
+                request.setProperty("WIDTH",
+                    ((Integer) value.getValue()).toString());
+
+                continue;
             }
 
             if (paramName.equals("TRANSPARENT")) {
@@ -213,9 +221,9 @@ public class WMSReader implements GridCoverageReader {
 
                 continue;
             }
-            
+
             if (value.getValue() == null) {
-            	continue;
+                continue;
             }
 
             request.setProperty(value.getDescriptor().getName().toString(),
@@ -229,14 +237,17 @@ public class WMSReader implements GridCoverageReader {
                 false);
 
         BufferedImage image = ImageIO.read(response.getInputStream());
-        if (image == null ){
-            throw new IOException("Image cannot be read from:"+response );
+
+        if (image == null) {
+            throw new IOException("Image cannot be read from:" + response);
         }
+
         Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
                 new double[] { 816000, 2460400 });
         CoordinateSystem cs = GeographicCoordinateSystem.WGS84;
 
-        hasNext = false;        
+        hasNext = false;
+
         GridCoverage coverage = new GridCoverage("wmsMap", image, cs, envelope);
 
         return coverage;
@@ -257,6 +268,8 @@ public class WMSReader implements GridCoverageReader {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param format
      */
     public void setFormat(WMSFormat format) {

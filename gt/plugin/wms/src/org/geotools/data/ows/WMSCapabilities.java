@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,6 @@
  */
 package org.geotools.data.ows;
 
-
 /**
  * Represents a base object for a WMS getCapabilities response.
  *
@@ -29,6 +28,8 @@ public class WMSCapabilities {
     private String version;
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the layers.
      */
     public Layer[] getLayers() {
@@ -36,6 +37,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param layers The layers to set.
      */
     public void setLayers(Layer[] layers) {
@@ -43,6 +46,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the request.
      */
     public WMSRequest getRequest() {
@@ -50,6 +55,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param request The request to set.
      */
     public void setRequest(WMSRequest request) {
@@ -57,6 +64,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the service.
      */
     public Service getService() {
@@ -64,6 +73,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param service The service to set.
      */
     public void setService(Service service) {
@@ -71,6 +82,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the version.
      */
     public String getVersion() {
@@ -78,6 +91,8 @@ public class WMSCapabilities {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param version The version to set.
      */
     public void setVersion(String version) {

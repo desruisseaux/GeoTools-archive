@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,24 +26,19 @@ import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-
 import org.jdom.input.SAXBuilder;
 import org.opengis.catalog.Catalog;
 import org.opengis.catalog.CatalogEntry;
 import org.opengis.catalog.MetadataEntity;
 import org.opengis.catalog.QueryDefinition;
 import org.opengis.catalog.QueryResult;
-
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URL;
 import java.net.URLConnection;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -53,87 +48,115 @@ import java.util.TreeSet;
 
 /**
  * WebMapServer is a class representing a WMS.
- *
+ * 
  * <p>
- * When performing the GetCapabilities request, all query parameters
- * are saved except the following, which are over-rided.
+ * When performing the GetCapabilities request, all query parameters are saved
+ * except the following, which are over-rided.
  * <pre><code>
  * service=WMS
  * version=1.1.1
  * request=GetCapabilities
  * </code></pre>
  * </p>
- *
+ * 
  * <p>
  * The current implementation is targeted towards the 1.3.0 OGC WMS
  * Implementation Specification. There are plans to generalize this support
  * for previous revisions.
  * </p>
- *
+ * 
  * <p>
  * Version number negotiation occurs as follows (credit OGC):
+ * 
  * <ul>
- * <li><b>1)</b> If the server implements the requested version number,
- *     the server shall send that version.
- * <li><b>2a)</b> If a version unknown to the server is requested, the
- *     server shall send the highest version less than the requested version.
- * <li><b>2b)</b> If the client request is for a version lower than any of
- *     those known to the server, then the server shall send the lowest version it knows.
- * <li><b>3a)</b> If the client does not understand the new version number sent by the
- *     server, it may either cease communicating with the server or send a new request
- *     with a new version number that the client does understand but which is less than
- *     that sent by the server (if the server had responded with a lower version).
- * <li><b>3b)</b> If the server had responded with a higher version (because the request
- *     was for a version lower than any known to the server), and the client does not
- *     understand the proposed higher version, then the client may send a new request with
- *     a version number higher than that sent by the server.
+ * <li>
+ * <b>1)</b> If the server implements the requested version number, the server
+ * shall send that version.
+ * </li>
+ * <li>
+ * <b>2a)</b> If a version unknown to the server is requested, the server shall
+ * send the highest version less than the requested version.
+ * </li>
+ * <li>
+ * <b>2b)</b> If the client request is for a version lower than any of those
+ * known to the server, then the server shall send the lowest version it
+ * knows.
+ * </li>
+ * <li>
+ * <b>3a)</b> If the client does not understand the new version number sent by
+ * the server, it may either cease communicating with the server or send a new
+ * request with a new version number that the client does understand but which
+ * is less than that sent by the server (if the server had responded with a
+ * lower version).
+ * </li>
+ * <li>
+ * <b>3b)</b> If the server had responded with a higher version (because the
+ * request was for a version lower than any known to the server), and the
+ * client does not understand the proposed higher version, then the client may
+ * send a new request with a version number higher than that sent by the
+ * server.
+ * </li>
  * </ul>
  * </p>
+ * 
  * <p>
- * The OGC tells us to repeat this process (or give up). This means we are actually going to
- * come up with a bit of setup cost in figuring out our GetCapabilities request. Initial we
- * have been using the JDOM parser and a Builder pattern to parse any getCapabilities document.
+ * The OGC tells us to repeat this process (or give up). This means we are
+ * actually going to come up with a bit of setup cost in figuring out our
+ * GetCapabilities request. Initial we have been using the JDOM parser and a
+ * Builder pattern to parse any getCapabilities document.
  * </p>
+ * 
  * <p>
  * This has a couple of drawbacks with respect to the above negotiation:
+ * 
  * <ul>
- * <li>Each of the possibly many getCapability requests would need to be relized in memory
- *     as a JDOM Document.
- * <li>We only can realize a Capabilities object for specifications for which we have a parser.
- *     Even if the Server is willing to give us a GetCapabilities docuemnt we can understand
- *     we need to know enough to ask the correct question.
  * <li>
+ * Each of the possibly many getCapability requests would need to be relized in
+ * memory as a JDOM Document.
+ * </li>
+ * <li>
+ * We only can realize a Capabilities object for specifications for which we
+ * have a parser. Even if the Server is willing to give us a GetCapabilities
+ * docuemnt we can understand we need to know enough to ask the correct
+ * question.
+ * </li>
  * </ul>
- * <p>
- * So what to do? Easy - use the JDOM root element to confirm version numbers before starting
- * the parser dance. Hard - make a custom SAX based class that grabs the version number for a
- * provided stream. Use BufferedInputStream so that if the version numbers do match we can
- * "rollback" and start the capabilities parsing off at the start of the stream.
  * </p>
+ * 
+ * <p>
+ * So what to do? Easy - use the JDOM root element to confirm version numbers
+ * before starting the parser dance. Hard - make a custom SAX based class that
+ * grabs the version number for a provided stream. Use BufferedInputStream so
+ * that if the version numbers do match we can "rollback" and start the
+ * capabilities parsing off at the start of the stream.
+ * </p>
+ *
  * @author Richard Gould, Refractions Research
  */
 public class WebMapServer implements Catalog {
-
     /**
-     * Returned by getStatus(). Indicates that the server is currently performing a request.
+     * Returned by getStatus(). Indicates that the server is currently
+     * performing a request.
      */
     public static final int IN_PROGRESS = 1;
-    
+
     /**
-     * Returned by getStatus(). Indicates that the capabilities document has not yet been retrieved.
+     * Returned by getStatus(). Indicates that the capabilities document has
+     * not yet been retrieved.
      */
     public static final int NOTCONNECTED = 0;
-    
+
     /**
-     * Returned by getStatus(). Indicates that there was an error with the most recently executed request.
+     * Returned by getStatus(). Indicates that there was an error with the most
+     * recently executed request.
      */
     public static final int ERROR = -1;
-    
+
     /**
-     * Returned by getStatus(). Indicates that the capabilities document has been successfully retrieved.
+     * Returned by getStatus(). Indicates that the capabilities document has
+     * been successfully retrieved.
      */
     public static final int CONNECTED = 2;
-    
     private final URL serverURL;
     private WMSCapabilities capabilities;
     private Exception problem;
@@ -147,32 +170,31 @@ public class WebMapServer implements Catalog {
 
     /**
      * Create a WebMapServer and immediately retrieve the GetCapabilities
-     * document in another thread.
+     * document in another thread. If there is an error while attempting to
+     * retrieve the GetCapabilities document, the exception will be placed in
+     * the problem field and can be retrieved using getProblem(). An error can
+     * be detected if getStatus returns ERROR.
      *
-     * If there is an error while attempting to retrieve the GetCapabilities
-     * document, the exception will be placed in the problem field and can be
-     * retrieved using getProblem(). An error can be detected if getStatus
-     * returns ERROR.
-     *
-     * @param serverURL the URL that points to the WMS's GetCapabilities document
+     * @param serverURL the URL that points to the WMS's GetCapabilities
+     *        document
      */
     public WebMapServer(URL serverURL) {
         this(serverURL, false);
     }
 
     /**
-     * Create a WebMapServer based on the URL located in serverURL.
-     * This will attempt to retrieve the serverURL in a thread unless
-     * wait is true, in which case it will retrieved later when requested or
-     * when needed.
-     *
-     * If there is an error while attempting to retrieve the GetCapabilities
+     * Create a WebMapServer based on the URL located in serverURL. This will
+     * attempt to retrieve the serverURL in a thread unless wait is true, in
+     * which case it will retrieved later when requested or when needed. If
+     * there is an error while attempting to retrieve the GetCapabilities
      * document, the exception will be placed in the problem field and can be
      * retrieved using getProbelm(). An error can be detected if getStatus
      * returns ERROR.
      *
-     * @param serverURL the URL that points to the WMS's GetCapabilities document
-     * @param wait true if the GetCapabilities document should not be retrieved immediately
+     * @param serverURL the URL that points to the WMS's GetCapabilities
+     *        document
+     * @param wait true if the GetCapabilities document should not be retrieved
+     *        immediately
      */
     public WebMapServer(final URL serverURL, boolean wait) {
         this.serverURL = serverURL;
@@ -198,43 +220,77 @@ public class WebMapServer implements Catalog {
 
     /**
      * Negotiate for WMS GetCapabilities Document we know how to handle.
+     * 
      * <p>
      * Version number negotiation occurs as follows (credit OGC):
+     * 
      * <ul>
-     * <li><b>1)</b> If the server implements the requested version number,
-     *     the server shall send that version.
-     * <li><b>2a)</b> If a version unknown to the server is requested, the
-     *     server shall send the highest version less than the requested version.
-     * <li><b>2b)</b> If the client request is for a version lower than any of
-     *     those known to the server, then the server shall send the lowest version it knows.
-     * <li><b>3a)</b> If the client does not understand the new version number sent by the
-     *     server, it may either cease communicating with the server or send a new request
-     *     with a new version number that the client does understand but which is less than
-     *     that sent by the server (if the server had responded with a lower version).
-     * <li><b>3b)</b> If the server had responded with a higher version (because the request
-     *     was for a version lower than any known to the server), and the client does not
-     *     understand the proposed higher version, then the client may send a new request with
-     *     a version number higher than that sent by the server.
+     * <li>
+     * <b>1)</b> If the server implements the requested version number, the
+     * server shall send that version.
+     * </li>
+     * <li>
+     * <b>2a)</b> If a version unknown to the server is requested, the server
+     * shall send the highest version less than the requested version.
+     * </li>
+     * <li>
+     * <b>2b)</b> If the client request is for a version lower than any of
+     * those known to the server, then the server shall send the lowest
+     * version it knows.
+     * </li>
+     * <li>
+     * <b>3a)</b> If the client does not understand the new version number sent
+     * by the server, it may either cease communicating with the server or
+     * send a new request with a new version number that the client does
+     * understand but which is less than that sent by the server (if the
+     * server had responded with a lower version).
+     * </li>
+     * <li>
+     * <b>3b)</b> If the server had responded with a higher version (because
+     * the request was for a version lower than any known to the server), and
+     * the client does not understand the proposed higher version, then the
+     * client may send a new request with a version number higher than that
+     * sent by the server.
+     * </li>
      * </ul>
      * </p>
+     * 
      * <p>
      * Example 1:<br>
      * Server understands versions 1, 2, 4, 5 and 8.<br>
      * Client understands versions 1,3, 4, 6, and 7.<br>
+     * 
      * <ol>
-     * <li>Client requests version 7. Server responds with version 5.
-     * <li>Client requests version 4. Server responds with version 4
-     * <li>Client does understands, negotiation ends successfully.
+     * <li>
+     * Client requests version 7. Server responds with version 5.
+     * </li>
+     * <li>
+     * Client requests version 4. Server responds with version 4
+     * </li>
+     * <li>
+     * Client does understands, negotiation ends successfully.
+     * </li>
      * </ol>
      * </p>
+     * 
      * <p>
      * Example 2:<br>
      * Server understands versions 4, 5 and 8.<br>
      * Client understands version 3.<br>
+     * 
      * <ol>
-     * <li>Client requests version 3. Server responds with version 4.
-     * <li>Client does not understand that version or any higher version, so negotiation fails
+     * <li>
+     * Client requests version 3. Server responds with version 4.
+     * </li>
+     * <li>
+     * Client does not understand that version or any higher version, so
+     * negotiation fails
+     * </li>
      * </ol>
+     * </p>
+     *
+     * @param server DOCUMENT ME!
+     *
      * @return GetCapabilitiesRequest suitable for use with a parser
      */
     private GetCapabilitiesRequest negotiateVersion(URL server) {
@@ -253,7 +309,8 @@ public class WebMapServer implements Catalog {
             Specification specification = specs[test];
             String clientVersion = specification.getVersion();
 
-            GetCapabilitiesRequest request = specification.createGetCapabilitiesRequest(server);
+            GetCapabilitiesRequest request = specification
+                .createGetCapabilitiesRequest(server);
 
             //Grab document
             URL url = request.getFinalURL();
@@ -320,8 +377,13 @@ public class WebMapServer implements Catalog {
     }
 
     /**
-     * Utility method returning the known version,
-     * just before the provided version
+     * Utility method returning the known version, just before the provided
+     * version
+     *
+     * @param known DOCUMENT ME!
+     * @param version DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
     String before(List known, String version) {
         if (known.isEmpty()) {
@@ -344,8 +406,13 @@ public class WebMapServer implements Catalog {
     }
 
     /**
-     * Utility method returning the known version,
-     * just after the provided version
+     * Utility method returning the known version, just after the provided
+     * version
+     *
+     * @param known DOCUMENT ME!
+     * @param version DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
     String after(List known, String version) {
         if (known.isEmpty()) {
@@ -395,15 +462,27 @@ public class WebMapServer implements Catalog {
     }
 
     /**
-         * Gets the current status of the GetCapabilities document.
-         * <UL>
-         * <LI>IN_PROGRESS: The thread is currently retrieving a request
-         * <LI>NOTCONNECTED: Thread has not attempt to retrieve document yet
-         * <LI>CONNECTED: The most recently issued request has been successfully retrieved.
-         * <LI>ERROR: An error has occured. It can be retrieved using getProblem()
-         * </UL>
-         * @return the current status of the GetCapabilities document
-         */
+     * Gets the current status of the GetCapabilities document.
+     * 
+     * <UL>
+     * <li>
+     * IN_PROGRESS: The thread is currently retrieving a request
+     * </li>
+     * <li>
+     * NOTCONNECTED: Thread has not attempt to retrieve document yet
+     * </li>
+     * <li>
+     * CONNECTED: The most recently issued request has been successfully
+     * retrieved.
+     * </li>
+     * <li>
+     * ERROR: An error has occured. It can be retrieved using getProblem()
+     * </li>
+     * </ul>
+     * 
+     *
+     * @return the current status of the GetCapabilities document
+     */
     public int getStatus() {
         if ((requestRetriever != null) && requestRetriever.isAlive()) {
             return IN_PROGRESS;
@@ -421,9 +500,9 @@ public class WebMapServer implements Catalog {
     }
 
     /**
-     * Get the getCapabilities document. If it is not already retrieved,
-     * then it shall be retrieved. If it returns null, there is an error
-     * which must be checked with getProblem()
+     * Get the getCapabilities document. If it is not already retrieved, then
+     * it shall be retrieved. If it returns null, there is an error which must
+     * be checked with getProblem()
      *
      * @return a WMT_MS_Capabilities, or null if there was an error
      */
@@ -434,8 +513,8 @@ public class WebMapServer implements Catalog {
                     requestRetriever.join();
 
                     if (capabilities == null) {
-                        issueRequest(specification.createGetCapabilitiesRequest(serverURL),
-                            false);
+                        issueRequest(specification.createGetCapabilitiesRequest(
+                                serverURL), false);
                     }
 
                     return capabilities;
@@ -502,7 +581,8 @@ public class WebMapServer implements Catalog {
 
                     currentResponse = new GetCapabilitiesResponse(parser,
                             document);
-                    capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
+                    capabilities = ((GetCapabilitiesResponse) currentResponse)
+                        .getCapabilities();
                 } catch (ParseCapabilitiesException e) {
                     problem = e;
                 } catch (IOException e) {
@@ -518,18 +598,19 @@ public class WebMapServer implements Catalog {
     }
 
     /**
-    * Utility method to return each layer that has a name.
-     * This method maintains no hierarchy at all.
+     * Utility method to return each layer that has a name. This method
+     * maintains no hierarchy at all.
+     *
      * @return A list of type Layer, each value has a it's name property set
-    */
+     */
     public List getNamedLayers() {
         List namedLayers = new ArrayList();
 
         Layer[] layers = capabilities.getLayers();
 
         for (int i = 0; i < layers.length; i++) {
-            if ((layers[i].getName() != null) &&
-                    (layers[i].getName().length() != 0)) {
+            if ((layers[i].getName() != null)
+                    && (layers[i].getName().length() != 0)) {
                 namedLayers.add(layers[i]);
             }
         }
@@ -623,7 +704,6 @@ public class WebMapServer implements Catalog {
      * Catalog Interface Methods
      **************************************************************************
      */
-    
     /* (non-Javadoc)
      * @see org.opengis.catalog.Catalog#query(org.opengis.catalog.QueryDefinition)
      */
@@ -637,7 +717,6 @@ public class WebMapServer implements Catalog {
      */
     public void add(CatalogEntry arg0) throws IllegalStateException {
         // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -645,26 +724,27 @@ public class WebMapServer implements Catalog {
      */
     public void remove(CatalogEntry arg0) throws IllegalStateException {
         // TODO Auto-generated method stub
-        
     }
 
     /**
-     * Returns an Iterator that can iterate through all of the layers in
-     * the capabilities. It flattens the hierarchy. Each element is of type Layer.
+     * Returns an Iterator that can iterate through all of the layers in the
+     * capabilities. It flattens the hierarchy. Each element is of type Layer.
+     *
      * @return an iterator that will iterate through the layers
      */
     public Iterator iterator() {
         ArrayList layers = new ArrayList();
-        
+
         for (int i = 0; i < capabilities.getLayers().length; i++) {
             Layer layer = capabilities.getLayers()[i];
-            
-            if (layer.getName() != null && layer.getName().length() != 0) { //$NON-NLS-1$
+
+            if ((layer.getName() != null) && (layer.getName().length() != 0)) { //$NON-NLS-1$
+
                 CatalogEntry entry = new WMSLayerCatalogEntry(this, layer);
                 layers.add(entry);
             }
         }
-        
+
         return layers.iterator();
     }
 }

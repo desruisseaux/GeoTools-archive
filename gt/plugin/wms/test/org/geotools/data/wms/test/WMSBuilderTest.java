@@ -1,31 +1,32 @@
 /*
- * Created on Aug 21, 2004
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.wms.test;
 
 import junit.framework.TestCase;
-
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSBuilder;
-
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 
-/**
- * @author Kefka
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class WMSBuilderTest extends TestCase {
     /*
      * @see TestCase#setUp()
@@ -72,11 +73,11 @@ public class WMSBuilderTest extends TestCase {
         assertEquals(capabilities.getVersion(), "1.1.1");
         assertEquals(capabilities.getService().getName(), "FakeService");
         assertEquals(capabilities.getService().getTitle(), "Test");
-        
+
         assertEquals(capabilities.getService().getLayerLimit(), 4);
         assertEquals(capabilities.getService().getMaxWidth(), 2000);
         assertEquals(capabilities.getService().getMaxHeight(), 1000);
-        
+
         assertEquals(capabilities.getRequest().getGetCapabilities().getGet(),
             new URL("http://get.com"));
         assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0],
@@ -88,7 +89,8 @@ public class WMSBuilderTest extends TestCase {
         BoundingBox bbox = (BoundingBox) capabilities.getLayers()[0].getBoundingBoxes()
                                                                     .get("bork");
         assertEquals(bbox.getMinX(), 1.0, 0.0);
-        
-        assertEquals(capabilities.getLayers()[0].getLatLonBoundingBox().getMaxX(), 100.0, 0.0);
+
+        assertEquals(capabilities.getLayers()[0].getLatLonBoundingBox().getMaxX(),
+            100.0, 0.0);
     }
 }

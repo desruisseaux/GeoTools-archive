@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,6 @@ package org.geotools.data.wms.request;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -26,17 +25,18 @@ import java.util.Properties;
 
 /**
  * Functionality for performing basic requests
+ *
  * @author Richard Gould
  */
 public class AbstractRequest {
-    /**
-     * Represents OGC Exception MIME types
-     */
+    /** Represents OGC Exception MIME types */
     public static final String EXCEPTION_XML = "application/vnd.ogc.se_xml";
     protected URL onlineResource;
     protected Properties properties;
 
     /**
+     * DOCUMENT ME!
+     *
      * @param onlineResource
      */
     public AbstractRequest(URL onlineResource) {

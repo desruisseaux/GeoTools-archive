@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,9 @@ import org.geotools.data.wms.WMSOperationType;
 
 
 /**
- * @author rgould
+ * DOCUMENT ME!
  *
- * Available WMS Operations are listed in a Request element.
+ * @author rgould Available WMS Operations are listed in a Request element.
  */
 public class WMSRequest {
     private WMSOperationType getCapabilities;
@@ -30,6 +30,8 @@ public class WMSRequest {
     private WMSOperationType getFeatureInfo;
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the getCapabilities.
      */
     public WMSOperationType getGetCapabilities() {
@@ -37,6 +39,8 @@ public class WMSRequest {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param getCapabilities The getCapabilities to set.
      */
     public void setGetCapabilities(WMSOperationType getCapabilities) {
@@ -44,6 +48,8 @@ public class WMSRequest {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the getFeatureInfo.
      */
     public WMSOperationType getGetFeatureInfo() {
@@ -51,6 +57,8 @@ public class WMSRequest {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param getFeatureInfo The getFeatureInfo to set.
      */
     public void setGetFeatureInfo(WMSOperationType getFeatureInfo) {
@@ -58,6 +66,8 @@ public class WMSRequest {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the getMap.
      */
     public WMSOperationType getGetMap() {
@@ -65,6 +75,8 @@ public class WMSRequest {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param getMap The getMap to set.
      */
     public void setGetMap(WMSOperationType getMap) {

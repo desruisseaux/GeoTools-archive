@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,6 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.ows.Layer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,19 +30,20 @@ import java.util.TreeSet;
  */
 public class Utils {
     /**
-     * Returns a list containing multiple SimpleLayer instances,
-     * representing a layer to be drawn and all available styles that
-     * can be used to draw it with. The Style value can be empty.
+     * Returns a list containing multiple SimpleLayer instances, representing a
+     * layer to be drawn and all available styles that can be used to draw it
+     * with. The Style value can be empty.
      *
-     * @param rootLayer The layer to start processing from
+     * @param layers The layer to start processing from
+     *
      * @return a list of type SimpleLayer
      */
     public static SimpleLayer[] findDrawableLayers(Layer[] layers) {
         List drawableLayers = new ArrayList();
 
         for (int i = 0; i < layers.length; i++) {
-            if ((layers[i].getName() == null) ||
-                    (layers[i].getName().length() == 0)) {
+            if ((layers[i].getName() == null)
+                    || (layers[i].getName().length() == 0)) {
                 continue;
             }
 

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,9 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.ParameterGroupDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -36,12 +31,14 @@ import java.util.Map;
 
 /**
  * GridCoverageExchangeFormat describing Capabilities of a Web Map Server.
+ * 
  * <p>
  * Unlike several file system Formats this represents the abilities of a
- * dynamic Server. In addition file formats are often called by client
- * code with the specification of a single URL for processing. WMSFormat
- * will need a series of Layers.
+ * dynamic Server. In addition file formats are often called by client code
+ * with the specification of a single URL for processing. WMSFormat will need
+ * a series of Layers.
  * </p>
+ *
  * @author Richard Gould, Refractions Researach
  */
 public class WMSFormat extends AbstractGridFormat {
@@ -51,12 +48,14 @@ public class WMSFormat extends AbstractGridFormat {
     /**
      * TODO: What does this mean? How can I have a WMSFormat without knowing
      * the capabilities of my Web Map Server?
+     * 
      * <p>
-     * It looks like a WMSFormat would need to be provided with
-     * capabilities during the call to accepts( Object ) and getReader( Object ).
-     * This still does not make sense to me as differnent Capabilties documents
+     * It looks like a WMSFormat would need to be provided with capabilities
+     * during the call to accepts( Object ) and getReader( Object ). This
+     * still does not make sense to me as differnent Capabilties documents
      * (for different specifications) should dictate the required parameters
      * described by getReadParameters().
+     * </p>
      */
     public WMSFormat() {
     }
@@ -85,8 +84,11 @@ public class WMSFormat extends AbstractGridFormat {
      */
 
     /**
-     * Web Map Servers are not capable of writing, as of version 1.1.1
-     * Returns null.
+     * Web Map Servers are not capable of writing, as of version 1.1.1 Returns
+     * null.
+     *
+     * @param destination DOCUMENT ME!
+     *
      * @return null
      */
     public GridCoverageWriter getWriter(Object destination) {
@@ -99,12 +101,19 @@ public class WMSFormat extends AbstractGridFormat {
 
     /**
      * Determines if the input can be processed or not.
+     * 
      * <p>
-     * Currently it accepts WebMapServers, WMT_MS_Capabilities, and URLs and Strings
-     * that point to the WMS's getCapabilities address.
+     * Currently it accepts WebMapServers, WMT_MS_Capabilities, and URLs and
+     * Strings that point to the WMS's getCapabilities address.
      * </p>
+     * 
      * <p>
      * Feedback: this seams a bit crazy?
+     * </p>
+     *
+     * @param input DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
     public boolean accepts(Object input) {
         if (input instanceof String) {
@@ -129,15 +138,18 @@ public class WMSFormat extends AbstractGridFormat {
     }
 
     /**
-     * Retrive parameter metadata describing parameters required by this
-     * Web Map Server.
+     * Retrive parameter metadata describing parameters required by this Web
+     * Map Server.
+     * 
      * <p>
      * This information should be specific enough to allow the creation of a
      * user interface.
      * </p>
+     *
+     * @return DOCUMENT ME!
      */
     public ParameterDescriptorGroup getReadParameters() {
-        GeneralParameterDescriptor params[] = new GeneralParameterDescriptor[16];
+        GeneralParameterDescriptor[] params = new GeneralParameterDescriptor[16];
 
         WMSParameterMaker maker = new WMSParameterMaker(capabilities);
         params[0] = maker.createVersionReadParam();
@@ -158,9 +170,10 @@ public class WMSFormat extends AbstractGridFormat {
         params[15] = maker.createTimeReadParam();
 
         Map properties = new HashMap();
-        properties.put( "name", capabilities.getService().getName() );
-        properties.put( "remarks", capabilities.getService().get_abstract() );
-        readParameters = new ParameterGroupDescriptor( properties, params );
+        properties.put("name", capabilities.getService().getName());
+        properties.put("remarks", capabilities.getService().get_abstract());
+        readParameters = new ParameterGroupDescriptor(properties, params);
+
         return readParameters;
     }
 }

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,18 +23,15 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WebMapServer;
-
 import org.jdom.JDOMException;
-
 import java.io.IOException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.security.InvalidParameterException;
 
 
 /**
+ * DOCUMENT ME!
  *
  * @author Richard Gould, Refractions Research
  */
@@ -124,6 +121,14 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 
     /**
      * WMS Specification does not permit writing!
+     *
+     * @param destination DOCUMENT ME!
+     * @param format DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws RuntimeException DOCUMENT ME!
      */
     public GridCoverageWriter getWriter(Object destination, Format format)
         throws IOException {

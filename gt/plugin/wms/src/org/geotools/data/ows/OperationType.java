@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ public class OperationType {
     private URL post;
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the formats.
      */
     public Object getFormats() {
@@ -32,6 +34,8 @@ public class OperationType {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param formats The formats to set.
      */
     public void setFormats(Object formats) {
@@ -39,6 +43,8 @@ public class OperationType {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the get.
      */
     public URL getGet() {
@@ -46,6 +52,8 @@ public class OperationType {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param get The get to set.
      */
     public void setGet(URL get) {
@@ -53,6 +61,8 @@ public class OperationType {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return Returns the post.
      */
     public URL getPost() {
@@ -60,6 +70,8 @@ public class OperationType {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param post The post to set.
      */
     public void setPost(URL post) {

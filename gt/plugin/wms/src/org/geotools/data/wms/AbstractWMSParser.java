@@ -37,10 +37,10 @@ import java.util.TreeSet;
  * Initial start at generating a Capabilities bean from a WMS GetCapabilities document.
  * <p>
  * Web Map Server specifications known at time of writing:
- * <li>WMS 1.0.0: @link http://www.opengis.org/docs/00-028.pdf
- * <li>WMS 1.1.0: @link http://www.opengis.org/docs/01-047r2.pdf
- * <li>WMS 1.1.1: @link http://www.opengis.org/docs/01-068r3.pdf
- * <li>WMS 1.3.0: @link http://portal.opengis.org/files/?artifact_id=4756
+ * <li>WMS 1.0.0: @link http://www.opengis.org/docs/00-028.pdf</li>
+ * <li>WMS 1.1.0: @link http://www.opengis.org/docs/01-047r2.pdf</li>
+ * <li>WMS 1.1.1: @link http://www.opengis.org/docs/01-068r3.pdf</li>
+ * <li>WMS 1.3.0: @link http://portal.opengis.org/files/?artifact_id=4756</li>
  * </p>
  *
  * @author Jody Garnett, Refractions Research

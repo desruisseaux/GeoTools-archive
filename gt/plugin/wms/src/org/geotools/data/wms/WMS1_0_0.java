@@ -148,8 +148,7 @@ public class WMS1_0_0 extends Specification {
      * <p>
      * WMS 1.0.0 does requests a bit differently:
      * <ul>
-     * <li>WMTVER=1.0.0
-     * <li>
+     * <li>WMTVER=1.0.0</li>
      * </p>
      */
     static public class GetCapsRequest extends GetCapabilitiesRequest {

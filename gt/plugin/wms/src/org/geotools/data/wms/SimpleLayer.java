@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,8 @@ import java.util.Set;
 
 
 /**
- * A simple bean that represents a layer name paired with a style name for use in requests.
+ * A simple bean that represents a layer name paired with a style name for use
+ * in requests.
  *
  * @author Richard Gould, Refractions Research Inc.
  */
@@ -30,6 +31,7 @@ public class SimpleLayer {
 
     /**
      * Name of style (limited to Set provided by validStyles).
+     * 
      * <p>
      * null is used to indicate the "default" style.
      * </p>
@@ -55,7 +57,6 @@ public class SimpleLayer {
      * SimpleLayer creation.
      *
      * @param name
-     * @param style
      * @param validStyles
      */
     public SimpleLayer(String name, Set validStyles) {
@@ -81,8 +82,9 @@ public class SimpleLayer {
     }
 
     /**
-     * Returns a Set of type <code>String</code> containing the names of
-     * all the styles that are valid for this layer.
+     * Returns a Set of type <code>String</code> containing the names of all
+     * the styles that are valid for this layer.
+     *
      * @return
      */
     public Set getValidStyles() {
