@@ -24,6 +24,10 @@ import javax.xml.parsers.SAXParserFactory;
  * @author dzwiers www.refractions.net
  */
 public class GMLParser2Test extends TestCase {
+    public void testBlank(){
+        // blank test ... lets it sit in the repository
+    }
+    
 //    public void testFMEPostalFeatures() throws SAXException, IOException {
 //        try {
 //            SAXParserFactory spf = SAXParserFactory.newInstance();

@@ -19,26 +19,6 @@ import java.util.logging.Level;
  * @author dzwiers www.refractions.net
  */
 public class WFSGetCapabilitiesTest extends TestCase {
-    public void testGaldos(){
-        try {            
-            String path = "galdos-http-getCapabilities.xml";
-
-            File f = TestData.file(this,path);
-            URI u = f.toURI();
-
-            Object doc = DocumentFactory.getInstance(u,null,Level.WARNING);
-            
-            assertNotNull("Document missing", doc);
-            System.out.println(doc);
-            
-        } catch (SAXException e) {
-            e.printStackTrace();
-            fail(e.toString());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-    }
     public void testGeomatics(){
         try {            
             String path = "geomatics-wfs-getCapabilities.xml";
@@ -62,6 +42,26 @@ public class WFSGetCapabilitiesTest extends TestCase {
     public void testMapServer(){
         try {            
             String path = "mswfs_gmap-getCapabilities.xml";
+
+            File f = TestData.file(this,path);
+            URI u = f.toURI();
+
+            Object doc = DocumentFactory.getInstance(u,null,Level.WARNING);
+            
+            assertNotNull("Document missing", doc);
+            System.out.println(doc);
+            
+        } catch (SAXException e) {
+            e.printStackTrace();
+            fail(e.toString());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail(e.toString());
+        }
+    }
+    public void testGaldos(){
+        try {            
+            String path = "galdos-http-getCapabilities.xml";
 
             File f = TestData.file(this,path);
             URI u = f.toURI();

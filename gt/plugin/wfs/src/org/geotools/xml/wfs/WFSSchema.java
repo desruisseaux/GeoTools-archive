@@ -301,9 +301,9 @@ public class WFSSchema implements Schema {
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-        if (uri.toString().toLowerCase().endsWith("WFS-basic.xsd")
-                || uri.toString().toLowerCase().endsWith("WFS-capabilities.xsd")
-                || uri.toString().toLowerCase().endsWith("WFS-transaction.xsd")) {
+        if (uri.toString().toLowerCase().endsWith("wfs-basic.xsd")
+                || uri.toString().toLowerCase().endsWith("wfs-capabilities.xsd")
+                || uri.toString().toLowerCase().endsWith("wfs-transaction.xsd")) {
             return true;
         }
 
