@@ -2446,7 +2446,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             }
 
             stroke2d = new BasicStroke(width / (float) scale, capCode,
-                    joinCode, (float) (Math.max(1, 10 / scale)), dashes,
+                    joinCode, (float) 1, dashes,
                     dashOffset / (float) scale);
         } else {
             if (width <= 1.0) {
@@ -2454,7 +2454,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             }
 
             stroke2d = new BasicStroke(width / (float) scale, capCode,
-                    joinCode, (float) (Math.max(1, 10 / scale)));
+                    joinCode, (float) 1);
         }
 
         graphic.setComposite(AlphaComposite.getInstance(
