@@ -12,6 +12,11 @@ import java.net.*;
 import com.vividsolutions.jts.geom.*;
 import java.io.*;
 import java.util.*;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.shp.*;
 import org.geotools.feature.*;
 
@@ -110,11 +115,18 @@ public class ShapefileTest extends TestCaseSupport {
     tmpFile.delete();
     
     // write features
-    ShapefileDataSource s = new ShapefileDataSource(tmpFile.toURL());
-    s.setFeatures(features);
+    ShapefileDataStoreFactory make = new ShapefileDataStoreFactory();
+    DataStore s = make.createDataStore( tmpFile.toURL() );
+    s.createSchema( type );
+    String typeName = type.getTypeName();
+    FeatureStore store = (FeatureStore) s.getFeatureSource( typeName );
     
-    s = new ShapefileDataSource(tmpFile.toURL());
-    FeatureCollection fc = s.getFeatures();
+    store.addFeatures( DataUtilities.reader( features ));
+    
+    s = new ShapefileDataStore( tmpFile.toURL() );
+    typeName = s.getTypeNames()[0];
+    FeatureSource source = s.getFeatureSource( typeName );
+    FeatureCollection fc = source.getFeatures().collection(); 
     
     ShapefileReadWriteTest.compare(features,fc);
   }
