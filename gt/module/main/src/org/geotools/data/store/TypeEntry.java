@@ -47,6 +47,27 @@ import com.vividsolutions.jts.geom.Envelope;
  * us off of AbstractDataStore. That is it should provide its own locking
  * and event notification.
  * </p>
+ * <p>
+ * There is a naming convention:
+ * <ul>
+ * <li> data access follows bean conventions: getTypeName(), getSchema()
+ * <li> resource access methods follow Collections conventions reader(), 
+ * writer(), etc...
+ * <li> overrrides are all protected and follow factory conventions:
+ *  createWriter(), createAppend(), createFeatureSource(),
+ *  createFeatureStore(), etc...
+ * </ul>
+ * <li>
+ * </p>
+ * <p>
+ * Feedback:
+ * <ul>
+ * <li>even notification yes
+ * <li>locking not - locking needs to be rejuggled
+ * <li>naming convention really helps when subclassing
+ * </ul>
+ * </p>
+ * 
  * @author jgarnett
  */
 final class TypeEntry implements CatalogEntry {
@@ -64,17 +85,10 @@ final class TypeEntry implements CatalogEntry {
     
     private FeatureListenerManager listeners = new FeatureListenerManager();
     
-    public TypeEntry( DataStore store, FeatureType schema, Map metadata ) {
+    public TypeEntry( DataStore parent, FeatureType schema, Map metadata ) {
         this.schema = schema;
         this.metadata = metadata;
-    }
-
-    public Object getResource() {
-        try {
-            return getFeatureSource();
-        } catch (IOException e) {
-            return null;
-        }
+        this.parent = parent;
     }
 
     /**
@@ -84,6 +98,14 @@ final class TypeEntry implements CatalogEntry {
      */
     public String getDataName() {
         return schema.getNamespace() + ":"+ schema.getTypeName();
+    }
+    
+    public Object resource() {
+        try {
+            return getFeatureSource();
+        } catch (IOException e) {
+            return null;
+        }
     }
     
     /**
