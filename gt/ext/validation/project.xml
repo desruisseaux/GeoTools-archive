@@ -99,6 +99,11 @@
       <type>test</type>
       <url>http://mockrunner.sourceforge.net/</url>
     </dependency>
+    <dependency>
+      <artifactId>shapefile</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.0-B6-DEV</version>
+    </dependency>
 
   </dependencies>
   <build>
