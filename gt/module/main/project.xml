@@ -256,6 +256,7 @@
             <include>**/*.xml</include>
             <include>**/*.wkt</include>
             <include>**/*.txt</include>
+            <include>**/*.xsd</include>
             <include>**/*.csv</include>
             <include>**/*.png</include>
             <include>**/*.gml</include>
