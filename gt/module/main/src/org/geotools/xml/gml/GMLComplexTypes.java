@@ -66,6 +66,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -6411,7 +6412,9 @@ public class GMLComplexTypes {
             return getAttributes(((Group)eg).getChild());
         case ElementGrouping.ELEMENT:
             // AttributeType
-            l.add(getAttribute((Element)eg));
+            Object o = getAttribute((Element)eg);
+        	if(o!=null)
+        	    l.add(o);
         	return l;
 
         case ElementGrouping.ALL:
@@ -6438,13 +6441,16 @@ public class GMLComplexTypes {
 //System.out.println(ct.getParent());
 
 			switch(ct.getChild().getGrouping()){
+			case ElementGrouping.SEQUENCE:
 			case ElementGrouping.CHOICE:
 			case ElementGrouping.ALL:
-			case ElementGrouping.SEQUENCE:
 			case ElementGrouping.GROUP:
 				List l =  getAttributes(ct.getChild());
-				if(l!=null)
-				return (AttributeType)l.get(0); // HACK
+				Iterator i = l==null?null:l.iterator();
+				if(i!=null && i.hasNext()){
+				    AttributeType att = (AttributeType)i.next(); // HACK
+				    return AttributeTypeFactory.newAttributeType(eg.getName(),att.getType(),att.isNillable());
+				}
 
 		}}
 	    	at = AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),eg.isNillable());

@@ -153,8 +153,8 @@ e.printStackTrace();
         spf.setValidating(false);
 
         try {
-            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+//            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+//            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             
             SAXParser sp = spf.newSAXParser();
             return sp;
