@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, 2004 Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
@@ -205,10 +205,7 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
      *      org.opengis.parameter.GeneralParameterValue[])
      */
-    public void write(GridCoverage coverage,
-        ParameterValueGroup parameters)
-        throws InvalidParameterNameException, InvalidParameterValueException, 
-            ParameterNotFoundException, IOException {
+    public void write(GridCoverage coverage, ParameterValueGroup parameters) throws IllegalArgumentException, IOException {
         setEnvironment( parameters );
         writeGridCoverage(coverage);
         mWriter.close();

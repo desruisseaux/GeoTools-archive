@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, 2004 Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import java.io.File;
 import java.net.URL;
@@ -87,18 +87,26 @@ public class ArcGridFormat extends AbstractGridFormat {
      * @see org.geotools.data.GridFormatFactorySpi#accepts(java.net.URL)
      */
     public boolean accepts(Object input) {
+        
+        String pathname = null;
+        if (input instanceof String) {
+            pathname = (new File((String)input)).getName() ; 
+        }
         if (input instanceof File) {
-            File f = (File) input;
-            if (f.getName().endsWith(".asc"))
-                return true;
+            pathname = ((File)input).getName();
         }
         if (input instanceof URL) {
             URL url = (URL) input;
-            String pathname = url.getFile();
-            if (pathname.endsWith(".asc"))
-                return true;
+            pathname = url.getFile();
         }
-        return false;
+
+        if (pathname != null && 
+            (pathname.endsWith(".asc") || pathname.endsWith(".asc.gz")) ||
+            (pathname.endsWith(".ASC") || pathname.endsWith(".ASC.GZ"))) {
+             return true;
+        } else {
+            return false;
+        }
     }
 
 }

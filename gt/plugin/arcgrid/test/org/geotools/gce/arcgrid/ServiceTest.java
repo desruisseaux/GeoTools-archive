@@ -1,4 +1,4 @@
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 /*
  * GmlSuite.java
@@ -8,7 +8,7 @@ package org.geotools.data.arcgrid;
  */
 import java.util.Iterator;
 
-import org.geotools.data.arcgrid.ArcGridFormatFactory;
+import org.geotools.gce.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 

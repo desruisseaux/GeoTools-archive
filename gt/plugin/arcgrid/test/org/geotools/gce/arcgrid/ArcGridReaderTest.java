@@ -1,11 +1,11 @@
 /*
  * Created on Apr 23, 2004
  */
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import java.net.URL;
 
-import org.geotools.data.arcgrid.ArcGridFormatFactory;
+import org.geotools.gce.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.resources.TestData;
@@ -85,6 +85,10 @@ public class ArcGridReaderTest extends TestCaseSupport {
         compress.setValue( true );
         
 //        params.createValue();
+    }
+    
+    public static final void main(String[] args) throws Exception {
+        junit.textui.TestRunner.run(suite(ArcGridReaderTest.class));
     }
 
 }

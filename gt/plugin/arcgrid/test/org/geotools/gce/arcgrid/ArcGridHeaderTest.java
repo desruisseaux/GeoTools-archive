@@ -5,11 +5,11 @@
  * Created on 12 February 2002, 21:27
  */
 
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import java.net.URL;
 
-import org.geotools.data.arcgrid.ArcGridRaster;
+import org.geotools.gce.arcgrid.ArcGridRaster;
 import org.geotools.resources.TestData;
 
 /**

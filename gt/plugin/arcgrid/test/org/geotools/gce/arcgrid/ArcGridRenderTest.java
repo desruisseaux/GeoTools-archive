@@ -20,7 +20,7 @@
  *
  * Created on 12 February 2002, 21:27
  */
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import java.awt.image.Raster;
 import java.io.FileNotFoundException;

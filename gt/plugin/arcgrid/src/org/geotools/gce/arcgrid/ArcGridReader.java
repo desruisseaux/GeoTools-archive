@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, 2004 Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcgrid;
+package org.geotools.gce.arcgrid;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * This class can read a arc grid data source and create a grid coverage from
+ * This class can read an arc grid data source and create a grid coverage from
  * the data.
  * 
  * @author jeichar
@@ -49,15 +49,12 @@ public class ArcGridReader implements GridCoverageReader {
 
     private Reader mReader;
 
-    boolean compress = false;
-    boolean GRASS = false;
-    /*
-    static class InternalParam{
-        boolean compress = false;
-        boolean GRASSFormatEnabled = false;
-    }    
-    private InternalParam params=new InternalParam();
-    */
+    /** value of the compress parameter, true if the file is gzipped*/
+    private boolean compress = false;
+    
+    /** value of the GRASS parameter, true if the file was created by grass*/
+    private boolean GRASS = false;
+
     private IOExchange mExchange = IOExchange.getIOExchange();
 
     /** Default color ramp */
@@ -73,6 +70,7 @@ public class ArcGridReader implements GridCoverageReader {
     /** The raster read from the data file */
     private ArcGridRaster arcGridRaster = null;
 
+    /** A name for the grid coverage */
     private String name;
 
     /**
@@ -138,10 +136,7 @@ public class ArcGridReader implements GridCoverageReader {
      * 
      * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
      */
-    public GridCoverage read( ParameterValueGroup params )
-            throws InvalidParameterNameException,
-            InvalidParameterValueException, ParameterNotFoundException,
-            IOException {
+    public GridCoverage read(ParameterValueGroup params) throws IllegalArgumentException, IOException {
         setEnvironment("ArcGrid", params );
 
         return getGridCoverage();
@@ -197,55 +192,8 @@ public class ArcGridReader implements GridCoverageReader {
             mReader= mExchange.getGZIPReader(mSource);
         else
             mReader = mExchange.getReader(mSource);
-
     }
-    boolean parseBoolean( ParameterValueGroup params, String name ){
-        if( params == null ){
-            throw new InvalidParameterValueException(
-                    "A Parameter group was expected",
-                    null, null );            
-        }
-        ParameterValue targetInfo = params.parameter( name );
-        if( targetInfo == null ){
-            throw new InvalidParameterNameException( name, "Not a ArcGrid paramerter" );
-        }
-        org.opengis.parameter.ParameterValue target = params.parameter( name );
-        if (target == null ){
-            throw new InvalidParameterValueException(
-                    "Parameter "+name+ "is requried",
-                    null, null ); 
-        }
-        return target.booleanValue();        
-    }
-    /*
-    static void parseParameter(ParameterValue parameter, 
-            InternalParam params)
-            throws InvalidParameterNameException,
-            InvalidParameterValueException {
-        try {
-            if (parameter.getDescriptor().getName(null).equals(
-                    "GRASSFormatEnabled")) {
-
-                params.GRASSFormatEnabled = parameter.booleanValue();
-
-                return;
-            } else if (parameter.getDescriptor().getName(null).equals(
-                    "Compressed")) {
-                params.compress = parameter.booleanValue();
-                return;
-            }
-        } catch (InvalidParameterTypeException e) {
-            throw new InvalidParameterValueException(
-                    "A Boolean value was expected", parameter.getDescriptor()
-                            .getName(null), 0);
-        }
-
-        throw new InvalidParameterNameException(parameter.getDescriptor()
-                .getName(null)
-                + " is not a valid parameter for ArcGrid", null);
-    }
-    */
-    
+        
     /**
      * Returns the ArcGridRaster read by the datasource. Use it only for
      * specific needs, it's not a datasource independent method.
