@@ -270,7 +270,7 @@
     </dependency>
     <dependency>
       <id>geoapi</id>
-      <version>20050211</version>
+      <version>20050213</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <!-- <dependency>
