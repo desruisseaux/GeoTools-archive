@@ -6,16 +6,16 @@
   <id>vpf</id>
   <currentVersion>1.0.0</currentVersion>
   <package>org.geotools.vpf</package>
-  <shortDescription>vpf module</shortDescription>
+  <shortDescription>VPF Plugin</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
-  <description>vpf module</description>
+  <description>VPF Plugin</description>
   <mailingLists />
   <developers>
     <developer>
       <name>Jeff Yutzler</name>
-      <id>kobit</id>
+      <id>jyutzler</id>
       <email>jeff@ionicenterprise.com</email>
-      <organization>IONIC</organization>
+      <organization>IONIC Enterprise Inc.</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
