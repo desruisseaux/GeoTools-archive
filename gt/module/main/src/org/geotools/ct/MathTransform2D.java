@@ -54,6 +54,9 @@ import javax.media.jai.PerspectiveTransform; // For JavaDoc
  *
  * @see AffineTransform
  * @see PerspectiveTransform
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.MathTransform2D}
+ *             in the <code>org.opengis.referencing.operation</code> package.
  */
 public interface MathTransform2D extends MathTransform {
     /**

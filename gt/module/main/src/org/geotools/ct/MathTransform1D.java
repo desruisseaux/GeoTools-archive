@@ -36,6 +36,9 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.MathTransform1D}
+ *             in the <code>org.opengis.referencing.operation</code> package.
  */
 public interface MathTransform1D extends MathTransform {
     /**

@@ -20,10 +20,12 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import javax.units.Unit;
+import java.util.Collections;
 
 // Parsing
 import java.util.Locale;
@@ -31,155 +33,221 @@ import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.ParseException;
 
+// Units
+import javax.units.Unit;
+import javax.units.SI;
+import javax.units.NonSI;
+
 // OpenGIS dependencies
-import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * Parser for <cite>Well Know Text</cite> (WKT).
+ * Parser for
+ * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+ * Known Text</cite> (WKT)</A>.
  * Instances of this class are thread-safe.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
+ * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
 public abstract class Parser extends AbstractParser {
     /**
-     * The factory to use for creating coordinate reference systems.
-     */                    
-    private CRSFactory crsFactory;
+     * The factory to use for creating {@linkplain Datum datum}.
+     */
+    private final DatumFactory datumFactory;
+
+    /**
+     * The factory to use for creating {@linkplain CoordinateSystem coordinate systems}.
+     */
+    private final CSFactory csFactory;
+
+    /**
+     * The factory to use for creating {@linkplain CoordinateReferenceSystem
+     * coordinate reference systems}.
+     */
+    private final CRSFactory crsFactory;
+
+    /**
+     * The list of {@linkplain AxisDirection axis directions} from their name.
+     */
+    private final Map directions;
     
     /**
-     * Construct a parser for the specified locale.
+     * Construct a parser for the specified locale using default factories.
      *
-     * @param locale     The locale for parsing and formatting numbers.
-     * @param crsFactory The factory for constructing reference coordinate systems.
+     * @param locale The locale for parsing and formatting numbers.
      */
-    public Parser(final Locale locale, final CRSFactory crsFactory) {
-        super(locale);
-        this.crsFactory = crsFactory;
+    public Parser(final Locale locale) {
+        this(locale,
+             FactoryFinder.getDatumFactory(),
+             FactoryFinder.getCSFactory(),
+             FactoryFinder.getCRSFactory());
     }
-//
-//    /**
-//     * Parses an <strong>optional</strong> "AUTHORITY" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * AUTHORITY["<name>", "<code>"]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @param  parentName The name of the parent object being parsed.
-//     * @return The name with the autority code, or <code>parent</code>
-//     *         if no "AUTHORITY" element has been found. Never null.
-//     */
-//    private static CharSequence parseAuthority(final Element parent, final CharSequence parentName)
-//        throws ParseException 
-//    {
-//        final Element element = parent.pullOptionalElement("AUTHORITY");
-//        if (element == null) {
-//            return parentName;
-//        }
-//        final String name = element.pullString("name");        
-//        final String code = element.pullString("code");
-//        final InfoProperties.Named info = new InfoProperties.Named(parentName.toString());
-//        info.put("authority",     name);
-//        info.put("authorityCode", code);
-//        element.close();
-//        return info;
-//    }
-//
-//    /**
-//     * Parses an "UNIT" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * UNIT["<name>", <conversion factor> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @param  unit The contextual unit. Usually {@link Unit#DEGREE} or {@link Unit#METRE}.
-//     * @return The "UNIT" element as an {@link Unit} object.
-//     * @throws ParseException if the "UNIT" can't be parsed.
-//     */
-//    private static Unit parseUnit(final Element parent, final Unit unit)
-//        throws ParseException
-//    {
-//        Element element = parent.pullElement("UNIT");
-//        CharSequence  name = element.pullString("name");
-//        double      factor = element.pullDouble("factor");
-//        name = parseAuthority(element, name);
-//        element.close();
-//        return unit.scale(factor);
-//    }
-//
-//    /**
-//     * Parses an "AXIS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * AXIS["<name>", NORTH | SOUTH | EAST | WEST | UP | DOWN | OTHER]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @param  required <code>true</code> if the axis is mandatory,
-//     *         or <code>false</code> if it is optional.
-//     * @return The "AXIS" element as a {@link AxisInfo} object, or <code>null</code>
-//     *         if the axis was not required and there is no axis object.
-//     * @throws ParseException if the "AXIS" element can't be parsed.
-//     */
-//    private AxisInfo parseAxis(final Element parent, final boolean required)
-//        throws ParseException 
-//    {
-//        final Element element;
-//        if (required) {
-//            element = parent.pullElement("AXIS");
-//        } else {
-//            element = parent.pullOptionalElement("AXIS");
-//            if (element == null) {
-//                return null;
-//            }
-//        }
-//        final String            name = element.pullString     ("name");
-//        final Element orientation = element.pullVoidElement("orientation");
-//        element.close();
-//        try {
-//            return new AxisInfo(name, AxisOrientation.getEnum(orientation.keyword, locale));
-//        } catch (NoSuchElementException exception) {
-//            throw element.parseFailed(exception,
-//                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
-//        }
-//    }
-//
-//    /**
-//     * Parses a "PRIMEM" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * PRIMEM["<name>", <longitude> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @param  unit The contextual unit.
-//     * @return The "PRIMEM" element as a {@link PrimeMeridian} object.
-//     * @throws ParseException if the "PRIMEM" element can't be parsed.
-//     */
-//    private PrimeMeridian parsePrimem(final Element parent, Unit unit) throws ParseException {
-//        Element   element = parent.pullElement("PRIMEM");
-//        CharSequence name = element.pullString("name");
-//        double  longitude = element.pullDouble("longitude");
-//        name = parseAuthority(element, name);
-//        element.close();
-//        try {
-//            return crsFactory.createPrimeMeridian(name, unit, longitude);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
+    
+    /**
+     * Construct a parser for the specified locale using the specified factories.
+     *
+     * @param locale       The locale for parsing and formatting numbers.
+     * @param datumFactroy The factory to use for creating {@linkplain Datum datum}.
+     * @param csFactory    The factory to use for creating {@linkplain CoordinateSystem
+     *                     coordinate systems}.
+     * @param crsFactory   The factory to use for creating {@linkplain CoordinateReferenceSystem
+     *                     coordinate reference systems}.
+     */
+    public Parser(final Locale             locale,
+                  final DatumFactory datumFactory,
+                  final CSFactory       csFactory,
+                  final CRSFactory     crsFactory)
+    {
+        super(locale);
+        this.datumFactory = datumFactory;
+        this. csFactory   =    csFactory;
+        this.crsFactory   =   crsFactory;
+
+        final AxisDirection[] values = AxisDirection.values();
+        directions = new HashMap((int)Math.ceil((values.length+1)/0.75f), 0.75f);
+        for (int i=0; i<values.length; i++) {
+            directions.put(values[i].name().trim().toUpperCase(), values[i]);
+        }
+    }
+
+    /**
+     * Parses an <strong>optional</strong> "AUTHORITY" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * AUTHORITY["<name>", "<code>"]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  parentName The name of the parent object being parsed.
+     * @return A properties map with the parent name and the optional autority code.
+     * @throws ParseException if the "AUTHORITY" can't be parsed.
+     */
+    private static Map parseAuthority(final Element parent, final String parentName)
+            throws ParseException
+    {
+        final Map properties = new HashMap(7);
+        properties.put("name", parentName);
+        final Element element = parent.pullOptionalElement("AUTHORITY");
+        if (element != null) {
+            properties.put("authority", element.pullString("name"));
+            properties.put("code",      element.pullString("code"));
+            element.close();
+        }
+        return properties;
+    }
+
+    /**
+     * Parses an "UNIT" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * UNIT["<name>", <conversion factor> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  unit The contextual unit. Usually {@link NonSI#DEGREE_ANGLE} or {@link SI#METRE}.
+     * @return The "UNIT" element as an {@link Unit} object.
+     * @throws ParseException if the "UNIT" can't be parsed.
+     *
+     * @todo Authority code is currently ignored. We may consider to create a subclass of
+     *       {@link Unit} which implements {@link Info} in a future version.
+     */
+    private static Unit parseUnit(final Element parent, final Unit unit)
+            throws ParseException
+    {
+        final Element element = parent.pullElement("UNIT");
+        final String     name = element.pullString("name");
+        final double   factor = element.pullDouble("factor");
+        final Map  properties = parseAuthority(element, name);
+        element.close();
+        return unit.multiply(factor);
+    }
+
+    /**
+     * Parses an "AXIS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * AXIS["<name>", NORTH | SOUTH | EAST | WEST | UP | DOWN | OTHER]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  unit The contextual unit. Usually {@link NonSI#DEGREE_ANGLE} or {@link SI#METRE}.
+     * @param  required <code>true</code> if the axis is mandatory,
+     *         or <code>false</code> if it is optional.
+     * @return The "AXIS" element as a {@link CoordinateSystemAxis} object, or <code>null</code>
+     *         if the axis was not required and there is no axis object.
+     * @throws ParseException if the "AXIS" element can't be parsed.
+     */
+    private CoordinateSystemAxis parseAxis(final Element parent, final Unit unit,
+                                           final boolean required)
+            throws ParseException
+    {
+        final Element element;
+        if (required) {
+            element = parent.pullElement("AXIS");
+        } else {
+            element = parent.pullOptionalElement("AXIS");
+            if (element == null) {
+                return null;
+            }
+        }
+        final String         name = element.pullString     ("name");
+        final Element orientation = element.pullVoidElement("orientation");
+        element.close();
+        final AxisDirection direction = (AxisDirection) directions.get(orientation.keyword.trim().toUpperCase());
+        if (direction == null) {
+            throw element.parseFailed(null,
+                  Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
+        }
+        try {
+            return csFactory.createCoordinateSystemAxis(Collections.singletonMap("name", name),
+                                                        name, direction, unit);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Parses a "PRIMEM" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * PRIMEM["<name>", <longitude> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  unit The contextual unit.
+     * @return The "PRIMEM" element as a {@link PrimeMeridian} object.
+     * @throws ParseException if the "PRIMEM" element can't be parsed.
+     */
+    private PrimeMeridian parsePrimem(final Element parent, Unit unit) throws ParseException {
+        Element   element = parent.pullElement("PRIMEM");
+        String       name = element.pullString("name");
+        double  longitude = element.pullDouble("longitude");
+        Map    properties = parseAuthority(element, name);
+        element.close();
+        try {
+            return datumFactory.createPrimeMeridian(properties, longitude, unit);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
 //    /**
 //     * Parses an <strong>optional</strong> "TOWGS84" element.
 //     * This element has the following pattern:
@@ -211,36 +279,36 @@ public abstract class Parser extends AbstractParser {
 //        element.close();
 //        return info;
 //    }
-//
-//    /**
-//     * Parses a "SPHEROID" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * SPHEROID["<name>", <semi-major axis>, <inverse flattening> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "SPHEROID" element as an {@link Ellipsoid} object.
-//     * @throws ParseException if the "SPHEROID" element can't be parsed.
-//     */
-//    private Ellipsoid parseSpheroid(final Element parent) throws ParseException {       
-//        Element          element = parent.pullElement("SPHEROID");
-//        CharSequence        name = element.pullString("name");
-//        double     semiMajorAxis = element.pullDouble("semiMajorAxis");
-//        double inverseFlattening = element.pullDouble("inverseFlattening");
-//        name = parseAuthority(element, name);
-//        element.close();
-//        if (inverseFlattening == 0) {
-//            // Inverse flattening nul is an OGC convention for a sphere.
-//            inverseFlattening = Double.POSITIVE_INFINITY;
-//        }
-//        try {
-//            return crsFactory.createFlattenedSphere(name, semiMajorAxis, inverseFlattening, Unit.METRE);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
+
+    /**
+     * Parses a "SPHEROID" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * SPHEROID["<name>", <semi-major axis>, <inverse flattening> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "SPHEROID" element as an {@link Ellipsoid} object.
+     * @throws ParseException if the "SPHEROID" element can't be parsed.
+     */
+    private Ellipsoid parseSpheroid(final Element parent) throws ParseException {       
+        Element          element = parent.pullElement("SPHEROID");
+        String              name = element.pullString("name");
+        double     semiMajorAxis = element.pullDouble("semiMajorAxis");
+        double inverseFlattening = element.pullDouble("inverseFlattening");
+        Map           properties = parseAuthority(element, name);
+        element.close();
+        if (inverseFlattening == 0) {
+            // Inverse flattening nul is an OGC convention for a sphere.
+            inverseFlattening = Double.POSITIVE_INFINITY;
+        }
+        try {
+            return datumFactory.createFlattenedSphere(properties, semiMajorAxis, inverseFlattening, SI.METER);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
 //    /**
 //     * Parses a "PROJECTION" element. This element has the following pattern:
 //     *
@@ -312,124 +380,123 @@ public abstract class Parser extends AbstractParser {
 //            throw element.parseFailed(exception, null);
 //        }
 //    }        
-//
-//    /**
-//     * Parses a "VERT_DATUM" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * VERT_DATUM["<name>", <datum type> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "VERT_DATUM" element as a {@link VerticalDatum} object.
-//     * @throws ParseException if the "VERT_DATUM" element can't be parsed.
-//     */
-//    private VerticalDatum parseVertDatum(final Element parent) throws ParseException {        
-//        Element   element = parent.pullElement("VERT_DATUM");
-//        CharSequence name = element.pullString ("name");
-//        final int   datum = element.pullInteger("datum");
-//        name = parseAuthority(element, name);
-//        element.close();
-//        final DatumType.Vertical type;
-//        try {
-//            type = (DatumType.Vertical) DatumType.getEnum(datum);
-//        } catch (RuntimeException exception) {
-//            // Include 'NoSuchElementException' and 'ClassCastException'
-//            throw element.parseFailed(exception,
-//                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
-//        }
-//        try {
-//            return crsFactory.createVerticalDatum(name, type);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//    
-//    /**
-//     * Parses a "LOCAL_DATUM" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * LOCAL_DATUM["<name>", <datum type> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "LOCAL_DATUM" element as a {@link LocalDatum} object.
-//     * @throws ParseException if the "LOCAL_DATUM" element can't be parsed.
-//     */
-//    private LocalDatum parseLocalDatum(final Element parent) throws ParseException {
-//        Element   element = parent.pullElement("LOCAL_DATUM");
-//        CharSequence name = element.pullString ("name");
-//        final int   datum = element.pullInteger("datum");
-//        name = parseAuthority(element, name);
-//        element.close();
-//        final DatumType.Local type;
-//        try {
-//            type = (DatumType.Local) DatumType.getEnum(datum);
-//        } catch (RuntimeException exception) {
-//            // Include 'NoSuchElementException' and 'ClassCastException'
-//            throw element.parseFailed(exception,
-//                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
-//        }
-//        try {
-//            return crsFactory.createLocalDatum(name, type);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
-//    /**
-//     * Parses a "LOCAL_CS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * LOCAL_CS["<name>", <local datum>, <unit>, <axis>, {,<axis>}* {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "LOCAL_CS" element as a {@link LocalCoordinateSystem} object.
-//     * @throws ParseException if the "LOCAL_CS" element can't be parsed.
-//     */
-//    private LocalCoordinateSystem parseLocalCS(final Element parent) throws ParseException {        
-//        Element    element = parent.pullElement("LOCAL_CS");
-//        CharSequence  name = element.pullString("name");
-//        LocalDatum   datum = parseLocalDatum(element);
-//        Unit          unit = parseUnit(element, Unit.METRE);
-//        AxisInfo      axis = parseAxis(element, true);
-//        List          list = new ArrayList();
-//        do {
-//            list.add(axis);
-//            axis = parseAxis(element, false);
-//        }
-//        while (axis != null);
-//        name = parseAuthority(element, name);
-//        element.close();
-//        AxisInfo[] array = (AxisInfo[]) list.toArray(new AxisInfo[list.size()]);
-//        try {
-//            return crsFactory.createLocalCoordinateSystem(name, datum, unit, array);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }        
-//
-//    /**
-//     * Parses a "GEOCCS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * GEOCCS["<name>", <datum>, <prime meridian>,  <linear unit>
-//     *        {,<axis> ,<axis> ,<axis>} {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "GEOCCS" element as a {@link GeocentricCoordinateSystem} object.
-//     * @throws ParseException if the "GEOCCS" element can't be parsed.
-//     */
-//    private GeocentricCoordinateSystem parseGeoCCS(final Element parent) throws ParseException {        
+
+    /**
+     * Parses a "VERT_DATUM" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * VERT_DATUM["<name>", <datum type> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "VERT_DATUM" element as a {@link VerticalDatum} object.
+     * @throws ParseException if the "VERT_DATUM" element can't be parsed.
+     */
+    private VerticalDatum parseVertDatum(final Element parent) throws ParseException {        
+        Element element = parent.pullElement("VERT_DATUM");
+        String     name = element.pullString ("name");
+        final int datum = element.pullInteger("datum");
+        Map  properties = parseAuthority(element, name);
+        element.close();
+        final VerticalDatumType type = org.geotools.referencing.datum.VerticalDatum
+                                       .getVerticalDatumTypeFromLegacyCode(datum);
+        if (type == null) {
+            throw element.parseFailed(null,
+                  Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
+        }
+        try {
+            return datumFactory.createVerticalDatum(properties, type);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Parses a "LOCAL_DATUM" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * LOCAL_DATUM["<name>", <datum type> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "LOCAL_DATUM" element as an {@link EngineeringDatum} object.
+     * @throws ParseException if the "LOCAL_DATUM" element can't be parsed.
+     *
+     * @todo The vertical datum type is currently ignored.
+     */
+    private EngineeringDatum parseLocalDatum(final Element parent) throws ParseException {
+        Element element = parent.pullElement("LOCAL_DATUM");
+        String     name = element.pullString ("name");
+        final int datum = element.pullInteger("datum");
+        Map  properties = parseAuthority(element, name);
+        element.close();
+        try {
+            return datumFactory.createEngineeringDatum(properties);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Parses a "LOCAL_CS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * LOCAL_CS["<name>", <local datum>, <unit>, <axis>, {,<axis>}* {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "LOCAL_CS" element as an {@link EngineeringCRS} object.
+     * @throws ParseException if the "LOCAL_CS" element can't be parsed.
+     *
+     * @todo The coordinate system used is always a Geotools implementation, since we don't
+     *       know which method to invokes in the {@link CSFactory} (is it a cartesian
+     *       coordinate system? a spherical one? etc.).
+     */
+    private EngineeringCRS parseLocalCS(final Element parent) throws ParseException {        
+        Element           element = parent.pullElement("LOCAL_CS");
+        String               name = element.pullString("name");
+        EngineeringDatum    datum = parseLocalDatum(element);
+        Unit                 unit = parseUnit(element, SI.METER);
+        CoordinateSystemAxis axis = parseAxis(element, unit, true);
+        List                 list = new ArrayList();
+        do {
+            list.add(axis);
+            axis = parseAxis(element, unit, false);
+        } while (axis != null);
+        Map properties = parseAuthority(element, name);
+        element.close();
+
+        final CoordinateSystem cs;
+        cs = new org.geotools.referencing.cs.CoordinateSystem(
+                 Collections.singletonMap("name", name),
+                 (CoordinateSystemAxis[]) list.toArray(new CoordinateSystemAxis[list.size()]));
+        try {
+            return crsFactory.createEngineeringCRS(properties, datum, cs);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }        
+
+    /**
+     * Parses a "GEOCCS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * GEOCCS["<name>", <datum>, <prime meridian>,  <linear unit>
+     *        {,<axis> ,<axis> ,<axis>} {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "GEOCCS" element as a {@link GeocentricCRS} object.
+     * @throws ParseException if the "GEOCCS" element can't be parsed.
+     */
+//    private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {        
 //        Element        element = parent.pullElement("GEOCCS");
-//        CharSequence      name = element.pullString("name");
+//        String            name = element.pullString("name");
 //        HorizontalDatum  datum = parseDatum (element);
-//        PrimeMeridian meridian = parsePrimem(element, Unit.DEGREE);
-//        Unit              unit = parseUnit  (element, Unit.METRE);
+//        PrimeMeridian meridian = parsePrimem(element, NonSI.DEGREE_ANGLE);
+//        Unit              unit = parseUnit  (element, SI.METER);
 //        AxisInfo[] axes = new AxisInfo[3];
 //        axes[0] = parseAxis(element, false);
 //        if (axes[0] != null) {
@@ -447,40 +514,41 @@ public abstract class Parser extends AbstractParser {
 //            throw element.parseFailed(exception, null);
 //        }
 //    }        
-//
-//    /**
-//     * Parses an <strong>optional</strong> "VERT_CS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * VERT_CS["<name>", <vert datum>, <linear unit>, {<axis>,} {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "VERT_CS" element as a {@link VerticalCoordinateSystem} object.
-//     * @throws ParseException if the "VERT_CS" element can't be parsed.
-//     */
-//    private VerticalCoordinateSystem parseVertCS(final Element parent) throws ParseException { 
-//        final Element element = parent.pullElement("VERT_CS");
-//        if (element == null) {
-//            return null;
-//        }
-//        CharSequence   name = element.pullString("name");
-//        VerticalDatum datum = parseVertDatum(element);
-//        Unit           unit = parseUnit(element, Unit.METRE);
-//        AxisInfo       axis = parseAxis(element, false);
-//        name = parseAuthority(element, name);
-//        element.close();
-//        if (axis == null) {
-//            axis = AxisInfo.ALTITUDE;
-//        }
-//        try {
-//            return crsFactory.createVerticalCoordinateSystem(name, datum, unit, axis);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
+
+    /**
+     * Parses an <strong>optional</strong> "VERT_CS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * VERT_CS["<name>", <vert datum>, <linear unit>, {<axis>,} {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "VERT_CS" element as a {@link VerticalCRS} object.
+     * @throws ParseException if the "VERT_CS" element can't be parsed.
+     */
+    private VerticalCRS parseVertCS(final Element parent) throws ParseException { 
+        final Element element = parent.pullElement("VERT_CS");
+        if (element == null) {
+            return null;
+        }
+        String               name = element.pullString("name");
+        VerticalDatum       datum = parseVertDatum(element);
+        Unit                 unit = parseUnit(element, SI.METER);
+        CoordinateSystemAxis axis = parseAxis(element, unit, false);
+        Map            properties = parseAuthority(element, name);
+        element.close();
+        if (axis == null) {
+            axis = org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE;
+        }
+        try {
+            return crsFactory.createVerticalCRS(properties, datum,
+                    csFactory.createVerticalCS(Collections.singletonMap("name", name), axis));
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
 //    /**
 //     * Parses a "GEOGCS" element. This element has the following pattern:
 //     *

@@ -108,11 +108,6 @@ import org.opengis.metadata.citation.Citation;
  */
 public class Factory implements CSFactory, DatumFactory, CRSFactory {
     /**
-     * The citation for Geotools 2.
-     */
-    private static final Citation VENDOR = new org.geotools.metadata.citation.Citation("Geotools 2");
-
-    /**
      * Construct a default factory. This method is public in order to allows instantiations
      * from a {@linkplain javax.imageio.spi.ServiceRegistry service registry}. Users should
      * not instantiate this factory directly, but use one of the following lines instead:
@@ -126,15 +121,204 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
     }
 
     /**
-     * Returns the vendor responsible for creating this factory implementation.
-     * Many implementations may be available for the same factory interface.
-     * The default implementation returns "Geotools 2".
+     * Returns the vendor responsible for creating this factory implementation. Many implementations
+     * may be available for the same factory interface. The default implementation returns
+     * {@linkplain org.geotools.metadata.citation.Citation.GEOTOOLS Geotools}.
      *
      * @return The vendor for this factory implementation.
      */
     public Citation getVendor() {
-        return VENDOR;
+        return org.geotools.metadata.citation.Citation.GEOTOOLS;
     }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                         ////////
+    ////////                        D A T U M   F A C T O R Y                        ////////
+    ////////                                                                         ////////
+    /////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Creates an ellipsoid from radius values.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  semiMajorAxis Equatorial radius in supplied linear units.
+     * @param  semiMinorAxis Polar radius in supplied linear units.
+     * @param  unit Linear units of ellipsoid axes.
+     * @throws FactoryException if the object creation failed.
+     */
+    public Ellipsoid createEllipsoid(Map    properties,
+                                     double semiMajorAxis,
+                                     double semiMinorAxis,
+                                     Unit   unit) throws FactoryException
+    {
+        Ellipsoid ellipsoid;
+        try {
+            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createEllipsoid(
+                        properties, semiMajorAxis, semiMinorAxis, unit);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
+        return ellipsoid;
+    }
+
+    /**
+     * Creates an ellipsoid from an major radius, and inverse flattening.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  semiMajorAxis Equatorial radius in supplied linear units.
+     * @param  inverseFlattening Eccentricity of ellipsoid.
+     * @param  unit Linear units of major axis.
+     * @throws FactoryException if the object creation failed.
+     */
+    public Ellipsoid createFlattenedSphere(Map    properties,
+                                           double semiMajorAxis,
+                                           double inverseFlattening,
+                                           Unit   unit) throws FactoryException
+    {
+        Ellipsoid ellipsoid;
+        try {
+            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createFlattenedSphere(
+                        properties, semiMajorAxis, inverseFlattening, unit);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
+        return ellipsoid;
+    }
+
+    /**
+     * Creates a prime meridian, relative to Greenwich. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  longitude Longitude of prime meridian in supplied angular units East of Greenwich.
+     * @param  angularUnit Angular units of longitude.
+     * @throws FactoryException if the object creation failed.
+     */
+    public PrimeMeridian createPrimeMeridian(Map    properties,
+                                             double longitude,
+                                             Unit   angularUnit) throws FactoryException
+    {
+        PrimeMeridian meridian;
+        try {
+            meridian = new org.geotools.referencing.datum.PrimeMeridian(properties, longitude, angularUnit);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        meridian = (PrimeMeridian) canonicalize(meridian);
+        return meridian;
+    }
+
+    /**
+     * Creates geodetic datum from ellipsoid and (optionaly) Bursa-Wolf parameters. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  ellipsoid Ellipsoid to use in new geodetic datum.
+     * @param  primeMeridian Prime meridian to use in new geodetic datum.
+     * @throws FactoryException if the object creation failed.
+     */
+    public GeodeticDatum createGeodeticDatum(Map           properties,
+                                             Ellipsoid     ellipsoid,
+                                             PrimeMeridian primeMeridian) throws FactoryException
+    {
+        GeodeticDatum datum;
+        try {
+            datum = new org.geotools.referencing.datum.GeodeticDatum(properties, ellipsoid, primeMeridian);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        datum = (GeodeticDatum) canonicalize(datum);
+        return datum;
+    }
+
+    /**
+     * Creates a vertical datum from an enumerated type value.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  type The type of this vertical datum (often “geoidal”).
+     * @throws FactoryException if the object creation failed.
+     */
+    public VerticalDatum createVerticalDatum(Map         properties,
+                                             VerticalDatumType type) throws FactoryException
+    {
+        VerticalDatum datum;
+        try {
+            datum = new org.geotools.referencing.datum.VerticalDatum(properties, type);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        datum = (VerticalDatum) canonicalize(datum);
+        return datum;
+    }
+
+    /**
+     * Creates a temporal datum from an enumerated type value.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  origin The date and time origin of this temporal datum.
+     * @throws FactoryException if the object creation failed.
+     */
+    public TemporalDatum createTemporalDatum(Map properties,
+                                             Date origin) throws FactoryException
+    {
+        TemporalDatum datum;
+        try {
+            datum = new org.geotools.referencing.datum.TemporalDatum(properties, origin);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        datum = (TemporalDatum) canonicalize(datum);
+        return datum;
+    }
+
+    /**
+     * Creates an engineering datum.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @throws FactoryException if the object creation failed.
+     */
+    public EngineeringDatum createEngineeringDatum(Map properties) throws FactoryException
+    {
+        EngineeringDatum datum;
+        try {
+            datum = new org.geotools.referencing.datum.EngineeringDatum(properties);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        datum = (EngineeringDatum) canonicalize(datum);
+        return datum;
+    }
+
+    /**
+     * Creates an image datum.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  pixelInCell Specification of the way the image grid is associated
+     *         with the image data attributes.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ImageDatum createImageDatum(Map         properties,
+                                       PixelInCell pixelInCell) throws FactoryException
+    {
+        ImageDatum datum;
+        try {
+            datum = new org.geotools.referencing.datum.ImageDatum(properties, pixelInCell);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        datum = (ImageDatum) canonicalize(datum);
+        return datum;
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                         ////////
+    ////////            C O O R D I N A T E   S Y S T E M   F A C T O R Y            ////////
+    ////////                                                                         ////////
+    /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Creates a coordinate system axis from an abbreviation and a unit.
@@ -362,177 +546,59 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
     }
 
     /**
-     * Creates an ellipsoid from radius values.
+     * Creates a two dimensional user defined coordinate system from the given pair of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  semiMajorAxis Equatorial radius in supplied linear units.
-     * @param  semiMinorAxis Polar radius in supplied linear units.
-     * @param  unit Linear units of ellipsoid axes.
+     * @param  axis0 The first  axis.
+     * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public Ellipsoid createEllipsoid(Map    properties,
-                                     double semiMajorAxis,
-                                     double semiMinorAxis,
-                                     Unit   unit) throws FactoryException
+    public UserDefinedCS createUserDefinedCS(Map             properties,
+                                             CoordinateSystemAxis axis0,
+                                             CoordinateSystemAxis axis1) throws FactoryException
     {
-        Ellipsoid ellipsoid;
+        UserDefinedCS cs;
         try {
-            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createEllipsoid(
-                        properties, semiMajorAxis, semiMinorAxis, unit);
+            cs = new org.geotools.referencing.cs.UserDefinedCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
-        return ellipsoid;
+        cs = (UserDefinedCS) canonicalize(cs);
+        return cs;
     }
 
     /**
-     * Creates an ellipsoid from an major radius, and inverse flattening.
+     * Creates a three dimensional user defined coordinate system from the given set of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  semiMajorAxis Equatorial radius in supplied linear units.
-     * @param  inverseFlattening Eccentricity of ellipsoid.
-     * @param  unit Linear units of major axis.
+     * @param  axis0 The first  axis.
+     * @param  axis1 The second axis.
+     * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public Ellipsoid createFlattenedSphere(Map    properties,
-                                           double semiMajorAxis,
-                                           double inverseFlattening,
-                                           Unit   unit) throws FactoryException
+    public UserDefinedCS createUserDefinedCS(Map             properties,
+                                             CoordinateSystemAxis axis0,
+                                             CoordinateSystemAxis axis1,
+                                             CoordinateSystemAxis axis2) throws FactoryException
     {
-        Ellipsoid ellipsoid;
+        UserDefinedCS cs;
         try {
-            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createFlattenedSphere(
-                        properties, semiMajorAxis, inverseFlattening, unit);
+            cs = new org.geotools.referencing.cs.UserDefinedCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
-        return ellipsoid;
+        cs = (UserDefinedCS) canonicalize(cs);
+        return cs;
     }
 
-    /**
-     * Creates a prime meridian, relative to Greenwich. 
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  longitude Longitude of prime meridian in supplied angular units East of Greenwich.
-     * @param  angularUnit Angular units of longitude.
-     * @throws FactoryException if the object creation failed.
-     */
-    public PrimeMeridian createPrimeMeridian(Map    properties,
-                                             double longitude,
-                                             Unit   angularUnit) throws FactoryException
-    {
-        PrimeMeridian meridian;
-        try {
-            meridian = new org.geotools.referencing.datum.PrimeMeridian(properties, longitude, angularUnit);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        meridian = (PrimeMeridian) canonicalize(meridian);
-        return meridian;
-    }
 
-    /**
-     * Creates geodetic datum from ellipsoid and (optionaly) Bursa-Wolf parameters. 
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  ellipsoid Ellipsoid to use in new geodetic datum.
-     * @param  primeMeridian Prime meridian to use in new geodetic datum.
-     * @throws FactoryException if the object creation failed.
-     */
-    public GeodeticDatum createGeodeticDatum(Map           properties,
-                                             Ellipsoid     ellipsoid,
-                                             PrimeMeridian primeMeridian) throws FactoryException
-    {
-        GeodeticDatum datum;
-        try {
-            datum = new org.geotools.referencing.datum.GeodeticDatum(properties, ellipsoid, primeMeridian);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        datum = (GeodeticDatum) canonicalize(datum);
-        return datum;
-    }
 
-    /**
-     * Creates a vertical datum from an enumerated type value.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  type The type of this vertical datum (often “geoidal”).
-     * @throws FactoryException if the object creation failed.
-     */
-    public VerticalDatum createVerticalDatum(Map         properties,
-                                             VerticalDatumType type) throws FactoryException
-    {
-        VerticalDatum datum;
-        try {
-            datum = new org.geotools.referencing.datum.VerticalDatum(properties, type);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        datum = (VerticalDatum) canonicalize(datum);
-        return datum;
-    }
+    /////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                         ////////
+    ////////  C O O R D I N A T E   R E F E R E N C E   S Y S T E M   F A C T O R Y  ////////
+    ////////                                                                         ////////
+    /////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Creates a temporal datum from an enumerated type value.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  origin The date and time origin of this temporal datum.
-     * @throws FactoryException if the object creation failed.
-     */
-    public TemporalDatum createTemporalDatum(Map properties,
-                                             Date origin) throws FactoryException
-    {
-        TemporalDatum datum;
-        try {
-            datum = new org.geotools.referencing.datum.TemporalDatum(properties, origin);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        datum = (TemporalDatum) canonicalize(datum);
-        return datum;
-    }
-
-    /**
-     * Creates an engineering datum.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @throws FactoryException if the object creation failed.
-     */
-    public EngineeringDatum createEngineeringDatum(Map properties) throws FactoryException
-    {
-        EngineeringDatum datum;
-        try {
-            datum = new org.geotools.referencing.datum.EngineeringDatum(properties);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        datum = (EngineeringDatum) canonicalize(datum);
-        return datum;
-    }
-
-    /**
-     * Creates an image datum.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  pixelInCell Specification of the way the image grid is associated
-     *         with the image data attributes.
-     * @throws FactoryException if the object creation failed.
-     */
-    public ImageDatum createImageDatum(Map         properties,
-                                       PixelInCell pixelInCell) throws FactoryException
-    {
-        ImageDatum datum;
-        try {
-            datum = new org.geotools.referencing.datum.ImageDatum(properties, pixelInCell);
-        } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        }
-        datum = (ImageDatum) canonicalize(datum);
-        return datum;
-    }
 
     /**
      * Creates a compound coordinate reference system from an ordered

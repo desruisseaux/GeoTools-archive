@@ -35,15 +35,17 @@ import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
- * The identity transform. The data are only copied without any transformation.
- * This class is used for identity transform of dimension greater than 2.
- * For 2D identity transform, {@link java.awt.geom.AffineTransform} is already
- * optimized. For 1D transform, {@link IdentityTransform1D} is the class to use.
+ * The identity transform. The data are only copied without any transformation. This class is
+ * used for identity transform of dimension greater than 2. For 1D and 2D identity transforms,
+ * {@link LinearTransform1D} and {@link java.awt.geom.AffineTransform} already provide their
+ * own optimisations.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class IdentityTransform extends AbstractMathTransform implements LinearTransform, Serializable {
+final class IdentityTransform extends AbstractMathTransform
+                           implements LinearTransform, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -55,14 +57,15 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
     private final int dimension;
 
     /**
-     * Pool of previously created identity transforms.
+     * Identity transforms for dimensions ranging from to 0 to 7.
+     * Elements in this array will be created only when first requested.
      */
     private static final LinearTransform[] POOL = new LinearTransform[8];
     
     /**
      * Construct an identity transform of the specified dimension.
      */
-    private IdentityTransform(final int dimension) {
+    protected IdentityTransform(final int dimension) {
         this.dimension = dimension;
     }
 

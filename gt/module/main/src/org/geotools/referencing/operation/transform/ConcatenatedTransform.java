@@ -22,6 +22,7 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.io.Serializable;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
@@ -38,6 +39,7 @@ import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.geometry.GeneralDirectPosition;
 
 
@@ -69,7 +71,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * But it is serialized in order to avoid rounding error if the inverse
      * transform is serialized instead of the original one.
      */
-    private ConcatenatedTransform inverse;
+    private MathTransform inverse;
     
     /**
      * Construct a concatenated transform. This constructor is for subclasses only. To
@@ -89,6 +91,42 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                     getName(transform1), getName(transform2)));
         }
     }
+    
+    /**
+     * Returns the underlying matrix for the specified transform,
+     * or <code>null</code> if the matrix is unavailable.
+     */
+    private static GeneralMatrix getMatrix(final MathTransform transform) {
+        if (transform instanceof LinearTransform) {
+            final Matrix matrix = ((LinearTransform) transform).getMatrix();
+            if (matrix instanceof GeneralMatrix) {
+                return (GeneralMatrix) matrix;
+            } else {
+                return new GeneralMatrix(matrix);
+            }
+        }
+        if (transform instanceof AffineTransform) {
+            return new GeneralMatrix((AffineTransform) transform);
+        }
+        return null;
+    }
+    
+    /**
+     * Tests if one math transform is the inverse of the other. This implementation
+     * can't detect every case. It just detect the case when <code>tr2</code> is an
+     * instance of {@link AbstractMathTransform.Inverse}.
+     *
+     * @todo We could make this test more general (just compare with tr2.inverse(),
+     *       no matter if it is an instance of AbstractMathTransform.Inverse or not,
+     *       and catch the exception if one is thrown). Would it be too expensive to
+     *       create inconditionnaly the inverse transform?
+     */
+    private static boolean areInverse(final MathTransform tr1, final MathTransform tr2) {
+        if (tr2 instanceof AbstractMathTransform.Inverse) {
+            return tr1.equals(((AbstractMathTransform.Inverse) tr2).inverse());
+        }
+        return false;
+    }
 
     /**
      * Construct a new concatenated transform.  This factory method checks for step transforms
@@ -102,10 +140,80 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * @param tr1 The first math transform.
      * @param tr2 The second math transform.
      * @return    The concatenated transform.
+     *
+     * @todo We could add one more optimisation: if one transform is a matrix and the
+     *       other transform is a PassThroughTransform, and if the matrix as 0 elements
+     *       for all rows matching the PassThrough sub-transform, then we can get ride
+     *       of the whole PassThroughTransform object.
      */
-    public static ConcatenatedTransform create(final MathTransform tr1,
-                                               final MathTransform tr2)
-    {
+    public static MathTransform create(MathTransform tr1, MathTransform tr2) {
+        if (tr1.isIdentity()) return tr2;
+        if (tr2.isIdentity()) return tr1;
+
+        // If both transforms use matrix, then we can create
+        // a single transform using the concatenated matrix.
+        final GeneralMatrix matrix1 = getMatrix(tr1);
+        if (matrix1 != null) {
+            final GeneralMatrix matrix2 = getMatrix(tr2);
+            if (matrix2 != null) {
+                // Compute "matrix = matrix2 * matrix1". Reuse an existing matrix object
+                // if possible, which is always the case when both matrix are square.
+                final int numRow = matrix2.getNumRow();
+                final int numCol = matrix1.getNumCol();
+                final GeneralMatrix matrix;
+                if (numCol == matrix2.getNumCol()) {
+                    matrix = matrix2;
+                    matrix2.mul(matrix1);
+                } else {
+                    matrix = new GeneralMatrix(numRow, numCol);
+                    matrix.mul(matrix2, matrix1);
+                }
+                // May not be really affine, but work anyway...
+                // This call will detect and optimize the special
+                // case where an 'AffineTransform' can be used.
+                return ProjectiveTransform.create(matrix);
+            }
+        }
+
+        // If one transform is the inverse of the
+        // other, returns the identity transform.
+        if (areInverse(tr1, tr2) || areInverse(tr2, tr1)) {
+            assert tr1.getDimSource() == tr2.getDimTarget();
+            assert tr1.getDimTarget() == tr2.getDimSource();
+            return IdentityTransform.create(tr1.getDimSource());
+        }
+
+        // If one or both math transform are instance of ConcatenatedTransform,
+        // then maybe it is possible to efficiently concatenate tr1 or tr2 with
+        // one of step transforms. Try that...
+        if (tr1 instanceof ConcatenatedTransform) {
+            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr1;
+            tr1 = ctr.transform1;
+            tr2 = create(ctr.transform2, tr2);
+        }
+        if (tr2 instanceof ConcatenatedTransform) {
+            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr2;
+            tr1 = create(tr1, ctr.transform1);
+            tr2 = ctr.transform2;
+        }
+
+        // Before to create a general ConcatenatedTransform object, give a
+        // chance to AbstractMathTransform to returns an optimized object.
+        if (tr1 instanceof AbstractMathTransform) {
+            final MathTransform optimized = ((AbstractMathTransform) tr1).concatenate(tr2, false);
+            if (optimized != null) {
+                return optimized;
+            }
+        }
+        if (tr2 instanceof AbstractMathTransform) {
+            final MathTransform optimized = ((AbstractMathTransform) tr2).concatenate(tr1, true);
+            if (optimized != null) {
+                return optimized;
+            }
+        }
+
+        // Can't avoid the creation of a ConcatenatedTransform object.
+        // Check for the type to create (1D, 2D, general case...)
         final int dimSource = tr1.getDimSource();
         final int dimTarget = tr2.getDimTarget();
         //
@@ -227,7 +335,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         assert isValid();
         if (inverse == null) {
             inverse = create(transform2.inverse(), transform1.inverse());
-            inverse.inverse = this;
+            if (inverse instanceof ConcatenatedTransform) {
+                ((ConcatenatedTransform) inverse).inverse = this;
+            }
         }
         return inverse;
     }

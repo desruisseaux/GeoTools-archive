@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -107,7 +95,7 @@ import org.geotools.resources.image.JAIUtilities;
  * systems mean, it is not necessary or desirable for a math transform object
  * to keep information on its source and target coordinate systems.
  *
- * @version $Id: MathTransformFactory.java,v 1.29 2004/03/08 11:30:56 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
@@ -119,6 +107,9 @@ import org.geotools.resources.image.JAIUtilities;
  *                <code>AbstractMathTransform</code>'s sub-classes. It would simplify
  *                <code>MathTransformFactory</code> but would introduces dependencies
  *                to the factory right inside the abstract math transform.
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.MathTransformFactory}
+ *             in the <code>org.geotools.referencing.operation</code> package.
  */
 public class MathTransformFactory {
     /**
@@ -863,7 +854,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
      * place to check for non-implemented OpenGIS methods (just check for methods throwing
      * {@link UnsupportedOperationException}). This class is suitable for RMI use.
      *
-     * @version $Id: MathTransformFactory.java,v 1.29 2004/03/08 11:30:56 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Export extends UnicastRemoteObject implements CT_MathTransformFactory {

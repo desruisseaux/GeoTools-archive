@@ -132,19 +132,17 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * The matrix should be affine, but it will not be verified.
      */
     public static LinearTransform create(final Matrix matrix) {
-        final int dimension = matrix.getNumRow();
-        if (dimension == matrix.getNumCol()) {
+        final int dimension = matrix.getNumRow()-1;
+        if (dimension == matrix.getNumCol()-1) {
+            if (matrix.isIdentity()) {
+                return IdentityTransform.create(dimension);
+            }
             final GeneralMatrix m = wrap(matrix);
             if (m.isAffine()) {
                 switch (dimension) {
-                    case 2: return LinearTransform1D.create(m.getElement(0,0), m.getElement(0,1));
-                    case 3: return create(m.toAffineTransform2D());
+                    case 1: return LinearTransform1D.create(m.getElement(0,0), m.getElement(0,1));
+                    case 2: return create(m.toAffineTransform2D());
                 }
-            }
-            if (matrix.isIdentity()) {
-                // The 1D and 2D cases have their own optimized identity transform,
-                // which is why this test must come after the 'isAffine()' test.
-                return IdentityTransform.create(dimension);
             }
         }
         return new ProjectiveTransform(matrix);
@@ -156,6 +154,9 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * <A HREF="http://java.sun.com/products/java-media/2D/index.jsp">Java2D</A>.
      */
     public static LinearTransform create(final AffineTransform matrix) {
+        if (matrix.isIdentity()) {
+            return IdentityTransform.create(2);
+        }
         return new AffineTransform2D(matrix);
     }
     

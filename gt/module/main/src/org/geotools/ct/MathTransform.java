@@ -68,6 +68,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see PerspectiveTransform
  * @see Transform3D
  * @see MathTransform2D
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.MathTransform}
+ *             in the <code>org.opengis.referencing.operation</code> package.
  */
 public interface MathTransform {
     /**

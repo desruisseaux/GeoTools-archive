@@ -16,22 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.cs;
 
@@ -56,7 +40,7 @@ import java.io.ObjectInputStream;
  * this map is used only internally by {@link Info} objects,   users don't need to
  * know those short-comming.
  *
- * @version $Id: InfoProperties.java,v 1.5 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 class InfoProperties implements Map, Serializable {
@@ -282,8 +266,7 @@ class InfoProperties implements Map, Serializable {
         private final String name;
 
         /**
-         * Constructs an <code>InfoProperties</code> with
-         * the specified name.
+         * Constructs an <code>InfoProperties</code> with the specified name.
          *
          * @param name the name.
          */

@@ -34,6 +34,8 @@ import java.text.ParseException;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @todo Use the symbols from a <code>Symbols</code>, which should be shared with {@link Formatter}.
  */
 public abstract class AbstractParser extends Format {
     /**

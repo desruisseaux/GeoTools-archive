@@ -61,6 +61,9 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
+ *
+ * @todo Symbols are hard-coded as static constants for now. They should be declared in a
+ *       <code>Symbols</code> class, which should be shared with {@link AbstractParser}.
  */
 public class Formatter {
     /**
