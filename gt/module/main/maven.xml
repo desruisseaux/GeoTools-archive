@@ -12,7 +12,7 @@
       <include name="org/geotools/cs/*Export.class"/>
       <include name="org/geotools/ct/*Export.class"/>
       <include name="org/geotools/cv/*Export.class"/>
-   
+      <exclude name="META-INF/services/org.opengis.referencing.crs.CRSAuthorityFactory "/>
     </rmic>
   </postGoal> 
 </project>
