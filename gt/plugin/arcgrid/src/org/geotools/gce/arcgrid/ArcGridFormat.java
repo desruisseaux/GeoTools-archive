@@ -16,26 +16,30 @@
  */
 package org.geotools.gce.arcgrid;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.data.coverage.grid.stream.IOExchange;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import java.io.Reader;
-import org.geotools.data.coverage.grid.stream.IOExchange;
-import java.io.IOException;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+
+import java.net.URL;
+
+import java.util.HashMap;
 
 /**A simple implementation of the Arc Grid Format.
  *
@@ -43,209 +47,227 @@ import org.opengis.spatialschema.geometry.Envelope;
  *  @author jeichar
  *  @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
-public class ArcGridFormat
-    extends AbstractGridFormat
-    implements Format {
+public class ArcGridFormat extends AbstractGridFormat implements Format {
+    /**Authority factory for CRS*/
+    private static CRSAuthorityFactory factory = null;
+    public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
+            CoordinateReferenceSystem.class, //calss of the object we will pass
+            null, //list of valid values not provided
+            ArcGridFormat.getDefaultCRS() //default value
+        );
 
-  /**Creates an instance and sets the metadata.
-   *
-   */
-  public ArcGridFormat() {
-    setInfo();
-  }
+    /** Indicates whether the arcgrid data is compressed with GZIP */
+    public static final ParameterDescriptor COMPRESS = new ParameterDescriptor("Compressed",
+            "Indicates whether the arcgrid data is compressed with GZIP",
+            Boolean.FALSE, true);
 
-  /**Sets the metadata information.
-   *
-   *
-   */
-  private void setInfo() {
-    HashMap info = new HashMap();
-    info.put("name", "ArcGrid");
-    info.put("description", "Arc Grid Coverage Format");
-    info.put("vendor", "Geotools");
-    info.put("docURL", "http://gdal.velocet.ca/projects/aigrid/index.html");
-    info.put("version", "1.0");
-    mInfo = info;
+    /** Indicates whether the arcgrid is in GRASS format */
+    public static final ParameterDescriptor GRASS = new ParameterDescriptor("GRASS",
+            "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true);
 
-    //reading parameters
-    readParameters = new ParameterGroup(new ParameterDescriptorGroup(mInfo,
-        new GeneralParameterDescriptor[] {GRASS, COMPRESS,CRS}));
-    //reading parameters
-    writeParameters = new ParameterGroup(new ParameterDescriptorGroup(mInfo,
-        new GeneralParameterDescriptor[] {GRASS, COMPRESS}));
-  }
-  public static final ParameterDescriptor CRS = new ParameterDescriptor(
-              "crs",
-              CoordinateReferenceSystem.class, //calss of the object we will pass
-              null, //list of valid values not provided
-              ArcGridFormat.getDefaultCRS()//default value
-                                                    );
-  /** Indicates whether the arcgrid data is compressed with GZIP */
-  public static final ParameterDescriptor COMPRESS = new ParameterDescriptor(
-      "Compressed",
-      "Indicates whether the arcgrid data is compressed with GZIP",
-      Boolean.FALSE, true);
-
-  /** Indicates whether the arcgrid is in GRASS format */
-  public static final ParameterDescriptor GRASS = new ParameterDescriptor(
-      "GRASS", "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true);
-
-  /**
-   * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object source)
-   */
-  public GridCoverageReader getReader(Object source) {
-    return new ArcGridReader(source);
-  }
-
-  /**
-   * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object destination)
-   */
-  public GridCoverageWriter getWriter(Object destination) {
-    return new ArcGridWriter(destination);
-  }
-
-  /**
-   * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object input)
-   */
-  public boolean accepts(Object input) {
-    boolean compress = false;
-    boolean GRASS = false;
-    Reader fakeReader = null;
-    IOExchange mExchange = IOExchange.getIOExchange();
-
-    //getting the path of this object
-    String pathname = null;
-    if (input instanceof String) {
-
-      pathname = (new File( (String) input)).getName();
-    }
-    else
-    if (input instanceof File) {
-      pathname = ( (File) input).getName();
-    }
-    else
-    if (input instanceof URL) {
-      URL url = (URL) input;
-      pathname = url.getFile();
-    }
-    else { //not acceptable!
-      return false;
+    /**Creates an instance and sets the metadata.
+     *
+     */
+    public ArcGridFormat() {
+        setInfo();
     }
 
+    /**Sets the metadata information.
+     *
+     *
+     */
+    private void setInfo() {
+        HashMap info = new HashMap();
 
+        info.put("name", "ArcGrid");
+        info.put("description", "Arc Grid Coverage Format");
+        info.put("vendor", "Geotools");
+        info.put("docURL", "http://gdal.velocet.ca/projects/aigrid/index.html");
+        info.put("version", "1.0");
+        mInfo = info;
 
-    //trying to check the header
-    try {
-      fakeReader = mExchange.getGZIPReader(input);
-      //it is compressed
-      compress = true;
-    }
-    catch (Exception e) {
-      //if I get here I hope it is not compressed
-      compress = false;
-    }
-    finally {
-      fakeReader = null;
+        //reading parameters
+        readParameters = new ParameterGroup(new ParameterDescriptorGroup(
+                    mInfo,
+                    new GeneralParameterDescriptor[] { GRASS, COMPRESS, CRS }));
+
+        //reading parameters
+        writeParameters = new ParameterGroup(new ParameterDescriptorGroup(
+                    mInfo, new GeneralParameterDescriptor[] { GRASS, COMPRESS }));
     }
 
-    //GRASS, arcgrid or not acceptable?
-    for (int i = 0; i < 3; i++) {
-      try {
-        if (i < 2) {
-          if (compress) {
-            fakeReader = mExchange.getGZIPReader(input);
-          }
-          else {
-            fakeReader = mExchange.getReader(input);
-          }
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object source)
+     */
+    public GridCoverageReader getReader(Object source) {
+        return new ArcGridReader(source);
+    }
+
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object destination)
+     */
+    public GridCoverageWriter getWriter(Object destination) {
+        return new ArcGridWriter(destination);
+    }
+
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object input)
+     */
+    public boolean accepts(Object input) {
+        boolean compress = false;
+        boolean GRASS = false;
+        Reader fakeReader = null;
+        IOExchange mExchange = IOExchange.getIOExchange();
+
+        //getting the path of this object
+        String pathname = null;
+
+        if (input instanceof String) {
+            pathname = (new File((String) input)).getName();
         }
-        switch (i) {
-          case 0: //reading an arcgrid ascii grid
-            ArcGridRaster acgRaster = new ArcGridRaster(fakeReader, compress);
-            //trying to parse the header
-            acgRaster.parseHeader();
-            fakeReader = null;
-            //ok it is an arcgrid ascii grid (well, it should be!)
-            return true;
-          case 1:
-            GRASSArcGridRaster gAscgRaster = new GRASSArcGridRaster(fakeReader,
-                compress);
-            //trying to parse the header
-            gAscgRaster.parseHeader();
-            fakeReader = null;
-            //ok it is an arcgrid ascii grid (well, it should be!)
-            return true;
-          default:
+        else if (input instanceof File) {
+            pathname = ((File) input).getName();
+        }
+        else if (input instanceof URL) {
+            URL url = (URL) input;
+
+            pathname = url.getFile();
+        }
+        else { //not acceptable!
+
             return false;
         }
 
-      }
-      catch (IOException e) {
-        fakeReader = null;
+        //trying to check the header
+        try {
+            fakeReader = mExchange.getGZIPReader(input);
 
-      }
+            //it is compressed
+            compress = true;
+        }
+        catch (Exception e) {
+            //if I get here I hope it is not compressed
+            compress = false;
+        }
+        finally {
+            fakeReader = null;
+        }
+
+        //GRASS, arcgrid or not acceptable?
+        for (int i = 0; i < 3; i++) {
+            try {
+                if (i < 2) {
+                    if (compress) {
+                        fakeReader = mExchange.getGZIPReader(input);
+                    }
+                    else {
+                        fakeReader = mExchange.getReader(input);
+                    }
+                }
+
+                switch (i) {
+                case 0: //reading an arcgrid ascii grid
+
+                    ArcGridRaster acgRaster = new ArcGridRaster(fakeReader,
+                            compress);
+
+                    //trying to parse the header
+                    acgRaster.parseHeader();
+                    fakeReader = null;
+
+                    //ok it is an arcgrid ascii grid (well, it should be!)
+                    return true;
+
+                case 1:
+
+                    GRASSArcGridRaster gAscgRaster = new GRASSArcGridRaster(fakeReader,
+                            compress);
+
+                    //trying to parse the header
+                    gAscgRaster.parseHeader();
+                    fakeReader = null;
+
+                    //ok it is an arcgrid ascii grid (well, it should be!)
+                    return true;
+
+                default:
+                    return false;
+                }
+            }
+            catch (IOException e) {
+                fakeReader = null;
+            }
+        }
+
+        return false;
     }
-    return false;
-  }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getName()
-   */
-  public String getName() {
-    return (String)this.mInfo.get("name");
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getName()
+     */
+    public String getName() {
+        return (String) this.mInfo.get("name");
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getDescription()
-   */
-  public String getDescription() {
-    return (String)this.mInfo.get("description");
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getDescription()
+     */
+    public String getDescription() {
+        return (String) this.mInfo.get("description");
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getVendor()
-   */
-  public String getVendor() {
-    return (String)this.mInfo.get("vendor");
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getVendor()
+     */
+    public String getVendor() {
+        return (String) this.mInfo.get("vendor");
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getDocURL()
-   */
-  public String getDocURL() {
-    return (String)this.mInfo.get("docURL");
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getDocURL()
+     */
+    public String getDocURL() {
+        return (String) this.mInfo.get("docURL");
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getVersion()
-   */
-  public String getVersion() {
-    return (String)this.mInfo.get("version");
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getVersion()
+     */
+    public String getVersion() {
+        return (String) this.mInfo.get("version");
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getReadParameters()
-   */
-  public ParameterValueGroup getReadParameters() {
-    return readParameters;
-  }
+    /**
+     * @see org.opengis.coverage.grid.Format#getReadParameters()
+     */
+    public ParameterValueGroup getReadParameters() {
+        return readParameters;
+    }
 
-  /**
-   * @see org.opengis.coverage.grid.Format#getWriteParameters()
-   */
-  public ParameterValueGroup getWriteParameters() {
-    return writeParameters;
-  }
-  /**
-   * getDefaultCRS
-   */
-  static CoordinateReferenceSystem getDefaultCRS() {
-      try{
-          return org.geotools.referencing.CRS.decode("EPSG:4326");
-      }
-      catch(org.opengis.referencing.NoSuchAuthorityCodeException e)
-      {
-          return GeographicCRS.WGS84;
-      }
+    /**
+     * @see org.opengis.coverage.grid.Format#getWriteParameters()
+     */
+    public ParameterValueGroup getWriteParameters() {
+        return writeParameters;
+    }
+
+    /**getDefaultCRS
+     *
+     * This method provides the user with a default crs WGS84
+     */
+    static CoordinateReferenceSystem getDefaultCRS() {
+        try {
+            if (ArcGridFormat.factory != null) {
+                return factory.createCoordinateReferenceSystem("4326");
+            }
+            else {
+                factory = FactoryFinder.getCRSAuthorityFactory("EPSG");
+
+                return factory.createCoordinateReferenceSystem("4326");
+            }
+        }
+        catch (Exception e) {
+            return GeographicCRS.WGS84;
+        }
     }
 }
