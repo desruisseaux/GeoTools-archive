@@ -82,8 +82,18 @@ public class RenderedGeometries extends RenderedLayer {
     /**
      * Set to <code>true</code> for debuging. This line may be set from the command line.
      */
-    private static final boolean DEBUG =
-        System.getProperty("org.geotools.j2d.debug", "false").equalsIgnoreCase("true");
+    private static final boolean DEBUG;
+    static {
+        boolean debug;
+        try {
+            debug = System.getProperty("org.geotools.j2d.debug", "false").equalsIgnoreCase("true");
+        } catch (SecurityException exception) {
+            // The renderer may be running in an Applet, in which case we
+            // can't read properties. Assumes we are not in debugging mode.
+            debug = false;
+        }
+        DEBUG = debug;
+    }
     
     /**
      * The maximum number of clipped geometries to cache. This number can be set to <code>0</code>

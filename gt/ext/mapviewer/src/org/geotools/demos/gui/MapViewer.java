@@ -206,6 +206,7 @@ public class MapViewer extends JApplet {
             container.add(new StatusBar(mapPane),     BorderLayout.SOUTH);
         } catch (Exception exception) {
             container.add(new JLabel(exception.getLocalizedMessage()), BorderLayout.CENTER);
+            exception.printStackTrace(); // Allows inspection in the Java console
         }
     }
 }

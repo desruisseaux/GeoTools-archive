@@ -90,9 +90,15 @@ public class NIOUtilities {
      * Check if a warning message should be logged.
      */
     private static synchronized boolean isLoggable() {
-        return !warned && (
-                System.getProperty("org.geotools.io.debugBuffer", "false").equalsIgnoreCase("true") ||
-                System.getProperty("os.name").indexOf("Windows") >= 0 );
+        try {
+            return !warned && (
+                    System.getProperty("org.geotools.io.debugBuffer", "false").equalsIgnoreCase("true") ||
+                    System.getProperty("os.name").indexOf("Windows") >= 0 );
+        } catch (SecurityException exception) {
+            // The utilities may be running in an Applet, in which case we
+            // can't read properties. Assumes we are not in debugging mode.
+            return false;
+        }
     }
 
     /**
