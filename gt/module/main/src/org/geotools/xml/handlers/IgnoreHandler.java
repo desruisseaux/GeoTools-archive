@@ -36,11 +36,25 @@ import java.util.Map;
  * @version $Id$
  */
 public class IgnoreHandler extends XMLElementHandler {
-    /**
+
+   public static final String NAME = "IGNORE_HANDLER";
+
+   private Element elem;
+
+   
+   public IgnoreHandler() {
+      elem = null;
+   }
+   
+   public IgnoreHandler(Element igElem) {
+      elem = igElem;
+   }
+   
+   /**
      * @see org.geotools.xml.XMLElementHandler#getElement()
      */
     public Element getElement() {
-        return null;
+        return elem;
     }
 
     /**
@@ -70,7 +84,7 @@ public class IgnoreHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#getName()
      */
     public String getName() {
-        return "";
+        return NAME;
     }
 
     /**

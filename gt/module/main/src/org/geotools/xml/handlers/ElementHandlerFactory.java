@@ -193,7 +193,7 @@ public class ElementHandlerFactory {
         }
 
         for (int i = 0; i < eth.length; i++) {
-            if (localName.equalsIgnoreCase(eth[i].getName())) {
+            if (localName.equalsIgnoreCase(eth[i].getName()) || eth[i].getName().equals(IgnoreHandler.NAME)) {
                 return createElementHandler(eth[i]);
             }
         }
@@ -229,7 +229,7 @@ public class ElementHandlerFactory {
             return new SimpleElementHandler(eth);
         }
 
-        return new IgnoreHandler();
+        return new IgnoreHandler(eth);
     }
     
     public URI getNamespace(String prefix){
