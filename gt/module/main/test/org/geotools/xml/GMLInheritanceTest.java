@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 public class GMLInheritanceTest extends TestCase {
 
     
-    public void testOneFeature(){
+    public void testNestedFeature(){
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
@@ -42,6 +42,37 @@ public class GMLInheritanceTest extends TestCase {
             SAXParser parser = spf.newSAXParser();
 
             String path = "sample/nestedFeatures.xml";
+            File f = TestData.file(this,path);
+            URI u = f.toURI();
+
+            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+            XMLSAXHandler.setLogLevel(Level.FINEST);
+            XSISAXHandler.setLogLevel(Level.FINEST);
+            XMLElementHandler.setLogLevel(Level.FINEST);
+            XSIElementHandler.setLogLevel(Level.FINEST);
+
+            parser.parse(f, xmlContentHandler);
+
+            Object doc = xmlContentHandler.getDocument();
+            assertNotNull("Document missing", doc);
+//            System.out.println(doc);
+            
+            checkFeatureCollection((FeatureCollection)doc);
+            
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail(e.toString());
+        }
+    }
+    public void testMultiInheritance(){
+        try {
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            spf.setValidating(false);
+
+            SAXParser parser = spf.newSAXParser();
+
+            String path = "sample/multiInheritance.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
