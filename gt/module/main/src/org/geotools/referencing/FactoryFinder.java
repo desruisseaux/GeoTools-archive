@@ -34,8 +34,7 @@ import java.util.logging.Logger;
 import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
+import org.geotools.geometry.JTS;
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.Arguments;
@@ -135,6 +134,7 @@ public final class FactoryFinder {
      * Returns the default implementation of {@link DatumFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
+     * @return First DatumFactory found, not determinisitc
      *
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link DatumFactory} interface.
@@ -145,6 +145,7 @@ public final class FactoryFinder {
 
     /**
      * Returns a set of all available implementations for the {@link DatumFactory} interface.
+     * @return Set of available DatumFactory
      */
     public static synchronized Set getDatumFactories() {
         return new LazySet(getProviders(DatumFactory.class));
@@ -154,6 +155,7 @@ public final class FactoryFinder {
      * Returns the default implementation of {@link CSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
+     * @return The first CSFactory found - not deterministic 
      *
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CSFactory} interface.
@@ -164,6 +166,7 @@ public final class FactoryFinder {
 
     /**
      * Returns a set of all available implementations for the {@link CSFactory} interface.
+     * @return Set of available CSFactory implementations
      */
     public static synchronized Set getCSFactories() {
         return new LazySet(getProviders(CSFactory.class));
@@ -173,6 +176,7 @@ public final class FactoryFinder {
      * Returns the default implementation of {@link CRSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
+     * @return The first CRSFactory found - not deterministic
      *
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CRSFactory} interface.
@@ -183,6 +187,7 @@ public final class FactoryFinder {
 
     /**
      * Returns a set of all available implementations for the {@link CRSFactory} interface.
+     * @return Set of available CRSFactory
      */
     public static synchronized Set getCRSFactories() {
         return new LazySet(getProviders(CRSFactory.class));
@@ -201,15 +206,14 @@ public final class FactoryFinder {
      * @param code
      * @return coordinate system for the provided code
      * @throws NoSuchAuthorityCodeException If the code could not be understood 
-     * @throws FactoryException
      */ 
     public static CoordinateReferenceSystem decode( String code ) throws NoSuchAuthorityCodeException {
         //Set factories = getAuthorityFactories();
-        if( "EPSG:4269".equals( code )){
+        if( "EPSG:4269".equals( code )){ //$NON-NLS-1$
             try {
                 // Temp hack for testing
                 return getCRSFactory().createFromWKT(
-                        "4269=GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]]"
+                        "4269=GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]]" //$NON-NLS-1$
                         );
             } catch (NoSuchElementException e) {
                 throw new NoSuchAuthorityCodeException( e.getLocalizedMessage(), "EPSG", code ); //$NON-NLS-1$
@@ -234,27 +238,8 @@ public final class FactoryFinder {
     	if( crs.equals(GeographicCRS.WGS84) )
     		return env;
         MathTransform transform=getCoordinateOperationFactory().createOperation(crs, GeographicCRS.WGS84).getMathTransform();
-        return transform(env, transform);
+        return JTS.transform(env, transform);
     }
-    
-    public static FeatureType transform(FeatureType ft, CoordinateReferenceSystem crs) throws SchemaException{
-        // TODO fill me in
-        return null;
-    }
-    
-    /**
-     * Transforms the Envelope using the MathTransform.
-	 * @param envelope the envelope to transform
-	 * @param transform the transformation to use
-	 * @return a new Envelope
-     * @throws TransformException 
-	 */
-	public static Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
-		double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
-		double[] newcoords=new double[4];
-		transform.transform(coords, 0, newcoords, 0, 4);
-		return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
-	}
     
     /**
      * Returns a set of all available implementations for the {@link AuthorityFactory} interface.

@@ -22,9 +22,9 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -98,7 +98,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
                 + " already used (check before using wrapper)");
         }
 
-        schema = FactoryFinder.transform(type, cs);
+        schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
     }
 

@@ -55,6 +55,7 @@ import org.geotools.data.wfs.WFSFilterVisitor.WFSBBoxFilterVisitor;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
@@ -310,7 +311,7 @@ public class WFSDataStore extends AbstractDataStore {
         try {
             if(crsName!=null){
                 crs = FactoryFinder.decode(crsName);
-            	t = FactoryFinder.transform(t,crs);
+            	t = FeatureTypes.transform(t,crs);
             }
         } catch (FactoryException e) {
             WFSDataStoreFactory.logger.warning(e.getMessage());
