@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  * @author Chris Holmes, TOPP
  * @version $Id$
  */
-public class LocationsXYDataStoreFactory
+public class BBOXDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
     	
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
@@ -67,18 +67,26 @@ public class LocationsXYDataStoreFactory
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
-            "must be 'locationsxy'", true, "locationsxy");
+            "must be 'bbox'", true, "BBOX");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param XCOLUMN = new Param("xcolumn", String.class,
-            "name of JDBC results column containing easting (x, longitude etc)", true, "longitude");
+    static final Param MINXCOLUMN = new Param("minxcolumn", String.class,
+            "name of JDBC results column containing eastmost easting (x, longitude etc)", true, "minx");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param YCOLUMN = new Param("ycolumn", String.class,
-            "name of JDBC results column containing northing (y, latitude etc)", true, "latitude");
+    static final Param MINYCOLUMN = new Param("minycolumn", String.class,
+            "name of JDBC results column containing southmost northing (y, latitude etc)", true, "miny");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param MAXXCOLUMN = new Param("maxxcolumn", String.class,
+            "name of JDBC results column containing westmost easting (x, longitude etc)", true, "maxx");
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param MAXYCOLUMN = new Param("maxycolumn", String.class,
+            "name of JDBC results column containing northmost northing (y, latitude etc)", true, "maxy");
 
     static final Param GEOMNAME = new Param("geom_name", String.class, "the " +
-      "name of the geometry attribute from the x,y column", false, GEOM_NAME_DEFAULT);
+      "name of the geometry attribute to generate from the bbox columns", false, GEOM_NAME_DEFAULT);
 
     /** Param, package visibiity for JUnit tests */
     static final Param HOST = new Param("host", String.class,
@@ -130,13 +138,13 @@ public class LocationsXYDataStoreFactory
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,XCOLUMN,YCOLUMN, GEOMNAME
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,MINXCOLUMN,MINYCOLUMN,MAXXCOLUMN,MAXYCOLUMN, GEOMNAME
     };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
      */
-    public LocationsXYDataStoreFactory() {
+    public BBOXDataStoreFactory() {
     }
 
     /**
@@ -170,7 +178,7 @@ public class LocationsXYDataStoreFactory
      *
      * @param params Set of parameters needed for a jdbc data store.
      *
-     * @return <code>true</code> if dbtype equals locationsXy, and contains keys
+     * @return <code>true</code> if dbtype equals BBOX, and contains keys
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
@@ -181,18 +189,18 @@ public class LocationsXYDataStoreFactory
                 if (!(((value = params.get(arrayParameters[i].key)) != null)
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
-                    	LOGGER.warning("LocationsXYDataStoreFactory: can Process Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
+                    	LOGGER.warning("BBOXDataStoreFactory: can Process Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
                         return (false);
                     }
                 }
             }
         } else {
-                   	LOGGER.warning("LocationsXYDataStoreFactory: can Process Cannot find params " );
+                   	LOGGER.warning("BBOXDataStoreFactory: can Process Cannot find params " );
             return (false);
         }
 
   
-        if (!(((String) params.get("dbtype")).equalsIgnoreCase("locationsxy"))) {
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("BBOX"))) {
             return (false);
         } else {
             return (true);
@@ -203,7 +211,7 @@ public class LocationsXYDataStoreFactory
      * Construct a postgis data store using the params.
      *
      * @param params The full set of information needed to construct a live
-     *        data source.  Should have  dbtype equal to locationsxy, as well as
+     *        data source.  Should have  dbtype equal to BBOX, as well as
      *        host, user, passwd, database, and table.
      *
      * @return The created DataSource, this may be null if the required
@@ -230,8 +238,10 @@ public class LocationsXYDataStoreFactory
         String namespace = (String) NAMESPACE.lookUp(params);
         String driver =   (String) DRIVER.lookUp(params);
         String urlprefix =   (String) URLPREFIX.lookUp(params);
-      String xcolumn =   (String) XCOLUMN.lookUp(params);
-      String ycolumn =   (String) YCOLUMN.lookUp(params);
+      String minxcolumn =   (String) MINXCOLUMN.lookUp(params);
+      String minycolumn =   (String) MINYCOLUMN.lookUp(params);
+      String maxxcolumn =   (String) MAXXCOLUMN.lookUp(params);
+      String maxycolumn =   (String) MAXYCOLUMN.lookUp(params);
       String geom_name = (String) GEOMNAME.lookUp(params);
 
         // Try processing params first so we can get an error message
@@ -271,10 +281,10 @@ public class LocationsXYDataStoreFactory
 	    geom_name = GEOM_NAME_DEFAULT;
 	}
         if (namespace != null) {
-            return new LocationsXYDataStore(pool, namespace, xcolumn,
-                                            ycolumn, geom_name);
+            return new BBOXDataStore(pool, namespace, minxcolumn,
+                                            minycolumn,maxxcolumn,maxycolumn, geom_name);
         } else {
-            return new LocationsXYDataStore(pool);
+            return new BBOXDataStore(pool);
         }
     }
 
@@ -342,7 +352,7 @@ public class LocationsXYDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, XCOLUMN, YCOLUMN
-        };
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, MINXCOLUMN, MINYCOLUMN
+,MAXXCOLUMN, MAXYCOLUMN        };
     }
 }

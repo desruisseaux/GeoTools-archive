@@ -54,15 +54,8 @@ public class JDBCDataStoreFactoryTest extends TestCase {
             new PropertyResourceBundle(this.getClass().getResourceAsStream("fixture.properties"));
 
         String namespace = resource.getString("namespace");
-        String host = resource.getString("host");
-              local.put("host",host);
               
-        String port = resource.getString("port");
-               local.put("port", port);
-               
-        String database = resource.getString("database");
-        local.put("database",database);
-
+  
         String user = resource.getString("user");
                local.put("user", user);
         String password = resource.getString("password");

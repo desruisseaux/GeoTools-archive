@@ -60,23 +60,24 @@ public class JDBCDataStoreFactory
 
     /** Param, package visibiity for JUnit tests */
     static final Param HOST = new Param("host", String.class,
-            "db host machine", true, "localhost");
+            "db host machine", false, "localhost");
 
     /** Param, package visibiity for JUnit tests */
     static final Param PORT = new Param("port", String.class,
-            "db connection port", true, "3306");
+            "db connection port", false, "3306");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DATABASE = new Param("database", String.class,
-            "jdbc database");
+            "jdbc database", false, "" );
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
-            "user name to login as");
+            "user name to login as", true, "");
 
     /** Param, package visibiity for JUnit tests */
     static final Param PASSWD = new Param("passwd", String.class,
-            "password used to login", false);
+            "password used to login", true, "");
+
 
     /**
      * Param, package visibiity for JUnit tests.
@@ -215,7 +216,7 @@ public class JDBCDataStoreFactory
         if (!canProcess(params)) {
             return null;
         }
-   JDBCConnectionFactory connFact = new JDBCConnectionFactory(host,Integer.parseInt(port), database, driver , urlprefix);
+   JDBCConnectionFactory connFact = new JDBCConnectionFactory( urlprefix, driver );
 
  //  MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,            Integer.parseInt(port), database);
            

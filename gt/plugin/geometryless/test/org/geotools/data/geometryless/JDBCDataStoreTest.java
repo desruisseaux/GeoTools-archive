@@ -89,15 +89,6 @@ public class JDBCDataStoreTest extends TestCase {
             new PropertyResourceBundle(this.getClass().getResourceAsStream("fixture.properties"));
 
         String namespace = resource.getString("namespace");
-        String host = resource.getString("host");
-              local.put("host",host);
-              
-        Integer port = new Integer(resource.getString("port"));
-               local.put("port", port);
-               
-        String database = resource.getString("database");
-        local.put("database",database);
-
         String user = resource.getString("user");
                local.put("user", user);
         String password = resource.getString("password");
@@ -114,7 +105,7 @@ public class JDBCDataStoreTest extends TestCase {
                 "The fixture.properties file needs to be configured for your own database");
         }
         
-        connFactory = new JDBCConnectionFactory(host, port.intValue(), database, Driver, urlprefix);
+        connFactory = new JDBCConnectionFactory(urlprefix, Driver);
 
         //connFactory = new PostgisConnectionFactory("localhost", "5432", 
         //   "testdb");

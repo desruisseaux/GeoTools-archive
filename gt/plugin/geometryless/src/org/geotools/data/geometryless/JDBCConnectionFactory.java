@@ -26,7 +26,6 @@ public class JDBCConnectionFactory {
 
     /** Creates configuration-driven JDBC driver class. */
     private String _driver = "";
-    private String _urlprefix = "";
     private static Map _dataSources = new HashMap();
     private String _dbURL;
     private String _username = "";
@@ -35,39 +34,18 @@ public class JDBCConnectionFactory {
     private String charSet;
 
     /**
-     * Creates a new JDBCConnectionFactory object from a specified database URL.  This
-     * is normally of the following format:<br/>
+     * Creates a new JDBCConnectionFactory object from a specified database URL.  
+	This is the only constructor supported since there is significant variability in implementation syntax
+<br/>
      * <br/>
      * jdbc:mysql://<host>:<port>/<instance>
      * @param url the JDBC database URL
      */
-    public JDBCConnectionFactory(String url, String driver, String urlprefix) {
+    public JDBCConnectionFactory(String url, String driver) {
        _driver = driver;
         _dbURL = url;
-        _urlprefix = urlprefix;
     }
 
-    /**
-     * Creates a new JDBCConnectionFactory object from a host name, port number,
-     * and instance name.
-     * @param host the JDBC database host
-     * @param port the port number for the JDBC database
-     * @param instance the JDBC database instance name
-     */
-    public JDBCConnectionFactory(String host, int port, String instance, String driver, String urlprefix) {
- 
-        this(urlprefix + host + ":" + String.valueOf(port) + "/" + instance, driver, urlprefix );
-    }
-
-    /**
-     * Creates a new JDBCConnectionFactory object from a host name and an instance
-     * name, using the normal MySQL port number of 3306.
-     * @param host the JDBC database host
-     * @param instance the JDBC database instance name
-    public JDBCConnectionFactory(String host, String instance) {
-        this(host, 3306, instance);
-    }
-     */
 
     /**
      * Creates and returns a JDBC ConnectionPool, or gets an existing ConnectionPool
@@ -90,12 +68,12 @@ public class JDBCConnectionFactory {
          * Creates a database connection method to initialize a given database for
          * feature extraction with the user and password params.
          *
-         * @param user the name of the user connect to connect to the pgsql db.
+         * @param user the name of the user connect to connect to the db.
          * @param password the password for the user.
          *
          * @return the sql Connection object to the database.
          *
-         * @throws SQLException if the postgis sql driver could not be found
+         * @throws SQLException if the configured sql driver could not be found
          */
     public Connection getConnection(String user, String password) throws SQLException {
         Properties props = new Properties();
