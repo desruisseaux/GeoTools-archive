@@ -20,11 +20,16 @@
 package org.geotools.referencing;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.CoordinateOperation;
 
 /**
  * This is a simple utility class for making use of the
@@ -45,7 +50,79 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @since 2.1.0
  */
 public class CRS {
-
+    public interface OpperationVisitor {
+        /**
+         * Implement this method to visit each available CoordinateOperationFactory
+         * known to FactoryFinder.
+         * <p>
+         * You may register additional Factories using META-INF/serivces
+         * please see  
+         * </p>
+         * @param factory
+         * @return Value created using the Factory, visit returns a list of these
+         */
+        public Object  factory( CoordinateOperationFactory factory ) throws FactoryException;
+    }
+    /**
+     * Grab transform between two CoordianteReference Systems.
+     * <p>
+     * Sample use:<pre><code>
+     * MathTransform transform = CRS.transform( CRS.decode("EPSG:42102"), CRS.decode("EPSG:4326") ); 
+     * </code></pre>
+     * </p>
+     * 
+     * @param from
+     * @param to
+     * @return MathTransform, or null if unavailable
+     * @throws FactoryException only if MathTransform is unavailable due to error
+     */
+    public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to ) throws FactoryException {
+        List list = visit( new OpperationVisitor() {
+            public Object factory( CoordinateOperationFactory factory ) throws FactoryException{
+                CoordinateOperation opperation = factory.createOperation( from, to );                
+                return opperation.getMathTransform();                
+            }
+        });
+        return list.isEmpty() ? null : (MathTransform) list.get(0);                         
+    }
+    
+    /**
+     * Visitor implementation is private until such time as Martin gives feedback.
+     * 
+     * TODO: Martin can you say aye or nay to this idea?
+     */
+    private static List visit(OpperationVisitor visitor ) throws FactoryException {
+        Throwable trouble = null;
+        List list = new ArrayList();
+        for( Iterator i = FactoryFinder.getCoordinateOperationFactories().iterator(); i.hasNext(); ){
+            CoordinateOperationFactory factory = (CoordinateOperationFactory) i.next();
+            try {
+                Object value = visitor.factory( factory );
+                if( value != null ) list.add( value );
+            } catch (Throwable t ){
+                if( t != null ){
+                    // log trouble - as we can only throw the "last" cause
+                    System.err.println( trouble );
+                }
+                trouble = t;
+            }            
+        }
+        if( list.isEmpty()){
+            if( trouble != null ) {
+                // trouble is the last known cause of failure
+                if( trouble instanceof FactoryException ) throw (FactoryException) trouble;            
+                if( trouble instanceof Exception ) throw new FactoryException( (Exception) trouble );
+                throw new FactoryException( "Trouble encountered while visiting CoordianteOpperationFactory", trouble );
+            }
+        }
+        else {
+            if( trouble != null ){
+                // log trouble - ie the last known cause of failure
+                System.err.println( trouble );
+            }
+        }
+        return list;
+    }
     /**
      * Locate for CoordinateReferenceSystem for specific code.
      * <p>
@@ -73,7 +150,8 @@ public class CRS {
         //for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
         for( Iterator i=FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
             CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
-            factory.getAuthority().getIdentifierTypes().contains( AUTHORITY );
+            if( !factory.getAuthority().getIdentifierTypes().contains( AUTHORITY ) ) continue;
+            
             try {
                 CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
                 if( crs != null ) return crs;
@@ -82,7 +160,7 @@ public class CRS {
             }
             catch (Throwable e) {
                 trouble = e;
-            }
+            }            
         }        
         if( trouble instanceof NoSuchAuthorityCodeException){
             throw (NoSuchAuthorityCodeException) trouble;

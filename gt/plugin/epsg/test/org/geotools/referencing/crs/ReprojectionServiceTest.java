@@ -18,12 +18,20 @@
  */
 package org.geotools.referencing.crs;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferenceSystem;
+import org.geotools.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -62,7 +70,7 @@ public class ReprojectionServiceTest extends TestCase {
 		assertNotNull( "bc", bc );
 	}
     
-	public void XXXtestAUTO4200() throws Exception {	
+	public void testAUTO4200() throws Exception {	
 	    CoordinateReferenceSystem utm = CRS.decode("AUTO:42001,0.0,0.0");
 		assertNotNull( "auto-utm", utm );		
 	}
@@ -79,9 +87,27 @@ public class ReprojectionServiceTest extends TestCase {
         assertNotNull( "latlong", latlong );
     }
     
-    public void testTranform() throws Exception {
-        CoordinateReferenceSystem bc = CRS.decode("EPSG:42102");
-        CoordinateReferenceSystem latlong = CRS.decode("EPSG:4269");
+    public void testManditoryTranform() throws Exception {                
+        CoordinateReferenceSystem WGS84 = (CoordinateReferenceSystem) epsg.createObject("EPSG:4326"); // latlong
+        CoordinateReferenceSystem NAD83 = (CoordinateReferenceSystem) epsg.createObject("EPSG:4269");
+        CoordinateReferenceSystem NAD83_UTM10 = (CoordinateReferenceSystem) epsg.createObject("EPSG:26910");
+        CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) epsg.createObject("EPSG:42102");
+                
+        CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory().createOperation( WGS84, WGS84 );
+        MathTransform math = op.getMathTransform();
+                
+        DirectPosition pt1 = new GeneralDirectPosition(0.0,0.0);        
+        DirectPosition pt2 = math.transform( pt1, null );
+        assertNotNull( pt2 );
+          
+        double pts[] = new double[] {
+                1187128,395268, 1187128,396027,
+                1188245,396027, 1188245,395268,
+                1187128,395268};
+        double tst[] = new double[ pts.length ];                        
+        math.transform( pts, 0, new double[ pts.length ], 0, pts.length/2 );
+        for( int i=0; i<pts.length;i++)
+            assertTrue( "pts["+i+"]", pts[i] != tst[i] );
         
         /*
         MathTransform transform = CRSService.reproject( bc, latlong, true );
