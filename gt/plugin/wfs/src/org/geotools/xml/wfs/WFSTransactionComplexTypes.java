@@ -22,6 +22,9 @@ import org.geotools.data.wfs.LockResult;
 import org.geotools.data.wfs.TransactionRequest;
 import org.geotools.data.wfs.Action;
 import org.geotools.data.wfs.TransactionResult;
+import org.geotools.data.wfs.Action.ActionFactory.DeleteAction;
+import org.geotools.data.wfs.Action.ActionFactory.InsertAction;
+import org.geotools.data.wfs.Action.ActionFactory.UpdateAction;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
@@ -773,7 +776,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Action.class;
+            return InsertAction.class;
         }
 
         /**
@@ -781,7 +784,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.INSERT;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof InsertAction;
         }
 
         /**
@@ -791,8 +794,11 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
+        	if(!canEncode(element,value,hints))
+        		return;
+        	
         	output.startElement(element.getNamespace(),element.getName(),null);
-        	Action a = (Action)value;
+        	InsertAction a = (InsertAction)value;
         	// find element definition
         	// should exist when original from a WFS ...
         	Feature f = a.getFeature();
@@ -900,7 +906,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Action.class;
+            return UpdateAction.class;
         }
 
         /**
@@ -908,7 +914,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.UPDATE;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof UpdateAction;
         }
 
         /**
@@ -918,30 +924,25 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-        	Action a = (Action)value;
+        	if(!canEncode(element,value,hints))
+        		return;
+        	
+        	UpdateAction a = (UpdateAction)value;
         	
             AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",a.getTypeName());
             
         	output.startElement(element.getNamespace(),element.getName(),attributes);
 
-        	Feature f1 = a.getFeature();
-        	Feature f2 = a.getUpdateFeature();
-        	
-        	Object[] v1 = f1.getAttributes(null);
-        	Object[] v2 = f2.getAttributes(null);
-        	if(v1!=null && v2!=null){
-        		if(v1.length!=v2.length); 
-        			// TODO do something?
-        		for(int i=0;i<v2.length;i++)
-        			if(!((v1[i]==null && v2[i]==null ) || v1[i].equals(v2[i]))){
-        				Object[] t = new Object[2];
-        				t[0] = f2.getFeatureType().getAttributeType(i);
-        				t[1] = v2[i];
-        				elems[0].getType().encode(elems[0],t,output,hints);
-        			}
+        	Object[] prop = new Object[2];
+        	String[] names = a.getPropertyNames();
+        	for(int i=0;i<names.length;i++){
+        		prop[0] = names[i];
+        		prop[1] = a.getProperty(names[i]);
+        		elems[0].getType().encode(elems[0],prop,output,hints);
         	}
-        	elems[1].getType().encode(elems[1],a.getFidFilter(),output,hints);
+        	
+        	elems[1].getType().encode(elems[1],a.getFilter(),output,hints);
         	
         	output.endElement(element.getNamespace(),element.getName());
         }
@@ -1035,7 +1036,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Action.class;
+            return DeleteAction.class;
         }
 
         /**
@@ -1043,7 +1044,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof Action && ((Action)value).getType() == Action.DELETE;
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof DeleteAction;
         }
 
         /**
@@ -1053,14 +1054,17 @@ public class WFSTransactionComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-        	Action a = (Action)value;
+        	if(!canEncode(element,value,hints))
+        		return;
+        	
+        	DeleteAction a = (DeleteAction)value;
         	
             AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",a.getTypeName());
             
         	output.startElement(element.getNamespace(),element.getName(),attributes);
 
-        	elems[0].getType().encode(elems[0],a.getFidFilter(),output,hints);
+        	elems[0].getType().encode(elems[0],a.getFilter(),output,hints);
         	
         	output.endElement(element.getNamespace(),element.getName());
         }

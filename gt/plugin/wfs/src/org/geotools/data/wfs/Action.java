@@ -6,8 +6,11 @@
  */
 package org.geotools.data.wfs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.feature.Feature;
-import org.geotools.filter.FidFilter;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 
 /**
@@ -22,10 +25,8 @@ public interface Action {
 	public static final int DELETE = 4;
 	public int getType();
 
-	public Feature getFeature();
-	public Feature getUpdateFeature();
-	public String getTypeName();
-	public FidFilter getFidFilter();
+//	public String getTypeName();
+	public Filter getFilter();
 
 	public static class ActionFactory{
 		private ActionFactory(){}
@@ -33,32 +34,50 @@ public interface Action {
 		public static ActionFactory getInstance(){
 			return instance;
 		}
-		public static Action createAction(Feature old, Feature neW){
-			if(old == null)
-				return new DefaultAction(INSERT,neW);
-			if(neW == null)
-				return new DefaultAction(DELETE,old);
-			return new DefaultAction(UPDATE,old,neW);
-		}
-		private static class DefaultAction implements Action{
-			private int t;
-			private Feature f1,f2;
-			private DefaultAction(){}
-			public DefaultAction(int type, Feature f){
-				t = type;f1=f;
+		
+		public static class InsertAction implements Action{
+			private Feature feature;
+			private String typeName;
+			private InsertAction(){}
+			protected InsertAction(String typeName, Feature f){
+				this.typeName = typeName;
+				feature = f;
 			}
-			public DefaultAction(int type, Feature f, Feature nw){
-				t = type;f1=f;f2=nw;
-			}
-			public int getType(){return t;}
-			public Feature getFeature(){return f1;}
-			public Feature getUpdateFeature(){return f2;}
-			public String getTypeName(){return f1.getFeatureType().getTypeName();}
-			public FidFilter getFidFilter(){return createFilter(f1);}
+			public int getType(){return INSERT;}
+			public Feature getFeature(){return feature;}
+			public String getTypeName(){return typeName;}
+			public Filter getFilter(){return feature.getID()==null?null:(FilterFactory.createFilterFactory().createFidFilter(feature.getID()));}
 		}
 		
-		public static FidFilter createFilter(Feature f){
-			return FilterFactory.createFilterFactory().createFidFilter(f.getID());
+		public static class UpdateAction implements Action{
+			private Filter filter;
+			private Map properties;
+			private String typeName;
+			private UpdateAction(){}
+			protected UpdateAction(String typeName, Filter f, Map properties){
+				filter = f;
+				this.properties = properties;
+				this.typeName = typeName;
+			}
+			public int getType(){return UPDATE;}
+			public Object getProperty(String name){return properties==null?null:properties.get(name);}
+			public String[] getPropertyNames(){return (String[])properties.keySet().toArray(new String[properties.keySet().size()]);}
+			public Map getProperties(){return new HashMap(properties);}
+			public String getTypeName(){return typeName;}
+			public Filter getFilter(){return filter;}
+		}
+		
+		public static class DeleteAction implements Action{
+			private Filter filter;
+			private String typeName;
+			private DeleteAction(){}
+			protected DeleteAction(String typeName, Filter f){
+				filter=f;
+				this.typeName = typeName;
+			}
+			public int getType(){return DELETE;}
+			public String getTypeName(){return typeName;}
+			public Filter getFilter(){return filter;}
 		}
 	}
 }
