@@ -129,6 +129,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param loader The class loader to use.
      * @param category The category to scan for plug-ins.
      *
+     * @todo Get ride of {@code catch(Error)} statement if Sun fix RFE #4640520.
      * @todo localize log messages.
      */
     private void scanForPlugins(final ClassLoader loader, final Class category) {
@@ -138,10 +139,32 @@ public class FactoryRegistry extends ServiceRegistry {
         message.append("Scan for '");
         message.append(Utilities.getShortName(category));
         message.append("' implementations:");
-        message.append(lineSeparator);
         boolean newServices = false;
         while (factories.hasNext()) {
-            Object factory = factories.next();
+            Object factory;
+            try {
+                factory = factories.next();
+            } catch (Error error) {
+                /*
+                 * TODO: Current J2SE implementation throws sun.misc.ServiceConfigurationError
+                 *       if the iterator failed to create the service (for example because of
+                 *       an exception thrown in the no-args constructor). We can't rely on sun
+                 *       internal packages. Catching java.lang.Error is not really safe neither.
+                 *       As a hack, we will catch Error and process it only if its cause is an
+                 *       Exception.
+                 */
+                final Throwable cause = error.getCause();
+                if (!(cause instanceof Exception)) {
+                    throw error;
+                }
+                /*
+                 * We could log a warning here, but we don't know which service exactly has
+                 * failed. Furthermore, this error may be normal (e.g. the EPSG authority
+                 * may have failed to instantiate itself because there is no EPSG database
+                 * on the user machine), so a 'warning' level may not be appropriate.
+                 */
+                continue;
+            }
             final Class factoryClass = factory.getClass();
             /*
              * If the factory implements more than one interface and an instance were
@@ -158,9 +181,9 @@ public class FactoryRegistry extends ServiceRegistry {
                  * to produces only one log entry, since some registration (e.g.
                  * MathTransformProviders) may be quite extensive.
                  */
+                message.append(lineSeparator);
                 message.append("  Register ");
                 message.append(factoryClass.getName());
-                message.append(lineSeparator);
                 newServices = true;
             }
         }

@@ -85,14 +85,6 @@ import org.geotools.referencing.FactoryFinder;
  * object has a code number ID. For example, the EPSG code for a WGS84 Lat/Lon coordinate
  * system is '4326'.
  * <br><br>
- * This base class provides a default implementation for all <code>createFoo</code>
- * methods found in
- * {@link DatumAuthorityFactory},
- * {@link CSAuthorityFactory} and
- * {@link CRSAuthorityFactory}
- * interfaces. However, none of those interfaces are declared in the <code>implements</code>
- * clause of this class. Subclasses should selects the interfaces the want to implement.
- * <br><br>
  * The default implementation for all <code>createFoo</code> methods ultimately invokes
  * {@link #createObject}, which may be the only method that a subclass need to override.
  * However, other methods may be overriden as well for better performances.
@@ -101,7 +93,7 @@ import org.geotools.referencing.FactoryFinder;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractAuthorityFactory extends AbstractFactory
-        implements AuthorityFactory, RegisterableService
+        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory, RegisterableService
 {
     /**
      * The minimum priority that a factory can have. Factories with lowest priority will be used
@@ -131,7 +123,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     /**
      * The priority for this factory.
      */
-    private final int priority;
+    final int priority;
 
     /**
      * Constructs an instance using the specified set of factories.

@@ -97,6 +97,7 @@ import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.MonolineFormatter;
@@ -127,15 +128,17 @@ import org.geotools.util.ScopedName;
  * @author Yann Cézard
  * @author Rueben Schulz
  */
-// TODO: vérifier noSuchAuthorityCode, new FactoryException
-public class DefaultFactory extends AbstractAuthorityFactory
-        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
-{
+public class EPSGFactory extends AbstractAuthorityFactory {
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                            ////////
     ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
     ////////                                                                            ////////
     ////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * The logger for EPSG factory.
+     */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.epsg");
+
     /**
      * Preference node for the JDBC driver class name, and its default value.
      */
@@ -313,6 +316,13 @@ public class DefaultFactory extends AbstractAuthorityFactory
     private final Set safetyGuard = new HashSet();
 
     /**
+     * The buffered authority factory, or <code>null</code> if none. This field is set
+     * to a different value by {@link DefaultFactory} only, which will point toward a
+     * buffered factory wrapping this {@code EPSGFactory} for efficienty.
+     */
+    private AbstractAuthorityFactory buffered = this;
+
+    /**
      * The connection to the EPSG database.
      */
     protected final Connection connection;
@@ -324,8 +334,9 @@ public class DefaultFactory extends AbstractAuthorityFactory
      *
      * @throws SQLException if the constructor failed to connect to the EPSG database.
      */
-    public DefaultFactory() throws SQLException {
+    public EPSGFactory() throws SQLException {
         this(new FactoryGroup());
+        // NOTE: A log message with connection information will be logged at level CONFIG.
     }
 
     /**
@@ -338,21 +349,21 @@ public class DefaultFactory extends AbstractAuthorityFactory
      * behavior can be changed by invoking the {@link #main} method from the command line.
      * For example:
      * <blockquote><pre>
-     * java org.geotools.referencing.espg.DefaultFactory -driver=[my driver] -connection=[my url]
+     * java org.geotools.referencing.espg.EPSGFactory -driver=[my driver] -connection=[my url]
      * </pre></blockquote>
      *
      * @param factories The set of object factories to use.
      * @throws SQLException if the constructor failed to connect to the EPSG database.
      */
-    public DefaultFactory(final FactoryGroup factories) throws SQLException {
-        this(factories, Preferences.systemNodeForPackage(DefaultFactory.class));
+    public EPSGFactory(final FactoryGroup factories) throws SQLException {
+        this(factories, Preferences.systemNodeForPackage(EPSGFactory.class));
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database.
      */
-    private DefaultFactory(final FactoryGroup factories,
-                           final Preferences preferences) throws SQLException
+    private EPSGFactory(final FactoryGroup factories,
+                        final Preferences preferences) throws SQLException
     {
         this(factories,
              preferences.get(CONNECTION, DEFAULT_CONNECTION),
@@ -378,10 +389,11 @@ public class DefaultFactory extends AbstractAuthorityFactory
      *
      * @throws SQLException if the constructor failed to connect to the EPSG database.
      */
-    public DefaultFactory(final FactoryGroup factories, final String url, final String driver)
+    public EPSGFactory(final FactoryGroup factories, final String url, final String driver)
             throws SQLException
     {
         this(factories, getConnection(url, driver));
+        LOGGER.config("Connection to EPSG database \""+url+"\" etablished."); // TODO: localize
     }
 
     /**
@@ -390,7 +402,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      */
-    public DefaultFactory(final FactoryGroup factories, final Connection connection) {
+    public EPSGFactory(final FactoryGroup factories, final Connection connection) {
         super(factories, MAX_PRIORITY);
         this.connection = connection;
         ensureNonNull("connection", connection);
@@ -423,9 +435,9 @@ public class DefaultFactory extends AbstractAuthorityFactory
                 // Try to connect anyway. It is possible that
                 // an other driver has already been loaded...
             }
-            record.setSourceClassName("DefaultFactory");
+            record.setSourceClassName("EPSGFactory");
             record.setSourceMethodName("<init>");
-            Logger.getLogger("org.geotools.referencing").log(record);
+            LOGGER.log(record);
         }
         return DriverManager.getConnection(url);
     }
@@ -444,9 +456,9 @@ public class DefaultFactory extends AbstractAuthorityFactory
      *   <li><strong><code>{@linkplain CoordinateReferenceSystem}.class&nbsp;</code></strong>
      *       asks for all authority codes accepted by one of
      *       {@link #createGeographicCRS createGeographicCRS},
-     *       {@link #createProjectedCRS createProjectedCRS},
-     *       {@link #createVerticalCRS createVerticalCRS},
-     *       {@link #createTemporalCRS createTemporalCRS}
+     *       {@link #createProjectedCRS  createProjectedCRS},
+     *       {@link #createVerticalCRS   createVerticalCRS},
+     *       {@link #createTemporalCRS   createTemporalCRS}
      *       and their friends.</li>
      *   <li><strong><code>{@linkplain ProjectedCRS}.class&nbsp;</code></strong>
      *       asks only for authority codes accepted by
@@ -765,19 +777,19 @@ public class DefaultFactory extends AbstractAuthorityFactory
                         lastObjectType = i;
                     }
                     switch (lastObjectType) {
-                        case  0:  return createCoordinateReferenceSystem(code);
-                        case  2:  return createCoordinateSystem         (code);
-                        case  4:  return createCoordinateSystemAxis     (code);
-                        case  6:  return createDatum                    (code);
-                        case  8:  return createEllipsoid                (code);
-                        case 10:  return createPrimeMeridian            (code);
+                        case  0:  return buffered.createCoordinateReferenceSystem(code);
+                        case  2:  return buffered.createCoordinateSystem         (code);
+                        case  4:  return buffered.createCoordinateSystemAxis     (code);
+                        case  6:  return buffered.createDatum                    (code);
+                        case  8:  return buffered.createEllipsoid                (code);
+                        case 10:  return buffered.createPrimeMeridian            (code);
                         default: throw new AssertionError(i); // Should not happen
                     }
                 }
                 statements.remove(KEY);
                 stmt.close();
             } catch (SQLException exception) {
-                throw new FactoryException(exception);
+                throw databaseFailure(IdentifiedObject.class, code, exception);
             }
         }
         return super.createObject(code);
@@ -829,7 +841,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             result.close();
         }
         catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(Unit.class, code, exception);
         }
         if (returnValue == null) {
             throw noSuchAuthorityCode(Unit.class, code);
@@ -893,8 +905,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        Logger.getLogger("org.geotools.referencing").warning(Resources.format(
-                                            ResourceKeys.WARNING_AMBIGUOUS_ELLIPSOID));
+                        LOGGER.warning(Resources.format(ResourceKeys.WARNING_AMBIGUOUS_ELLIPSOID));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);
@@ -907,7 +918,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(Ellipsoid.class, code, exception);
         }
         if (returnValue == null) {
              throw noSuchAuthorityCode(Ellipsoid.class, code);
@@ -951,7 +962,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(PrimeMeridian.class, code, exception);
         }
         if (returnValue == null) {
             throw noSuchAuthorityCode(PrimeMeridian.class, code);
@@ -1011,7 +1022,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(Extent.class, code, exception);
         }
         if (returnValue == null) {
             throw noSuchAuthorityCode(Extent.class, code);
@@ -1106,7 +1117,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             final GeodeticDatum datum;
             try {
                 safetyGuard.add(code);
-                datum = createGeodeticDatum(info.target);
+                datum = buffered.createGeodeticDatum(info.target);
             } finally {
                 safetyGuard.remove(code);
             }
@@ -1198,8 +1209,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                  */
                 if (type.equalsIgnoreCase("geodetic")) {
                     properties = new HashMap(properties); // Protect from changes
-                    final Ellipsoid         ellipsoid = createEllipsoid    (getString(result, 8, code));
-                    final PrimeMeridian      meridian = createPrimeMeridian(getString(result, 9, code));
+                    final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result, 8, code));
+                    final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 9, code));
                     final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
                     if (param != null) {
                         result = null; // Already closed by createBursaWolfParameters
@@ -1226,7 +1237,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(Datum.class, code, exception);
         }
         if (returnValue == null) {
             throw noSuchAuthorityCode(Datum.class, code);
@@ -1387,16 +1398,14 @@ public class DefaultFactory extends AbstractAuthorityFactory
                         case 2: cs=factory.createPolarCS(properties, axis[0], axis[1]); break;
                     }
                 } else if (type.equalsIgnoreCase("cylindrical")) {
-// TODO: Needs a geoapi.jar update.
-//                    switch (dimension) {
-//                        case 3: cs=factory.createCylindricalCS(properties, axis[0], axis[1], axis[2]); break;
-//                    }
+                    switch (dimension) {
+                        case 3: cs=factory.createCylindricalCS(properties, axis[0], axis[1], axis[2]); break;
+                    }
                 } else if (type.equalsIgnoreCase("affine")) {
-// TODO: Needs a geoapi.jar update.
-//                    switch (dimension) {
-//                        case 2: cs=factory.createAffineCS(properties, axis[0], axis[1]); break;
-//                        case 3: cs=factory.createAffineCS(properties, axis[0], axis[1], axis[2]); break;
-//                    }
+                    switch (dimension) {
+                        case 2: cs=factory.createAffineCS(properties, axis[0], axis[1]); break;
+                        case 3: cs=factory.createAffineCS(properties, axis[0], axis[1], axis[2]); break;
+                    }
                 } else {
                     result.close();
                     throw new FactoryException(Resources.format(
@@ -1410,7 +1419,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            throw databaseFailure(CoordinateSystem.class, code, exception);
         }
         if (returnValue == null) {
             throw noSuchAuthorityCode(CoordinateSystem.class, code);
@@ -1469,8 +1478,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                 {
                     final String csCode       = getString(result, 6, code);
                     final String dmCode       = getString(result, 7, code);
-                    final EllipsoidalCS cs    = createEllipsoidalCS(csCode);
-                    final GeodeticDatum datum = createGeodeticDatum(dmCode);
+                    final EllipsoidalCS cs    = buffered.createEllipsoidalCS(csCode);
+                    final GeodeticDatum datum = buffered.createGeodeticDatum(dmCode);
                     crs = factory.createGeographicCRS(
                           createProperties(name, code, area, scope, remarks), datum, cs);
                 }
@@ -1485,8 +1494,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                     final String geoCode    = getString(result, 8, code);
                     final String conversion = getString(result, 9, code);
                     result.close(); // Must be close before createGeographicCRS
-                    final CartesianCS   cs     = createCartesianCS(csCode);
-                    final GeographicCRS geoCRS = createGeographicCRS(geoCode);
+                    final CartesianCS   cs     = buffered.createCartesianCS(csCode);
+                    final GeographicCRS geoCRS = buffered.createGeographicCRS(geoCode);
                     stmt = prepareStatement("Projection", "SELECT COORD_OP_NAME,"
                                                         +       " AREA_OF_USE_CODE,"
                                                         +       " COORD_OP_SCOPE,"
@@ -1534,8 +1543,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                 else if (type.equalsIgnoreCase("vertical")) {
                     final String        csCode = getString(result, 6, code);
                     final String        dmCode = getString(result, 7, code);
-                    final VerticalCS    cs     = createVerticalCS   (csCode);
-                    final VerticalDatum datum  = createVerticalDatum(dmCode);
+                    final VerticalCS    cs     = buffered.createVerticalCS   (csCode);
+                    final VerticalDatum datum  = buffered.createVerticalDatum(dmCode);
                     crs = factory.createVerticalCRS(
                           createProperties(name, code, area, scope, remarks), datum, cs);
                 }
@@ -1551,8 +1560,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                     result.close();
                     result = null;
                     final CoordinateReferenceSystem crs1, crs2;
-                    crs1 = createCoordinateReferenceSystem(code1);
-                    crs2 = createCoordinateReferenceSystem(code2);
+                    crs1 = buffered.createCoordinateReferenceSystem(code1);
+                    crs2 = buffered.createCoordinateReferenceSystem(code2);
                     crs  = factory.createCompoundCRS(
                            createProperties(name, code, area, scope, remarks),
                            new CoordinateReferenceSystem[] {crs1, crs2});
@@ -1563,8 +1572,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                 else if (type.equalsIgnoreCase("geocentric")) {
                     final String           csCode = getString(result, 6, code);
                     final String           dmCode = getString(result, 7, code);
-                    final CoordinateSystem cs     = createCoordinateSystem(csCode);
-                    final GeodeticDatum    datum  = createGeodeticDatum   (dmCode);
+                    final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
+                    final GeodeticDatum    datum  = buffered.createGeodeticDatum   (dmCode);
                     final Map properties = createProperties(name, code, area, scope, remarks);
                     if (cs instanceof CartesianCS) {
                         crs = factory.createGeocentricCRS(properties, datum, (CartesianCS) cs);
@@ -1582,8 +1591,8 @@ public class DefaultFactory extends AbstractAuthorityFactory
                 else if (type.equalsIgnoreCase("engineering")) {
                     final String           csCode = getString(result, 6, code);
                     final String           dmCode = getString(result, 7, code);
-                    final CoordinateSystem cs     = createCoordinateSystem(csCode);
-                    final EngineeringDatum datum  = createEngineeringDatum(dmCode);
+                    final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
+                    final EngineeringDatum datum  = buffered.createEngineeringDatum(dmCode);
                     crs = factory.createEngineeringCRS(
                           createProperties(name, code, area, scope, remarks), datum, cs);
                 }
@@ -1603,7 +1612,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             }
             result.close();
         } catch (SQLException exception) {
-            throw new FactoryException(code, exception);
+            throw databaseFailure(CoordinateReferenceSystem.class, code, exception);
         }
         if (returnValue == null) {
              throw noSuchAuthorityCode(CoordinateReferenceSystem.class, code);
@@ -1786,6 +1795,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
             throw new FactoryException(exception);
         }
         super.dispose();
+        LOGGER.fine("EPSG connection closed."); // TODO: localize
     }
 
     /**
@@ -1799,11 +1809,23 @@ public class DefaultFactory extends AbstractAuthorityFactory
     }
 
     /**
+     * Constructs an exception for a database failure.
+     *
+     * @todo localize
+     */
+    private static FactoryException databaseFailure(final Class type, final String code,
+                                                    final SQLException cause)
+    {
+        return new FactoryException("Database failure will constructing a " +
+                Utilities.getShortName(type) + "for code \""+code+"\".", cause);
+    }
+
+    /**
      * Constructs an object from the EPSG database and print its WKT (Well Know Text) to
      * the standard output. This method can be invoked from the command line. For example:
      *
      * <blockquote><pre>
-     * java org.geotools.referencing.epsg.DefaultFactory 4181
+     * java org.geotools.referencing.epsg.EPSGFactory 4181
      * </pre></blockquote>
      *
      * Should print:
@@ -1818,7 +1840,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
      *       Set the EPSG database URL. The URL must conform to
      *       {@link DriverManager#getConnection(String)} specification. The default value
      *       is <code>jdbc:odbc:EPSG</code>. The specified URL is stored in system preferences
-     *       and will become the default URL every time an <code>DefaultFactory</code>
+     *       and will become the default URL every time an <code>EPSGFactory</code>
      *       is created without explicit URL. The "<code>default</code>" string reset the default
      *       URL.
      *       <br><br>
@@ -1826,13 +1848,13 @@ public class DefaultFactory extends AbstractAuthorityFactory
      *   <strong><code>-driver</code></strong><br>
      *       Set the driver class. The default value is <code>sun.jdbc.odbc.JdbcOdbcDriver</code>.
      *       The specified classname is stored in system preferences and will become the default
-     *       driver every time an <code>DefaultFactory</code> is created without explicit
+     *       driver every time an <code>EPSGFactory</code> is created without explicit
      *       driver. The "<code>default</code>" string reset the default driver.
      *       <br><br>
      *
      *   <strong><code>-encoding</code></strong><br>
      *       Set the console encoding for this application output.
-     *       This value has no impact on <code>DefaultFactory</code> behavior.
+     *       This value has no impact on <code>EPSGFactory</code> behavior.
      * </blockquote>
      *
      * @param args A list of EPSG code to display.
@@ -1844,7 +1866,7 @@ public class DefaultFactory extends AbstractAuthorityFactory
         final PrintWriter     out = arguments.out;
         final String       driver = arguments.getOptionalString("-driver");
         final String   connection = arguments.getOptionalString("-connection");
-        final Preferences   prefs = Preferences.systemNodeForPackage(DefaultFactory.class);
+        final Preferences   prefs = Preferences.systemNodeForPackage(EPSGFactory.class);
         if (driver != null) {
             if (driver.equalsIgnoreCase("default")) {
                 prefs.remove(DRIVER);
@@ -1861,9 +1883,9 @@ public class DefaultFactory extends AbstractAuthorityFactory
         }
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         try {
-            DefaultFactory factory = null;
+            EPSGFactory factory = null;
             try {
-                factory = new DefaultFactory();
+                factory = new EPSGFactory();
                 for (int i=0; i<args.length; i++) {
                     out.println(factory.createObject(args[i]));
                 }
