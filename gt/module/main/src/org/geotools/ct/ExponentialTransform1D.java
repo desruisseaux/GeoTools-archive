@@ -334,7 +334,7 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
          */
         public Provider(final boolean logarithm) {
             super(logarithm ? "Logarithmic" : "Exponential",
-                  logarithm ? ResourceKeys.LOGARITHM : ResourceKeys.EXPONENTIAL,
+                  logarithm ? ResourceKeys.LOGARITHMIC : ResourceKeys.EXPONENTIAL,
                   null);
             this.logarithm = logarithm;
             put("base", 10, POSITIVE_RANGE);

@@ -59,7 +59,7 @@ public interface ResourceKeys
     public static final int LATITUDE                                    =    35;
     public static final int LOADED_JDBC_DRIVER_$3                       =    36;
     public static final int LOCAL                                       =    37;
-    public static final int LOGARITHM                                   =    38;
+    public static final int LOGARITHMIC                                 =    38;
     public static final int LONGITUDE                                   =    39;
     public static final int MOLODENSKI_TRANSFORM                        =    40;
     public static final int NADCON_TRANSFORM                            =    41;

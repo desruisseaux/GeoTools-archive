@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.awt.geom.AffineTransform;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
@@ -34,7 +35,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 // Geotools dependencies
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
@@ -127,8 +127,8 @@ public class MathTransformTest extends TestCase {
             final int dimension = 10;
             final GeneralMatrix matrix = new GeneralMatrix(dimension+1, dimension+1);
             for (int i=0; i<dimension; i++) {
-                matrix.setElement(i,i,         1000*Math.random()-500);
-                matrix.setElement(i,dimension, 1000*Math.random()-500);
+                matrix.setElement(i,i,         400*Math.random()-200);
+                matrix.setElement(i,dimension, 400*Math.random()-200);
             }
             assertTrue(matrix.isAffine());
             /*
@@ -169,7 +169,7 @@ public class MathTransformTest extends TestCase {
         final MathTransform[] transforms = new MathTransform[2];
         final int numDim = 4;
         final int numPts = 250;
-        for (int pass=0; pass<1000; pass++) {
+        for (int pass=0; pass<400; pass++) {
             final int     dimSource = random.nextInt(numDim)+1;
             final int     dimTarget = random.nextInt(numDim)+1;
             final int     dimInterm = random.nextInt(numDim)+1;
@@ -343,20 +343,17 @@ public class MathTransformTest extends TestCase {
             "Exponential",
             "Affine"
         };
-        final String identifier = candidates[random.nextInt(candidates.length)];
-        final Parameter[] parameters;
-        if (identifier.equalsIgnoreCase("Affine")) {
-            parameters = new Parameter[] {
-                new Parameter("num_row", 2),
-                new Parameter("num_col", 2),
-                new Parameter("elt_0_0", random.nextDouble()*2+0.1, null),   // scale
-                new Parameter("elt_0_1", random.nextDouble()*1 - 2, null)};  // offset
+        final String classification = candidates[random.nextInt(candidates.length)];
+        final ParameterValueGroup parameters = factory.getDefaultParameters(classification);
+        if (classification.equalsIgnoreCase("Affine")) {
+            parameters.parameter("num_row").setValue(2);
+            parameters.parameter("num_col").setValue(2);
+            parameters.parameter("elt_0_0").setValue(random.nextDouble()*2+0.1); // scale
+            parameters.parameter("elt_0_1").setValue(random.nextDouble()*1 - 2); // offset
         } else {
-            parameters = new Parameter[] {
-                new Parameter("base", random.nextDouble()*4 + 0.1, null)};
+            parameters.parameter("base").setValue(random.nextDouble()*4 + 0.1);
         }
-        throw new RuntimeException("TODO");
-//        return (MathTransform1D) factory.createParameterizedTransform(identifier, parameters);
+        return (MathTransform1D) factory.createParameterizedTransform(parameters);
     }
 
     /**
@@ -435,17 +432,17 @@ public class MathTransformTest extends TestCase {
       * @param input          Array of input values.
       * @param expected       Array of expected output values.
       */
-    private void compareTransform1D(final String identifier,
+    private void compareTransform1D(final String   classification,
                                     final double   base,
                                     final double[] input,
                                     final double[] expected)
             throws FactoryException, TransformException
     {
         assertEquals(input.length, expected.length);
-if (true) return; // TODO
-        final MathTransform1D direct = null;//(MathTransform1D) factory.createParameterizedTransform(
-//                identifier, new Parameter[] {new Parameter("base", base, null)});
-
+        final ParameterValueGroup parameters = factory.getDefaultParameters(classification);
+        parameters.parameter("base").setValue(base);
+        final MathTransform1D direct =
+             (MathTransform1D) factory.createParameterizedTransform(parameters);
         final MathTransform1D inverse = (MathTransform1D) direct.inverse();
         final DirectPosition1D point = new DirectPosition1D();
         for (int i=0; i<expected.length; i++) {

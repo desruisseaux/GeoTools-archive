@@ -248,17 +248,21 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #getDefaultParameters
      * @see #getAvailableTransforms
      */
-    public MathTransform createParameterizedTransform(final ParameterValueGroup parameters)
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws FactoryException
     {
         final String classification = parameters.getDescriptor().getName().getCode();
         final MathTransformProvider provider = getProvider(classification);
         MathTransform tr;
         try {
+            parameters = provider.ensureValidValues(parameters);
             tr = provider.createMathTransform(parameters);
         } catch (IllegalArgumentException exception) {
-            throw new FactoryException(exception);
-        } catch (IllegalStateException exception) {
+            /*
+             * Catch only exceptions which may be the result of improper parameter
+             * usage (e.g. a value out of range). Do not catch exception caused by
+             * programming errors (e.g. null pointer).
+             */
             throw new FactoryException(exception);
         }
         tr = (MathTransform) pool.canonicalize(tr);

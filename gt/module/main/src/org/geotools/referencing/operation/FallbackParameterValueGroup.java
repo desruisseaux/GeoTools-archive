@@ -50,7 +50,7 @@ final class FallbackParameterValueGroup extends ParameterGroup {
      * The expected parameter descriptor. Will be used in order to create default values
      * when the requested value was not found.
      */
-    private final ParameterDescriptorGroup fallback;
+    protected final ParameterDescriptorGroup fallback;
     
     /**
      * Construct a parameter group from the specified list of parameters.

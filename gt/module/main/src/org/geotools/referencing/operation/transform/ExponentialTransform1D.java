@@ -138,12 +138,9 @@ public class ExponentialTransform1D extends AbstractMathTransform
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue[] parameters = new ParameterValue[scale!=1 ? 2 : 1];
-        switch (parameters.length) {
-            case 2: parameters[1] = new ParameterReal(Provider.SCALE, scale); // fall through
-            case 1: parameters[0] = new ParameterReal(Provider.BASE,  base);  // fall through
-        }
-        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, parameters);
+        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, new ParameterValue[] {
+            new ParameterReal(Provider.BASE,  base),
+            new ParameterReal(Provider.SCALE, scale)});
     }
     
     /**

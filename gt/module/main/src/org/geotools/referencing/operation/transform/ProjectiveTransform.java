@@ -473,10 +473,9 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            values = ensureValidValues(values);
             return create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
         }
     }

@@ -134,12 +134,9 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue[] parameters = new ParameterValue[offset!=0 ? 2 : 1];
-        switch (parameters.length) {
-            case 2: parameters[1] = new ParameterReal(Provider.OFFSET, offset); // fall through
-            case 1: parameters[0] = new ParameterReal(Provider.BASE,   base);   // fall through
-        }
-        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, parameters);
+        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, new ParameterValue[] {
+            new ParameterReal(Provider.BASE,   base),
+            new ParameterReal(Provider.OFFSET, offset)});
     }
     
     /**
@@ -309,7 +306,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
                         new Identifier(Citation.GEOTOOLS,
-                            Resources.formatInternational(ResourceKeys.LOGARITHM))
+                            Resources.formatInternational(ResourceKeys.LOGARITHMIC))
                      }, new ParameterDescriptor[] {
                         BASE, OFFSET
                      });
@@ -320,7 +317,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         public Provider() {
             super(1, 1, PARAMETERS);
         }
-        
+
         /**
          * Creates a logarithmic transform from the specified group of parameter values.
          *

@@ -188,8 +188,13 @@ public abstract class MathTransformProvider extends OperationMethod {
              * unless assertions are enabled.
              */
             IllegalArgumentException e;
-            assert (e=assertValidValues(values.values(), parameters))!=null : e;
+            assert (e=assertValidValues(values.values(), parameters))==null : e;
             return values;
+        }
+        if (values instanceof FallbackParameterValueGroup) {
+            if (parameters.equals(((FallbackParameterValueGroup) values).fallback)) {
+                return values;
+            }
         }
         final Collection asList = values.values();
         ensureValidValues(asList, parameters);
@@ -263,7 +268,6 @@ public abstract class MathTransformProvider extends OperationMethod {
      * Subclasses should implements this method as in the example below:
      *
      * <blockquote><pre>
-     * values = {@linkplain #ensureValidValues ensureValidValues}(values);
      * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
      * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
      * // etc...

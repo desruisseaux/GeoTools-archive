@@ -982,10 +982,9 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * @throws FactoryException if there is a problem creating this 
          *         math transform.
          */
-        protected MathTransform createMathTransform(ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
             throws ParameterNotFoundException, FactoryException
         {
-            values = ensureValidValues(values);
             return new NADCONTransform(
                 stringValue(LAT_DIFF_FILE,  values),
                 stringValue(LONG_DIFF_FILE, values));
