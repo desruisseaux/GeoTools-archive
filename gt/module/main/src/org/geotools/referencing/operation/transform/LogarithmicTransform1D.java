@@ -329,8 +329,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(values.getValue("base"  ).doubleValue(),
-                          values.getValue("offset").doubleValue());
+            return create(doubleValue(values, BASE),
+                          doubleValue(values, OFFSET));
         }
 
         /**

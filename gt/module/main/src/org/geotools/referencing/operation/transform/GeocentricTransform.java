@@ -633,9 +633,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            final double  semiMajor = values.getValue("semi_major").doubleValue();
-            final double  semiMinor = values.getValue("semi_minor").doubleValue();
-            final int dimGeographic = values.getValue("dim"       ).intValue();
+            final int dimGeographic =    intValue(values, DIM);
+            final double  semiMajor = doubleValue(values, SEMI_MAJOR);
+            final double  semiMinor = doubleValue(values, SEMI_MINOR);
             return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
         }
 

@@ -253,6 +253,66 @@ public abstract class MathTransformProvider extends OperationMethod {
             throws ParameterNotFoundException;
 
     /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by constructor for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  group The parameter value group to search into.
+     * @param  param The parameter to look for.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo Revisit if a more elaborated test is needed for choosing an identifier.
+     */
+    private static ParameterValue getValue(final ParameterValueGroup group,
+                                           final OperationParameter  param)
+            throws ParameterNotFoundException
+    {
+        final Identifier[] identifiers = param.getIdentifiers();
+        final String name;
+        if (identifiers!=null && identifiers.length!=0) {
+            name = identifiers[0].getCode();
+        } else {
+            name = param.getName(null);
+        }
+        return group.getValue(name);
+    }
+
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by constructor for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  group The parameter value group to search into.
+     * @param  param The parameter to look for.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     */
+    protected static int intValue(final ParameterValueGroup group,
+                                  final OperationParameter  param)
+            throws ParameterNotFoundException
+    {
+        return getValue(group, param).intValue();
+    }
+
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by constructor for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  group The parameter value group to search into.
+     * @param  param The parameter to look for.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     */
+    protected static double doubleValue(final ParameterValueGroup group,
+                                        final OperationParameter  param)
+            throws ParameterNotFoundException
+    {
+        return getValue(group, param).doubleValue();
+    }
+
+    /**
      * Returns the resources key for {@linkplain #getName localized name}.
      * This method is for internal purpose by Geotools implementation only.
      */

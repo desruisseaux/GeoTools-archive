@@ -363,8 +363,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(values.getValue("base" ).doubleValue(),
-                          values.getValue("scale").doubleValue());
+            return create(doubleValue(values, BASE),
+                          doubleValue(values, SCALE));
         }
 
         /**

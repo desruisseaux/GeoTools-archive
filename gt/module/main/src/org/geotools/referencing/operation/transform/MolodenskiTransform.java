@@ -67,11 +67,12 @@ import org.geotools.resources.cts.ResourceKeys;
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
- * @version $Id:$
+ * @version $Id$
  * @author Rueben Schulz
+ *
+ * @see AbridgedMolodenskiTransform
  */
-class MolodenskiTransform extends AbstractMathTransform implements Serializable {
-    
+public class MolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -124,52 +125,38 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
     private final double e2;
     
     /**
-     * Construct a MolodenskiTransform from the specified datums.
-     *
-     * @param source source horizontal datum you are transforming from.
-     * @param target target horizontal datum you are transforming to.
-     * @param source3D <code>true</code> if the source geographic CRS has a Z-axis (3 dimentional)
-     * @param target3D <code>true</code> if the target geographic CRS has a Z-axis (3 dimentional)
-     */
-//This cannot be ported until a WGS84 Parameters replacement is completed.
-//This should call MolodenskiTransform(ParameterValueGroup).
-//    protected MolodenskiTransform(final HorizontalDatum source,
-//                                          final HorizontalDatum target,
-//                                          final boolean source3D, final boolean target3D)
-//    {
-        
-//    }
-    
-    /**
-     * Construct a MolodenskiTransform from the specified parameters.
+     * Construct a Molodenski transform from the specified parameters.
      * 
-     * @param  parameters The parameter values in standard units.
+     * @param a        The source semi-major axis length in meters.
+     * @param b        The source semi-minor axis length in meters.
+     * @param source3D <code>true</code> if the source has a height.
+     * @param ta       The target semi-major axis length in meters.
+     * @param tb       The target semi-minor axis length in meters.
+     * @param target3D <code>true</code> if the target has a height.
+     * @param dx       The <var>x</var> translation in meters.
+     * @param dy       The <var>y</var> translation in meters.
+     * @param dz       The <var>z</var> translation in meters.
      */
-    protected MolodenskiTransform(final ParameterValueGroup values) {
-        final int dim = values.getValue("dim").intValue();
-        switch (dim) {
-            case 2:  source3D=target3D=false; break;
-            case 3:  source3D=target3D=true;  break;
-            default: throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
-        }
-        final double ta, tb, f;
-        dx = values.getValue("dx").doubleValue();
-        dy = values.getValue("dy").doubleValue();
-        dz = values.getValue("dz").doubleValue();
-        a  = values.getValue("src_semi_major").doubleValue();
-        b  = values.getValue("src_semi_minor").doubleValue();
-        ta = values.getValue("tgt_semi_major").doubleValue();
-        tb = values.getValue("tgt_semi_minor").doubleValue();
-        da = ta - a;
-        db = tb - b;
-        a_b = a/b;
-        b_a = b/a;
-        daa = da*a;
-        da_a = da/a;
-        f  = (a-b)/a;
-        df = (ta-tb)/ta - f;
-        e2  = 1 - (b*b)/(a*a);
+    protected MolodenskiTransform(final double  a, final double  b, final boolean source3D,
+                                  final double ta, final double tb, final boolean target3D,
+                                  final double dx, final double dy, final double  dz)
+    {
+        this.source3D = source3D;
+        this.target3D = target3D;
+        this.dx       = dx;
+        this.dy       = dy;
+        this.dz       = dz;
+        this.a        = a;
+        this.b        = b;
+
+        da    =  ta - a;
+        db    =  tb - b;
+        a_b   =  a/b;
+        b_a   =  b/a;
+        daa   =  da*a;
+        da_a  =  da/a;
+        df    =  (ta-tb)/ta - (a-b)/a;
+        e2    =  1 - (b*b)/(a*a);
     }
     
     /**
@@ -333,11 +320,8 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
     public static class Provider extends MathTransformProvider {
         /**
          * Serial number for interoperability with different versions.
-         *
-         * @toDo serialver gives me the same value for MolodenskiTransform as 
-         *       for MolodenskiTransform$Provider
          */
-        //private static final long serialVersionUID = 6831719006135449291L;
+        private static final long serialVersionUID = -5332126871499059030L;
 
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
@@ -432,8 +416,21 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
         protected MathTransform createMathTransform(final ParameterValueGroup values) 
                 throws ParameterNotFoundException 
         {
-            return new MolodenskiTransform(values);
+            final boolean hasHeight;
+            final int dim = intValue(values, Provider.DIM);
+            switch (dim) {
+                case 2:  hasHeight=false; break;
+                case 3:  hasHeight=true;  break;
+                default: throw new IllegalArgumentException(Resources.format(
+                               ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
+            }
+            return new MolodenskiTransform(doubleValue(values, SRC_SEMI_MAJOR),
+                                           doubleValue(values, SRC_SEMI_MINOR), hasHeight,
+                                           doubleValue(values, TGT_SEMI_MAJOR),
+                                           doubleValue(values, TGT_SEMI_MINOR), hasHeight,
+                                           doubleValue(values, DX),
+                                           doubleValue(values, DY),
+                                           doubleValue(values, DZ));
         }
     }
-    
 }

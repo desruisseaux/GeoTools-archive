@@ -18,51 +18,42 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.cs;
+package org.geotools.referencing.datum;
 
 // J2SE dependencies
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+import org.opengis.referencing.operation.Matrix;
+
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.wkt.Formattable;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
- * Parameters for a geographic transformation into WGS84.
+ * Parameters for a geographic transformation between two datum.
  * The Bursa Wolf parameters should be applied to geocentric coordinates,
- * where the X axis points towards the Greenwich Prime Meridian, the Y axis
- * points East, and the Z axis points North.
+ * where the <var>X</var> axis points towards the Greenwich Prime Meridian,
+ * the <var>Y</var> axis points East, and the <var>Z</var> axis points North.
+ * The "Bursa-Wolf" formula is expressed in matrix form with 7 parameters:
+ *
+ * <p align="center"><img src="../doc-files/BursaWolf.png"></p>
  *
  * @version $Id$
- * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
- *
- * @see org.opengis.cs.CS_WGS84ConversionInfo
- *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.BursaWolfParameters}.
  */
-public class WGS84ConversionInfo implements Cloneable, Serializable {
+public class BursaWolfParameters extends Formattable implements Cloneable, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3427461418504464735L;
+    private static final long serialVersionUID = 754825592343010900L;
     
     /** Bursa Wolf shift in meters. */
     public double dx;
@@ -86,12 +77,12 @@ public class WGS84ConversionInfo implements Cloneable, Serializable {
     public double ppm;
     
     /** Human readable text describing intended region of transformation. */
-    public String areaOfUse;
+    public String domainOfValidity;
     
     /**
-     * Constructs a conversion info with all parameters set to 0.
+     * Constructs a transformation info with all parameters set to 0.
      */
-    public WGS84ConversionInfo() {
+    public BursaWolfParameters() {
     }
 
     /**
@@ -117,7 +108,7 @@ public class WGS84ConversionInfo implements Cloneable, Serializable {
         //       suppose to take the sinus of rotation angles?
         final double  S = 1 + ppm/1E+6;
         final double RS = (Math.PI/(180*3600)) * S;
-        return new Matrix(4,4, new double[] {
+        return new GeneralMatrix(4,4, new double[] {
                  S,  -ez*RS,  +ey*RS,  dx,
             +ez*RS,       S,  -ex*RS,  dy,
             -ey*RS,  +ex*RS,       S,  dz,
@@ -151,19 +142,16 @@ public class WGS84ConversionInfo implements Cloneable, Serializable {
             return super.clone();
         }  catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
-            final InternalError error = new InternalError(exception.getMessage());
-            error.initCause(exception);
-            throw error;
+            throw new AssertionError(exception);
         }
     }
     
     /**
-     * Compares the specified object with
-     * this object for equality.
+     * Compares the specified object with this object for equality.
      */
     public boolean equals(final Object object) {
-        if (object instanceof WGS84ConversionInfo) {
-            final WGS84ConversionInfo that = (WGS84ConversionInfo) object;
+        if (object instanceof BursaWolfParameters) {
+            final BursaWolfParameters that = (BursaWolfParameters) object;
             return Double.doubleToLongBits(this.dx)  == Double.doubleToLongBits(that.dx)  &&
                    Double.doubleToLongBits(this.dy)  == Double.doubleToLongBits(that.dy)  &&
                    Double.doubleToLongBits(this.dz)  == Double.doubleToLongBits(that.dz)  &&
@@ -171,26 +159,30 @@ public class WGS84ConversionInfo implements Cloneable, Serializable {
                    Double.doubleToLongBits(this.ey)  == Double.doubleToLongBits(that.ey)  &&
                    Double.doubleToLongBits(this.ez)  == Double.doubleToLongBits(that.ez)  &&
                    Double.doubleToLongBits(this.ppm) == Double.doubleToLongBits(that.ppm) &&
-                   Utilities.equals(this.areaOfUse, that.areaOfUse);
+                   Utilities.equals(this.domainOfValidity, that.domainOfValidity);
         }
         return false;
     }
     
     /**
-     * Returns the Well Known Text (WKT) for this object.
-     * The WKT is part of OpenGIS's specification and
-     * looks like <code>TOWGS84[dx, dy, dz, ex, ey, ez, ppm]</code>.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element. The WKT contains the parameters in <i>translation</i>,
+     * <i>rotation</i>, <i>scale</i> order, as in
+     * <code>TOWGS84[{@linkplain #dx}, {@linkplain #dy}, {@linkplain #dz},
+     * {@linkplain #ex}, {@linkplain #ey}, {@linkplain #ez}, {@linkplain #ppm}]</code>.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public String toString() {
-        final StringBuffer buffer=new StringBuffer("TOWGS84[");
-        buffer.append(dx);        buffer.append(", ");
-        buffer.append(dy);        buffer.append(", ");
-        buffer.append(dz);        buffer.append(", ");
-        buffer.append(ex);        buffer.append(", ");
-        buffer.append(ey);        buffer.append(", ");
-        buffer.append(ez);        buffer.append(", ");
-        buffer.append(ppm);
-        buffer.append(']');
-        return buffer.toString();
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append(dx);
+        formatter.append(dy);
+        formatter.append(dz);
+        formatter.append(ex);
+        formatter.append(ey);
+        formatter.append(ez);
+        formatter.append(ppm);
+        return "TOWGS84[";
     }
 }

@@ -47,7 +47,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
@@ -597,7 +596,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * because of a {@link SingularMatrixException}, then the exception is
      * wrapped into a {@link NoninvertibleTransformException}.
      */
-    private static Matrix invert(final Matrix matrix) throws NoninvertibleTransformException {
+    static Matrix invert(final Matrix matrix) throws NoninvertibleTransformException {
         try {
             ((GMatrix)matrix).invert();
             return matrix;
