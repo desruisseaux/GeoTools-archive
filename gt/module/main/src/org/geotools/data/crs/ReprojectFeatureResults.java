@@ -31,8 +31,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.JTS;
 import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -79,13 +82,17 @@ public class ReprojectFeatureResults implements FeatureResults {
      *
      * @throws IOException
      * @throws SchemaException
+     * @throws TransformException 
+     * @throws FactoryException 
+     * @throws NoSuchElementException 
+     * @throws OperationNotFoundException 
      * @throws CannotCreateTransformException
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException
      */
     public ReprojectFeatureResults(FeatureResults results,
         CoordinateReferenceSystem destinationCS)
-        throws IOException, SchemaException{
+        throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException{
         if (destinationCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -116,7 +123,7 @@ public class ReprojectFeatureResults implements FeatureResults {
         if (results instanceof ReprojectFeatureResults) {
             ReprojectFeatureResults reproject = (ReprojectFeatureResults) results;
             this.results = reproject.getOrigin();
-            this.transform = CRSService.concatenate(reproject.transform,
+            this.transform = JTS.concatenate(reproject.transform,
                     transform);
         }
     }
@@ -124,7 +131,7 @@ public class ReprojectFeatureResults implements FeatureResults {
     /**
      * @see org.geotools.data.FeatureResults#getSchema()
      */
-    public FeatureType getSchema() throws IOException {
+    public FeatureType getSchema(){
         return schema;
     }
 
