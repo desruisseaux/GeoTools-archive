@@ -202,7 +202,7 @@ public class StyledShapePainter {
                                 width, height);
                         paint = new TexturePaint(image, scaledRect);
                     }
-
+                    
                     graphics.setPaint(paint);
                     graphics.setComposite(ps2d.getFillComposite());
                     graphics.fill(shape);

@@ -132,7 +132,7 @@ class GeomCollectionIterator extends AbstractLiteIterator {
      *
      * @return the specific iterator for the geometry passed.
      */
-    private PathIterator getIterator(Geometry g) {
+    private AbstractLiteIterator getIterator(Geometry g) {
         AbstractLiteIterator pi = null;
 
         if (g instanceof Polygon) {
@@ -154,7 +154,6 @@ class GeomCollectionIterator extends AbstractLiteIterator {
             pi = new PointIterator(p, at);
         }
         
-        pi.setMathTransform(getMathTransform());
         return pi;
     }
 
@@ -250,6 +249,8 @@ class GeomCollectionIterator extends AbstractLiteIterator {
      * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
      */
     public void setMathTransform( MathTransform transform ) {
-        mathTransform=transform;
+        for(int i=0; i<gc.getNumGeometries(); i++){
+            getIterator(gc.getGeometryN(i)).setMathTransform(transform);
+        }
     }
 }
