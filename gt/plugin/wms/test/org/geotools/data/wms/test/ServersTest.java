@@ -21,7 +21,7 @@ import org.geotools.data.wms.WebMapServer;
  */
 public class ServersTest extends TestCase {
     public void testServers() throws Exception{
-    	URL[] servers = new URL[30];
+    	URL[] servers = new URL[50];
 //		servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
 //    	servers[1] = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetCapabilities");
 //    	servers[2] = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
@@ -51,7 +51,7 @@ public class ServersTest extends TestCase {
 //    	servers[23] = new URL("http://atlas.walis.wa.gov.au/servlet/com.esri.wms.Esrimap?VERSION=1.1.0&Request=getcapabilities");
 //    	servers[24] = new URL("http://iceds.ge.ucl.ac.uk/cgi-bin/wms?map=wms.map&SERVICE=WMS&REQUEST=GetCapabilities");
 //    	servers[25] = new URL("http://test.landmap.ac.uk/ecwp/ecw_wms.dll?request=GetCapabilities&service=wms");
-    	
+//    	servers[26] = new URL("http://emandev.cciw.ca/cgi-bin/mapserver/mapserv.exe?REQUEST=GetCapabilities&MAP=C:/Inetpub/wwwroot/emanco/cgi-bin/mapserver/naturewatch.map&VERSION=1.1.1&SERVICE=WMS");
    	
     	for (int i = 0; i < servers.length; i++) {
     		if (servers[i] != null) {
