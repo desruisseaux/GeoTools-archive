@@ -3,7 +3,7 @@ package org.geotools.data.wfs;
 
 import java.util.List;
 
-import org.geotools.data.wms.getCapabilities.MetadataURL;
+import org.geotools.data.wms.capabilities.MetadataURL;
 
 import com.vividsolutions.jts.geom.Envelope;
 

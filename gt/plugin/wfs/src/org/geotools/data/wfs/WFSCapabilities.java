@@ -1,7 +1,7 @@
 
 package org.geotools.data.wfs;
 
-import org.geotools.data.wms.getCapabilities.Service;
+import org.geotools.data.wms.capabilities.Service;
 
 /**
  * <p> 
